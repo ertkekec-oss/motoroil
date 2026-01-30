@@ -125,12 +125,17 @@ export interface Campaign {
 export interface Coupon {
     id: string;
     code: string;
+    campaignName?: string;
     type: 'percent' | 'amount';
     value: number;
     minPurchaseAmount: number;
     customerCategoryId?: string;
     customerId?: string;
+    startDate?: string;
     expiryDate?: string;
+    conditions?: any;
+    usageLimit: number;
+    usedCount: number;
     isUsed: boolean;
 }
 
@@ -216,7 +221,7 @@ interface AppContextType {
     transactions: Transaction[];
     setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
     addTransaction: (t: Omit<Transaction, 'id' | 'date'>) => void;
-    processSale: (saleData: { items: { productId: number | string, qty: number }[], total: number, discountAmount?: number, kasaId: number | string, description: string, paymentMode?: string, customerId?: string | number, customerName?: string, installments?: number, installmentLabel?: string, pointsUsed?: number, couponCode?: string }) => Promise<boolean>;
+    processSale: (saleData: { items: { productId: number | string, qty: number }[], total: number, discountAmount?: number, kasaId: number | string, description: string, paymentMode?: string, customerId?: string | number, customerName?: string, installments?: number, installmentLabel?: string, pointsUsed?: number, couponCode?: string, referenceCode?: string }) => Promise<boolean>;
     staff: Staff[];
     setStaff: (staff: Staff[]) => void;
     currentUser: Staff | null; // null means System Admin
@@ -317,6 +322,8 @@ interface AppContextType {
     updateWarranties: (list: string[]) => void;
     paymentMethods: PaymentMethod[];
     updatePaymentMethods: (methods: PaymentMethod[]) => Promise<void>;
+    appSettings: Record<string, any>;
+    updateAppSetting: (key: string, value: any) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -465,37 +472,58 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const [suspendedSales, setSuspendedSales] = useState<SuspendedSale[]>([]);
 
-    // Persist suspended sales to localStorage
     useEffect(() => {
-        const saved = localStorage.getItem('suspendedSales');
-        if (saved) {
+        const fetchSuspended = async () => {
             try {
-                setSuspendedSales(JSON.parse(saved).map((s: any) => ({
-                    ...s,
-                    timestamp: new Date(s.timestamp)
-                })));
-            } catch (e) { console.error('Error parsing suspendedSales', e); }
-        }
+                const res = await fetch('/api/suspended-sales');
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    setSuspendedSales(data.map((s: any) => ({
+                        ...s,
+                        timestamp: new Date(s.createdAt)
+                    })));
+                }
+            } catch (e) { console.error('Error fetching suspendedSales', e); }
+        };
+        fetchSuspended();
+
+        // Optional: Poll for changes if needed
+        const interval = setInterval(fetchSuspended, 30000); // 30s
+        return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        localStorage.setItem('suspendedSales', JSON.stringify(suspendedSales));
-    }, [suspendedSales]);
-
-    const suspendSale = (label: string, items: { product: Product, qty: number }[], customer: Customer | null, total: number) => {
-        const newSuspendedSale: SuspendedSale = {
-            id: Math.random().toString(36).substr(2, 9),
+    const suspendSale = async (label: string, items: { product: Product, qty: number }[], customer: Customer | null, total: number) => {
+        const payload = {
             label: label || `Müşteri ${suspendedSales.length + 1}`,
-            items: JSON.parse(JSON.stringify(items)), // Deep clone
-            customer,
-            timestamp: new Date(),
-            total
+            items: JSON.parse(JSON.stringify(items)),
+            customer: customer ? { name: customer.name, id: customer.id } : null,
+            total,
+            branch: activeBranchName
         };
-        setSuspendedSales(prev => [...prev, newSuspendedSale]);
+
+        try {
+            const res = await fetch('/api/suspended-sales', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const saved = await res.json();
+                setSuspendedSales(prev => [{ ...saved, timestamp: new Date(saved.createdAt) }, ...prev]);
+            }
+        } catch (e) {
+            console.error('Error suspending sale', e);
+            // Fallback to local if needed, but here we require DB success
+        }
     };
 
-    const removeSuspendedSale = (id: string) => {
-        setSuspendedSales(prev => prev.filter(sale => sale.id !== id));
+    const removeSuspendedSale = async (id: string) => {
+        try {
+            const res = await fetch(`/api/suspended-sales?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setSuspendedSales(prev => prev.filter(sale => sale.id !== id));
+            }
+        } catch (e) { console.error('Error removing suspended sale', e); }
     };
 
     const [currentUser, setCurrentUser] = useState<Staff | null>(null);
@@ -529,10 +557,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const [appSettings, setAppSettings] = useState<Record<string, any>>({});
+    const refreshAppSettings = async () => {
+        try {
+            const res = await fetch('/api/settings');
+            const data = await res.json();
+            if (data && !data.error) setAppSettings(data);
+        } catch (e) { console.error('App setting error', e); }
+    };
+
+    const updateAppSetting = async (key: string, value: any) => {
+        setAppSettings(prev => ({ ...prev, [key]: value }));
+        try {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [key]: value })
+            });
+        } catch (e) { console.error('Update app setting error', e); }
+    };
+
     useEffect(() => {
         refreshPending();
         refreshSecurityEvents();
         refreshStockTransfers();
+        refreshAppSettings();
     }, []);
 
     // --- BRANCHES ---
@@ -543,10 +592,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             const res = await fetch('/api/branches', { cache: 'no-store' });
             const data = await res.json();
             if (data.success) {
-                setBranches(data.branches);
+                let branchList = data.branches || [];
+
+                // Ensure 'Merkez' branch always exists
+                const hasMerkez = branchList.some((b: Branch) => b.name === 'Merkez');
+                if (!hasMerkez) {
+                    // Add Merkez as a fallback
+                    branchList = [
+                        { id: 0, name: 'Merkez', type: 'Merkez', status: 'Aktif' },
+                        ...branchList
+                    ];
+                }
+
+                // Sort: Merkez first, then others
+                branchList.sort((a: Branch, b: Branch) => {
+                    if (a.name === 'Merkez') return -1;
+                    if (b.name === 'Merkez') return 1;
+                    return a.name.localeCompare(b.name);
+                });
+
+                setBranches(branchList);
             }
         } catch (error) {
             console.error('Branches fetch failed', error);
+            // Fallback to Merkez only
+            setBranches([
+                { id: 0, name: 'Merkez', type: 'Merkez', status: 'Aktif' }
+            ]);
         }
     };
 
@@ -822,7 +894,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }));
     };
 
-    const processSale = async (saleData: { items: { productId: number | string, qty: number }[], total: number, discountAmount?: number, kasaId: number | string, description: string, paymentMode?: string, customerId?: string | number, customerName?: string, installments?: number, installmentLabel?: string, pointsUsed?: number, couponCode?: string }) => {
+    const processSale = async (saleData: {
+        items: { productId: number | string, qty: number }[],
+        total: number,
+        discountAmount?: number,
+        kasaId: number | string,
+        description: string,
+        paymentMode?: string,
+        customerId?: string | number,
+        customerName?: string,
+        installments?: number,
+        installmentLabel?: string,
+        pointsUsed?: number,
+        couponCode?: string,
+        referenceCode?: string
+    }) => {
         // 1. Update Local Inventory (Optimistic UI)
         setProducts(prevProducts => prevProducts.map(p => {
             const saleItem = saleData.items.find(si => si.productId === p.id);
@@ -911,7 +997,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                     earnedPoints,
                     pointsUsed: saleData.pointsUsed || 0,
                     couponCode: saleData.couponCode,
-                    installmentLabel: saleData.installmentLabel // Pass the label explicitly
+                    installmentLabel: saleData.installmentLabel,
+                    referenceCode: saleData.referenceCode
                 })
             });
 
@@ -1430,11 +1517,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             refreshCampaigns,
             coupons,
             refreshCoupons,
-            refreshCoupons,
             referralSettings,
             updateReferralSettings,
             paymentMethods,
-            updatePaymentMethods
+            updatePaymentMethods,
+            appSettings,
+            updateAppSetting
         }}>
             {children}
         </AppContext.Provider>

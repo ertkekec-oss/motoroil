@@ -1,16 +1,18 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
 import Pagination from '@/components/Pagination';
+import { useSearchParams } from 'next/navigation';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function CustomersPage() {
+    const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('all');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid'); // New: View Toggle
     const { customers, currentUser, hasPermission, suppClasses, custClasses } = useApp();
@@ -65,7 +67,21 @@ export default function CustomersPage() {
 
     // --- ADD CUSTOMER LOGIC ---
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [newCustomer, setNewCustomer] = useState({
+        name: '',
+        phone: '',
+        email: '',
+        address: '',
+        taxNumber: '',
+        taxOffice: '',
+        contactPerson: '',
+        iban: '',
+        customerClass: '',
+        referredByCode: ''
+    });
+    const [editCustomer, setEditCustomer] = useState<any>({
+        id: '',
         name: '',
         phone: '',
         email: '',
@@ -112,6 +128,65 @@ export default function CustomersPage() {
             setIsProcessing(false);
         }
     };
+
+    const handleEditCustomer = async () => {
+        if (!editCustomer.name) {
+            showWarning("Eksik Bilgi", "İsim zorunludur!");
+            return;
+        }
+
+        if (isProcessing) return;
+
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/customers', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editCustomer)
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess("Başarılı", "Müşteri başarıyla güncellendi.");
+                setIsEditModalOpen(false);
+                setEditCustomer({ id: '', name: '', phone: '', email: '', address: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '' });
+                window.location.reload();
+            } else {
+                showError("Hata", data.error || "Beklenmedik bir hata oluştu.");
+            }
+
+        } catch (error: any) {
+            console.error(error);
+            showError("Hata", "Müşteri güncellenirken bir hata oluştu.");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    // Handle edit parameter from URL
+    useEffect(() => {
+        const editId = searchParams.get('edit');
+        if (editId && customers.length > 0) {
+            const customerToEdit = customers.find(c => c.id === editId);
+            if (customerToEdit) {
+                setEditCustomer({
+                    id: customerToEdit.id,
+                    name: customerToEdit.name || '',
+                    phone: customerToEdit.phone || '',
+                    email: customerToEdit.email || '',
+                    address: customerToEdit.address || '',
+                    taxNumber: (customerToEdit as any).taxNumber || '',
+                    taxOffice: (customerToEdit as any).taxOffice || '',
+                    contactPerson: (customerToEdit as any).contactPerson || '',
+                    iban: (customerToEdit as any).iban || '',
+                    customerClass: (customerToEdit as any).customerClass || '',
+                    referredByCode: (customerToEdit as any).referredByCode || ''
+                });
+                setIsEditModalOpen(true);
+                // Clear URL parameter
+                window.history.replaceState({}, '', '/customers');
+            }
+        }
+    }, [searchParams, customers]);
 
     const handleDeleteCustomer = (id: string | number) => {
         if (!canDelete) return;
@@ -292,52 +367,188 @@ export default function CustomersPage() {
 
             {/* CONTENT AREA */}
             {viewMode === 'grid' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
                     {paginatedCustomers.map(cust => (
-                        <div key={cust.id} className="card glass hover-scale" style={{ padding: '0', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <div style={{ padding: '24px', background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div
+                            key={cust.id}
+                            className="card glass hover-scale"
+                            style={{
+                                padding: '0',
+                                overflow: 'hidden',
+                                border: '1px solid rgba(255,255,255,0.08)',
+                                background: 'linear-gradient(135deg, rgba(15,17,26,0.95) 0%, rgba(20,22,35,0.95) 100%)',
+                                backdropFilter: 'blur(10px)',
+                                transition: 'all 0.3s ease'
+                            }}
+                        >
+                            {/* Header with gradient */}
+                            <div style={{
+                                padding: '20px 24px',
+                                background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(37,99,235,0.05) 100%)',
+                                borderBottom: '1px solid rgba(59,130,246,0.1)'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                    {/* Avatar */}
                                     <div style={{
-                                        width: '50px', height: '50px', borderRadius: '12px',
-                                        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: '20px', fontWeight: 'bold', color: 'white',
-                                        boxShadow: '0 4px 10px rgba(59, 130, 246, 0.3)'
+                                        width: '56px',
+                                        height: '56px',
+                                        borderRadius: '16px',
+                                        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '24px',
+                                        fontWeight: '900',
+                                        color: 'white',
+                                        boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
+                                        border: '2px solid rgba(255,255,255,0.1)'
                                     }}>
                                         {cust.name?.charAt(0).toUpperCase()}
                                     </div>
+
+                                    {/* Balance Badge */}
                                     <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontSize: '16px', fontWeight: 'bold', color: cust.balance > 0 ? '#ef4444' : (cust.balance < 0 ? '#10b981' : '#ccc') }}>
+                                        <div style={{
+                                            fontSize: '20px',
+                                            fontWeight: '900',
+                                            color: cust.balance > 0 ? '#ef4444' : (cust.balance < 0 ? '#10b981' : '#94a3b8'),
+                                            textShadow: cust.balance !== 0 ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
+                                        }}>
                                             {formatCurrency(Math.abs(cust.balance))}
                                         </div>
-                                        <div style={{ fontSize: '11px', color: '#888' }}>
-                                            {cust.balance > 0 ? 'Borçlu' : (cust.balance < 0 ? 'Alacaklı' : 'Dengeli')}
+                                        <div style={{
+                                            fontSize: '10px',
+                                            fontWeight: '700',
+                                            color: cust.balance > 0 ? '#ef4444' : (cust.balance < 0 ? '#10b981' : '#64748b'),
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.5px',
+                                            marginTop: '2px'
+                                        }}>
+                                            {cust.balance > 0 ? '● Borçlu' : (cust.balance < 0 ? '● Alacaklı' : '● Dengeli')}
                                         </div>
                                     </div>
                                 </div>
-                                <h3 style={{ margin: '15px 0 5px 0', fontSize: '18px', fontWeight: 'bold', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+
+                                {/* Customer Name */}
+                                <h3 style={{
+                                    margin: '0 0 8px 0',
+                                    fontSize: '18px',
+                                    fontWeight: '800',
+                                    color: 'white',
+                                    letterSpacing: '-0.3px',
+                                    lineHeight: '1.3'
+                                }}>
                                     {cust.name}
                                 </h3>
-                                <div style={{ fontSize: '11px', color: '#00e676', fontWeight: 'bold', marginBottom: '4px' }}>💰 {Number(cust.points || 0).toFixed(0)} Puan | 🗝️ {cust.referralCode}</div>
-                                <div style={{ fontSize: '12px', color: '#888' }}>{cust.category || 'Genel Müşteri'} • {cust.branch || 'Merkez'}</div>
+
+                                {/* Points & Referral Code */}
+                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                                    <span style={{
+                                        fontSize: '11px',
+                                        fontWeight: '700',
+                                        color: '#10b981',
+                                        background: 'rgba(16,185,129,0.1)',
+                                        padding: '4px 10px',
+                                        borderRadius: '6px',
+                                        border: '1px solid rgba(16,185,129,0.2)'
+                                    }}>
+                                        ⭐ {Number(cust.points || 0).toFixed(0)} Puan
+                                    </span>
+                                    <span style={{
+                                        fontSize: '11px',
+                                        fontWeight: '700',
+                                        color: '#8b5cf6',
+                                        background: 'rgba(139,92,246,0.1)',
+                                        padding: '4px 10px',
+                                        borderRadius: '6px',
+                                        border: '1px solid rgba(139,92,246,0.2)'
+                                    }}>
+                                        🔑 {cust.referralCode}
+                                    </span>
+                                </div>
+
+                                {/* Category & Branch */}
+                                <div style={{ display: 'flex', gap: '6px', fontSize: '11px', color: '#94a3b8', fontWeight: '600' }}>
+                                    <span>{cust.category || 'Genel'}</span>
+                                    <span>•</span>
+                                    <span>{cust.branch || 'Merkez'}</span>
+                                </div>
                             </div>
 
-                            <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#aaa' }}>
-                                    <span>📞</span> {cust.phone || '-'}
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#aaa' }}>
-                                    <span>📧</span> {cust.email || '-'}
+                            {/* Contact Info */}
+                            <div style={{ padding: '16px 24px', background: 'rgba(0,0,0,0.2)' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#cbd5e1' }}>
+                                        <span style={{ fontSize: '16px' }}>📞</span>
+                                        <span style={{ fontWeight: '500' }}>{cust.phone || '-'}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#cbd5e1' }}>
+                                        <span style={{ fontSize: '16px' }}>📧</span>
+                                        <span style={{
+                                            fontWeight: '500',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap'
+                                        }}>
+                                            {cust.email || '-'}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div style={{ padding: '16px 24px', background: 'rgba(0,0,0,0.2)', display: 'flex', gap: '10px' }}>
-                                <Link href={`/customers/${cust.id}`} className="btn btn-primary" style={{ flex: 1, textAlign: 'center', padding: '10px', fontSize: '13px', textDecoration: 'none' }}>
-                                    Detay
+                            {/* Action Buttons */}
+                            <div style={{
+                                padding: '16px 24px',
+                                background: 'rgba(0,0,0,0.3)',
+                                borderTop: '1px solid rgba(255,255,255,0.05)',
+                                display: 'flex',
+                                gap: '8px'
+                            }}>
+                                <Link
+                                    href={`/customers/${cust.id}`}
+                                    className="btn btn-primary"
+                                    style={{
+                                        flex: 1,
+                                        textAlign: 'center',
+                                        padding: '12px',
+                                        fontSize: '13px',
+                                        fontWeight: '700',
+                                        textDecoration: 'none',
+                                        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                        border: 'none',
+                                        boxShadow: '0 4px 12px rgba(59,130,246,0.3)'
+                                    }}
+                                >
+                                    📋 Detay & İşlemler
                                 </Link>
-                                <button onClick={() => handleDeleteCustomer(cust.id)} className="btn btn-outline" style={{ padding: '10px', fontSize: '16px', color: '#ff4444', borderColor: '#ff4444' }}>🗑️</button>
-                                <a href={`tel:${cust.phone}`} className="btn btn-outline" style={{ padding: '10px', fontSize: '16px' }}>📞</a>
-                                <a href={`https://wa.me/${cust.phone?.replace(/\s/g, '')}`} target="_blank" className="btn btn-outline" style={{ padding: '10px', fontSize: '16px', color: '#25D366', borderColor: '#25D366' }}>💬</a>
+                                <a
+                                    href={`tel:${cust.phone}`}
+                                    className="btn btn-outline"
+                                    style={{
+                                        padding: '12px 16px',
+                                        fontSize: '18px',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    📞
+                                </a>
+                                <a
+                                    href={`https://wa.me/${cust.phone?.replace(/\s/g, '')}`}
+                                    target="_blank"
+                                    className="btn btn-outline"
+                                    style={{
+                                        padding: '12px 16px',
+                                        fontSize: '18px',
+                                        color: '#25D366',
+                                        background: 'rgba(37,211,102,0.1)',
+                                        border: '1px solid rgba(37,211,102,0.3)',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    💬
+                                </a>
                             </div>
                         </div>
                     ))}
@@ -356,18 +567,18 @@ export default function CustomersPage() {
                         </thead>
                         <tbody>
                             {paginatedCustomers.map(cust => (
-                                <tr key={cust.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s' }} className="hover:bg-white/5">
+                                <tr key={cust.id} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s' }} className="hover-bg">
                                     <td style={{ padding: '20px' }}>
-                                        <div style={{ fontWeight: '600', color: 'white' }}>{cust.name}</div>
+                                        <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>{cust.name}</div>
                                         <div style={{ fontSize: '11px', color: '#00e676' }}>Puan: {Number(cust.points || 0).toFixed(0)} | Kod: {cust.referralCode}</div>
-                                        {(cust as any).taxNumber && <div style={{ fontSize: '12px', color: '#666' }}>VKN: {(cust as any).taxNumber}</div>}
+                                        {(cust as any).taxNumber && <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>VKN: {(cust as any).taxNumber}</div>}
                                     </td>
                                     <td>
-                                        <div style={{ fontSize: '13px', color: '#ccc' }}>{cust.phone}</div>
-                                        <div style={{ fontSize: '12px', color: '#666' }}>{cust.email}</div>
+                                        <div style={{ fontSize: '13px', color: 'var(--text-main)', opacity: 0.8 }}>{cust.phone}</div>
+                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cust.email}</div>
                                     </td>
                                     <td>
-                                        <span style={{ padding: '4px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.1)', fontSize: '11px', color: '#ccc' }}>
+                                        <span style={{ padding: '4px 8px', borderRadius: '4px', background: 'var(--input-bg)', fontSize: '11px', color: 'var(--text-muted)' }}>
                                             {cust.category || 'Genel'}
                                         </span>
                                     </td>
@@ -380,7 +591,7 @@ export default function CustomersPage() {
                                         </span>
                                     </td>
                                     <td style={{ textAlign: 'right', paddingRight: '20px' }}>
-                                        <Link href={`/customers/${cust.id}`} className="btn btn-sm btn-outline" style={{ textDecoration: 'none', marginRight: '8px' }}>Detay</Link>
+                                        <Link href={`/customers/${cust.id}`} className="btn btn-sm btn-primary" style={{ textDecoration: 'none', marginRight: '8px' }}>Detay</Link>
                                         <button onClick={() => handleDeleteCustomer(cust.id)} className="btn btn-sm btn-outline" style={{ color: '#ff4444', borderColor: '#ff4444' }}>Sil</button>
                                     </td>
                                 </tr>
@@ -391,7 +602,7 @@ export default function CustomersPage() {
             )}
 
             {filteredCustomers.length === 0 && (
-                <div style={{ padding: '60px', textAlign: 'center', color: '#888', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.1)', marginTop: '20px' }}>
+                <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--input-bg)', borderRadius: '16px', border: '1px dashed var(--border-light)', marginTop: '20px' }}>
                     <div style={{ fontSize: '48px', marginBottom: '20px', opacity: 0.3 }}>🔍</div>
                     <h3>Kayıt Bulunamadı</h3>
                     <p>Arama kriterlerinize uygun müşteri bulunmuyor.</p>
@@ -406,49 +617,49 @@ export default function CustomersPage() {
 
             {/* ADD CUSTOMER MODAL */}
             {isModalOpen && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
-                    <div className="card glass animate-in" style={{ width: '600px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                            <h3 style={{ margin: 0 }}>👤 Yeni Müşteri Ekle</h3>
-                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-overlay)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+                    <div className="card glass animate-in" style={{ width: '600px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', maxHeight: '90vh', overflowY: 'auto' }}>
+                        <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: '1px solid var(--border-light)' }}>
+                            <h3 style={{ margin: 0, color: 'var(--text-main)' }}>👤 Yeni Müşteri Ekle</h3>
+                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', fontSize: '24px', cursor: 'pointer' }}>×</button>
                         </div>
                         <div className="flex-col gap-4">
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>AD SOYAD / UNVAN <span style={{ color: 'red' }}>*</span></label>
-                                    <input type="text" value={newCustomer.name} onChange={e => setNewCustomer({ ...newCustomer, name: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newCustomer.name} onChange={e => setNewCustomer({ ...newCustomer, name: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>YETKİLİ KİŞİ</label>
-                                    <input type="text" value={newCustomer.contactPerson} onChange={e => setNewCustomer({ ...newCustomer, contactPerson: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newCustomer.contactPerson} onChange={e => setNewCustomer({ ...newCustomer, contactPerson: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
                                 </div>
                             </div>
 
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>TELEFON</label>
-                                    <input type="text" value={newCustomer.phone} onChange={e => setNewCustomer({ ...newCustomer, phone: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newCustomer.phone} onChange={e => setNewCustomer({ ...newCustomer, phone: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>E-POSTA</label>
-                                    <input type="text" value={newCustomer.email} onChange={e => setNewCustomer({ ...newCustomer, email: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newCustomer.email} onChange={e => setNewCustomer({ ...newCustomer, email: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
                                 </div>
                             </div>
 
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>VERGİ NO / TC</label>
-                                    <input type="text" value={newCustomer.taxNumber} onChange={e => setNewCustomer({ ...newCustomer, taxNumber: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newCustomer.taxNumber} onChange={e => setNewCustomer({ ...newCustomer, taxNumber: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>VERGİ DAİRESİ</label>
-                                    <input type="text" value={newCustomer.taxOffice} onChange={e => setNewCustomer({ ...newCustomer, taxOffice: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newCustomer.taxOffice} onChange={e => setNewCustomer({ ...newCustomer, taxOffice: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
                                 </div>
                             </div>
 
                             <div>
                                 <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>IBAN</label>
-                                <input type="text" placeholder="TR..." value={newCustomer.iban} onChange={e => setNewCustomer({ ...newCustomer, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                <input type="text" placeholder="TR..." value={newCustomer.iban} onChange={e => setNewCustomer({ ...newCustomer, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
                             </div>
 
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
@@ -457,7 +668,7 @@ export default function CustomersPage() {
                                     <select
                                         value={newCustomer.customerClass}
                                         onChange={e => setNewCustomer({ ...newCustomer, customerClass: e.target.value })}
-                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
                                     >
                                         <option value="">Sınıf Seçin...</option>
                                         {(custClasses || []).map(cls => (
@@ -467,16 +678,86 @@ export default function CustomersPage() {
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>REFERANS KODU (Varsa)</label>
-                                    <input type="text" value={newCustomer.referredByCode} onChange={e => setNewCustomer({ ...newCustomer, referredByCode: e.target.value.toUpperCase() })} placeholder="DAVET KODU" style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newCustomer.referredByCode} onChange={e => setNewCustomer({ ...newCustomer, referredByCode: e.target.value.toUpperCase() })} placeholder="DAVET KODU" style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
                                 </div>
                             </div>
 
                             <div>
                                 <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ADRES</label>
-                                <textarea value={newCustomer.address} onChange={e => setNewCustomer({ ...newCustomer, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', minHeight: '80px', resize: 'vertical' }} />
+                                <textarea value={newCustomer.address} onChange={e => setNewCustomer({ ...newCustomer, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)', minHeight: '80px', resize: 'vertical' }} />
                             </div>
                             <button onClick={handleAddCustomer} disabled={isProcessing} className="btn btn-primary w-full" style={{ padding: '16px', marginTop: '10px', fontSize: '16px' }}>
                                 {isProcessing ? 'KAYDEDİLİYOR...' : 'KAYDET'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* EDIT CUSTOMER MODAL */}
+            {isEditModalOpen && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+                    <div className="card glass animate-in" style={{ width: '600px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}>
+                        <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                            <h3 style={{ margin: 0 }}>✏️ Müşteri Düzenle</h3>
+                            <button onClick={() => setIsEditModalOpen(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                        </div>
+                        <div className="flex-col gap-4">
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>MÜŞTERİ ADI <span style={{ color: 'red' }}>*</span></label>
+                                    <input type="text" value={editCustomer.name} onChange={e => setEditCustomer({ ...editCustomer, name: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>TELEFON</label>
+                                    <input type="text" value={editCustomer.phone} onChange={e => setEditCustomer({ ...editCustomer, phone: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                            </div>
+
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>E-POSTA</label>
+                                    <input type="text" value={editCustomer.email} onChange={e => setEditCustomer({ ...editCustomer, email: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>MÜŞTERİ SINIFI</label>
+                                    <select value={editCustomer.customerClass} onChange={e => setEditCustomer({ ...editCustomer, customerClass: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}>
+                                        <option value="">Sınıf Seçin...</option>
+                                        {custClasses.map(cls => (
+                                            <option key={cls} value={cls}>{cls}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ NO</label>
+                                    <input type="text" value={editCustomer.taxNumber} onChange={e => setEditCustomer({ ...editCustomer, taxNumber: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ DAİRESİ</label>
+                                    <input type="text" value={editCustomer.taxOffice} onChange={e => setEditCustomer({ ...editCustomer, taxOffice: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-muted" style={{ fontSize: '12px' }}>YETKİLİ KİŞİ</label>
+                                <input type="text" value={editCustomer.contactPerson} onChange={e => setEditCustomer({ ...editCustomer, contactPerson: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                            </div>
+
+                            <div>
+                                <label className="text-muted" style={{ fontSize: '12px' }}>IBAN</label>
+                                <input type="text" placeholder="TR..." value={editCustomer.iban} onChange={e => setEditCustomer({ ...editCustomer, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                            </div>
+
+                            <div>
+                                <label className="text-muted" style={{ fontSize: '12px' }}>ADRES</label>
+                                <textarea value={editCustomer.address} onChange={e => setEditCustomer({ ...editCustomer, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', minHeight: '80px' }} />
+                            </div>
+
+                            <button onClick={handleEditCustomer} disabled={isProcessing} className="btn btn-primary w-full" style={{ padding: '16px', marginTop: '10px' }}>
+                                {isProcessing ? 'GÜNCELLENİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
                             </button>
                         </div>
                     </div>

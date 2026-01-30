@@ -13,7 +13,12 @@ function POSContent() {
     products, kasalar, processSale, customers, transactions, salesExpenses,
     campaigns, stockTransfers, suspendedSales, suspendSale, removeSuspendedSale,
     refreshTransactions,
-    paymentMethods
+    paymentMethods,
+    referralSettings,
+    appSettings,
+    updateAppSetting,
+    refreshCustomers,
+    custClasses // Added for customer class selection
   } = useApp();
   const { showSuccess, showError, showWarning, showConfirm } = useModal();
 
@@ -32,19 +37,76 @@ function POSContent() {
   const [validCoupon, setValidCoupon] = useState<any>(null);
   const [referenceCode, setReferenceCode] = useState('');
 
+
+  // Customer Selection & Adding
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [isAddingCustomer, setIsAddingCustomer] = useState(false);
+  const [newCustomerData, setNewCustomerData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    taxNumber: '',
+    taxOffice: '',
+    contactPerson: '',
+    iban: '',
+    customerClass: '',
+    referredByCode: ''
+  });
+
+  const handleSaveNewCustomer = async () => {
+    if (!newCustomerData.name) {
+      showError('Hata', 'Müşteri adı zorunludur.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/customers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCustomerData)
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (refreshCustomers) await refreshCustomers();
+        setSelectedCustomer(data.customer.name);
+        setIsCustomerModalOpen(false);
+        setIsAddingCustomer(false);
+        setNewCustomerData({ name: '', phone: '', email: '', address: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '' });
+        showSuccess('Başarılı', 'Yeni müşteri oluşturuldu ve seçildi.');
+      } else {
+        showError('Hata', data.error);
+      }
+    } catch (e: any) {
+      showError('Hata', e.message);
+    }
+  };
+
+  const filteredCustomerList = useMemo(() => {
+    let list = customers || [];
+    // Filter out 'Perakende Müşteri' because we will show it explicitly at top
+    list = list.filter(c => c.name !== 'Perakende Müşteri');
+
+    if (customerSearch.trim() === '') {
+      return list.slice(0, 20); // Show recent 20
+    }
+    return list.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()));
+  }, [customers, customerSearch]);
+
   // --- SUSPEND STATES ---
   const [showSuspendModal, setShowSuspendModal] = useState(false);
   const [suspenseLabel, setSuspenseLabel] = useState('');
   const [showResumptionModal, setShowResumptionModal] = useState(false);
+  const [showPromotionsModal, setShowPromotionsModal] = useState(false);
 
   // Discount States
   const [discountType, setDiscountType] = useState<'percent' | 'amount'>('percent');
   const [discountValue, setDiscountValue] = useState(0);
 
-  // Privacy States - Rakamları gizleme
-  const [hideRevenue, setHideRevenue] = useState(false);
-  const [hideProfit, setHideProfit] = useState(false);
-  const [hideExpense, setHideExpense] = useState(false);
+  // Privacy States - Persistent
+  const { hideRevenue, hideProfit, hideExpense } = appSettings.privacySettings || { hideRevenue: false, hideProfit: false, hideExpense: false };
+  const setHideRevenue = (val: boolean) => updateAppSetting('privacySettings', { ...appSettings.privacySettings, hideRevenue: val });
+  const setHideProfit = (val: boolean) => updateAppSetting('privacySettings', { ...appSettings.privacySettings, hideProfit: val });
+  const setHideExpense = (val: boolean) => updateAppSetting('privacySettings', { ...appSettings.privacySettings, hideExpense: val });
 
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => { inputRef.current?.focus(); }, []);
@@ -162,7 +224,34 @@ function POSContent() {
     return totalDiscount;
   }, [paymentMode, campaigns, cart, subtotal]);
 
-  const finalTotal = Math.max(0, subtotal - manualDiscountAmount - couponDiscountAmount - pointsDiscountAmount - campaignDiscountAmount);
+  const totalDiscount = manualDiscountAmount + couponDiscountAmount + pointsDiscountAmount + campaignDiscountAmount;
+  const effectiveDiscountRate = subtotal > 0 ? (totalDiscount / subtotal) * 100 : 0;
+
+  // Calculate VAT Excluded Total
+  const vatExcludedTotal = useMemo(() => {
+    return cart.reduce((sum, item) => {
+      const lineTotal = Number(item.price || 0) * item.qty;
+      // Assume price is Tax Included (default retail behavior) unless flagged otherwise
+      // Use item.salesVat (e.g. 20)
+      const vatRate = typeof item.salesVat === 'number' ? item.salesVat : 20; // Default 20% if missing
+      const isVatIncluded = item.salesVatIncluded !== false; // Default true
+
+      let basePrice = 0;
+      if (isVatIncluded) {
+        basePrice = lineTotal / (1 + (vatRate / 100));
+      } else {
+        // If VAT not included, then price is already base. 
+        // BUT subtotal considers item.price as the gross unit usually in this app logic (from previous context). 
+        // If item.price implies +VAT, then subtotal logic needs update or we assume item.price IS the final visible price.
+        // Let's assume item.price is always what the customer sees on the shelf (Gross).
+        // So we just strip VAT from it.
+        basePrice = lineTotal / (1 + (vatRate / 100));
+      }
+      return sum + basePrice;
+    }, 0);
+  }, [cart]);
+
+  const finalTotal = Math.max(0, subtotal - totalDiscount);
 
   const customer = useMemo(() => {
     return customers.find(c => c.name === selectedCustomer);
@@ -249,6 +338,76 @@ function POSContent() {
     removeSuspendedSale(sale.id);
     setShowResumptionModal(false);
     showSuccess('Geri Yüklendi', 'Askıya alınan sepet başarıyla geri yüklendi.');
+  };
+
+  const handleApplyReference = () => {
+    if (!referenceCode) return;
+
+    const referrer = customers.find(c => c.referralCode?.toUpperCase() === referenceCode.toUpperCase());
+
+    if (referrer) {
+      showSuccess("Referans Geçerli", `${referrer.name} referansı ile indirim uygulandı!`);
+      // Apply the referee gift discount if it exists in settings
+      if (referralSettings?.refereeGift > 0) {
+        setDiscountType('amount');
+        setDiscountValue(referralSettings.refereeGift);
+      }
+    } else {
+      showError("Hata", "Geçersiz referans kodu.");
+    }
+  };
+
+  const handleValidateCoupon = async () => {
+    if (!couponCode) return;
+    try {
+      const res = await fetch(`/api/coupons?code=${couponCode}`);
+      const coupon = await res.json();
+
+      if (!coupon || coupon.error) {
+        showError('Hata', 'Geçersiz kupon kodu.');
+        return;
+      }
+
+      if (coupon.isUsed || (coupon.usageLimit > 0 && coupon.usedCount >= coupon.usageLimit)) {
+        showError('Hata', 'Bu kuponun kullanım limiti dolmuş.');
+        return;
+      }
+
+      const now = new Date();
+      if (coupon.startDate && new Date(coupon.startDate) > now) {
+        showError('Hata', 'Kupon henüz aktif değil.');
+        return;
+      }
+      if (coupon.expiryDate && new Date(coupon.expiryDate) < now) {
+        showError('Hata', 'Kuponun süresi dolmuş.');
+        return;
+      }
+
+      if (coupon.minPurchaseAmount && subtotal < Number(coupon.minPurchaseAmount)) {
+        showError('Hata', `Bu kupon için minimum harcama tutarı: ₺${coupon.minPurchaseAmount}`);
+        return;
+      }
+
+      if (coupon.conditions) {
+        const { brands, categories } = coupon.conditions as any;
+        const hasValidItem = cart.some(item => {
+          const brandMatch = !brands || brands.length === 0 || brands.includes(item.brand);
+          const catMatch = !categories || categories.length === 0 || categories.includes(item.category);
+          return brandMatch && catMatch;
+        });
+
+        if (!hasValidItem && (brands?.length > 0 || categories?.length > 0)) {
+          showError('Hata', 'Kupon sepetinizdeki ürünler için geçerli değil.');
+          return;
+        }
+      }
+
+      setValidCoupon(coupon);
+      showSuccess('Başarılı', 'Kupon başarıyla uygulandı!');
+
+    } catch (e) {
+      showError('Hata', 'Kupon doğrulanırken hata oluştu.');
+    }
   };
 
   return (
@@ -480,7 +639,7 @@ function POSContent() {
             </div>
 
             {/* YOLDAKİ */}
-            <div onClick={() => router.push('/inventory?tab=transfers')} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
+            <div onClick={() => router.push('/inventory?tab=transfers')} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))', border: '1px solid var(--border-subtle)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1 }}>🚚</div>
               <div style={{ fontSize: '9px', fontWeight: '800', color: '#93c5fd', marginBottom: '6px' }}>YOLDAKİ</div>
               <div style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6' }}>{stats.inTransit}</div>
@@ -505,10 +664,29 @@ function POSContent() {
               </div>
             </div>
             {/* Referans Kodu */}
-            <div>
-              <label style={{ fontSize: '9px', opacity: 0.4, fontWeight: '700', display: 'block', marginBottom: '6px' }}>REFERANS KODU</label>
-              <input type="text" placeholder="Opsiyonel..." value={referenceCode} onChange={(e) => setReferenceCode(e.target.value)} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', padding: '10px', borderRadius: '8px', color: 'white', fontSize: '12px', fontWeight: '600' }} />
-            </div>
+            {/* Kod Uygula Butonu */}
+            <button
+              onClick={() => setShowPromotionsModal(true)}
+              style={{
+                width: '100%',
+                padding: '14px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, var(--secondary), #2563eb)',
+                border: 'none',
+                color: 'white',
+                fontWeight: '800',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(59, 130, 246, 0.2)',
+                transition: 'all 0.2s'
+              }}
+            >
+              <span style={{ fontSize: '18px' }}>🎁</span> KOD VEYA REFERANS UYGULA
+            </button>
             {/* İndirim */}
             <div style={{ display: 'flex', gap: '10px' }}>
               <div style={{ flex: 1 }}>
@@ -525,8 +703,42 @@ function POSContent() {
             </div>
             {/* Toplamlar */}
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', opacity: 0.5 }}><span>Ara Toplam</span><span>₺{subtotal.toLocaleString()}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontWeight: '800' }}>TOPLAM</span><span style={{ fontSize: '28px', fontWeight: '900', color: 'var(--primary)' }}>₺{finalTotal.toLocaleString()}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', opacity: 0.5 }}><span>Ara Toplam</span><span>₺{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
+                <span>KDV Hariç</span>
+                <span>₺{vatExcludedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+
+              {manualDiscountAmount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#10b981' }}>
+                  <span>Manuel İndirim</span>
+                  <span>-₺{manualDiscountAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              )}
+              {couponDiscountAmount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#10b981' }}>
+                  <span>Kupon İndirimi ({validCoupon?.code})</span>
+                  <span>-₺{couponDiscountAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              )}
+              {campaignDiscountAmount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#10b981' }}>
+                  <span>Kampanya İndirimi</span>
+                  <span>-₺{campaignDiscountAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              )}
+              {pointsDiscountAmount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#10b981' }}>
+                  <span>Puan Kullanımı</span>
+                  <span>-₺{pointsDiscountAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                <span style={{ fontWeight: '800' }}>TOPLAM</span>
+                <span style={{ fontSize: '28px', fontWeight: '900', color: 'var(--primary)' }}>₺{finalTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
             </div>
             <div style={{ flex: 1 }}></div>
             {/* Ödeme Yöntemleri */}
@@ -657,32 +869,301 @@ function POSContent() {
       {/* MODALS */}
       {isCustomerModalOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setIsCustomerModalOpen(false)}>
-          <div style={{ background: 'var(--bg-card)', width: '500px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)', padding: '24px' }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}><h3>MÜŞTERİ SEÇİMİ</h3><button onClick={() => setIsCustomerModalOpen(false)}>×</button></div>
-            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-              {customers.map((c, i) => (
-                <div key={i} onClick={() => { setSelectedCustomer(c.name); setIsCustomerModalOpen(false); }} style={{ padding: '12px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{c.name}</div>
-              ))}
+          <div style={{ background: 'var(--bg-card)', width: '800px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '85vh' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0 }}>MÜŞTERİ SEÇİMİ</h3>
+              <button onClick={() => setIsCustomerModalOpen(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '20px', cursor: 'pointer' }}>×</button>
             </div>
+
+            {/* Add New Customer Toggle/Form */}
+            {!isAddingCustomer ? (
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input
+                  type="text"
+                  placeholder="🔍 Müşteri ara..."
+                  value={customerSearch}
+                  onChange={(e) => setCustomerSearch(e.target.value)}
+                  autoFocus
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}
+                />
+                <button
+                  onClick={() => setIsAddingCustomer(true)}
+                  className="btn-primary"
+                  style={{ padding: '0 16px', borderRadius: '8px', fontSize: '12px', whiteSpace: 'nowrap' }}
+                >
+                  + YENİ EKLE
+                </button>
+              </div>
+            ) : (
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ fontWeight: '700', fontSize: '12px', color: 'var(--primary)', marginBottom: '4px' }}>YENİ MÜŞTERİ OLUŞTUR</div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="Ad Soyad / Firma Adı *"
+                    value={newCustomerData.name}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, name: e.target.value })}
+                    style={{ padding: '8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Yetkili Kişi"
+                    value={newCustomerData.contactPerson}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, contactPerson: e.target.value })}
+                    style={{ padding: '8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Telefon"
+                    value={newCustomerData.phone}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, phone: e.target.value })}
+                    style={{ padding: '8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px' }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="E-posta"
+                    value={newCustomerData.email}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, email: e.target.value })}
+                    style={{ padding: '8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Vergi No"
+                    value={newCustomerData.taxNumber}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, taxNumber: e.target.value })}
+                    style={{ padding: '8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Vergi Dairesi"
+                    value={newCustomerData.taxOffice}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, taxOffice: e.target.value })}
+                    style={{ padding: '8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px' }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="IBAN (TR...)"
+                    value={newCustomerData.iban}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, iban: e.target.value })}
+                    style={{ padding: '8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px' }}
+                  />
+                  <select
+                    value={newCustomerData.customerClass}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, customerClass: e.target.value })}
+                    style={{ padding: '8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px' }}
+                  >
+                    <option value="">Sınıf Seç...</option>
+                    {(custClasses || []).map(cls => (
+                      <option key={cls} value={cls}>{cls}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Ref. Kodu"
+                    value={newCustomerData.referredByCode}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, referredByCode: e.target.value.toUpperCase() })}
+                    style={{ padding: '8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px' }}
+                  />
+                </div>
+
+                <textarea
+                  placeholder="Adres"
+                  value={newCustomerData.address}
+                  onChange={(e) => setNewCustomerData({ ...newCustomerData, address: e.target.value })}
+                  style={{ padding: '8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', minHeight: '40px', resize: 'vertical', fontSize: '13px' }}
+                />
+
+                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                  <button onClick={handleSaveNewCustomer} className="btn-primary" style={{ flex: 1, padding: '10px', borderRadius: '6px', fontSize: '13px' }}>KAYDET & SEÇ</button>
+                  <button onClick={() => setIsAddingCustomer(false)} style={{ padding: '10px 20px', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', cursor: 'pointer' }}>İPTAL</button>
+                </div>
+              </div>
+            )}
+
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', minHeight: '300px' }}>
+              {/* Always Show Perakende Default */}
+              <div
+                onClick={() => { setSelectedCustomer('Perakende Müşteri'); setIsCustomerModalOpen(false); }}
+                style={{
+                  padding: '14px',
+                  cursor: 'pointer',
+                  background: selectedCustomer === 'Perakende Müşteri' ? 'var(--primary-20)' : 'rgba(255,255,255,0.03)',
+                  border: '1px solid var(--primary)',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}
+              >
+                <div style={{ background: 'var(--primary)', padding: '8px', borderRadius: '50%', fontSize: '16px' }}>🏬</div>
+                <div style={{ fontWeight: '700' }}>Perakende Müşteri</div>
+              </div>
+
+              {filteredCustomerList.map((c, i) => (
+                <div key={i} onClick={() => { setSelectedCustomer(c.name); setIsCustomerModalOpen(false); }} className="customer-row" style={{ padding: '12px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.03)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontWeight: '600' }}>{c.name}</div>
+                    <div style={{ fontSize: '11px', opacity: 0.5 }}>{c.phone || c.email || 'İletişim yok'}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontWeight: '700', color: (c.points || 0) > 0 ? '#fbbf24' : 'rgba(255,255,255,0.3)' }}>
+                      {c.points ? `✨ ${c.points} P` : ''}
+                    </div>
+                    {c.balance !== 0 && (
+                      <div style={{ fontSize: '11px', color: c.balance > 0 ? '#ef4444' : '#10b981' }}>
+                        {c.balance > 0 ? `Borç: ₺${c.balance}` : `Alacak: ₺${Math.abs(c.balance)}`}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {filteredCustomerList.length === 0 && (
+                <div style={{ padding: '20px', textAlign: 'center', opacity: 0.4, fontSize: '13px' }}>
+                  Kayıt bulunamadı. Yeni ekleyebilirsiniz.
+                </div>
+              )}
+            </div>
+
+            <style jsx>{`
+                .customer-row:hover { background: rgba(255,255,255,0.05); border-radius: 8px; }
+            `}</style>
           </div>
         </div>
       )}
 
       {showResumptionModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: 'var(--bg-card)', width: '500px', borderRadius: '16px', padding: '24px' }}>
-            <h3>ASKIDAKİ SEPETLER</h3>
-            {suspendedSales.map(s => <div key={s.id} onClick={() => handleResumeSale(s.id)} style={{ padding: '12px', cursor: 'pointer' }}>{s.label} - ₺{s.total}</div>)}
-            <button onClick={() => setShowResumptionModal(false)}>KAPAT</button>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(5px)' }} onClick={() => setShowResumptionModal(false)}>
+          <div style={{ background: 'var(--bg-card)', width: '600px', borderRadius: '16px', padding: '24px', border: '1px solid var(--border-light)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>⏳ ASKIDAKİ SEPETLER</h3>
+              <button
+                onClick={() => setShowResumptionModal(false)}
+                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', cursor: 'pointer', width: '32px', height: '32px', borderRadius: '50%' }}
+              >✕</button>
+            </div>
+
+            <div style={{ maxHeight: '400px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {suspendedSales.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'rgba(255,255,255,0.3)' }}>Askıda satış bulunmuyor.</div>
+              ) : suspendedSales.map(s => (
+                <div key={s.id} style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+                  className="hover:bg-white/5"
+                >
+                  <div onClick={() => handleResumeSale(s.id)} style={{ flex: 1 }}>
+                    <div style={{ fontWeight: '700', fontSize: '14px', marginBottom: '4px' }}>{s.label}</div>
+                    <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', display: 'flex', gap: '12px' }}>
+                      <span>👤 {s.customer?.name || 'Müşteri Yok'}</span>
+                      <span>📦 {s.items.length} Ürün</span>
+                      <span>🕒 {new Date(s.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div style={{ fontWeight: '800', fontSize: '16px', color: 'var(--primary)' }}>₺{Number(s.total).toLocaleString()}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <button
+                        onClick={() => handleResumeSale(s.id)}
+                        className="btn-primary"
+                        style={{ padding: '6px 12px', fontSize: '11px', borderRadius: '6px' }}
+                      >SEÇ</button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          showConfirm('Sil?', 'Bu askıdaki satışı silmek istediğinize emin misiniz?', () => removeSuspendedSale(s.id));
+                        }}
+                        style={{ padding: '6px 12px', fontSize: '11px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', border: 'none', cursor: 'pointer' }}
+                      >SİL</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ marginTop: '20px', textAlign: 'right', fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>
+              Toplam {suspendedSales.length} bekleyen işlem
+            </div>
           </div>
         </div>
       )}
 
-      <style jsx>{`
-        .stat-card-modern:hover { transform: translateY(-4px); }
-        .cart-item:hover { background: rgba(255,255,255,0.06) !important; }
-        .qty-btn { width: 32px; height: 32px; cursor: pointer; }
-      `}</style>
+      {showPromotionsModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 3500, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }} onClick={() => setShowPromotionsModal(false)}>
+          <div style={{ background: 'var(--bg-card)', width: '450px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.1)', padding: '32px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '900', margin: 0, color: 'var(--primary)' }}>🎁 KOD UYGULA</h2>
+              <button
+                onClick={() => setShowPromotionsModal(false)}
+                style={{ background: 'rgba(120,120,120,0.1)', border: 'none', color: 'white', cursor: 'pointer', width: '32px', height: '32px', borderRadius: '50%', fontWeight: '900' }}
+              >✕</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {/* Referans Kodu */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <label style={{ fontSize: '11px', opacity: 0.5, fontWeight: '800', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>REFERANS KODU</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="Müşteri referans kodu..."
+                    value={referenceCode}
+                    onChange={(e) => setReferenceCode(e.target.value)}
+                    style={{ flex: 1, background: 'var(--bg-deep)', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '10px', color: 'white', fontSize: '14px', outline: 'none' }}
+                  />
+                  <button
+                    onClick={() => { handleApplyReference(); }}
+                    className="btn btn-primary"
+                    style={{ padding: '0 20px', borderRadius: '10px', fontWeight: '800', fontSize: '12px' }}
+                  >UYGULA</button>
+                </div>
+              </div>
+
+              {/* Kupon Kodu */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <label style={{ fontSize: '11px', opacity: 0.5, fontWeight: '800', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>İNDİRİM KUPONU</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="Kupon kodunuz..."
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    style={{ flex: 1, background: 'var(--bg-deep)', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '10px', color: 'white', fontSize: '14px', outline: 'none' }}
+                  />
+                  <button
+                    onClick={() => { handleValidateCoupon(); }}
+                    className="btn-primary"
+                    style={{ padding: '0 20px', borderRadius: '10px', fontWeight: '800', fontSize: '12px', background: 'var(--success)', borderColor: 'var(--success)' }}
+                  >UYGULA</button>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowPromotionsModal(false)}
+                className="btn btn-ghost"
+                style={{ width: '100%', padding: '14px', borderRadius: '12px', fontSize: '13px', fontWeight: '700', color: 'var(--text-muted)' }}
+              >PENCEREYİ KAPAT</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

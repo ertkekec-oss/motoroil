@@ -82,7 +82,7 @@ export default function Sidebar() {
                 </div>
 
                 <div style={{ padding: '0 24px 24px 24px' }}>
-                    <div style={{ fontSize: '9px', fontWeight: '900', color: 'rgba(255,255,255,0.3)', letterSpacing: '1.5px', marginBottom: '8px', textTransform: 'uppercase' }}>Operasyonel Şube</div>
+                    <div style={{ fontSize: '9px', fontWeight: '900', color: 'var(--text-muted)', opacity: 0.5, letterSpacing: '1.5px', marginBottom: '8px', textTransform: 'uppercase' }}>Operasyonel Şube</div>
                     <select
                         disabled={hasPermission('branch_isolation') && !isSystemAdmin}
                         value={activeBranchName}
@@ -164,7 +164,7 @@ export default function Sidebar() {
                         width: '40px', height: '40px', borderRadius: '14px',
                         background: (displayUser.role?.includes('Admin') || currentUser === null) ? 'var(--primary)' : 'var(--success)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0,
-                        boxShadow: '0 8px 16px rgba(0,0,0,0.3)'
+                        boxShadow: 'var(--shadow-premium)'
                     }}>
                         {(displayUser.role?.includes('Admin') || currentUser === null) ? '⚡' : '👤'}
                     </div>
@@ -215,11 +215,11 @@ export default function Sidebar() {
                     background: transparent;
                 }
                 .sidebar-scroll::-webkit-scrollbar-thumb {
-                    background: rgba(255, 255, 255, 0.05);
+                    background: var(--border-rich);
                     border-radius: 10px;
                 }
                 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-                    background: rgba(255, 255, 255, 0.2);
+                    background: var(--text-muted);
                 }
             `}</style>
         </aside>

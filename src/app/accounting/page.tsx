@@ -591,13 +591,13 @@ export default function AccountingPage() {
                     <div>
                         <div className="flex-between mb-4"><h3>Tahsil Edilecekler</h3><button onClick={() => openModal('receivable')} className="btn btn-primary">+ Tahsilat Ekle</button></div>
                         <table className="w-full text-left">
-                            <thead className="text-muted text-xs border-b border-white/10"><tr><th className="p-3">Cari Bilgisi</th><th>Vade</th><th>Kalan Tutar</th><th>Durum</th><th></th></tr></thead>
+                            <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Cari Bilgisi</th><th>Vade</th><th>Kalan Tutar</th><th>Durum</th><th></th></tr></thead>
                             <tbody>
                                 {paginate([...filterByBranch(receivables), ...customerReceivables]).map(item => (
-                                    <tr key={item.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                    <tr key={item.id} className="border-b border-subtle hover-bg transition-colors">
                                         <td className="p-4"><div>{item.title}</div><div className="text-xs text-muted">{item.date}</div></td>
                                         <td>{item.due}</td><td className="font-bold">{Math.abs(item.amount).toLocaleString()} ₺</td>
-                                        <td><span className="text-xs bg-white/10 px-2 py-1 rounded">{item.status}</span></td>
+                                        <td><span className="text-xs bg-subtle px-2 py-1 rounded">{item.status}</span></td>
                                         <td className="text-right">
                                             <button onClick={() => handleCollect(item)} className="btn btn-outline text-xs mr-2 border-primary text-primary hover:bg-primary hover:text-white">Tahsil Et</button>
                                         </td>
@@ -613,13 +613,13 @@ export default function AccountingPage() {
                     <div>
                         <div className="flex-between mb-4"><h3>Ödemeler</h3><button onClick={() => openModal('payable')} className="btn btn-primary">+ Ödeme Ekle</button></div>
                         <table className="w-full text-left">
-                            <thead className="text-muted text-xs border-b border-white/10"><tr><th className="p-3">Cari Bilgisi</th><th>Vade</th><th>Borç Tutarı</th><th>Durum</th><th></th></tr></thead>
+                            <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Cari Bilgisi</th><th>Vade</th><th>Borç Tutarı</th><th>Durum</th><th></th></tr></thead>
                             <tbody>
                                 {paginate([...filterByBranch(payables), ...supplierPayables]).map(item => (
-                                    <tr key={item.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                    <tr key={item.id} className="border-b border-subtle hover-bg transition-colors">
                                         <td className="p-4"><div>{item.title}</div><div className="text-xs text-muted">{item.date}</div></td>
                                         <td>{item.due}</td><td className="font-bold text-danger">{item.amount.toLocaleString()} ₺</td>
-                                        <td><span className="text-xs bg-white/10 px-2 py-1 rounded">{item.status}</span></td>
+                                        <td><span className="text-xs bg-subtle px-2 py-1 rounded">{item.status}</span></td>
                                         <td className="text-right">
                                             <button onClick={() => handlePay(item)} className="btn btn-outline text-xs mr-2 border-primary text-primary hover:bg-primary hover:text-white">Öde</button>
                                         </td>
@@ -635,17 +635,17 @@ export default function AccountingPage() {
                     <div>
                         <div className="flex-between mb-4"><h3>Çek & Senet Portföyü</h3><button onClick={() => setShowCheckModal(true)} className="btn btn-primary">+ Ekle</button></div>
                         <table className="w-full text-left">
-                            <thead className="text-muted text-xs border-b border-white/10"><tr><th className="p-3">Tür</th><th>Muhatap</th><th>Vade</th><th>Banka</th><th>Tutar</th><th>Durum</th><th></th></tr></thead>
+                            <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Tür</th><th>Muhatap</th><th>Vade</th><th>Banka</th><th>Tutar</th><th>Durum</th><th></th></tr></thead>
                             <tbody>
                                 {checks.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-muted">Kayıtlı evrak bulunmuyor.</td></tr>}
                                 {paginate(checks).map(c => (
-                                    <tr key={c.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                    <tr key={c.id} className="border-b border-subtle hover-bg transition-colors">
                                         <td className="p-4"><b>{c.type}</b></td>
                                         <td>{c.customer?.name || c.supplier?.name || '-'}</td>
                                         <td>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
                                         <td className="text-muted">{c.bank}</td>
                                         <td className="font-bold">{Number(c.amount).toLocaleString()} ₺</td>
-                                        <td><span className="text-xs bg-white/10 px-2 py-1 rounded">{c.status}</span></td>
+                                        <td><span className="text-xs bg-subtle px-2 py-1 rounded">{c.status}</span></td>
                                         <td className="text-right">
                                             {c.status === 'Beklemede' && (
                                                 <button
@@ -703,7 +703,7 @@ export default function AccountingPage() {
                             {kasalar.map(k => (
                                 <div key={k.id} className="card glass-plus relative overflow-hidden group">
                                     <div className="flex-between mb-2">
-                                        <span className="text-[10px] tracking-widest uppercase text-muted bg-white/5 px-2 py-1 rounded">{k.type}</span>
+                                        <span className="text-[10px] tracking-widest uppercase text-muted bg-subtle px-2 py-1 rounded">{k.type}</span>
                                         <div className="flex gap-2">
                                             {canDelete && <button onClick={() => handleEditKasa(k)} className="text-muted hover:text-primary transition-colors">✏️</button>}
                                             {canDelete && <button onClick={() => handleDeleteKasa(k.id.toString(), k.balance)} className="text-muted hover:text-danger transition-colors">🗑️</button>}
@@ -722,12 +722,12 @@ export default function AccountingPage() {
                     <div>
                         <div className="flex-between mb-4"><h3>Gider Kayıtları</h3><button onClick={() => { setIsEditingExpense(false); setShowExpenseModal(true); }} className="btn btn-primary">+ Gider Ekle</button></div>
                         <table className="w-full text-left">
-                            <thead className="text-muted text-xs border-b border-white/10"><tr><th className="p-3">Açıklama</th><th>Kategori</th><th>Tarih</th><th>Tutar</th><th>Ödeme</th><th></th></tr></thead>
+                            <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Açıklama</th><th>Kategori</th><th>Tarih</th><th>Tutar</th><th>Ödeme</th><th></th></tr></thead>
                             <tbody>
                                 {paginate(expenses).map(e => (
-                                    <tr key={e.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                    <tr key={e.id} className="border-b border-subtle hover-bg transition-colors">
                                         <td className="p-4"><b>{e.title}</b></td>
-                                        <td><span className="text-xs bg-white/10 px-2 py-1 rounded">{e.category}</span></td>
+                                        <td><span className="text-xs bg-subtle px-2 py-1 rounded">{e.category}</span></td>
                                         <td className="text-muted">{e.date}</td>
                                         <td className="font-bold text-danger">{e.amount.toLocaleString()} ₺</td>
                                         <td className="text-xs text-muted">{e.method}</td>

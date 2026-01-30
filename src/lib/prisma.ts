@@ -133,6 +133,14 @@ const prismaClientSingleton = () => {
                     },
                 },
             },
+            suspendedSale: {
+                total: {
+                    needs: { total: true },
+                    compute(sale) {
+                        return Number(sale.total);
+                    },
+                },
+            },
         },
     });
 };

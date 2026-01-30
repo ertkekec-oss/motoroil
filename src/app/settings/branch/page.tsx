@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 
@@ -9,22 +9,33 @@ export default function BranchSettingsPage() {
     const { showSuccess } = useModal();
     const isSystemAdmin = currentUser === null;
 
-    // Branch configuration state (Hardcoded default for now, could be dynamic)
-    const [branchConfigs, setBranchConfigs] = useState<{ [branch: string]: number[] }>({
-        'Merkez': [1, 2, 3],
-    });
-
     const branches = contextBranches?.length > 0 ? contextBranches.map(b => b.name) : ['Merkez', 'Kadıköy'];
 
-    const toggleKasaForBranch = (branch: string, kasaId: number) => {
-        const currentKasalar = branchConfigs[branch] || [];
-        const newKasalar = currentKasalar.includes(kasaId)
-            ? currentKasalar.filter(id => id !== kasaId)
-            : [...currentKasalar, kasaId];
+    // Branch configuration state
+    const [branchConfigs, setBranchConfigs] = useState<{ [branch: string]: number[] }>({});
 
-        setBranchConfigs({
-            ...branchConfigs,
-            [branch]: newKasalar
+    // Initialize branch configs when branches are loaded
+    useEffect(() => {
+        if (branches.length > 0 && Object.keys(branchConfigs).length === 0) {
+            const configs: { [branch: string]: number[] } = {};
+            branches.forEach(branch => {
+                configs[branch] = branch === 'Merkez' ? [1, 2, 3] : [];
+            });
+            setBranchConfigs(configs);
+        }
+    }, [branches]);
+
+    const toggleKasaForBranch = (branch: string, kasaId: number) => {
+        setBranchConfigs(prevConfigs => {
+            const currentKasalar = prevConfigs[branch] || [];
+            const newKasalar = currentKasalar.includes(kasaId)
+                ? currentKasalar.filter(id => id !== kasaId)
+                : [...currentKasalar, kasaId];
+
+            return {
+                ...prevConfigs,
+                [branch]: newKasalar
+            };
         });
     };
 

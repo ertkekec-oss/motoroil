@@ -32,15 +32,53 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const data = await request.json();
+
+        // Multi-generate support
+        if (data.count && data.count > 1) {
+            const count = parseInt(data.count);
+            const coupons = [];
+            const prefix = data.campaignName ? data.campaignName.substring(0, 3).toUpperCase() : 'CPN';
+
+            for (let i = 0; i < count; i++) {
+                const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+                const code = `${prefix}-${randomSuffix}`;
+
+                coupons.push({
+                    code,
+                    campaignName: data.campaignName,
+                    type: data.type,
+                    value: data.value,
+                    minPurchaseAmount: data.minPurchaseAmount || 0,
+                    customerCategoryId: data.customerCategoryId,
+                    startDate: data.startDate ? new Date(data.startDate) : new Date(),
+                    expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+                    conditions: data.conditions || { brands: [], categories: [] },
+                    usageLimit: data.usageLimit || 1,
+                    usedCount: 0,
+                    isUsed: false
+                });
+            }
+
+            const result = await prisma.coupon.createMany({
+                data: coupons
+            });
+            return NextResponse.json({ success: true, count: result.count });
+        }
+
         const coupon = await prisma.coupon.create({
             data: {
                 code: data.code || Math.random().toString(36).substring(2, 8).toUpperCase(),
+                campaignName: data.campaignName,
                 type: data.type,
                 value: data.value,
-                minPurchaseAmount: data.minPurchaseAmount,
+                minPurchaseAmount: data.minPurchaseAmount || 0,
                 customerCategoryId: data.customerCategoryId,
                 customerId: data.customerId,
-                expiryDate: data.expiryDate ? new Date(data.expiryDate) : undefined,
+                startDate: data.startDate ? new Date(data.startDate) : new Date(),
+                expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+                conditions: data.conditions || { brands: [], categories: [] },
+                usageLimit: data.usageLimit || 1,
+                usedCount: 0,
                 isUsed: false
             }
         });

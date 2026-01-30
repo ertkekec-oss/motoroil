@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 import StatementModal from '@/components/modals/StatementModal';
+import Pagination from '@/components/Pagination';
 
 export default function CustomerDetailClient({ customer, historyList }: { customer: any, historyList: any[] }) {
     const router = useRouter();
@@ -19,6 +20,14 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [servicesLoading, setServicesLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [filePreview, setFilePreview] = useState<string | null>(null);
+
+    // PAGINATION
+    const ITEMS_PER_PAGE = 10;
+    const [currentPage, setCurrentPage] = useState(1);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeTab]);
 
     // Fetch documents on tab change
     const fetchDocuments = async () => {
@@ -370,6 +379,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
         return true;
     });
 
+    const totalPages = Math.ceil(filteredHistory.length / ITEMS_PER_PAGE);
+    const paginatedHistory = filteredHistory.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
     return (
         <div className="container" style={{ padding: '30px 20px', maxWidth: '1400px', margin: '0 auto' }}>
 
@@ -462,6 +474,11 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 </div>
                             </div>
                             <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                    onClick={() => router.push(`/customers?edit=${customer.id}`)}
+                                    style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', padding: '10px 16px', borderRadius: '10px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}>
+                                    ✏️ Düzenle
+                                </button>
                                 <button
                                     onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
                                     style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '10px 16px', borderRadius: '10px', cursor: 'pointer', fontSize: '13px' }}>
@@ -807,7 +824,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             {filteredHistory.length === 0 ? (
                                 <tr><td colSpan={6} style={{ padding: '50px', textAlign: 'center', color: '#666', fontSize: '14px' }}>Bu kategoride kayıt bulunamadı.</td></tr>
                             ) : (
-                                filteredHistory.map((item, idx) => (
+                                paginatedHistory.map((item, idx) => (
                                     <Fragment key={item.id || idx}>
                                         <tr
                                             onClick={() => item.items && setExpandedRowId(expandedRowId === item.id ? null : item.id)}
@@ -868,6 +885,13 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         </tbody>
                     </table>
                 )}
+                <div style={{ padding: '20px' }}>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
             </div>
 
             {/* INVOICE MODAL - PROFESSIONAL E-FATURA STYLE */}

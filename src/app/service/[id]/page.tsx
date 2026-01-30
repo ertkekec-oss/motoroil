@@ -43,8 +43,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         return (
             <div className="container flex-center min-h-[80vh]">
                 <div className="flex flex-col items-center gap-6">
-                    <div className="w-16 h-16 rounded-full border-4 border-white/5 border-t-primary animate-spin"></div>
-                    <span className="text-[11px] font-black text-white/20 uppercase tracking-[0.3em] animate-pulse">Detaylar Yükleniyor...</span>
+                    <div className="w-16 h-16 rounded-full border-4 border-subtle border-t-primary animate-spin"></div>
+                    <span className="text-[11px] font-black text-muted uppercase tracking-[0.3em] animate-pulse">Detaylar Yükleniyor...</span>
                 </div>
             </div>
         );
@@ -53,10 +53,10 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     if (error || !service) {
         return (
             <div className="container flex-center min-h-[80vh]">
-                <div className="bg-white/5 border border-white/10 rounded-[40px] p-12 text-center max-w-lg shadow-2xl">
+                <div className="bg-subtle border border-main rounded-[40px] p-12 text-center max-w-lg shadow-2xl">
                     <div className="text-6xl mb-6">⚠️</div>
-                    <h2 className="text-2xl font-black text-white mb-2">Eyvah! Bir Sorun Var</h2>
-                    <p className="text-white/40 font-medium mb-8 leading-relaxed">{error || 'İstediğiniz servis kaydına şu an ulaşamıyoruz.'}</p>
+                    <h2 className="text-2xl font-black text-main mb-2">Eyvah! Bir Sorun Var</h2>
+                    <p className="text-muted font-medium mb-8 leading-relaxed">{error || 'İstediğiniz servis kaydına şu an ulaşamıyoruz.'}</p>
                     <button onClick={() => router.back()} className="px-8 py-4 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">Geri Dön</button>
                 </div>
             </div>
@@ -76,20 +76,20 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
                 <div className="space-y-1">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => router.back()} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">←</button>
+                        <button onClick={() => router.back()} className="w-10 h-10 rounded-xl bg-subtle border border-main flex items-center justify-center text-muted hover:text-main hover:bg-hover transition-all">←</button>
                         <div>
                             <div className="flex items-center gap-3">
-                                <h1 className="text-4xl font-black text-white tracking-tight">Servis Detayı</h1>
+                                <h1 className="text-4xl font-black text-main tracking-tight">Servis Detayı</h1>
                                 <span className="px-3 py-1 rounded-lg bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest mt-1">
                                     SRV-{service.id.toString().slice(-6).toUpperCase()}
                                 </span>
                             </div>
-                            <p className="text-white/30 font-bold text-sm ml-1 uppercase tracking-[0.2em]">{service.status} İşlemi</p>
+                            <p className="text-muted font-bold text-sm ml-1 uppercase tracking-[0.2em]">{service.status} İşlemi</p>
                         </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button onClick={() => window.print()} className="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white/60 font-black text-xs uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all flex items-center gap-3">
+                    <button onClick={() => window.print()} className="px-6 py-3 rounded-2xl bg-subtle border border-main text-muted font-black text-xs uppercase tracking-widest hover:bg-hover hover:text-main transition-all flex items-center gap-3">
                         <span>🖨️</span>
                         Yazdır
                     </button>

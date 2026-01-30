@@ -26,9 +26,14 @@ export default function SuppliersPage() {
 
     // Modal States
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [newSupplier, setNewSupplier] = useState({
         name: '', phone: '', email: '', address: '', category: '',
+        taxNumber: '', taxOffice: '', contactPerson: '', iban: ''
+    });
+    const [editSupplier, setEditSupplier] = useState<any>({
+        id: '', name: '', phone: '', email: '', address: '', category: '',
         taxNumber: '', taxOffice: '', contactPerson: '', iban: ''
     });
 
@@ -113,6 +118,59 @@ export default function SuppliersPage() {
             showError('Hata', 'Bir hata oluştu.');
         } finally {
             setIsProcessing(false);
+        }
+    };
+
+    const handleEditSupplier = async () => {
+        if (!editSupplier.name) {
+            showError('Hata', 'Firma adı zorunludur!');
+            return;
+        }
+        if (isProcessing) return;
+
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/suppliers', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editSupplier)
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess('Başarılı', 'Tedarikçi başarıyla güncellendi.');
+                setIsEditModalOpen(false);
+                setEditSupplier({ id: '', name: '', phone: '', email: '', address: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '' });
+                window.location.reload();
+            } else {
+                showError('Hata', data.error);
+            }
+        } catch (error: any) {
+            console.error(error);
+            showError('Hata', 'Bir hata oluştu.');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const handleDeleteSupplier = async (supplier: any) => {
+        if (!confirm(`"${supplier.name}" tedarikçisini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/suppliers?id=${supplier.id}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess('Başarılı', 'Tedarikçi başarıyla silindi.');
+                window.location.reload();
+            } else {
+                showError('Hata', data.error || 'Silme işlemi başarısız.');
+            }
+        } catch (error: any) {
+            console.error(error);
+            showError('Hata', 'Bir hata oluştu.');
         }
     };
 
@@ -278,18 +336,32 @@ export default function SuppliersPage() {
                                 )}
                             </div>
 
-                            <div style={{ padding: '16px 24px', background: 'rgba(0,0,0,0.2)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                <button
-                                    onClick={() => { setSelectedSup(sup); setIsPurchaseModalOpen(true); }}
-                                    className="btn btn-outline" style={{ fontSize: '12px', padding: '8px', color: '#3b82f6', borderColor: '#3b82f6' }}>
-                                    🛒 Alış Gir
-                                </button>
-                                <button
-                                    onClick={() => router.push(`/payment?amount=${Math.abs(sup.balance)}&title=${encodeURIComponent(sup.name)}&type=payable&ref=SUP-${sup.id}`)}
-                                    className="btn btn-outline" style={{ fontSize: '12px', padding: '8px' }}>
-                                    💸 Ödeme Yap
-                                </button>
-                                <Link href={`/suppliers/${sup.id}`} className="btn btn-primary" style={{ gridColumn: 'span 2', textAlign: 'center', padding: '10px', fontSize: '13px', textDecoration: 'none' }}>
+                            <div style={{ padding: '16px 24px', background: 'rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                    <button
+                                        onClick={() => { setEditSupplier(sup); setIsEditModalOpen(true); }}
+                                        className="btn btn-outline" style={{ fontSize: '12px', padding: '8px', color: '#10b981', borderColor: '#10b981' }}>
+                                        ✏️ Düzenle
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteSupplier(sup)}
+                                        className="btn btn-outline" style={{ fontSize: '12px', padding: '8px', color: '#ef4444', borderColor: '#ef4444' }}>
+                                        🗑️ Sil
+                                    </button>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                    <button
+                                        onClick={() => { setSelectedSup(sup); setIsPurchaseModalOpen(true); }}
+                                        className="btn btn-outline" style={{ fontSize: '12px', padding: '8px', color: '#3b82f6', borderColor: '#3b82f6' }}>
+                                        🛒 Alış Gir
+                                    </button>
+                                    <button
+                                        onClick={() => router.push(`/payment?amount=${Math.abs(sup.balance)}&title=${encodeURIComponent(sup.name)}&type=payable&ref=SUP-${sup.id}`)}
+                                        className="btn btn-outline" style={{ fontSize: '12px', padding: '8px' }}>
+                                        💸 Ödeme Yap
+                                    </button>
+                                </div>
+                                <Link href={`/suppliers/${sup.id}`} className="btn btn-primary" style={{ textAlign: 'center', padding: '10px', fontSize: '13px', textDecoration: 'none' }}>
                                     İşlem Detayları & Ekstre
                                 </Link>
                             </div>
@@ -331,8 +403,12 @@ export default function SuppliersPage() {
                                         </div>
                                     </td>
                                     <td style={{ textAlign: 'right', paddingRight: '20px' }}>
-                                        <button onClick={() => { setSelectedSup(sup); setIsPurchaseModalOpen(true); }} className="btn btn-sm btn-outline" style={{ marginRight: '5px' }}>🛒</button>
-                                        <Link href={`/suppliers/${sup.id}`} className="btn btn-sm btn-primary" style={{ textDecoration: 'none' }}>Detay</Link>
+                                        <div style={{ display: 'flex', gap: '5px', justifyContent: 'flex-end' }}>
+                                            <button onClick={() => { setEditSupplier(sup); setIsEditModalOpen(true); }} className="btn btn-sm btn-outline" style={{ color: '#10b981', borderColor: '#10b981' }}>✏️</button>
+                                            <button onClick={() => handleDeleteSupplier(sup)} className="btn btn-sm btn-outline" style={{ color: '#ef4444', borderColor: '#ef4444' }}>🗑️</button>
+                                            <button onClick={() => { setSelectedSup(sup); setIsPurchaseModalOpen(true); }} className="btn btn-sm btn-outline">🛒</button>
+                                            <Link href={`/suppliers/${sup.id}`} className="btn btn-sm btn-primary" style={{ textDecoration: 'none' }}>Detay</Link>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -433,6 +509,79 @@ export default function SuppliersPage() {
                             </div>
                             <button onClick={handleAddSupplier} disabled={isProcessing} className="btn btn-primary w-full" style={{ padding: '16px', marginTop: '10px' }}>
                                 {isProcessing ? 'KAYDEDİLİYOR...' : 'KAYDET'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* EDIT SUPPLIER MODAL */}
+            {isEditModalOpen && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+                    <div className="card glass animate-in" style={{ width: '600px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}>
+                        <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                            <h3 style={{ margin: 0 }}>✏️ Tedarikçi Düzenle</h3>
+                            <button onClick={() => setIsEditModalOpen(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                        </div>
+                        <div className="flex-col gap-4">
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>FİRMA ADI <span style={{ color: 'red' }}>*</span></label>
+                                    <input type="text" value={editSupplier.name} onChange={e => setEditSupplier({ ...editSupplier, name: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>YETKİLİ KİŞİ</label>
+                                    <input type="text" value={editSupplier.contactPerson} onChange={e => setEditSupplier({ ...editSupplier, contactPerson: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-muted" style={{ fontSize: '12px' }}>TEDARİKÇİ SINIFI (KATEGORİ)</label>
+                                <select
+                                    value={editSupplier.category}
+                                    onChange={e => setEditSupplier({ ...editSupplier, category: e.target.value })}
+                                    style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                >
+                                    <option value="">Sınıf Seçin...</option>
+                                    {(dbSuppClasses.length > 0 ? dbSuppClasses : ['Saha Tedarikçisi', 'Distribütör', 'Yedek Parça', 'Hizmet']).map(cls => (
+                                        <option key={cls} value={cls}>{cls}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>TELEFON</label>
+                                    <input type="text" value={editSupplier.phone} onChange={e => setEditSupplier({ ...editSupplier, phone: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>E-POSTA</label>
+                                    <input type="text" value={editSupplier.email} onChange={e => setEditSupplier({ ...editSupplier, email: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                            </div>
+
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ NO</label>
+                                    <input type="text" value={editSupplier.taxNumber} onChange={e => setEditSupplier({ ...editSupplier, taxNumber: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ DAİRESİ</label>
+                                    <input type="text" value={editSupplier.taxOffice} onChange={e => setEditSupplier({ ...editSupplier, taxOffice: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-muted" style={{ fontSize: '12px' }}>IBAN</label>
+                                <input type="text" placeholder="TR..." value={editSupplier.iban} onChange={e => setEditSupplier({ ...editSupplier, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                            </div>
+
+                            <div>
+                                <label className="text-muted" style={{ fontSize: '12px' }}>ADRES</label>
+                                <textarea value={editSupplier.address} onChange={e => setEditSupplier({ ...editSupplier, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', minHeight: '80px' }} />
+                            </div>
+                            <button onClick={handleEditSupplier} disabled={isProcessing} className="btn btn-primary w-full" style={{ padding: '16px', marginTop: '10px' }}>
+                                {isProcessing ? 'GÜNCELLENİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
                             </button>
                         </div>
                     </div>

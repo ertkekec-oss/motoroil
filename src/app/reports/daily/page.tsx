@@ -56,17 +56,17 @@ export default function DailyReportPage() {
         <div className="p-6 pb-32 animate-fade-in">
             <style jsx>{`
                 .glass-card {
-                    background: rgba(15, 17, 30, 0.4);
+                    background: var(--bg-card);
                     backdrop-filter: blur(20px);
-                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    border: 1px solid var(--border-light);
                     border-radius: 24px;
                     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 }
                 .glass-card:hover {
                     border-color: var(--primary);
                     transform: translateY(-5px);
-                    background: rgba(15, 17, 30, 0.6);
-                    box-shadow: 0 20px 40px -20px var(--primary-glow);
+                    background: var(--bg-hover);
+                    box-shadow: var(--shadow-premium);
                 }
                 .pulse-box {
                     width: 8px;
@@ -92,9 +92,9 @@ export default function DailyReportPage() {
                 .gradient-text-cyan { background: linear-gradient(135deg, #00F0FF, #00B4D8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
                 .select-premium {
-                    background: rgba(255,255,255,0.05);
-                    border: 1px solid rgba(255,255,255,0.1);
-                    color: white;
+                    background: var(--input-bg);
+                    border: 1px solid var(--border-light);
+                    color: var(--text-main);
                     border-radius: 12px;
                     padding: 8px 16px;
                     font-size: 12px;
@@ -112,11 +112,11 @@ export default function DailyReportPage() {
                         <div className="pulse-box"></div>
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Canlı Akış Aktif</span>
                     </div>
-                    <h1 className="text-4xl font-black tracking-tight text-white mb-1">Gün Özet Raporu</h1>
-                    <p className="text-white/40 font-medium">Şu an: {currentTimeStr} • Veriler anlık olarak güncellenmektedir.</p>
+                    <h1 className="text-4xl font-black tracking-tight text-main mb-1">Gün Özet Raporu</h1>
+                    <p className="text-muted font-medium">Şu an: {currentTimeStr} • Veriler anlık olarak güncellenmektedir.</p>
                 </div>
 
-                <div className="flex items-center gap-4 bg-white/5 p-1 rounded-2xl border border-white/5 animate-in fade-in slide-in-from-right duration-700">
+                <div className="flex items-center gap-4 bg-subtle p-1 rounded-2xl border border-subtle animate-in fade-in slide-in-from-right duration-700">
                     {adminActiveTab === 'branch' && canViewAll && (
                         <select
                             className="select-premium mr-2"
@@ -124,21 +124,21 @@ export default function DailyReportPage() {
                             onChange={(e) => setSelectedBranch(e.target.value)}
                         >
                             {branches?.map((b: any) => (
-                                <option key={b.id} value={b.name} style={{ background: '#080911' }}>{b.name}</option>
+                                <option key={b.id} value={b.name} style={{ background: 'var(--bg-deep)' }}>{b.name}</option>
                             ))}
                         </select>
                     )}
                     {canViewAll && (
-                        <div className="flex bg-black/20 rounded-xl p-1">
+                        <div className="flex bg-main/20 rounded-xl p-1">
                             <button
                                 onClick={() => setAdminActiveTab('overall')}
-                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'overall' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'overall' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-main'}`}
                             >
                                 KONSOLİDE
                             </button>
                             <button
                                 onClick={() => setAdminActiveTab('branch')}
-                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'branch' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'branch' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-main'}`}
                             >
                                 ŞUBE BAZLI
                             </button>
@@ -153,10 +153,10 @@ export default function DailyReportPage() {
                         <span>TOPLAM CİRO</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
                     </div>
-                    <div className="text-4xl font-black text-white mb-2">
+                    <div className="text-4xl font-black text-main mb-2">
                         ₺ <span className="gradient-text-orange">{stats.sales.toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-white/20">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-muted">
                         <span className="w-4 h-0.5 bg-primary/20"></span>
                         GÜNLÜK SATIŞ HACMİ
                     </div>
@@ -215,13 +215,13 @@ export default function DailyReportPage() {
                                 {adminActiveTab === 'overall' ? 'Tüm şubelerden gelen konsolide akış.' : `${selectedBranch} şubesi finansal akışı.`}
                             </p>
                         </div>
-                        <div className="text-[10px] font-black text-white/20 uppercase tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">Bugün: {filteredTransactions.length} İşlem</div>
+                        <div className="text-[10px] font-black text-muted uppercase tracking-widest bg-subtle px-4 py-2 rounded-full border border-subtle">Bugün: {filteredTransactions.length} İşlem</div>
                     </div>
 
                     <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                         {filteredTransactions.length > 0 ? (
                             filteredTransactions.slice(0, 20).map((t, i) => (
-                                <div key={i} className="flex-between p-5 group rounded-2xl bg-white/[0.02] border border-white/[0.03] hover:bg-white/[0.05] hover:border-white/10 hover:translate-x-1 transition-all">
+                                <div key={i} className="flex-between p-5 group rounded-2xl bg-subtle border border-subtle hover:bg-hover hover:border-main hover:translate-x-1 transition-all">
                                     <div className="flex gap-5 items-center">
                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-lg ${t.type === 'Sales' ? 'bg-orange-500/10 text-orange-400 shadow-orange-500/5' :
                                             t.type === 'Expense' ? 'bg-red-500/10 text-red-400 shadow-red-500/5' :

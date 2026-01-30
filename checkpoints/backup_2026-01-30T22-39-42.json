@@ -1,0 +1,1854 @@
+{
+  "metadata": {
+    "timestamp": "2026-01-30T22:39:42.994Z",
+    "version": "4.2.0",
+    "checkpointId": "BACKUP_2026-01-30T22-39-42",
+    "stats": {
+      "users": 0,
+      "staff": 0,
+      "branches": 1,
+      "products": 6,
+      "customers": 1,
+      "suppliers": 1,
+      "kasalar": 4,
+      "transactions": 1,
+      "salesInvoices": 0,
+      "purchaseInvoices": 0,
+      "checks": 0,
+      "orders": 17,
+      "serviceRecords": 0,
+      "stockTransfers": 2,
+      "campaigns": 2,
+      "coupons": 23,
+      "warranties": 0,
+      "auditLogs": 1,
+      "securityEvents": 0,
+      "notifications": 0,
+      "pendingProducts": 0,
+      "pendingTransfers": 0,
+      "inventoryAudits": 1,
+      "appSettings": 9,
+      "marketplaceConfigs": 0,
+      "marketplaceProductMaps": 0,
+      "customerCategories": 0,
+      "customerDocuments": 0
+    }
+  },
+  "data": {
+    "users": [],
+    "staff": [],
+    "branches": [
+      {
+        "id": 1,
+        "name": "ANTALYA",
+        "type": "Şube",
+        "city": "ANTALYA",
+        "address": "",
+        "phone": "",
+        "manager": "",
+        "status": "Aktif",
+        "createdAt": "2026-01-30T17:19:19.622Z",
+        "updatedAt": "2026-01-30T17:19:19.622Z"
+      }
+    ],
+    "products": [
+      {
+        "id": "cml0yajq3000111x1l1i0uad0",
+        "name": "SALCANO HECTOR 26V",
+        "code": "12122",
+        "barcode": "",
+        "price": "12000",
+        "buyPrice": "10000",
+        "stock": 1,
+        "category": "Motosiklet",
+        "description": null,
+        "imageUrl": null,
+        "minStock": 5,
+        "brand": "SALCANO",
+        "type": "Diğer",
+        "supplier": "",
+        "branch": "Kadıköy Şube",
+        "salesVat": 20,
+        "salesVatIncluded": true,
+        "purchaseVat": 20,
+        "purchaseVatIncluded": false,
+        "salesOiv": "0",
+        "salesOtv": "0",
+        "otvType": "Ö.T.V yok",
+        "gtip": null,
+        "purchaseDiscount": "0",
+        "otvCode": "7",
+        "deletedAt": null,
+        "createdAt": "2026-01-30T14:00:38.235Z",
+        "updatedAt": "2026-01-30T17:20:02.388Z"
+      },
+      {
+        "id": "cml0y4zxy0001oyq407hb89u7",
+        "name": "SALCANO HECTOR 26V",
+        "code": "12122",
+        "barcode": "",
+        "price": "12000",
+        "buyPrice": "10000",
+        "stock": 1,
+        "category": "Motosiklet",
+        "description": null,
+        "imageUrl": null,
+        "minStock": 5,
+        "brand": "SALCANO",
+        "type": "Diğer",
+        "supplier": "",
+        "branch": "Beşiktaş Şube",
+        "salesVat": 20,
+        "salesVatIncluded": true,
+        "purchaseVat": 20,
+        "purchaseVatIncluded": false,
+        "salesOiv": "0",
+        "salesOtv": "0",
+        "otvType": "Ö.T.V yok",
+        "gtip": null,
+        "purchaseDiscount": "0",
+        "otvCode": "7",
+        "deletedAt": null,
+        "createdAt": "2026-01-30T13:56:19.318Z",
+        "updatedAt": "2026-01-30T13:56:19.318Z"
+      },
+      {
+        "id": "cml15fqkq0001v548zlhi96bz",
+        "name": "SALCANO HECTOR 26V",
+        "code": "12122",
+        "barcode": "",
+        "price": "12000",
+        "buyPrice": "10000",
+        "stock": 1,
+        "category": "Motosiklet",
+        "description": null,
+        "imageUrl": null,
+        "minStock": 5,
+        "brand": "SALCANO",
+        "type": "Diğer",
+        "supplier": "",
+        "branch": "ANTALYA",
+        "salesVat": 20,
+        "salesVatIncluded": true,
+        "purchaseVat": 20,
+        "purchaseVatIncluded": false,
+        "salesOiv": "0",
+        "salesOtv": "0",
+        "otvType": "Ö.T.V yok",
+        "gtip": null,
+        "purchaseDiscount": "0",
+        "otvCode": "7",
+        "deletedAt": null,
+        "createdAt": "2026-01-30T17:20:37.706Z",
+        "updatedAt": "2026-01-30T17:20:37.706Z"
+      },
+      {
+        "id": "cml1arfh70000u6tnlond8unp",
+        "name": "DENEME",
+        "code": "444",
+        "barcode": "",
+        "price": "0",
+        "buyPrice": "0",
+        "stock": 0,
+        "category": "Motosiklet",
+        "description": null,
+        "imageUrl": null,
+        "minStock": 5,
+        "brand": "SALCANO",
+        "type": "Diğer",
+        "supplier": "",
+        "branch": "Merkez",
+        "salesVat": 20,
+        "salesVatIncluded": true,
+        "purchaseVat": 20,
+        "purchaseVatIncluded": true,
+        "salesOiv": "0",
+        "salesOtv": "0",
+        "otvType": "Ö.T.V yok",
+        "gtip": null,
+        "purchaseDiscount": "0",
+        "otvCode": "7",
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:49:41.276Z",
+        "updatedAt": "2026-01-30T19:49:41.276Z"
+      },
+      {
+        "id": "cml0spvca0003vs27cnx42bn5",
+        "name": "SALCANO HECTOR 26V",
+        "code": "12122",
+        "barcode": "",
+        "price": "12000",
+        "buyPrice": "10000",
+        "stock": -1,
+        "category": "Motosiklet",
+        "description": null,
+        "imageUrl": null,
+        "minStock": 5,
+        "brand": "SALCANO",
+        "type": "Diğer",
+        "supplier": "",
+        "branch": "Merkez",
+        "salesVat": 20,
+        "salesVatIncluded": true,
+        "purchaseVat": 20,
+        "purchaseVatIncluded": true,
+        "salesOiv": "0",
+        "salesOtv": "0",
+        "otvType": "Ö.T.V yok",
+        "gtip": null,
+        "purchaseDiscount": "0",
+        "otvCode": "7",
+        "deletedAt": null,
+        "createdAt": "2026-01-30T11:24:35.342Z",
+        "updatedAt": "2026-01-30T21:45:03.499Z"
+      },
+      {
+        "id": "cml1010e300005j2ak8h7npmo",
+        "name": "DENEME",
+        "code": "12321",
+        "barcode": "",
+        "price": "333",
+        "buyPrice": "222",
+        "stock": 0,
+        "category": "Motosiklet",
+        "description": null,
+        "imageUrl": null,
+        "minStock": 5,
+        "brand": "",
+        "type": "Diğer",
+        "supplier": "",
+        "branch": "Merkez",
+        "salesVat": 20,
+        "salesVatIncluded": true,
+        "purchaseVat": 20,
+        "purchaseVatIncluded": true,
+        "salesOiv": "0",
+        "salesOtv": "0",
+        "otvType": "Ö.T.V yok",
+        "gtip": null,
+        "purchaseDiscount": "0",
+        "otvCode": "7",
+        "deletedAt": null,
+        "createdAt": "2026-01-30T14:49:12.507Z",
+        "updatedAt": "2026-01-30T14:49:12.507Z"
+      }
+    ],
+    "customers": [
+      {
+        "id": "cml1b01qp0001u6nyk5is53l5",
+        "name": "kekeç",
+        "email": "",
+        "phone": "",
+        "address": "bahçeli evler mah. soylular sok.",
+        "taxNumber": "",
+        "taxOffice": "",
+        "contactPerson": "",
+        "iban": "",
+        "balance": "0",
+        "points": "240",
+        "branch": "Merkez",
+        "categoryId": null,
+        "supplierClass": null,
+        "customerClass": "",
+        "referralCode": "D3Y4D6",
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:56:23.377Z",
+        "updatedAt": "2026-01-30T19:56:54.132Z"
+      }
+    ],
+    "suppliers": [
+      {
+        "id": "cml0ykpwv0003lyvduf5jyu90",
+        "name": "deneme",
+        "phone": "05360269224",
+        "email": "",
+        "address": "bahçeli evler mah. soylular sok.",
+        "category": "Distribütör",
+        "taxNumber": "",
+        "taxOffice": "",
+        "contactPerson": "",
+        "iban": "",
+        "balance": "0",
+        "branch": "Merkez",
+        "isActive": true,
+        "deletedAt": null,
+        "createdAt": "2026-01-30T14:08:32.723Z",
+        "updatedAt": "2026-01-30T19:05:10.742Z"
+      }
+    ],
+    "kasalar": [
+      {
+        "id": "cml1055vb0001ut3g0phmcefm",
+        "name": "ÇEK / SENET PORTFÖYÜ",
+        "type": "Evrak",
+        "balance": "0",
+        "currency": "TRY",
+        "isActive": true,
+        "deletedAt": null,
+        "createdAt": "2026-01-30T14:52:26.231Z",
+        "updatedAt": "2026-01-30T19:05:11.111Z"
+      },
+      {
+        "id": "cml0zevjd0002zlex417q05un",
+        "name": "KUVEYT TÜRK",
+        "type": "Banka",
+        "balance": "0",
+        "currency": "TRY",
+        "isActive": true,
+        "deletedAt": null,
+        "createdAt": "2026-01-30T14:31:59.785Z",
+        "updatedAt": "2026-01-30T19:05:11.111Z"
+      },
+      {
+        "id": "cml138h2x0004bjmxknd5ycg8",
+        "name": "ÖDEAL",
+        "type": "Banka",
+        "balance": "0",
+        "currency": "TRY",
+        "isActive": true,
+        "deletedAt": null,
+        "createdAt": "2026-01-30T16:18:59.577Z",
+        "updatedAt": "2026-01-30T19:05:11.111Z"
+      },
+      {
+        "id": "cml0t7lsv000076kcexqiymsb",
+        "name": "NAKİT KASA",
+        "type": "Nakit",
+        "balance": "10800",
+        "currency": "TRY",
+        "isActive": true,
+        "deletedAt": null,
+        "createdAt": "2026-01-30T11:38:22.879Z",
+        "updatedAt": "2026-01-30T19:56:53.757Z"
+      }
+    ],
+    "transactions": [
+      {
+        "id": "cml1b0pbq0003pc6dg640el95",
+        "type": "Sales",
+        "amount": "10800",
+        "description": "POS Satışı (Nakit) - kekeç | REF:cml1b0ow70001pc6dvrrp1atl",
+        "date": "2026-01-30T19:56:53.943Z",
+        "kasaId": "cml0t7lsv000076kcexqiymsb",
+        "customerId": "cml1b01qp0001u6nyk5is53l5",
+        "supplierId": null,
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:56:53.943Z",
+        "updatedAt": "2026-01-30T19:56:53.943Z"
+      }
+    ],
+    "salesInvoices": [],
+    "purchaseInvoices": [],
+    "checks": [],
+    "orders": [
+      {
+        "id": "cml1b0ow70001pc6dvrrp1atl",
+        "marketplaceId": "LOCAL",
+        "orderNumber": "POS-20260130-4168",
+        "marketplace": "POS",
+        "customerName": "kekeç",
+        "customerEmail": null,
+        "totalAmount": "10800",
+        "currency": "TRY",
+        "status": "Tamamlandı",
+        "orderDate": "2026-01-30T19:56:53.381Z",
+        "items": [
+          {
+            "qty": 1,
+            "sku": "12122",
+            "vat": 20,
+            "name": "SALCANO HECTOR 26V",
+            "price": 12000,
+            "productId": "cml0spvca0003vs27cnx42bn5",
+            "earnedPoints": 240
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "description": "POS Satışı: kekeç (cash)",
+          "paymentMode": "cash",
+          "targetKasaId": "cml0t7lsv000076kcexqiymsb",
+          "referenceCode": ""
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:56:53.383Z",
+        "updatedAt": "2026-01-30T19:56:53.383Z"
+      },
+      {
+        "id": "cml19j1ty000370pixrwz7ya3",
+        "marketplaceId": "218030376",
+        "orderNumber": "218030376",
+        "marketplace": "MotorOil",
+        "customerName": "Berhan Özbakır",
+        "customerEmail": "msdolphine@yahoo.com",
+        "totalAmount": "2584.36",
+        "currency": "TRY",
+        "status": "Hazırlanıyor",
+        "orderDate": "2026-01-08T22:36:27.000Z",
+        "items": [
+          {
+            "sku": "",
+            "price": 2584.36,
+            "quantity": 1,
+            "productName": "Su1002Kn Hava Fi̇ltresi̇ Suzuki Dl650 Vstrom 20022019"
+          },
+          {
+            "sku": "ISKONTO",
+            "price": -258.44,
+            "quantity": 1,
+            "productName": "PROMOSYON"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": "",
+              "price": 2584.36,
+              "quantity": 1,
+              "productName": "Su1002Kn Hava Fi̇ltresi̇ Suzuki Dl650 Vstrom 20022019"
+            },
+            {
+              "sku": "ISKONTO",
+              "price": -258.44,
+              "quantity": 1,
+              "productName": "PROMOSYON"
+            }
+          ],
+          "status": "Hazırlanıyor",
+          "orderId": "218030376",
+          "orderDate": "2026-01-08T22:36:27.000Z",
+          "totalAmount": 2584.36,
+          "customerName": "Berhan Özbakır",
+          "customerEmail": "msdolphine@yahoo.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:10.726Z",
+        "updatedAt": "2026-01-30T22:30:16.506Z"
+      },
+      {
+        "id": "cml19j29n000670pi5co2h2u9",
+        "marketplaceId": "118557083",
+        "orderNumber": "118557083",
+        "marketplace": "MotorOil",
+        "customerName": "Serkan Topuz",
+        "customerEmail": "srkn.ethem.tpz@gmail.com",
+        "totalAmount": "2199",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2025-12-16T22:41:01.000Z",
+        "items": [
+          {
+            "sku": "",
+            "price": 2199,
+            "quantity": 1,
+            "productName": "Petrol Ofisi Maximoto 10W-40 Scooter MB 1 Litre (12 Adet)"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": "",
+              "price": 2199,
+              "quantity": 1,
+              "productName": "Petrol Ofisi Maximoto 10W-40 Scooter MB 1 Litre (12 Adet)"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "118557083",
+          "orderDate": "2025-12-16T22:41:01.000Z",
+          "totalAmount": 2199,
+          "customerName": "Serkan Topuz",
+          "customerEmail": "srkn.ethem.tpz@gmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:11.291Z",
+        "updatedAt": "2026-01-30T22:30:17.071Z"
+      },
+      {
+        "id": "cml19j2qa000970pih4jb5j8g",
+        "marketplaceId": "742677521",
+        "orderNumber": "742677521",
+        "marketplace": "MotorOil",
+        "customerName": "Eyüp biçen",
+        "customerEmail": "hzsociopath@gmail.com",
+        "totalAmount": "980",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2025-11-10T09:29:15.000Z",
+        "items": [
+          {
+            "sku": "",
+            "price": 980,
+            "quantity": 1,
+            "productName": "Motosiklet Brandası Kamuflaj"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": "",
+              "price": 980,
+              "quantity": 1,
+              "productName": "Motosiklet Brandası Kamuflaj"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "742677521",
+          "orderDate": "2025-11-10T09:29:15.000Z",
+          "totalAmount": 980,
+          "customerName": "Eyüp biçen",
+          "customerEmail": "hzsociopath@gmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:11.890Z",
+        "updatedAt": "2026-01-30T22:30:17.637Z"
+      },
+      {
+        "id": "cml19j1ji000170pibfakwffk",
+        "marketplaceId": "113902524",
+        "orderNumber": "113902524",
+        "marketplace": "MotorOil",
+        "customerName": "Çağrı Kekeç",
+        "customerEmail": "iletisim@motoroil.com.tr",
+        "totalAmount": "1568.54",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2026-01-25T16:33:42.000Z",
+        "items": [
+          {
+            "sku": 108535,
+            "price": 1568.54,
+            "quantity": 1,
+            "productName": "Motul 8100 Eco-Lite 0W20 4L Tam Sentetik Motor Yağı"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": 108535,
+              "price": 1568.54,
+              "quantity": 1,
+              "productName": "Motul 8100 Eco-Lite 0W20 4L Tam Sentetik Motor Yağı"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "113902524",
+          "orderDate": "2026-01-25T16:33:42.000Z",
+          "totalAmount": 1568.54,
+          "customerName": "Çağrı Kekeç",
+          "customerEmail": "iletisim@motoroil.com.tr"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:10.351Z",
+        "updatedAt": "2026-01-30T22:30:16.128Z"
+      },
+      {
+        "id": "cml19j2vi000a70pipg7xm7au",
+        "marketplaceId": "257341037",
+        "orderNumber": "257341037",
+        "marketplace": "MotorOil",
+        "customerName": "Hüseyin Yılmaz",
+        "customerEmail": "kuzueso13@gmail.com",
+        "totalAmount": "2199",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2025-11-05T12:35:30.000Z",
+        "items": [
+          {
+            "sku": "",
+            "price": 2199,
+            "quantity": 1,
+            "productName": "Petrol Ofisi Maximoto 10W-40 Scooter MB 1 Litre (12 Adet)"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": "",
+              "price": 2199,
+              "quantity": 1,
+              "productName": "Petrol Ofisi Maximoto 10W-40 Scooter MB 1 Litre (12 Adet)"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "257341037",
+          "orderDate": "2025-11-05T12:35:30.000Z",
+          "totalAmount": 2199,
+          "customerName": "Hüseyin Yılmaz",
+          "customerEmail": "kuzueso13@gmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:12.078Z",
+        "updatedAt": "2026-01-30T22:30:17.826Z"
+      },
+      {
+        "id": "cml19j1z6000470piewe21vk0",
+        "marketplaceId": "247100103",
+        "orderNumber": "247100103",
+        "marketplace": "MotorOil",
+        "customerName": "irfan kaplan",
+        "customerEmail": "ikaplan61@hotmail.com",
+        "totalAmount": "2010",
+        "currency": "TRY",
+        "status": "Hazırlanıyor",
+        "orderDate": "2026-01-08T10:30:23.000Z",
+        "items": [
+          {
+            "sku": 9089,
+            "price": 2010,
+            "quantity": 1,
+            "productName": "Liqui Moly 5W30 Motor Yağı Molygen New Generation 4 Litre"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": 9089,
+              "price": 2010,
+              "quantity": 1,
+              "productName": "Liqui Moly 5W30 Motor Yağı Molygen New Generation 4 Litre"
+            }
+          ],
+          "status": "Hazırlanıyor",
+          "orderId": "247100103",
+          "orderDate": "2026-01-08T10:30:23.000Z",
+          "totalAmount": 2010,
+          "customerName": "irfan kaplan",
+          "customerEmail": "ikaplan61@hotmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:10.915Z",
+        "updatedAt": "2026-01-30T22:30:16.695Z"
+      },
+      {
+        "id": "cml19j24f000570piubacv1o8",
+        "marketplaceId": "727099461",
+        "orderNumber": "727099461",
+        "marketplace": "MotorOil",
+        "customerName": "Miraç Can Ölmez",
+        "customerEmail": "olmezmiraccan@gmail.com",
+        "totalAmount": "1560",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2026-01-06T14:54:48.000Z",
+        "items": [
+          {
+            "sku": 2368,
+            "price": 1560,
+            "quantity": 1,
+            "productName": "Liqui Moly Antibakteriyel Dizel Yakıt Katkısı 1L"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": 2368,
+              "price": 1560,
+              "quantity": 1,
+              "productName": "Liqui Moly Antibakteriyel Dizel Yakıt Katkısı 1L"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "727099461",
+          "orderDate": "2026-01-06T14:54:48.000Z",
+          "totalAmount": 1560,
+          "customerName": "Miraç Can Ölmez",
+          "customerEmail": "olmezmiraccan@gmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:11.103Z",
+        "updatedAt": "2026-01-30T22:30:16.883Z"
+      },
+      {
+        "id": "cml19j2fu000770pi1b97jq0v",
+        "marketplaceId": "845374493",
+        "orderNumber": "845374493",
+        "marketplace": "MotorOil",
+        "customerName": "Abdullah İÇÖZ",
+        "customerEmail": "melih.icoz@outlook.com",
+        "totalAmount": "10750",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2025-11-19T09:51:14.000Z",
+        "items": [
+          {
+            "sku": 24744,
+            "price": 10750,
+            "quantity": 1,
+            "productName": "Salcano Nova 20 Monoblok Mekanik Disk Çocuk Bisikleti"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": 24744,
+              "price": 10750,
+              "quantity": 1,
+              "productName": "Salcano Nova 20 Monoblok Mekanik Disk Çocuk Bisikleti"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "845374493",
+          "orderDate": "2025-11-19T09:51:14.000Z",
+          "totalAmount": 10750,
+          "customerName": "Abdullah İÇÖZ",
+          "customerEmail": "melih.icoz@outlook.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:11.514Z",
+        "updatedAt": "2026-01-30T22:30:17.260Z"
+      },
+      {
+        "id": "cml19j2l2000870pivnntrssa",
+        "marketplaceId": "550036240",
+        "orderNumber": "550036240",
+        "marketplace": "MotorOil",
+        "customerName": "Mehmet Yusuf yılgın",
+        "customerEmail": "bgblek37@gmail.com",
+        "totalAmount": "267",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2025-11-18T13:11:59.000Z",
+        "items": [
+          {
+            "sku": "",
+            "price": 267,
+            "quantity": 1,
+            "productName": "Motul İnjector Cleaner Diesel"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": "",
+              "price": 267,
+              "quantity": 1,
+              "productName": "Motul İnjector Cleaner Diesel"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "550036240",
+          "orderDate": "2025-11-18T13:11:59.000Z",
+          "totalAmount": 267,
+          "customerName": "Mehmet Yusuf yılgın",
+          "customerEmail": "bgblek37@gmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:11.702Z",
+        "updatedAt": "2026-01-30T22:30:17.449Z"
+      },
+      {
+        "id": "cml19j30r000b70pi3kdkdefo",
+        "marketplaceId": "318004861",
+        "orderNumber": "318004861",
+        "marketplace": "MotorOil",
+        "customerName": "Ercan Bayram",
+        "customerEmail": "rcnbyrm@gmail.com",
+        "totalAmount": "810",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2025-11-04T21:18:19.000Z",
+        "items": [
+          {
+            "sku": "",
+            "price": 810,
+            "quantity": 1,
+            "productName": "Motul 5000 10W40 4T 1 L 3 Adet Motosiklet Yağı"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": "",
+              "price": 810,
+              "quantity": 1,
+              "productName": "Motul 5000 10W40 4T 1 L 3 Adet Motosiklet Yağı"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "318004861",
+          "orderDate": "2025-11-04T21:18:19.000Z",
+          "totalAmount": 810,
+          "customerName": "Ercan Bayram",
+          "customerEmail": "rcnbyrm@gmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:12.267Z",
+        "updatedAt": "2026-01-30T22:30:18.015Z"
+      },
+      {
+        "id": "cml19j3gh000e70pi3lrke6k4",
+        "marketplaceId": "650419921",
+        "orderNumber": "650419921",
+        "marketplace": "MotorOil",
+        "customerName": "Kemal Çotur",
+        "customerEmail": "kemal_cotur@hotmail.com",
+        "totalAmount": "1128",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2025-11-04T10:19:31.000Z",
+        "items": [
+          {
+            "sku": 105936,
+            "price": 453,
+            "quantity": 1,
+            "productName": "Motul Scooter Power 4T 10W30 Mb Motor Yağı 1 L"
+          },
+          {
+            "sku": 105781,
+            "price": 325,
+            "quantity": 1,
+            "productName": "Motul Hd 80W90 Şanziman Yaği 1L"
+          },
+          {
+            "sku": "",
+            "price": 350,
+            "quantity": 1,
+            "productName": "HİFLO HF204 FORZA YAĞ FİLTRESİ"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": 105936,
+              "price": 453,
+              "quantity": 1,
+              "productName": "Motul Scooter Power 4T 10W30 Mb Motor Yağı 1 L"
+            },
+            {
+              "sku": 105781,
+              "price": 325,
+              "quantity": 1,
+              "productName": "Motul Hd 80W90 Şanziman Yaği 1L"
+            },
+            {
+              "sku": "",
+              "price": 350,
+              "quantity": 1,
+              "productName": "HİFLO HF204 FORZA YAĞ FİLTRESİ"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "650419921",
+          "orderDate": "2025-11-04T10:19:31.000Z",
+          "totalAmount": 1128,
+          "customerName": "Kemal Çotur",
+          "customerEmail": "kemal_cotur@hotmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:12.833Z",
+        "updatedAt": "2026-01-30T22:30:18.580Z"
+      },
+      {
+        "id": "cml19j361000c70pip42mff0s",
+        "marketplaceId": "507446128",
+        "orderNumber": "507446128",
+        "marketplace": "MotorOil",
+        "customerName": "HAKAN SUNGUR",
+        "customerEmail": "hknsungur@yahoo.com",
+        "totalAmount": "1375",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2025-11-04T13:03:41.000Z",
+        "items": [
+          {
+            "sku": "",
+            "price": 275,
+            "quantity": 5,
+            "productName": "Motul E10 Shine & Go 400 Ml Sprey"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": "",
+              "price": 275,
+              "quantity": 5,
+              "productName": "Motul E10 Shine & Go 400 Ml Sprey"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "507446128",
+          "orderDate": "2025-11-04T13:03:41.000Z",
+          "totalAmount": 1375,
+          "customerName": "HAKAN SUNGUR",
+          "customerEmail": "hknsungur@yahoo.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:12.458Z",
+        "updatedAt": "2026-01-30T22:30:18.203Z"
+      },
+      {
+        "id": "cml19j3b9000d70pizzwoiukp",
+        "marketplaceId": "977147784",
+        "orderNumber": "977147784",
+        "marketplace": "MotorOil",
+        "customerName": "Gökhan Çolak",
+        "customerEmail": "gokhanbuse74@gmail.com",
+        "totalAmount": "1717",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2025-11-04T11:03:47.000Z",
+        "items": [
+          {
+            "sku": "",
+            "price": 1717,
+            "quantity": 1,
+            "productName": "Motul 7100 10W40 Motosi̇klet Yaği + C4 Chai̇n Lube"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": "",
+              "price": 1717,
+              "quantity": 1,
+              "productName": "Motul 7100 10W40 Motosi̇klet Yaği + C4 Chai̇n Lube"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "977147784",
+          "orderDate": "2025-11-04T11:03:47.000Z",
+          "totalAmount": 1717,
+          "customerName": "Gökhan Çolak",
+          "customerEmail": "gokhanbuse74@gmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:12.645Z",
+        "updatedAt": "2026-01-30T22:30:18.391Z"
+      },
+      {
+        "id": "cml19j3lo000f70piegbywipi",
+        "marketplaceId": "787845249",
+        "orderNumber": "787845249",
+        "marketplace": "MotorOil",
+        "customerName": "EREĞLİ PROMAK",
+        "customerEmail": "korhankoc87@hotmail.com",
+        "totalAmount": "7075",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2025-11-03T14:09:41.000Z",
+        "items": [
+          {
+            "sku": "",
+            "price": 1415,
+            "quantity": 5,
+            "productName": "Motul Dot 5.1 Fren Hi̇droli̇ği̇ 500 Ml (5 Adet)"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": "",
+              "price": 1415,
+              "quantity": 5,
+              "productName": "Motul Dot 5.1 Fren Hi̇droli̇ği̇ 500 Ml (5 Adet)"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "787845249",
+          "orderDate": "2025-11-03T14:09:41.000Z",
+          "totalAmount": 7075,
+          "customerName": "EREĞLİ PROMAK",
+          "customerEmail": "korhankoc87@hotmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:13.021Z",
+        "updatedAt": "2026-01-30T22:30:18.769Z"
+      },
+      {
+        "id": "cml19j1as000070pi7zfrpy7f",
+        "marketplaceId": "988638760",
+        "orderNumber": "988638760",
+        "marketplace": "MotorOil",
+        "customerName": "mücahit Baran",
+        "customerEmail": "palabiyik522@hotmail.com",
+        "totalAmount": "648",
+        "currency": "TRY",
+        "status": "Hazırlanıyor",
+        "orderDate": "2026-01-30T18:57:29.000Z",
+        "items": [
+          {
+            "sku": "P.O-0018",
+            "price": 648,
+            "quantity": 1,
+            "productName": "Petrol Ofisi Maxima XT 5W30 4 lt Motor Yağı"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": "P.O-0018",
+              "price": 648,
+              "quantity": 1,
+              "productName": "Petrol Ofisi Maxima XT 5W30 4 lt Motor Yağı"
+            }
+          ],
+          "status": "Hazırlanıyor",
+          "orderId": "988638760",
+          "orderDate": "2026-01-30T18:57:29.000Z",
+          "totalAmount": 648,
+          "customerName": "mücahit Baran",
+          "customerEmail": "palabiyik522@hotmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:10.036Z",
+        "updatedAt": "2026-01-30T22:30:15.847Z"
+      },
+      {
+        "id": "cml19j1oq000270pieglh5ei9",
+        "marketplaceId": "649891308",
+        "orderNumber": "649891308",
+        "marketplace": "MotorOil",
+        "customerName": "BÜLENT TRABZON",
+        "customerEmail": "avansiparis@gmail.com",
+        "totalAmount": "3120",
+        "currency": "TRY",
+        "status": "Kargolandı",
+        "orderDate": "2026-01-10T10:08:57.000Z",
+        "items": [
+          {
+            "sku": 2368,
+            "price": 1560,
+            "quantity": 2,
+            "productName": "Liqui Moly Antibakteriyel Dizel Yakıt Katkısı 1L"
+          },
+          {
+            "sku": "ISKONTO",
+            "price": -312,
+            "quantity": 1,
+            "productName": "PROMOSYON"
+          }
+        ],
+        "shippingAddress": null,
+        "invoiceAddress": null,
+        "cargoTrackingNo": null,
+        "cargoProvider": null,
+        "rawData": {
+          "items": [
+            {
+              "sku": 2368,
+              "price": 1560,
+              "quantity": 2,
+              "productName": "Liqui Moly Antibakteriyel Dizel Yakıt Katkısı 1L"
+            },
+            {
+              "sku": "ISKONTO",
+              "price": -312,
+              "quantity": 1,
+              "productName": "PROMOSYON"
+            }
+          ],
+          "status": "Kargolandı",
+          "orderId": "649891308",
+          "orderDate": "2026-01-10T10:08:57.000Z",
+          "totalAmount": 3120,
+          "customerName": "BÜLENT TRABZON",
+          "customerEmail": "avansiparis@gmail.com"
+        },
+        "deletedAt": null,
+        "createdAt": "2026-01-30T19:15:10.538Z",
+        "updatedAt": "2026-01-30T22:30:16.316Z"
+      }
+    ],
+    "serviceRecords": [],
+    "stockTransfers": [
+      {
+        "id": "cml0yhekf0001lyvdkeedhyxq",
+        "productId": "cml0spvca0003vs27cnx42bn5",
+        "productName": "SALCANO HECTOR 26V",
+        "productCode": "12122",
+        "qty": 1,
+        "fromBranch": "Merkez",
+        "toBranch": "Kadıköy Şube",
+        "status": "RECEIVED",
+        "requestedBy": "Sistem",
+        "shippedAt": "2026-01-30T14:05:58.143Z",
+        "receivedAt": "2026-01-30T14:34:16.605Z",
+        "receivedBy": "Sistem",
+        "trackingNo": null,
+        "notes": "Hızlı Transfer",
+        "createdAt": "2026-01-30T14:05:58.143Z",
+        "updatedAt": "2026-01-30T14:34:16.606Z"
+      },
+      {
+        "id": "cml15ezh00001xemxwvlicyrd",
+        "productId": "cml0yajq3000111x1l1i0uad0",
+        "productName": "SALCANO HECTOR 26V",
+        "productCode": "12122",
+        "qty": 1,
+        "fromBranch": "Merkez",
+        "toBranch": "ANTALYA",
+        "status": "RECEIVED",
+        "requestedBy": "Sistem",
+        "shippedAt": "2026-01-30T17:20:02.580Z",
+        "receivedAt": "2026-01-30T17:20:37.896Z",
+        "receivedBy": "Sistem",
+        "trackingNo": null,
+        "notes": "Hızlı Transfer",
+        "createdAt": "2026-01-30T17:20:02.580Z",
+        "updatedAt": "2026-01-30T17:20:37.897Z"
+      }
+    ],
+    "campaigns": [
+      {
+        "id": "cml0zw8n00009544py94lmne9",
+        "name": "PARAPUAN",
+        "type": "loyalty_points",
+        "description": null,
+        "conditions": {
+          "brands": [
+            "SALCANO"
+          ],
+          "categories": [],
+          "paymentMethod": ""
+        },
+        "discountRate": 0,
+        "pointsRate": 0.02,
+        "startDate": "2026-01-30T14:45:29.824Z",
+        "endDate": null,
+        "isActive": true,
+        "createdAt": "2026-01-30T14:45:29.824Z",
+        "updatedAt": "2026-01-30T14:45:29.824Z"
+      },
+      {
+        "id": "cml19crru00043b406zab8xsj",
+        "name": "nakite %10 indirim",
+        "type": "payment_method_discount",
+        "description": null,
+        "conditions": {
+          "brands": [],
+          "categories": [],
+          "paymentMethod": "cash"
+        },
+        "discountRate": 0.1,
+        "pointsRate": 0,
+        "startDate": "2026-01-30T19:10:17.181Z",
+        "endDate": null,
+        "isActive": true,
+        "createdAt": "2026-01-30T19:10:17.181Z",
+        "updatedAt": "2026-01-30T19:10:17.181Z"
+      }
+    ],
+    "coupons": [
+      {
+        "id": "cml0zvsia000g141whhb7c9mw",
+        "code": "2026",
+        "campaignName": null,
+        "type": "amount",
+        "value": 100,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T19:19:14.476Z",
+        "expiryDate": null,
+        "conditions": null,
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T14:45:08.918Z",
+        "updatedAt": "2026-01-30T14:45:08.918Z"
+      },
+      {
+        "id": "cml19j805000g70piv2txvgh4",
+        "code": "OLM50H",
+        "campaignName": null,
+        "type": "amount",
+        "value": 1000,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T19:19:14.476Z",
+        "expiryDate": null,
+        "conditions": null,
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:15:18.725Z",
+        "updatedAt": "2026-01-30T19:15:18.725Z"
+      },
+      {
+        "id": "cml19sp7900007y0fx4bmkcrp",
+        "code": "FFOMZU",
+        "campaignName": null,
+        "type": "amount",
+        "value": 0,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T19:22:41.056Z",
+        "expiryDate": null,
+        "conditions": null,
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:22:40.917Z",
+        "updatedAt": "2026-01-30T19:22:40.917Z"
+      },
+      {
+        "id": "cml19zar20000ft9dquijsyjc",
+        "code": "TAB-G8GLF",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar20001ft9d4hrfry1p",
+        "code": "TAB-X6ZC7",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar20002ft9dak6ejew4",
+        "code": "TAB-5QSAL",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar20003ft9d3pezk4wp",
+        "code": "TAB-NKMYR",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar20004ft9dhko5pahs",
+        "code": "TAB-E8HUB",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar20005ft9duxqkchms",
+        "code": "TAB-BV88E",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar20006ft9dclgv1tpf",
+        "code": "TAB-TSLCM",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar20007ft9d50ffav1b",
+        "code": "TAB-545V4",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar20008ft9d12gd2ga9",
+        "code": "TAB-LY519",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar20009ft9dntw6id30",
+        "code": "TAB-7ZEFS",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar2000aft9de7o6d35f",
+        "code": "TAB-R9HD5",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar2000bft9dazuwg5k7",
+        "code": "TAB-HUZSS",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar2000cft9dzzzkw8qj",
+        "code": "TAB-LVKU9",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar2000dft9d4d2zpjur",
+        "code": "TAB-BXPIN",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar2000eft9d4qxwk6r9",
+        "code": "TAB-LR3EJ",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar2000fft9d291zq2xb",
+        "code": "TAB-X4EFL",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar2000gft9d1lki1jyr",
+        "code": "TAB-COOYS",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar2000hft9djz9735mw",
+        "code": "TAB-IJ1K9",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar2000ift9duumu13sz",
+        "code": "TAB-6UP06",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      },
+      {
+        "id": "cml19zar2000jft9dpl7wemqx",
+        "code": "TAB-IWBFO",
+        "campaignName": "TABİPLER ODASI",
+        "type": "percent",
+        "value": 99,
+        "minPurchaseAmount": "0",
+        "customerCategoryId": "",
+        "customerId": null,
+        "startDate": "2026-01-30T00:00:00.000Z",
+        "expiryDate": "2026-02-10T00:00:00.000Z",
+        "conditions": {
+          "brands": [],
+          "categories": []
+        },
+        "usageLimit": 1,
+        "usedCount": 0,
+        "isUsed": false,
+        "usedAt": null,
+        "createdAt": "2026-01-30T19:27:48.779Z",
+        "updatedAt": "2026-01-30T19:27:48.779Z"
+      }
+    ],
+    "warranties": [],
+    "auditLogs": [
+      {
+        "id": "cml1967g800003b40dt293j6h",
+        "userId": null,
+        "userName": "Admin",
+        "action": "RESET_DATA",
+        "entity": "SYSTEM",
+        "entityId": null,
+        "details": "Tüm finansal veriler, servis kayıtları ve işlem geçmişi admin tarafından sıfırlandı.",
+        "ipAddress": null,
+        "createdAt": "2026-01-30T19:05:11.481Z"
+      }
+    ],
+    "securityEvents": [],
+    "notifications": [],
+    "pendingProducts": [],
+    "pendingTransfers": [],
+    "inventoryAudits": [
+      {
+        "id": "cml198t030000oltt5tj3s4gq",
+        "branch": "Merkez",
+        "startedAt": "2026-01-30T19:07:12.723Z",
+        "finishedAt": "2026-01-30T19:07:13.655Z",
+        "status": "completed",
+        "items": [
+          {
+            "id": "cml0spvca0003vs27cnx42bn5",
+            "diff": 6,
+            "name": "SALCANO HECTOR 26V",
+            "stock": -6,
+            "counted": 0,
+            "costDiff": 60000
+          }
+        ],
+        "reportedBy": "Sistem",
+        "createdAt": "2026-01-30T19:07:12.723Z",
+        "updatedAt": "2026-01-30T19:07:13.656Z"
+      }
+    ],
+    "appSettings": [
+      {
+        "id": "cml0sogb60000vs270ulor2ru",
+        "key": "brands",
+        "value": [
+          "SALCANO"
+        ],
+        "updatedAt": "2026-01-30T11:23:29.299Z"
+      },
+      {
+        "id": "cml0soknz0001vs27yvp8flnl",
+        "key": "prodCats",
+        "value": [
+          "BİSİKLET"
+        ],
+        "updatedAt": "2026-01-30T11:23:34.852Z"
+      },
+      {
+        "id": "cml0sos4w0002vs27eti0h3an",
+        "key": "custClasses",
+        "value": [
+          "MAĞAZA"
+        ],
+        "updatedAt": "2026-01-30T11:23:44.625Z"
+      },
+      {
+        "id": "cml11fcuk0004qs6x1ifr2cst",
+        "key": "salesExpenses",
+        "value": {
+          "otherCosts": [
+            {
+              "cost": 0.5,
+              "name": "Poşet/Ambalaj"
+            },
+            {
+              "cost": 15,
+              "name": "Kargo Maliyeti (Ortalama)"
+            }
+          ],
+          "eInvoiceCost": 0.15,
+          "printingCost": 0.05,
+          "posCommissions": [
+            {
+              "rate": 3,
+              "installment": "Tek Çekim"
+            },
+            {
+              "rate": 5,
+              "installment": "2 TAKSİT"
+            }
+          ]
+        },
+        "updatedAt": "2026-01-30T15:28:35.830Z"
+      },
+      {
+        "id": "cml135yel0000bjmxaqrykoat",
+        "key": "paymentMethods",
+        "value": [
+          {
+            "id": "pm_1769789871355",
+            "icon": "💵",
+            "type": "cash",
+            "label": "NAKİT",
+            "linkedKasaId": "cml0t7lsv000076kcexqiymsb"
+          },
+          {
+            "id": "pm_1769789996938",
+            "icon": "💳",
+            "type": "card",
+            "label": "KREDİ KARTI",
+            "linkedKasaId": "cml138h2x0004bjmxknd5ycg8"
+          },
+          {
+            "id": "pm_1769796476690",
+            "icon": "🏦",
+            "type": "transfer",
+            "label": "HAVALE",
+            "linkedKasaId": "cml0zevjd0002zlex417q05un"
+          }
+        ],
+        "updatedAt": "2026-01-30T18:07:52.732Z"
+      },
+      {
+        "id": "cml19art200013b40ve87wipv",
+        "key": "motoMaintenancePrice",
+        "value": 400,
+        "updatedAt": "2026-01-30T19:08:44.302Z"
+      },
+      {
+        "id": "cml19art200023b402ji1a0mt",
+        "key": "bikeMaintenancePrice",
+        "value": 200,
+        "updatedAt": "2026-01-30T19:08:44.302Z"
+      },
+      {
+        "id": "cml0zv3dl0007544p6g8zi3cj",
+        "key": "referralSettings",
+        "value": {
+          "refereeGift": 5,
+          "referrerDiscount": 2
+        },
+        "updatedAt": "2026-01-30T19:15:40.126Z"
+      },
+      {
+        "id": "cml1fczy400004ftkqfs7onbk",
+        "key": "privacySettings",
+        "value": {
+          "hideProfit": false,
+          "hideExpense": false,
+          "hideRevenue": false
+        },
+        "updatedAt": "2026-01-30T22:01:35.570Z"
+      }
+    ],
+    "marketplaceConfigs": [],
+    "marketplaceProductMaps": [],
+    "customerCategories": [],
+    "customerDocuments": []
+  }
+}

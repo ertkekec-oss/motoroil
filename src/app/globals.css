@@ -7,6 +7,8 @@
   --bg-dark: #080911;
   --bg-card: rgba(15, 17, 30, 0.7);
   --bg-hover: rgba(30, 35, 60, 0.8);
+  --glass-bg: rgba(15, 17, 30, 0.4);
+  --modal-overlay: rgba(0, 0, 0, 0.7);
 
   --primary: #FF5500;
   /* Motoroil Orange */
@@ -21,6 +23,7 @@
   --text-muted: #64748B;
   --border-light: rgba(255, 255, 255, 0.04);
   --border-rich: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(255, 255, 255, 0.03);
 
   --success: #10B981;
   --danger: #FF3333;
@@ -37,6 +40,8 @@
 
   /* Noise overlay opacity */
   --noise-opacity: 0.02;
+
+  --gradient-text: linear-gradient(135deg, white 0%, #CBD5E1 100%);
 }
 
 /* Light Mode Theme */
@@ -45,6 +50,8 @@
   --bg-dark: #F1F5F9;
   --bg-card: rgba(255, 255, 255, 0.9);
   --bg-hover: rgba(241, 245, 249, 0.95);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --modal-overlay: rgba(0, 0, 0, 0.4);
 
   --primary: #FF5500;
   --primary-rgb: 255, 85, 0;
@@ -57,6 +64,7 @@
   --text-muted: #64748B;
   --border-light: rgba(0, 0, 0, 0.06);
   --border-rich: rgba(0, 0, 0, 0.12);
+  --input-bg: rgba(0, 0, 0, 0.03);
 
   --success: #10B981;
   --danger: #EF4444;
@@ -66,6 +74,8 @@
   --glass-border: 1px solid rgba(0, 0, 0, 0.08);
 
   --noise-opacity: 0.015;
+
+  --gradient-text: linear-gradient(135deg, #0F172A 0%, #475569 100%);
 }
 
 /* Base Reset & Core Styles */
@@ -116,7 +126,7 @@ body::before {
 
 /* Glassmorphism & UI Components */
 .glass {
-  background: rgba(15, 17, 30, 0.4);
+  background: var(--glass-bg);
   backdrop-filter: blur(20px) saturate(180%);
   border: var(--glass-border);
 }
@@ -174,7 +184,7 @@ body::before {
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-hover);
   color: var(--text-main);
 }
 
@@ -389,7 +399,7 @@ body::before {
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, white 0%, #CBD5E1 100%);
+  background: var(--gradient-text);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -402,7 +412,7 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--modal-overlay);
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
@@ -442,18 +452,18 @@ body::before {
 
 .input-field {
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--input-bg);
+  border: 1px solid var(--border-light);
   padding: 12px 16px;
   border-radius: 12px;
-  color: white;
+  color: var(--text-main);
   outline: none;
   transition: all 0.2s ease;
 }
 
 .input-field:focus {
   border-color: var(--primary);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-hover);
 }
 
 .form-group label {
@@ -465,10 +475,40 @@ body::before {
   color: var(--text-muted);
   margin-bottom: 6px;
 }
+
+/* Theme Optimized Utility Overrides */
+.border-subtle {
+  border-color: var(--border-light);
+}
+
+.border-main {
+  border-color: var(--border-rich);
+}
+
+.bg-main {
+  background-color: var(--bg-card);
+}
+
+.bg-subtle {
+  background-color: var(--bg-dark);
+}
+
+.hover-bg:hover {
+  background-color: var(--bg-hover);
+}
+
+.text-main {
+  color: var(--text-main);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
 /* Form Elements Legibility Fix */
 select {
   appearance: none;
-  background-image: url('data:image/svg+xml,%3Csvg xmlns=''http://www.w3.org/2000/svg'' fill=''none'' viewBox=''0 0 24 24'' stroke=''white''%3E%3Cpath stroke-linecap=''round'' stroke-linejoin=''round'' stroke-width=''2'' d=''M19 9l-7 7-7-7''%3E%3C/path%3E%3C/svg%3E');
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 16px;
@@ -481,11 +521,34 @@ select option {
   padding: 10px;
 }
 
-[data-theme=''light''] select {
-  background-image: url('data:image/svg+xml,%3Csvg xmlns=''http://www.w3.org/2000/svg'' fill=''none'' viewBox=''0 0 24 24'' stroke=''black''%3E%3Cpath stroke-linecap=''round'' stroke-linejoin=''round'' stroke-width=''2'' d=''M19 9l-7 7-7-7''%3E%3C/path%3E%3C/svg%3E');
+[data-theme="light"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='black'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
 }
 
-[data-theme=''light''] select option {
+[data-theme="light"] select option {
   background-color: white;
   color: black;
+}
+
+/* POS Page Styles */
+.stat-card-modern {
+  transition: transform 0.2s ease;
+}
+
+.stat-card-modern:hover {
+  transform: translateY(-4px);
+}
+
+.cart-item {
+  transition: background-color 0.2s ease;
+}
+
+.cart-item:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
 }

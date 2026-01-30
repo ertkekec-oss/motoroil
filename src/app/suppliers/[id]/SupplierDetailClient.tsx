@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useModal } from '@/contexts/ModalContext';
@@ -10,6 +10,7 @@ import { useApp } from '@/contexts/AppContext';
 import SupplierPurchaseModal from '@/components/modals/SupplierPurchaseModal';
 import TransactionDetailModal from '@/components/modals/TransactionDetailModal';
 import StatementModal from '@/components/modals/StatementModal';
+import Pagination from '@/components/Pagination';
 
 export default function SupplierDetailClient({ supplierId, supplierData, displayHistory }: { supplierId: string, supplierData: any, displayHistory: any[] }) {
     const router = useRouter();
@@ -19,6 +20,15 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
 
     // Check Collection States
     const [activeTab, setActiveTab] = useState<'all' | 'checks'>('all');
+
+    // PAGINATION
+    const ITEMS_PER_PAGE = 10;
+    const [currentPage, setCurrentPage] = useState(1);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeTab]);
+
     const [showCheckCollectModal, setShowCheckCollectModal] = useState(false);
     const [activeCheck, setActiveCheck] = useState<any>(null);
     const [targetKasaId, setTargetKasaId] = useState('');
@@ -238,88 +248,107 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                     </div>
 
                     <div style={{ overflowX: 'auto' }}>
-                        {activeTab === 'all' ? (
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                {/* ... existing table header ... */}
-                                <thead style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: '#888' }}>
-                                    <tr>
-                                        <th style={{ padding: '12px' }}>Tarih</th>
-                                        <th>İşlem Türü</th>
-                                        <th>Açıklama / Referans</th>
-                                        <th style={{ textAlign: 'right' }}>Tutar</th>
-                                        <th style={{ textAlign: 'center' }}>İşlem</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {displayHistory.map((item, idx) => (
-                                        <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                                            <td style={{ padding: '16px 12px', color: '#ccc', fontSize: '13px' }}>{item.date}</td>
-                                            <td>
-                                                <span style={{ fontSize: '10px', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold', background: item.type === 'Alış' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)', color: item.color }}>
-                                                    {item.type.toUpperCase()}
-                                                </span>
-                                            </td>
-                                            <td style={{ fontSize: '14px', color: '#eee' }}>
-                                                {item.desc}
-                                                <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>Ref: {item.method}</div>
-                                            </td>
-                                            <td style={{ textAlign: 'right', fontWeight: '700', color: (item.amount < 0 && item.type !== 'Ödeme') ? '#ef4444' : '#10b981', fontSize: '15px' }}>
-                                                {item.amount.toLocaleString()} ₺
-                                            </td>
-                                            <td style={{ textAlign: 'center' }}>
-                                                <button
-                                                    onClick={() => { setSelectedTransaction(item); setIsDetailModalOpen(true); }}
-                                                    style={{ fontSize: '11px', padding: '4px 10px', background: 'transparent', border: '1px solid #555', color: '#ccc', borderRadius: '4px', cursor: 'pointer' }}
-                                                >
-                                                    🔍 Detay
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {displayHistory.length === 0 && (
-                                        <tr><td colSpan={5} style={{ textAlign: 'center', padding: '60px', color: '#888' }}>Henüz bir işlem kaydı bulunmuyor.</td></tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        ) : (
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                <thead style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: '#888' }}>
-                                    <tr>
-                                        <th style={{ padding: '12px' }}>Vade</th>
-                                        <th>Tür</th>
-                                        <th>Banka / No</th>
-                                        <th>Durum</th>
-                                        <th style={{ textAlign: 'right' }}>Tutar</th>
-                                        <th style={{ textAlign: 'center' }}>İşlem</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {(!supplier.checks || supplier.checks.length === 0) ? (
-                                        <tr><td colSpan={6} style={{ textAlign: 'center', padding: '60px', color: '#888' }}>Kayıtlı evrak bulunmuyor.</td></tr>
-                                    ) : (
-                                        supplier.checks.map((c: any) => (
-                                            <tr key={c.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                                                <td style={{ padding: '16px 12px', color: '#ccc', fontSize: '13px' }}>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
-                                                <td><b>{c.type}</b></td>
-                                                <td style={{ color: '#aaa' }}>{c.bank} - {c.number}</td>
-                                                <td><span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '10px' }}>{c.status}</span></td>
-                                                <td style={{ textAlign: 'right', fontWeight: '700', color: '#fff' }}>{Number(c.amount).toLocaleString()} ₺</td>
-                                                <td style={{ textAlign: 'center' }}>
-                                                    {c.status === 'Beklemede' && (
-                                                        <button
-                                                            onClick={() => { setActiveCheck(c); setTargetKasaId(String(kasalar[0]?.id || '')); setShowCheckCollectModal(true); }}
-                                                            style={{ fontSize: '10px', padding: '5px 10px', background: '#3b82f6', border: 'none', color: 'white', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                                                        >
-                                                            {c.type.includes('Alınan') ? 'Tahsil Et' : 'Öde'}
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        )}
+                        {(() => {
+                            const currentList = activeTab === 'all' ? displayHistory : (supplier.checks || []);
+                            const totalPages = Math.ceil(currentList.length / ITEMS_PER_PAGE);
+                            const paginatedList = currentList.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+                            if (activeTab === 'all') {
+                                return (
+                                    <>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                                            <thead style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: '#888' }}>
+                                                <tr>
+                                                    <th style={{ padding: '12px' }}>Tarih</th>
+                                                    <th>İşlem Türü</th>
+                                                    <th>Açıklama / Referans</th>
+                                                    <th style={{ textAlign: 'right' }}>Tutar</th>
+                                                    <th style={{ textAlign: 'center' }}>İşlem</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedList.map((item, idx) => (
+                                                    <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                                        <td style={{ padding: '16px 12px', color: '#ccc', fontSize: '13px' }}>{item.date}</td>
+                                                        <td>
+                                                            <span style={{ fontSize: '10px', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold', background: item.type === 'Alış' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)', color: item.color }}>
+                                                                {item.type.toUpperCase()}
+                                                            </span>
+                                                        </td>
+                                                        <td style={{ fontSize: '14px', color: '#eee' }}>
+                                                            {item.desc}
+                                                            <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>Ref: {item.method}</div>
+                                                        </td>
+                                                        <td style={{ textAlign: 'right', fontWeight: '700', color: (item.amount < 0 && item.type !== 'Ödeme') ? '#ef4444' : '#10b981', fontSize: '15px' }}>
+                                                            {item.amount.toLocaleString()} ₺
+                                                        </td>
+                                                        <td style={{ textAlign: 'center' }}>
+                                                            <button
+                                                                onClick={() => { setSelectedTransaction(item); setIsDetailModalOpen(true); }}
+                                                                style={{ fontSize: '11px', padding: '4px 10px', background: 'transparent', border: '1px solid #555', color: '#ccc', borderRadius: '4px', cursor: 'pointer' }}
+                                                            >
+                                                                🔍 Detay
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {paginatedList.length === 0 && (
+                                                    <tr><td colSpan={5} style={{ textAlign: 'center', padding: '60px', color: '#888' }}>Henüz bir işlem kaydı bulunmuyor.</td></tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                        <div style={{ marginTop: '20px' }}>
+                                            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                                        </div>
+                                    </>
+                                );
+                            } else {
+                                return (
+                                    <>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                                            <thead style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: '#888' }}>
+                                                <tr>
+                                                    <th style={{ padding: '12px' }}>Vade</th>
+                                                    <th>Tür</th>
+                                                    <th>Banka / No</th>
+                                                    <th>Durum</th>
+                                                    <th style={{ textAlign: 'right' }}>Tutar</th>
+                                                    <th style={{ textAlign: 'center' }}>İşlem</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedList.length === 0 ? (
+                                                    <tr><td colSpan={6} style={{ textAlign: 'center', padding: '60px', color: '#888' }}>Kayıtlı evrak bulunmuyor.</td></tr>
+                                                ) : (
+                                                    paginatedList.map((c: any) => (
+                                                        <tr key={c.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                                            <td style={{ padding: '16px 12px', color: '#ccc', fontSize: '13px' }}>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
+                                                            <td><b>{c.type}</b></td>
+                                                            <td style={{ color: '#aaa' }}>{c.bank} - {c.number}</td>
+                                                            <td><span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '10px' }}>{c.status}</span></td>
+                                                            <td style={{ textAlign: 'right', fontWeight: '700', color: '#fff' }}>{Number(c.amount).toLocaleString()} ₺</td>
+                                                            <td style={{ textAlign: 'center' }}>
+                                                                {c.status === 'Beklemede' && (
+                                                                    <button
+                                                                        onClick={() => { setActiveCheck(c); setTargetKasaId(String(kasalar[0]?.id || '')); setShowCheckCollectModal(true); }}
+                                                                        style={{ fontSize: '10px', padding: '5px 10px', background: '#3b82f6', border: 'none', color: 'white', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                                                                    >
+                                                                        {c.type.includes('Alınan') ? 'Tahsil Et' : 'Öde'}
+                                                                    </button>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
+                                        <div style={{ marginTop: '20px' }}>
+                                            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                                        </div>
+                                    </>
+                                );
+                            }
+                        })()}
                     </div>
                 </div>
 

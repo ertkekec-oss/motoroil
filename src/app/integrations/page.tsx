@@ -160,44 +160,71 @@ export default function IntegrationsPage() {
         setIsTesting(false);
     };
 
-    // Load settings from localStorage on mount
+    // Load settings from Database (and fallback to localStorage) on mount
     useEffect(() => {
-        const savedEFatura = localStorage.getItem('motoroil_efatura_settings');
-        const savedMarketplace = localStorage.getItem('motoroil_marketplace_settings');
-        const savedPos = localStorage.getItem('motoroil_pos_settings');
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/integrations/settings/save');
+                const data = await res.json();
+                if (data.success) {
+                    if (data.eFaturaSettings) setEFaturaSettings(data.eFaturaSettings);
+                    if (data.posSettings) setPosSettings(data.posSettings);
+                    if (data.marketplaceSettings && Object.keys(data.marketplaceSettings).length > 0) {
+                        setMarketplaceSettings(prev => ({
+                            ...prev,
+                            ...data.marketplaceSettings
+                        }));
+                    }
+                }
+            } catch (e) {
+                console.error('Fetch error:', e);
+                // Fallback to localStorage
+                const savedEFatura = localStorage.getItem('motoroil_efatura_settings');
+                const savedMarketplace = localStorage.getItem('motoroil_marketplace_settings');
+                const savedPos = localStorage.getItem('motoroil_pos_settings');
 
-        if (savedEFatura) setEFaturaSettings(JSON.parse(savedEFatura));
-        if (savedMarketplace) setMarketplaceSettings(JSON.parse(savedMarketplace));
-        if (savedPos) setPosSettings(JSON.parse(savedPos));
+                if (savedEFatura) setEFaturaSettings(JSON.parse(savedEFatura));
+                if (savedMarketplace) setMarketplaceSettings(JSON.parse(savedMarketplace));
+                if (savedPos) setPosSettings(JSON.parse(savedPos));
+            }
+        };
+        fetchSettings();
     }, []);
 
     const saveSettings = async () => {
-        // LocalStorage'a kaydet (Browser için)
-        localStorage.setItem('motoroil_efatura_settings', JSON.stringify(eFaturaSettings));
-        localStorage.setItem('motoroil_marketplace_settings', JSON.stringify(marketplaceSettings));
-        localStorage.setItem('motoroil_pos_settings', JSON.stringify(posSettings));
-
         try {
-            // Veritabanına kaydet (Cron işlemleri için sunucu tarafında gerekli)
+            // Veritabanına kaydet
             const response = await fetch('/api/integrations/settings/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     marketplaceSettings,
-                    eFaturaSettings
+                    eFaturaSettings,
+                    posSettings
                 })
             });
 
             const data = await response.json();
 
             if (data.success) {
-                showSuccess('Başarılı', '✅ Ayarlar başarıyla kaydedildi! (Sunucu & Local)');
+                showSuccess('Başarılı', '✅ Tüm ayarlar veritabanına kaydedildi.');
+
+                // Backup to localStorage
+                localStorage.setItem('motoroil_efatura_settings', JSON.stringify(eFaturaSettings));
+                localStorage.setItem('motoroil_marketplace_settings', JSON.stringify(marketplaceSettings));
+                localStorage.setItem('motoroil_pos_settings', JSON.stringify(posSettings));
             } else {
-                showError('Kısmi Başarılı', '⚠️ Ayarlar tarayıcıya kaydedildi ama sunucuya kaydedilemedi: ' + data.error);
+                showError('Hata', '⚠️ Ayarlar kaydedilemedi: ' + data.error);
             }
         } catch (error) {
             console.error('Save error:', error);
-            showSuccess('Kaydedildi', '✅ Ayarlar tarayıcıya kaydedildi. (Sunucu bağlantı hatası)');
+            showError('Hata', 'Sunucu bağlantı hatası.');
+
+            // Local fallback
+            localStorage.setItem('motoroil_efatura_settings', JSON.stringify(eFaturaSettings));
+            localStorage.setItem('motoroil_marketplace_settings', JSON.stringify(marketplaceSettings));
+            localStorage.setItem('motoroil_pos_settings', JSON.stringify(posSettings));
+            showSuccess('Yerel Kayıt', '✅ Ayarlar tarayıcıya (yerel) kaydedildi.');
         }
     };
 

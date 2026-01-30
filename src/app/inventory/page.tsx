@@ -582,7 +582,7 @@ function InventoryContent() {
                 }
             `}</style>
             {/* --- HEADER --- */}
-            <div className="flex justify-between items-end mb-8">
+            <div className="flex justify-between items-center mb-8">
                 <div>
                     {!isCounting ? (
                         <>
@@ -603,6 +603,59 @@ function InventoryContent() {
                     )}
                 </div>
 
+                {!isCounting && (
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleExcelUpload}
+                            accept=".xlsx, .xls"
+                            className="hidden"
+                        />
+
+                        <div className="flex bg-subtle p-1 rounded-xl border border-main">
+                            <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 px-3 py-2 rounded-lg hover-bg text-muted hover:text-main transition-colors text-[11px] font-bold uppercase tracking-wide">
+                                <span className="text-sm">📤</span>
+                                <span>Yükle</span>
+                            </button>
+                            <div className="w-px h-6 my-auto bg-main mx-1"></div>
+                            <button onClick={exportToExcel} className="flex items-center gap-2 px-3 py-2 rounded-lg hover-bg text-muted hover:text-main transition-colors text-[11px] font-bold uppercase tracking-wide">
+                                <span className="text-sm">📥</span>
+                                <span>İndir</span>
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={startCount}
+                            className="group relative px-6 py-2.5 rounded-xl bg-subtle border border-main overflow-hidden hover:border-emerald-500/50 transition-all hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div className="relative flex items-center gap-2 text-muted group-hover:text-emerald-400 font-bold text-xs uppercase tracking-wide">
+                                <span className="group-hover:rotate-12 transition-transform duration-300 transform origin-center text-sm">🔍</span>
+                                <span>Stok Sayımı</span>
+                            </div>
+                        </button>
+
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            className="group relative px-6 py-2.5 rounded-xl bg-[#FF5500] hover:bg-[#FF6600] overflow-hidden shadow-lg shadow-[#FF5500]/30 hover:shadow-[#FF5500]/50 hover:scale-[1.02] transition-all"
+                        >
+                            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+                            <div className="relative flex items-center gap-2 text-white font-black text-xs uppercase tracking-wide">
+                                <span className="text-sm leading-none">+</span>
+                                <span>YENİ ÜRÜN</span>
+                            </div>
+                        </button>
+
+                        <button
+                            onClick={() => setShowScanner(true)}
+                            className="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-xl bg-subtle border border-main text-muted hover:text-main hover:border-white/30 transition-all font-bold text-xs uppercase tracking-wide"
+                        >
+                            <span>📷</span>
+                            Barkod Tara
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* --- DASHBOARD STATS (New Design) --- */}
@@ -612,9 +665,9 @@ function InventoryContent() {
                         <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
                         <div>
                             <div className="text-muted text-xs font-bold uppercase tracking-wider mb-1">Toplam Ürün</div>
-                            <div className="text-3xl font-black text-white">{(products || []).length}</div>
+                            <div className="text-3xl font-black text-main">{(products || []).length}</div>
                         </div>
-                        <div className="text-[10px] text-white/40 font-medium mt-4">
+                        <div className="text-[10px] text-muted font-medium mt-4">
                             {(products || []).filter(p => !p.category).length} kategorisiz ürün
                         </div>
                     </div>
@@ -683,74 +736,23 @@ function InventoryContent() {
             {/* --- UNIFIED TOOLBAR --- */}
             {!isCounting ? (
                 <div className="flex items-center gap-3 mb-6 z-20 relative overflow-x-auto pb-2 scrollbar-none no-scrollbar flex-nowrap min-w-0">
-                    <div className="flex p-1 bg-white/5 backdrop-blur-md rounded-xl border border-white/5 whitespace-nowrap">
+                    <div className="flex p-1 bg-subtle backdrop-blur-md rounded-xl border border-subtle whitespace-nowrap">
                         <button
                             onClick={() => setActiveTab('all')}
-                            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-main hover:bg-subtle'}`}
                         >
                             <span>📦</span>
                             Envanter Listesi
                         </button>
                         <button
                             onClick={() => setActiveTab('transfers')}
-                            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'transfers' ? 'bg-white/10 text-white shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'transfers' ? 'bg-main text-main shadow-lg' : 'text-muted hover:text-main hover:bg-subtle'}`}
                         >
                             <span>🚛</span>
                             Transfer & Sevkiyat
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleExcelUpload}
-                            accept=".xlsx, .xls"
-                            className="hidden"
-                        />
-
-                        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
-                            <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wide">
-                                <span className="text-sm">📤</span>
-                                <span>Yükle</span>
-                            </button>
-                            <div className="w-px h-6 my-auto bg-white/10 mx-1"></div>
-                            <button onClick={exportToExcel} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wide">
-                                <span className="text-sm">📥</span>
-                                <span>İndir</span>
-                            </button>
-                        </div>
-
-                        <button
-                            onClick={startCount}
-                            className="group relative px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 overflow-hidden hover:border-emerald-500/50 transition-all hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                            <div className="relative flex items-center gap-2 text-white/70 group-hover:text-emerald-400 font-bold text-xs uppercase tracking-wide">
-                                <span className="group-hover:rotate-12 transition-transform duration-300 transform origin-center text-sm">🔍</span>
-                                <span>Stok Sayımı</span>
-                            </div>
-                        </button>
-
-                        <button
-                            onClick={() => setShowAddModal(true)}
-                            className="group relative px-6 py-2.5 rounded-xl bg-[#FF5500] hover:bg-[#FF6600] overflow-hidden shadow-lg shadow-[#FF5500]/30 hover:shadow-[#FF5500]/50 hover:scale-[1.02] transition-all"
-                        >
-                            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
-                            <div className="relative flex items-center gap-2 text-white font-black text-xs uppercase tracking-wide">
-                                <span className="text-sm leading-none">+</span>
-                                <span>YENİ ÜRÜN</span>
-                            </div>
-                        </button>
-
-                        <button
-                            onClick={() => setShowScanner(true)}
-                            className="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition-all font-bold text-xs uppercase tracking-wide"
-                        >
-                            <span>📷</span>
-                            Barkod Tara
-                        </button>
-                    </div>
 
                     <InventoryFilterBar
                         searchTerm={searchTerm}
@@ -772,7 +774,7 @@ function InventoryContent() {
             ) : (
                 <div className="flex items-center justify-between mb-6 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
                     <div className="flex items-center gap-4">
-                        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                        <div className="flex bg-subtle p-1 rounded-xl border border-main">
                             <input
                                 type="text"
                                 placeholder="Sayılacak ürünü ara..."

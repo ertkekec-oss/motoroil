@@ -18,7 +18,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div style={{ background: '#020205', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+      <div style={{ background: 'var(--bg-deep)', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)' }}>
         Yükleniyor...
       </div>
     );
@@ -34,14 +34,15 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', width: '100%', background: '#020205', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: '100vh', width: '100%', background: 'var(--bg-deep)', overflow: 'hidden' }}>
       <Sidebar />
       <main style={{
         flex: 1,
         marginLeft: '240px',
         height: '100%',
         overflowY: 'auto',
-        position: 'relative'
+        position: 'relative',
+        background: 'var(--bg-deep)'
       }}>
         {children}
         <ThemeToggle />

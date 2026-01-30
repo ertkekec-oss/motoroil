@@ -745,7 +745,7 @@ export default function SalesPage() {
                                         const isExpanded = expandedOrderId === o.id;
                                         return (
                                             <Fragment key={o.id}>
-                                                <tr style={{ borderTop: isExpanded ? 'none' : '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent' }} onClick={() => toggleExpand(o.id)}>
+                                                <tr style={{ borderTop: isExpanded ? 'none' : '1px solid var(--border-light)', cursor: 'pointer', background: isExpanded ? 'var(--bg-hover)' : 'transparent' }} onClick={() => toggleExpand(o.id)}>
                                                     <td style={{ padding: '16px' }} onClick={(e) => e.stopPropagation()}>
                                                         <input
                                                             type="checkbox"
@@ -754,7 +754,7 @@ export default function SalesPage() {
                                                             style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
                                                         />
                                                     </td>
-                                                    <td style={{ padding: '16px', fontFamily: 'monospace', fontWeight: 'bold' }}>{o.orderNumber || o.id}</td>
+                                                    <td style={{ padding: '16px', fontFamily: 'monospace', fontWeight: 'bold', color: 'var(--text-main)' }}>{o.orderNumber || o.id}</td>
                                                     <td>
                                                         <span style={{
                                                             fontSize: '11px', padding: '2px 6px', borderRadius: '4px',
@@ -768,7 +768,7 @@ export default function SalesPage() {
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        <div>{o.customerName}</div>
+                                                        <div style={{ color: 'var(--text-main)' }}>{o.customerName}</div>
                                                         <div className="text-muted" style={{ fontSize: '11px' }}>{new Date(o.orderDate || o.date).toLocaleDateString('tr-TR')}</div>
                                                     </td>
                                                     <td style={{ fontWeight: 'bold' }}>{parseFloat(o.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {o.currency}</td>
@@ -804,48 +804,46 @@ export default function SalesPage() {
                                                         </button>
                                                     </td>
                                                 </tr>
-                                                {
-                                                    isExpanded && (
-                                                        <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
-                                                            <td colSpan={6} style={{ padding: '0 20px 20px 20px' }}>
-                                                                <div style={{ padding: '20px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-                                                                    <div className="flex-between mb-4" style={{ alignItems: 'center' }}>
-                                                                        <h4 style={{ color: 'var(--text-main)', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px', margin: 0 }}>📦 Sipariş Detayı</h4>
-                                                                    </div>
-                                                                    <table style={{ width: '100%', fontSize: '13px', textAlign: 'left' }}>
-                                                                        <thead style={{ color: 'var(--text-muted)' }}>
-                                                                            <tr>
-                                                                                <th style={{ paddingBottom: '8px' }}>Ürün Adı</th>
-                                                                                <th>Adet</th>
-                                                                                <th>Birim Fiyat</th>
-                                                                                <th style={{ textAlign: 'right' }}>Tutar (KDV Dahil)</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            {o.items && o.items.map((item: any, idx: number) => (
-                                                                                <tr key={idx} style={{ borderTop: '1px solid var(--border-light)' }}>
-                                                                                    <td style={{ padding: '8px 0' }}>{item.name || item.productName}</td>
-                                                                                    <td>{item.qty || item.quantity}</td>
-                                                                                    <td>
-                                                                                        {item.unitPrice ? item.unitPrice.toFixed(2) :
-                                                                                            item.price ? item.price.toFixed(2) : '0.00'} ₺
-                                                                                    </td>
-                                                                                    <td style={{ textAlign: 'right', fontWeight: 'bold' }}>
-                                                                                        {item.total ? item.total.toFixed(2) :
-                                                                                            (item.price && item.quantity) ? (item.price * item.quantity).toFixed(2) : '0.00'} ₺
-                                                                                    </td>
-                                                                                </tr>
-                                                                            ))}
-                                                                        </tbody>
-                                                                    </table>
-                                                                    {(!o.items || o.items.length === 0) && (
-                                                                        <div className="text-muted text-center" style={{ fontSize: '11px', padding: '10px' }}>Ürün detayı bulunamadı.</div>
-                                                                    )}
+                                                {isExpanded && (
+                                                    <tr style={{ borderBottom: '1px solid var(--border-light)', background: 'var(--bg-hover)' }}>
+                                                        <td colSpan={6} style={{ padding: '0 20px 20px 20px' }}>
+                                                            <div style={{ padding: '20px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                                                                <div className="flex-between mb-4" style={{ alignItems: 'center' }}>
+                                                                    <h4 style={{ color: 'var(--text-main)', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px', margin: 0 }}>📦 Sipariş Detayı</h4>
                                                                 </div>
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                }
+                                                                <table style={{ width: '100%', fontSize: '13px', textAlign: 'left' }}>
+                                                                    <thead style={{ color: 'var(--text-muted)' }}>
+                                                                        <tr>
+                                                                            <th style={{ paddingBottom: '8px' }}>Ürün Adı</th>
+                                                                            <th>Adet</th>
+                                                                            <th>Birim Fiyat</th>
+                                                                            <th style={{ textAlign: 'right' }}>Tutar (KDV Dahil)</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {o.items && o.items.map((item: any, idx: number) => (
+                                                                            <tr key={idx} style={{ borderTop: '1px solid var(--border-light)' }}>
+                                                                                <td style={{ padding: '8px 0', color: 'var(--text-main)' }}>{item.name || item.productName}</td>
+                                                                                <td style={{ color: 'var(--text-main)' }}>{item.qty || item.quantity}</td>
+                                                                                <td style={{ color: 'var(--text-main)' }}>
+                                                                                    {item.unitPrice ? item.unitPrice.toFixed(2) :
+                                                                                        item.price ? item.price.toFixed(2) : '0.00'} ₺
+                                                                                </td>
+                                                                                <td style={{ textAlign: 'right', fontWeight: 'bold', color: 'var(--text-main)' }}>
+                                                                                    {item.total ? item.total.toFixed(2) :
+                                                                                        (item.price && item.quantity) ? (item.price * item.quantity).toFixed(2) : '0.00'} ₺
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                                {(!o.items || o.items.length === 0) && (
+                                                                    <div className="text-muted text-center" style={{ fontSize: '11px', padding: '10px' }}>Ürün detayı bulunamadı.</div>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
                                             </Fragment>
                                         );
                                     })}
@@ -857,106 +855,108 @@ export default function SalesPage() {
                         <div className="mt-4 pt-4 border-t border-white/10">
                             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                         </div>
-                    </div>
+                    </div >
                 )}
 
                 {/* INVOICES */}
-                {activeTab === 'invoices' && (
-                    <div>
-                        <div className="flex-between mb-4">
-                            <h3>📑 Kesilen Faturalar (Cariler)</h3>
-                            <button onClick={fetchInvoices} className="btn btn-outline" style={{ fontSize: '12px' }}>🔄 Yenile</button>
-                        </div>
+                {
+                    activeTab === 'invoices' && (
+                        <div>
+                            <div className="flex-between mb-4">
+                                <h3>📑 Kesilen Faturalar (Cariler)</h3>
+                                <button onClick={fetchInvoices} className="btn btn-outline" style={{ fontSize: '12px' }}>🔄 Yenile</button>
+                            </div>
 
-                        {isLoadingInvoices ? <p>Yükleniyor...</p> : (
-                            <table style={{ width: '100%', marginTop: '16px', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                <thead className="text-muted" style={{ fontSize: '12px' }}>
-                                    <tr>
-                                        <th style={{ padding: '12px' }}>Fatura No</th>
-                                        <th>Cari</th>
-                                        <th>Tarih</th>
-                                        <th>Tutar</th>
-                                        <th>Durum</th>
-                                        <th style={{ textAlign: 'center' }}>İşlem</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {realInvoices.length === 0 ? (
-                                        <tr><td colSpan={6} style={{ textAlign: 'center', padding: '40px' }} className="text-muted">Fatura bulunamadı.</td></tr>
-                                    ) : paginate(realInvoices).map(inv => {
-                                        const isExpanded = expandedOrderId === inv.id;
-                                        return (
-                                            <Fragment key={inv.id}>
-                                                <tr style={{ borderTop: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent' }} onClick={() => toggleExpand(inv.id)}>
-                                                    <td style={{ padding: '16px', fontWeight: 'bold' }}>{inv.invoiceNo}</td>
-                                                    <td>{inv.customer?.name}</td>
-                                                    <td style={{ fontSize: '12px' }}>{new Date(inv.invoiceDate).toLocaleDateString('tr-TR')}</td>
-                                                    <td style={{ fontWeight: 'bold' }}>{inv.totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
-                                                    <td>
-                                                        <span style={{
-                                                            padding: '4px 8px', borderRadius: '4px', fontSize: '11px',
-                                                            background: inv.isFormal ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                                                            color: inv.isFormal ? 'var(--success)' : 'var(--warning)',
-                                                            border: `1px solid ${inv.isFormal ? 'var(--success)' : 'var(--warning)'}`
-                                                        }}>
-                                                            {inv.status}
-                                                        </span>
-                                                    </td>
-                                                    <td style={{ textAlign: 'center' }}>
-                                                        <div className="flex-center gap-2" onClick={e => e.stopPropagation()}>
-                                                            {!inv.isFormal && (
-                                                                <button
-                                                                    onClick={() => handleApproveInvoice(inv.id)}
-                                                                    className="btn btn-primary"
-                                                                    style={{ fontSize: '11px', padding: '6px 12px', background: 'var(--success)', border: 'none' }}
-                                                                >
-                                                                    ✅ Onayla
-                                                                </button>
-                                                            )}
-                                                            <button className="btn btn-outline" style={{ fontSize: '11px', padding: '6px 12px' }}>İndir</button>
-                                                            <button onClick={() => handleDeleteInvoice(inv.id)} className="btn btn-outline" style={{ fontSize: '11px', padding: '6px 12px', border: '1px solid #ff4444', color: '#ff4444' }}>Sil</button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                {isExpanded && (
-                                                    <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                                                        <td colSpan={6} style={{ padding: '20px' }}>
-                                                            <div style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px' }}>
-                                                                <div className="flex-between mb-3">
-                                                                    <h5 className="m-0">Fatura İçeriği</h5>
-                                                                    <button onClick={() => alert('Düzenleme yakında eklenecek')} className="btn btn-outline btn-sm" style={{ fontSize: '11px' }}>✏️ İçeriği Düzenle</button>
-                                                                </div>
-                                                                <table style={{ width: '100%', fontSize: '13px' }}>
-                                                                    <thead className="text-muted">
-                                                                        <tr><th>Ürün</th><th>Miktar</th><th>Birim Fiyat</th><th style={{ textAlign: 'right' }}>Toplam</th></tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {(inv.items as any[]).map((item, idx) => (
-                                                                            <tr key={idx} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                                                                                <td style={{ padding: '8px 0' }}>{item.name}</td>
-                                                                                <td>{item.qty}</td>
-                                                                                <td style={{ textAlign: 'right' }}>{item.price.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
-                                                                                <td style={{ textAlign: 'right' }}>{(item.qty * item.price).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
-                                                                            </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
-                                                                <div className="flex-end mt-4" style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                                                                    TOPLAM: {inv.totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
-                                                                </div>
+                            {isLoadingInvoices ? <p>Yükleniyor...</p> : (
+                                <table style={{ width: '100%', marginTop: '16px', borderCollapse: 'collapse', textAlign: 'left' }}>
+                                    <thead className="text-muted" style={{ fontSize: '12px' }}>
+                                        <tr>
+                                            <th style={{ padding: '12px' }}>Fatura No</th>
+                                            <th>Cari</th>
+                                            <th>Tarih</th>
+                                            <th>Tutar</th>
+                                            <th>Durum</th>
+                                            <th style={{ textAlign: 'center' }}>İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {realInvoices.length === 0 ? (
+                                            <tr><td colSpan={6} style={{ textAlign: 'center', padding: '40px' }} className="text-muted">Fatura bulunamadı.</td></tr>
+                                        ) : paginate(realInvoices).map(inv => {
+                                            const isExpanded = expandedOrderId === inv.id;
+                                            return (
+                                                <Fragment key={inv.id}>
+                                                    <tr style={{ borderTop: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent' }} onClick={() => toggleExpand(inv.id)}>
+                                                        <td style={{ padding: '16px', fontWeight: 'bold' }}>{inv.invoiceNo}</td>
+                                                        <td>{inv.customer?.name}</td>
+                                                        <td style={{ fontSize: '12px' }}>{new Date(inv.invoiceDate).toLocaleDateString('tr-TR')}</td>
+                                                        <td style={{ fontWeight: 'bold' }}>{inv.totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
+                                                        <td>
+                                                            <span style={{
+                                                                padding: '4px 8px', borderRadius: '4px', fontSize: '11px',
+                                                                background: inv.isFormal ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                                                color: inv.isFormal ? 'var(--success)' : 'var(--warning)',
+                                                                border: `1px solid ${inv.isFormal ? 'var(--success)' : 'var(--warning)'}`
+                                                            }}>
+                                                                {inv.status}
+                                                            </span>
+                                                        </td>
+                                                        <td style={{ textAlign: 'center' }}>
+                                                            <div className="flex-center gap-2" onClick={e => e.stopPropagation()}>
+                                                                {!inv.isFormal && (
+                                                                    <button
+                                                                        onClick={() => handleApproveInvoice(inv.id)}
+                                                                        className="btn btn-primary"
+                                                                        style={{ fontSize: '11px', padding: '6px 12px', background: 'var(--success)', border: 'none' }}
+                                                                    >
+                                                                        ✅ Onayla
+                                                                    </button>
+                                                                )}
+                                                                <button className="btn btn-outline" style={{ fontSize: '11px', padding: '6px 12px' }}>İndir</button>
+                                                                <button onClick={() => handleDeleteInvoice(inv.id)} className="btn btn-outline" style={{ fontSize: '11px', padding: '6px 12px', border: '1px solid #ff4444', color: '#ff4444' }}>Sil</button>
                                                             </div>
                                                         </td>
                                                     </tr>
-                                                )}
-                                            </Fragment>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        )}
-                        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-                    </div>
-                )}
+                                                    {isExpanded && (
+                                                        <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                                                            <td colSpan={6} style={{ padding: '20px' }}>
+                                                                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px' }}>
+                                                                    <div className="flex-between mb-3">
+                                                                        <h5 className="m-0">Fatura İçeriği</h5>
+                                                                        <button onClick={() => alert('Düzenleme yakında eklenecek')} className="btn btn-outline btn-sm" style={{ fontSize: '11px' }}>✏️ İçeriği Düzenle</button>
+                                                                    </div>
+                                                                    <table style={{ width: '100%', fontSize: '13px' }}>
+                                                                        <thead className="text-muted">
+                                                                            <tr><th>Ürün</th><th>Miktar</th><th>Birim Fiyat</th><th style={{ textAlign: 'right' }}>Toplam</th></tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {(inv.items as any[]).map((item, idx) => (
+                                                                                <tr key={idx} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                                    <td style={{ padding: '8px 0' }}>{item.name}</td>
+                                                                                    <td>{item.qty}</td>
+                                                                                    <td style={{ textAlign: 'right' }}>{item.price.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
+                                                                                    <td style={{ textAlign: 'right' }}>{(item.qty * item.price).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
+                                                                                </tr>
+                                                                            ))}
+                                                                        </tbody>
+                                                                    </table>
+                                                                    <div className="flex-end mt-4" style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                                                                        TOPLAM: {inv.totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </Fragment>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            )}
+                            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                        </div>
+                    )
+                }
 
                 {/* STORE SALES */}
                 {

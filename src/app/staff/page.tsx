@@ -6,7 +6,7 @@ import { useModal } from '@/contexts/ModalContext';
 
 export default function StaffPage() {
     const [activeTab, setActiveTab] = useState('list'); // list, roles, performance
-    const { staff, setStaff, currentUser, hasPermission, addNotification, refreshStaff, branches } = useApp();
+    const { staff, setStaff, currentUser, hasPermission, addNotification, refreshStaff, branches, addFinancialTransaction, kasalar, setKasalar } = useApp();
     const { showSuccess, showConfirm } = useModal();
     const isSystemAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
 
@@ -14,21 +14,123 @@ export default function StaffPage() {
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [showPermissionModal, setShowPermissionModal] = useState(false);
     const [showAddStaffModal, setShowAddStaffModal] = useState(false);
+    const [showEditStaffModal, setShowEditStaffModal] = useState(false);
+    const [editStaff, setEditStaff] = useState<any>({ name: '', role: '', branch: '', type: 'service' });
 
     const [taskContent, setTaskContent] = useState('');
     const [taskPriority, setTaskPriority] = useState('normal');
     const [isProcessing, setIsProcessing] = useState(false);
 
+
+
+    const handleMarkAsPaid = (payroll: any) => {
+        if (!kasalar || kasalar.length === 0) {
+            showSuccess("Hata", "Ödeme yapılacak kasa bulunamadı. Lütfen sayfayı yenileyin.");
+            return;
+        }
+
+        showConfirm('Ödeme Onayı', `${payroll.staff?.name || 'Personel'} için ${Number(payroll.netPay).toLocaleString()} TL ödeme yapılacak ve kasadan düşülecek. Onaylıyor musunuz?`, async () => {
+            setIsProcessing(true);
+            try {
+                // 1. Update Payroll Status
+                const res = await fetch('/api/staff/payroll', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: payroll.id, status: 'Ödendi' })
+                });
+
+                if (res.ok) {
+                    // 2. Add Expense Transaction
+                    const kasaId = kasalar.find(k => k.type === 'Nakit')?.id || kasalar[0]?.id; // Default to Cash or first available
+
+                    if (addFinancialTransaction && kasaId) {
+                        await addFinancialTransaction({
+                            type: 'Expense',
+                            amount: Number(payroll.netPay),
+                            description: `Maaş Ödemesi: ${payroll.staff?.name} (${payroll.period})`,
+                            kasaId: kasaId.toString()
+                        });
+                    }
+
+                    await fetchPayrolls();
+                    showSuccess("Ödeme Yapıldı", "Maaş ödemesi muhasebeye işlendi.");
+                }
+            } catch (e) { console.error(e); }
+            finally { setIsProcessing(false); }
+        });
+    };
+
     const [newStaff, setNewStaff] = useState({
         name: '', role: '', branch: '', type: 'service'
     });
 
+    // --- NEW STATES FOR HR MODULES ---
+    const [shifts, setShifts] = useState<any[]>([]);
+    const [leaves, setLeaves] = useState<any[]>([]);
+    const [payrolls, setPayrolls] = useState<any[]>([]);
+    const [currentWeekStart, setCurrentWeekStart] = useState(getMonday(new Date()));
+
+    function getMonday(d: Date) {
+        d = new Date(d);
+        var day = d.getDay(),
+            diff = d.getDate() - day + (day == 0 ? -6 : 1);
+        return new Date(d.setDate(diff));
+    }
+
+    // --- FETCH DATA FUNCTIONS ---
+    useEffect(() => {
+        if (kasalar.length === 0) {
+            fetch('/api/kasalar')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && setKasalar) setKasalar(data.kasalar);
+                })
+                .catch(err => console.error('Failed to fetch kasalar', err));
+        }
+    }, []);
+
+    const fetchShifts = async () => {
+        try {
+            const endWeek = new Date(currentWeekStart);
+            endWeek.setDate(endWeek.getDate() + 6);
+
+            const res = await fetch(`/api/staff/shifts?start=${currentWeekStart.toISOString()}&end=${endWeek.toISOString()}`);
+            if (res.ok) {
+                const data = await res.json();
+                setShifts(data);
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    const fetchLeaves = async () => {
+        try {
+            const res = await fetch('/api/staff/leaves');
+            if (res.ok) setLeaves(await res.json());
+        } catch (e) { console.error(e); }
+    };
+
+    const fetchPayrolls = async () => {
+        try {
+            const currentPeriod = new Date().toISOString().slice(0, 7); // YYYY-MM
+            const res = await fetch(`/api/staff/payroll?period=${currentPeriod}`);
+            if (res.ok) setPayrolls(await res.json());
+        } catch (e) { console.error(e); }
+    };
+
+    // Load data when tab changes
+    useEffect(() => {
+        if (activeTab === 'shifts') fetchShifts();
+        if (activeTab === 'leaves') fetchLeaves();
+        if (activeTab === 'payroll') fetchPayrolls();
+    }, [activeTab, currentWeekStart]);
+
     // Set default branch when branches load
     useEffect(() => {
-        if (branches.length > 0 && !newStaff.branch) {
-            setNewStaff(prev => ({ ...prev, branch: branches[0].name }));
+        // Do not auto-select first branch to force manual selection
+        if (!newStaff.branch) {
+            setNewStaff(prev => ({ ...prev, branch: '' }));
         }
-    }, [branches]);
+    }, []);
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -110,6 +212,11 @@ export default function StaffPage() {
 
     const handleSaveStaff = async () => {
         if (!newStaff.name || !newStaff.role) return;
+        if (!newStaff.branch) {
+            showSuccess('Hata', 'Lütfen personel için bir şube seçiniz.');
+            return;
+        }
+
         setIsProcessing(true);
         try {
             const res = await fetch('/api/staff', {
@@ -125,7 +232,7 @@ export default function StaffPage() {
             if (res.ok) {
                 await refreshStaff();
                 setShowAddStaffModal(false);
-                setNewStaff({ name: '', role: '', branch: branches[0]?.name || '', type: 'service' });
+                setNewStaff({ name: '', role: '', branch: '', type: 'service' });
                 showSuccess("Personel Eklendi", "Sisteme giriş yetkileri varsayılan olarak tanımlandı.");
             }
         } catch (e) {
@@ -133,6 +240,206 @@ export default function StaffPage() {
         } finally {
             setIsProcessing(false);
         }
+    };
+
+    const handleEditStaff = async () => {
+        if (!editStaff.name || !editStaff.role || !editStaff.branch) {
+            showSuccess('Hata', 'Lütfen tüm zorunlu alanları doldurun.');
+            return;
+        }
+
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/staff', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: editStaff.id,
+                    name: editStaff.name,
+                    role: editStaff.role,
+                    branch: editStaff.branch,
+                    type: editStaff.type
+                })
+            });
+
+            if (res.ok) {
+                await refreshStaff();
+                setShowEditStaffModal(false);
+                setEditStaff({ name: '', role: '', branch: '', type: 'service' });
+                showSuccess("Personel Güncellendi", "Personel bilgileri başarıyla güncellendi.");
+            }
+        } catch (e) {
+            console.error('Edit staff failed', e);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    // --- SHIFT CREATION LOGIC ---
+    const [showShiftModal, setShowShiftModal] = useState(false);
+    const [newShift, setNewShift] = useState({
+        staffId: '', start: '', end: '', type: 'Normal'
+    });
+
+    const handleCreateShift = async () => {
+        if (!newShift.staffId || !newShift.start || !newShift.end) return;
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/staff/shifts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    staffId: newShift.staffId,
+                    start: newShift.start,
+                    end: newShift.end,
+                    type: newShift.type,
+                    branch: currentUser?.branch || 'Merkez'
+                })
+            });
+
+            if (res.ok) {
+                await fetchShifts();
+                setShowShiftModal(false);
+                setNewShift({ staffId: '', start: '', end: '', type: 'Normal' });
+                showSuccess("Vardiya Eklendi", "Vardiya planı başarıyla oluşturuldu.");
+            }
+        } catch (e) { console.error(e); }
+        finally { setIsProcessing(false); }
+    };
+
+    const handleDeleteShift = async (shiftId: string) => {
+        setIsProcessing(true);
+        try {
+            await fetch(`/api/staff/shifts?id=${shiftId}`, { method: 'DELETE' });
+            await fetchShifts();
+            showSuccess("Vardiya Silindi", "Vardiya planı kaldırıldı.");
+        } catch (e) { console.error(e); }
+        finally { setIsProcessing(false); }
+    };
+
+    // --- LEAVE REQUEST LOGIC ---
+    const [showLeaveModal, setShowLeaveModal] = useState(false);
+    const [newLeave, setNewLeave] = useState({
+        staffId: '', type: 'Yıllık İzin', startDate: '', endDate: '', description: ''
+    });
+
+    const handleCreateLeave = async () => {
+        if (!newLeave.staffId || !newLeave.startDate || !newLeave.endDate) return;
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/staff/leaves', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    staffId: newLeave.staffId,
+                    type: newLeave.type,
+                    startDate: newLeave.startDate,
+                    endDate: newLeave.endDate,
+                    description: newLeave.description,
+                    status: 'Beklemede'
+                })
+            });
+
+            if (res.ok) {
+                await fetchLeaves();
+                setShowLeaveModal(false);
+                setNewLeave({ staffId: '', type: 'Yıllık İzin', startDate: '', endDate: '', description: '' });
+                showSuccess("İzin Talebi Oluşturuldu", "Yönetici onayı bekleniyor.");
+            }
+        } catch (e) { console.error(e); }
+        finally { setIsProcessing(false); }
+    };
+
+    const handleUpdateLeaveStatus = async (id: string, status: string) => {
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/staff/leaves', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id,
+                    status,
+                    approvedBy: currentUser?.name || 'Yönetici'
+                })
+            });
+
+            if (res.ok) {
+                await fetchLeaves();
+                showSuccess(`İzin ${status}`, `İzin talebi başarıyla ${status.toLowerCase()}ildi.`);
+            }
+        } catch (e) { console.error(e); }
+        finally { setIsProcessing(false); }
+    };
+
+    // --- PAYROLL MANAGEMENT LOGIC ---
+    const [showPayrollModal, setShowPayrollModal] = useState(false);
+    const [currentPayroll, setCurrentPayroll] = useState({
+        staffId: '', staffName: '', salary: 0, bonus: 0, deductions: 0, netPay: 0, period: ''
+    });
+
+    const [updateBaseSalary, setUpdateBaseSalary] = useState(false);
+
+    const handleOpenPayrollModal = (person: any) => {
+        setUpdateBaseSalary(false);
+        const period = new Date().toISOString().slice(0, 7);
+        // Find existing payroll or use base salary
+        const existing = payrolls.find(p => p.staffId === person.id);
+
+        setCurrentPayroll({
+            staffId: person.id,
+            staffName: person.name,
+            salary: existing ? Number(existing.salary) : Number(person.salary || 17002),
+            bonus: existing ? Number(existing.bonus) : 0,
+            deductions: existing ? Number(existing.deductions) : 0,
+            netPay: existing ? Number(existing.netPay) : Number(person.salary || 17002),
+            period: period
+        });
+        setShowPayrollModal(true);
+    };
+
+    const handleSavePayroll = async () => {
+        setIsProcessing(true);
+        // Recalculate net pay to be sure
+        const net = Number(currentPayroll.salary) + Number(currentPayroll.bonus) - Number(currentPayroll.deductions);
+
+        try {
+            const res = await fetch('/api/staff/payroll', {
+                method: 'POST', // Using POST to create or update
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    staffId: currentPayroll.staffId,
+                    period: currentPayroll.period,
+                    salary: currentPayroll.salary,
+                    bonus: currentPayroll.bonus,
+                    deductions: currentPayroll.deductions,
+                    netPay: net,
+                    status: 'Bekliyor'
+                })
+            });
+
+            if (res.ok) {
+                // Update Staff Base Salary if requested
+                if (updateBaseSalary) {
+                    await fetch('/api/staff', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: currentPayroll.staffId, salary: currentPayroll.salary })
+                    });
+                    // Refresh staff to reflect salary change
+                    await refreshStaff();
+                }
+
+                await fetchPayrolls();
+                setShowPayrollModal(false);
+                showSuccess("Bordro Kaydedildi", "Ödeme emri başarıyla oluşturuldu.");
+            }
+        } catch (e) { console.error(e); }
+        finally { setIsProcessing(false); }
+    };
+
+    const handlePayAll = async () => {
+        // Implementation for bulk payment can be added later
+        addNotification({ type: 'info', icon: '💰', text: 'Toplu ödeme servisi eklenecek.' });
     };
 
     const savePermissions = async () => {
@@ -239,6 +546,9 @@ export default function StaffPage() {
                     <button onClick={() => setActiveTab('list')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'list' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>PERSONEL LİSTESİ</button>
                     <button onClick={() => setActiveTab('roles')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'roles' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>ROLLER & İZİNLER</button>
                     <button onClick={() => setActiveTab('performance')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'performance' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>PERFORMANS</button>
+                    <button onClick={() => setActiveTab('shifts')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'shifts' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>VARDİYA</button>
+                    <button onClick={() => setActiveTab('leaves')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'leaves' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>İZİNLER</button>
+                    <button onClick={() => setActiveTab('payroll')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'payroll' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>BORDRO</button>
                 </div>
 
                 {activeTab === 'list' && (
@@ -293,6 +603,12 @@ export default function StaffPage() {
                             </div>
 
                             <div className="flex gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
+                                <button
+                                    onClick={() => { setEditStaff(person); setShowEditStaffModal(true); }}
+                                    className="flex-1 py-3 rounded-xl bg-primary/10 border border-primary/20 text-primary text-[10px] font-black hover:bg-primary/20 transition-all"
+                                >
+                                    ✏️ DÜZENLE
+                                </button>
                                 <button
                                     onClick={() => { setSelectedStaff(person); setShowTaskModal(true); }}
                                     className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black hover:bg-white/10 transition-all"
@@ -411,7 +727,283 @@ export default function StaffPage() {
                 </div>
             )}
 
-            {/* --- TASK MODAL --- */}
+            {/* --- SHIFT MANAGEMENT TAB --- */}
+            {activeTab === 'shifts' && (
+                <div className="card glass p-0 overflow-hidden">
+                    <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                        <div>
+                            <h3 className="text-xl font-black mb-1">📅 Haftalık Vardiya Planı</h3>
+                            <p className="text-xs text-white/40 font-bold uppercase tracking-widest">
+                                {new Date(currentWeekStart).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })} - {new Date(new Date(currentWeekStart).setDate(new Date(currentWeekStart).getDate() + 6)).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                            </p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => {
+                                    const d = new Date(currentWeekStart);
+                                    d.setDate(d.getDate() - 7);
+                                    setCurrentWeekStart(d);
+                                }}
+                                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition-all"
+                            >
+                                ◀ Önceki Hafta
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const d = new Date(currentWeekStart);
+                                    d.setDate(d.getDate() + 7);
+                                    setCurrentWeekStart(d);
+                                }}
+                                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition-all"
+                            >
+                                Sonraki Hafta ▶
+                            </button>
+                            <button
+                                onClick={() => setShowShiftModal(true)}
+                                className="px-4 py-2 rounded-lg bg-primary text-white text-xs font-bold transition-all ml-2 shadow-lg shadow-primary/20">+ YENİ PLAN</button>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
+                                <tr>
+                                    <th className="p-6 border-r border-white/5 w-[200px]">PERSONEL</th>
+                                    <th className="p-6 border-r border-white/5 text-center w-[14%]">Pazartesi</th>
+                                    <th className="p-6 border-r border-white/5 text-center w-[14%]">Salı</th>
+                                    <th className="p-6 border-r border-white/5 text-center w-[14%]">Çarşamba</th>
+                                    <th className="p-6 border-r border-white/5 text-center w-[14%]">Perşembe</th>
+                                    <th className="p-6 border-r border-white/5 text-center w-[14%]">Cuma</th>
+                                    <th className="p-6 text-center w-[14%]">Cumartesi</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {staff.map((person) => (
+                                    <tr key={person.id} className="hover:bg-white/[0.02]">
+                                        <td className="p-6 border-r border-white/5 font-bold">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-xs font-black text-white/60">
+                                                    {person.name.charAt(0)}
+                                                </div>
+                                                <div>
+                                                    <div className="text-sm text-white">{person.name}</div>
+                                                    <div className="text-[10px] text-white/40 uppercase">{person.role}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        {[0, 1, 2, 3, 4, 5, 6].map((offset) => {
+                                            const d = new Date(currentWeekStart);
+                                            d.setDate(d.getDate() + offset);
+                                            const shift = shifts.find(s => s.staffId === person.id && new Date(s.start).getDate() === d.getDate());
+
+                                            return (
+                                                <td key={offset} className="p-4 border-r border-white/5 text-center align-middle">
+                                                    {shift ? (
+                                                        <div className="relative group/shift">
+                                                            {shift.type === 'İzinli' ? (
+                                                                <div className="inline-block px-3 py-1 rounded bg-white/5 border border-white/5 text-[10px] font-bold text-white/30">
+                                                                    İZİNLİ
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex flex-col gap-1 items-center">
+                                                                    <span className="text-xs font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                                                        {new Date(shift.start).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} - {new Date(shift.end).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleDeleteShift(shift.id); }}
+                                                                className="absolute -top-3 -right-3 w-5 h-5 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center opacity-0 group-hover/shift:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
+                                                                title="Vardiyayı Sil"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-[10px] text-white/10">-</div>
+                                                    )}
+                                                </td>
+                                            )
+                                        })}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+
+            {/* --- LEAVE MANAGEMENT TAB --- */}
+            {activeTab === 'leaves' && (
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="card glass p-8">
+                            <h4 className="text-muted text-xs font-black uppercase mb-4">BUGÜN İZİNLİLER</h4>
+                            <div className="text-4xl font-black text-white mb-2">2 <span className="text-lg text-white/40 font-normal">Kişi</span></div>
+                            <div className="flex -space-x-2">
+                                <div className="w-8 h-8 rounded-full bg-red-500 border-2 border-[#1a1c2e]"></div>
+                                <div className="w-8 h-8 rounded-full bg-blue-500 border-2 border-[#1a1c2e]"></div>
+                            </div>
+                        </div>
+                        <div className="card glass p-8">
+                            <h4 className="text-muted text-xs font-black uppercase mb-4">BEKLEYEN ONAYLAR</h4>
+                            <div className="text-4xl font-black text-amber-400 mb-2">5 <span className="text-lg text-white/40 font-normal">Talep</span></div>
+                            <p className="text-xs text-white/40">Son talep 2 saat önce geldi.</p>
+                        </div>
+                        <button
+                            onClick={() => setShowLeaveModal(true)}
+                            className="card glass p-8 border-2 border-dashed border-white/10 hover:border-primary/50 hover:bg-primary/5 transition-all text-center flex flex-col items-center justify-center gap-3">
+                            <span className="text-3xl">📝</span>
+                            <span className="font-black text-sm text-primary">YENİ İZİN TALEBİ OLUŞTUR</span>
+                        </button>
+                    </div>
+
+                    <div className="card glass p-0 overflow-hidden">
+                        <div className="p-6 border-b border-white/5">
+                            <h3 className="text-xl font-black">İzin Hareketleri</h3>
+                        </div>
+                        <table className="w-full text-left">
+                            <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
+                                <tr>
+                                    <th className="p-6">PERSONEL</th>
+                                    <th className="p-6">İZİN TÜRÜ</th>
+                                    <th className="p-6">TARİH ARALIĞI</th>
+                                    <th className="p-6">SÜRE</th>
+                                    <th className="p-6">DURUM</th>
+                                    <th className="p-6 text-right">İŞLEM</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {leaves.length > 0 ? (
+                                    leaves.map((leave, idx) => (
+                                        <tr key={leave.id} className="hover:bg-white/[0.02]">
+                                            <td className="p-6 font-bold">{leave.staff?.name}</td>
+                                            <td className="p-6 text-sm text-white/70">{leave.type}</td>
+                                            <td className="p-6 font-mono text-sm text-white/60">
+                                                {new Date(leave.startDate).toLocaleDateString('tr-TR')} - {new Date(leave.endDate).toLocaleDateString('tr-TR')}
+                                            </td>
+                                            <td className="p-6 font-bold text-white">{leave.days} Gün</td>
+                                            <td className="p-6">
+                                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${leave.status === 'Onaylandı' ? 'bg-emerald-500/10 text-emerald-400' :
+                                                    leave.status === 'Reddedildi' ? 'bg-red-500/10 text-red-500' :
+                                                        'bg-amber-500/10 text-amber-500'
+                                                    }`}>{leave.status}</span>
+                                            </td>
+                                            <td className="p-6 text-right">
+                                                {leave.status === 'Bekliyor' || leave.status === 'Beklemede' ? (
+                                                    <div className="flex justify-end gap-2">
+                                                        <button
+                                                            onClick={() => handleUpdateLeaveStatus(leave.id, 'Onaylandı')}
+                                                            disabled={isProcessing}
+                                                            className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center font-bold"
+                                                            title="Onayla"
+                                                        >
+                                                            ✓
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleUpdateLeaveStatus(leave.id, 'Reddedildi')}
+                                                            disabled={isProcessing}
+                                                            className="w-8 h-8 rounded-lg bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center font-bold"
+                                                            title="Reddet"
+                                                        >
+                                                            ✕
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-[10px] text-white/40 font-bold uppercase">
+                                                        {leave.approvedBy ? `İŞLEM: ${leave.approvedBy}` : (leave.status === 'Beklemede' ? 'BEKLİYOR' : '-')}
+                                                    </div>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr><td colSpan={6} className="p-8 text-center text-white/40">Henüz izin talebi bulunmuyor.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+
+            {/* --- PAYROLL TAB --- */}
+            {activeTab === 'payroll' && (
+                <div className="card glass p-0 overflow-hidden">
+                    <div className="p-6 border-b border-white/5 flex justify-between items-center">
+                        <h3 className="text-xl font-black">💰 Maaş & Hakediş Listesi (Ocak 2026)</h3>
+                        <button onClick={handlePayAll} className="px-5 py-2 rounded-lg bg-emerald-500 text-black text-xs font-black hover:bg-emerald-400 transition-all">TÜMÜNÜ ÖDE</button>
+                    </div>
+                    <table className="w-full text-left">
+                        <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
+                            <tr>
+                                <th className="p-6">PERSONEL</th>
+                                <th className="p-6 text-right">MAAŞ</th>
+                                <th className="p-6 text-right">PRİM</th>
+                                <th className="p-6 text-right">AVANS / KESİNTİ</th>
+                                <th className="p-6 text-right">NET ÖDENECEK</th>
+                                <th className="p-6 text-center">DURUM</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {staff.map((person) => {
+                                const payroll = payrolls.find(p => p.staffId === person.id);
+                                return (
+                                    <tr key={person.id} className="hover:bg-white/[0.02]">
+                                        <td className="p-6 font-bold text-white">{person.name}</td>
+                                        <td className="p-6 text-right text-white/60">
+                                            {payroll ? `₺ ${Number(payroll.salary).toLocaleString()}` : '-'}
+                                        </td>
+                                        <td className="p-6 text-right text-emerald-400 font-bold">
+                                            {payroll && Number(payroll.bonus) > 0 ? `+ ₺ ${Number(payroll.bonus).toLocaleString()}` : '-'}
+                                        </td>
+                                        <td className="p-6 text-right text-red-400 font-bold">
+                                            {payroll && Number(payroll.deductions) > 0 ? `- ₺ ${Number(payroll.deductions).toLocaleString()}` : '-'}
+                                        </td>
+                                        <td className="p-6 text-right font-black text-xl text-white">
+                                            {payroll ? `₺ ${Number(payroll.netPay).toLocaleString()}` : '-'}
+                                        </td>
+                                        <td className="p-6 text-center">
+                                            {payroll ? (
+                                                payroll.status === 'Bekliyor' ? (
+                                                    <div className="flex flex-col gap-2 items-center">
+                                                        <span className="text-[10px] text-white/40 font-bold uppercase">BEKLİYOR</span>
+                                                        <button
+                                                            onClick={() => handleMarkAsPaid(payroll)}
+                                                            className="px-4 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-lg shadow-emerald-500/10 text-[10px]"
+                                                        >
+                                                            ÖDE 💸
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${payroll.status === 'Ödendi' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/5 text-white/40'
+                                                        }`}>
+                                                        {payroll.status} {payroll.paidAt && `(${new Date(payroll.paidAt).toLocaleDateString()})`}
+                                                    </span>
+                                                )
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleOpenPayrollModal(person)}
+                                                    className="px-3 py-1 rounded text-[10px] bg-primary/20 text-primary font-bold hover:bg-primary/30 transition-all">
+                                                    HESAPLA
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                        <tfoot className="bg-white/5 border-t border-white/10">
+                            <tr>
+                                <td colSpan={4} className="p-6 text-right text-xs font-black text-white/40 uppercase tracking-widest">TOPLAM ÖDENECEK</td>
+                                <td className="p-6 text-right text-2xl font-black text-emerald-500">
+                                    ₺ {payrolls.reduce((sum, p) => sum + Number(p.netPay || 0), 0).toLocaleString()}
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            )}
             {showTaskModal && (
                 <div className="modal-overlay">
                     <div className="modal-content card glass p-8 animate-in">
@@ -541,8 +1133,13 @@ export default function StaffPage() {
                             </div>
 
                             <div className="form-group">
-                                <label>Atanacak Şube</label>
-                                <select className="input-field" value={newStaff.branch} onChange={(e) => setNewStaff({ ...newStaff, branch: e.target.value })}>
+                                <label>Atanacak Şube <span className="text-red-500">*</span></label>
+                                <select
+                                    className="input-field"
+                                    value={newStaff.branch}
+                                    onChange={(e) => setNewStaff({ ...newStaff, branch: e.target.value })}
+                                >
+                                    <option value="" disabled>Şube Seçiniz...</option>
                                     {branches.map(b => (
                                         <option key={b.id} value={b.name}>{b.name}</option>
                                     ))}
@@ -556,6 +1153,330 @@ export default function StaffPage() {
 
                             <button onClick={handleSaveStaff} className="w-full btn btn-primary py-4 font-black mt-4">
                                 {isProcessing ? 'KAYDEDİLİYOR...' : 'PERSONELİ EKLE'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* --- EDIT STAFF MODAL --- */}
+            {showEditStaffModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content card glass p-8 max-w-md animate-in">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-black">✏️ Personel Düzenle</h2>
+                            <button onClick={() => setShowEditStaffModal(false)} className="close-btn">&times;</button>
+                        </div>
+
+                        <div className="space-y-5">
+                            <div className="form-group">
+                                <label>Ad Soyad</label>
+                                <input
+                                    type="text"
+                                    className="input-field"
+                                    placeholder="Personel tam adını girin"
+                                    value={editStaff.name}
+                                    onChange={(e) => setEditStaff({ ...editStaff, name: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Rol / Unvan</label>
+                                <input
+                                    type="text"
+                                    className="input-field"
+                                    placeholder="Mekanik, Satış Danışmanı vb."
+                                    value={editStaff.role}
+                                    onChange={(e) => setEditStaff({ ...editStaff, role: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Atanacak Şube <span className="text-red-500">*</span></label>
+                                <select
+                                    className="input-field"
+                                    value={editStaff.branch}
+                                    onChange={(e) => setEditStaff({ ...editStaff, branch: e.target.value })}
+                                >
+                                    {branches.map(b => (
+                                        <option key={b.id} value={b.name}>{b.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <button onClick={handleEditStaff} className="w-full btn btn-primary py-4 font-black mt-4">
+                                {isProcessing ? 'GÜNCELLENİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* --- SHIFT CREATION MODAL --- */}
+            {showShiftModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-primary/20">
+                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                            <h2 className="text-xl font-black text-white flex items-center gap-3">
+                                📅 <span className="text-white/80">Yeni Vardiya Planı</span>
+                            </h2>
+                            <button onClick={() => setShowShiftModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Personel Seçimi</label>
+                                <select
+                                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 focus:bg-white/10 transition-all outline-none appearance-none"
+                                    value={newShift.staffId}
+                                    onChange={(e) => setNewShift({ ...newShift, staffId: e.target.value })}
+                                >
+                                    <option value="" className="bg-[#0f111a]">Personel Seçiniz...</option>
+                                    {staff.map(s => (
+                                        <option key={s.id} value={s.id} className="bg-[#0f111a] text-white">{s.name} ({s.role})</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Başlangıç</label>
+                                    <input
+                                        type="datetime-local"
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                        value={newShift.start}
+                                        onChange={(e) => setNewShift({ ...newShift, start: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Bitiş</label>
+                                    <input
+                                        type="datetime-local"
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                        value={newShift.end}
+                                        onChange={(e) => setNewShift({ ...newShift, end: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Vardiya Tipi</label>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {['Normal', 'İzinli', 'Raporlu'].map(type => (
+                                        <button
+                                            key={type}
+                                            onClick={() => setNewShift({ ...newShift, type })}
+                                            className={`h-10 rounded-lg text-xs font-black uppercase tracking-wide transition-all ${newShift.type === type
+                                                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                                                : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
+                                                }`}
+                                        >
+                                            {type}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={handleCreateShift}
+                                disabled={isProcessing}
+                                className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                            >
+                                {isProcessing ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        <span>KAYDEDİLİYOR...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>💾 PLANI KAYDET</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* --- LEAVE REQUEST MODAL --- */}
+            {showLeaveModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-primary/20">
+                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                            <h2 className="text-xl font-black text-white flex items-center gap-3">
+                                📝 <span className="text-white/80">Yeni İzin Talebi</span>
+                            </h2>
+                            <button onClick={() => setShowLeaveModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Personel Seçimi</label>
+                                <select
+                                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 focus:bg-white/10 transition-all outline-none appearance-none"
+                                    value={newLeave.staffId}
+                                    onChange={(e) => setNewLeave({ ...newLeave, staffId: e.target.value })}
+                                >
+                                    <option value="" className="bg-[#0f111a]">Personel Seçiniz...</option>
+                                    {staff.map(s => (
+                                        <option key={s.id} value={s.id} className="bg-[#0f111a] text-white">{s.name} ({s.role})</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">İzin Türü</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {['Yıllık İzin', 'Ücretsiz İzin', 'Raporlu', 'İdari İzin'].map(type => (
+                                        <button
+                                            key={type}
+                                            onClick={() => setNewLeave({ ...newLeave, type })}
+                                            className={`h-10 rounded-lg text-xs font-black uppercase tracking-wide transition-all ${newLeave.type === type
+                                                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                                                : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
+                                                }`}
+                                        >
+                                            {type}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Başlangıç</label>
+                                    <input
+                                        type="date"
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                        value={newLeave.startDate}
+                                        onChange={(e) => setNewLeave({ ...newLeave, startDate: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Bitiş</label>
+                                    <input
+                                        type="date"
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                        value={newLeave.endDate}
+                                        onChange={(e) => setNewLeave({ ...newLeave, endDate: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Açıklama / Not</label>
+                                <textarea
+                                    className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-primary/50 focus:bg-white/10 transition-all outline-none resize-none"
+                                    placeholder="İzin nedeni veya ek notlar..."
+                                    value={newLeave.description}
+                                    onChange={(e) => setNewLeave({ ...newLeave, description: e.target.value })}
+                                />
+                            </div>
+
+                            <button
+                                onClick={handleCreateLeave}
+                                disabled={isProcessing}
+                                className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                            >
+                                {isProcessing ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        <span>TALEP OLUŞTURULUYOR...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>🚀 TALEBİ GÖNDER</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* --- PAYROLL MODAL --- */}
+            {showPayrollModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-primary/20">
+                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                            <div>
+                                <h2 className="text-xl font-black text-white flex items-center gap-3">
+                                    💰 <span className="text-white/80">Maaş Hesapla</span>
+                                </h2>
+                                <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{currentPayroll.staffName} • {currentPayroll.period}</div>
+                            </div>
+                            <button onClick={() => setShowPayrollModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Maaş (Net)</label>
+                                        <label className="flex items-center gap-2 cursor-pointer group">
+                                            <input
+                                                type="checkbox"
+                                                checked={updateBaseSalary}
+                                                onChange={(e) => setUpdateBaseSalary(e.target.checked)}
+                                                className="w-3 h-3 rounded border-white/20 bg-white/5 text-primary focus:ring-0 checked:bg-primary"
+                                            />
+                                            <span className="text-[9px] font-bold text-white/40 group-hover:text-white/60">VARSAYILAN YAP</span>
+                                        </label>
+                                    </div>
+                                    <input
+                                        type="number"
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono"
+                                        value={currentPayroll.salary}
+                                        onChange={(e) => setCurrentPayroll({ ...currentPayroll, salary: Number(e.target.value) })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Prim / Bonus</label>
+                                    <input
+                                        type="number"
+                                        className="w-full h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 text-sm text-emerald-400 focus:border-emerald-500/50 outline-none font-mono"
+                                        value={currentPayroll.bonus}
+                                        onChange={(e) => setCurrentPayroll({ ...currentPayroll, bonus: Number(e.target.value) })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Avans / Kesinti</label>
+                                    <input
+                                        type="number"
+                                        className="w-full h-12 bg-red-500/10 border border-red-500/20 rounded-xl px-4 text-sm text-red-400 focus:border-red-500/50 outline-none font-mono"
+                                        value={currentPayroll.deductions}
+                                        onChange={(e) => setCurrentPayroll({ ...currentPayroll, deductions: Number(e.target.value) })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">NET ÖDENECEK</label>
+                                    <div className="w-full h-12 bg-white/10 border border-white/20 rounded-xl px-4 flex items-center text-lg font-black text-white font-mono">
+                                        ₺ {(Number(currentPayroll.salary) + Number(currentPayroll.bonus) - Number(currentPayroll.deductions)).toLocaleString()}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-3">
+                                <span className="text-xl">ℹ️</span>
+                                <p className="text-[10px] font-bold text-primary/80 leading-relaxed uppercase">
+                                    ONAYLANDIKTAN SONRA BU TUTAR GİDERLERE "PERSONEL MAAŞ ÖDEMESİ" OLARAK İŞLENECEKTİR.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={handleSavePayroll}
+                                disabled={isProcessing}
+                                className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                            >
+                                {isProcessing ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        <span>İŞLENİYOR...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>💾 ÖDEME EMRİNİ OLUŞTUR</span>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>

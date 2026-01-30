@@ -6,9 +6,9 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { items, total, kasaId, description, paymentMode, customerName, customerId, earnedPoints, pointsUsed, couponCode } = body;
+        const { items, total, kasaId, description, paymentMode, customerName, customerId, earnedPoints, pointsUsed, couponCode, referenceCode } = body;
 
-        console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName }); // Debug log
+        console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode }); // Debug log
 
         // 1. Kasa ID Güvenli Seçim (Fallback Logic)
         let targetKasaId = (kasaId === 'CashKasa' || !kasaId) ? undefined : kasaId;
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
                     status: 'Tamamlandı',
                     orderDate: new Date(),
                     items: items as any,
-                    rawData: { targetKasaId, description, paymentMode }
+                    rawData: { targetKasaId, description, paymentMode, referenceCode }
                 }
             });
 
@@ -131,12 +131,22 @@ export async function POST(request: Request) {
                 }
             }
 
-            // F. Mark Coupon as Used
+            // F. Update Coupon Usage
             if (couponCode) {
-                await tx.coupon.update({
-                    where: { code: couponCode },
-                    data: { isUsed: true }
-                });
+                const coupon = await tx.coupon.findUnique({ where: { code: couponCode } }) as any;
+                if (coupon) {
+                    const newUsedCount = (coupon.usedCount || 0) + 1;
+                    const isNowUsed = coupon.usageLimit > 0 && newUsedCount >= coupon.usageLimit;
+
+                    await tx.coupon.update({
+                        where: { code: couponCode },
+                        data: {
+                            usedCount: newUsedCount,
+                            isUsed: isNowUsed,
+                            usedAt: new Date()
+                        }
+                    });
+                }
             }
 
             // G. Handle Bank Commission Expense
