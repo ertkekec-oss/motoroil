@@ -15,8 +15,8 @@ export default function BranchSettingsPage() {
         [contextBranches]
     );
 
-    // Branch configuration state
-    const [branchConfigs, setBranchConfigs] = useState<{ [branch: string]: number[] }>({});
+    // Branch configuration state - using string IDs for kasalar (CUID format)
+    const [branchConfigs, setBranchConfigs] = useState<{ [branch: string]: string[] }>({});
 
     // Track if we've initialized to prevent re-initialization
     const isInitialized = useRef(false);
@@ -24,51 +24,34 @@ export default function BranchSettingsPage() {
     // Initialize branch configs when branches are loaded
     useEffect(() => {
         if (branches.length > 0 && !isInitialized.current) {
-            const configs: { [branch: string]: number[] } = {};
+            const configs: { [branch: string]: string[] } = {};
             branches.forEach(branch => {
-                configs[branch] = branch === 'Merkez' ? [1, 2, 3] : [];
+                // Initialize with empty arrays - users will select kasas manually
+                configs[branch] = [];
             });
             setBranchConfigs(configs);
             isInitialized.current = true;
         }
     }, [branches]);
 
-    const toggleKasaForBranch = (branch: string, kasaId: number) => {
-        console.log('=== TOGGLE START ===');
-        console.log('Branch:', branch);
-        console.log('Kasa ID:', kasaId, 'Type:', typeof kasaId);
-        console.log('Current branchConfigs:', JSON.stringify(branchConfigs, null, 2));
-        console.log('Current config for', branch, ':', branchConfigs[branch]);
-
+    const toggleKasaForBranch = (branch: string, kasaId: string) => {
         setBranchConfigs(prevConfigs => {
-            console.log('prevConfigs:', JSON.stringify(prevConfigs, null, 2));
-
             const currentKasalar = prevConfigs[branch] || [];
-            console.log('currentKasalar:', currentKasalar);
-
             const isCurrentlyAssigned = currentKasalar.includes(kasaId);
-            console.log('Is currently assigned?', isCurrentlyAssigned);
-
             const newKasalar = isCurrentlyAssigned
                 ? currentKasalar.filter(id => id !== kasaId)
                 : [...currentKasalar, kasaId];
 
-            console.log('New kasalar for', branch, ':', newKasalar);
-
-            const newConfigs = {
+            return {
                 ...prevConfigs,
                 [branch]: newKasalar
             };
-
-            console.log('New branchConfigs:', JSON.stringify(newConfigs, null, 2));
-            console.log('=== TOGGLE END ===\n');
-
-            return newConfigs;
         });
     };
 
     const saveSettings = () => {
         // In a real app, this would save to backend/database
+        console.log('Saving branch configs:', branchConfigs);
         showSuccess('Başarılı', '✅ Şube ayarları kaydedildi!');
     };
 
@@ -115,19 +98,14 @@ export default function BranchSettingsPage() {
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px' }}>
                                 {kasalar.map(kasa => {
-                                    // Debug: Log kasa structure
-                                    console.log('Kasa object:', kasa);
-                                    console.log('Kasa ID:', kasa.id, 'Type:', typeof kasa.id);
+                                    // Use string ID directly - no conversion needed
+                                    const kasaId = String(kasa.id);
+                                    const isAssigned = (branchConfigs[branch] || []).includes(kasaId);
 
-                                    // Convert to number properly - handle both string and number IDs
-                                    const kasaIdNumber = typeof kasa.id === 'string' ? parseInt(kasa.id, 10) : Number(kasa.id);
-                                    console.log('Converted Kasa ID:', kasaIdNumber);
-
-                                    const isAssigned = (branchConfigs[branch] || []).includes(kasaIdNumber);
                                     return (
                                         <div
                                             key={kasa.id}
-                                            onClick={() => toggleKasaForBranch(branch, kasaIdNumber)}
+                                            onClick={() => toggleKasaForBranch(branch, kasaId)}
                                             style={{
                                                 padding: '16px',
                                                 background: isAssigned ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.02)',
