@@ -265,8 +265,8 @@ function POSContent() {
       {/* SOL PANEL (Satış ve Liste) */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
 
-        {/* ÜST DASHBOARD - 3 KART (CIRO, KAR, GIDER) */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+        {/* ÜST DASHBOARD - 4 KART */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
 
           {/* GÜNLÜK CİRO */}
           <div className="stat-card-modern" style={{
@@ -360,111 +360,111 @@ function POSContent() {
               {hideExpense ? '₺*****' : `₺${stats.expense.toLocaleString()}`}
             </div>
           </div>
-        </div>
 
-        {/* ARAMA BARI (ÜSTE SABİT) */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <form onSubmit={handleSearchSubmit} style={{
-            flex: 1,
-            display: 'flex',
-            gap: '8px',
-            background: 'rgba(255,255,255,0.02)',
-            padding: '6px',
-            borderRadius: '12px',
-            border: '1px solid rgba(255,255,255,0.06)',
-            position: 'relative'
-          }}>
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Barkod, ürün adı veya kod..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                padding: '8px 16px',
-                color: 'white',
-                fontSize: '14px',
-                outline: 'none'
-              }}
-            />
-            <button type="submit" className="btn-primary" style={{ padding: '0 24px', borderRadius: '8px', fontSize: '13px', fontWeight: '700' }}>EKLE</button>
-
-            {filteredProducts.length > 0 && (
-              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg-card)', borderRadius: '12px', marginTop: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', zIndex: 1000, boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
-                {filteredProducts.map(p => (
-                  <div key={p.id} onClick={() => addToCart(p)} className="search-result-row" style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.03)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: '600', fontSize: '13px' }}>{p.name}</div>
-                      <div style={{ fontSize: '10px', opacity: 0.4, marginTop: '2px' }}>{p.barcode}</div>
-                    </div>
-                    <div style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '14px' }}>₺{Number(p.price).toLocaleString()}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </form>
-          <div style={{ width: '200px' }}></div>
-        </div>
-
-        {/* ALT GÖVDE: SEPET + KARTLAR */}
-        <div style={{ flex: 1, display: 'flex', gap: '16px', minHeight: 0 }}>
-          {/* SEPET LISTESI */}
-          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {cart.length === 0 ? (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}>
-                <div style={{ fontSize: '60px' }}>🛒</div>
-                <div style={{ fontSize: '13px', fontWeight: '600', marginTop: '12px' }}>Sepet Boş</div>
-              </div>
-            ) : (
-              cart.map((item, idx) => (
-                <div key={idx} className="cart-item" style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ flex: 2, minWidth: 0 }}>
-                    <div style={{ fontWeight: '600', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
-                    <div style={{ fontSize: '10px', opacity: 0.3, marginTop: '2px' }}>{item.barcode}</div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <button onClick={() => setCart(cart.map((c, i) => i === idx ? { ...c, qty: Math.max(1, c.qty - 1) } : c))} className="qty-btn">-</button>
-                    <span style={{ fontWeight: '700', minWidth: '24px', textAlign: 'center', fontSize: '13px' }}>{item.qty}</span>
-                    <button onClick={() => setCart(cart.map((c, i) => i === idx ? { ...c, qty: c.qty + 1 } : c))} className="qty-btn">+</button>
-                  </div>
-                  <div style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '14px', minWidth: '80px', textAlign: 'right' }}>₺{(item.price * item.qty).toLocaleString()}</div>
-                  <button onClick={() => setCart(cart.filter((_, i) => i !== idx))} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '18px' }}>×</button>
-                </div>
-              ))
+          {/* BİLDİRİMLER */}
+          <div
+            onClick={() => router.push('/notifications')}
+            className="stat-card-modern"
+            style={{
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              padding: '18px',
+              borderRadius: '16px',
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 8px 32px rgba(245, 158, 11, 0.1)',
+              cursor: 'pointer'
+            }}
+          >
+            <div style={{ position: 'absolute', top: '-20px', right: '-20px', fontSize: '70px', opacity: 0.08 }}>🔔</div>
+            <div style={{ fontSize: '10px', fontWeight: '800', color: '#fcd34d', letterSpacing: '1px', marginBottom: '10px' }}>BİLDİRİMLER</div>
+            <div style={{ fontSize: '28px', fontWeight: '900', color: '#f59e0b', textShadow: '0 2px 10px rgba(245, 158, 11, 0.3)' }}>
+              {stats.criticalStock + stats.inTransit}
+            </div>
+            {(stats.criticalStock + stats.inTransit) > 0 && (
+              <div className="pulse-dot" style={{ position: 'absolute', top: '12px', right: '12px', background: '#f59e0b', width: '10px', height: '10px', borderRadius: '50%' }}></div>
             )}
           </div>
+        </div>
 
-          {/* 4'LÜ DİKEY KART GURUBU */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '200px' }}>
-            {/* BİLDİRİMLER */}
-            <div
-              onClick={() => router.push('/notifications')}
-              className="stat-card-modern stat-card-compact"
-              style={{
-                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
-                padding: '14px',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 8px 32px rgba(245, 158, 11, 0.1)'
-              }}
-            >
-              <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1 }}>🔔</div>
-              <div style={{ fontSize: '9px', fontWeight: '800', color: '#fcd34d', letterSpacing: '0.5px', marginBottom: '6px' }}>BİLDİRİMLER</div>
-              <div style={{ fontSize: '24px', fontWeight: '900', color: '#f59e0b', textShadow: '0 2px 10px rgba(245, 158, 11, 0.3)' }}>
-                {stats.criticalStock + stats.inTransit}
-              </div>
-              {(stats.criticalStock + stats.inTransit) > 0 && (
-                <div className="pulse-dot" style={{ position: 'absolute', top: '8px', right: '8px', background: '#f59e0b', width: '8px', height: '8px', borderRadius: '50%' }}></div>
+        {/* ANA GÖVDE: SEPET + KARTLAR (ARAMA BARI SEPETİN ÜSTÜNDE) */}
+        <div style={{ flex: 1, display: 'flex', gap: '16px', minHeight: 0 }}>
+
+          {/* SOL KOLON: ARAMA + SEPET */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', minWidth: 0 }}>
+            {/* ARAMA BARI */}
+            <form onSubmit={handleSearchSubmit} style={{
+              display: 'flex',
+              gap: '8px',
+              background: 'rgba(255,255,255,0.02)',
+              padding: '6px',
+              borderRadius: '12px',
+              border: '1px solid rgba(255,255,255,0.06)',
+              position: 'relative'
+            }}>
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="Barkod, ürün adı veya kod..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '8px 16px',
+                  color: 'white',
+                  fontSize: '14px',
+                  outline: 'none'
+                }}
+              />
+              <button type="submit" className="btn-primary" style={{ padding: '0 24px', borderRadius: '8px', fontSize: '13px', fontWeight: '700' }}>EKLE</button>
+
+              {filteredProducts.length > 0 && (
+                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg-card)', borderRadius: '12px', marginTop: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', zIndex: 1000, boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
+                  {filteredProducts.map(p => (
+                    <div key={p.id} onClick={() => addToCart(p)} className="search-result-row" style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.03)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontWeight: '600', fontSize: '13px' }}>{p.name}</div>
+                        <div style={{ fontSize: '10px', opacity: 0.4, marginTop: '2px' }}>{p.barcode}</div>
+                      </div>
+                      <div style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '14px' }}>₺{Number(p.price).toLocaleString()}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </form>
+
+            {/* SEPET LISTESI */}
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {cart.length === 0 ? (
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}>
+                  <div style={{ fontSize: '60px' }}>🛒</div>
+                  <div style={{ fontSize: '13px', fontWeight: '600', marginTop: '12px' }}>Sepet Boş</div>
+                </div>
+              ) : (
+                cart.map((item, idx) => (
+                  <div key={idx} className="cart-item" style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ flex: 2, minWidth: 0 }}>
+                      <div style={{ fontWeight: '600', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                      <div style={{ fontSize: '10px', opacity: 0.3, marginTop: '2px' }}>{item.barcode}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <button onClick={() => setCart(cart.map((c, i) => i === idx ? { ...c, qty: Math.max(1, c.qty - 1) } : c))} className="qty-btn">-</button>
+                      <span style={{ fontWeight: '700', minWidth: '24px', textAlign: 'center', fontSize: '13px' }}>{item.qty}</span>
+                      <button onClick={() => setCart(cart.map((c, i) => i === idx ? { ...c, qty: c.qty + 1 } : c))} className="qty-btn">+</button>
+                    </div>
+                    <div style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '14px', minWidth: '80px', textAlign: 'right' }}>₺{(item.price * item.qty).toLocaleString()}</div>
+                    <button onClick={() => setCart(cart.filter((_, i) => i !== idx))} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '18px' }}>×</button>
+                  </div>
+                ))
               )}
             </div>
+          </div>
 
+          {/* SAĞ DİKEY KART GURUBU (ARTIK BOŞLUKSUZ) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '200px' }}>
             {/* BEKLEYEN */}
             <div onClick={() => suspendedSales.length > 0 && setShowResumptionModal(true)} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1 }}>⏳</div>
