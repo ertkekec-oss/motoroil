@@ -529,15 +529,126 @@ function POSContent() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontWeight: '800' }}>TOPLAM</span><span style={{ fontSize: '28px', fontWeight: '900', color: 'var(--primary)' }}>₺{finalTotal.toLocaleString()}</span></div>
             </div>
             <div style={{ flex: 1 }}></div>
-            {/* Ödeme */}
+            {/* Ödeme Yöntemleri */}
             <div>
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginBottom: '10px' }}>ÖDEME YÖNTEMİ</div>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontWeight: '700', marginBottom: '10px', textAlign: 'center' }}>ÖDEME YÖNTEMİ</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-                {['cash', 'card', 'transfer', 'account'].map(mode => (
-                  <button key={mode} onClick={() => setPaymentMode(mode as any)} style={{ padding: '12px', background: paymentMode === mode ? 'var(--primary)' : 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', cursor: 'pointer', color: '#fff', fontSize: '10px', fontWeight: '700' }}>{mode.toUpperCase()}</button>
+                {[
+                  ...(paymentMethods || []),
+                  { id: 'account', label: 'VERESİYE', icon: '📖', type: 'account', linkedKasaId: '' }
+                ].map((m: any) => (
+                  <button
+                    key={m.id}
+                    onClick={() => {
+                      setPaymentMode(m.type);
+                      if (m.linkedKasaId) {
+                        setSelectedKasa(m.linkedKasaId);
+                      } else {
+                        if (m.type === 'cash') setSelectedKasa(kasalar.find(k => !['Banka', 'POS', 'Sanal POS', 'Havale'].some(t => k.type.includes(t)))?.id || '');
+                        if (m.type === 'transfer') setSelectedKasa(kasalar.find(k => k.type.includes('Banka') || k.type.includes('Havale'))?.id || '');
+                        if (m.type === 'card') setSelectedKasa(kasalar.find(k => k.type.includes('POS') || k.type.includes('Kredi') || k.type.includes('Banka'))?.id || '');
+                      }
+                    }}
+                    className="payment-btn"
+                    style={{
+                      padding: '12px',
+                      background: paymentMode === m.type ? 'var(--primary)' : 'rgba(255,255,255,0.03)',
+                      borderRadius: '10px',
+                      border: paymentMode === m.type ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.06)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    <span style={{ fontSize: '20px' }}>{m.icon}</span>
+                    <span style={{ color: 'white', fontSize: '10px', fontWeight: '700', opacity: paymentMode === m.type ? 1 : 0.5 }}>{m.label}</span>
+                  </button>
                 ))}
               </div>
             </div>
+
+            {/* Kasa/Banka/Taksit Seçimi */}
+            {paymentMode === 'cash' && (
+              <div className="animate-fade-in" style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>KASA</label>
+                <select
+                  value={selectedKasa}
+                  onChange={e => setSelectedKasa(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '8px',
+                    color: 'white',
+                    fontSize: '12px',
+                    fontWeight: '600'
+                  }}
+                >
+                  <option value="">Seçiniz...</option>
+                  {kasalar?.filter(k => !['Banka', 'POS', 'Sanal POS', 'Havale'].some(t => k.type.includes(t))).map(k => (
+                    <option key={k.id} value={k.id}>{k.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {paymentMode === 'transfer' && (
+              <div className="animate-fade-in" style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>BANKA</label>
+                <select
+                  value={selectedKasa}
+                  onChange={e => setSelectedKasa(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '8px',
+                    color: 'white',
+                    fontSize: '12px',
+                    fontWeight: '600'
+                  }}
+                >
+                  <option value="">Seçiniz...</option>
+                  {kasalar?.filter(k => k.type.includes('Banka') || k.type.includes('Havale')).map(k => (
+                    <option key={k.id} value={k.id}>{k.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {paymentMode === 'card' && (
+              <div className="animate-fade-in" style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>TAKSİT</label>
+                <select
+                  onChange={e => {
+                    const val = e.target.value;
+                    setInstallmentLabel(val);
+                    const num = parseInt(val);
+                    setInstallmentCount(isNaN(num) ? 1 : num);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '8px',
+                    color: 'white',
+                    fontSize: '12px',
+                    fontWeight: '600'
+                  }}
+                >
+                  <option value="">Seçiniz...</option>
+                  {(salesExpenses?.posCommissions || []).map((comm: any, idx: number) => (
+                    <option key={idx} value={comm.installment}>{comm.installment}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <button disabled={isProcessing || !paymentMode || cart.length === 0} onClick={handleFinalize} className="btn-primary" style={{ width: '100%', padding: '16px', borderRadius: '12px', fontSize: '15px', fontWeight: '800' }}>{isProcessing ? 'İŞLENİYOR...' : 'ONAYLA ➔'}</button>
           </div>
         </div>
