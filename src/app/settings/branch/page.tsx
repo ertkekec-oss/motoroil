@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 
@@ -9,28 +9,39 @@ export default function BranchSettingsPage() {
     const { showSuccess } = useModal();
     const isSystemAdmin = currentUser === null;
 
-    const branches = contextBranches?.length > 0 ? contextBranches.map(b => b.name) : ['Merkez', 'Kadıköy'];
+    // Memoize branches to prevent re-creation on every render
+    const branches = useMemo(() =>
+        contextBranches?.length > 0 ? contextBranches.map(b => b.name) : ['Merkez', 'Kadıköy'],
+        [contextBranches]
+    );
 
     // Branch configuration state
     const [branchConfigs, setBranchConfigs] = useState<{ [branch: string]: number[] }>({});
 
+    // Track if we've initialized to prevent re-initialization
+    const isInitialized = useRef(false);
+
     // Initialize branch configs when branches are loaded
     useEffect(() => {
-        if (branches.length > 0 && Object.keys(branchConfigs).length === 0) {
+        if (branches.length > 0 && !isInitialized.current) {
             const configs: { [branch: string]: number[] } = {};
             branches.forEach(branch => {
                 configs[branch] = branch === 'Merkez' ? [1, 2, 3] : [];
             });
             setBranchConfigs(configs);
+            isInitialized.current = true;
         }
     }, [branches]);
 
     const toggleKasaForBranch = (branch: string, kasaId: number) => {
+        console.log('Toggle called:', { branch, kasaId, currentConfig: branchConfigs[branch] });
         setBranchConfigs(prevConfigs => {
             const currentKasalar = prevConfigs[branch] || [];
             const newKasalar = currentKasalar.includes(kasaId)
                 ? currentKasalar.filter(id => id !== kasaId)
                 : [...currentKasalar, kasaId];
+
+            console.log('New config for', branch, ':', newKasalar);
 
             return {
                 ...prevConfigs,
