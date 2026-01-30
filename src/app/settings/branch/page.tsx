@@ -115,11 +115,19 @@ export default function BranchSettingsPage() {
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px' }}>
                                 {kasalar.map(kasa => {
-                                    const isAssigned = (branchConfigs[branch] || []).includes(Number(kasa.id));
+                                    // Debug: Log kasa structure
+                                    console.log('Kasa object:', kasa);
+                                    console.log('Kasa ID:', kasa.id, 'Type:', typeof kasa.id);
+
+                                    // Convert to number properly - handle both string and number IDs
+                                    const kasaIdNumber = typeof kasa.id === 'string' ? parseInt(kasa.id, 10) : Number(kasa.id);
+                                    console.log('Converted Kasa ID:', kasaIdNumber);
+
+                                    const isAssigned = (branchConfigs[branch] || []).includes(kasaIdNumber);
                                     return (
                                         <div
                                             key={kasa.id}
-                                            onClick={() => toggleKasaForBranch(branch, Number(kasa.id))}
+                                            onClick={() => toggleKasaForBranch(branch, kasaIdNumber)}
                                             style={{
                                                 padding: '16px',
                                                 background: isAssigned ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.02)',
