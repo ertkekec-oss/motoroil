@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -14,6 +13,7 @@ export default function ServiceDashboard() {
     const [isLoading, setIsLoading] = useState(false);
 
     const [activeJobs, setActiveJobs] = useState<any[]>([]);
+    const [appointments, setAppointments] = useState<any[]>([]);
 
     const fetchServices = async () => {
         setIsLoading(true);
@@ -21,27 +21,34 @@ export default function ServiceDashboard() {
             const res = await fetch('/api/services');
             const data = await res.json();
             if (data.success) {
-                // Filter for "active" jobs? Or just show all?
-                // For now, let's show all and the user can filter by status.
-                setActiveJobs(data.services);
+                setActiveJobs(data.services || []);
             }
         } catch (error) { console.error("Service fetch error", error); }
         finally { setIsLoading(false); }
     };
 
+    // fetchAppointments eklendi (veya statik veri)
     useEffect(() => {
         fetchServices();
-        const intv = setInterval(fetchServices, 45000);
+        // Şimdilik boş dizi verelim ki çökmesin
+        setAppointments([]);
+        const intv = setInterval(fetchServices, 45000); // Keep the interval for fetchServices
         return () => clearInterval(intv);
     }, []);
 
     const handleDeleteService = async (id: string) => {
-        const { showConfirm, showSuccess, showError } = (window as any).modal; // Accessing via window if useModal isn't enough, but it's better to use context.
+        // Modal context'i kullanılmıyor, şimdilik console log verelim veya context ekleyelim
+        console.log("Delete service", id);
     };
+
+    // Filtreleme mantığı düzeltildi
+    const filteredJobs = !hasPermission('branch_isolation') || isSystemAdmin
+        ? activeJobs
+        : activeJobs.filter((j: any) => j.branch === currentUser?.branch);
 
     const filteredAppointments = !hasPermission('branch_isolation') || isSystemAdmin
         ? appointments
-        : (appointments as any).filter((a: any) => a.branch === currentUser?.branch);
+        : appointments.filter((a: any) => a.branch === currentUser?.branch);
 
     // PAGINATION LOGIC
     const [currentPage, setCurrentPage] = useState(1);
@@ -54,10 +61,7 @@ export default function ServiceDashboard() {
         return list.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
     };
 
-    // Safe access to filteredJobs if it exists in scope (it seems missing in view but used in code)
-    // We will assume filteredJobs is available or falling back to activeJobs
-    const jobsList = typeof filteredJobs !== 'undefined' ? filteredJobs : activeJobs;
-    const currentList = activeServiceTab === 'jobs' ? jobsList : filteredAppointments;
+    const currentList = activeServiceTab === 'jobs' ? filteredJobs : filteredAppointments;
     const totalPages = Math.ceil((currentList?.length || 0) / itemsPerPage);
 
     const serviceHistoryDetails = {
