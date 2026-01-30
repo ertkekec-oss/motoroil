@@ -1,0 +1,175 @@
+                {/* 3.6. E-TİCARET PAZARYERLERİ (YENİ) */}
+                {activeTab === 'marketplaces' && (
+                    <div>
+                        <h2 style={{ marginBottom: '10px' }}>E-Ticaret Pazaryerleri</h2>
+                        <p className="text-muted" style={{ marginBottom: '30px', fontSize: '14px' }}>
+                            Her pazaryeri için komisyon, kargo ve hizmet bedeli oranlarını tanımlayın. Satış anında tahmini kar otomatik hesaplanır.
+                        </p>
+
+                        <div className="grid-cols-1 gap-6">
+                            {marketplaces.map((mp, idx) => (
+                                <div key={mp.id} className="card glass" style={{ opacity: mp.active ? 1 : 0.5 }}>
+                                    {editingMarketplaceIdx === idx ? (
+                                        // EDIT MODE
+                                        <div>
+                                            <div className="flex-between mb-4">
+                                                <h3 style={{ color: 'var(--primary)' }}>✏️ {mp.name} Düzenleniyor</h3>
+                                                <div style={{ display: 'flex', gap: '8px' }}>
+                                                    <button onClick={saveEditingMarketplace} className="btn btn-primary" style={{ padding: '6px 16px', fontSize: '13px' }}>Kaydet</button>
+                                                    <button onClick={cancelEditingMarketplace} className="btn btn-ghost" style={{ padding: '6px 16px', fontSize: '13px' }}>İptal</button>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid-cols-2 gap-4">
+                                                {/* Komisyon */}
+                                                <div className="flex-col gap-2">
+                                                    <label className="text-muted" style={{ fontSize: '12px' }}>KOMİSYON ORANI (%)</label>
+                                                    <input 
+                                                        type="number" 
+                                                        step="0.1"
+                                                        value={editingMarketplaceData.commission}
+                                                        onChange={e => setEditingMarketplaceData({ ...editingMarketplaceData, commission: parseFloat(e.target.value) || 0 })}
+                                                        style={{ padding: '10px', background: 'black', border: '1px solid var(--primary)', borderRadius: '6px', color: 'white' }}
+                                                    />
+                                                </div>
+
+                                                {/* Kargo */}
+                                                <div className="flex-col gap-2">
+                                                    <label className="text-muted" style={{ fontSize: '12px' }}>KARGO GİDERİ</label>
+                                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                                        <input 
+                                                            type="number" 
+                                                            step="0.1"
+                                                            value={editingMarketplaceData.shippingCost}
+                                                            onChange={e => setEditingMarketplaceData({ ...editingMarketplaceData, shippingCost: parseFloat(e.target.value) || 0 })}
+                                                            style={{ flex: 1, padding: '10px', background: 'black', border: '1px solid var(--primary)', borderRadius: '6px', color: 'white' }}
+                                                        />
+                                                        <select 
+                                                            value={editingMarketplaceData.shippingType}
+                                                            onChange={e => setEditingMarketplaceData({ ...editingMarketplaceData, shippingType: e.target.value as 'fixed' | 'percent' })}
+                                                            style={{ padding: '10px', background: 'black', border: '1px solid var(--primary)', borderRadius: '6px', color: 'white' }}
+                                                        >
+                                                            <option value="fixed">₺ Sabit</option>
+                                                            <option value="percent">% Yüzde</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                {/* Hizmet Bedeli */}
+                                                <div className="flex-col gap-2">
+                                                    <label className="text-muted" style={{ fontSize: '12px' }}>HİZMET BEDELİ (%)</label>
+                                                    <input 
+                                                        type="number" 
+                                                        step="0.1"
+                                                        value={editingMarketplaceData.serviceFee}
+                                                        onChange={e => setEditingMarketplaceData({ ...editingMarketplaceData, serviceFee: parseFloat(e.target.value) || 0 })}
+                                                        style={{ padding: '10px', background: 'black', border: '1px solid var(--primary)', borderRadius: '6px', color: 'white' }}
+                                                    />
+                                                </div>
+
+                                                {/* Stopaj */}
+                                                <div className="flex-col gap-2">
+                                                    <label className="text-muted" style={{ fontSize: '12px' }}>STOPAJ (%)</label>
+                                                    <input 
+                                                        type="number" 
+                                                        step="0.1"
+                                                        value={editingMarketplaceData.withholding}
+                                                        onChange={e => setEditingMarketplaceData({ ...editingMarketplaceData, withholding: parseFloat(e.target.value) || 0 })}
+                                                        style={{ padding: '10px', background: 'black', border: '1px solid var(--primary)', borderRadius: '6px', color: 'white' }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // VIEW MODE
+                                        <div>
+                                            <div className="flex-between mb-4">
+                                                <div className="flex-center gap-3">
+                                                    <h3>{mp.name}</h3>
+                                                    {!mp.active && <span style={{ fontSize: '11px', padding: '4px 8px', background: 'rgba(239, 68, 68, 0.2)', color: 'var(--danger)', borderRadius: '4px' }}>PASİF</span>}
+                                                </div>
+                                                <div style={{ display: 'flex', gap: '8px' }}>
+                                                    <button onClick={() => startEditingMarketplace(idx)} className="btn btn-ghost" style={{ padding: '6px 12px', fontSize: '12px', color: 'var(--primary)' }}>Düzenle</button>
+                                                    <button 
+                                                        onClick={() => toggleMarketplaceActive(idx)} 
+                                                        className="btn btn-ghost" 
+                                                        style={{ padding: '6px 12px', fontSize: '12px', color: mp.active ? 'var(--warning)' : 'var(--success)' }}
+                                                    >
+                                                        {mp.active ? 'Pasifleştir' : 'Aktifleştir'}
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid-cols-4 gap-4">
+                                                <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', borderLeft: '3px solid var(--danger)' }}>
+                                                    <div className="text-muted" style={{ fontSize: '11px' }}>KOMİSYON</div>
+                                                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--danger)', marginTop: '4px' }}>%{mp.commission}</div>
+                                                </div>
+                                                <div style={{ padding: '12px', background: 'rgba(255, 165, 0, 0.1)', borderRadius: '8px', borderLeft: '3px solid var(--warning)' }}>
+                                                    <div className="text-muted" style={{ fontSize: '11px' }}>KARGO</div>
+                                                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--warning)', marginTop: '4px' }}>
+                                                        {mp.shippingType === 'fixed' ? `₺${mp.shippingCost}` : `%${mp.shippingCost}`}
+                                                    </div>
+                                                </div>
+                                                <div style={{ padding: '12px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', borderLeft: '3px solid var(--primary)' }}>
+                                                    <div className="text-muted" style={{ fontSize: '11px' }}>HİZMET BEDELİ</div>
+                                                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--primary)', marginTop: '4px' }}>%{mp.serviceFee}</div>
+                                                </div>
+                                                <div style={{ padding: '12px', background: 'rgba(147, 51, 234, 0.1)', borderRadius: '8px', borderLeft: '3px solid #9333ea' }}>
+                                                    <div className="text-muted" style={{ fontSize: '11px' }}>STOPAJ</div>
+                                                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#9333ea', marginTop: '4px' }}>%{mp.withholding}</div>
+                                                </div>
+                                            </div>
+
+                                            {/* Örnek Hesaplama */}
+                                            <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
+                                                <div className="text-muted" style={{ fontSize: '11px', marginBottom: '8px' }}>ÖRNEK: 1.000₺ Satış</div>
+                                                <div style={{ fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                    <div className="flex-between">
+                                                        <span className="text-muted">Komisyon:</span>
+                                                        <span style={{ color: 'var(--danger)' }}>- ₺{(1000 * mp.commission / 100).toFixed(2)}</span>
+                                                    </div>
+                                                    <div className="flex-between">
+                                                        <span className="text-muted">Kargo:</span>
+                                                        <span style={{ color: 'var(--danger)' }}>
+                                                            - {mp.shippingType === 'fixed' ? `₺${mp.shippingCost.toFixed(2)}` : `₺${(1000 * mp.shippingCost / 100).toFixed(2)}`}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex-between">
+                                                        <span className="text-muted">Hizmet:</span>
+                                                        <span style={{ color: 'var(--danger)' }}>- ₺{(1000 * mp.serviceFee / 100).toFixed(2)}</span>
+                                                    </div>
+                                                    {mp.withholding > 0 && (
+                                                        <div className="flex-between">
+                                                            <span className="text-muted">Stopaj:</span>
+                                                            <span style={{ color: 'var(--danger)' }}>- ₺{(1000 * mp.withholding / 100).toFixed(2)}</span>
+                                                        </div>
+                                                    )}
+                                                    <div style={{ height: '1px', background: 'var(--border-light)', margin: '6px 0' }}></div>
+                                                    <div className="flex-between" style={{ fontWeight: 'bold' }}>
+                                                        <span>Tahmini Net:</span>
+                                                        <span style={{ color: 'var(--success)' }}>
+                                                            ₺{(1000 - (1000 * mp.commission / 100) - (mp.shippingType === 'fixed' ? mp.shippingCost : 1000 * mp.shippingCost / 100) - (1000 * mp.serviceFee / 100) - (1000 * mp.withholding / 100)).toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Info Box */}
+                        <div className="card" style={{ marginTop: '24px', background: 'rgba(59, 130, 246, 0.05)', border: '1px solid var(--primary)' }}>
+                            <h4 style={{ color: 'var(--primary)', marginBottom: '8px' }}>💡 Nasıl Kullanılır?</h4>
+                            <ul style={{ fontSize: '13px', lineHeight: '1.8', color: 'var(--text-muted)', paddingLeft: '20px' }}>
+                                <li>Her pazaryeri için <b>ortalama gider oranlarını</b> girin</li>
+                                <li>Satış yaparken pazaryeri seçtiğinizde <b>tahmini net kar otomatik hesaplanır</b></li>
+                                <li>Pazaryerinden fatura geldiğinde <b>gerçek giderleri</b> Muhasebe bölümünden kaydedin</li>
+                                <li>Raporlarda <b>tahmini ve gerçek kar farkını</b> görebilirsiniz</li>
+                                <li>Kullanmadığınız pazaryerlerini <b>pasifleştirebilirsiniz</b></li>
+                            </ul>
+                        </div>
+                    </div>
+                )}

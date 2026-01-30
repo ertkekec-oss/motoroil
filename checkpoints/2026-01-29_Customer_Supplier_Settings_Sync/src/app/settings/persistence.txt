@@ -1,0 +1,68 @@
+
+    // --- DATA PERSISTENCE (AUTO SAVE) ---
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    // 1. Load data from localStorage on mount
+    useEffect(() => {
+        try {
+            const savedUsers = localStorage.getItem('motoroil_settings_users');
+            if (savedUsers) setUsers(JSON.parse(savedUsers));
+
+            const savedBranches = localStorage.getItem('motoroil_settings_branches');
+            if (savedBranches) setBranches(JSON.parse(savedBranches));
+
+            const savedInvoice = localStorage.getItem('motoroil_settings_invoice');
+            if (savedInvoice) setInvoiceSettings(JSON.parse(savedInvoice));
+
+            const savedExpenses = localStorage.getItem('motoroil_settings_expenses');
+            if (savedExpenses) setSalesExpenses(JSON.parse(savedExpenses));
+
+            const savedMarketplaces = localStorage.getItem('motoroil_settings_marketplaces');
+            if (savedMarketplaces) setMarketplaces(JSON.parse(savedMarketplaces));
+
+            const savedDefinitions = localStorage.getItem('motoroil_settings_definitions');
+            if (savedDefinitions) {
+                const defs = JSON.parse(savedDefinitions);
+                if (defs.brands) setBrands(defs.brands);
+                if (defs.prodCats) setProdCats(defs.prodCats);
+                if (defs.custClasses) setCustClasses(defs.custClasses);
+            }
+        } catch (error) {
+            console.error('Ayarlar yüklenirken hata oluştu:', error);
+        } finally {
+            setIsLoaded(true);
+        }
+    }, []);
+
+    // 2. Auto-save data when changes occur
+    useEffect(() => {
+        if (!isLoaded) return;
+        localStorage.setItem('motoroil_settings_users', JSON.stringify(users));
+    }, [users, isLoaded]);
+
+    useEffect(() => {
+        if (!isLoaded) return;
+        localStorage.setItem('motoroil_settings_branches', JSON.stringify(branches));
+    }, [branches, isLoaded]);
+
+    useEffect(() => {
+        if (!isLoaded) return;
+        localStorage.setItem('motoroil_settings_invoice', JSON.stringify(invoiceSettings));
+    }, [invoiceSettings, isLoaded]);
+
+    useEffect(() => {
+        if (!isLoaded) return;
+        localStorage.setItem('motoroil_settings_expenses', JSON.stringify(salesExpenses));
+    }, [salesExpenses, isLoaded]);
+
+    useEffect(() => {
+        if (!isLoaded) return;
+        localStorage.setItem('motoroil_settings_marketplaces', JSON.stringify(marketplaces));
+    }, [marketplaces, isLoaded]);
+
+    useEffect(() => {
+        if (!isLoaded) return;
+        localStorage.setItem('motoroil_settings_definitions', JSON.stringify({
+            brands, prodCats, custClasses
+        }));
+    }, [brands, prodCats, custClasses, isLoaded]);

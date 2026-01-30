@@ -1,0 +1,45 @@
+# Vercel Ignore File
+# Bu dosyalar Vercel'e yüklenmeyecek
+
+# Büyük dosyalar
+*.zip
+*.rar
+*.tar.gz
+*.pdf
+*.mp4
+*.exe
+*.msi
+
+# Sistem dosyaları
+Thumbs.db
+.DS_Store
+
+# Git dosyaları
+.git
+.gitignore
+
+# Environment
+.env*
+!.env.example
+
+# Build ve Cache
+.next
+node_modules
+dist
+build
+coverage
+
+# Loglar
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Deploy Notları
+*_DEPLOYMENT.md
+*_KURULUM.md
+*.md
+!README.md
+
+# Diğer
+marketplace_section.txt
