@@ -449,7 +449,7 @@ export default function AccountingPage() {
             await fetch(`/api/kasalar/${editingKasa.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: editingKasa.name })
+                body: JSON.stringify({ name: editingKasa.name, type: editingKasa.type })
             });
             showSuccess("Başarılı", "Kasa bilgileri güncellendi.");
             setShowKasaEditModal(false);
@@ -1002,13 +1002,21 @@ export default function AccountingPage() {
             {showKasaEditModal && editingKasa && (
                 <div className="modal-overlay">
                     <div className="card glass animate-in modal-content" style={{ width: '400px' }}>
-                        <div className="flex-between mb-4"><h3>Kasa Düzenle</h3><button onClick={() => setShowKasaEditModal(false)} className="close-btn">&times;</button></div>
-                        <div className="flex-col gap-4">
+                        <div className="flex-between mb-4"><h3>Hesap Düzenle</h3><button onClick={() => setShowKasaEditModal(false)} className="close-btn">&times;</button></div>
+                        <div className="flex flex-col gap-4">
                             <div className="form-group">
-                                <label>Kasa / Banka Adı</label>
+                                <label>Hesap Tipi</label>
+                                <select className="input-field" value={editingKasa.type} onChange={e => setEditingKasa({ ...editingKasa, type: e.target.value })}>
+                                    {(kasaTypes && kasaTypes.length > 0 ? kasaTypes : ['Nakit', 'Banka', 'POS', 'Kredi Kartı']).map(t => (
+                                        <option key={t} value={t}>{t}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label>Hesap Adı</label>
                                 <input className="input-field" value={editingKasa.name} onChange={e => setEditingKasa({ ...editingKasa, name: e.target.value })} />
                             </div>
-                            <button onClick={handleSaveKasaEdit} disabled={isProcessing} className="btn btn-primary">Kaydet</button>
+                            <button onClick={handleSaveKasaEdit} disabled={isProcessing} className="btn btn-primary w-full p-3 font-bold">Kaydet</button>
                         </div>
                     </div>
                 </div>
