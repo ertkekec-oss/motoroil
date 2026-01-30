@@ -30,6 +30,7 @@ function POSContent() {
   const [couponCode, setCouponCode] = useState('');
   const [pointsToUse, setPointsToUse] = useState(0);
   const [validCoupon, setValidCoupon] = useState<any>(null);
+  const [referenceCode, setReferenceCode] = useState('');
 
   // --- SUSPEND STATES ---
   const [showSuspendModal, setShowSuspendModal] = useState(false);
@@ -44,8 +45,6 @@ function POSContent() {
   const [hideRevenue, setHideRevenue] = useState(false);
   const [hideProfit, setHideProfit] = useState(false);
   const [hideExpense, setHideExpense] = useState(false);
-
-  const [referenceCode, setReferenceCode] = useState('');
 
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => { inputRef.current?.focus(); }, []);
@@ -263,7 +262,7 @@ function POSContent() {
       background: 'var(--bg-main)'
     }}>
 
-      {/* SOL PANEL */}
+      {/* SOL PANEL (Satış ve Liste) */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
 
         {/* ÜST DASHBOARD - 4 KART */}
@@ -285,18 +284,14 @@ function POSContent() {
               <div style={{ fontSize: '10px', fontWeight: '800', color: '#6ee7b7', letterSpacing: '1px' }}>GÜNLÜK CİRO</div>
               <button
                 onClick={() => setHideRevenue(!hideRevenue)}
+                className="privacy-btn"
                 style={{
                   background: hideRevenue ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255,255,255,0.15)',
                   border: '1px solid rgba(255,255,255,0.2)',
                   borderRadius: '8px',
                   padding: '6px 12px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                  cursor: 'pointer'
                 }}
-                className="privacy-btn"
-                title={hideRevenue ? 'Göster' : 'Gizle'}
               >{hideRevenue ? '👁️' : '🙈'}</button>
             </div>
             <div style={{ fontSize: '28px', fontWeight: '900', color: '#10b981', textShadow: '0 2px 10px rgba(16, 185, 129, 0.3)' }}>
@@ -320,18 +315,14 @@ function POSContent() {
               <div style={{ fontSize: '10px', fontWeight: '800', color: '#93c5fd', letterSpacing: '1px' }}>GÜNLÜK KAR</div>
               <button
                 onClick={() => setHideProfit(!hideProfit)}
+                className="privacy-btn"
                 style={{
                   background: hideProfit ? 'rgba(59, 130, 246, 0.3)' : 'rgba(255,255,255,0.15)',
                   border: '1px solid rgba(255,255,255,0.2)',
                   borderRadius: '8px',
                   padding: '6px 12px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                  cursor: 'pointer'
                 }}
-                className="privacy-btn"
-                title={hideProfit ? 'Göster' : 'Gizle'}
               >{hideProfit ? '👁️' : '🙈'}</button>
             </div>
             <div style={{ fontSize: '28px', fontWeight: '900', color: stats.profit >= 0 ? '#3b82f6' : '#ef4444', textShadow: '0 2px 10px rgba(59, 130, 246, 0.3)' }}>
@@ -355,18 +346,14 @@ function POSContent() {
               <div style={{ fontSize: '10px', fontWeight: '800', color: '#fca5a5', letterSpacing: '1px' }}>GÜNLÜK GİDER</div>
               <button
                 onClick={() => setHideExpense(!hideExpense)}
+                className="privacy-btn"
                 style={{
                   background: hideExpense ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255,255,255,0.15)',
                   border: '1px solid rgba(255,255,255,0.2)',
                   borderRadius: '8px',
                   padding: '6px 12px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                  cursor: 'pointer'
                 }}
-                className="privacy-btn"
-                title={hideExpense ? 'Göster' : 'Gizle'}
               >{hideExpense ? '👁️' : '🙈'}</button>
             </div>
             <div style={{ fontSize: '28px', fontWeight: '900', color: '#ef4444', textShadow: '0 2px 10px rgba(239, 68, 68, 0.3)' }}>
@@ -395,18 +382,14 @@ function POSContent() {
             <div style={{ fontSize: '28px', fontWeight: '900', color: '#f59e0b', textShadow: '0 2px 10px rgba(245, 158, 11, 0.3)' }}>
               {stats.criticalStock + stats.inTransit}
             </div>
-            <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.5)', marginTop: '6px' }}>
-              {stats.criticalStock} Kritik • {stats.inTransit} Yolda
-            </div>
             {(stats.criticalStock + stats.inTransit) > 0 && (
-              <div className="pulse-dot" style={{ position: 'absolute', top: '12px', right: '12px', background: '#f59e0b', width: '10px', height: '10px', borderRadius: '50%', boxShadow: '0 0 20px rgba(245, 158, 11, 0.8)' }}></div>
+              <div className="pulse-dot" style={{ position: 'absolute', top: '12px', right: '12px', background: '#f59e0b', width: '10px', height: '10px', borderRadius: '50.0%' }}></div>
             )}
           </div>
         </div>
 
-        {/* ARAMA BARI + KOMPAKT STAT KARTLARI */}
-        <div style={{ display: 'flex', gap: '16px' }}>
-          {/* ARAMA BARI */}
+        {/* ARAMA BARI (ÜSTE SABİT) */}
+        <div style={{ display: 'flex', gap: '8px' }}>
           <form onSubmit={handleSearchSubmit} style={{
             flex: 1,
             display: 'flex',
@@ -433,42 +416,12 @@ function POSContent() {
                 outline: 'none'
               }}
             />
-            <button type="submit" className="btn-primary" style={{
-              padding: '0 24px',
-              borderRadius: '8px',
-              fontSize: '13px',
-              fontWeight: '700'
-            }}>EKLE</button>
+            <button type="submit" className="btn-primary" style={{ padding: '0 24px', borderRadius: '8px', fontSize: '13px', fontWeight: '700' }}>EKLE</button>
 
             {filteredProducts.length > 0 && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                background: 'var(--bg-card)',
-                borderRadius: '12px',
-                marginTop: '8px',
-                overflow: 'hidden',
-                border: '1px solid rgba(255,255,255,0.06)',
-                zIndex: 1000,
-                boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
-              }}>
+              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg-card)', borderRadius: '12px', marginTop: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', zIndex: 1000, boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
                 {filteredProducts.map(p => (
-                  <div
-                    key={p.id}
-                    onClick={() => addToCart(p)}
-                    className="search-result-row"
-                    style={{
-                      padding: '12px 16px',
-                      cursor: 'pointer',
-                      borderBottom: '1px solid rgba(255,255,255,0.03)',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      transition: 'all 0.15s'
-                    }}
-                  >
+                  <div key={p.id} onClick={() => addToCart(p)} className="search-result-row" style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.03)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontWeight: '600', fontSize: '13px' }}>{p.name}</div>
                       <div style={{ fontSize: '10px', opacity: 0.4, marginTop: '2px' }}>{p.barcode}</div>
@@ -479,648 +432,147 @@ function POSContent() {
               </div>
             )}
           </form>
+          <div style={{ width: '200px' }}></div>
+        </div>
 
-          {/* KOMPAKT STAT KARTLARI - SAĞ TARAF (ÜST ÜSTE) */}
+        {/* ALT GÖVDE: SEPET + KARTLAR */}
+        <div style={{ flex: 1, display: 'flex', gap: '16px', minHeight: 0 }}>
+          {/* SEPET LISTESI */}
+          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {cart.length === 0 ? (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}>
+                <div style={{ fontSize: '60px' }}>🛒</div>
+                <div style={{ fontSize: '13px', fontWeight: '600', marginTop: '12px' }}>Sepet Boş</div>
+              </div>
+            ) : (
+              cart.map((item, idx) => (
+                <div key={idx} className="cart-item" style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ flex: 2, minWidth: 0 }}>
+                    <div style={{ fontWeight: '600', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                    <div style={{ fontSize: '10px', opacity: 0.3, marginTop: '2px' }}>{item.barcode}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button onClick={() => setCart(cart.map((c, i) => i === idx ? { ...c, qty: Math.max(1, c.qty - 1) } : c))} className="qty-btn">-</button>
+                    <span style={{ fontWeight: '700', minWidth: '24px', textAlign: 'center', fontSize: '13px' }}>{item.qty}</span>
+                    <button onClick={() => setCart(cart.map((c, i) => i === idx ? { ...c, qty: c.qty + 1 } : c))} className="qty-btn">+</button>
+                  </div>
+                  <div style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '14px', minWidth: '80px', textAlign: 'right' }}>₺{(item.price * item.qty).toLocaleString()}</div>
+                  <button onClick={() => setCart(cart.filter((_, i) => i !== idx))} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '18px' }}>×</button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* 3'LÜ KART GURUBU */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '200px' }}>
-
-            {/* BEKLEYEN SEPET - EN ÜST */}
-            <div
-              onClick={() => suspendedSales.length > 0 && setShowResumptionModal(true)}
-              className="stat-card-modern stat-card-compact"
-              style={{
-                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
-                padding: '14px',
-                borderRadius: '12px',
-                cursor: suspendedSales.length > 0 ? 'pointer' : 'default',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 8px 32px rgba(245, 158, 11, 0.1)'
-              }}
-            >
-              <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1, pointerEvents: 'none' }}>⏳</div>
-              <div style={{ fontSize: '9px', fontWeight: '800', color: '#fcd34d', letterSpacing: '0.5px', marginBottom: '6px' }}>BEKLEYEN</div>
-              <div style={{ fontSize: '24px', fontWeight: '900', color: '#f59e0b', textShadow: '0 2px 10px rgba(245, 158, 11, 0.3)' }}>{suspendedSales.length}</div>
-              {suspendedSales.length > 0 && (
-                <div className="pulse-dot" style={{ position: 'absolute', top: '8px', right: '8px', background: '#f59e0b', width: '8px', height: '8px', borderRadius: '50%', boxShadow: '0 0 20px rgba(245, 158, 11, 0.8)' }}></div>
-              )}
+            {/* BEKLEYEN */}
+            <div onClick={() => suspendedSales.length > 0 && setShowResumptionModal(true)} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1 }}>⏳</div>
+              <div style={{ fontSize: '9px', fontWeight: '800', color: '#fcd34d', marginBottom: '6px' }}>BEKLEYEN</div>
+              <div style={{ fontSize: '24px', fontWeight: '900', color: '#f59e0b' }}>{suspendedSales.length}</div>
             </div>
 
-            {/* KRİTİK STOK - ORTA */}
-            <div
-              onClick={() => router.push('/inventory?filter=critical-stock')}
-              className="stat-card-modern stat-card-compact"
-              style={{
-                background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.08))',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-                padding: '14px',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 8px 32px rgba(239, 68, 68, 0.1)'
-              }}
-            >
-              <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1, pointerEvents: 'none' }}>🚨</div>
-              <div style={{ fontSize: '9px', fontWeight: '800', color: '#fca5a5', letterSpacing: '0.5px', marginBottom: '6px' }}>KRİTİK STOK</div>
-              <div style={{ fontSize: '24px', fontWeight: '900', color: '#ef4444', textShadow: '0 2px 10px rgba(239, 68, 68, 0.3)' }}>{stats.criticalStock}</div>
+            {/* KRİTİK */}
+            <div onClick={() => router.push('/inventory?filter=critical-stock')} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.08))', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1 }}>🚨</div>
+              <div style={{ fontSize: '9px', fontWeight: '800', color: '#fca5a5', marginBottom: '6px' }}>KRİTİK STOK</div>
+              <div style={{ fontSize: '24px', fontWeight: '900', color: '#ef4444' }}>{stats.criticalStock}</div>
             </div>
 
-            {/* YOLDAKİ - EN ALT */}
-            <div
-              onClick={() => router.push('/inventory?tab=transfers')}
-              className="stat-card-modern stat-card-compact"
-              style={{
-                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
-                padding: '14px',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
-              }}
-            >
-              <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1, pointerEvents: 'none' }}>🚚</div>
-              <div style={{ fontSize: '9px', fontWeight: '800', color: '#93c5fd', letterSpacing: '0.5px', marginBottom: '6px' }}>YOLDAKİ</div>
-              <div style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6', textShadow: '0 2px 10px rgba(59, 130, 246, 0.3)' }}>{stats.inTransit}</div>
+            {/* YOLDAKİ */}
+            <div onClick={() => router.push('/inventory?tab=transfers')} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1 }}>🚚</div>
+              <div style={{ fontSize: '9px', fontWeight: '800', color: '#93c5fd', marginBottom: '6px' }}>YOLDAKİ</div>
+              <div style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6' }}>{stats.inTransit}</div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* SEPET LİSTESİ */}
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>          {
-          cart.length === 0 ? (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}>
-              <div style={{ fontSize: '60px' }}>🛒</div>
-              <div style={{ fontSize: '13px', fontWeight: '600', marginTop: '12px' }}>Sepet Boş</div>
-            </div>
-          ) : (
-            cart.map((item, idx) => (
-              <div key={idx} className="cart-item" style={{
-                background: 'rgba(255,255,255,0.02)',
-                padding: '12px 16px',
-                borderRadius: '10px',
-                border: '1px solid rgba(255,255,255,0.04)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                transition: 'all 0.15s'
-              }}>
-                <div style={{ flex: 2, minWidth: 0 }}>
-                  <div style={{ fontWeight: '600', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
-                  <div style={{ fontSize: '10px', opacity: 0.3, marginTop: '2px' }}>{item.barcode}</div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <button onClick={() => setCart(cart.map((c, i) => i === idx ? { ...c, qty: Math.max(1, c.qty - 1) } : c))} className="qty-btn">-</button>
-                  <span style={{ fontWeight: '700', minWidth: '24px', textAlign: 'center', fontSize: '13px' }}>{item.qty}</span>
-                  <button onClick={() => setCart(cart.map((c, i) => i === idx ? { ...c, qty: c.qty + 1 } : c))} className="qty-btn">+</button>
-                </div>
-                <div style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '14px', minWidth: '80px', textAlign: 'right' }}>
-                  ₺{(item.price * item.qty).toLocaleString()}
-                </div>
-                <button onClick={() => setCart(cart.filter((_, i) => i !== idx))} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '18px', padding: '4px' }}>×</button>
-              </div>
-            ))
-          )
-        }
-        </div >
-      </div >
-
-      {/* SAĞ PANEL */}
-      < div style={{ width: '400px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-        {/* SATIŞ ÖZETİ */}
-        < div style={{
-          background: 'rgba(255,255,255,0.02)',
-          borderRadius: '16px',
-          border: '1px solid rgba(255,255,255,0.06)',
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-          overflow: 'hidden'
-        }}>
+      {/* SAĞ PANEL (SATIŞ ÖZETİ) */}
+      <div style={{ width: '400px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
           <div style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-            <h2 style={{ margin: 0, fontSize: '14px', fontWeight: '800', letterSpacing: '0.5px', opacity: 0.5 }}>SATIŞ ÖZETİ</h2>
+            <h2 style={{ margin: 0, fontSize: '14px', fontWeight: '800', opacity: 0.5 }}>SATIŞ ÖZETİ</h2>
           </div>
-
           <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, overflowY: 'auto' }}>
-
             {/* Müşteri */}
             <div>
               <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontWeight: '700', marginBottom: '8px' }}>MÜŞTERİ</div>
-              <div onClick={() => setIsCustomerModalOpen(true)} className="customer-select" style={{
-                background: 'rgba(255,255,255,0.03)',
-                padding: '14px',
-                borderRadius: '10px',
-                border: '1px solid rgba(255,255,255,0.06)',
-                cursor: 'pointer',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                transition: 'all 0.15s'
-              }}>
-                <div>
-                  <div style={{ fontWeight: '700', fontSize: '13px' }}>{selectedCustomer}</div>
-                  {customer && (
-                    <div style={{ fontSize: '10px', color: '#10b981', fontWeight: '600', marginTop: '4px' }}>Puan: {Number(customer.points || 0).toFixed(0)}</div>
-                  )}
-                </div>
+              <div onClick={() => setIsCustomerModalOpen(true)} className="customer-select" style={{ background: 'rgba(255,255,255,0.03)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div><div style={{ fontWeight: '700', fontSize: '13px' }}>{selectedCustomer}</div></div>
                 <div style={{ fontSize: '10px', color: 'var(--primary)', fontWeight: '700' }}>DEĞİŞTİR ▾</div>
               </div>
             </div>
-
             {/* Referans Kodu */}
             <div>
               <label style={{ fontSize: '9px', opacity: 0.4, fontWeight: '700', display: 'block', marginBottom: '6px' }}>REFERANS KODU</label>
-              <input
-                type="text"
-                placeholder="Opsiyonel..."
-                value={referenceCode}
-                onChange={(e) => setReferenceCode(e.target.value)}
-                style={{
-                  width: '100%',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  color: 'white',
-                  fontSize: '12px',
-                  fontWeight: '600'
-                }}
-              />
+              <input type="text" placeholder="Opsiyonel..." value={referenceCode} onChange={(e) => setReferenceCode(e.target.value)} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', padding: '10px', borderRadius: '8px', color: 'white', fontSize: '12px', fontWeight: '600' }} />
             </div>
-
-            {/* İndirim & Puan */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div>
+            {/* İndirim */}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ flex: 1 }}>
                 <label style={{ fontSize: '9px', opacity: 0.4, fontWeight: '700', display: 'block', marginBottom: '6px' }}>İNDİRİM</label>
                 <div style={{ position: 'relative' }}>
-                  <input
-                    type="number"
-                    value={discountValue || ''}
-                    onChange={e => setDiscountValue(Number(e.target.value))}
-                    style={{
-                      width: '100%',
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      padding: '10px',
-                      borderRadius: '8px',
-                      color: 'white',
-                      fontSize: '13px',
-                      fontWeight: '600'
-                    }}
-                  />
-                  <button
-                    onClick={() => setDiscountType(discountType === 'percent' ? 'amount' : 'percent')}
-                    style={{
-                      position: 'absolute',
-                      right: '6px',
-                      top: '6px',
-                      bottom: '6px',
-                      padding: '0 10px',
-                      background: 'var(--primary)',
-                      border: 'none',
-                      borderRadius: '6px',
-                      color: 'white',
-                      fontSize: '10px',
-                      fontWeight: '700',
-                      cursor: 'pointer'
-                    }}
-                  >{discountType === 'percent' ? '%' : '₺'}</button>
+                  <input type="number" value={discountValue || ''} onChange={e => setDiscountValue(Number(e.target.value))} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', padding: '10px', borderRadius: '8px', color: 'white', fontSize: '13px' }} />
+                  <button onClick={() => setDiscountType(discountType === 'percent' ? 'amount' : 'percent')} style={{ position: 'absolute', right: '6px', top: '6px', bottom: '6px', background: 'var(--primary)', padding: '0 8px', border: 'none', borderRadius: '6px', color: 'white', fontSize: '10px' }}>{discountType === 'percent' ? '%' : '₺'}</button>
                 </div>
               </div>
-              <div>
+              <div style={{ flex: 1 }}>
                 <label style={{ fontSize: '9px', opacity: 0.4, fontWeight: '700', display: 'block', marginBottom: '6px' }}>PUAN</label>
-                <input
-                  type="number"
-                  value={pointsToUse || ''}
-                  onChange={e => {
-                    const val = Number(e.target.value);
-                    if (customer && val > Number(customer.points || 0)) return;
-                    setPointsToUse(val);
-                  }}
-                  style={{
-                    width: '100%',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    padding: '10px',
-                    borderRadius: '8px',
-                    color: 'white',
-                    fontSize: '13px',
-                    fontWeight: '600'
-                  }}
-                  placeholder="0"
-                />
+                <input type="number" value={pointsToUse || ''} onChange={e => setPointsToUse(Number(e.target.value))} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', padding: '10px', borderRadius: '8px', color: 'white', fontSize: '13px' }} />
               </div>
             </div>
-
             {/* Toplamlar */}
-            <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', opacity: 0.5 }}>
-                <span>Ara Toplam</span>
-                <span style={{ fontWeight: '700' }}>₺{subtotal.toLocaleString()}</span>
-              </div>
-
-              {campaignDiscountAmount > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#10b981' }}>
-                  <span>Kampanya</span>
-                  <span style={{ fontWeight: '700' }}>-₺{campaignDiscountAmount.toLocaleString()}</span>
-                </div>
-              )}
-
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '800', letterSpacing: '0.5px', opacity: 0.7 }}>TOPLAM</span>
-                  <span style={{ fontSize: '28px', fontWeight: '900', color: 'var(--primary)' }}>₺{finalTotal.toLocaleString()}</span>
-                </div>
-              </div>
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', opacity: 0.5 }}><span>Ara Toplam</span><span>₺{subtotal.toLocaleString()}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontWeight: '800' }}>TOPLAM</span><span style={{ fontSize: '28px', fontWeight: '900', color: 'var(--primary)' }}>₺{finalTotal.toLocaleString()}</span></div>
             </div>
-
             <div style={{ flex: 1 }}></div>
-
-            {/* Ödeme Yöntemleri */}
+            {/* Ödeme */}
             <div>
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontWeight: '700', marginBottom: '10px', textAlign: 'center' }}>ÖDEME YÖNTEMİ</div>
+              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginBottom: '10px' }}>ÖDEME YÖNTEMİ</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-                {[
-                  ...(paymentMethods || []),
-                  { id: 'account', label: 'VERESİYE', icon: '📖', type: 'account', linkedKasaId: '' }
-                ].map((m: any) => (
-                  <button
-                    key={m.id}
-                    onClick={() => {
-                      setPaymentMode(m.type);
-                      if (m.linkedKasaId) {
-                        setSelectedKasa(m.linkedKasaId);
-                      } else {
-                        if (m.type === 'cash') setSelectedKasa(kasalar.find(k => !['Banka', 'POS', 'Sanal POS', 'Havale'].some(t => k.type.includes(t)))?.id || '');
-                        if (m.type === 'transfer') setSelectedKasa(kasalar.find(k => k.type.includes('Banka') || k.type.includes('Havale'))?.id || '');
-                        if (m.type === 'card') setSelectedKasa(kasalar.find(k => k.type.includes('POS') || k.type.includes('Kredi') || k.type.includes('Banka'))?.id || '');
-                      }
-                    }}
-                    className="payment-btn"
-                    style={{
-                      padding: '12px',
-                      background: paymentMode === m.type ? 'var(--primary)' : 'rgba(255,255,255,0.03)',
-                      borderRadius: '10px',
-                      border: paymentMode === m.type ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.06)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '6px',
-                      transition: 'all 0.15s'
-                    }}
-                  >
-                    <span style={{ fontSize: '20px' }}>{m.icon}</span>
-                    <span style={{ color: 'white', fontSize: '10px', fontWeight: '700', opacity: paymentMode === m.type ? 1 : 0.5 }}>{m.label}</span>
-                  </button>
+                {['cash', 'card', 'transfer', 'account'].map(mode => (
+                  <button key={mode} onClick={() => setPaymentMode(mode as any)} style={{ padding: '12px', background: paymentMode === mode ? 'var(--primary)' : 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', cursor: 'pointer', color: '#fff', fontSize: '10px', fontWeight: '700' }}>{mode.toUpperCase()}</button>
                 ))}
               </div>
-
-              {/* Kasa Seçimi */}
-              {paymentMode === 'cash' && (
-                <div className="animate-fade-in" style={{ marginBottom: '12px' }}>
-                  <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>KASA</label>
-                  <select
-                    value={selectedKasa}
-                    onChange={e => setSelectedKasa(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      borderRadius: '8px',
-                      color: 'white',
-                      fontSize: '12px',
-                      fontWeight: '600'
-                    }}
-                  >
-                    <option value="">Seçiniz...</option>
-                    {kasalar.filter(k => !['Banka', 'POS', 'Sanal POS', 'Havale'].some(t => k.type.includes(t))).map(k => (
-                      <option key={k.id} value={k.id}>{k.name}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {paymentMode === 'transfer' && (
-                <div className="animate-fade-in" style={{ marginBottom: '12px' }}>
-                  <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>BANKA</label>
-                  <select
-                    value={selectedKasa}
-                    onChange={e => setSelectedKasa(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      borderRadius: '8px',
-                      color: 'white',
-                      fontSize: '12px',
-                      fontWeight: '600'
-                    }}
-                  >
-                    <option value="">Seçiniz...</option>
-                    {kasalar.filter(k => k.type.includes('Banka') || k.type.includes('Havale')).map(k => (
-                      <option key={k.id} value={k.id}>{k.name}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {paymentMode === 'card' && (
-                <div className="animate-fade-in" style={{ marginBottom: '12px' }}>
-                  <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>TAKSİT</label>
-                  <select
-                    onChange={e => {
-                      const val = e.target.value;
-                      setInstallmentLabel(val);
-                      const num = parseInt(val);
-                      setInstallmentCount(isNaN(num) ? 1 : num);
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      borderRadius: '8px',
-                      color: 'white',
-                      fontSize: '12px',
-                      fontWeight: '600'
-                    }}
-                  >
-                    <option value="">Seçiniz...</option>
-                    {(salesExpenses?.posCommissions || []).map((comm: any, idx: number) => (
-                      <option key={idx} value={comm.installment}>{comm.installment}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
             </div>
-
-            <button
-              disabled={isProcessing || !paymentMode || cart.length === 0}
-              onClick={handleFinalize}
-              className="btn-primary"
-              style={{
-                width: '100%',
-                padding: '16px',
-                borderRadius: '12px',
-                fontSize: '15px',
-                fontWeight: '800',
-                opacity: (isProcessing || !paymentMode || cart.length === 0) ? 0.4 : 1,
-                cursor: (isProcessing || !paymentMode || cart.length === 0) ? 'not-allowed' : 'pointer'
-              }}
-            >
-              {isProcessing ? 'İŞLENİYOR...' : 'ONAYLA ➔'}
-            </button>
-
-            {cart.length > 0 && (
-              <button
-                onClick={() => setShowSuspendModal(true)}
-                className="btn-ghost"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '10px',
-                  fontSize: '11px',
-                  fontWeight: '700'
-                }}
-              >
-                ⏳ ASKIYA AL
-              </button>
-            )}
+            <button disabled={isProcessing || !paymentMode || cart.length === 0} onClick={handleFinalize} className="btn-primary" style={{ width: '100%', padding: '16px', borderRadius: '12px', fontSize: '15px', fontWeight: '800' }}>{isProcessing ? 'İŞLENİYOR...' : 'ONAYLA ➔'}</button>
           </div>
-        </div >
-      </div >
+        </div>
+      </div>
 
       {/* MODALS */}
-      {
-        isCustomerModalOpen && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setIsCustomerModalOpen(false)}>
-            <div style={{ background: 'var(--bg-card)', width: '500px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)', padding: '24px' }} onClick={e => e.stopPropagation()}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '800' }}>MÜŞTERİ SEÇİMİ</h2>
-                <button onClick={() => setIsCustomerModalOpen(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '24px', cursor: 'pointer' }}>×</button>
-              </div>
-              <div style={{ maxHeight: '400px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div
-                  onClick={() => { setSelectedCustomer('Perakende Müşteri'); setIsCustomerModalOpen(false); inputRef.current?.focus(); }}
-                  className="customer-row"
-                  style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid var(--primary)', cursor: 'pointer', transition: 'all 0.15s' }}
-                >
-                  <div style={{ fontWeight: '800', fontSize: '14px' }}>Perakende Müşteri</div>
-                </div>
-                {customers.filter(c => c.name !== 'Perakende Müşteri').map((c, i) => (
-                  <div
-                    key={i}
-                    onClick={() => { setSelectedCustomer(c.name); setIsCustomerModalOpen(false); inputRef.current?.focus(); }}
-                    className="customer-row"
-                    style={{
-                      padding: '14px',
-                      background: 'rgba(255,255,255,0.02)',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(255,255,255,0.04)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      transition: 'all 0.15s'
-                    }}
-                  >
-                    <div style={{ fontWeight: '600', fontSize: '13px' }}>{c.name}</div>
-                    <div style={{ color: Number(c.balance) > 0 ? '#ef4444' : '#10b981', fontWeight: '700', fontSize: '13px' }}>₺{Math.abs(Number(c.balance || 0)).toLocaleString()}</div>
-                  </div>
-                ))}
-              </div>
+      {isCustomerModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setIsCustomerModalOpen(false)}>
+          <div style={{ background: 'var(--bg-card)', width: '500px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)', padding: '24px' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}><h3>MÜŞTERİ SEÇİMİ</h3><button onClick={() => setIsCustomerModalOpen(false)}>×</button></div>
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              {customers.map((c, i) => (
+                <div key={i} onClick={() => { setSelectedCustomer(c.name); setIsCustomerModalOpen(false); }} style={{ padding: '12px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>{c.name}</div>
+              ))}
             </div>
           </div>
-        )
-      }
+        </div>
+      )}
 
-      {
-        showSuspendModal && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ background: 'var(--bg-card)', width: '400px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)', padding: '24px' }}>
-              <h2 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '800' }}>SEPETİ ASKIYA AL</h2>
-              <p style={{ margin: '0 0 16px 0', fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>Sepeti tanımlamak için bir etiket girin.</p>
-              <input
-                autoFocus
-                type="text"
-                placeholder="Örn: 34 ABC 123"
-                value={suspenseLabel}
-                onChange={e => setSuspenseLabel(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSuspendSale()}
-                style={{
-                  width: '100%',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  padding: '14px',
-                  borderRadius: '10px',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  outline: 'none',
-                  marginBottom: '16px'
-                }}
-              />
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button onClick={() => setShowSuspendModal(false)} className="btn-ghost" style={{ flex: 1, padding: '12px', borderRadius: '10px' }}>VAZGEÇ</button>
-                <button onClick={handleSuspendSale} className="btn-primary" style={{ flex: 1, padding: '12px', borderRadius: '10px' }}>ASKIYA AL</button>
-              </div>
-            </div>
+      {showResumptionModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: 'var(--bg-card)', width: '500px', borderRadius: '16px', padding: '24px' }}>
+            <h3>ASKIDAKİ SEPETLER</h3>
+            {suspendedSales.map(s => <div key={s.id} onClick={() => handleResumeSale(s.id)} style={{ padding: '12px', cursor: 'pointer' }}>{s.label} - ₺{s.total}</div>)}
+            <button onClick={() => setShowResumptionModal(false)}>KAPAT</button>
           </div>
-        )
-      }
-
-      {
-        showResumptionModal && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ background: 'var(--bg-card)', width: '500px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)', padding: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ margin: 0, fontSize: '16px', fontWeight: '800' }}>ASKIDAKİ SEPETLER</h2>
-                <button onClick={() => setShowResumptionModal(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '24px', cursor: 'pointer' }}>×</button>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '400px', overflowY: 'auto' }}>
-                {suspendedSales.map((sale) => (
-                  <div
-                    key={sale.id}
-                    onClick={() => handleResumeSale(sale.id)}
-                    className="suspend-row"
-                    style={{
-                      padding: '16px',
-                      background: 'rgba(255,255,255,0.02)',
-                      borderRadius: '12px',
-                      border: '1px solid rgba(255,255,255,0.04)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      transition: 'all 0.15s'
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontWeight: '800', fontSize: '14px', color: '#f59e0b' }}>{sale.label}</div>
-                      <div style={{ fontSize: '10px', opacity: 0.4, marginTop: '4px' }}>
-                        {sale.items.length} Kalem • {new Date(sale.timestamp).toLocaleTimeString('tr-TR')}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontWeight: '800', fontSize: '16px' }}>₺{sale.total.toLocaleString()}</div>
-                      <div style={{ fontSize: '9px', color: '#10b981', fontWeight: '700', marginTop: '2px' }}>GERİ YÜKLE ➔</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )
-      }
+        </div>
+      )}
 
       <style jsx>{`
-        .stat-card-modern {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .stat-card-modern:hover {
-          transform: translateY(-4px) scale(1.02);
-          box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3) !important;
-        }
-        .search-result-row:hover {
-          background: rgba(255,255,255,0.08) !important;
-        }
-        .cart-item {
-          transition: all 0.2s ease;
-        }
-        .cart-item:hover {
-          background: rgba(255,255,255,0.06) !important;
-          border-color: rgba(255,255,255,0.12) !important;
-          transform: translateX(4px);
-        }
-        .qty-btn {
-          background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-          border: 1px solid rgba(255,255,255,0.1);
-          color: white;
-          width: 32px;
-          height: 32px;
-          borderRadius: 8px;
-          cursor: pointer;
-          font-size: 16px;
-          font-weight: 800;
-          transition: all 0.2s;
-        }
-        .qty-btn:hover {
-          background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
-          transform: scale(1.1);
-        }
-        .customer-select {
-          transition: all 0.2s ease;
-        }
-        .customer-select:hover {
-          background: rgba(255,255,255,0.06) !important;
-          border-color: var(--primary) !important;
-          transform: translateX(2px);
-        }
-        .payment-btn {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .payment-btn:hover {
-          transform: translateY(-3px) scale(1.05);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-        }
-        .customer-row {
-          transition: all 0.2s ease;
-        }
-        .customer-row:hover {
-          background: rgba(255,255,255,0.06) !important;
-          border-color: var(--primary) !important;
-          transform: translateX(4px);
-        }
-        .suspend-row {
-          transition: all 0.2s ease;
-        }
-        .suspend-row:hover {
-          background: rgba(245, 158, 11, 0.1) !important;
-          border-color: #f59e0b !important;
-          transform: translateX(4px);
-        }
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.5;
-            transform: scale(1.2);
-          }
-        }
-        .pulse-dot {
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: slideIn 0.3s ease-out;
-        }
-        .privacy-btn:hover {
-          background: rgba(255,255,255,0.3) !important;
-          transform: scale(1.15);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
-        }
+        .stat-card-modern:hover { transform: translateY(-4px); }
+        .cart-item:hover { background: rgba(255,255,255,0.06) !important; }
+        .qty-btn { width: 32px; height: 32px; cursor: pointer; }
       `}</style>
-    </div >
+    </div>
   );
 }
 
