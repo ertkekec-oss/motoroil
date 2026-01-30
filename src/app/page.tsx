@@ -265,8 +265,8 @@ function POSContent() {
       {/* SOL PANEL (Satış ve Liste) */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
 
-        {/* ÜST DASHBOARD - 4 KART */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        {/* ÜST DASHBOARD - 3 KART (CIRO, KAR, GIDER) */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
 
           {/* GÜNLÜK CİRO */}
           <div className="stat-card-modern" style={{
@@ -360,32 +360,6 @@ function POSContent() {
               {hideExpense ? '₺*****' : `₺${stats.expense.toLocaleString()}`}
             </div>
           </div>
-
-          {/* BİLDİRİMLER */}
-          <div
-            onClick={() => router.push('/notifications')}
-            className="stat-card-modern"
-            style={{
-              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(245, 158, 11, 0.3)',
-              padding: '18px',
-              borderRadius: '16px',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 8px 32px rgba(245, 158, 11, 0.1)',
-              cursor: 'pointer'
-            }}
-          >
-            <div style={{ position: 'absolute', top: '-20px', right: '-20px', fontSize: '70px', opacity: 0.08 }}>🔔</div>
-            <div style={{ fontSize: '10px', fontWeight: '800', color: '#fcd34d', letterSpacing: '1px', marginBottom: '10px' }}>BİLDİRİMLER</div>
-            <div style={{ fontSize: '28px', fontWeight: '900', color: '#f59e0b', textShadow: '0 2px 10px rgba(245, 158, 11, 0.3)' }}>
-              {stats.criticalStock + stats.inTransit}
-            </div>
-            {(stats.criticalStock + stats.inTransit) > 0 && (
-              <div className="pulse-dot" style={{ position: 'absolute', top: '12px', right: '12px', background: '#f59e0b', width: '10px', height: '10px', borderRadius: '50.0%' }}></div>
-            )}
-          </div>
         </div>
 
         {/* ARAMA BARI (ÜSTE SABİT) */}
@@ -463,24 +437,50 @@ function POSContent() {
             )}
           </div>
 
-          {/* 3'LÜ KART GURUBU */}
+          {/* 4'LÜ DİKEY KART GURUBU */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '200px' }}>
+            {/* BİLDİRİMLER */}
+            <div
+              onClick={() => router.push('/notifications')}
+              className="stat-card-modern stat-card-compact"
+              style={{
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                padding: '14px',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: '0 8px 32px rgba(245, 158, 11, 0.1)'
+              }}
+            >
+              <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1 }}>🔔</div>
+              <div style={{ fontSize: '9px', fontWeight: '800', color: '#fcd34d', letterSpacing: '0.5px', marginBottom: '6px' }}>BİLDİRİMLER</div>
+              <div style={{ fontSize: '24px', fontWeight: '900', color: '#f59e0b', textShadow: '0 2px 10px rgba(245, 158, 11, 0.3)' }}>
+                {stats.criticalStock + stats.inTransit}
+              </div>
+              {(stats.criticalStock + stats.inTransit) > 0 && (
+                <div className="pulse-dot" style={{ position: 'absolute', top: '8px', right: '8px', background: '#f59e0b', width: '8px', height: '8px', borderRadius: '50%' }}></div>
+              )}
+            </div>
+
             {/* BEKLEYEN */}
-            <div onClick={() => suspendedSales.length > 0 && setShowResumptionModal(true)} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative' }}>
+            <div onClick={() => suspendedSales.length > 0 && setShowResumptionModal(true)} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1 }}>⏳</div>
               <div style={{ fontSize: '9px', fontWeight: '800', color: '#fcd34d', marginBottom: '6px' }}>BEKLEYEN</div>
               <div style={{ fontSize: '24px', fontWeight: '900', color: '#f59e0b' }}>{suspendedSales.length}</div>
             </div>
 
             {/* KRİTİK */}
-            <div onClick={() => router.push('/inventory?filter=critical-stock')} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.08))', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative' }}>
+            <div onClick={() => router.push('/inventory?filter=critical-stock')} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.08))', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1 }}>🚨</div>
               <div style={{ fontSize: '9px', fontWeight: '800', color: '#fca5a5', marginBottom: '6px' }}>KRİTİK STOK</div>
               <div style={{ fontSize: '24px', fontWeight: '900', color: '#ef4444' }}>{stats.criticalStock}</div>
             </div>
 
             {/* YOLDAKİ */}
-            <div onClick={() => router.push('/inventory?tab=transfers')} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative' }}>
+            <div onClick={() => router.push('/inventory?tab=transfers')} className="stat-card-modern stat-card-compact" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '14px', borderRadius: '12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '50px', opacity: 0.1 }}>🚚</div>
               <div style={{ fontSize: '9px', fontWeight: '800', color: '#93c5fd', marginBottom: '6px' }}>YOLDAKİ</div>
               <div style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6' }}>{stats.inTransit}</div>
