@@ -45,6 +45,8 @@ function POSContent() {
   const [hideProfit, setHideProfit] = useState(false);
   const [hideExpense, setHideExpense] = useState(false);
 
+  const [referenceCode, setReferenceCode] = useState('');
+
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => { inputRef.current?.focus(); }, []);
 
@@ -193,7 +195,8 @@ function POSContent() {
         kasaId: selectedKasa || 'CashKasa',
         customerId: customer?.id,
         pointsUsed: pointsToUse,
-        couponCode: validCoupon?.code
+        couponCode: validCoupon?.code,
+        referenceCode: referenceCode
       });
 
       if (success) {
@@ -206,6 +209,7 @@ function POSContent() {
         setPointsToUse(0);
         setValidCoupon(null);
         setCouponCode('');
+        setReferenceCode('');
       }
     } catch (err: any) {
       showError("Hata", err.message || "İşlem hatası.");
@@ -408,7 +412,7 @@ function POSContent() {
             display: 'flex',
             gap: '8px',
             background: 'rgba(255,255,255,0.02)',
-            padding: '8px',
+            padding: '6px',
             borderRadius: '12px',
             border: '1px solid rgba(255,255,255,0.06)',
             position: 'relative'
@@ -423,7 +427,7 @@ function POSContent() {
                 flex: 1,
                 background: 'transparent',
                 border: 'none',
-                padding: '12px 16px',
+                padding: '8px 16px',
                 color: 'white',
                 fontSize: '14px',
                 outline: 'none'
@@ -627,6 +631,27 @@ function POSContent() {
                 </div>
                 <div style={{ fontSize: '10px', color: 'var(--primary)', fontWeight: '700' }}>DEĞİŞTİR ▾</div>
               </div>
+            </div>
+
+            {/* Referans Kodu */}
+            <div>
+              <label style={{ fontSize: '9px', opacity: 0.4, fontWeight: '700', display: 'block', marginBottom: '6px' }}>REFERANS KODU</label>
+              <input
+                type="text"
+                placeholder="Opsiyonel..."
+                value={referenceCode}
+                onChange={(e) => setReferenceCode(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  color: 'white',
+                  fontSize: '12px',
+                  fontWeight: '600'
+                }}
+              />
             </div>
 
             {/* İndirim & Puan */}
