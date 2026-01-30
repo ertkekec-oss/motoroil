@@ -34,19 +34,36 @@ export default function BranchSettingsPage() {
     }, [branches]);
 
     const toggleKasaForBranch = (branch: string, kasaId: number) => {
-        console.log('Toggle called:', { branch, kasaId, currentConfig: branchConfigs[branch] });
+        console.log('=== TOGGLE START ===');
+        console.log('Branch:', branch);
+        console.log('Kasa ID:', kasaId, 'Type:', typeof kasaId);
+        console.log('Current branchConfigs:', JSON.stringify(branchConfigs, null, 2));
+        console.log('Current config for', branch, ':', branchConfigs[branch]);
+
         setBranchConfigs(prevConfigs => {
+            console.log('prevConfigs:', JSON.stringify(prevConfigs, null, 2));
+
             const currentKasalar = prevConfigs[branch] || [];
-            const newKasalar = currentKasalar.includes(kasaId)
+            console.log('currentKasalar:', currentKasalar);
+
+            const isCurrentlyAssigned = currentKasalar.includes(kasaId);
+            console.log('Is currently assigned?', isCurrentlyAssigned);
+
+            const newKasalar = isCurrentlyAssigned
                 ? currentKasalar.filter(id => id !== kasaId)
                 : [...currentKasalar, kasaId];
 
-            console.log('New config for', branch, ':', newKasalar);
+            console.log('New kasalar for', branch, ':', newKasalar);
 
-            return {
+            const newConfigs = {
                 ...prevConfigs,
                 [branch]: newKasalar
             };
+
+            console.log('New branchConfigs:', JSON.stringify(newConfigs, null, 2));
+            console.log('=== TOGGLE END ===\n');
+
+            return newConfigs;
         });
     };
 
