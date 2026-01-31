@@ -331,11 +331,49 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+import { useAuth } from './AuthContext';
+
+// ... (previous imports)
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
     const { showError } = useModal();
-    // INITIAL MOCK DATA
+    const { user: authUser } = useAuth(); // Get user from AuthContext
 
+    // INITIAL MOCK DATA
     const [products, setProducts] = useState<(Product & { branch?: string })[]>([]);
+
+    // ...
+
+    const [currentUser, setCurrentUser] = useState<Staff | null>(null);
+
+    // Sync Auth User to App Context Current User
+    useEffect(() => {
+        if (authUser) {
+            // We need to map AuthUser to Staff type somewhat or ensure compatibility
+            // AuthUser has: username, role, branch, name, permissions
+            // Staff has: id, name, role, branch, permissions, status... etc
+
+            // For now, construct a compatible object. Ideally, fetch full staff details if needed.
+            // But essential fields for permission checks are present in authUser.
+            const mappedUser: Staff = {
+                id: authUser.username || 'unknown', // AuthUser might miss ID, fallback to username
+                name: authUser.name,
+                role: authUser.role,
+                branch: authUser.branch,
+                permissions: authUser.permissions,
+                status: 'Active',
+                currentJob: '',
+                username: authUser.username
+            };
+            // Only update if changed to prevent loops
+            setCurrentUser(prev => {
+                if (prev?.username === authUser.username && prev?.role === authUser.role) return prev;
+                return mappedUser;
+            });
+        } else {
+            setCurrentUser(null);
+        }
+    }, [authUser]);
 
     const refreshProducts = async () => {
         try {
@@ -529,7 +567,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         } catch (e) { console.error('Error removing suspended sale', e); }
     };
 
-    const [currentUser, setCurrentUser] = useState<Staff | null>(null);
+    // currentUser state moved to top (synced with AuthContext)
 
     const [pendingProducts, setPendingProducts] = useState<PendingProduct[]>([]);
     const [pendingTransfers, setPendingTransfers] = useState<PendingTransfer[]>([]);
