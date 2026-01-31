@@ -165,7 +165,15 @@ export default function ReportsPage() {
         const expenses = expenseAnalytics.total;
         const cogs = revenue * 0.65; // 65% COGS estimate
         const grossProfit = revenue - cogs;
-        const netProfit = revenue - cogs - expenses;
+        const hiddenCosts = {
+            pos: revenue * 0.025, // 2.5% POS commission estimate
+            eDoc: salesAnalytics.count * 1.25, // 1.25 TL per invoice
+            paper: salesAnalytics.count * 0.50, // 0.50 TL per printout
+            returns: revenue * 0.01 // 1% returns estimate
+        };
+
+        const totalHiddenCosts = Object.values(hiddenCosts).reduce((a, b) => a + Number(b), 0);
+        const netProfit = (revenue - cogs - expenses) - totalHiddenCosts;
         const profitMargin = revenue > 0 ? (netProfit / revenue) * 100 : 0;
 
         // Detailed Financial Status
@@ -198,6 +206,7 @@ export default function ReportsPage() {
             grossProfit,
             netProfit,
             profitMargin,
+            hiddenCosts,
             receivable,
             payable,
             plannedReceivable,
