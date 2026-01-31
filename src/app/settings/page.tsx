@@ -734,7 +734,7 @@ export default function SettingsPage() {
                 {activeTab === 'staff' && (
                     <div className="animate-fade-in-up" style={{ margin: '-40px', minHeight: 'calc(100vh - 100px)' }}>
                         <iframe
-                            src="/staff"
+                            src="/staff?embedded=true"
                             style={{ width: '100%', height: 'calc(100vh - 60px)', border: 'none' }}
                             title="Ekip Yönetimi"
                         />
@@ -745,7 +745,7 @@ export default function SettingsPage() {
                 {activeTab === 'integrations' && (
                     <div className="animate-fade-in-up" style={{ margin: '-40px', minHeight: 'calc(100vh - 100px)' }}>
                         <iframe
-                            src="/integrations"
+                            src="/integrations?embedded=true"
                             style={{ width: '100%', height: 'calc(100vh - 60px)', border: 'none' }}
                             title="Entegrasyonlar"
                         />

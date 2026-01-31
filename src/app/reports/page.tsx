@@ -748,7 +748,7 @@ export default function ReportsPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                             <div className="glass card" style={{ padding: '0', borderRadius: '16px', overflow: 'hidden', minHeight: '800px' }}>
                                 <iframe
-                                    src="/reports/daily"
+                                    src="/reports/daily?embedded=true"
                                     style={{ width: '100%', height: '800px', border: 'none' }}
                                     title="Gün Sonu Raporu"
                                 />
@@ -761,7 +761,7 @@ export default function ReportsPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                             <div className="glass card" style={{ padding: '0', borderRadius: '16px', overflow: 'hidden', minHeight: '800px' }}>
                                 <iframe
-                                    src="/reports/suppliers"
+                                    src="/reports/suppliers?embedded=true"
                                     style={{ width: '100%', height: '800px', border: 'none' }}
                                     title="Tedarikçi Raporları"
                                 />
