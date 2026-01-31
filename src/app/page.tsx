@@ -261,8 +261,8 @@ function POSContent() {
     if (cart.length === 0) return;
     if (!paymentMode) return showWarning("Hata", "Lütfen bir ödeme yöntemi seçiniz.");
 
-    if ((paymentMode === 'cash' || paymentMode === 'transfer') && !selectedKasa) {
-      return showWarning("Hata", "Lütfen işlem yapılacak kasa/banka hesabını seçiniz.");
+    if ((paymentMode === 'cash' || paymentMode === 'transfer' || paymentMode === 'card') && !selectedKasa) {
+      return showWarning("Hata", "Lütfen işlem yapılacak kasa/banka/POS hesabını seçiniz.");
     }
 
     if (paymentMode === 'account' && selectedCustomer === 'Perakende Müşteri') {
@@ -298,6 +298,9 @@ function POSContent() {
         setValidCoupon(null);
         setCouponCode('');
         setReferenceCode('');
+      } else {
+        // success is false, but an error message might have been shown by AppContext or we should show a generic one
+        showError("Hata", "Satış kaydedilemedi. Lütfen kasalarınızı ve bağlantınızı kontrol edin.");
       }
     } catch (err: any) {
       showError("Hata", err.message || "İşlem hatası.");
@@ -834,31 +837,55 @@ function POSContent() {
             )}
 
             {paymentMode === 'card' && (
-              <div className="animate-fade-in" style={{ marginBottom: '12px' }}>
-                <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>TAKSİT</label>
-                <select
-                  onChange={e => {
-                    const val = e.target.value;
-                    setInstallmentLabel(val);
-                    const num = parseInt(val);
-                    setInstallmentCount(isNaN(num) ? 1 : num);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    borderRadius: '8px',
-                    color: 'white',
-                    fontSize: '12px',
-                    fontWeight: '600'
-                  }}
-                >
-                  <option value="">Seçiniz...</option>
-                  {(salesExpenses?.posCommissions || []).map((comm: any, idx: number) => (
-                    <option key={idx} value={comm.installment}>{comm.installment}</option>
-                  ))}
-                </select>
+              <div className="animate-fade-in" style={{ marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div>
+                  <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>POS HESABI / BANKA</label>
+                  <select
+                    value={selectedKasa}
+                    onChange={e => setSelectedKasa(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      borderRadius: '8px',
+                      color: 'white',
+                      fontSize: '12px',
+                      fontWeight: '600'
+                    }}
+                  >
+                    <option value="">Seçiniz...</option>
+                    {kasalar?.filter(k => k.type.includes('POS') || k.type.includes('Kredi') || k.type.includes('Banka')).map(k => (
+                      <option key={k.id} value={k.id}>{k.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>TAKSİT</label>
+                  <select
+                    onChange={e => {
+                      const val = e.target.value;
+                      setInstallmentLabel(val);
+                      const num = parseInt(val);
+                      setInstallmentCount(isNaN(num) ? 1 : num);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      borderRadius: '8px',
+                      color: 'white',
+                      fontSize: '12px',
+                      fontWeight: '600'
+                    }}
+                  >
+                    <option value="">Tek Çekim</option>
+                    {(salesExpenses?.posCommissions || []).map((comm: any, idx: number) => (
+                      <option key={idx} value={comm.installment}>{comm.installment}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             )}
             <button disabled={isProcessing || !paymentMode || cart.length === 0} onClick={handleFinalize} className="btn-primary" style={{ width: '100%', padding: '16px', borderRadius: '12px', fontSize: '15px', fontWeight: '800' }}>{isProcessing ? 'İŞLENİYOR...' : 'ONAYLA ➔'}</button>
