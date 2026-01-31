@@ -22,7 +22,7 @@ const COLORS = {
 };
 
 export default function ReportsPage() {
-    const { transactions, products, customers, kasalar, branches, currentUser, hasPermission } = useApp();
+    const { transactions, products, customers, suppliers, kasalar, branches, currentUser, hasPermission } = useApp();
     const { showSuccess, showError } = useModal();
 
     const isSystemAdmin = currentUser === null;
