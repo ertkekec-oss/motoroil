@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
         const resetAll = options.all === true;
 
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: any) => {
             // --- ALL ---
             if (resetAll) {
                 // Dependency order (leaves to root)
@@ -87,15 +87,16 @@ export async function POST(request: Request) {
                 }
 
                 if (options.customers) {
-                    // Must clear dependent records first
                     await tx.salesInvoice.deleteMany({});
                     await tx.serviceRecord.deleteMany({});
                     await tx.warranty.deleteMany({});
                     await tx.coupon.deleteMany({});
                     await tx.customerDocument.deleteMany({});
+                    // Clear plans associated with customers
+                    await tx.installment.deleteMany({ where: { paymentPlan: { customerId: { not: null } } } });
+                    await tx.paymentPlan.deleteMany({ where: { customerId: { not: null } } });
                     await tx.customer.deleteMany({});
                     await tx.customerCategory.deleteMany({});
-                    // When cariler are reset, their transactions (movements) should probably go too
                     await tx.transaction.deleteMany({ where: { NOT: { customerId: null } } });
                 }
 
@@ -153,7 +154,7 @@ export async function POST(request: Request) {
                 }
             });
         }, {
-            timeout: 60000 // 60s timeout for large datasets
+            timeout: 60000
         });
 
         return NextResponse.json({ success: true, message: 'Veriler başarıyla sıfırlandı.' });

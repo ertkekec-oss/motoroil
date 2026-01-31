@@ -17,7 +17,7 @@ export async function POST(request: Request) {
         }
 
         // Transactional Operation
-        const result = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx: any) => {
             const direction = installment.paymentPlan.direction || 'OUT';
             const isCollection = direction === 'IN';
 
@@ -30,8 +30,8 @@ export async function POST(request: Request) {
                     kasaId: kasaId,
                     date: new Date(),
                     branch: installment.paymentPlan.branch || 'Merkez',
-                    customerId: installment.paymentPlan.customerId,
-                    supplierId: installment.paymentPlan.supplierId
+                    customerId: installment.paymentPlan.customerId || null,
+                    supplierId: installment.paymentPlan.supplierId || null
                 }
             });
 

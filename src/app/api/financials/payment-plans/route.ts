@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         const remainder = Number((total - (monthlyAmount * count)).toFixed(2));
 
         // Create Plan and Installments Transactionally
-        const plan = await prisma.$transaction(async (tx) => {
+        const plan = await prisma.$transaction(async (tx: any) => {
             const plan = await tx.paymentPlan.create({
                 data: {
                     title,
@@ -32,8 +32,8 @@ export async function POST(request: Request) {
                     branch: branch || 'Merkez',
                     type: type || 'Kredi',
                     direction: direction || 'OUT',
-                    customerId,
-                    supplierId,
+                    customerId: customerId || null,
+                    supplierId: supplierId || null,
                     installments: {
                         create: Array.from({ length: count }).map((_, i) => {
                             const dueDate = new Date(start);
@@ -128,7 +128,7 @@ export async function GET(request: Request) {
             /* whereClause.branch = branch; */
         }
 
-        const plans = await prisma.paymentPlan.findMany({
+        const plans = await (prisma as any).paymentPlan.findMany({
             where: whereClause,
             include: {
                 installments: {
