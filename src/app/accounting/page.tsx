@@ -10,6 +10,7 @@ import Pagination from '@/components/Pagination';
 export default function AccountingPage() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('receivables'); // receivables, payables, banks, expenses, checks
+    const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'this_month'>('all');
     const {
         kasalar, setKasalar, addTransaction, currentUser, hasPermission,
         customers, suppliers, addFinancialTransaction, checks, addCheck,
@@ -103,10 +104,84 @@ export default function AccountingPage() {
             title: t.description?.replace('Gider: ', '').split(' (')[0] || t.description,
             category: t.description?.match(/\((.*?)\)/)?.[1] || 'Genel',
             date: new Date(t.date).toLocaleDateString('tr-TR'),
+            rawDate: t.date,
             amount: t.amount,
             method: kasalar.find(k => k.id.toString() === t.kasaId.toString())?.name || 'Bilinmiyor'
         }));
     }, [transactions, kasalar]);
+
+    // Financial Dashboard Stats
+    const stats = useMemo(() => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        // Receivables Stats (Customer balances are current snapshots, installments have dates)
+        let receivablesToday = 0;
+        let receivablesThisMonth = 0;
+
+        // From installments (IN)
+        scheduledPayments.forEach(plan => {
+            if (plan.direction === 'IN') {
+                plan.installments.forEach((inst: any) => {
+                    if (inst.status !== 'Paid') {
+                        const dueDate = new Date(inst.dueDate);
+                        if (dueDate.getTime() <= today.getTime() + 86400000) {
+                            receivablesToday += Number(inst.amount);
+                        }
+                        if (dueDate >= firstDayOfMonth) {
+                            receivablesThisMonth += Number(inst.amount);
+                        }
+                    }
+                });
+            }
+        });
+
+        // From Checks (IN)
+        checks.forEach(c => {
+            if (c.type.includes('Alınan') && c.status === 'Beklemede') {
+                const dueDate = new Date(c.dueDate);
+                if (dueDate.getTime() <= today.getTime() + 86400000) {
+                    receivablesToday += Number(c.amount);
+                }
+                if (dueDate >= firstDayOfMonth) {
+                    receivablesThisMonth += Number(c.amount);
+                }
+            }
+        });
+
+        const netKasa = kasalar.reduce((a, b) => a + Number(b.balance), 0);
+
+        return { receivablesToday, receivablesThisMonth, netKasa };
+    }, [scheduledPayments, checks, kasalar]);
+
+    const filterByTime = (list: any[]) => {
+        if (timeFilter === 'all') return list;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const nextDay = new Date(today.getTime() + 86400000);
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        return list.filter(item => {
+            if (!item.date) return true;
+            let d: Date;
+            if (item.date.includes('.')) {
+                const parts = item.date.split('.');
+                d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+            } else {
+                d = new Date(item.rawDate || item.date);
+            }
+
+            if (timeFilter === 'today') {
+                return d.getTime() >= today.getTime() && d.getTime() < nextDay.getTime();
+            }
+            if (timeFilter === 'this_month') {
+                return d.getTime() >= startOfMonth.getTime();
+            }
+            return true;
+        });
+    };
 
     // PAGINATION
     const itemsPerPage = 10;
@@ -117,13 +192,13 @@ export default function AccountingPage() {
     }, [activeTab]);
 
     const activeListLength = useMemo(() => {
-        if (activeTab === 'receivables') return [...filterByBranch(receivables), ...customerReceivables].length;
-        if (activeTab === 'payables') return [...filterByBranch(payables), ...supplierPayables].length;
-        if (activeTab === 'checks') return checks.length;
-        if (activeTab === 'expenses') return expenses.length;
-        if (activeTab === 'transactions_list') return transactions.length;
+        if (activeTab === 'receivables') return filterByTime([...filterByBranch(receivables), ...customerReceivables]).length;
+        if (activeTab === 'payables') return filterByTime([...filterByBranch(payables), ...supplierPayables]).length;
+        if (activeTab === 'checks') return filterByTime(checks).length;
+        if (activeTab === 'expenses') return filterByTime(expenses).length;
+        if (activeTab === 'transactions_list') return filterByTime(transactions).length;
         return 0;
-    }, [activeTab, receivables, customerReceivables, payables, supplierPayables, checks, expenses, transactions]);
+    }, [activeTab, receivables, customerReceivables, payables, supplierPayables, checks, expenses, transactions, timeFilter]);
 
     const totalPages = Math.ceil(activeListLength / itemsPerPage);
 
@@ -715,15 +790,63 @@ export default function AccountingPage() {
                     <p className="text-muted">Nakit akışı, alacak/borç ve kasa yönetimi</p>
                 </div>
                 <div className="flex gap-4">
-                    <button onClick={() => { refreshCustomers(); window.location.reload(); }} className="btn btn-outline text-xs">🔄 Yenile</button>
-                    <div className="card glass-plus flex-col items-end">
-                        <span className="text-[10px] text-muted tracking-widest uppercase">Net Kasa</span>
-                        <span className="text-3xl font-black text-success">
-                            {kasalar.reduce((a, b) => a + Number(b.balance), 0).toLocaleString()} ₺
-                        </span>
-                    </div>
+                    <button onClick={() => { refreshCustomers(); refreshTransactions(); refreshKasalar(); refreshSuppliers(); }} className="btn btn-outline text-xs">🔄 Yenile</button>
                 </div>
             </header>
+
+            {/* DASHBOARD STATS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-primary">
+                    <div className="flex-between mb-2">
+                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Bugünkü Alacaklar</span>
+                        <div className="p-2 bg-primary/10 rounded-lg text-primary text-xl">📅</div>
+                    </div>
+                    <div>
+                        <div className="text-3xl font-black text-white">{stats.receivablesToday.toLocaleString()} ₺</div>
+                        <div className="text-[10px] text-muted mt-1">Vadesi bugün veya geçmiş olanlar</div>
+                    </div>
+                </div>
+
+                <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-accent">
+                    <div className="flex-between mb-2">
+                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Bu Ayki Alacaklar</span>
+                        <div className="p-2 bg-accent/10 rounded-lg text-accent text-xl">⏳</div>
+                    </div>
+                    <div>
+                        <div className="text-3xl font-black text-white">{stats.receivablesThisMonth.toLocaleString()} ₺</div>
+                        <div className="text-[10px] text-muted mt-1">{new Date().toLocaleString('tr-TR', { month: 'long' })} ayı toplamı</div>
+                    </div>
+                </div>
+
+                <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-success">
+                    <div className="flex-between mb-2">
+                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Net Kasa Durumu</span>
+                        <div className="p-2 bg-success/10 rounded-lg text-success text-xl">💰</div>
+                    </div>
+                    <div>
+                        <div className="text-3xl font-black text-success">{stats.netKasa.toLocaleString()} ₺</div>
+                        <div className="text-[10px] text-muted mt-1">Tüm kasa ve bankaların toplamı</div>
+                    </div>
+                </div>
+
+                <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-warning">
+                    <div className="flex-between mb-2">
+                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Zaman Filtresi</span>
+                        <div className="p-2 bg-warning/10 rounded-lg text-warning text-xl">🔍</div>
+                    </div>
+                    <div className="flex gap-1 mt-2">
+                        {['all', 'today', 'this_month'].map(f => (
+                            <button
+                                key={f}
+                                onClick={() => setTimeFilter(f as any)}
+                                className={`flex-1 text-[10px] font-bold py-2 rounded-md transition-all ${timeFilter === f ? 'bg-primary text-white' : 'bg-white/5 text-muted hover:bg-white/10'}`}
+                            >
+                                {f === 'all' ? 'TÜMÜ' : f === 'today' ? 'BUGÜN' : 'BU AY'}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
 
             <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
                 {['Alacaklar', 'Borçlar', 'Çek & Senet', 'Banka & Kasa', 'Giderler', 'Finansal Hareketler'].map((label, i) => {
@@ -748,7 +871,7 @@ export default function AccountingPage() {
                         <table className="w-full text-left">
                             <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Cari Bilgisi</th><th>Vade</th><th>Kalan Tutar</th><th>Durum</th><th></th></tr></thead>
                             <tbody>
-                                {paginate([...filterByBranch(receivables), ...customerReceivables]).map(item => (
+                                {paginate(filterByTime([...filterByBranch(receivables), ...customerReceivables])).map(item => (
                                     <tr key={item.id} className="border-b border-subtle hover-bg transition-colors">
                                         <td className="p-4"><div>{item.title}</div><div className="text-xs text-muted">{item.date}</div></td>
                                         <td>{item.due}</td><td className="font-bold">{Math.abs(item.amount).toLocaleString()} ₺</td>
@@ -858,7 +981,7 @@ export default function AccountingPage() {
                         <table className="w-full text-left">
                             <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Cari Bilgisi</th><th>Vade</th><th>Borç Tutarı</th><th>Durum</th><th></th></tr></thead>
                             <tbody>
-                                {paginate([...filterByBranch(payables), ...supplierPayables]).map(item => (
+                                {paginate(filterByTime([...filterByBranch(payables), ...supplierPayables])).map(item => (
                                     <tr key={item.id} className="border-b border-subtle hover-bg transition-colors">
                                         <td className="p-4"><div>{item.title}</div><div className="text-xs text-muted">{item.date}</div></td>
                                         <td>{item.due}</td><td className="font-bold text-danger">{item.amount.toLocaleString()} ₺</td>
@@ -969,7 +1092,7 @@ export default function AccountingPage() {
                             <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Tür</th><th>Muhatap</th><th>Vade</th><th>Banka</th><th>Branch</th><th>Tutar</th><th>Durum</th><th></th></tr></thead>
                             <tbody>
                                 {checks.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-muted">Kayıtlı evrak bulunmuyor.</td></tr>}
-                                {paginate(checks).map(c => (
+                                {paginate(filterByTime(checks)).map(c => (
                                     <tr key={c.id} className="border-b border-subtle hover-bg transition-colors">
                                         <td className="p-4"><b>{c.type}</b></td>
                                         <td>{c.customer?.name || c.supplier?.name || '-'}</td>
@@ -1163,7 +1286,7 @@ export default function AccountingPage() {
                         <table className="w-full text-left">
                             <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Açıklama</th><th>Kategori</th><th>Tarih</th><th>Tutar</th><th>Ödeme</th><th></th></tr></thead>
                             <tbody>
-                                {paginate(expenses).map(e => (
+                                {paginate(filterByTime(expenses)).map(e => (
                                     <tr key={e.id} className="border-b border-subtle hover-bg transition-colors">
                                         <td className="p-4"><b>{e.title}</b></td>
                                         <td><span className="text-xs bg-subtle px-2 py-1 rounded">{e.category}</span></td>
@@ -1187,7 +1310,7 @@ export default function AccountingPage() {
                         <div className="flex-between mb-4">
                             <h3>Tüm Finansal Hareketler</h3>
                             <div className="flex gap-2">
-                                <button onClick={() => window.location.reload()} className="btn btn-outline text-xs">🔄 Yenile</button>
+                                <button onClick={() => { refreshTransactions(); refreshKasalar(); }} className="btn btn-outline text-xs">🔄 Yenile</button>
                             </div>
                         </div>
                         <div className="card glass-plus overflow-hidden">
@@ -1205,7 +1328,7 @@ export default function AccountingPage() {
                                 </thead>
                                 <tbody>
                                     {transactions.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-muted">İşlem kaydı bulunmuyor.</td></tr>}
-                                    {paginate([...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())).map(t => {
+                                    {paginate(filterByTime([...transactions]).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())).map(t => {
                                         const cust = customers.find(c => c.id === t.customerId);
                                         const supp = suppliers.find(s => s.id === t.supplierId);
                                         const entityName = cust ? cust.name : (supp ? supp.name : 'Genel');
