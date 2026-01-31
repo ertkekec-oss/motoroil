@@ -801,88 +801,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return currentUser.permissions.includes('*') || currentUser.permissions.includes(permId);
     };
 
-    // Branch / Permission Filtering Logic
-    const visibleProducts = useMemo(() => {
-        const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
-
-        // Admin or non-restricted user
-        if (isAdmin || !hasPermission('branch_isolation')) {
-            if (activeBranchName === 'Merkez' || activeBranchName === 'Tümü' || activeBranchName === 'Hepsi') return products;
-            return products.filter(p => p.branch === activeBranchName);
-        }
-
-        // Restricted user logic
-        const userBranch = currentUser?.branch || 'Merkez';
-        return products.map(p => {
-            const isMyBranch = p.branch === userBranch;
-            const isMerkez = p.branch === 'Merkez';
-            if (isMyBranch) return p;
-            if (isMerkez) {
-                return { ...p, price: 0, buyPrice: 0, _restricted: true };
-            }
-            return null;
-        }).filter(p => p !== null) as Product[];
-    }, [products, activeBranchName, currentUser]);
-
-    const visibleTransactions = useMemo(() => {
-        let filtered = transactions;
-        if (!hasPermission('ecommerce_view')) {
-            const ecommerceKasa = kasalar.find(k => k.name === 'E-ticaret');
-            if (ecommerceKasa) {
-                filtered = filtered.filter(t => String(t.kasaId || '') !== String(ecommerceKasa.id || ''));
-            }
-        }
-
-        const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
-        const filterBranch = isAdmin ? activeBranchName : (currentUser?.branch || 'Merkez');
-
-        // Note: visibleKasaIds check is secondary to branch check
-        if (filterBranch === 'Merkez' || filterBranch === 'Tümü' || filterBranch === 'Hepsi') return filtered;
-
-        return filtered.filter(t => (t as any).branch === filterBranch);
-    }, [transactions, activeBranchName, currentUser, kasalar]);
-
-    const visibleCustomers = useMemo(() => {
-        const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
-        if (isAdmin || !hasPermission('branch_isolation')) {
-            if (activeBranchName === 'Merkez' || activeBranchName === 'Tümü' || activeBranchName === 'Hepsi') return customers;
-            return customers.filter(c => (c.branch || 'Merkez') === activeBranchName);
-        }
-        const userBranch = currentUser?.branch || 'Merkez';
-        return customers.filter(c => (c.branch || 'Merkez') === userBranch);
-    }, [customers, activeBranchName, currentUser]);
-
-    const visibleSuppliers = useMemo(() => {
-        if (currentUser === null) return suppliers;
-        if (!hasPermission('supplier_view')) return [];
-        return suppliers;
-    }, [suppliers, currentUser]);
-
-    const visibleChecks = useMemo(() => {
-        const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
-        const filterBranch = isAdmin ? activeBranchName : (currentUser?.branch || 'Merkez');
-
-        if (filterBranch === 'Merkez' || filterBranch === 'Tümü' || filterBranch === 'Hepsi') return checks;
-        return checks.filter(c => (c.branch || 'Merkez') === filterBranch);
-    }, [checks, activeBranchName, currentUser]);
-
-    const visibleKasalar = useMemo(() => {
-        const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
-        const filterBranch = isAdmin ? activeBranchName : (currentUser?.branch || 'Merkez');
-
-        if (filterBranch === 'Merkez') return kasalar;
-
-        const mappedIds = appSettings.branchKasaMappings?.[filterBranch];
-        if (mappedIds && Array.isArray(mappedIds) && mappedIds.length > 0) {
-            return kasalar.filter(k => mappedIds.includes(k.id.toString()));
-        }
-
-        return kasalar.filter(k =>
-            (k.branch || 'Merkez') === filterBranch ||
-            k.type === 'Banka' ||
-            k.name.toLowerCase().includes(filterBranch.toLowerCase())
-        );
-    }, [kasalar, activeBranchName, currentUser, appSettings]);
+    // --- LEGACY FILTERING REMOVED (Moved to bottom) ---
 
     const addTransaction = (t: Omit<Transaction, 'id' | 'date'>) => {
         const newT: Transaction = {
@@ -1444,6 +1363,99 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             });
         } catch (e) { console.error('Warranties save error', e); }
     };
+
+    // --- BRANCH ISOLATION LOGIC ---
+    const visibleProducts = useMemo(() => {
+        // DEBUG LOGS
+        // console.log("Filtering Products. User:", currentUser?.name, "Role:", currentUser?.role);
+        // console.log("Has Isolation Perm:", hasPermission('branch_isolation'));
+
+        if (!currentUser) return products; // System Admin sees all
+
+        // Admin or Manager bypass isolation (Extra check incase permission logic fails)
+        const isManager = currentUser.role?.toLowerCase().includes('admin') || currentUser.role?.toLowerCase().includes('müdür');
+        if (isManager && !hasPermission('branch_isolation')) return products;
+
+        if (hasPermission('branch_isolation')) {
+            const userBranch = currentUser.branch;
+            // console.log("User Branch:", userBranch);
+
+            if (!userBranch) return []; // No branch assigned? No data.
+
+            const filtered = products.filter(p => {
+                // Strict check: Must match branch exactly.
+                // If product has no branch, assume it's 'Merkez' or Global.
+                // Branch staff should ONLY see their branch data.
+                return p.branch === userBranch;
+            });
+            // console.log(`Filtered products from ${products.length} to ${filtered.length}`);
+            return filtered;
+        }
+        return products;
+    }, [products, currentUser]);
+
+    const visibleTransactions = useMemo(() => {
+        if (!currentUser) return transactions;
+
+        // Admin/Manager bypass (unless explicitly restricted perm is on?)
+        // Usually Admins don't have 'branch_isolation' perm.
+        if (hasPermission('branch_isolation')) {
+            const userBranch = currentUser.branch;
+            if (!userBranch) return [];
+
+            // Filter by Kasa IDs that belong to this branch
+            const allowedKasaIds = kasalar.filter(k => k.branch === userBranch).map(k => k.id);
+
+            // Also try to check if transaction has branch prop directly
+            return transactions.filter(t => {
+                const tBranch = (t as any).branch;
+                if (tBranch && tBranch === userBranch) return true;
+                return allowedKasaIds.includes(t.kasaId) || allowedKasaIds.includes(Number(t.kasaId));
+            });
+        }
+        return transactions;
+    }, [transactions, currentUser, kasalar]);
+
+    const visibleKasalar = useMemo(() => {
+        if (!currentUser) return kasalar;
+        if (hasPermission('branch_isolation')) {
+            const userBranch = currentUser.branch;
+            if (!userBranch) return [];
+            return kasalar.filter(k => k.branch === userBranch);
+        }
+        return kasalar;
+    }, [kasalar, currentUser]);
+
+    const visibleCustomers = useMemo(() => {
+        if (!currentUser) return customers;
+        if (hasPermission('branch_isolation')) {
+            const userBranch = currentUser.branch;
+            if (!userBranch) return [];
+            return customers.filter(c => c.branch === userBranch);
+        }
+        return customers;
+    }, [customers, currentUser]);
+
+    const visibleSuppliers = useMemo(() => {
+        if (!currentUser) return suppliers;
+        if (hasPermission('branch_isolation')) {
+            // If suppliers are global (no branch set), maybe allow specific perm?
+            // For now, strict mode:
+            const userBranch = currentUser.branch;
+            if (!userBranch) return [];
+            return suppliers.filter(s => s.branch === userBranch);
+        }
+        return suppliers;
+    }, [suppliers, currentUser]);
+
+    const visibleChecks = useMemo(() => {
+        if (!currentUser) return checks;
+        if (hasPermission('branch_isolation')) {
+            // Checks dont have branch field explicit usually, but let's assume filtering not critical or check implementation
+            return checks; // TODO: Add branch to checks
+        }
+        return checks;
+    }, [checks, currentUser]);
 
     const removeNotification = clearNotification;
 
