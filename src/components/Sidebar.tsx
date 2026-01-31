@@ -168,8 +168,15 @@ export default function Sidebar() {
                     }}>
                         {(displayUser.role?.includes('Admin') || currentUser === null) ? '⚡' : '👤'}
                     </div>
-                    <div>
-                        <div style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-main)' }}>{displayUser.name}</div>
+                    <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            {displayUser.name}
+                            {hasPermission('staff_manage') && (
+                                <Link href="/settings" title="Ayarlar" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '14px', marginLeft: '5px' }}>
+                                    ⚙️
+                                </Link>
+                            )}
+                        </div>
                         <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{displayUser.role || 'Personel'}</div>
                     </div>
                 </div>

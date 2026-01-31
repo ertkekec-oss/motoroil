@@ -794,7 +794,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const hasPermission = (permId: string) => {
         if (currentUser === null) return true; // Admin has all permissions
-        return currentUser.permissions.includes(permId);
+        return currentUser.permissions.includes('*') || currentUser.permissions.includes(permId);
     };
 
     // Branch / Permission Filtering Logic

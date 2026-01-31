@@ -597,6 +597,7 @@ export default function SettingsPage() {
                 {[
                     // { id: 'users', label: 'Personel Yönetimi', icon: '👤' }, // REMOVED as requested - duplicate of Team Management
                     { id: 'branches', label: 'Şubeler & Depo', icon: '🏢' },
+                    { id: 'profile', label: 'Hesabım', icon: '👤' },
                     { id: 'invoice', label: 'Fatura Ayarları', icon: '🧾' },
                     { id: 'services', label: 'Servis Ücretleri', icon: '🔧' },
                     { id: 'taxes', label: 'KDV & Vergiler', icon: '💰' },
@@ -1096,6 +1097,47 @@ export default function SettingsPage() {
                 )}
 
                 {/* 3. FATURA AYARLARI */}
+                {/* PROFILE TAB */}
+                {activeTab === 'profile' && (
+                    <div className="animate-fade-in-up" style={{ maxWidth: '600px' }}>
+                        <h1 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '4px' }}>Profilim</h1>
+                        <p style={{ fontSize: '12px', opacity: 0.5, marginBottom: '24px' }}>Hesap bilgilerinizi ve profil ayarlarınızı görüntüleyin</p>
+
+                        <div className="card glass" style={{ padding: '32px' }}>
+                            <div className="flex items-center gap-6 mb-8">
+                                <div style={{
+                                    width: '80px', height: '80px', borderRadius: '24px',
+                                    background: 'linear-gradient(135deg, var(--primary) 0%, #E64A00 100%)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: '32px', fontWeight: '900', color: 'white',
+                                    boxShadow: '0 10px 30px rgba(255, 85, 0, 0.3)'
+                                }}>
+                                    {users.find((u: any) => u.name === (currentUser?.name || ''))?.name?.substring(0, 1).toUpperCase() || 'A'}
+                                </div>
+                                <div>
+                                    <h2 style={{ fontSize: '20px', fontWeight: '900' }}>{currentUser?.name || 'Yönetici'}</h2>
+                                    <div style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: '700' }}>{currentUser?.role || 'Sistem Yöneticisi'}</div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="flex-col gap-1.5">
+                                    <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>E-POSTA</label>
+                                    <input type="text" readOnly value={currentUser?.email || '-'} className="input-field" style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.05)', opacity: 0.7 }} />
+                                </div>
+                                <div className="flex-col gap-1.5">
+                                    <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>ŞUBE</label>
+                                    <input type="text" readOnly value={currentUser?.branch || 'Merkez'} className="input-field" style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.05)', opacity: 0.7 }} />
+                                </div>
+                            </div>
+
+                            <p style={{ fontSize: '11px', opacity: 0.4, marginTop: '32px', textAlign: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '20px' }}>
+                                Şifre değişikliği ve profil güncelleme için sistem yöneticisine başvurun.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
                 {activeTab === 'invoice' && (
                     <div style={{ maxWidth: '600px' }} className="animate-fade-in-up">
                         <h2 style={{ fontSize: '18px', fontWeight: '900', marginBottom: '16px' }}>Fatura Konfigürasyonu</h2>
