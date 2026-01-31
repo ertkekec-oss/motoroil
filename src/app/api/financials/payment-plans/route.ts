@@ -21,36 +21,86 @@ export async function POST(request: Request) {
         const remainder = Number((total - (monthlyAmount * count)).toFixed(2));
 
         // Create Plan and Installments Transactionally
-        const plan = await prisma.paymentPlan.create({
-            data: {
-                title,
-                totalAmount: total,
-                installmentCount: count,
-                startDate: start,
-                description,
-                branch: branch || 'Merkez',
-                type: type || 'Kredi',
-                direction: direction || 'OUT',
-                customerId,
-                supplierId,
-                installments: {
-                    create: Array.from({ length: count }).map((_, i) => {
-                        const dueDate = new Date(start);
-                        dueDate.setMonth(dueDate.getMonth() + i);
+        const plan = await prisma.$transaction(async (tx) => {
+            const plan = await tx.paymentPlan.create({
+                data: {
+                    title,
+                    totalAmount: total,
+                    installmentCount: count,
+                    startDate: start,
+                    description,
+                    branch: branch || 'Merkez',
+                    type: type || 'Kredi',
+                    direction: direction || 'OUT',
+                    customerId,
+                    supplierId,
+                    installments: {
+                        create: Array.from({ length: count }).map((_, i) => {
+                            const dueDate = new Date(start);
+                            dueDate.setMonth(dueDate.getMonth() + i);
 
-                        // Add remainder to last installment
-                        const amount = i === count - 1 ? monthlyAmount + remainder : monthlyAmount;
+                            // Add remainder to last installment
+                            const amount = i === count - 1 ? monthlyAmount + remainder : monthlyAmount;
 
-                        return {
-                            installmentNo: i + 1,
-                            dueDate: dueDate,
-                            amount: amount,
-                            status: 'Pending'
-                        };
-                    })
-                }
-            },
-            include: { installments: true }
+                            return {
+                                installmentNo: i + 1,
+                                dueDate: dueDate,
+                                amount: amount,
+                                status: 'Pending'
+                            };
+                        })
+                    }
+                },
+                include: { installments: true }
+            });
+
+            // HANDLE FINANCIAL EFFECTS (Cari Hesaplara İşle)
+
+            // 1. Receivables (Vadeli Satış) -> Müşteri Borçlanır
+            if (direction === 'IN' && customerId) {
+                // Create Sales Transaction (Without Kasa - Veresiye)
+                await tx.transaction.create({
+                    data: {
+                        type: 'Sales',
+                        amount: total,
+                        description: `Vadeli Satış Planı: ${title}`,
+                        date: start,
+                        branch: branch || 'Merkez',
+                        customerId: customerId
+                        // kasaId is null/undefined (Veresiye)
+                    }
+                });
+
+                // Update Customer Balance (Increment = Borç Artışı to us)
+                await tx.customer.update({
+                    where: { id: customerId },
+                    data: { balance: { increment: total } }
+                });
+            }
+
+            // 2. Payables (Vadeli Borç/Mal Alımı) -> Tedarikçiye Borçlanırız
+            if (direction === 'OUT' && supplierId) {
+                // Create Purchase Transaction
+                await tx.transaction.create({
+                    data: {
+                        type: 'Purchase',
+                        amount: total,
+                        description: `Vadeli Borç Planı: ${title}`,
+                        date: start,
+                        branch: branch || 'Merkez',
+                        supplierId: supplierId
+                    }
+                });
+
+                // Update Supplier Balance (Decrement = Borçlanma / Alacağımız Azalır)
+                // Note: Supplier balance convention: (+): Alacağımız var, (-): Borcumuz var.
+                await tx.supplier.update({
+                    where: { id: supplierId },
+                    data: { balance: { decrement: total } }
+                });
+            }
+
+            return plan;
         });
 
         return NextResponse.json({ success: true, plan });

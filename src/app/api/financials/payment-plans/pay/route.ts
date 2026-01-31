@@ -29,19 +29,34 @@ export async function POST(request: Request) {
                     description: `${installment.paymentPlan.title} - Taksit ${installment.installmentNo}/${installment.paymentPlan.installmentCount} (${isCollection ? 'Tahsilat' : 'Ödeme'})`,
                     kasaId: kasaId,
                     date: new Date(),
-                    branch: installment.paymentPlan.branch || 'Merkez'
+                    branch: installment.paymentPlan.branch || 'Merkez',
+                    customerId: installment.paymentPlan.customerId,
+                    supplierId: installment.paymentPlan.supplierId
                 }
             });
 
-            // 2. Update Kasa Balance (Increment or Decrement)
-            // Note: Using 'balance' field. If schema uses 'amount', this needs to be adjusted.
-            // Based on frontend usage, 'balance' is the correct field name.
+            // 2. Update Kasa Balance
             await tx.kasa.update({
                 where: { id: kasaId },
                 data: { balance: { [isCollection ? 'increment' : 'decrement']: installment.amount } }
             });
 
-            // 3. Mark Installment as Paid
+            // 3. Update Customer / Supplier Balance
+            if (isCollection && installment.paymentPlan.customerId) {
+                // Collection -> Customer Debt Decreases
+                await tx.customer.update({
+                    where: { id: installment.paymentPlan.customerId },
+                    data: { balance: { decrement: installment.amount } }
+                });
+            } else if (!isCollection && installment.paymentPlan.supplierId) {
+                // Payment -> Supplier Dept Decreases (moves from negative towards zero)
+                await tx.supplier.update({
+                    where: { id: installment.paymentPlan.supplierId },
+                    data: { balance: { increment: installment.amount } }
+                });
+            }
+
+            // 4. Mark Installment as Paid
             const updatedInstallment = await tx.installment.update({
                 where: { id: installmentId },
                 data: {
@@ -51,7 +66,7 @@ export async function POST(request: Request) {
                 }
             });
 
-            // 4. Check if Plan is Completed
+            // 5. Check if Plan is Completed
             const pendingCount = await tx.installment.count({
                 where: { paymentPlanId: installment.paymentPlanId, status: 'Pending' }
             });

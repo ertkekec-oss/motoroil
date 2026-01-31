@@ -309,8 +309,8 @@ model Transaction {
   date        DateTime @default(now())
   branch      String?  @default("Merkez")
 
-  kasaId String
-  kasa   Kasa   @relation(fields: [kasaId], references: [id])
+  kasaId String?
+  kasa   Kasa?   @relation(fields: [kasaId], references: [id])
 
   customerId String?
   customer   Customer? @relation(fields: [customerId], references: [id])
