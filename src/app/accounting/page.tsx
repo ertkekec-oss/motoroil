@@ -127,50 +127,72 @@ export default function AccountingPage() {
     const stats = useMemo(() => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+        const nextDay = new Date(today.getTime() + 86400000);
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        // This Week Calculation
+        const dayOfWeek = today.getDay();
+        const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+        const startOfWeek = new Date(new Date().setDate(diff));
+        startOfWeek.setHours(0, 0, 0, 0);
 
-        // Receivables / Payments Today
-        let receivablesToday = 0;
-        let paymentsToday = 0;
+        let startDate: Date | null = null;
+        let endDate: Date | null = null;
+
+        if (timeFilter === 'today') {
+            startDate = today;
+            endDate = nextDay;
+        } else if (timeFilter === 'this_week') {
+            startDate = startOfWeek;
+        } else if (timeFilter === 'this_month') {
+            startDate = startOfMonth;
+        } else if (timeFilter === 'custom' && customRange.start && customRange.end) {
+            startDate = new Date(customRange.start);
+            endDate = new Date(customRange.end);
+            endDate.setHours(23, 59, 59, 999);
+        }
+
+        // Receivables / Payments
+        let filteredReceivables = 0;
+        let filteredPayments = 0;
 
         // From installments
         scheduledPayments.forEach(plan => {
             plan.installments.forEach((inst: any) => {
-                if (inst.status !== 'Paid') {
-                    const dueDate = new Date(inst.dueDate);
-                    if (dueDate.getTime() <= today.getTime() + 86400000) {
-                        if (plan.direction === 'IN') receivablesToday += Number(inst.amount);
-                        else paymentsToday += Number(inst.amount);
-                    }
+                const dueDate = new Date(inst.dueDate);
+                const isMatched = !startDate || (dueDate >= startDate && (!endDate || dueDate <= endDate));
+
+                if (inst.status !== 'Paid' && isMatched) {
+                    if (plan.direction === 'IN') filteredReceivables += Number(inst.amount);
+                    else filteredPayments += Number(inst.amount);
                 }
             });
         });
 
         // From Checks
         checks.forEach(c => {
-            if (c.status === 'Beklemede') {
-                const dueDate = new Date(c.dueDate);
-                if (dueDate.getTime() <= today.getTime() + 86400000) {
-                    if (c.type.includes('Alınan')) receivablesToday += Number(c.amount);
-                    else paymentsToday += Number(c.amount);
-                }
+            const dueDate = new Date(c.dueDate);
+            const isMatched = !startDate || (dueDate >= startDate && (!endDate || dueDate <= endDate));
+
+            if (c.status === 'Beklemede' && isMatched) {
+                if (c.type.includes('Alınan')) filteredReceivables += Number(c.amount);
+                else filteredPayments += Number(c.amount);
             }
         });
 
-        // Expenses Today
-        const expensesToday = transactions
+        // Expenses
+        const filteredExpenses = transactions
             .filter(t => t.type === 'Expense')
             .filter(t => {
                 const d = new Date(t.date);
-                return d >= today && d < new Date(today.getTime() + 86400000);
+                return !startDate || (d >= startDate && (!endDate || d <= endDate));
             })
             .reduce((a, b) => a + Number(b.amount), 0);
 
         const netKasa = kasalar.reduce((a, b) => a + Number(b.balance), 0);
 
-        return { receivablesToday, paymentsToday, expensesToday, netKasa };
-    }, [scheduledPayments, checks, kasalar, transactions]);
+        return { filteredReceivables, filteredPayments, filteredExpenses, netKasa };
+    }, [scheduledPayments, checks, kasalar, transactions, timeFilter, customRange]);
 
     const [showScheduledModal, setShowScheduledModal] = useState(false);
     const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
@@ -823,34 +845,40 @@ export default function AccountingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-primary">
                     <div className="flex-between mb-2">
-                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Bugünkü Alacaklar</span>
+                        <span className="text-xs font-bold text-muted uppercase tracking-wider">
+                            {timeFilter === 'all' ? 'Toplam Alacaklar' : timeFilter === 'today' ? 'Bugünkü Alacaklar' : timeFilter === 'this_week' ? 'Bu Haftaki Alacaklar' : timeFilter === 'this_month' ? 'Bu Ayki Alacaklar' : 'Seçili Alacaklar'}
+                        </span>
                         <div className="p-2 bg-primary/10 rounded-lg text-primary text-xl">📅</div>
                     </div>
                     <div>
-                        <div className="text-3xl font-black text-white">{stats.receivablesToday.toLocaleString()} ₺</div>
-                        <div className="text-[10px] text-muted mt-1">Vadesi bugün veya geçmiş olanlar</div>
+                        <div className="text-3xl font-black text-white">{stats.filteredReceivables.toLocaleString()} ₺</div>
+                        <div className="text-[10px] text-muted mt-1">Seçili dönemdeki taksit ve çekler</div>
                     </div>
                 </div>
 
                 <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-error">
                     <div className="flex-between mb-2">
-                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Bugünkü Ödemeler</span>
+                        <span className="text-xs font-bold text-muted uppercase tracking-wider">
+                            {timeFilter === 'all' ? 'Toplam Ödemeler' : timeFilter === 'today' ? 'Bugünkü Ödemeler' : timeFilter === 'this_week' ? 'Bu Haftaki Ödemeler' : timeFilter === 'this_month' ? 'Bu Ayki Ödemeler' : 'Seçili Ödemeler'}
+                        </span>
                         <div className="p-2 bg-error/10 rounded-lg text-error text-xl">💸</div>
                     </div>
                     <div>
-                        <div className="text-3xl font-black text-white">{stats.paymentsToday.toLocaleString()} ₺</div>
-                        <div className="text-[10px] text-muted mt-1">Borç ve çek ödemeleri toplamı</div>
+                        <div className="text-3xl font-black text-white">{stats.filteredPayments.toLocaleString()} ₺</div>
+                        <div className="text-[10px] text-muted mt-1">Seçili dönemdeki borç ve çekler</div>
                     </div>
                 </div>
 
                 <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-warning">
                     <div className="flex-between mb-2">
-                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Bugünkü Giderler</span>
+                        <span className="text-xs font-bold text-muted uppercase tracking-wider">
+                            {timeFilter === 'all' ? 'Toplam Giderler' : timeFilter === 'today' ? 'Bugünkü Giderler' : timeFilter === 'this_week' ? 'Bu Haftaki Giderler' : timeFilter === 'this_month' ? 'Bu Ayki Giderler' : 'Seçili Giderler'}
+                        </span>
                         <div className="p-2 bg-warning/10 rounded-lg text-warning text-xl">📉</div>
                     </div>
                     <div>
-                        <div className="text-3xl font-black text-white">{stats.expensesToday.toLocaleString()} ₺</div>
-                        <div className="text-[10px] text-muted mt-1">Banka ve kasadan çıkan giderler</div>
+                        <div className="text-3xl font-black text-white">{stats.filteredExpenses.toLocaleString()} ₺</div>
+                        <div className="text-[10px] text-muted mt-1">Kasa ve bankadan çıkan giderler</div>
                     </div>
                 </div>
 
@@ -861,7 +889,7 @@ export default function AccountingPage() {
                     </div>
                     <div>
                         <div className="text-3xl font-black text-success">{stats.netKasa.toLocaleString()} ₺</div>
-                        <div className="text-[10px] text-muted mt-1">Tüm kasa ve bankaların toplamı</div>
+                        <div className="text-[10px] text-muted mt-1">Anlık kasa ve banka toplamları</div>
                     </div>
                 </div>
             </div>
