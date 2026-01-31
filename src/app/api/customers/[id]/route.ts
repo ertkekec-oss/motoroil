@@ -1,6 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getSession, hasPermission } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,9 +10,10 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
         const { id } = await params;
-        // ID is CUID (String) in Prisma schema, so no parseInt needed.
-        // But need to ensure it's not empty or invalid if required.
         const customerId = id;
 
         if (!customerId) {
@@ -24,7 +26,7 @@ export async function GET(
                 transactions: {
                     orderBy: { date: 'desc' }
                 },
-                invoices: { // Correct relation name is 'invoices', not 'sales'
+                invoices: {
                     orderBy: { invoiceDate: 'desc' }
                 }
             }
@@ -47,6 +49,9 @@ export async function PUT(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
         const { id } = await params;
         const body = await request.json();
         const { name, email, phone, address, taxNumber, taxOffice, contactPerson, iban, categoryId, supplierClass, customerClass, branch } = body;
@@ -81,6 +86,14 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
+        // CRITICAL: Check server-side permission
+        if (!hasPermission(session, 'delete_records')) {
+            return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
+        }
+
         const { id } = await params;
 
         // Check if there are transactions or invoices

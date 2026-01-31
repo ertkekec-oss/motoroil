@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendMail } from '@/lib/mail';
-import { hashPassword } from '@/lib/auth';
+import { getSession, hasPermission, hashPassword } from '@/lib/auth';
 
 export async function GET() {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
         const staff = await prisma.staff.findMany({
             orderBy: { createdAt: 'desc' }
         });
@@ -16,6 +19,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
+        if (!hasPermission(session, 'staff_manage')) {
+            return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
+        }
+
         const data = await request.json();
 
         // 1. Generate Credentials
@@ -75,6 +85,13 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
+        if (!hasPermission(session, 'staff_manage')) {
+            return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
+        }
+
         const data = await request.json();
         const { id, ...updateData } = data;
 
@@ -99,6 +116,13 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
+        if (!hasPermission(session, 'staff_manage')) {
+            return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
+        }
+
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 

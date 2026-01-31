@@ -65,3 +65,10 @@ export async function deleteSession() {
     const cookieStore = await cookies();
     cookieStore.delete('session');
 }
+
+export function hasPermission(session: any, permission: string): boolean {
+    if (!session) return false;
+    const permissions = session.permissions || [];
+    if (permissions.includes('*')) return true;
+    return permissions.includes(permission);
+}
