@@ -687,9 +687,8 @@ export default function SettingsPage() {
                     { id: 'definitions', label: 'Tanımlar & Liste', icon: '📚' },
                     { id: 'notifications', label: 'Bildirim Ayarları', icon: '🔔' },
                     { id: 'backup', label: 'Bulut Yedekleme', icon: '☁️' },
-                    { id: 'backup', label: 'Bulut Yedekleme', icon: '☁️' },
                     { id: 'logs', label: 'İşlem Günlükleri', icon: '📜' },
-                    { id: 'system', label: 'Sistem Ayarları', icon: '⚙️' }
+                    { id: 'system', label: 'Mail Ayarları', icon: '📧' }
                 ].map(item => (
                     <button
                         key={item.id}
@@ -2442,9 +2441,9 @@ export default function SettingsPage() {
                     <div className="animate-fade-in-up space-y-6 max-w-4xl p-8" style={{ padding: '32px' }}>
                         <div>
                             <h1 className="text-2xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50" style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px', background: '-webkit-linear-gradient(left, #fff, rgba(255,255,255,0.5))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                                ⚙️ Sistem Ayarları
+                                📧 Mail Ayarları
                             </h1>
-                            <p className="text-sm text-white/40" style={{ fontSize: '13px', opacity: 0.4 }}>Uygulama genel yapılandırması ve entegrasyon ayarları.</p>
+                            <p className="text-sm text-white/40" style={{ fontSize: '13px', opacity: 0.4 }}>Mail sunucu yapılandırması ve SMTP entegrasyon ayarları.</p>
                         </div>
 
                         <div className="card glass p-8" style={{ padding: '32px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '16px' }}>
