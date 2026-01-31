@@ -585,7 +585,7 @@ function InventoryContent() {
 
     const exportToExcel = () => {
         const data = filteredProducts.map(p => ({
-            'Stok Kodu': p.code, 'Ürün Adı': p.name, 'Kategori': p.category, 'Marka': p.brand,
+            'Stok Kodu': p.code, 'Barkod': p.barcode || '', 'Ürün Adı': p.name, 'Kategori': p.category, 'Marka': p.brand,
             'Stok': p.stock, 'Birim Fiyat': p.price, 'Alış Fiyatı': p.buyPrice, 'KDV (%)': p.salesVat
         }));
         const ws = XLSX.utils.json_to_sheet(data);
