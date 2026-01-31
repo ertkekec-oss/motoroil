@@ -371,7 +371,19 @@ model AuditLog {
   @@index([action, entity])
   @@index([entityId])
   @@index([userId])
+  @@index([userName])
   @@index([createdAt])
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  ip        String
+  username  String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+  @@index([username, createdAt])
 }
 
 model Branch {
