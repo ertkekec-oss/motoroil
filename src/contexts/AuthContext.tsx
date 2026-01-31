@@ -22,18 +22,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock kullanıcı veritabanı - Gerçek uygulamada bu backend'den gelecek
-const USERS = [
-    {
-        username: 'admin',
-        password: 'admin123',
-        role: 'Admin' as const,
-        branch: 'Merkez',
-        name: 'Yönetici',
-        permissions: ['*'] // Tüm yetkiler
-    }
-];
-
+// AuthProvider bileşeni
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -98,7 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const login = async (username: string, password: string): Promise<boolean> => {
         try {
-            // 1. Try DB Login
             const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -112,48 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 localStorage.setItem('motoroil_isLoggedIn', 'true');
                 return true;
             }
-
-            // 2. Fallback to hardcoded USERS (for dev/emergency)
-            const foundUser = USERS.find(
-                u => u.username === username && u.password === password
-            );
-
-            if (!foundUser) {
-                return false;
-            }
-
-            const userData: User = {
-                username: foundUser.username,
-                role: foundUser.role,
-                branch: foundUser.branch,
-                name: foundUser.name,
-                permissions: foundUser.permissions
-            };
-
-            setUser(userData);
-            localStorage.setItem('motoroil_user', JSON.stringify(userData));
-            localStorage.setItem('motoroil_isLoggedIn', 'true');
-
-            return true;
+            return false;
         } catch (error) {
             console.error('Login error:', error);
-            // Even if API fails, check hardcoded
-            const foundUser = USERS.find(
-                u => u.username === username && u.password === password
-            );
-            if (foundUser) {
-                const userData: User = {
-                    username: foundUser.username,
-                    role: foundUser.role,
-                    branch: foundUser.branch,
-                    name: foundUser.name,
-                    permissions: foundUser.permissions
-                };
-                setUser(userData);
-                localStorage.setItem('motoroil_user', JSON.stringify(userData));
-                localStorage.setItem('motoroil_isLoggedIn', 'true');
-                return true;
-            }
             return false;
         }
     };
