@@ -930,7 +930,6 @@ export default function AccountingPage() {
                                                     <div className="max-h-[200px] overflow-y-auto custom-scrollbar">
                                                         {plan.installments.map((inst: any) => (
                                                             <div key={inst.id} className="flex-between p-2 border-b border-white/5 text-xs hover:bg-white/5">
-                                                                ```
                                                                 <div>{inst.installmentNo}. Taksit <span className="text-muted ml-1">{new Date(inst.dueDate).toLocaleDateString()}</span></div>
                                                                 <div className="text-right">
                                                                     <div className="font-bold">{Number(inst.amount).toLocaleString()}</div>
