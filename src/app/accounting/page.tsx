@@ -10,7 +10,12 @@ import Pagination from '@/components/Pagination';
 export default function AccountingPage() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('receivables'); // receivables, payables, banks, expenses, checks
-    const { kasalar, setKasalar, addTransaction, currentUser, hasPermission, customers, suppliers, addFinancialTransaction, checks, addCheck, collectCheck, transactions, refreshCustomers, kasaTypes, activeBranchName } = useApp();
+    const {
+        kasalar, setKasalar, addTransaction, currentUser, hasPermission,
+        customers, suppliers, addFinancialTransaction, checks, addCheck,
+        collectCheck, transactions, refreshCustomers, refreshTransactions,
+        refreshKasalar, refreshSuppliers, kasaTypes, activeBranchName
+    } = useApp();
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
 
     const isSystemAdmin = currentUser === null;
@@ -277,10 +282,16 @@ export default function AccountingPage() {
             const data = await res.json();
             if (data.success) {
                 showSuccess("Ödendi", "Taksit ödemesi başarıyla yapıldı.");
-                // Refresh
+                // Refresh plans
                 const res2 = await fetch('/api/financials/payment-plans');
                 const data2 = await res2.json();
                 if (data2.success) setScheduledPayments(data2.plans);
+
+                // CRITICAL: Refresh all related data so movements & balances are visible immediately!
+                refreshTransactions();
+                refreshKasalar();
+                refreshCustomers();
+                refreshSuppliers();
             } else {
                 showError("Hata", data.error || 'Ödenemedi');
             }
