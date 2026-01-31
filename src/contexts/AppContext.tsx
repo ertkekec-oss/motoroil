@@ -1418,14 +1418,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
             if (!userBranch) return []; // No branch assigned? No data.
 
-            const filtered = products.filter(p => {
-                // Strict check: Must match branch exactly.
-                // If product has no branch, assume it's 'Merkez' or Global.
-                // Branch staff should ONLY see their branch data.
-                return p.branch === userBranch;
-            });
-            // console.log(`Filtered products from ${products.length} to ${filtered.length}`);
-            return filtered;
+            return products.map(p => {
+                // 1. Own Branch Product -> Full Access
+                if (p.branch === userBranch) return p;
+
+                // 2. Central Product -> Restricted Access
+                const isCentral = !p.branch || p.branch === 'Merkez' || p.branch === 'Depo';
+
+                if (isCentral) {
+                    return {
+                        ...p,
+                        stock: -1,
+                        buyPrice: 0,
+                        _restricted: true
+                    };
+                }
+
+                return null;
+            }).filter(p => p !== null) as (Product & { _restricted?: boolean })[];
         }
         return products;
     }, [products, currentUser]);
