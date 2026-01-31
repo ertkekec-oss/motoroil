@@ -1,15 +1,22 @@
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getSession, hasPermission } from '@/lib/auth';
+import { logActivity } from '@/lib/audit';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
         const { searchParams } = new URL(request.url);
         const branch = searchParams.get('branch');
 
-        const where = branch && branch !== 'Tümü' && branch !== 'all' ? { branch } : {};
+        const where: any = { deletedAt: null };
+        if (branch && branch !== 'Tümü' && branch !== 'all') {
+            where.branch = branch;
+        }
 
         const invoices = await prisma.salesInvoice.findMany({
             where,
@@ -24,6 +31,13 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
+        if (!hasPermission(session, 'sales_invoice_manage')) {
+            return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
+        }
+
         const body = await request.json();
         const {
             customerId,
@@ -43,8 +57,8 @@ export async function POST(request: Request) {
         }
 
         const result = await prisma.$transaction(async (tx) => {
-            // Find customer to get their branch if not provided
             const customer = await tx.customer.findUnique({ where: { id: customerId } });
+            const targetBranch = branch || customer?.branch || session.branch || 'Merkez';
 
             // 1. Create Invoice
             const invoice = await tx.salesInvoice.create({
@@ -58,7 +72,7 @@ export async function POST(request: Request) {
                     items: items,
                     isFormal: isFormal || status === 'Onaylandı',
                     status: status,
-                    branch: branch || customer?.branch || 'Merkez'
+                    branch: String(targetBranch)
                 }
             });
 
@@ -71,7 +85,7 @@ export async function POST(request: Request) {
                 });
 
                 // B. Create Financial Transaction Record
-                const defaultKasa = await tx.kasa.findFirst();
+                const defaultKasa = await tx.kasa.findFirst({ where: { branch: String(targetBranch) } }) || await tx.kasa.findFirst();
                 if (defaultKasa) {
                     await tx.transaction.create({
                         data: {
@@ -80,27 +94,57 @@ export async function POST(request: Request) {
                             description: `Faturalı Satış: ${invoice.invoiceNo}`,
                             kasaId: defaultKasa.id.toString(),
                             customerId: customerId,
-                            date: new Date()
+                            date: new Date(),
+                            branch: String(targetBranch)
                         }
                     });
                 }
 
-                // C. Update Stock (Inventory) - WITH ERROR HANDLING
+                // C. Update Stock (Inventory)
                 for (const item of items) {
                     if (item.productId) {
-                        try {
-                            const pId = String(item.productId);
-                            await tx.product.update({
-                                where: { id: pId },
-                                data: { stock: { decrement: Number(item.qty) } }
-                            });
-                        } catch (stockErr) {
-                            console.warn(`Stok güncelleme hatası (Ürün ID: ${item.productId}) - Devam ediliyor.`);
-                            // Stok hatası faturayı engellemesin
-                        }
+                        const pId = String(item.productId);
+                        const qty = Number(item.qty);
+
+                        // Global Stock
+                        await tx.product.update({
+                            where: { id: pId },
+                            data: { stock: { decrement: qty } }
+                        });
+
+                        // Branch Stock
+                        await tx.stock.upsert({
+                            where: { productId_branch: { productId: pId, branch: String(targetBranch) } },
+                            update: { quantity: { decrement: qty } },
+                            create: { productId: pId, branch: String(targetBranch), quantity: -qty }
+                        });
+
+                        // Record FIFO Movement (Sale)
+                        await (tx as any).stockMovement.create({
+                            data: {
+                                productId: pId,
+                                branch: String(targetBranch),
+                                quantity: -qty,
+                                price: item.price || 0, // Sale price (for records)
+                                type: 'SALE',
+                                referenceId: invoice.id
+                            }
+                        });
                     }
                 }
             }
+
+            // 3. Log Activity
+            await logActivity({
+                userId: session.id as string,
+                userName: session.username as string,
+                action: 'CREATE',
+                entity: 'SalesInvoice',
+                entityId: invoice.id,
+                newData: invoice,
+                details: `${invoice.invoiceNo} numaralı satış faturası oluşturuldu.`,
+                branch: session.branch as string
+            });
 
             return invoice;
         });

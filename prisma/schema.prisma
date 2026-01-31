@@ -87,6 +87,7 @@ model Product {
   updatedAt           DateTime                @updatedAt
   marketplaceMaps     MarketplaceProductMap[]
   stocks              Stock[]
+  movements           StockMovement[]
 
   @@unique([code, branch])
   @@index([name])
@@ -94,6 +95,22 @@ model Product {
   @@index([code])
   @@index([category])
   @@index([supplier])
+}
+
+model StockMovement {
+  id          String   @id @default(cuid())
+  productId   String
+  branch      String
+  quantity    Int      // + for in, - for out
+  price       Decimal  @db.Decimal(10, 2) // Purchase price or cost price
+  type        String   // 'PURCHASE', 'SALE', 'ADJUSTMENT', 'TRANSFER'
+  referenceId String?  // ID of PurchaseInvoice, SalesInvoice, etc.
+  createdAt   DateTime @default(now())
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([branch])
+  @@index([createdAt])
 }
 
 model Stock {

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { calculateInventoryValueFIFO } from '@/lib/inventory';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,11 +54,34 @@ export async function GET(request: Request) {
 
         const payable = Math.abs(Number(customerDebtStats._sum.balance || 0)) + Math.abs(Number(supplierStats._sum.balance || 0));
 
-        // 4. Products
-        const productStats = await prisma.product.aggregate({
-            where: whereClause,
-            _sum: { stock: true }
+        // 4. Products & Inventory Value
+        const products = await prisma.product.findMany({
+            where: { ...whereClause, deletedAt: null },
+            select: { id: true, buyPrice: true }
         });
+
+        let totalStockValue = 0;
+        let totalStockCount = 0;
+
+        for (const p of products) {
+            const stockItems = await prisma.stock.findMany({
+                where: { productId: p.id, ...(whereClause.branch ? { branch: whereClause.branch } : {}) }
+            });
+
+            const qty = stockItems.reduce((sum, s) => sum + s.quantity, 0);
+            totalStockCount += qty;
+
+            // Simplified FIFO for summary performance: 
+            // In a production app with 10k items, we'd cache this or use a single query.
+            // For now, we'll use our FIFO utility if qty > 0.
+            if (qty > 0) {
+                const branchesToSum = whereClause.branch ? [whereClause.branch] : stockItems.map(s => s.branch);
+                for (const b of branchesToSum) {
+                    const val = await calculateInventoryValueFIFO(p.id, b);
+                    totalStockValue += val;
+                }
+            }
+        }
 
         return NextResponse.json({
             success: true,
@@ -66,7 +90,8 @@ export async function GET(request: Request) {
                 expenses: totalExpenses,
                 receivable,
                 payable,
-                totalStock: productStats._sum.stock || 0
+                totalStock: totalStockCount,
+                stockValue: totalStockValue
             }
         });
 
