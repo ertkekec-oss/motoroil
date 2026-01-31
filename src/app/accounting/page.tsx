@@ -10,7 +10,8 @@ import Pagination from '@/components/Pagination';
 export default function AccountingPage() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('receivables'); // receivables, payables, banks, expenses, checks
-    const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'this_month'>('all');
+    const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'this_week' | 'this_month' | 'custom'>('all');
+    const [customRange, setCustomRange] = useState({ start: '', end: '' });
     const {
         kasalar, setKasalar, addTransaction, currentUser, hasPermission,
         customers, suppliers, addFinancialTransaction, checks, addCheck,
@@ -129,44 +130,47 @@ export default function AccountingPage() {
 
         const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-        // Receivables Stats (Customer balances are current snapshots, installments have dates)
+        // Receivables / Payments Today
         let receivablesToday = 0;
-        let receivablesThisMonth = 0;
+        let paymentsToday = 0;
 
-        // From installments (IN)
+        // From installments
         scheduledPayments.forEach(plan => {
-            if (plan.direction === 'IN') {
-                plan.installments.forEach((inst: any) => {
-                    if (inst.status !== 'Paid') {
-                        const dueDate = new Date(inst.dueDate);
-                        if (dueDate.getTime() <= today.getTime() + 86400000) {
-                            receivablesToday += Number(inst.amount);
-                        }
-                        if (dueDate >= firstDayOfMonth) {
-                            receivablesThisMonth += Number(inst.amount);
-                        }
+            plan.installments.forEach((inst: any) => {
+                if (inst.status !== 'Paid') {
+                    const dueDate = new Date(inst.dueDate);
+                    if (dueDate.getTime() <= today.getTime() + 86400000) {
+                        if (plan.direction === 'IN') receivablesToday += Number(inst.amount);
+                        else paymentsToday += Number(inst.amount);
                     }
-                });
-            }
+                }
+            });
         });
 
-        // From Checks (IN)
+        // From Checks
         checks.forEach(c => {
-            if (c.type.includes('Alınan') && c.status === 'Beklemede') {
+            if (c.status === 'Beklemede') {
                 const dueDate = new Date(c.dueDate);
                 if (dueDate.getTime() <= today.getTime() + 86400000) {
-                    receivablesToday += Number(c.amount);
-                }
-                if (dueDate >= firstDayOfMonth) {
-                    receivablesThisMonth += Number(c.amount);
+                    if (c.type.includes('Alınan')) receivablesToday += Number(c.amount);
+                    else paymentsToday += Number(c.amount);
                 }
             }
         });
+
+        // Expenses Today
+        const expensesToday = transactions
+            .filter(t => t.type === 'Expense')
+            .filter(t => {
+                const d = new Date(t.date);
+                return d >= today && d < new Date(today.getTime() + 86400000);
+            })
+            .reduce((a, b) => a + Number(b.amount), 0);
 
         const netKasa = kasalar.reduce((a, b) => a + Number(b.balance), 0);
 
-        return { receivablesToday, receivablesThisMonth, netKasa };
-    }, [scheduledPayments, checks, kasalar]);
+        return { receivablesToday, paymentsToday, expensesToday, netKasa };
+    }, [scheduledPayments, checks, kasalar, transactions]);
 
     const [showScheduledModal, setShowScheduledModal] = useState(false);
     const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
@@ -180,6 +184,15 @@ export default function AccountingPage() {
         const nextDay = new Date(today.getTime() + 86400000);
         const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
+        // This Week Calculation
+        const dayOfWeek = today.getDay(); // 0 (Sun) to 6 (Sat)
+        const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Monday
+        const startOfWeek = new Date(today.setDate(diff));
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const resetToday = new Date();
+        resetToday.setHours(0, 0, 0, 0);
+
         return list.filter(item => {
             if (!item.date) return true;
             let d: Date;
@@ -191,10 +204,19 @@ export default function AccountingPage() {
             }
 
             if (timeFilter === 'today') {
-                return d.getTime() >= today.getTime() && d.getTime() < nextDay.getTime();
+                return d.getTime() >= resetToday.getTime() && d.getTime() < nextDay.getTime();
+            }
+            if (timeFilter === 'this_week') {
+                return d.getTime() >= startOfWeek.getTime();
             }
             if (timeFilter === 'this_month') {
                 return d.getTime() >= startOfMonth.getTime();
+            }
+            if (timeFilter === 'custom' && customRange.start && customRange.end) {
+                const start = new Date(customRange.start);
+                const end = new Date(customRange.end);
+                end.setHours(23, 59, 59, 999);
+                return d >= start && d <= end;
             }
             return true;
         });
@@ -215,7 +237,7 @@ export default function AccountingPage() {
         if (activeTab === 'expenses') return filterByTime(expenses).length;
         if (activeTab === 'transactions_list') return filterByTime(transactions).length;
         return 0;
-    }, [activeTab, receivables, customerReceivables, payables, supplierPayables, checks, expenses, transactions, timeFilter]);
+    }, [activeTab, receivables, customerReceivables, payables, supplierPayables, checks, expenses, transactions, timeFilter, customRange]);
 
     const totalPages = Math.ceil(activeListLength / itemsPerPage);
 
@@ -810,14 +832,25 @@ export default function AccountingPage() {
                     </div>
                 </div>
 
-                <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-accent">
+                <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-error">
                     <div className="flex-between mb-2">
-                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Bu Ayki Alacaklar</span>
-                        <div className="p-2 bg-accent/10 rounded-lg text-accent text-xl">⏳</div>
+                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Bugünkü Ödemeler</span>
+                        <div className="p-2 bg-error/10 rounded-lg text-error text-xl">💸</div>
                     </div>
                     <div>
-                        <div className="text-3xl font-black text-white">{stats.receivablesThisMonth.toLocaleString()} ₺</div>
-                        <div className="text-[10px] text-muted mt-1">{new Date().toLocaleString('tr-TR', { month: 'long' })} ayı toplamı</div>
+                        <div className="text-3xl font-black text-white">{stats.paymentsToday.toLocaleString()} ₺</div>
+                        <div className="text-[10px] text-muted mt-1">Borç ve çek ödemeleri toplamı</div>
+                    </div>
+                </div>
+
+                <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-warning">
+                    <div className="flex-between mb-2">
+                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Bugünkü Giderler</span>
+                        <div className="p-2 bg-warning/10 rounded-lg text-warning text-xl">📉</div>
+                    </div>
+                    <div>
+                        <div className="text-3xl font-black text-white">{stats.expensesToday.toLocaleString()} ₺</div>
+                        <div className="text-[10px] text-muted mt-1">Banka ve kasadan çıkan giderler</div>
                     </div>
                 </div>
 
@@ -831,24 +864,37 @@ export default function AccountingPage() {
                         <div className="text-[10px] text-muted mt-1">Tüm kasa ve bankaların toplamı</div>
                     </div>
                 </div>
+            </div>
 
-                <div className="card glass-plus p-5 flex flex-col justify-between border-l-4 border-warning">
-                    <div className="flex-between mb-2">
-                        <span className="text-xs font-bold text-muted uppercase tracking-wider">Zaman Filtresi</span>
-                        <div className="p-2 bg-warning/10 rounded-lg text-warning text-xl">🔍</div>
+            {/* TIME FILTERS */}
+            <div className="flex items-center gap-2 mb-6 bg-white/5 p-2 rounded-xl overflow-x-auto">
+                {['all', 'today', 'this_week', 'this_month', 'custom'].map(f => (
+                    <button
+                        key={f}
+                        onClick={() => setTimeFilter(f as any)}
+                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${timeFilter === f ? 'bg-primary text-white shadow-lg' : 'hover:bg-white/5 text-muted'}`}
+                    >
+                        {f === 'all' ? 'TÜMÜ' : f === 'today' ? 'BUGÜN' : f === 'this_week' ? 'BU HAFTA' : f === 'this_month' ? 'BU AY' : 'ÖZEL TARİH'}
+                    </button>
+                ))}
+
+                {timeFilter === 'custom' && (
+                    <div className="flex items-center gap-2 ml-4 animate-in slide-in-from-left-2">
+                        <input
+                            type="date"
+                            className="bg-subtle border border-white/10 rounded px-2 py-1 text-[10px] text-white outline-none"
+                            value={customRange.start}
+                            onChange={e => setCustomRange(prev => ({ ...prev, start: e.target.value }))}
+                        />
+                        <span className="text-muted text-[10px]">-</span>
+                        <input
+                            type="date"
+                            className="bg-subtle border border-white/10 rounded px-2 py-1 text-[10px] text-white outline-none"
+                            value={customRange.end}
+                            onChange={e => setCustomRange(prev => ({ ...prev, end: e.target.value }))}
+                        />
                     </div>
-                    <div className="flex gap-1 mt-2">
-                        {['all', 'today', 'this_month'].map(f => (
-                            <button
-                                key={f}
-                                onClick={() => setTimeFilter(f as any)}
-                                className={`flex-1 text-[10px] font-bold py-2 rounded-md transition-all ${timeFilter === f ? 'bg-primary text-white' : 'bg-white/5 text-muted hover:bg-white/10'}`}
-                            >
-                                {f === 'all' ? 'TÜMÜ' : f === 'today' ? 'BUGÜN' : 'BU AY'}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                )}
             </div>
 
             <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
