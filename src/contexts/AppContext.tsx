@@ -839,22 +839,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             }
         }
 
-        const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
-
-        // Branch Isolation / Selection check
-        if (isAdmin || hasPermission('branch_isolation')) {
-            const filterBranch = isAdmin ? activeBranchName : (currentUser?.branch || 'Merkez');
-
-            if (filterBranch !== 'Tümü' && filterBranch !== 'Hepsi') {
-                const targetKasalar = kasalar.filter(k => k.branch === filterBranch || k.name.includes(filterBranch));
-                const targetKasaIds = targetKasalar.map(k => k.id.toString());
-                if (targetKasaIds.length > 0) {
-                    filtered = filtered.filter(t => targetKasaIds.includes(String(t.kasaId || '')));
-                }
-            }
-        }
-
-        return filtered;
+        // Sync with visible kasalar
+        const visibleKasaIds = getVisibleKasalar().map(k => k.id.toString());
+        return filtered.filter(t => visibleKasaIds.includes(String(t.kasaId || '')));
     };
 
     const getVisibleCustomers = () => {
@@ -877,14 +864,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const getVisibleKasalar = () => {
         const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
+        const filterBranch = isAdmin ? activeBranchName : (currentUser?.branch || 'Merkez');
 
-        if (isAdmin || !hasPermission('branch_isolation')) {
-            if (activeBranchName === 'Tümü' || activeBranchName === 'Hepsi') return kasalar;
-            return kasalar.filter(k => (k.branch || 'Merkez') === activeBranchName || k.type === 'Banka');
+        if (filterBranch === 'Tümü' || filterBranch === 'Hepsi') return kasalar;
+
+        // Use the mappings from settings
+        const mappedIds = appSettings.branchKasaMappings?.[filterBranch];
+        if (mappedIds && Array.isArray(mappedIds) && mappedIds.length > 0) {
+            return kasalar.filter(k => mappedIds.includes(k.id.toString()));
         }
 
-        const userBranch = currentUser?.branch || 'Merkez';
-        return kasalar.filter(k => (k.branch || 'Merkez') === userBranch || k.type === 'Banka');
+        // Fallback for banks (usually visible to all) or specific branch name matching
+        return kasalar.filter(k =>
+            (k.branch || 'Merkez') === filterBranch ||
+            k.type === 'Banka' ||
+            k.name.toLowerCase().includes(filterBranch.toLowerCase())
+        );
     };
 
     const addTransaction = (t: Omit<Transaction, 'id' | 'date'>) => {
