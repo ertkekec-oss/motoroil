@@ -344,37 +344,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     // ...
 
-    const [currentUser, setCurrentUser] = useState<Staff | null>(null);
-
-    // Sync Auth User to App Context Current User
-    useEffect(() => {
-        if (authUser) {
-            // We need to map AuthUser to Staff type somewhat or ensure compatibility
-            // AuthUser has: username, role, branch, name, permissions
-            // Staff has: id, name, role, branch, permissions, status... etc
-
-            // For now, construct a compatible object. Ideally, fetch full staff details if needed.
-            // But essential fields for permission checks are present in authUser.
-            const mappedUser: Staff = {
-                id: authUser.username || 'unknown', // AuthUser might miss ID, fallback to username
-                name: authUser.name,
-                role: authUser.role,
-                branch: authUser.branch,
-                permissions: authUser.permissions,
-                status: 'Active',
-                currentJob: '',
-                username: authUser.username
-            };
-            // Only update if changed to prevent loops
-            setCurrentUser(prev => {
-                if (prev?.username === authUser.username && prev?.role === authUser.role) return prev;
-                return mappedUser;
-            });
-        } else {
-            setCurrentUser(null);
-        }
-    }, [authUser]);
-
     const refreshProducts = async () => {
         try {
             const t = Date.now();
@@ -567,7 +536,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         } catch (e) { console.error('Error removing suspended sale', e); }
     };
 
-    // currentUser state moved to top (synced with AuthContext)
+    const [currentUser, setCurrentUser] = useState<Staff | null>(null);
+
+    // Sync Auth User to App Context Current User (with dynamic updates from staff list)
+    useEffect(() => {
+        if (authUser) {
+            // Try to find the user in the fresh staff list first for real-time permission updates
+            const freshUser = staff.find(s => s.username === authUser.username || s.email === authUser.username);
+
+            if (freshUser) {
+                setCurrentUser(freshUser);
+                // console.log("User Synced from Staff List:", freshUser.name, freshUser.permissions);
+            } else {
+                // Fallback to authUser snapshot (e.g. before staff list loads)
+                const mappedUser: Staff = {
+                    id: authUser.username || 'unknown',
+                    name: authUser.name,
+                    role: authUser.role,
+                    branch: authUser.branch,
+                    permissions: authUser.permissions,
+                    status: 'Active',
+                    currentJob: '',
+                    username: authUser.username
+                };
+                setCurrentUser(mappedUser);
+                // console.log("User Synced from Auth Snapshot:", mappedUser.name);
+            }
+        } else {
+            setCurrentUser(null);
+        }
+    }, [authUser, staff]);
 
     const [pendingProducts, setPendingProducts] = useState<PendingProduct[]>([]);
     const [pendingTransfers, setPendingTransfers] = useState<PendingTransfer[]>([]);
