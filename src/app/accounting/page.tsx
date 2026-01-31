@@ -1486,23 +1486,29 @@ export default function AccountingPage() {
                                 <input type="text" placeholder="Örn: X Müşteri Taksitli Satış" value={newPlan.title} onChange={e => setNewPlan({ ...newPlan, title: e.target.value })} className="input-field" />
                             </div>
 
-                            <div className="form-group">
-                                <label>İlgili Cari (Opsiyonel)</label>
-                                <select
-                                    className="input-field"
-                                    value={newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId}
-                                    onChange={e => setNewPlan({
-                                        ...newPlan,
-                                        customerId: newPlan.direction === 'IN' ? e.target.value : '',
-                                        supplierId: newPlan.direction === 'OUT' ? e.target.value : ''
-                                    })}
-                                >
-                                    <option value="">Cari Seçiniz...</option>
-                                    {(newPlan.direction === 'IN' ? customers : suppliers).map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            {newPlan.type !== 'Kredi' ? (
+                                <div className="form-group">
+                                    <label>İlgili Cari (Opsiyonel)</label>
+                                    <select
+                                        className="input-field"
+                                        value={newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId}
+                                        onChange={e => setNewPlan({
+                                            ...newPlan,
+                                            customerId: newPlan.direction === 'IN' ? e.target.value : '',
+                                            supplierId: newPlan.direction === 'OUT' ? e.target.value : ''
+                                        })}
+                                    >
+                                        <option value="">Cari Seçiniz...</option>
+                                        {(newPlan.direction === 'IN' ? customers : suppliers).map(c => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            ) : (
+                                <div className="p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-muted mb-4">
+                                    ℹ️ <b>Banka Kredisi</b> için cari seçimi zorunlu değildir. Banka adını üstteki "Plan Adı" alanına yazabilirsiniz.
+                                </div>
+                            )}
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="form-group">
