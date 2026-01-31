@@ -15,12 +15,21 @@ export default function CustomersPage() {
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('all');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid'); // New: View Toggle
-    const { customers, currentUser, hasPermission, suppClasses, custClasses, branches } = useApp();
+    const { customers, currentUser, hasPermission, suppClasses, custClasses, branches, activeBranchName } = useApp();
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
     const canDelete = hasPermission('delete_records');
 
     const [isProcessing, setIsProcessing] = useState(false);
     const [searchTerm, setSearchTerm] = useState(''); // New: Debounced Search
+
+    // Sync branch filter and new customer branch with global operational branch
+    useEffect(() => {
+        if (activeBranchName) {
+            setBranchFilter(activeBranchName);
+            setNewCustomer(prev => ({ ...prev, branch: activeBranchName }));
+            setCurrentPage(1); // Reset pagination on branch change
+        }
+    }, [activeBranchName]);
 
     // Default to user's branch if not system admin, otherwise 'all'
     const initialBranch = currentUser?.branch || 'all';
@@ -85,7 +94,7 @@ export default function CustomersPage() {
         iban: '',
         customerClass: '',
         referredByCode: '',
-        branch: currentUser?.branch || 'Merkez'
+        branch: activeBranchName || currentUser?.branch || 'Merkez'
     });
     const [editCustomer, setEditCustomer] = useState<any>({
         id: '',
@@ -122,7 +131,7 @@ export default function CustomersPage() {
                 showSuccess("Başarılı", "Müşteri başarıyla oluşturuldu.");
                 setIsModalOpen(false);
 
-                setNewCustomer({ name: '', phone: '', email: '', address: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '', branch: currentUser?.branch || 'Merkez' });
+                setNewCustomer({ name: '', phone: '', email: '', address: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '', branch: activeBranchName || currentUser?.branch || 'Merkez' });
                 window.location.reload();
             } else {
                 showError("Hata", data.error || "Beklenmedik bir hata oluştu.");

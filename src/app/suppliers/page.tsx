@@ -12,14 +12,22 @@ import Pagination from '@/components/Pagination';
 
 export default function SuppliersPage() {
     const router = useRouter();
-    const { suppliers, currentUser, branches, hasPermission } = useApp();
+    const { suppliers, currentUser, branches, hasPermission, activeBranchName } = useApp();
     const { showSuccess, showError } = useModal();
 
     // UI States
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('all'); // all, active, passive, debt, credit
-    const [branchFilter, setBranchFilter] = useState(currentUser?.branch || 'all');
+    const [branchFilter, setBranchFilter] = useState(activeBranchName || 'all');
+
+    useEffect(() => {
+        if (activeBranchName) {
+            setBranchFilter(activeBranchName);
+            setNewSupplier(prev => ({ ...prev, branch: activeBranchName }));
+            setCurrentPage(1);
+        }
+    }, [activeBranchName]);
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
@@ -32,7 +40,7 @@ export default function SuppliersPage() {
     const [newSupplier, setNewSupplier] = useState({
         name: '', phone: '', email: '', address: '', category: '',
         taxNumber: '', taxOffice: '', contactPerson: '', iban: '',
-        branch: currentUser?.branch || 'Merkez'
+        branch: activeBranchName || currentUser?.branch || 'Merkez'
     });
     const [editSupplier, setEditSupplier] = useState<any>({
         id: '', name: '', phone: '', email: '', address: '', category: '',
@@ -114,7 +122,7 @@ export default function SuppliersPage() {
             if (data.success) {
                 showSuccess('Başarılı', 'Tedarikçi başarıyla oluşturuldu.');
                 setIsModalOpen(false);
-                setNewSupplier({ name: '', phone: '', email: '', address: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', branch: currentUser?.branch || 'Merkez' });
+                setNewSupplier({ name: '', phone: '', email: '', address: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', branch: activeBranchName || currentUser?.branch || 'Merkez' });
                 window.location.reload();
             } else {
                 showError('Hata', data.error);
