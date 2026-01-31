@@ -10,7 +10,7 @@ import Pagination from '@/components/Pagination';
 export default function AccountingPage() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('receivables'); // receivables, payables, banks, expenses, checks
-    const { kasalar, setKasalar, addTransaction, currentUser, hasPermission, customers, suppliers, addFinancialTransaction, checks, addCheck, collectCheck, transactions, refreshCustomers, kasaTypes } = useApp();
+    const { kasalar, setKasalar, addTransaction, currentUser, hasPermission, customers, suppliers, addFinancialTransaction, checks, addCheck, collectCheck, transactions, refreshCustomers, kasaTypes, activeBranchName } = useApp();
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
 
     const isSystemAdmin = currentUser === null;
@@ -143,6 +143,33 @@ export default function AccountingPage() {
             }));
         }
     }, [kasalar]);
+
+    const [branchKasaMappings, setBranchKasaMappings] = useState<Record<string, string[]>>({});
+
+    useEffect(() => {
+        const fetchBranchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                const data = await res.json();
+                if (data && data.branchKasaMappings) {
+                    setBranchKasaMappings(data.branchKasaMappings);
+                }
+            } catch (err) {
+                console.error('Settings fetch failed:', err);
+            }
+        };
+        fetchBranchSettings();
+    }, []);
+
+    // Filtered Kasa List based on Active Branch
+    const filteredKasalar = useMemo(() => {
+        if (!activeBranchName || activeBranchName === 'all' || isSystemAdmin && activeBranchName === 'Tümü') return kasalar;
+
+        const allowedIds = branchKasaMappings[activeBranchName];
+        if (!allowedIds || allowedIds.length === 0) return kasalar; // Fallback if no mapping exists
+
+        return kasalar.filter(k => allowedIds.includes(k.id.toString()));
+    }, [kasalar, activeBranchName, branchKasaMappings, isSystemAdmin]);
 
     const [showPayModal, setShowPayModal] = useState(false);
     const [activePayItem, setActivePayItem] = useState<any>(null);
@@ -507,13 +534,37 @@ export default function AccountingPage() {
             });
             const data = await res.json();
             if (data.success) {
+                // IMPORTANT: Automatically assign this new kasa to the active branch if one is selected
+                if (activeBranchName && activeBranchName !== 'all' && data.kasa?.id) {
+                    try {
+                        const settingsRes = await fetch('/api/settings');
+                        const settingsData = await settingsRes.json();
+                        const currentMappings = settingsData.branchKasaMappings || {};
+                        const branchList = currentMappings[activeBranchName] || [];
+
+                        if (!branchList.includes(data.kasa.id)) {
+                            currentMappings[activeBranchName] = [...branchList, data.kasa.id];
+                            await fetch('/api/settings', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ branchKasaMappings: currentMappings })
+                            });
+                        }
+                    } catch (err) {
+                        console.error('Auto-mapping failed', err);
+                    }
+                }
+
+                // Refresh Kasalar list
                 const kRes = await fetch('/api/kasalar');
                 const kData = await kRes.json();
-                if (kData.success) setKasalar(kData.kasalar);
+                if (kData.success) {
+                    setKasalar(kData.kasalar);
+                }
+
                 setShowAddBank(false);
                 setNewBank({ name: '', type: 'Nakit Kasa' });
                 showSuccess("Başarılı", "Kasa/Banka başarıyla oluşturuldu.");
-
             } else {
                 showError("Hata", data.error || 'Oluşturulamadı');
             }
@@ -700,7 +751,7 @@ export default function AccountingPage() {
                             {hasPermission('create_bank') && <button onClick={() => setShowAddBank(true)} className="btn btn-primary">+ Yeni Hesap</button>}
                         </div></div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {kasalar.map(k => (
+                            {filteredKasalar.map(k => (
                                 <div key={k.id} className="card glass-plus relative overflow-hidden group">
                                     <div className="flex-between mb-2">
                                         <span className="text-[10px] tracking-widest uppercase text-muted bg-subtle px-2 py-1 rounded">{k.type}</span>
@@ -715,6 +766,7 @@ export default function AccountingPage() {
                                 </div>
                             ))}
                         </div>
+
                     </div>
                 )}
 

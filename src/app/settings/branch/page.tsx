@@ -21,17 +21,29 @@ export default function BranchSettingsPage() {
     // Track if we've initialized to prevent re-initialization
     const isInitialized = useRef(false);
 
-    // Initialize branch configs when branches are loaded
+    // Initialize branch configs from DB or context
     useEffect(() => {
-        if (branches.length > 0 && !isInitialized.current) {
-            const configs: { [branch: string]: string[] } = {};
-            branches.forEach(branch => {
-                // Initialize with empty arrays - users will select kasas manually
-                configs[branch] = [];
-            });
-            setBranchConfigs(configs);
-            isInitialized.current = true;
-        }
+        const fetchConfigs = async () => {
+            if (branches.length > 0 && !isInitialized.current) {
+                try {
+                    const res = await fetch('/api/settings');
+                    const data = await res.json();
+                    if (data && data.branchKasaMappings) {
+                        setBranchConfigs(data.branchKasaMappings);
+                    } else {
+                        const configs: { [branch: string]: string[] } = {};
+                        branches.forEach(branch => {
+                            configs[branch] = [];
+                        });
+                        setBranchConfigs(configs);
+                    }
+                    isInitialized.current = true;
+                } catch (e) {
+                    console.error('Fetch error:', e);
+                }
+            }
+        };
+        fetchConfigs();
     }, [branches]);
 
     const toggleKasaForBranch = (branch: string, kasaId: string) => {
@@ -49,10 +61,19 @@ export default function BranchSettingsPage() {
         });
     };
 
-    const saveSettings = () => {
-        // In a real app, this would save to backend/database
-        console.log('Saving branch configs:', branchConfigs);
-        showSuccess('Başarılı', '✅ Şube ayarları kaydedildi!');
+    const saveSettings = async () => {
+        try {
+            const res = await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ branchKasaMappings: branchConfigs })
+            });
+            if (res.ok) {
+                showSuccess('Başarılı', '✅ Şube ayarları veritabanına kaydedildi!');
+            }
+        } catch (e) {
+            console.error('Save error:', e);
+        }
     };
 
     if (!hasPermission('settings_manage')) {

@@ -626,11 +626,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const [activeBranchName, setActiveBranchName] = useState<string>('Merkez');
 
+    // Load active branch from localStorage on mount
     useEffect(() => {
-        if (currentUser?.branch) {
+        const savedBranch = localStorage.getItem('motoroil_activeBranch');
+        if (savedBranch) {
+            setActiveBranchName(savedBranch);
+        } else if (currentUser?.branch) {
             setActiveBranchName(currentUser.branch);
         }
     }, [currentUser]);
+
+    // Save active branch to localStorage when it changes
+    const handleSetActiveBranchName = (name: string) => {
+        setActiveBranchName(name);
+        localStorage.setItem('motoroil_activeBranch', name);
+    };
 
     useEffect(() => {
         refreshBranches();
@@ -1514,7 +1524,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             kasaTypes,
             setKasaTypes,
             activeBranchName,
-            setActiveBranchName,
+            setActiveBranchName: handleSetActiveBranchName,
             campaigns,
             refreshCampaigns,
             coupons,
