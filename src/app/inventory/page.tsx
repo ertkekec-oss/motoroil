@@ -33,7 +33,7 @@ function InventoryContent() {
     const initialFilter = searchParams.get('filter') as any || 'none';
 
     const [activeTab, setActiveTab] = useState(initialTab);
-    const { products, setProducts, currentUser, hasPermission, requestProductCreation, branches: contextBranches, brands: dbBrands, prodCats: dbCategories, refreshSettings } = useApp();
+    const { products, setProducts, currentUser, hasPermission, requestProductCreation, branches: contextBranches, brands: dbBrands, prodCats: dbCategories, refreshSettings, activeBranchName } = useApp();
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
     const isSystemAdmin = currentUser === null || currentUser.role === 'ADMIN';
     const canEdit = hasPermission('inventory_edit');
@@ -65,8 +65,14 @@ function InventoryContent() {
         code: '', productCode: '', barcode: '', name: '', brand: '', category: 'Motosiklet', type: 'Diğer',
         stock: 0, price: 0, buyPrice: 0, status: 'ok', supplier: '', gtip: '', gtin: '',
         salesVat: 20, salesVatIncluded: true, purchaseVat: 20, purchaseVatIncluded: true,
-        salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok'
+        salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok', branch: activeBranchName || 'Merkez'
     });
+
+    useEffect(() => {
+        if (activeBranchName && activeBranchName !== 'all' && activeBranchName !== 'Tümü' && activeBranchName !== 'Hepsi') {
+            setNewProduct(prev => ({ ...prev, branch: activeBranchName }));
+        }
+    }, [activeBranchName]);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -426,7 +432,7 @@ function InventoryContent() {
                     code: '', productCode: '', barcode: '', name: '', brand: '', category: 'Motosiklet', type: 'Diğer',
                     stock: 0, price: 0, buyPrice: 0, status: 'ok', supplier: '', gtip: '', gtin: '',
                     salesVat: 20, salesVatIncluded: true, purchaseVat: 20, purchaseVatIncluded: true,
-                    salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok'
+                    salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok', branch: activeBranchName || 'Merkez'
                 });
                 showSuccess('Ürün Talebi Oluşturuldu', 'Yönetici onayı bekleniyor.');
             } else {
@@ -447,7 +453,7 @@ function InventoryContent() {
                             code: '', productCode: '', barcode: '', name: '', brand: '', category: defaultCat, type: 'Diğer',
                             stock: 0, price: 0, buyPrice: 0, status: 'ok', supplier: '', gtip: '', gtin: '',
                             salesVat: 20, salesVatIncluded: true, purchaseVat: 20, purchaseVatIncluded: true,
-                            salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok'
+                            salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok', branch: activeBranchName || 'Merkez'
                         });
                         showSuccess('Yeni Ürün Eklendi', 'Ürün başarıyla eklendi.');
                     } else {
