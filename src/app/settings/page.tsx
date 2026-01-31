@@ -678,6 +678,7 @@ export default function SettingsPage() {
                 {[
                     { id: 'staff', label: 'Ekip Yönetimi', icon: '👥' },
                     { id: 'branches', label: 'Şubeler & Depo', icon: '🏢' },
+                    { id: 'integrations', label: 'Entegrasyonlar', icon: '🔌' },
                     { id: 'profile', label: 'Hesabım', icon: '👤' },
                     { id: 'invoice', label: 'Fatura Ayarları', icon: '🧾' },
                     { id: 'services', label: 'Servis Ücretleri', icon: '🔧' },
@@ -729,242 +730,29 @@ export default function SettingsPage() {
             {/* RIGHT CONTENT AREA */}
             <div style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
 
-                {/* 1. EKİP YÖNETİMİ - REDESIGNED */}
+                {/* 1. EKİP YÖNETİMİ - FULL FEATURED */}
                 {activeTab === 'staff' && (
-                    <div className="animate-fade-in-up">
-                        <div className="flex-between mb-4">
-                            <div>
-                                <h1 style={{ fontSize: '20px', fontWeight: '900', background: 'var(--gradient-text)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '2px' }}>Ekip Yönetimi</h1>
-                                <p style={{ fontSize: '11px', opacity: 0.5 }}>Sistem erişim yetkilerini ve personel listesini yönetin</p>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: '18px', fontWeight: '900', color: 'var(--primary)' }}>{users.length}</div>
-                                <div style={{ fontSize: '9px', fontWeight: '800', opacity: 0.5, textTransform: 'uppercase' }}>Kayıtlı Personel</div>
-                            </div>
-                        </div>
-
-                        <div className="grid-cols-12 gap-6">
-                            {/* Add User Form - Compact Side Card */}
-                            <div className="col-span-12 xl:col-span-4">
-                                <div className="card glass" style={{ padding: '20px', border: '1px solid var(--primary-glow)' }}>
-                                    <h3 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span style={{ width: '24px', height: '24px', borderRadius: '6px', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>+</span>
-                                        Yeni Personel Tanımla
-                                    </h3>
-
-                                    <div className="flex-col gap-4">
-                                        <div className="flex-col gap-1.5">
-                                            <label style={{ fontSize: '10px', fontWeight: '800', opacity: 0.6, letterSpacing: '0.5px' }}>AD SOYAD</label>
-                                            <input type="text" className="input-field" value={newUser.name} onChange={e => setNewUser({ ...newUser, name: e.target.value })} style={{ padding: '10px', fontSize: '12px' }} placeholder="Örn: Ahmet Yılmaz" />
-                                        </div>
-
-                                        <div className="grid-cols-2 gap-3">
-                                            <div className="flex-col gap-1.5">
-                                                <label style={{ fontSize: '10px', fontWeight: '800', opacity: 0.6, letterSpacing: '0.5px' }}>KULLANICI ADI</label>
-                                                <input type="text" className="input-field" value={newUser.username} onChange={e => setNewUser({ ...newUser, username: e.target.value })} style={{ padding: '10px', fontSize: '12px' }} placeholder="ayilmaz" />
-                                            </div>
-                                            <div className="flex-col gap-1.5">
-                                                <label style={{ fontSize: '10px', fontWeight: '800', opacity: 0.6, letterSpacing: '0.5px' }}>ŞİFRE</label>
-                                                <input type="password" className="input-field" value={newUser.password} onChange={e => setNewUser({ ...newUser, password: e.target.value })} style={{ padding: '10px', fontSize: '12px' }} placeholder="****" />
-                                            </div>
-                                        </div>
-
-                                        <div className="grid-cols-2 gap-3">
-                                            <div className="flex-col gap-1.5">
-                                                <label style={{ fontSize: '10px', fontWeight: '800', opacity: 0.6, letterSpacing: '0.5px' }}>ŞUBE</label>
-                                                <select className="input-field" value={newUser.branch} onChange={e => setNewUser({ ...newUser, branch: e.target.value })} style={{ padding: '10px', fontSize: '12px' }}>
-                                                    <option>Merkez</option>
-                                                    <option>Kadıköy</option>
-                                                    <option>Beşiktaş</option>
-                                                    <option>İzmir</option>
-                                                    <option>Tümü</option>
-                                                </select>
-                                            </div>
-                                            <div className="flex-col gap-1.5">
-                                                <label style={{ fontSize: '10px', fontWeight: '800', opacity: 0.6, letterSpacing: '0.5px' }}>ROL</label>
-                                                <select className="input-field" value={newUser.role} onChange={e => setNewUser({ ...newUser, role: e.target.value })} style={{ padding: '10px', fontSize: '12px' }}>
-                                                    {Object.keys(permissionTemplates).map(role => <option key={role}>{role}</option>)}
-                                                    <option>Personel</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <button onClick={addUser} className="btn btn-primary w-full" style={{ height: '42px', marginTop: '4px', fontSize: '12px', fontWeight: '900' }}>
-                                            PERSONELİ KAYDET
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Personnel List Table */}
-                            <div className="col-span-12 xl:col-span-8">
-                                <div className="card glass" style={{ padding: '0', overflow: 'hidden' }}>
-                                    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', fontSize: '12px' }}>
-                                        <thead>
-                                            <tr style={{ background: 'rgba(255,255,255,0.02)', color: 'var(--text-muted)', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}>
-                                                <th style={{ padding: '12px 20px' }}>PERSONEL / ERİŞİM</th>
-                                                <th>ŞUBE</th>
-                                                <th>ROL & YETKİ</th>
-                                                <th style={{ textAlign: 'right', paddingRight: '20px' }}>İŞLEM</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {users.map(u => (
-                                                <tr key={u.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.2s' }}>
-                                                    <td style={{ padding: '12px 20px' }}>
-                                                        <div className="flex items-center gap-3">
-                                                            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary) 0%, #E64A00 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', color: 'white', fontSize: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
-                                                                {u.name.substring(0, 1).toUpperCase()}
-                                                            </div>
-                                                            <div className="flex-col">
-                                                                <div style={{ fontWeight: '800', fontSize: '13px', color: 'white' }}>{u.name}</div>
-                                                                <div style={{ fontSize: '10px', fontFamily: 'monospace', opacity: 0.5 }}>@{u.username}</div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div style={{ fontWeight: '700', opacity: 0.8, fontSize: '11px' }}>🏢 {u.branch || 'Merkez'}</div>
-                                                    </td>
-                                                    <td>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                            <span style={{
-                                                                background: u.role === 'Admin' ? 'rgba(255, 85, 0, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                                                                color: u.role === 'Admin' ? 'var(--primary)' : 'var(--success)',
-                                                                padding: '3px 8px', borderRadius: '4px', fontSize: '9px', fontWeight: '900'
-                                                            }}>
-                                                                {u.role.toUpperCase()}
-                                                            </span>
-                                                            <button
-                                                                onClick={() => setEditingUserPerms(u)}
-                                                                className="btn btn-ghost"
-                                                                style={{ padding: '3px 6px', fontSize: '9px', border: '1px solid var(--border-light)', borderRadius: '4px', opacity: 0.8 }}
-                                                            >
-                                                                🛡️ {(u.permissions || []).includes('*') ? 'Tam' : `${(u.permissions || []).length} Yetki`}
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                    <td style={{ textAlign: 'right', paddingRight: '20px' }}>
-                                                        {u.role !== 'System Admin' && (
-                                                            <button
-                                                                onClick={() => deleteUser(u.id)}
-                                                                className="btn btn-ghost"
-                                                                style={{ color: 'var(--danger)', fontSize: '16px', padding: '6px' }}
-                                                                title="Personeli Sistemden Sil"
-                                                            >🗑️</button>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                            {users.length === 0 && (
-                                                <tr><td colSpan={4} style={{ padding: '60px', textAlign: 'center', opacity: 0.3 }}>Henüz kayıtlı personel bulunmuyor.</td></tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* PERMISSION MODAL */}
-                        {editingUserPerms && (
-                            <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <div className="card glass animate-fade-in" style={{ width: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
-                                    <div className="flex-between mb-6">
-                                        <h3 style={{ borderBottom: '2px solid var(--primary)', paddingBottom: '5px' }}>🛡️ Yetki Yönetimi: {editingUserPerms.name}</h3>
-                                        <button onClick={() => setEditingUserPerms(null)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
-                                    </div>
-
-                                    <div className="flex-col gap-4">
-                                        <div className="flex-col gap-2">
-                                            <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>HAZIR ŞABLON UYGULA</label>
-                                            <div className="flex-center gap-2" style={{ flexWrap: 'wrap' }}>
-                                                {Object.keys(permissionTemplates).map(role => (
-                                                    <button
-                                                        key={role}
-                                                        onClick={async () => {
-                                                            const newPerms = (permissionTemplates as any)[role];
-                                                            setEditingUserPerms({ ...editingUserPerms, role, permissions: newPerms });
-                                                        }}
-                                                        className="btn btn-outline"
-                                                        style={{ fontSize: '10px', padding: '4px 8px' }}
-                                                    >
-                                                        {role}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex-col gap-3" style={{ padding: '20px', background: 'var(--bg-deep)', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={(editingUserPerms.permissions || []).includes('*')}
-                                                    onChange={e => {
-                                                        const newPerms = e.target.checked ? ['*'] : [];
-                                                        setEditingUserPerms({ ...editingUserPerms, permissions: newPerms });
-                                                    }}
-                                                />
-                                                <span style={{ fontWeight: 'bold', color: 'var(--warning)' }}>TAM YETKİ (System Admin)</span>
-                                            </div>
-
-                                            {availablePermissions.map(perm => {
-                                                const isChecked = (editingUserPerms.permissions || []).includes(perm.id) || (editingUserPerms.permissions || []).includes('*');
-                                                const isDisabled = (editingUserPerms.permissions || []).includes('*');
-
-                                                return (
-                                                    <label key={perm.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: isDisabled ? 'not-allowed' : 'pointer', opacity: isDisabled ? 0.5 : 1 }}>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={isChecked}
-                                                            disabled={isDisabled}
-                                                            onChange={val => {
-                                                                let newPerms = [...(editingUserPerms.permissions || [])];
-                                                                if (val.target.checked) newPerms.push(perm.id);
-                                                                else newPerms = newPerms.filter(p => p !== perm.id);
-                                                                setEditingUserPerms({ ...editingUserPerms, permissions: newPerms });
-                                                            }}
-                                                        />
-                                                        <span style={{ fontSize: '14px' }}>{perm.label}</span>
-                                                    </label>
-                                                );
-                                            })}
-                                        </div>
-
-                                        <button
-                                            onClick={async () => {
-                                                try {
-                                                    const res = await fetch('/api/staff', {
-                                                        method: 'PUT',
-                                                        headers: { 'Content-Type': 'application/json' },
-                                                        body: JSON.stringify({
-                                                            id: editingUserPerms.id,
-                                                            role: editingUserPerms.role,
-                                                            permissions: editingUserPerms.permissions
-                                                        })
-                                                    });
-                                                    if (res.ok) {
-                                                        showSuccess('Başarılı', 'Yetkiler güncellendi.');
-                                                        await refreshStaff();
-                                                        setEditingUserPerms(null);
-                                                    } else {
-                                                        showError('Hata', 'Yetkiler kaydedilemedi.');
-                                                    }
-                                                } catch (e) {
-                                                    showError('Hata', 'Sunucu hatası.');
-                                                }
-                                            }}
-                                            className="btn btn-primary w-full"
-                                            style={{ padding: '15px', fontWeight: 'bold' }}
-                                        >
-                                            DEĞİŞİKLİKLERİ KAYDET
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                    <div className="animate-fade-in-up" style={{ margin: '-40px', minHeight: 'calc(100vh - 100px)' }}>
+                        <iframe
+                            src="/staff"
+                            style={{ width: '100%', height: 'calc(100vh - 60px)', border: 'none' }}
+                            title="Ekip Yönetimi"
+                        />
                     </div>
                 )}
 
-                {/* 2. ŞUBELER & BELGELER (YENİ) */}
+                {/* 2. ENTEGRASYONLAR */}
+                {activeTab === 'integrations' && (
+                    <div className="animate-fade-in-up" style={{ margin: '-40px', minHeight: 'calc(100vh - 100px)' }}>
+                        <iframe
+                            src="/integrations"
+                            style={{ width: '100%', height: 'calc(100vh - 60px)', border: 'none' }}
+                            title="Entegrasyonlar"
+                        />
+                    </div>
+                )}
+
+                {/* 3. ŞUBELER & DEPO */}
                 {activeTab === 'branches' && (
                     <div>
                         <h2 style={{ marginBottom: '20px' }}>Şubeler ve Dijital Arşiv</h2>
