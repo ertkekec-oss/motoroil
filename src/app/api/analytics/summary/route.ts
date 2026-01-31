@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
-import { calculateInventoryValueFIFO } from '@/lib/inventory';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,32 +53,40 @@ export async function GET(request: Request) {
 
         const payable = Math.abs(Number(customerDebtStats._sum.balance || 0)) + Math.abs(Number(supplierStats._sum.balance || 0));
 
-        // 4. Products & Inventory Value
+        // 4. OPTIMIZED Inventory Value Calculation
+        // Instead of N+1 queries, we use a single aggregation query
+        const stockData = await prisma.stock.groupBy({
+            by: ['productId', 'branch'],
+            where: whereClause.branch ? { branch: whereClause.branch } : {},
+            _sum: { quantity: true }
+        });
+
+        let totalStockCount = 0;
+        let totalStockValue = 0;
+
+        // Batch fetch all products with their buyPrice
+        const productIds = stockData.map(s => s.productId);
         const products = await prisma.product.findMany({
-            where: { ...whereClause, deletedAt: null },
+            where: {
+                id: { in: productIds },
+                deletedAt: null
+            },
             select: { id: true, buyPrice: true }
         });
 
-        let totalStockValue = 0;
-        let totalStockCount = 0;
+        const productMap = new Map(products.map(p => [p.id, p]));
 
-        for (const p of products) {
-            const stockItems = await prisma.stock.findMany({
-                where: { productId: p.id, ...(whereClause.branch ? { branch: whereClause.branch } : {}) }
-            });
-
-            const qty = stockItems.reduce((sum, s) => sum + s.quantity, 0);
+        // Calculate total stock and approximate value using buyPrice
+        // For true FIFO, we'd need a more complex query, but this is a good approximation
+        for (const stock of stockData) {
+            const qty = stock._sum.quantity || 0;
             totalStockCount += qty;
 
-            // Simplified FIFO for summary performance: 
-            // In a production app with 10k items, we'd cache this or use a single query.
-            // For now, we'll use our FIFO utility if qty > 0.
-            if (qty > 0) {
-                const branchesToSum = whereClause.branch ? [whereClause.branch] : stockItems.map(s => s.branch);
-                for (const b of branchesToSum) {
-                    const val = await calculateInventoryValueFIFO(p.id, b);
-                    totalStockValue += val;
-                }
+            const product = productMap.get(stock.productId);
+            if (product && qty > 0) {
+                // Simplified: Use current buyPrice as approximation
+                // For exact FIFO, consider implementing a materialized view or caching strategy
+                totalStockValue += qty * Number(product.buyPrice);
             }
         }
 
