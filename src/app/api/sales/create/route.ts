@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { items, total, kasaId, description, paymentMode, customerName, customerId, earnedPoints, pointsUsed, couponCode, referenceCode } = body;
+        const { items, total, kasaId, description, paymentMode, customerName, customerId, earnedPoints, pointsUsed, couponCode, referenceCode, branch } = body;
 
         console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode }); // Debug log
 
@@ -61,6 +61,7 @@ export async function POST(request: Request) {
                     currency: 'TRY',
                     status: 'Tamamlandı',
                     orderDate: new Date(),
+                    branch: branch || 'Merkez',
                     items: items as any,
                     rawData: { targetKasaId, description, paymentMode, referenceCode }
                 }
@@ -106,7 +107,8 @@ export async function POST(request: Request) {
                     amount: finalTotal,
                     description: transactionDesc,
                     kasaId: targetKasaId,
-                    customerId: customerId || null
+                    customerId: customerId || null,
+                    branch: branch || 'Merkez'
                 }
             });
 

@@ -93,7 +93,6 @@ export default function Sidebar() {
                             borderRadius: '12px', color: 'var(--text-main)', cursor: 'pointer', outline: 'none',
                             fontSize: '13px', fontWeight: '700', transition: '0.3s'
                         }}>
-                        {isSystemAdmin && <option value="Tümü">🌐 TÜM ŞUBELER</option>}
                         {branches.map(b => (
                             <option key={b.id} value={b.name}>
                                 {b.type === 'Merkez' ? '🏢' : '🔧'} {b.name.toUpperCase()}

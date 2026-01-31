@@ -4,15 +4,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useModal } from '@/contexts/ModalContext';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 export default function SettingsPage() {
-    const [activeTab, setActiveTab] = useState('branches'); // Default to branches since users is removed
-    const [definitionTab, setDefinitionTab] = useState('brands'); // brands, cust_class, supp_class, prod_cat
-    const [campaignSubTab, setCampaignSubTab] = useState('loyalty'); // loyalty, referral, coupons
+    const [activeTab, setActiveTab] = useState('branches');
+    const [definitionTab, setDefinitionTab] = useState('brands');
+    const [campaignSubTab, setCampaignSubTab] = useState('loyalty');
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
+    const { user: currentUser } = useAuth(); // Fix: Get currentUser from AuthContext
     const {
         branches: contextBranches,
         refreshBranches,
@@ -37,8 +39,43 @@ export default function SettingsPage() {
     } = useApp();
 
     const [newPaymentMethod, setNewPaymentMethod] = useState({ label: '', type: 'cash', linkedKasaId: '' });
+    const [smtpSettings, setSmtpSettings] = useState({ email: '', password: '' });
 
+    const [profilePass, setProfilePass] = useState({ old: '', new: '', confirm: '' });
     const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Personel', branch: 'Merkez', username: '', password: '' });
+
+    const handlePasswordChange = async () => {
+        if (profilePass.new !== profilePass.confirm) {
+            showError('Hata', 'Yeni şifreler eşleşmiyor.');
+            return;
+        }
+        if (!profilePass.old || !profilePass.new) {
+            showError('Hata', 'Lütfen tüm alanları doldurun.');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/auth/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: currentUser?.username,
+                    oldPassword: profilePass.old,
+                    newPassword: profilePass.new
+                })
+            });
+
+            if (res.ok) {
+                showSuccess('Başarılı', 'Şifreniz güncellendi.');
+                setProfilePass({ old: '', new: '', confirm: '' });
+            } else {
+                const data = await res.json();
+                showError('Hata', data.error || 'Şifre değiştirilemedi.');
+            }
+        } catch (e) {
+            showError('Hata', 'Sunucu hatası.');
+        }
+    };
 
     const permissionTemplates = {
         'Admin': ['*'],
@@ -587,6 +624,35 @@ export default function SettingsPage() {
 
 
 
+    // Fetch SMTP settings
+    useEffect(() => {
+        if (activeTab === 'system') {
+            fetch('/api/settings/mail')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && !data.error) setSmtpSettings({ email: data.email || '', password: data.password || '' });
+                })
+                .catch(err => console.error("SMTP fetch failed", err));
+        }
+    }, [activeTab]);
+
+    const saveSmtpSettings = async () => {
+        try {
+            const res = await fetch('/api/settings/mail', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(smtpSettings)
+            });
+            if (res.ok) {
+                showSuccess('Başarılı', 'Mail ayarları kaydedildi.');
+            } else {
+                showError('Hata', 'Kaydedilemedi.');
+            }
+        } catch (e) {
+            showError('Hata', 'Sunucu hatası.');
+        }
+    };
+
     return (
         <div className="container" style={{ padding: '0', height: '100vh', display: 'flex' }}>
 
@@ -606,7 +672,9 @@ export default function SettingsPage() {
                     { id: 'definitions', label: 'Tanımlar & Liste', icon: '📚' },
                     { id: 'notifications', label: 'Bildirim Ayarları', icon: '🔔' },
                     { id: 'backup', label: 'Bulut Yedekleme', icon: '☁️' },
-                    { id: 'logs', label: 'İşlem Günlükleri', icon: '📜' }
+                    { id: 'backup', label: 'Bulut Yedekleme', icon: '☁️' },
+                    { id: 'logs', label: 'İşlem Günlükleri', icon: '📜' },
+                    { id: 'system', label: 'Sistem Ayarları', icon: '⚙️' }
                 ].map(item => (
                     <button
                         key={item.id}
@@ -1099,41 +1167,82 @@ export default function SettingsPage() {
                 {/* 3. FATURA AYARLARI */}
                 {/* PROFILE TAB */}
                 {activeTab === 'profile' && (
-                    <div className="animate-fade-in-up" style={{ maxWidth: '600px' }}>
+                    <div className="animate-fade-in-up" style={{ maxWidth: '800px' }}>
                         <h1 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '4px' }}>Profilim</h1>
                         <p style={{ fontSize: '12px', opacity: 0.5, marginBottom: '24px' }}>Hesap bilgilerinizi ve profil ayarlarınızı görüntüleyin</p>
 
-                        <div className="card glass" style={{ padding: '32px' }}>
-                            <div className="flex items-center gap-6 mb-8">
-                                <div style={{
-                                    width: '80px', height: '80px', borderRadius: '24px',
-                                    background: 'linear-gradient(135deg, var(--primary) 0%, #E64A00 100%)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: '32px', fontWeight: '900', color: 'white',
-                                    boxShadow: '0 10px 30px rgba(255, 85, 0, 0.3)'
-                                }}>
-                                    {users.find((u: any) => u.name === (currentUser?.name || ''))?.name?.substring(0, 1).toUpperCase() || 'A'}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* INFO CARD */}
+                            <div className="card glass" style={{ padding: '32px' }}>
+                                <div className="flex items-center gap-6 mb-8">
+                                    <div style={{
+                                        width: '80px', height: '80px', borderRadius: '24px',
+                                        background: 'linear-gradient(135deg, var(--primary) 0%, #E64A00 100%)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: '32px', fontWeight: '900', color: 'white',
+                                        boxShadow: '0 10px 30px rgba(255, 85, 0, 0.3)'
+                                    }}>
+                                        {users.find((u: any) => u.name === (currentUser?.name || ''))?.name?.substring(0, 1).toUpperCase() || 'A'}
+                                    </div>
+                                    <div>
+                                        <h2 style={{ fontSize: '20px', fontWeight: '900' }}>{currentUser?.name || 'Yönetici'}</h2>
+                                        <div style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: '700' }}>{currentUser?.role || 'Sistem Yöneticisi'}</div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h2 style={{ fontSize: '20px', fontWeight: '900' }}>{currentUser?.name || 'Yönetici'}</h2>
-                                    <div style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: '700' }}>{currentUser?.role || 'Sistem Yöneticisi'}</div>
+
+                                <div className="flex-col gap-4">
+                                    <div className="flex-col gap-1.5">
+                                        <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>KULLANICI ADI</label>
+                                        <input type="text" readOnly value={currentUser?.username || '-'} className="input-field" style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.05)', opacity: 0.7 }} />
+                                    </div>
+                                    <div className="flex-col gap-1.5">
+                                        <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>ŞUBE</label>
+                                        <input type="text" readOnly value={currentUser?.branch || 'Merkez'} className="input-field" style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.05)', opacity: 0.7 }} />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="flex-col gap-1.5">
-                                    <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>E-POSTA</label>
-                                    <input type="text" readOnly value={currentUser?.email || '-'} className="input-field" style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.05)', opacity: 0.7 }} />
-                                </div>
-                                <div className="flex-col gap-1.5">
-                                    <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>ŞUBE</label>
-                                    <input type="text" readOnly value={currentUser?.branch || 'Merkez'} className="input-field" style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.05)', opacity: 0.7 }} />
+                            {/* PASSWORD CHANGE */}
+                            <div className="card glass p-6">
+                                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                                    🔐 Şifre Değiştir
+                                </h3>
+                                <div className="flex flex-col gap-3">
+                                    <div>
+                                        <label className="text-xs font-bold opacity-60">Mevcut Şifre</label>
+                                        <input
+                                            type="password"
+                                            className="input-field w-full"
+                                            value={profilePass.old}
+                                            onChange={e => setProfilePass({ ...profilePass, old: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold opacity-60">Yeni Şifre</label>
+                                        <input
+                                            type="password"
+                                            className="input-field w-full"
+                                            value={profilePass.new}
+                                            onChange={e => setProfilePass({ ...profilePass, new: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold opacity-60">Yeni Şifre (Tekrar)</label>
+                                        <input
+                                            type="password"
+                                            className="input-field w-full"
+                                            value={profilePass.confirm}
+                                            onChange={e => setProfilePass({ ...profilePass, confirm: e.target.value })}
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={handlePasswordChange}
+                                        className="btn btn-primary mt-2 font-bold"
+                                    >
+                                        Şifreyi Güncelle
+                                    </button>
                                 </div>
                             </div>
-
-                            <p style={{ fontSize: '11px', opacity: 0.4, marginTop: '32px', textAlign: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '20px' }}>
-                                Şifre değişikliği ve profil güncelleme için sistem yöneticisine başvurun.
-                            </p>
                         </div>
                     </div>
                 )}
@@ -2257,6 +2366,68 @@ export default function SettingsPage() {
                                     className="btn"
                                     style={{ padding: '10px 20px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', opacity: couponPage >= totalCouponPages ? 0.3 : 1 }}
                                 >İleri ▶</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* SYSTEM SETTINGS TAB */}
+                {activeTab === 'system' && (
+                    <div className="animate-fade-in-up space-y-6 max-w-4xl p-8" style={{ padding: '32px' }}>
+                        <div>
+                            <h1 className="text-2xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50" style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px', background: '-webkit-linear-gradient(left, #fff, rgba(255,255,255,0.5))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                                ⚙️ Sistem Ayarları
+                            </h1>
+                            <p className="text-sm text-white/40" style={{ fontSize: '13px', opacity: 0.4 }}>Uygulama genel yapılandırması ve entegrasyon ayarları.</p>
+                        </div>
+
+                        <div className="card glass p-8" style={{ padding: '32px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '16px' }}>
+                            <div className="flex justify-between items-center border-b border-white/5 pb-6 mb-6" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '24px', marginBottom: '24px' }}>
+                                <div>
+                                    <h3 className="text-lg font-black flex items-center gap-2" style={{ fontSize: '18px', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        📧 Mail Sunucu Ayarları (SMTP)
+                                    </h3>
+                                    <p className="text-xs text-white/40 mt-1" style={{ fontSize: '12px', opacity: 0.4, marginTop: '4px' }}>Personel şifreleri ve bildirimlerin gönderileceği mail hesabı.</p>
+                                </div>
+                                <div className={`px-3 py-1 rounded-full text-[10px] font-bold ${smtpSettings.email ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`} style={{ padding: '4px 12px', borderRadius: '50px', fontSize: '10px', fontWeight: 'bold', background: smtpSettings.email ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: smtpSettings.email ? '#10b981' : '#ef4444' }}>
+                                    {smtpSettings.email ? 'YAPILANDIRILDI' : 'AYARLANMADI'}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+                                <div className="space-y-2" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label className="text-xs font-bold text-white/60" style={{ fontSize: '12px', fontWeight: 'bold', opacity: 0.6 }}>Gönderici E-Posta (Gmail vb.)</label>
+                                    <input
+                                        type="email"
+                                        className="input-field w-full p-3"
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', outline: 'none' }}
+                                        placeholder="ornek@gmail.com"
+                                        value={smtpSettings.email}
+                                        onChange={e => setSmtpSettings({ ...smtpSettings, email: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label className="text-xs font-bold text-white/60" style={{ fontSize: '12px', fontWeight: 'bold', opacity: 0.6 }}>Uygulama Şifresi (App Password)</label>
+                                    <input
+                                        type="password"
+                                        className="input-field w-full p-3"
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', outline: 'none' }}
+                                        placeholder="**** **** **** ****"
+                                        value={smtpSettings.password}
+                                        onChange={e => setSmtpSettings({ ...smtpSettings, password: e.target.value })}
+                                    />
+                                    <p className="text-[10px] text-white/30" style={{ fontSize: '10px', opacity: 0.3, marginTop: '4px' }}>Gmail kullanıyorsanız normal şifreniz çalışmaz. Google Hesabım &gt; Güvenlik &gt; Uygulama Şifreleri kısmından 16 haneli şifre almalısınız.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end mt-6" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
+                                <button
+                                    onClick={saveSmtpSettings}
+                                    className="px-6 py-3 rounded-xl bg-primary text-white font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                                    style={{ padding: '12px 24px', borderRadius: '12px', background: 'var(--primary)', color: 'white', fontWeight: '900', border: 'none', cursor: 'pointer', boxShadow: '0 10px 20px -10px var(--primary)' }}
+                                >
+                                    KAYDET
+                                </button>
                             </div>
                         </div>
                     </div>

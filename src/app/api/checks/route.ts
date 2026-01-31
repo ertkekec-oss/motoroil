@@ -22,7 +22,7 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { type, number, bank, dueDate, amount, description, customerId, supplierId } = body;
+        const { type, number, bank, dueDate, amount, description, customerId, supplierId, branch } = body;
 
         const amountVal = parseFloat(amount);
 
@@ -52,7 +52,8 @@ export async function POST(request: Request) {
                     amount: amountVal,
                     description,
                     customerId,
-                    supplierId
+                    supplierId,
+                    branch: branch || 'Merkez'
                 }
             });
 
@@ -68,7 +69,8 @@ export async function POST(request: Request) {
                     description: `${type}: ${number} - ${bank || ''} (Vade: ${dueDate}) ${description || ''}`,
                     kasaId: checksKasa.id,
                     customerId,
-                    supplierId
+                    supplierId,
+                    branch: branch || 'Merkez'
                 }
             });
 

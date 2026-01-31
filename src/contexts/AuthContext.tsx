@@ -43,6 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Sayfa yüklendiğinde localStorage'dan kullanıcıyı kontrol et
     useEffect(() => {
         const checkAuth = () => {
+            // Şifre sıfırlama sayfasındaysak hiçbir auth kontrolü yapma
+            if (pathname.startsWith('/reset-password')) {
+                setIsLoading(false);
+                return;
+            }
+
             try {
                 // Eski localStorage key'lerini temizle (migration)
                 const oldIsLoggedIn = localStorage.getItem('isLoggedIn');
@@ -72,14 +78,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     setUser(userData);
                 } else {
                     // Login sayfasında değilse, login'e yönlendir
-                    if (pathname !== '/login') {
+                    if (pathname !== '/login' && !pathname.startsWith('/reset-password')) {
                         router.push('/login');
                     }
                 }
             } catch (error) {
                 console.error('Auth check error:', error);
                 localStorage.clear();
-                if (pathname !== '/login') {
+                if (pathname !== '/login' && !pathname.startsWith('/reset-password')) {
                     router.push('/login');
                 }
             } finally {

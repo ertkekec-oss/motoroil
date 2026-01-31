@@ -68,7 +68,7 @@ function PaymentContent() {
             else if (paymentMethod === 'account') description += ' (Cari Hesaba İşlendi / Veresiye)';
 
             const result = await addFinancialTransaction({
-                type: paymentType === 'payable' ? 'Payment' : 'Collection',
+                type: paymentMethod === 'account' ? 'Sales' : (paymentType === 'payable' ? 'Payment' : 'Collection'),
                 amount: parseFloat(amount),
                 description: description,
                 kasaId: paymentMethod === 'account' ? undefined : selectedAccount, // No kasa for account/veresiye

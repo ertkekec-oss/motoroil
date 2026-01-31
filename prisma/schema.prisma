@@ -45,6 +45,7 @@ model Order {
   cargoTrackingNo String?
   cargoProvider   String?
   rawData         Json? // Pazaryerinden gelen ham veri (debug için)
+  branch          String?   @default("Merkez")
   deletedAt       DateTime? // Soft delete
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -86,14 +87,28 @@ model Product {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  marketplaceMaps MarketplaceProductMap[]
+  stocks              Stock[]
+  marketplaceMaps     MarketplaceProductMap[]
 
-  @@unique([code, branch]) // Aynı kod aynı şubede tekrar edemez
+  @@unique([code, branch]) // Mevcut şube bazlı kısıtlamayı koruyalım, migration sonrası kaldırılabilir
   @@index([name])
   @@index([barcode])
   @@index([code])
   @@index([category])
   @@index([supplier])
+}
+
+model Stock {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  branch    String
+  quantity  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, branch])
+  @@index([branch])
 }
 
 model MarketplaceProductMap {
@@ -278,6 +293,7 @@ model Kasa {
   type         String        @default("Nakit")
   balance      Decimal       @default(0) @db.Decimal(12, 2)
   currency     String        @default("TRY")
+  branch       String?       @default("Merkez")
   isActive     Boolean       @default(true)
   deletedAt    DateTime? // Soft delete
   transactions Transaction[]
@@ -291,6 +307,7 @@ model Transaction {
   amount      Decimal  @db.Decimal(12, 2)
   description String?
   date        DateTime @default(now())
+  branch      String?  @default("Merkez")
 
   kasaId String
   kasa   Kasa   @relation(fields: [kasaId], references: [id])
@@ -310,6 +327,7 @@ model Transaction {
   @@index([date])
   @@index([type])
   @@index([kasaId])
+  @@index([branch])
 }
 
 model Check {
@@ -321,6 +339,7 @@ model Check {
   amount      Decimal  @db.Decimal(12, 2)
   status      String   @default("Beklemede") // Beklemede, Tahsil Edildi, Ödendi, İptal, Ciro Edildi
   description String?
+  branch      String?  @default("Merkez")
 
   customerId String?
   customer   Customer? @relation(fields: [customerId], references: [id])
@@ -334,6 +353,7 @@ model Check {
   @@index([dueDate])
   @@index([status])
   @@index([number])
+  @@index([branch])
 }
 
 model AuditLog {
@@ -403,6 +423,8 @@ model Staff {
   permissions  String[]  @default([])
   performance  Int?      @default(100)
   salary       Decimal?  @default(17002) @db.Decimal(10, 2)
+  age          Int?
+  address      String?
   lastActive   DateTime? @default(now())
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -411,7 +433,22 @@ model Staff {
   leaveRequests LeaveRequest[]
   payrolls      Payroll[]
 
+  documents     StaffDocument[]
+
   @@index([username])
+}
+
+model StaffDocument {
+  id         String   @id @default(cuid())
+  staffId    String
+  staff      Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  fileName   String
+  fileType   String
+  fileSize   Int
+  fileData   String // Base64 encoded
+  uploadedAt DateTime @default(now())
+
+  @@index([staffId])
 }
 
 model Shift {

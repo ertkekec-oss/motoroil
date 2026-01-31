@@ -74,8 +74,12 @@ export default function AccountingPage() {
     }, [suppliers, customers]);
 
     const filterByBranch = (list: any[]) => {
-        if (isSystemAdmin || !hasPermission('branch_isolation')) return list;
-        return list.filter(item => item.branch === currentUser?.branch);
+        const isAdmin = isSystemAdmin || !hasPermission('branch_isolation');
+        // "Merkez" sees everything.
+        if (isAdmin && activeBranchName === 'Merkez') return list;
+
+        const targetBranch = isAdmin ? activeBranchName : (currentUser?.branch || 'Merkez');
+        return list.filter(item => (item.branch || 'Merkez') === targetBranch);
     };
 
     useEffect(() => {
@@ -190,7 +194,7 @@ export default function AccountingPage() {
     const [newCheck, setNewCheck] = useState({ type: 'Alınan Çek', number: '', bank: '', dueDate: '', amount: '', entityId: '', description: '' });
 
     const [showExpenseModal, setShowExpenseModal] = useState(false);
-    const [newExpense, setNewExpense] = useState({ id: '', title: '', category: 'Diğer', amount: '', date: new Date().toISOString().split('T')[0], method: 'Nakit' });
+    const [newExpense, setNewExpense] = useState({ id: '', title: '', category: 'Diğer', amount: '', date: new Date().toISOString().split('T')[0], method: 'Nakit', kasaId: '' });
     const [isEditingExpense, setIsEditingExpense] = useState(false);
 
     const [editingKasa, setEditingKasa] = useState<any>(null);
@@ -389,14 +393,15 @@ export default function AccountingPage() {
     };
 
     const saveNewExpense = async () => {
-        if (!newExpense.title || !newExpense.amount) return;
+        if (!newExpense.title || !newExpense.amount || !newExpense.kasaId) {
+            showWarning("Eksik Bilgi", "Lütfen tüm alanları (Açıklama, Tutar, Kasa) doldurunuz.");
+            return;
+        }
         if (isProcessing) return;
         setIsProcessing(true);
         try {
             const amt = parseFloat(newExpense.amount);
-            const kId = newExpense.method === 'Nakit' ?
-                kasalar.find(k => k.type === 'Nakit')?.id :
-                kasalar.find(k => k.type === 'Banka')?.id;
+            const kId = newExpense.kasaId;
 
             if (isEditingExpense && newExpense.id) {
                 // UPDATE EXISTING
@@ -423,7 +428,7 @@ export default function AccountingPage() {
             }
 
             setShowExpenseModal(false);
-            setNewExpense({ id: '', title: '', category: 'Diğer', amount: '', date: new Date().toISOString().split('T')[0], method: 'Nakit' });
+            setNewExpense({ id: '', title: '', category: 'Diğer', amount: '', date: new Date().toISOString().split('T')[0], method: 'Nakit', kasaId: '' });
             setIsEditingExpense(false);
 
             // Force refresh transactions
@@ -443,7 +448,8 @@ export default function AccountingPage() {
             category: e.category,
             amount: e.amount.toString(),
             date: e.date.split('.').reverse().join('-'), // DD.MM.YYYY -> YYYY-MM-DD
-            method: e.method
+            method: e.method || 'Nakit',
+            kasaId: e.kasaId?.toString() || ''
         });
         setIsEditingExpense(true);
         setShowExpenseModal(true);
@@ -686,7 +692,7 @@ export default function AccountingPage() {
                     <div>
                         <div className="flex-between mb-4"><h3>Çek & Senet Portföyü</h3><button onClick={() => setShowCheckModal(true)} className="btn btn-primary">+ Ekle</button></div>
                         <table className="w-full text-left">
-                            <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Tür</th><th>Muhatap</th><th>Vade</th><th>Banka</th><th>Tutar</th><th>Durum</th><th></th></tr></thead>
+                            <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Tür</th><th>Muhatap</th><th>Vade</th><th>Banka</th><th>Branch</th><th>Tutar</th><th>Durum</th><th></th></tr></thead>
                             <tbody>
                                 {checks.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-muted">Kayıtlı evrak bulunmuyor.</td></tr>}
                                 {paginate(checks).map(c => (
@@ -695,6 +701,7 @@ export default function AccountingPage() {
                                         <td>{c.customer?.name || c.supplier?.name || '-'}</td>
                                         <td>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
                                         <td className="text-muted">{c.bank}</td>
+                                        <td className="text-xs text-muted">{c.branch || 'Merkez'}</td>
                                         <td className="font-bold">{Number(c.amount).toLocaleString()} ₺</td>
                                         <td><span className="text-xs bg-subtle px-2 py-1 rounded">{c.status}</span></td>
                                         <td className="text-right">
@@ -811,6 +818,7 @@ export default function AccountingPage() {
                                         <th>Tür</th>
                                         <th>Cari / Açıklama</th>
                                         <th>Kasa / Banka</th>
+                                        <th>Şube</th>
                                         <th className="text-right">Tutar</th>
                                         <th className="text-right p-3">İşlem</th>
                                     </tr>
@@ -844,6 +852,7 @@ export default function AccountingPage() {
                                                     <div className="text-[10px] text-muted truncate max-w-[200px]">{t.description}</div>
                                                 </td>
                                                 <td className="text-xs">{kasa ? kasa.name : '-'}</td>
+                                                <td className="text-[10px] text-muted">{t.branch || 'Merkez'}</td>
                                                 <td className={`text-right font-bold ${isInflow ? 'text-success' : 'text-danger'}`}>
                                                     {isInflow ? '+' : '-'} {t.amount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                                 </td>
@@ -990,9 +999,12 @@ export default function AccountingPage() {
                                     </select>
                                 </div>
                                 <div className="form-group">
-                                    <label>Ödeme Yöntemi</label>
-                                    <select value={newExpense.method} onChange={e => setNewExpense({ ...newExpense, method: e.target.value })} className="input-field">
-                                        <option>Nakit</option><option>Banka</option>
+                                    <label>Ödeme Yapılacak Kasa</label>
+                                    <select value={newExpense.kasaId} onChange={e => setNewExpense({ ...newExpense, kasaId: e.target.value })} className="input-field">
+                                        <option value="">Seçiniz...</option>
+                                        {filteredKasalar.map(k => (
+                                            <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString()} ₺)</option>
+                                        ))}
                                     </select>
                                 </div>
                             </div>

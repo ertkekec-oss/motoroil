@@ -11,6 +11,10 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showForgotModal, setShowForgotModal] = useState(false);
+    const [forgotEmail, setForgotEmail] = useState('');
+    const [forgotLoading, setForgotLoading] = useState(false);
+    const [forgotMessage, setForgotMessage] = useState('');
 
     // Eğer zaten giriş yapılmışsa ana sayfaya yönlendir
     useEffect(() => {
@@ -30,12 +34,42 @@ export default function LoginPage() {
             if (success) {
                 router.push('/');
             } else {
-                setError('Kullanıcı adı veya şifre hatalı!');
+                setError('E-Posta, kullanıcı adı veya şifre hatalı!');
             }
         } catch (err) {
             setError('Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleForgotPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!forgotEmail) return;
+        setForgotLoading(true);
+        setForgotMessage('');
+
+        try {
+            const res = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: forgotEmail })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setForgotMessage(data.message || 'Sıfırlama bağlantısı gönderildi.');
+                setTimeout(() => {
+                    setShowForgotModal(false);
+                    setForgotMessage('');
+                    setForgotEmail('');
+                }, 3000);
+            } else {
+                setError(data.error || 'İşlem başarısız.');
+            }
+        } catch (e) {
+            setError('Sunucu hatası.');
+        } finally {
+            setForgotLoading(false);
         }
     };
 
@@ -93,13 +127,13 @@ export default function LoginPage() {
                             color: 'var(--text-muted)',
                             fontWeight: '500'
                         }}>
-                            Kullanıcı Adı
+                            Kullanıcı Adı veya E-Posta
                         </label>
                         <input
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Kullanıcı adınızı girin"
+                            placeholder="ornek@sirket.com veya username"
                             required
                             autoFocus
                             disabled={loading}
@@ -164,6 +198,15 @@ export default function LoginPage() {
                                 e.target.style.background = 'rgba(255,255,255,0.08)';
                             }}
                         />
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                            <button
+                                type="button"
+                                onClick={() => setShowForgotModal(true)}
+                                style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}
+                            >
+                                Şifremi Unuttum?
+                            </button>
+                        </div>
                     </div>
 
                     {error && (
@@ -254,6 +297,59 @@ export default function LoginPage() {
                     © 2026 MotorOil - Tüm hakları saklıdır
                 </div>
             </div>
+            {/* Forgot Password Modal */}
+            {showForgotModal && (
+                <div style={{
+                    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                }}>
+                    <div className="card glass" style={{ width: '400px', padding: '30px' }}>
+                        <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>🔑 Şifre Sıfırlama</h3>
+                        <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px' }}>
+                            Sisteme kayıtlı e-posta adresinizi giriniz. Size şifre sıfırlama bağlantısı göndereceğiz.
+                        </p>
+
+                        {forgotMessage ? (
+                            <div className="bg-emerald-500/10 text-emerald-500 p-4 rounded-lg text-center font-bold mb-4">
+                                ✅ {forgotMessage}
+                            </div>
+                        ) : (
+                            <form onSubmit={handleForgotPassword}>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold' }}>E-Posta Adresi</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        className="input-field"
+                                        style={{ width: '100%', padding: '12px' }}
+                                        value={forgotEmail}
+                                        onChange={e => setForgotEmail(e.target.value)}
+                                        placeholder="E-posta adresiniz..."
+                                    />
+                                </div>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowForgotModal(false)}
+                                        className="btn"
+                                        style={{ flex: 1, background: 'rgba(255,255,255,0.1)' }}
+                                    >
+                                        İptal
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={forgotLoading}
+                                        className="btn btn-primary"
+                                        style={{ flex: 1 }}
+                                    >
+                                        {forgotLoading ? 'Gönderiliyor...' : 'Bağlantı Gönder'}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -15,8 +15,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const pathname = usePathname();
   const isLoginPage = pathname === '/login';
+  const isResetPage = pathname.startsWith('/reset-password');
 
-  if (isLoading) {
+  if (isLoading && !isResetPage) {
     return (
       <div style={{ background: 'var(--bg-deep)', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)' }}>
         Yükleniyor...
@@ -24,12 +25,12 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthenticated && !isLoginPage) {
-    // Redirection is handled in AuthContext, but we should not render layout here
+  if (!isAuthenticated && !isLoginPage && !isResetPage) {
+    // Redirection is handled in AuthContext
     return null;
   }
 
-  if (isLoginPage) {
+  if (isLoginPage || isResetPage) {
     return <>{children}</>;
   }
 

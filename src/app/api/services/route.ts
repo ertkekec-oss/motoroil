@@ -7,12 +7,10 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const customerId = searchParams.get('customerId');
 
-        if (!customerId) {
-            return NextResponse.json({ success: false, error: 'Customer ID required' }, { status: 400 });
-        }
+        const where = customerId ? { customerId } : {};
 
         const services = await prisma.serviceRecord.findMany({
-            where: { customerId },
+            where,
             orderBy: { createdAt: 'desc' },
             include: {
                 customer: {

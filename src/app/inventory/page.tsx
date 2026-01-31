@@ -152,7 +152,31 @@ function InventoryContent() {
     // Memoized filtering
     const filteredProducts = useMemo(() => {
         if (!products) return [];
-        return products.filter(p => {
+
+        // Map products to include relevant stock for the current branch
+        const mappedProducts = products.map(p => {
+            // If p.stocks is available (from new API), use it. Fallback to p.stock for old data/safety.
+            let effectiveStock = p.stock || 0;
+
+            if (p.stocks && Array.isArray(p.stocks)) {
+                // Defines which branch's stock to show
+                const targetBranch = (activeBranchName && activeBranchName !== 'Tümü' && activeBranchName !== 'Hepsi')
+                    ? activeBranchName
+                    : 'Merkez';
+
+                const stockEntry = p.stocks.find((s: any) => s.branch === targetBranch);
+                // If we found an entry, use it. If not, and we are looking for a specific branch, it's 0.
+                // If we are looking for Merkez and no entry exists, maybe fallback to p.stock?
+                if (stockEntry) {
+                    effectiveStock = stockEntry.quantity;
+                } else if (targetBranch !== 'Merkez' && !stockEntry) {
+                    effectiveStock = 0;
+                }
+            }
+            return { ...p, stock: effectiveStock, originalStock: p.stock };
+        });
+
+        return mappedProducts.filter((p: any) => {
             const matchesSearch = (p.name || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
                 (p.code || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase());
             const matchesCategory = filterCategory === 'all' ? true :
@@ -165,12 +189,12 @@ function InventoryContent() {
             if (specialFilter === 'critical-stock') matchesSpecial = (p.stock || 0) <= (p.minStock || 5);
 
             return matchesSearch && matchesCategory && matchesBrand && matchesSpecial;
-        }).sort((a, b) => {
+        }).sort((a: any, b: any) => {
             if (stockSort === 'asc') return (a.stock || 0) - (b.stock || 0);
             if (stockSort === 'desc') return (b.stock || 0) - (a.stock || 0);
             return 0;
         });
-    }, [products, debouncedSearchTerm, filterCategory, filterBrand, specialFilter, stockSort]);
+    }, [products, debouncedSearchTerm, filterCategory, filterBrand, specialFilter, stockSort, activeBranchName]);
 
     // PAGINATION
     const [currentPage, setCurrentPage] = useState(1);
@@ -571,7 +595,35 @@ function InventoryContent() {
         showSuccess('Excel İndiriliyor', 'Dosya indirme işlemi başlatıldı.');
     };
 
-    const handleBulkAction = (mode: any) => { setShowBulkModal(mode); };
+    const handleBulkAction = (mode: any) => {
+        if (mode === 'delete') {
+            showConfirm('Toplu Silme Onayı', `Seçili ${selectedIds.length} ürünü kalıcı olarak silmek istediğinize emin misiniz?`, async () => {
+                setIsProcessing(true);
+                try {
+                    const res = await fetch('/api/products/bulk', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ids: selectedIds })
+                    });
+                    if (res.ok) {
+                        const pRes = await fetch('/api/products');
+                        const pData = await pRes.json();
+                        if (pData.success) setProducts(pData.products);
+                        showSuccess('Silindi', 'Seçili ürünler başarıyla silindi.');
+                        setSelectedIds([]);
+                    } else {
+                        showError('Hata', 'Silme işlemi başarısız oldu.');
+                    }
+                } catch (err) {
+                    showError('Hata', 'İşlem sırasında bir hata oluştu.');
+                } finally {
+                    setIsProcessing(false);
+                }
+            });
+        } else {
+            setShowBulkModal(mode);
+        }
+    };
 
     const handleBarcodeScan = (barcode: string) => {
         setSearchTerm(barcode);
@@ -1035,240 +1087,235 @@ function InventoryContent() {
                                     <input type="text" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
                                         value={newProduct.code} onChange={e => setNewProduct({ ...newProduct, code: e.target.value })} placeholder="Örn: OTO-001" />
                                 </div>
-                                <div>
-                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Şube <span className="text-red-500">*</span></label>
-                                    <select className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                        value={newProduct.branch} onChange={e => setNewProduct({ ...newProduct, branch: e.target.value })}>
-                                        {contextBranches.map(b => (
-                                            <option key={b.name} value={b.name}>{b.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-4">
-                                <div>
-                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Kategori</label>
-                                    <select className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                        value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
-                                        {(dbCategories.length > 0 ? dbCategories : ['Motosiklet', 'Otomobil', 'Aksesuar', 'Yedek Parça', 'Madeni Yağ']).map(cat => (
-                                            <option key={cat} value={cat}>{cat}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Marka</label>
-                                    <div className="relative">
-                                        <input type="text" list="brand-list" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={newProduct.brand} onChange={e => setNewProduct({ ...newProduct, brand: e.target.value })} placeholder="Marka seçin veya yazın" />
-                                        <datalist id="brand-list">
-                                            {dbBrands.map(brand => (
-                                                <option key={brand} value={brand} />
-                                            ))}
-                                        </datalist>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Barkod</label>
-                                    <input type="text" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                        value={newProduct.barcode} onChange={e => setNewProduct({ ...newProduct, barcode: e.target.value })} />
-                                </div>
-                            </div>
-
-                            {/* Fiyatlandırma & KDV */}
-                            <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
-                                <h3 className="text-sm font-bold text-white/80 border-b border-white/10 pb-2">📦 Fiyatlandırma & Vergi Yönetimi</h3>
-
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    {/* Alış Fiyatı */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-muted uppercase block">Alış Fiyatı</label>
-                                        <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={newProduct.buyPrice} onChange={e => setNewProduct({ ...newProduct, buyPrice: parseFloat(e.target.value) })} />
-                                    </div>
-
-                                    {/* Alış KDV */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-muted uppercase block">Alış KDV</label>
-                                        <div className="flex gap-2">
-                                            <select className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                                value={newProduct.purchaseVat} onChange={e => setNewProduct({ ...newProduct, purchaseVat: parseInt(e.target.value) })}>
-                                                <option value="0">%0</option>
-                                                <option value="1">%1</option>
-                                                <option value="10">%10</option>
-                                                <option value="20">%20</option>
-                                            </select>
-                                            <div className="flex items-center">
-                                                <input type="checkbox" className="w-5 h-5 accent-primary"
-                                                    checked={newProduct.purchaseVatIncluded}
-                                                    onChange={e => setNewProduct({ ...newProduct, purchaseVatIncluded: e.target.checked })}
-                                                    title="KDV Dahil mi?"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Satış Fiyatı */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-muted uppercase block">Satış Fiyatı</label>
-                                        <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })} />
-                                    </div>
-
-                                    {/* Satış KDV */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-muted uppercase block">Satış KDV</label>
-                                        <div className="flex gap-2">
-                                            <select className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                                value={newProduct.salesVat} onChange={e => setNewProduct({ ...newProduct, salesVat: parseInt(e.target.value) })}>
-                                                <option value="0">%0</option>
-                                                <option value="1">%1</option>
-                                                <option value="10">%10</option>
-                                                <option value="20">%20</option>
-                                            </select>
-                                            <div className="flex items-center">
-                                                <input type="checkbox" className="w-5 h-5 accent-primary"
-                                                    checked={newProduct.salesVatIncluded}
-                                                    onChange={e => setNewProduct({ ...newProduct, salesVatIncluded: e.target.checked })}
-                                                    title="KDV Dahil mi?"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div>
-                                        <label className="text-xs font-bold text-muted uppercase mb-1 block">Alış İskonto (%)</label>
-                                        <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={(newProduct as any).purchaseDiscount || 0} onChange={e => setNewProduct({ ...newProduct, purchaseDiscount: parseFloat(e.target.value) } as any)} />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold text-muted uppercase mb-1 block">Stok Miktarı</label>
-                                        <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={newProduct.stock} onChange={e => setNewProduct({ ...newProduct, stock: parseFloat(e.target.value) })} />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Ek Vergiler & Detaylar */}
-                            <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
-                                <h3 className="text-sm font-bold text-white/80 border-b border-white/10 pb-2">📑 Ek Vergiler & Gümrük</h3>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-xs font-bold text-muted uppercase mb-1 block">Ö.T.V Türü</label>
-                                        <select className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={newProduct.otvType} onChange={e => setNewProduct({ ...newProduct, otvType: e.target.value })}>
-                                            <option value="Ö.T.V yok">Ö.T.V Yok</option>
-                                            <option value="Liste Fiyatından">Liste Fiyatından</option>
-                                            <option value="Birim Başına">Birim Başına (Maktu)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold text-muted uppercase mb-1 block">Ö.T.V Tutarı</label>
-                                        <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={newProduct.salesOtv} onChange={e => setNewProduct({ ...newProduct, salesOtv: parseFloat(e.target.value) })} />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-xs font-bold text-muted uppercase mb-1 block">Ö.İ.V Tutarı</label>
-                                        <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={newProduct.salesOiv} onChange={e => setNewProduct({ ...newProduct, salesOiv: parseFloat(e.target.value) })} />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold text-muted uppercase mb-1 block">GTİP Kodu</label>
-                                        <input type="text" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={(newProduct as any).gtip || ''} onChange={e => setNewProduct({ ...newProduct, gtip: e.target.value } as any)} placeholder="12.34.56.78.90" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button onClick={handleSaveNewProduct} className="w-full btn btn-primary py-4 mt-4 font-bold text-lg shadow-lg shadow-primary/20 hover:scale-[1.01] transition-transform">
-                                {isProcessing ? 'Kaydediliyor...' : '✨ Ürünü Kaydet'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {auditReport && (
-                <div className="fixed inset-0 bg-black/95 z-[5000] flex items-center justify-center p-4">
-                    <div className="bg-[#0f172a] rounded-[32px] max-w-5xl w-full max-h-[90vh] flex flex-col border border-white/20 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden animate-in">
-                        <div className="p-8 border-b border-white/10 bg-white/[0.02]">
-                            <div className="flex-between">
-                                <div>
-                                    <h2 className="text-3xl font-black text-white">Sayım Sonuç Raporu</h2>
-                                    <p className="text-white/40 font-medium">{auditReport.items.length} kalemde fark tespit edildi.</p>
-                                </div>
-                                <div className="text-right">
-                                    <div className="text-[10px] text-white/30 font-black uppercase tracking-widest">TOPLAM MALİYET ETKİSİ</div>
-                                    <div className={`text-2xl font-black ${auditReport.items.reduce((a: any, b: any) => a + b.costDiff, 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                                        {Number(auditReport.items.reduce((a: any, b: any) => a + b.costDiff, 0)).toLocaleString('tr-TR')} ₺
-                                    </div>
-                                </div>
+                                {/* Şube seçimi kaldırıldı - Ürünler global olarak tanımlanır */}
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-4 custom-scroll">
-                            <table className="w-full text-left">
-                                <thead className="text-[10px] text-white/30 font-black uppercase tracking-wider sticky top-0 bg-[#0f172a] z-10">
-                                    <tr>
-                                        <th className="p-4">Ürün Detayı</th>
-                                        <th className="p-4 text-center">Sistem</th>
-                                        <th className="p-4 text-center">Fiziksel</th>
-                                        <th className="p-4 text-center">Fark</th>
-                                        <th className="p-4 text-right">Maliyet Etkisi</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-white/5">
-                                    {auditReport.items.map((item: any) => (
-                                        <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
-                                            <td className="p-4">
-                                                <div className="font-bold text-white mb-0.5">{item.name}</div>
-                                                <div className="text-[10px] text-white/30 font-mono">{item.id}</div>
-                                            </td>
-                                            <td className="p-4 text-center font-medium text-white/50">{item.stock}</td>
-                                            <td className="p-4 text-center font-bold text-white">{item.counted}</td>
-                                            <td className="p-4 text-center">
-                                                <span className={`px-2 py-1 rounded-md text-xs font-black ${item.diff > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'
-                                                    }`}>
-                                                    {item.diff > 0 ? '+' : ''}{item.diff}
-                                                </span>
-                                            </td>
-                                            <td className={`p-4 text-right font-bold tabular-nums ${item.costDiff >= 0 ? 'text-emerald-400/70' : 'text-red-400/70'}`}>
-                                                {item.costDiff.toLocaleString('tr-TR')} ₺
-                                            </td>
-                                        </tr>
+                        <div className="grid grid-cols-3 gap-4">
+                            <div>
+                                <label className="text-xs font-bold text-muted uppercase mb-1 block">Kategori</label>
+                                <select className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                    value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
+                                    {(dbCategories.length > 0 ? dbCategories : ['Motosiklet', 'Otomobil', 'Aksesuar', 'Yedek Parça', 'Madeni Yağ']).map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
                                     ))}
-                                </tbody>
-                            </table>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-muted uppercase mb-1 block">Marka</label>
+                                <div className="relative">
+                                    <input type="text" list="brand-list" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={newProduct.brand} onChange={e => setNewProduct({ ...newProduct, brand: e.target.value })} placeholder="Marka seçin veya yazın" />
+                                    <datalist id="brand-list">
+                                        {dbBrands.map(brand => (
+                                            <option key={brand} value={brand} />
+                                        ))}
+                                    </datalist>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-muted uppercase mb-1 block">Barkod</label>
+                                <input type="text" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                    value={newProduct.barcode} onChange={e => setNewProduct({ ...newProduct, barcode: e.target.value })} />
+                            </div>
                         </div>
 
-                        <div className="p-8 bg-white/[0.02] border-t border-white/10 flex justify-end gap-3">
-                            <button onClick={() => setAuditReport(null)} className="px-8 py-3 rounded-xl border border-white/10 text-white/60 hover:text-white hover:bg-white/5 font-bold transition-all">
-                                Vazgeç
-                            </button>
-                            <button
-                                onClick={applyCountResults}
-                                disabled={isProcessing}
-                                className="px-8 py-3 rounded-xl bg-primary hover:bg-[#FF6600] text-white font-black shadow-lg shadow-primary/20 transition-all hover:scale-105"
-                            >
-                                {isProcessing ? 'İŞLENİYOR...' : 'SONUÇLARI ONAYLA VE STOKLARI GÜNCELLE'}
-                            </button>
+                        {/* Fiyatlandırma & KDV */}
+                        <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
+                            <h3 className="text-sm font-bold text-white/80 border-b border-white/10 pb-2">📦 Fiyatlandırma & Vergi Yönetimi</h3>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {/* Alış Fiyatı */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted uppercase block">Alış Fiyatı</label>
+                                    <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={newProduct.buyPrice} onChange={e => setNewProduct({ ...newProduct, buyPrice: parseFloat(e.target.value) })} />
+                                </div>
+
+                                {/* Alış KDV */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted uppercase block">Alış KDV</label>
+                                    <div className="flex gap-2">
+                                        <select className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                            value={newProduct.purchaseVat} onChange={e => setNewProduct({ ...newProduct, purchaseVat: parseInt(e.target.value) })}>
+                                            <option value="0">%0</option>
+                                            <option value="1">%1</option>
+                                            <option value="10">%10</option>
+                                            <option value="20">%20</option>
+                                        </select>
+                                        <div className="flex items-center">
+                                            <input type="checkbox" className="w-5 h-5 accent-primary"
+                                                checked={newProduct.purchaseVatIncluded}
+                                                onChange={e => setNewProduct({ ...newProduct, purchaseVatIncluded: e.target.checked })}
+                                                title="KDV Dahil mi?"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Satış Fiyatı */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted uppercase block">Satış Fiyatı</label>
+                                    <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })} />
+                                </div>
+
+                                {/* Satış KDV */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted uppercase block">Satış KDV</label>
+                                    <div className="flex gap-2">
+                                        <select className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                            value={newProduct.salesVat} onChange={e => setNewProduct({ ...newProduct, salesVat: parseInt(e.target.value) })}>
+                                            <option value="0">%0</option>
+                                            <option value="1">%1</option>
+                                            <option value="10">%10</option>
+                                            <option value="20">%20</option>
+                                        </select>
+                                        <div className="flex items-center">
+                                            <input type="checkbox" className="w-5 h-5 accent-primary"
+                                                checked={newProduct.salesVatIncluded}
+                                                onChange={e => setNewProduct({ ...newProduct, salesVatIncluded: e.target.checked })}
+                                                title="KDV Dahil mi?"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Alış İskonto (%)</label>
+                                    <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={(newProduct as any).purchaseDiscount || 0} onChange={e => setNewProduct({ ...newProduct, purchaseDiscount: parseFloat(e.target.value) } as any)} />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Stok Miktarı</label>
+                                    <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={newProduct.stock} onChange={e => setNewProduct({ ...newProduct, stock: parseFloat(e.target.value) })} />
+                                </div>
+                            </div>
                         </div>
+
+                        {/* Ek Vergiler & Detaylar */}
+                        <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
+                            <h3 className="text-sm font-bold text-white/80 border-b border-white/10 pb-2">📑 Ek Vergiler & Gümrük</h3>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Ö.T.V Türü</label>
+                                    <select className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={newProduct.otvType} onChange={e => setNewProduct({ ...newProduct, otvType: e.target.value })}>
+                                        <option value="Ö.T.V yok">Ö.T.V Yok</option>
+                                        <option value="Liste Fiyatından">Liste Fiyatından</option>
+                                        <option value="Birim Başına">Birim Başına (Maktu)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Ö.T.V Tutarı</label>
+                                    <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={newProduct.salesOtv} onChange={e => setNewProduct({ ...newProduct, salesOtv: parseFloat(e.target.value) })} />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Ö.İ.V Tutarı</label>
+                                    <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={newProduct.salesOiv} onChange={e => setNewProduct({ ...newProduct, salesOiv: parseFloat(e.target.value) })} />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">GTİP Kodu</label>
+                                    <input type="text" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={(newProduct as any).gtip || ''} onChange={e => setNewProduct({ ...newProduct, gtip: e.target.value } as any)} placeholder="12.34.56.78.90" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onClick={handleSaveNewProduct} className="w-full btn btn-primary py-4 mt-4 font-bold text-lg shadow-lg shadow-primary/20 hover:scale-[1.01] transition-transform">
+                            {isProcessing ? 'Kaydediliyor...' : '✨ Ürünü Kaydet'}
+                        </button>
                     </div>
                 </div>
             )}
+
+
+            {
+                auditReport && (
+                    <div className="fixed inset-0 bg-black/95 z-[5000] flex items-center justify-center p-4">
+                        <div className="bg-[#0f172a] rounded-[32px] max-w-5xl w-full max-h-[90vh] flex flex-col border border-white/20 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden animate-in">
+                            <div className="p-8 border-b border-white/10 bg-white/[0.02]">
+                                <div className="flex-between">
+                                    <div>
+                                        <h2 className="text-3xl font-black text-white">Sayım Sonuç Raporu</h2>
+                                        <p className="text-white/40 font-medium">{auditReport.items.length} kalemde fark tespit edildi.</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-[10px] text-white/30 font-black uppercase tracking-widest">TOPLAM MALİYET ETKİSİ</div>
+                                        <div className={`text-2xl font-black ${auditReport.items.reduce((a: any, b: any) => a + b.costDiff, 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                                            {Number(auditReport.items.reduce((a: any, b: any) => a + b.costDiff, 0)).toLocaleString('tr-TR')} ₺
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-4 custom-scroll">
+                                <table className="w-full text-left">
+                                    <thead className="text-[10px] text-white/30 font-black uppercase tracking-wider sticky top-0 bg-[#0f172a] z-10">
+                                        <tr>
+                                            <th className="p-4">Ürün Detayı</th>
+                                            <th className="p-4 text-center">Sistem</th>
+                                            <th className="p-4 text-center">Fiziksel</th>
+                                            <th className="p-4 text-center">Fark</th>
+                                            <th className="p-4 text-right">Maliyet Etkisi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {auditReport.items.map((item: any) => (
+                                            <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
+                                                <td className="p-4">
+                                                    <div className="font-bold text-white mb-0.5">{item.name}</div>
+                                                    <div className="text-[10px] text-white/30 font-mono">{item.id}</div>
+                                                </td>
+                                                <td className="p-4 text-center font-medium text-white/50">{item.stock}</td>
+                                                <td className="p-4 text-center font-bold text-white">{item.counted}</td>
+                                                <td className="p-4 text-center">
+                                                    <span className={`px-2 py-1 rounded-md text-xs font-black ${item.diff > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'
+                                                        }`}>
+                                                        {item.diff > 0 ? '+' : ''}{item.diff}
+                                                    </span>
+                                                </td>
+                                                <td className={`p-4 text-right font-bold tabular-nums ${item.costDiff >= 0 ? 'text-emerald-400/70' : 'text-red-400/70'}`}>
+                                                    {item.costDiff.toLocaleString('tr-TR')} ₺
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div className="p-8 bg-white/[0.02] border-t border-white/10 flex justify-end gap-3">
+                                <button onClick={() => setAuditReport(null)} className="px-8 py-3 rounded-xl border border-white/10 text-white/60 hover:text-white hover:bg-white/5 font-bold transition-all">
+                                    Vazgeç
+                                </button>
+                                <button
+                                    onClick={applyCountResults}
+                                    disabled={isProcessing}
+                                    className="px-8 py-3 rounded-xl bg-primary hover:bg-[#FF6600] text-white font-black shadow-lg shadow-primary/20 transition-all hover:scale-105"
+                                >
+                                    {isProcessing ? 'İŞLENİYOR...' : 'SONUÇLARI ONAYLA VE STOKLARI GÜNCELLE'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
 
             <BarcodeScanner
                 isOpen={showScanner}
                 onScan={handleBarcodeScan}
                 onClose={() => setShowScanner(false)}
             />
-        </div>
+        </div >
     );
 }
 

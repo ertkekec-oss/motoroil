@@ -84,9 +84,9 @@ export async function POST(request: Request) {
                     type: isAlinan ? 'Collection' : 'Payment',
                     amount: amountVal,
                     description: `${newStatus}: ${check.type} (${check.number}) -> Portföyden Kasa'ya Aktarım`,
-                    kasaId: targetKasaId,
                     customerId: check.customerId,
-                    supplierId: check.supplierId
+                    supplierId: check.supplierId,
+                    branch: (check as any).branch || 'Merkez'
                 }
             });
 

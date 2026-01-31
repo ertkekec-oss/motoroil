@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import Pagination from '@/components/Pagination';
 
 export default function ServiceDashboard() {
-    const { currentUser, hasPermission } = useApp();
-    const isSystemAdmin = currentUser === null;
+    const { user: currentUser, hasPermission } = useAuth(); // AuthContext provides user and hasPermission
+    const isSystemAdmin = currentUser?.role === 'Admin';
 
     const [activeServiceTab, setActiveServiceTab] = useState<'jobs' | 'calendar'>('jobs');
     const [selectedService, setSelectedService] = useState<any>(null);

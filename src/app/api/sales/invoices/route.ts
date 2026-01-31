@@ -6,7 +6,13 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const branch = searchParams.get('branch');
+
+        const where = branch && branch !== 'Tümü' && branch !== 'all' ? { branch } : {};
+
         const invoices = await prisma.salesInvoice.findMany({
+            where,
             include: { customer: true },
             orderBy: { createdAt: 'desc' }
         });

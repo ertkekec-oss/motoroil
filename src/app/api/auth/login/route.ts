@@ -5,9 +5,14 @@ export async function POST(request: Request) {
     try {
         const { username, password } = await request.json();
 
-        // Find staff member by username
-        const staff = await prisma.staff.findUnique({
-            where: { username }
+        // Find staff member by username OR email
+        const staff = await prisma.staff.findFirst({
+            where: {
+                OR: [
+                    { username: username }, // Assume input 'username' can be email too
+                    { email: username }
+                ]
+            }
         });
 
         if (!staff || staff.password !== password) {

@@ -27,7 +27,9 @@ export async function POST(request: Request) {
             kasaId,
             customerId,
             supplierId,
-            targetKasaId
+            targetKasaId,
+            branch,
+            isAccountTransaction
         } = body;
 
         // Validation & Parsing
@@ -52,6 +54,7 @@ export async function POST(request: Request) {
                     kasaId,
                     customerId,
                     supplierId,
+                    branch: branch || 'Merkez'
                 }
             });
 
@@ -59,13 +62,15 @@ export async function POST(request: Request) {
             // Effect depends on type:
             // Collection/Sales: +
             // Payment/Expense/Purchase: -
-            const isPositive = ['Sales', 'Collection'].includes(type);
-            const effect = isPositive ? amount : -amount;
+            if (!isAccountTransaction) {
+                const isPositive = ['Sales', 'Collection'].includes(type);
+                const effect = isPositive ? amount : -amount;
 
-            await tx.kasa.update({
-                where: { id: kasaId },
-                data: { balance: { increment: effect } }
-            });
+                await tx.kasa.update({
+                    where: { id: kasaId },
+                    data: { balance: { increment: effect } }
+                });
+            }
 
             // 3. Update Customer Balance (if applicable)
             if (customerId) {

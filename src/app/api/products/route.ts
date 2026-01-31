@@ -5,7 +5,8 @@ import prisma from '@/lib/prisma';
 export async function GET() {
     try {
         const products = await prisma.product.findMany({
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
+            include: { stocks: true }
         });
         return NextResponse.json({ success: true, products });
     } catch (error: any) {
@@ -20,6 +21,11 @@ export async function POST(request: Request) {
             salesVat, salesVatIncluded, purchaseVat, purchaseVatIncluded,
             salesOiv, salesOtv, otvType } = body;
 
+        // Ürün her zaman Merkez'de oluşturulur (Global Definition)
+        // Ancak stok bilgisi varsa ilgili şubeye (veya Merkez'e) Stock kaydı olarak eklenir.
+
+        const targetBranch = branch || 'Merkez';
+
         const product = await prisma.product.create({
             data: {
                 name,
@@ -28,19 +34,26 @@ export async function POST(request: Request) {
                 brand: brand || '',
                 category: category || 'Genel',
                 type: type || 'Ürün',
-                stock: parseFloat(stock) || 0,
+                stock: 0, // Deprecated: Global stock (sum) or just 0, relying on Stock table
                 price: parseFloat(price) || 0,
                 buyPrice: parseFloat(buyPrice) || 0,
                 supplier: supplier || '',
-                branch: branch || 'Merkez',
+                branch: 'Merkez', // Force global definition owner to Merkez
                 salesVat: parseInt(salesVat) || 20,
                 salesVatIncluded: salesVatIncluded !== undefined ? salesVatIncluded : true,
                 purchaseVat: parseInt(purchaseVat) || 20,
                 purchaseVatIncluded: purchaseVatIncluded !== undefined ? purchaseVatIncluded : true,
                 salesOiv: parseFloat(salesOiv) || 0,
                 salesOtv: parseFloat(salesOtv) || 0,
-                otvType: otvType || 'Ö.T.V yok'
-            }
+                otvType: otvType || 'Ö.T.V yok',
+                stocks: {
+                    create: {
+                        branch: targetBranch,
+                        quantity: parseFloat(stock) || 0
+                    }
+                }
+            },
+            include: { stocks: true }
         });
 
         return NextResponse.json({ success: true, product });

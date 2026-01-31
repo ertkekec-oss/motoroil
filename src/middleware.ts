@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Public paths - Login olmadan erişilebilir
-    const publicPaths = ['/login'];
+    const publicPaths = ['/login', '/reset-password'];
 
     // Eğer public path'teyse, devam et
     if (publicPaths.some(path => pathname.startsWith(path))) {

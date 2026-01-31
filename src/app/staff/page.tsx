@@ -15,7 +15,7 @@ export default function StaffPage() {
     const [showPermissionModal, setShowPermissionModal] = useState(false);
     const [showAddStaffModal, setShowAddStaffModal] = useState(false);
     const [showEditStaffModal, setShowEditStaffModal] = useState(false);
-    const [editStaff, setEditStaff] = useState<any>({ name: '', role: '', branch: '', type: 'service' });
+    const [editStaff, setEditStaff] = useState<any>({ name: '', email: '', role: '', branch: '', type: 'service', age: '', address: '', salary: '' });
 
     const [taskContent, setTaskContent] = useState('');
     const [taskPriority, setTaskPriority] = useState('normal');
@@ -61,7 +61,7 @@ export default function StaffPage() {
     };
 
     const [newStaff, setNewStaff] = useState({
-        name: '', role: '', branch: '', type: 'service'
+        name: '', email: '', role: '', branch: '', type: 'service', age: '', address: '', salary: ''
     });
 
     // --- NEW STATES FOR HR MODULES ---
@@ -69,6 +69,10 @@ export default function StaffPage() {
     const [leaves, setLeaves] = useState<any[]>([]);
     const [payrolls, setPayrolls] = useState<any[]>([]);
     const [currentWeekStart, setCurrentWeekStart] = useState(getMonday(new Date()));
+
+    // --- STAFF DOCUMENTS STATE ---
+    const [staffDocuments, setStaffDocuments] = useState<any[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
 
     function getMonday(d: Date) {
         d = new Date(d);
@@ -116,6 +120,20 @@ export default function StaffPage() {
             if (res.ok) setPayrolls(await res.json());
         } catch (e) { console.error(e); }
     };
+
+    const fetchStaffDocuments = async (staffId: string) => {
+        if (!staffId) return;
+        try {
+            const res = await fetch(`/api/staff/documents?staffId=${staffId}`);
+            if (res.ok) setStaffDocuments(await res.json());
+        } catch (e) { console.error(e); }
+    };
+
+    useEffect(() => {
+        if (showEditStaffModal && editStaff.id) {
+            fetchStaffDocuments(editStaff.id);
+        }
+    }, [showEditStaffModal, editStaff.id]);
 
     // Load data when tab changes
     useEffect(() => {
@@ -212,6 +230,12 @@ export default function StaffPage() {
 
     const handleSaveStaff = async () => {
         if (!newStaff.name || !newStaff.role) return;
+
+        if (!newStaff.email) {
+            showSuccess('Hata', 'Lütfen e-posta adresini giriniz.');
+            return;
+        }
+
         if (!newStaff.branch) {
             showSuccess('Hata', 'Lütfen personel için bir şube seçiniz.');
             return;
@@ -224,6 +248,8 @@ export default function StaffPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...newStaff,
+                    age: newStaff.age ? parseInt(newStaff.age) : null,
+                    salary: newStaff.salary ? parseFloat(newStaff.salary) : 17002,
                     status: 'Müsait',
                     permissions: ['branch_isolation']
                 })
@@ -232,8 +258,8 @@ export default function StaffPage() {
             if (res.ok) {
                 await refreshStaff();
                 setShowAddStaffModal(false);
-                setNewStaff({ name: '', role: '', branch: '', type: 'service' });
-                showSuccess("Personel Eklendi", "Sisteme giriş yetkileri varsayılan olarak tanımlandı.");
+                setNewStaff({ name: '', email: '', role: '', branch: '', type: 'service', age: '', address: '', salary: '' });
+                showSuccess("Personel Eklendi", "Sisteme giriş yetkileri varsayılan olarak tanımlandı. Şifre mail olarak gönderildi.");
             }
         } catch (e) {
             console.error('Save staff failed', e);
@@ -256,16 +282,20 @@ export default function StaffPage() {
                 body: JSON.stringify({
                     id: editStaff.id,
                     name: editStaff.name,
+                    email: editStaff.email,
                     role: editStaff.role,
                     branch: editStaff.branch,
-                    type: editStaff.type
+                    type: editStaff.type,
+                    age: editStaff.age,
+                    address: editStaff.address,
+                    salary: editStaff.salary
                 })
             });
 
             if (res.ok) {
                 await refreshStaff();
                 setShowEditStaffModal(false);
-                setEditStaff({ name: '', role: '', branch: '', type: 'service' });
+                setEditStaff({ name: '', email: '', role: '', branch: '', type: 'service', age: '', address: '', salary: '' });
                 showSuccess("Personel Güncellendi", "Personel bilgileri başarıyla güncellendi.");
             }
         } catch (e) {
@@ -273,6 +303,61 @@ export default function StaffPage() {
         } finally {
             setIsProcessing(false);
         }
+    };
+
+    // --- DOCUMENT HANDLERS ---
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !editStaff.id) return;
+
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            showSuccess("Hata", "Dosya boyutu 5MB'dan küçük olmalıdır.");
+            return;
+        }
+
+        setIsUploading(true);
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64 = reader.result as string;
+            try {
+                const res = await fetch('/api/staff/documents', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        staffId: editStaff.id,
+                        fileName: file.name,
+                        fileType: file.type,
+                        fileSize: file.size,
+                        fileData: base64
+                    })
+                });
+
+                if (res.ok) {
+                    await fetchStaffDocuments(editStaff.id);
+                    showSuccess("Dosya Yüklendi", "Personel belgesi başarıyla kaydedildi.");
+                } else {
+                    const err = await res.json();
+                    showSuccess("Hata", err.error || "Dosya yüklenemedi.");
+                }
+            } catch (e) {
+                console.error("Upload error", e);
+                showSuccess("Hata", "Dosya yüklenirken bir sorun oluştu.");
+            } finally {
+                setIsUploading(false);
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleDeleteDocument = async (docId: string) => {
+        if (!confirm("Belgeyi silmek istediğinize emin misiniz?")) return;
+        try {
+            const res = await fetch(`/api/staff/documents?id=${docId}`, { method: 'DELETE' });
+            if (res.ok) {
+                await fetchStaffDocuments(editStaff.id);
+                showSuccess("Silindi", "Belge başarıyla silindi.");
+            }
+        } catch (e) { console.error(e); }
     };
 
     // --- SHIFT CREATION LOGIC ---
@@ -1122,6 +1207,50 @@ export default function StaffPage() {
                             </div>
 
                             <div className="form-group">
+                                <label>E-Posta (Giriş İçin) <span className="text-red-500">*</span></label>
+                                <input
+                                    type="email"
+                                    className="input-field"
+                                    placeholder="ornek@sirket.com"
+                                    value={newStaff.email}
+                                    onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="form-group">
+                                    <label>Yaş</label>
+                                    <input
+                                        type="number"
+                                        className="input-field"
+                                        placeholder="25"
+                                        value={newStaff.age}
+                                        onChange={(e) => setNewStaff({ ...newStaff, age: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Net Maaş</label>
+                                    <input
+                                        type="number"
+                                        className="input-field"
+                                        placeholder="17002"
+                                        value={newStaff.salary}
+                                        onChange={(e) => setNewStaff({ ...newStaff, salary: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Adres</label>
+                                <textarea
+                                    className="input-field min-h-[60px]"
+                                    placeholder="Açık adres..."
+                                    value={newStaff.address}
+                                    onChange={(e) => setNewStaff({ ...newStaff, address: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="form-group">
                                 <label>Rol / Unvan</label>
                                 <input
                                     type="text"
@@ -1181,6 +1310,46 @@ export default function StaffPage() {
                             </div>
 
                             <div className="form-group">
+                                <label>E-Posta</label>
+                                <input
+                                    type="email"
+                                    className="input-field"
+                                    value={editStaff.email || ''}
+                                    onChange={(e) => setEditStaff({ ...editStaff, email: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="form-group">
+                                    <label>Yaş</label>
+                                    <input
+                                        type="number"
+                                        className="input-field"
+                                        value={editStaff.age || ''}
+                                        onChange={(e) => setEditStaff({ ...editStaff, age: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Maaş</label>
+                                    <input
+                                        type="number"
+                                        className="input-field"
+                                        value={editStaff.salary || ''}
+                                        onChange={(e) => setEditStaff({ ...editStaff, salary: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Adres</label>
+                                <textarea
+                                    className="input-field"
+                                    value={editStaff.address || ''}
+                                    onChange={(e) => setEditStaff({ ...editStaff, address: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="form-group">
                                 <label>Rol / Unvan</label>
                                 <input
                                     type="text"
@@ -1203,285 +1372,351 @@ export default function StaffPage() {
                                     ))}
                                 </select>
                             </div>
-
-                            <button onClick={handleEditStaff} className="w-full btn btn-primary py-4 font-black mt-4">
-                                {isProcessing ? 'GÜNCELLENİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
-                            </button>
                         </div>
+
+                        {/* --- DOCUMENTS SECTION --- */}
+                        <div className="pt-6 border-t border-white/10">
+                            <h3 className="text-sm font-black uppercase text-white/60 mb-4">📂 Personel Evrakları</h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <label className={`btn btn-secondary px-4 py-2 text-xs font-bold cursor-pointer ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                        {isUploading ? 'YÜKLENİYOR...' : '📄 BELGE YÜKLE (PDF/JPG)'}
+                                        <input
+                                            type="file"
+                                            accept=".pdf, .jpg, .jpeg, .png"
+                                            className="hidden"
+                                            onChange={handleFileUpload}
+                                            disabled={isUploading}
+                                        />
+                                    </label>
+                                    <span className="text-[10px] text-white/30">Maks. 5MB</span>
+                                </div>
+
+                                <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                                    {staffDocuments.length > 0 ? (
+                                        staffDocuments.map(doc => (
+                                            <div key={doc.id} className="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/5 group hover:border-white/10 transition-all">
+                                                <div className="flex items-center gap-3 overflow-hidden">
+                                                    <span className="text-xl opacity-50">
+                                                        {doc.fileType.includes('pdf') ? '📕' : '🖼️'}
+                                                    </span>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <a
+                                                            href={doc.fileData}
+                                                            download={doc.fileName}
+                                                            className="text-sm font-bold text-white hover:text-primary truncate transition-colors"
+                                                            title='İndirmek için tıklayın'
+                                                        >
+                                                            {doc.fileName}
+                                                        </a>
+                                                        <span className="text-[10px] text-white/30">
+                                                            {(doc.fileSize / 1024).toFixed(1)} KB • {new Date(doc.uploadedAt).toLocaleDateString()}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleDeleteDocument(doc.id)}
+                                                    className="w-7 h-7 flex items-center justify-center rounded bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                                                    title="Belgeyi Sil"
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-4 text-xs text-white/20 italic border border-dashed border-white/10 rounded-lg">
+                                            Henüz yüklenmiş belge yok.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onClick={handleEditStaff} className="w-full btn btn-primary py-4 font-black mt-4">
+                            {isProcessing ? 'GÜNCELLENİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
+                        </button>
                     </div>
                 </div>
             )}
+
 
             {/* --- SHIFT CREATION MODAL --- */}
-            {showShiftModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-primary/20">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                            <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                📅 <span className="text-white/80">Yeni Vardiya Planı</span>
-                            </h2>
-                            <button onClick={() => setShowShiftModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
-                        </div>
+            {
+                showShiftModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                        <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-primary/20">
+                            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                                <h2 className="text-xl font-black text-white flex items-center gap-3">
+                                    📅 <span className="text-white/80">Yeni Vardiya Planı</span>
+                                </h2>
+                                <button onClick={() => setShowShiftModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                            </div>
 
-                        <div className="p-8 space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Personel Seçimi</label>
-                                <select
-                                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 focus:bg-white/10 transition-all outline-none appearance-none"
-                                    value={newShift.staffId}
-                                    onChange={(e) => setNewShift({ ...newShift, staffId: e.target.value })}
+                            <div className="p-8 space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Personel Seçimi</label>
+                                    <select
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 focus:bg-white/10 transition-all outline-none appearance-none"
+                                        value={newShift.staffId}
+                                        onChange={(e) => setNewShift({ ...newShift, staffId: e.target.value })}
+                                    >
+                                        <option value="" className="bg-[#0f111a]">Personel Seçiniz...</option>
+                                        {staff.map(s => (
+                                            <option key={s.id} value={s.id} className="bg-[#0f111a] text-white">{s.name} ({s.role})</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Başlangıç</label>
+                                        <input
+                                            type="datetime-local"
+                                            className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                            value={newShift.start}
+                                            onChange={(e) => setNewShift({ ...newShift, start: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Bitiş</label>
+                                        <input
+                                            type="datetime-local"
+                                            className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                            value={newShift.end}
+                                            onChange={(e) => setNewShift({ ...newShift, end: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Vardiya Tipi</label>
+                                    <div className="grid grid-cols-3 gap-3">
+                                        {['Normal', 'İzinli', 'Raporlu'].map(type => (
+                                            <button
+                                                key={type}
+                                                onClick={() => setNewShift({ ...newShift, type })}
+                                                className={`h-10 rounded-lg text-xs font-black uppercase tracking-wide transition-all ${newShift.type === type
+                                                    ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                                                    : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
+                                                    }`}
+                                            >
+                                                {type}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={handleCreateShift}
+                                    disabled={isProcessing}
+                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
                                 >
-                                    <option value="" className="bg-[#0f111a]">Personel Seçiniz...</option>
-                                    {staff.map(s => (
-                                        <option key={s.id} value={s.id} className="bg-[#0f111a] text-white">{s.name} ({s.role})</option>
-                                    ))}
-                                </select>
+                                    {isProcessing ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            <span>KAYDEDİLİYOR...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>💾 PLANI KAYDET</span>
+                                        </>
+                                    )}
+                                </button>
                             </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Başlangıç</label>
-                                    <input
-                                        type="datetime-local"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        value={newShift.start}
-                                        onChange={(e) => setNewShift({ ...newShift, start: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Bitiş</label>
-                                    <input
-                                        type="datetime-local"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        value={newShift.end}
-                                        onChange={(e) => setNewShift({ ...newShift, end: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Vardiya Tipi</label>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {['Normal', 'İzinli', 'Raporlu'].map(type => (
-                                        <button
-                                            key={type}
-                                            onClick={() => setNewShift({ ...newShift, type })}
-                                            className={`h-10 rounded-lg text-xs font-black uppercase tracking-wide transition-all ${newShift.type === type
-                                                ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                                                : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
-                                                }`}
-                                        >
-                                            {type}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={handleCreateShift}
-                                disabled={isProcessing}
-                                className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
-                            >
-                                {isProcessing ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>KAYDEDİLİYOR...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>💾 PLANI KAYDET</span>
-                                    </>
-                                )}
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* --- LEAVE REQUEST MODAL --- */}
-            {showLeaveModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-primary/20">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                            <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                📝 <span className="text-white/80">Yeni İzin Talebi</span>
-                            </h2>
-                            <button onClick={() => setShowLeaveModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
-                        </div>
-
-                        <div className="p-8 space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Personel Seçimi</label>
-                                <select
-                                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 focus:bg-white/10 transition-all outline-none appearance-none"
-                                    value={newLeave.staffId}
-                                    onChange={(e) => setNewLeave({ ...newLeave, staffId: e.target.value })}
-                                >
-                                    <option value="" className="bg-[#0f111a]">Personel Seçiniz...</option>
-                                    {staff.map(s => (
-                                        <option key={s.id} value={s.id} className="bg-[#0f111a] text-white">{s.name} ({s.role})</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">İzin Türü</label>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {['Yıllık İzin', 'Ücretsiz İzin', 'Raporlu', 'İdari İzin'].map(type => (
-                                        <button
-                                            key={type}
-                                            onClick={() => setNewLeave({ ...newLeave, type })}
-                                            className={`h-10 rounded-lg text-xs font-black uppercase tracking-wide transition-all ${newLeave.type === type
-                                                ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                                                : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
-                                                }`}
-                                        >
-                                            {type}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Başlangıç</label>
-                                    <input
-                                        type="date"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        value={newLeave.startDate}
-                                        onChange={(e) => setNewLeave({ ...newLeave, startDate: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Bitiş</label>
-                                    <input
-                                        type="date"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        value={newLeave.endDate}
-                                        onChange={(e) => setNewLeave({ ...newLeave, endDate: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Açıklama / Not</label>
-                                <textarea
-                                    className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-primary/50 focus:bg-white/10 transition-all outline-none resize-none"
-                                    placeholder="İzin nedeni veya ek notlar..."
-                                    value={newLeave.description}
-                                    onChange={(e) => setNewLeave({ ...newLeave, description: e.target.value })}
-                                />
-                            </div>
-
-                            <button
-                                onClick={handleCreateLeave}
-                                disabled={isProcessing}
-                                className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
-                            >
-                                {isProcessing ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>TALEP OLUŞTURULUYOR...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>🚀 TALEBİ GÖNDER</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            {/* --- PAYROLL MODAL --- */}
-            {showPayrollModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-primary/20">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                            <div>
+            {
+                showLeaveModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                        <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-primary/20">
+                            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
                                 <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                    💰 <span className="text-white/80">Maaş Hesapla</span>
+                                    📝 <span className="text-white/80">Yeni İzin Talebi</span>
                                 </h2>
-                                <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{currentPayroll.staffName} • {currentPayroll.period}</div>
+                                <button onClick={() => setShowLeaveModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
                             </div>
-                            <button onClick={() => setShowPayrollModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
-                        </div>
 
-                        <div className="p-8 space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="p-8 space-y-6">
                                 <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Maaş (Net)</label>
-                                        <label className="flex items-center gap-2 cursor-pointer group">
-                                            <input
-                                                type="checkbox"
-                                                checked={updateBaseSalary}
-                                                onChange={(e) => setUpdateBaseSalary(e.target.checked)}
-                                                className="w-3 h-3 rounded border-white/20 bg-white/5 text-primary focus:ring-0 checked:bg-primary"
-                                            />
-                                            <span className="text-[9px] font-bold text-white/40 group-hover:text-white/60">VARSAYILAN YAP</span>
-                                        </label>
-                                    </div>
-                                    <input
-                                        type="number"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono"
-                                        value={currentPayroll.salary}
-                                        onChange={(e) => setCurrentPayroll({ ...currentPayroll, salary: Number(e.target.value) })}
-                                    />
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Personel Seçimi</label>
+                                    <select
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 focus:bg-white/10 transition-all outline-none appearance-none"
+                                        value={newLeave.staffId}
+                                        onChange={(e) => setNewLeave({ ...newLeave, staffId: e.target.value })}
+                                    >
+                                        <option value="" className="bg-[#0f111a]">Personel Seçiniz...</option>
+                                        {staff.map(s => (
+                                            <option key={s.id} value={s.id} className="bg-[#0f111a] text-white">{s.name} ({s.role})</option>
+                                        ))}
+                                    </select>
                                 </div>
+
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Prim / Bonus</label>
-                                    <input
-                                        type="number"
-                                        className="w-full h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 text-sm text-emerald-400 focus:border-emerald-500/50 outline-none font-mono"
-                                        value={currentPayroll.bonus}
-                                        onChange={(e) => setCurrentPayroll({ ...currentPayroll, bonus: Number(e.target.value) })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Avans / Kesinti</label>
-                                    <input
-                                        type="number"
-                                        className="w-full h-12 bg-red-500/10 border border-red-500/20 rounded-xl px-4 text-sm text-red-400 focus:border-red-500/50 outline-none font-mono"
-                                        value={currentPayroll.deductions}
-                                        onChange={(e) => setCurrentPayroll({ ...currentPayroll, deductions: Number(e.target.value) })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">NET ÖDENECEK</label>
-                                    <div className="w-full h-12 bg-white/10 border border-white/20 rounded-xl px-4 flex items-center text-lg font-black text-white font-mono">
-                                        ₺ {(Number(currentPayroll.salary) + Number(currentPayroll.bonus) - Number(currentPayroll.deductions)).toLocaleString()}
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">İzin Türü</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {['Yıllık İzin', 'Ücretsiz İzin', 'Raporlu', 'İdari İzin'].map(type => (
+                                            <button
+                                                key={type}
+                                                onClick={() => setNewLeave({ ...newLeave, type })}
+                                                className={`h-10 rounded-lg text-xs font-black uppercase tracking-wide transition-all ${newLeave.type === type
+                                                    ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                                                    : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
+                                                    }`}
+                                            >
+                                                {type}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-3">
-                                <span className="text-xl">ℹ️</span>
-                                <p className="text-[10px] font-bold text-primary/80 leading-relaxed uppercase">
-                                    ONAYLANDIKTAN SONRA BU TUTAR GİDERLERE "PERSONEL MAAŞ ÖDEMESİ" OLARAK İŞLENECEKTİR.
-                                </p>
-                            </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Başlangıç</label>
+                                        <input
+                                            type="date"
+                                            className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                            value={newLeave.startDate}
+                                            onChange={(e) => setNewLeave({ ...newLeave, startDate: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Bitiş</label>
+                                        <input
+                                            type="date"
+                                            className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                            value={newLeave.endDate}
+                                            onChange={(e) => setNewLeave({ ...newLeave, endDate: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
 
-                            <button
-                                onClick={handleSavePayroll}
-                                disabled={isProcessing}
-                                className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
-                            >
-                                {isProcessing ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>İŞLENİYOR...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>💾 ÖDEME EMRİNİ OLUŞTUR</span>
-                                    </>
-                                )}
-                            </button>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Açıklama / Not</label>
+                                    <textarea
+                                        className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-primary/50 focus:bg-white/10 transition-all outline-none resize-none"
+                                        placeholder="İzin nedeni veya ek notlar..."
+                                        value={newLeave.description}
+                                        onChange={(e) => setNewLeave({ ...newLeave, description: e.target.value })}
+                                    />
+                                </div>
+
+                                <button
+                                    onClick={handleCreateLeave}
+                                    disabled={isProcessing}
+                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                                >
+                                    {isProcessing ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            <span>TALEP OLUŞTURULUYOR...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>🚀 TALEBİ GÖNDER</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+
+            {/* --- PAYROLL MODAL --- */}
+            {
+                showPayrollModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                        <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-primary/20">
+                            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                                <div>
+                                    <h2 className="text-xl font-black text-white flex items-center gap-3">
+                                        💰 <span className="text-white/80">Maaş Hesapla</span>
+                                    </h2>
+                                    <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{currentPayroll.staffName} • {currentPayroll.period}</div>
+                                </div>
+                                <button onClick={() => setShowPayrollModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                            </div>
+
+                            <div className="p-8 space-y-6">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Maaş (Net)</label>
+                                            <label className="flex items-center gap-2 cursor-pointer group">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={updateBaseSalary}
+                                                    onChange={(e) => setUpdateBaseSalary(e.target.checked)}
+                                                    className="w-3 h-3 rounded border-white/20 bg-white/5 text-primary focus:ring-0 checked:bg-primary"
+                                                />
+                                                <span className="text-[9px] font-bold text-white/40 group-hover:text-white/60">VARSAYILAN YAP</span>
+                                            </label>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono"
+                                            value={currentPayroll.salary}
+                                            onChange={(e) => setCurrentPayroll({ ...currentPayroll, salary: Number(e.target.value) })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Prim / Bonus</label>
+                                        <input
+                                            type="number"
+                                            className="w-full h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 text-sm text-emerald-400 focus:border-emerald-500/50 outline-none font-mono"
+                                            value={currentPayroll.bonus}
+                                            onChange={(e) => setCurrentPayroll({ ...currentPayroll, bonus: Number(e.target.value) })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Avans / Kesinti</label>
+                                        <input
+                                            type="number"
+                                            className="w-full h-12 bg-red-500/10 border border-red-500/20 rounded-xl px-4 text-sm text-red-400 focus:border-red-500/50 outline-none font-mono"
+                                            value={currentPayroll.deductions}
+                                            onChange={(e) => setCurrentPayroll({ ...currentPayroll, deductions: Number(e.target.value) })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">NET ÖDENECEK</label>
+                                        <div className="w-full h-12 bg-white/10 border border-white/20 rounded-xl px-4 flex items-center text-lg font-black text-white font-mono">
+                                            ₺ {(Number(currentPayroll.salary) + Number(currentPayroll.bonus) - Number(currentPayroll.deductions)).toLocaleString()}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-3">
+                                    <span className="text-xl">ℹ️</span>
+                                    <p className="text-[10px] font-bold text-primary/80 leading-relaxed uppercase">
+                                        ONAYLANDIKTAN SONRA BU TUTAR GİDERLERE "PERSONEL MAAŞ ÖDEMESİ" OLARAK İŞLENECEKTİR.
+                                    </p>
+                                </div>
+
+                                <button
+                                    onClick={handleSavePayroll}
+                                    disabled={isProcessing}
+                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                                >
+                                    {isProcessing ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            <span>İŞLENİYOR...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>💾 ÖDEME EMRİNİ OLUŞTUR</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+        </div >
     );
 }

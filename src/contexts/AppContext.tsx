@@ -28,6 +28,7 @@ export interface Product {
     otvType?: string;
     salesOiv?: number;
     minStock?: number;
+    stocks?: any[];
 }
 
 export interface Transaction {
@@ -629,7 +630,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // Load active branch from localStorage on mount
     useEffect(() => {
         const savedBranch = localStorage.getItem('motoroil_activeBranch');
-        if (savedBranch) {
+        if (savedBranch === 'Tümü' || savedBranch === 'Hepsi') {
+            setActiveBranchName('Merkez');
+            localStorage.setItem('motoroil_activeBranch', 'Merkez');
+        } else if (savedBranch) {
             setActiveBranchName(savedBranch);
         } else if (currentUser?.branch) {
             setActiveBranchName(currentUser.branch);
@@ -798,12 +802,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     // Branch / Permission Filtering Logic
-    const getVisibleProducts = () => {
+    const visibleProducts = useMemo(() => {
         const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
 
         // Admin or non-restricted user
         if (isAdmin || !hasPermission('branch_isolation')) {
-            if (activeBranchName === 'Tümü' || activeBranchName === 'Hepsi') return products;
+            if (activeBranchName === 'Merkez' || activeBranchName === 'Tümü' || activeBranchName === 'Hepsi') return products;
             return products.filter(p => p.branch === activeBranchName);
         }
 
@@ -812,26 +816,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return products.map(p => {
             const isMyBranch = p.branch === userBranch;
             const isMerkez = p.branch === 'Merkez';
-
             if (isMyBranch) return p;
-
             if (isMerkez) {
-                return {
-                    ...p,
-                    price: 0,
-                    buyPrice: 0,
-                    _restricted: true
-                };
+                return { ...p, price: 0, buyPrice: 0, _restricted: true };
             }
-
             return null;
         }).filter(p => p !== null) as Product[];
-    };
+    }, [products, activeBranchName, currentUser]);
 
-    const getVisibleTransactions = () => {
+    const visibleTransactions = useMemo(() => {
         let filtered = transactions;
-
-        // E-commerce visibility check
         if (!hasPermission('ecommerce_view')) {
             const ecommerceKasa = kasalar.find(k => k.name === 'E-ticaret');
             if (ecommerceKasa) {
@@ -839,54 +833,63 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             }
         }
 
-        // Sync with visible kasalar
-        const visibleKasaIds = getVisibleKasalar().map(k => k.id.toString());
-        return filtered.filter(t => visibleKasaIds.includes(String(t.kasaId || '')));
-    };
-
-    const getVisibleCustomers = () => {
-        const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
-
-        if (isAdmin || !hasPermission('branch_isolation')) {
-            if (activeBranchName === 'Tümü' || activeBranchName === 'Hepsi') return customers;
-            return customers.filter(c => (c.branch || 'Merkez') === activeBranchName);
-        }
-
-        const userBranch = currentUser?.branch || 'Merkez';
-        return customers.filter(c => (c.branch || 'Merkez') === userBranch);
-    };
-
-    const getVisibleSuppliers = () => {
-        if (currentUser === null) return suppliers;
-        if (!hasPermission('supplier_view')) return [];
-        return suppliers;
-    };
-
-    const getVisibleKasalar = () => {
         const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
         const filterBranch = isAdmin ? activeBranchName : (currentUser?.branch || 'Merkez');
 
-        if (filterBranch === 'Tümü' || filterBranch === 'Hepsi') return kasalar;
+        // Note: visibleKasaIds check is secondary to branch check
+        if (filterBranch === 'Merkez' || filterBranch === 'Tümü' || filterBranch === 'Hepsi') return filtered;
 
-        // Use the mappings from settings
+        return filtered.filter(t => (t as any).branch === filterBranch);
+    }, [transactions, activeBranchName, currentUser, kasalar]);
+
+    const visibleCustomers = useMemo(() => {
+        const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
+        if (isAdmin || !hasPermission('branch_isolation')) {
+            if (activeBranchName === 'Merkez' || activeBranchName === 'Tümü' || activeBranchName === 'Hepsi') return customers;
+            return customers.filter(c => (c.branch || 'Merkez') === activeBranchName);
+        }
+        const userBranch = currentUser?.branch || 'Merkez';
+        return customers.filter(c => (c.branch || 'Merkez') === userBranch);
+    }, [customers, activeBranchName, currentUser]);
+
+    const visibleSuppliers = useMemo(() => {
+        if (currentUser === null) return suppliers;
+        if (!hasPermission('supplier_view')) return [];
+        return suppliers;
+    }, [suppliers, currentUser]);
+
+    const visibleChecks = useMemo(() => {
+        const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
+        const filterBranch = isAdmin ? activeBranchName : (currentUser?.branch || 'Merkez');
+
+        if (filterBranch === 'Merkez' || filterBranch === 'Tümü' || filterBranch === 'Hepsi') return checks;
+        return checks.filter(c => (c.branch || 'Merkez') === filterBranch);
+    }, [checks, activeBranchName, currentUser]);
+
+    const visibleKasalar = useMemo(() => {
+        const isAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
+        const filterBranch = isAdmin ? activeBranchName : (currentUser?.branch || 'Merkez');
+
+        if (filterBranch === 'Merkez') return kasalar;
+
         const mappedIds = appSettings.branchKasaMappings?.[filterBranch];
         if (mappedIds && Array.isArray(mappedIds) && mappedIds.length > 0) {
             return kasalar.filter(k => mappedIds.includes(k.id.toString()));
         }
 
-        // Fallback for banks (usually visible to all) or specific branch name matching
         return kasalar.filter(k =>
             (k.branch || 'Merkez') === filterBranch ||
             k.type === 'Banka' ||
             k.name.toLowerCase().includes(filterBranch.toLowerCase())
         );
-    };
+    }, [kasalar, activeBranchName, currentUser, appSettings]);
 
     const addTransaction = (t: Omit<Transaction, 'id' | 'date'>) => {
         const newT: Transaction = {
             ...t as any,
             id: `TR-${Math.random().toString(36).substr(2, 9)}`,
-            date: new Date().toISOString()
+            date: new Date().toISOString(),
+            branch: (t as any).branch || activeBranchName || 'Merkez'
         };
         setTransactions(prev => [newT, ...prev]);
 
@@ -914,8 +917,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         installmentLabel?: string,
         pointsUsed?: number,
         couponCode?: string,
-        referenceCode?: string
+        referenceCode?: string,
+        branch?: string
     }) => {
+        const saleBranch = saleData.branch || activeBranchName || 'Merkez';
         // 1. Update Local Inventory (Optimistic UI)
         setProducts(prevProducts => prevProducts.map(p => {
             const saleItem = saleData.items.find(si => si.productId === p.id);
@@ -930,12 +935,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             return p;
         }));
 
-        // 2. Add Transaction & Update Kasa (Local)
         addTransaction({
             type: 'Sales',
             description: saleData.description,
             amount: saleData.total,
-            kasaId: saleData.kasaId
+            kasaId: saleData.kasaId,
+            branch: saleBranch
         } as any);
 
         // 3. Trigger Security Shield Sale Record
@@ -1005,7 +1010,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                     pointsUsed: saleData.pointsUsed || 0,
                     couponCode: saleData.couponCode,
                     installmentLabel: saleData.installmentLabel,
-                    referenceCode: saleData.referenceCode
+                    referenceCode: saleData.referenceCode,
+                    branch: saleBranch
                 })
             });
 
@@ -1041,7 +1047,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             const res = await fetch('/api/financials/transactions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify({ ...data, branch: data.branch || activeBranchName || 'Merkez' })
             });
             const result = await res.json();
             if (result.success) {
@@ -1065,7 +1071,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             const res = await fetch('/api/checks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify({ ...data, branch: data.branch || activeBranchName || 'Merkez' })
             });
             const result = await res.json();
             if (result.success) {
@@ -1443,11 +1449,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <AppContext.Provider value={{
-            products: getVisibleProducts(),
+            products: visibleProducts,
             setProducts,
-            kasalar: getVisibleKasalar(),
+            kasalar: visibleKasalar,
             setKasalar,
-            transactions: getVisibleTransactions(),
+            transactions: visibleTransactions,
             setTransactions,
             addTransaction,
             processSale,
@@ -1457,9 +1463,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             currentUser,
             setCurrentUser,
             hasPermission,
-            customers: getVisibleCustomers(),
+            customers: visibleCustomers,
             setCustomers,
-            suppliers: getVisibleSuppliers(),
+            suppliers: visibleSuppliers,
             setSuppliers,
             pendingProducts,
             requestProductCreation,
@@ -1476,7 +1482,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             removeNotification,
             clearNotification: removeNotification,
             addFinancialTransaction,
-            checks,
+            checks: visibleChecks,
             addCheck,
             collectCheck,
             stockTransfers,
