@@ -29,7 +29,7 @@ export default function ReportsPage() {
     const canViewAll = isSystemAdmin || !hasPermission('branch_isolation');
 
     // States
-    const [activeTab, setActiveTab] = useState('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'sales' | 'finance' | 'inventory' | 'customers' | 'cashflow' | 'daily' | 'suppliers'>('overview');
     const [reportScope, setReportScope] = useState<'all' | 'single'>(canViewAll ? 'all' : 'single');
     const [selectedBranch, setSelectedBranch] = useState(currentUser?.branch || 'Merkez');
     const [dateRange, setDateRange] = useState({
@@ -366,6 +366,8 @@ export default function ReportsPage() {
                     <div style={{ display: 'flex', gap: '10px', marginTop: '20px', overflowX: 'auto', paddingBottom: '10px' }}>
                         {[
                             { id: 'overview', icon: '📈', label: 'Genel Bakış' },
+                            { id: 'daily', icon: '📅', label: 'Gün Sonu Raporu' },
+                            { id: 'suppliers', icon: '🚚', label: 'Tedarikçi Raporları' },
                             { id: 'sales', icon: '💰', label: 'Satış Analizi' },
                             { id: 'finance', icon: '💎', label: 'Finansal Durum' },
                             { id: 'inventory', icon: '📦', label: 'Envanter' },
@@ -374,7 +376,7 @@ export default function ReportsPage() {
                         ].map(tab => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
+                                onClick={() => setActiveTab(tab.id as any)}
                                 className={activeTab === tab.id ? 'btn-primary' : 'btn-ghost'}
                                 style={{
                                     padding: '10px 20px',
@@ -737,6 +739,32 @@ export default function ReportsPage() {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Daily Report Tab */}
+                    {activeTab === 'daily' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            <div className="glass card" style={{ padding: '0', borderRadius: '16px', overflow: 'hidden', minHeight: '800px' }}>
+                                <iframe
+                                    src="/reports/daily"
+                                    style={{ width: '100%', height: '800px', border: 'none' }}
+                                    title="Gün Sonu Raporu"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Suppliers Report Tab */}
+                    {activeTab === 'suppliers' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            <div className="glass card" style={{ padding: '0', borderRadius: '16px', overflow: 'hidden', minHeight: '800px' }}>
+                                <iframe
+                                    src="/reports/suppliers"
+                                    style={{ width: '100%', height: '800px', border: 'none' }}
+                                    title="Tedarikçi Raporları"
+                                />
                             </div>
                         </div>
                     )}
