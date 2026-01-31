@@ -18,22 +18,27 @@ export async function POST(request: Request) {
 
         // Transactional Operation
         const result = await prisma.$transaction(async (tx) => {
-            // 1. Create Expense Transaction
+            const direction = installment.paymentPlan.direction || 'OUT';
+            const isCollection = direction === 'IN';
+
+            // 1. Create Transaction (Collection or Payment)
             const transaction = await tx.transaction.create({
                 data: {
-                    type: 'Expense',
+                    type: isCollection ? 'Collection' : 'Payment',
                     amount: installment.amount,
-                    description: `${installment.paymentPlan.title} - Taksit ${installment.installmentNo}/${installment.paymentPlan.installmentCount}`,
+                    description: `${installment.paymentPlan.title} - Taksit ${installment.installmentNo}/${installment.paymentPlan.installmentCount} (${isCollection ? 'Tahsilat' : 'Ödeme'})`,
                     kasaId: kasaId,
                     date: new Date(),
                     branch: installment.paymentPlan.branch || 'Merkez'
                 }
             });
 
-            // 2. Decrement Kasa Balance
+            // 2. Update Kasa Balance (Increment or Decrement)
+            // Note: Using 'balance' field. If schema uses 'amount', this needs to be adjusted.
+            // Based on frontend usage, 'balance' is the correct field name.
             await tx.kasa.update({
                 where: { id: kasaId },
-                data: { amount: { decrement: installment.amount } }
+                data: { balance: { [isCollection ? 'increment' : 'decrement']: installment.amount } }
             });
 
             // 3. Mark Installment as Paid
