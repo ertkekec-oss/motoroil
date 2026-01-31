@@ -153,31 +153,62 @@ export default function StaffPage() {
     const [searchTerm, setSearchTerm] = useState('');
 
     const allPermissions = [
-        { id: 'pos_access', label: 'Hızlı Satış (POS)', category: 'Satış' },
+        // --- SATIŞ & POS ---
+        { id: 'pos_access', label: 'Hızlı Satış (POS) Erişimi', category: 'Satış' },
         { id: 'sales_archive', label: 'Geçmiş Satışları Görme', category: 'Satış' },
         { id: 'discount_auth', label: 'İskonto Yapma Yetkisi', category: 'Satış' },
+        { id: 'price_override', label: '💸 Fiyat Değiştirme / Manuel Fiyat', category: 'Satış' },
+        { id: 'return_create', label: '↩️ İade Alma', category: 'Satış' },
+        { id: 'credit_sales', label: 'Veresiye (Açık Hesap) Satış', category: 'Satış' },
+
+        // --- SERVİS & İŞ EMRİ ---
+        { id: 'service_view', label: 'Servis / İş Emirlerini Görme', category: 'Servis' },
+        { id: 'service_create', label: 'Yeni İş Emri Oluşturma', category: 'Servis' },
+        { id: 'service_complete', label: 'İş Emri Tamamlama / Kapatma', category: 'Servis' },
+        { id: 'appointment_manage', label: 'Randevu Takvimi Yönetimi', category: 'Servis' },
+
+        // --- TEKLİF YÖNETİMİ ---
+        { id: 'offer_create', label: 'Teklif Hazırlama', category: 'Teklif' },
+        { id: 'offer_approve', label: '✅ Teklif Onaylama / Satışa Çevirme', category: 'Teklif' },
+
+        // --- DEPO & STOK ---
         { id: 'inventory_view', label: 'Stok Görüntüleme', category: 'Depo' },
-        { id: 'inventory_edit', label: 'Stok Düzenleme/Ekleme', category: 'Depo' },
-        { id: 'inventory_transfer', label: 'Depolar Arası Transfer', category: 'Depo' },
-        { id: 'reports_view', label: 'Raporları Görme (Dashboard)', category: 'Muhasebe' },
-        { id: 'accounting_manage', label: 'Kasa/Banka Yönetimi', category: 'Muhasebe' },
-        { id: 'expense_create', label: 'Gider/Ödeme Girişi', category: 'Muhasebe' },
-        { id: 'customer_view', label: 'Müşteri Listesi Görme', category: 'Müşteri' },
-        { id: 'customer_edit', label: 'Müşteri Bilgi Düzenleme', category: 'Müşteri' },
-        { id: 'supplier_view', label: 'Tedarikçileri Görme', category: 'Tedarikçi' },
-        { id: 'finance_view', label: 'Finansal Özetleri Görme', category: 'Finansal Yönetim' },
-        { id: 'finance_transactions', label: 'Kasa/Banka Hareketleri', category: 'Finansal Yönetim' },
-        { id: 'finance_reports', label: 'Bilanço ve Kar/Zarar Raporları', category: 'Finansal Yönetim' },
-        { id: 'ecommerce_view', label: 'E-Ticaret Satışlarını Görme', category: 'E-Ticaret' },
-        { id: 'ecommerce_manage', label: 'E-Ticaret Sipariş Yönetimi', category: 'E-Ticaret' },
+        { id: 'inventory_edit', label: 'Ürün Ekleme / Düzenleme', category: 'Depo' },
+        { id: 'inventory_transfer', label: 'Depolar Arası Transfer İsteği', category: 'Depo' },
+        { id: 'stock_correction', label: 'Stok Sayım / Düzeltme', category: 'Depo' },
+
+        // --- MUHASEBE & FİNANS ---
+        { id: 'finance_view', label: 'Finansal Özetleri Görme', category: 'Finans' },
+        { id: 'finance_transactions', label: 'Kasa/Banka Hareketleri', category: 'Finans' },
+        { id: 'accounting_manage', label: 'Kasa/Banka Hesap Yönetimi', category: 'Finans' },
+        { id: 'expense_create', label: 'Gider / Masraf Girişi', category: 'Finans' },
+        { id: 'finance_reports', label: 'Bilanço ve Kar/Zarar', category: 'Finans' },
+
+        // --- MÜŞTERİ & TEDARİKÇİ ---
+        { id: 'customer_view', label: 'Müşteri Listesi', category: 'Cari' },
+        { id: 'customer_edit', label: 'Müşteri Ekleme / Düzenleme', category: 'Cari' },
+        { id: 'customer_delete', label: '⚠️ Müşteri Silme', category: 'Cari' },
+        { id: 'supplier_view', label: 'Tedarikçi Listesi', category: 'Cari' },
+        { id: 'supplier_edit', label: 'Tedarikçi Yönetimi', category: 'Cari' },
+
+        // --- E-TİCARET ---
+        { id: 'ecommerce_view', label: 'E-Ticaret Paneli', category: 'Online' },
+        { id: 'ecommerce_manage', label: 'Sipariş ve Entegrasyon Yönetimi', category: 'Online' },
+
+        // --- YÖNETİM & GÜVENLİK ---
         { id: 'staff_manage', label: 'Personel Yönetimi', category: 'Yönetim' },
-        { id: 'settings_manage', label: 'Sistem Ayarlarını Değiştirme', category: 'Yönetim' },
-        { id: 'security_access', label: 'Güvenlik Masasına Erişim', category: 'Yönetim' },
-        { id: 'delete_records', label: '🔴 Kayıt Silme', category: 'Kritik Yetkiler' },
-        { id: 'create_staff', label: '🔴 Personel Ekleme', category: 'Kritik Yetkiler' },
-        { id: 'create_bank', label: '🔴 Kasa/Banka Açma', category: 'Kritik Yetkiler' },
-        { id: 'approve_products', label: '🔴 Ürün Kartı Onaylama', category: 'Kritik Yetkiler' },
-        { id: 'branch_isolation', label: '❌ Sadece Kendi Şubesi (Zorunlu)', category: 'Güvenlik' }
+        { id: 'settings_manage', label: 'Sistem Ayarları', category: 'Yönetim' },
+        { id: 'security_access', label: 'Güvenlik Masası / Loglar', category: 'Yönetim' },
+
+        // --- KRİTİK İŞLEMLER ---
+        { id: 'delete_records', label: '🔴 Kayıt Silme (Genel)', category: 'Kritik' },
+        { id: 'create_staff', label: '🔴 Personel Ekleme', category: 'Kritik' },
+        { id: 'create_bank', label: '🔴 Kasa/Banka Silme/Açma', category: 'Kritik' },
+        { id: 'approve_products', label: '🔴 Ürün Kartı Onayı', category: 'Kritik' },
+        { id: 'approve_transfers', label: '🔴 Transfer Onaylama', category: 'Kritik' },
+
+        // --- ÖZEL KISITLAMALAR ---
+        { id: 'branch_isolation', label: '🚫 Şube İzolasyonu (Sadece Kendi Şubesi)', category: 'Kısıtlama' }
     ];
 
     const filteredStaff = useMemo(() => {

@@ -17,16 +17,21 @@ export default function Sidebar() {
 
     // UI mapping for permissions
     const permMap: Record<string, string> = {
+        '/': 'pos_access', // POS requires specific access
         '/accounting': 'finance_view',
         '/customers': 'customer_view',
         '/suppliers': 'supplier_view',
         '/inventory': 'inventory_view',
+        '/service': 'service_view', // New granular perm
+        '/sales': 'sales_archive',
         '/staff': 'staff_manage',
         '/reports': 'reports_view',
+        '/reports/daily': 'reports_view',
         '/security/suspicious': 'security_access',
         '/integrations': 'settings_manage',
         '/settings/branch': 'settings_manage',
-        '/settings': 'staff_manage', // simple mock
+        '/settings': 'settings_manage', // Corrected from staff_manage
+        '/ecommerce': 'ecommerce_view'
     };
 
     const menuItems = [
