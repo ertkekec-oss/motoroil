@@ -157,6 +157,48 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [targetKasaId, setTargetKasaId] = useState('');
     const [isProcessingCollection, setIsProcessingCollection] = useState(false);
 
+    // PLAN MODAL STATE
+    const [showPlanModal, setShowPlanModal] = useState(false);
+    const [planData, setPlanData] = useState({
+        title: '', totalAmount: '', installmentCount: '3', startDate: new Date().toISOString().split('T')[0],
+        type: 'Kredi', direction: 'IN', customerId: '', supplierId: '', isExisting: true
+    });
+
+    const handleOpenPlanModal = (item: any) => {
+        setPlanData({
+            title: item.desc || 'Vadeli Satış Planı',
+            totalAmount: Math.abs(item.amount).toString(),
+            installmentCount: '3',
+            startDate: new Date().toISOString().split('T')[0],
+            type: 'Kredi',
+            direction: 'IN', // Müşteri için
+            customerId: customer.id,
+            supplierId: '',
+            isExisting: true // Default: Mevcut bakiyeden
+        });
+        setShowPlanModal(true);
+    };
+
+    const handleSavePlan = async () => {
+        if (!planData.title || !planData.totalAmount || !planData.installmentCount) return;
+
+        try {
+            const res = await fetch('/api/financials/payment-plans', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...planData, branch: 'Merkez' })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess('Başarılı', 'Ödeme planı oluşturuldu.');
+                setShowPlanModal(false);
+                refreshTransactions(); // Refresh history
+            } else {
+                showError('Hata', data.error || 'Plan oluşturulamadı');
+            }
+        } catch (e) { showError('Hata', 'İşlem sırasında hata oluştu'); }
+    };
+
     const handleExecuteCheckCollect = async () => {
         if (!activeCheck || !targetKasaId) return;
         setIsProcessingCollection(true);
@@ -850,13 +892,23 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 {Math.abs(item.amount).toLocaleString()} ₺
                                             </td>
                                             <td style={{ textAlign: 'right', paddingRight: '20px' }}>
-                                                {item.type === 'Satış' && item.orderId && (
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
-                                                        style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
-                                                    >
-                                                        🧾 Faturalandır
-                                                    </button>
+                                                {item.type === 'Satış' && (
+                                                    <div style={{ display: 'flex', gap: '5px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                                        {item.orderId && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
+                                                                style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
+                                                            >
+                                                                🧾 Faturalandır
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleOpenPlanModal(item); }}
+                                                            style={{ padding: '6px 12px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
+                                                        >
+                                                            📅 Vadelendir
+                                                        </button>
+                                                    </div>
                                                 )}
                                             </td>
                                             <td style={{ textAlign: 'center', color: '#666' }}>{item.items ? (expandedRowId === item.id ? '▲' : '▼') : ''}</td>
@@ -1517,6 +1569,81 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 }}
                             >
                                 {isProcessingCollection ? 'İŞLENİYOR...' : 'İŞLEMİ TAMAMLA'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* PLAN MODAL */}
+            {showPlanModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(5px)' }}>
+                    <div className="card glass animate-in" style={{ width: '500px', maxWidth: '90vw', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 style={{ margin: 0, color: '#fff', fontSize: '18px' }}>Vadeli Satış Planı Oluştur</h3>
+                            <button onClick={() => setShowPlanModal(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '20px', cursor: 'pointer' }}>&times;</button>
+                        </div>
+                        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <div>
+                                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>Plan Başlığı</label>
+                                <input
+                                    value={planData.title}
+                                    onChange={e => setPlanData({ ...planData, title: e.target.value })}
+                                    style={{ width: '100%', padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px' }}
+                                />
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <div>
+                                    <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>Toplam Tutar</label>
+                                    <input
+                                        type="number"
+                                        value={planData.totalAmount}
+                                        onChange={e => setPlanData({ ...planData, totalAmount: e.target.value })}
+                                        style={{ width: '100%', padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px', fontWeight: 'bold' }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>Taksit Sayısı</label>
+                                    <input
+                                        type="number"
+                                        value={planData.installmentCount}
+                                        onChange={e => setPlanData({ ...planData, installmentCount: e.target.value })}
+                                        style={{ width: '100%', padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px' }}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>Başlangıç Tarihi</label>
+                                <input
+                                    type="date"
+                                    value={planData.startDate}
+                                    onChange={e => setPlanData({ ...planData, startDate: e.target.value })}
+                                    style={{ width: '100%', padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px' }}
+                                    className="input-date-dark"
+                                />
+                            </div>
+
+                            <div style={{ padding: '10px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px', marginTop: '5px' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#10b981', cursor: 'pointer' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={planData.isExisting}
+                                        onChange={e => setPlanData({ ...planData, isExisting: e.target.checked })}
+                                        style={{ accentColor: '#10b981' }}
+                                    />
+                                    <span><b>Mevcut Bakiyeden Dönüştür</b></span>
+                                </label>
+                                <div style={{ fontSize: '11px', color: '#888', marginTop: '5px', marginLeft: '24px' }}>
+                                    Bu seçenek aktifken cari bakiyesine ekstra borç eklenmez, sadece ödeme planı oluşturulur.
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={handleSavePlan}
+                                className="btn btn-primary"
+                                style={{ marginTop: '10px', padding: '12px', width: '100%', justifyContent: 'center' }}
+                            >
+                                Planı Oluştur
                             </button>
                         </div>
                     </div>
