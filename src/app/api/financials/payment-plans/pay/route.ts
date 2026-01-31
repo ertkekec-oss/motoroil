@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
     try {
-        const { installmentId, kasaId } = await request.json();
+        const { installmentId, kasaId, installmentLabel } = await request.json();
 
         if (!installmentId || !kasaId) return NextResponse.json({ error: 'Eksik bilgi' }, { status: 400 });
 
-        const installment = await prisma.installment.findUnique({
+        const installment: any = await prisma.installment.findUnique({
             where: { id: installmentId },
             include: { paymentPlan: true }
         });
@@ -15,6 +15,8 @@ export async function POST(request: Request) {
         if (!installment || installment.status === 'Paid') {
             return NextResponse.json({ error: 'Taksit bulunamadı veya zaten ödenmiş' }, { status: 400 });
         }
+
+        const installmentAmount = Number(installment.amount);
 
         // Transactional Operation
         const result = await prisma.$transaction(async (tx: any) => {
@@ -25,7 +27,7 @@ export async function POST(request: Request) {
             const transaction = await tx.transaction.create({
                 data: {
                     type: isCollection ? 'Collection' : 'Payment',
-                    amount: installment.amount,
+                    amount: installmentAmount,
                     description: `${installment.paymentPlan.title} - Taksit ${installment.installmentNo}/${installment.paymentPlan.installmentCount} (${isCollection ? 'Tahsilat' : 'Ödeme'})`,
                     kasaId: kasaId,
                     date: new Date(),
@@ -38,7 +40,7 @@ export async function POST(request: Request) {
             // 2. Update Kasa Balance
             await tx.kasa.update({
                 where: { id: kasaId },
-                data: { balance: { [isCollection ? 'increment' : 'decrement']: installment.amount } }
+                data: { balance: { [isCollection ? 'increment' : 'decrement']: installmentAmount } }
             });
 
             // 3. Update Customer / Supplier Balance
@@ -46,13 +48,13 @@ export async function POST(request: Request) {
                 // Collection -> Customer Debt Decreases
                 await tx.customer.update({
                     where: { id: installment.paymentPlan.customerId },
-                    data: { balance: { decrement: installment.amount } }
+                    data: { balance: { decrement: installmentAmount } }
                 });
             } else if (!isCollection && installment.paymentPlan.supplierId) {
-                // Payment -> Supplier Dept Decreases (moves from negative towards zero)
+                // Payment -> Supplier Dept Decreases
                 await tx.supplier.update({
                     where: { id: installment.paymentPlan.supplierId },
-                    data: { balance: { increment: installment.amount } }
+                    data: { balance: { increment: installmentAmount } }
                 });
             }
 
@@ -79,7 +81,6 @@ export async function POST(request: Request) {
             }
 
             // 6. Handle POS Commission (New logic)
-            const { installmentLabel } = await request.clone().json();
             const selectedKasa = await tx.kasa.findUnique({ where: { id: kasaId } });
 
             if (selectedKasa && selectedKasa.type.match(/POS|Kredi|Banka/) && isCollection) {
@@ -90,7 +91,7 @@ export async function POST(request: Request) {
                     if (salesExpenses?.posCommissions) {
                         const instLabelRaw = installmentLabel;
                         const instCount = parseInt(instLabelRaw) || 1;
-                        const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
+                        const instLabelFallback = instLabelRaw ? instLabelRaw : (instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim');
 
                         let commissionConfig;
                         if (instLabelRaw) {
@@ -105,7 +106,7 @@ export async function POST(request: Request) {
 
                         if (commissionConfig && Number(commissionConfig.rate) > 0) {
                             const rate = Number(commissionConfig.rate);
-                            const commissionAmount = (installment.amount * rate) / 100;
+                            const commissionAmount = (installmentAmount * rate) / 100;
 
                             // Create Expense Transaction
                             await tx.transaction.create({
@@ -119,7 +120,7 @@ export async function POST(request: Request) {
                                 }
                             });
 
-                            // Deduct from Kasa (Net result reflects reality)
+                            // Deduct from Kasa
                             await tx.kasa.update({
                                 where: { id: kasaId },
                                 data: { balance: { decrement: commissionAmount } }
@@ -131,13 +132,16 @@ export async function POST(request: Request) {
                 }
             }
 
-            return updatedInstallment;
+            return {
+                ...updatedInstallment,
+                amount: Number(updatedInstallment.amount)
+            };
         });
 
         return NextResponse.json({ success: true, installment: result });
 
     } catch (e: any) {
         console.error("Payment Error:", e);
-        return NextResponse.json({ error: e.message }, { status: 500 });
+        return NextResponse.json({ error: e.message || 'Sunucu hatası' }, { status: 500 });
     }
 }
