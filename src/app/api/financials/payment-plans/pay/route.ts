@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
     try {
@@ -76,6 +76,59 @@ export async function POST(request: Request) {
                     where: { id: installment.paymentPlanId },
                     data: { status: 'Completed' }
                 });
+            }
+
+            // 6. Handle POS Commission (New logic)
+            const { installmentLabel } = await request.clone().json();
+            const selectedKasa = await tx.kasa.findUnique({ where: { id: kasaId } });
+
+            if (selectedKasa && selectedKasa.type.match(/POS|Kredi|Banka/) && isCollection) {
+                try {
+                    const settingsRes = await tx.appSettings.findUnique({ where: { key: 'salesExpenses' } });
+                    const salesExpenses = settingsRes?.value as any;
+
+                    if (salesExpenses?.posCommissions) {
+                        const instLabelRaw = installmentLabel;
+                        const instCount = parseInt(instLabelRaw) || 1;
+                        const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
+
+                        let commissionConfig;
+                        if (instLabelRaw) {
+                            commissionConfig = salesExpenses.posCommissions.find((c: any) => c.installment === instLabelRaw);
+                        }
+
+                        if (!commissionConfig) {
+                            commissionConfig = salesExpenses.posCommissions.find((c: any) =>
+                                c.installment === instLabelFallback || (instCount === 1 && c.installment === 'Tek Çekim')
+                            );
+                        }
+
+                        if (commissionConfig && Number(commissionConfig.rate) > 0) {
+                            const rate = Number(commissionConfig.rate);
+                            const commissionAmount = (installment.amount * rate) / 100;
+
+                            // Create Expense Transaction
+                            await tx.transaction.create({
+                                data: {
+                                    type: 'Expense',
+                                    amount: commissionAmount,
+                                    description: `Banka POS Komisyon Gideri (${commissionConfig.installment}) - Taksit Tahsilatı: ${installment.paymentPlan.title}`,
+                                    kasaId: kasaId,
+                                    date: new Date(),
+                                    branch: installment.paymentPlan.branch || 'Merkez'
+                                }
+                            });
+
+                            // Deduct from Kasa (Net result reflects reality)
+                            await tx.kasa.update({
+                                where: { id: kasaId },
+                                data: { balance: { decrement: commissionAmount } }
+                            });
+                        }
+                    }
+                } catch (commErr) {
+                    console.error('Commission Error (ignored):', commErr);
+                }
             }
 
             return updatedInstallment;

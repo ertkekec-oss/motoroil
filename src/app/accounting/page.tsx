@@ -15,7 +15,7 @@ export default function AccountingPage() {
         kasalar, setKasalar, addTransaction, currentUser, hasPermission,
         customers, suppliers, addFinancialTransaction, checks, addCheck,
         collectCheck, transactions, refreshCustomers, refreshTransactions,
-        refreshKasalar, refreshSuppliers, kasaTypes, activeBranchName
+        refreshKasalar, refreshSuppliers, kasaTypes, activeBranchName, salesExpenses
     } = useApp();
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
 
@@ -111,6 +111,18 @@ export default function AccountingPage() {
     }, [transactions, kasalar]);
 
     // Financial Dashboard Stats
+    const [editingKasa, setEditingKasa] = useState<any>(null);
+    const [showKasaEditModal, setShowKasaEditModal] = useState(false);
+
+    const [showCheckCollectModal, setShowCheckCollectModal] = useState(false);
+    const [activeCheck, setActiveCheck] = useState<any>(null);
+    const [targetKasaId, setTargetKasaId] = useState('');
+    const [installmentLabel, setInstallmentLabel] = useState('');
+
+    // --- SCHEDULED PAYMENTS LOGIC ---
+    const [scheduledPayments, setScheduledPayments] = useState<any[]>([]);
+
+    // Financial Dashboard Stats
     const stats = useMemo(() => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -155,6 +167,11 @@ export default function AccountingPage() {
 
         return { receivablesToday, receivablesThisMonth, netKasa };
     }, [scheduledPayments, checks, kasalar]);
+
+    const [showScheduledModal, setShowScheduledModal] = useState(false);
+    const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
+    const [payingInstallmentId, setPayingInstallmentId] = useState<string | null>(null);
+    const [installmentKasaId, setInstallmentKasaId] = useState<string>('');
 
     const filterByTime = (list: any[]) => {
         if (timeFilter === 'all') return list;
@@ -277,20 +294,6 @@ export default function AccountingPage() {
     const [newExpense, setNewExpense] = useState({ id: '', title: '', category: 'Diğer', amount: '', date: new Date().toISOString().split('T')[0], method: 'Nakit', kasaId: '' });
     const [isEditingExpense, setIsEditingExpense] = useState(false);
 
-    const [editingKasa, setEditingKasa] = useState<any>(null);
-    const [showKasaEditModal, setShowKasaEditModal] = useState(false);
-
-    const [showCheckCollectModal, setShowCheckCollectModal] = useState(false);
-    const [activeCheck, setActiveCheck] = useState<any>(null);
-    const [targetKasaId, setTargetKasaId] = useState('');
-
-    // --- SCHEDULED PAYMENTS LOGIC ---
-    const [scheduledPayments, setScheduledPayments] = useState<any[]>([]);
-    const [showScheduledModal, setShowScheduledModal] = useState(false);
-    const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
-    const [payingInstallmentId, setPayingInstallmentId] = useState<string | null>(null);
-    const [installmentKasaId, setInstallmentKasaId] = useState<string>('');
-
     useEffect(() => {
         if (activeTab === 'receivables' || activeTab === 'payables') {
             const fetchScheduled = async () => {
@@ -346,13 +349,13 @@ export default function AccountingPage() {
         }
     };
 
-    const handlePayInstallment = async (inst: any, kasaId: string) => {
+    const handlePayInstallment = async (inst: any, kasaId: string, installmentLabel?: string) => {
         setIsProcessing(true);
         try {
             const res = await fetch('/api/financials/payment-plans/pay', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ installmentId: inst.id, kasaId })
+                body: JSON.stringify({ installmentId: inst.id, kasaId, installmentLabel })
             });
             const data = await res.json();
             if (data.success) {
@@ -927,33 +930,61 @@ export default function AccountingPage() {
                                                     <div className="max-h-[200px] overflow-y-auto custom-scrollbar">
                                                         {plan.installments.map((inst: any) => (
                                                             <div key={inst.id} className="flex-between p-2 border-b border-white/5 text-xs hover:bg-white/5">
+                                                                ```
                                                                 <div>{inst.installmentNo}. Taksit <span className="text-muted ml-1">{new Date(inst.dueDate).toLocaleDateString()}</span></div>
                                                                 <div className="text-right">
                                                                     <div className="font-bold">{Number(inst.amount).toLocaleString()}</div>
                                                                     {inst.status !== 'Paid' ? (
                                                                         <div className="flex flex-col gap-1 items-end">
                                                                             {payingInstallmentId === inst.id ? (
-                                                                                <div className="flex gap-1 animate-in slide-in-from-right-2">
-                                                                                    <select
-                                                                                        value={installmentKasaId}
-                                                                                        onChange={e => setInstallmentKasaId(e.target.value)}
-                                                                                        className="bg-subtle text-[10px] border border-white/10 rounded px-1 h-6 outline-none"
-                                                                                        onClick={e => e.stopPropagation()}
-                                                                                    >
-                                                                                        <option value="">Seç...</option>
-                                                                                        {kasalar.filter(k => k.name !== 'ÇEK / SENET PORTFÖYÜ').map(k => (
-                                                                                            <option key={k.id} value={k.id}>{k.name}</option>
-                                                                                        ))}
-                                                                                    </select>
-                                                                                    <button
-                                                                                        disabled={!installmentKasaId || isProcessing}
-                                                                                        onClick={(e) => { e.stopPropagation(); handlePayInstallment(inst, installmentKasaId); setPayingInstallmentId(null); }}
-                                                                                        className="bg-primary text-white text-[10px] px-2 rounded h-6 font-bold"
-                                                                                    >Onayla</button>
-                                                                                    <button
-                                                                                        onClick={(e) => { e.stopPropagation(); setPayingInstallmentId(null); }}
-                                                                                        className="bg-subtle text-white text-[10px] px-2 rounded h-6"
-                                                                                    >X</button>
+                                                                                <div className="flex flex-col gap-1 items-end animate-in slide-in-from-right-2">
+                                                                                    <div className="flex gap-1">
+                                                                                        <select
+                                                                                            value={installmentKasaId}
+                                                                                            onChange={e => {
+                                                                                                setInstallmentKasaId(e.target.value);
+                                                                                                setInstallmentLabel(''); // Reset label on kasa change
+                                                                                            }}
+                                                                                            className="bg-subtle text-[10px] border border-white/10 rounded px-1 h-6 outline-none"
+                                                                                            onClick={e => e.stopPropagation()}
+                                                                                        >
+                                                                                            <option value="">Seç...</option>
+                                                                                            {kasalar.filter(k => k.name !== 'ÇEK / SENET PORTFÖYÜ').map(k => (
+                                                                                                <option key={k.id} value={k.id.toString()}>{k.name}</option>
+                                                                                            ))}
+                                                                                        </select>
+                                                                                        <button
+                                                                                            style={{ display: 'none' }}
+                                                                                            id={`hidden-submit-${inst.id}`}
+                                                                                            onClick={(e) => { e.stopPropagation(); handlePayInstallment(inst, installmentKasaId, installmentLabel); setPayingInstallmentId(null); }}
+                                                                                        ></button>
+                                                                                        <button
+                                                                                            disabled={!installmentKasaId || isProcessing}
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                document.getElementById(`hidden-submit-${inst.id}`)?.click();
+                                                                                            }}
+                                                                                            className="bg-primary text-white text-[10px] px-2 rounded h-6 font-bold"
+                                                                                        >Onayla</button>
+                                                                                        <button
+                                                                                            onClick={(e) => { e.stopPropagation(); setPayingInstallmentId(null); }}
+                                                                                            className="bg-subtle text-white text-[10px] px-2 rounded h-6"
+                                                                                        >X</button>
+                                                                                    </div>
+                                                                                    {/* Show installment options if selected kasa is POS/Card */}
+                                                                                    {installmentKasaId && kasalar.find(k => k.id.toString() === installmentKasaId)?.type.match(/POS|Kredi|Banka/) && (
+                                                                                        <select
+                                                                                            value={installmentLabel}
+                                                                                            onChange={e => setInstallmentLabel(e.target.value)}
+                                                                                            className="bg-subtle text-[9px] border border-white/10 rounded px-1 h-5 w-full outline-none mt-0.5"
+                                                                                            onClick={e => e.stopPropagation()}
+                                                                                        >
+                                                                                            <option value="">Tek Çekim</option>
+                                                                                            {(salesExpenses?.posCommissions || []).map((comm: any, idx: number) => (
+                                                                                                <option key={idx} value={comm.installment}>{comm.installment}</option>
+                                                                                            ))}
+                                                                                        </select>
+                                                                                    )}
                                                                                 </div>
                                                                             ) : (
                                                                                 <button onClick={(e) => { e.stopPropagation(); setPayingInstallmentId(inst.id); setInstallmentKasaId(kasalar.find(k => k.type === 'Nakit')?.id.toString() || ''); }} className="text-primary hover:underline">Tahsil Et</button>
@@ -1202,27 +1233,54 @@ export default function AccountingPage() {
                                                                         {inst.status !== 'Paid' && (
                                                                             <div className="flex justify-end gap-1">
                                                                                 {payingInstallmentId === inst.id ? (
-                                                                                    <div className="flex gap-1 animate-in slide-in-from-right-2">
-                                                                                        <select
-                                                                                            value={installmentKasaId}
-                                                                                            onChange={e => setInstallmentKasaId(e.target.value)}
-                                                                                            className="bg-subtle text-[10px] border border-white/10 rounded px-1 h-8 outline-none"
-                                                                                            onClick={e => e.stopPropagation()}
-                                                                                        >
-                                                                                            <option value="">Seç...</option>
-                                                                                            {kasalar.filter(k => k.name !== 'ÇEK / SENET PORTFÖYÜ').map(k => (
-                                                                                                <option key={k.id} value={k.id}>{k.name}</option>
-                                                                                            ))}
-                                                                                        </select>
-                                                                                        <button
-                                                                                            disabled={!installmentKasaId || isProcessing}
-                                                                                            onClick={(e) => { e.stopPropagation(); handlePayInstallment(inst, installmentKasaId); setPayingInstallmentId(null); }}
-                                                                                            className="btn btn-xs btn-primary h-8"
-                                                                                        >Onayla</button>
-                                                                                        <button
-                                                                                            onClick={(e) => { e.stopPropagation(); setPayingInstallmentId(null); }}
-                                                                                            className="btn btn-xs btn-outline h-8"
-                                                                                        >X</button>
+                                                                                    <div className="flex flex-col gap-1 items-end animate-in slide-in-from-right-2">
+                                                                                        <div className="flex gap-1">
+                                                                                            <select
+                                                                                                value={installmentKasaId}
+                                                                                                onChange={e => {
+                                                                                                    setInstallmentKasaId(e.target.value);
+                                                                                                    setInstallmentLabel('');
+                                                                                                }}
+                                                                                                className="bg-subtle text-[10px] border border-white/10 rounded px-1 h-8 outline-none"
+                                                                                                onClick={e => e.stopPropagation()}
+                                                                                            >
+                                                                                                <option value="">Seç...</option>
+                                                                                                {kasalar.filter(k => k.name !== 'ÇEK / SENET PORTFÖYÜ').map(k => (
+                                                                                                    <option key={k.id} value={k.id.toString()}>{k.name}</option>
+                                                                                                ))}
+                                                                                            </select>
+                                                                                            <button
+                                                                                                style={{ display: 'none' }}
+                                                                                                id={`hidden-submit-plan-${inst.id}`}
+                                                                                                onClick={(e) => { e.stopPropagation(); handlePayInstallment(inst, installmentKasaId, installmentLabel); setPayingInstallmentId(null); }}
+                                                                                            ></button>
+                                                                                            <button
+                                                                                                disabled={!installmentKasaId || isProcessing}
+                                                                                                onClick={(e) => {
+                                                                                                    e.stopPropagation();
+                                                                                                    document.getElementById(`hidden-submit-plan-${inst.id}`)?.click();
+                                                                                                }}
+                                                                                                className="btn btn-xs btn-primary h-8"
+                                                                                            >Onayla</button>
+                                                                                            <button
+                                                                                                onClick={(e) => { e.stopPropagation(); setPayingInstallmentId(null); }}
+                                                                                                className="btn btn-xs btn-outline h-8"
+                                                                                            >X</button>
+                                                                                        </div>
+                                                                                        {/* Show installment options if selected kasa is POS/Card */}
+                                                                                        {installmentKasaId && kasalar.find(k => k.id.toString() === installmentKasaId)?.type.match(/POS|Kredi|Banka/) && (
+                                                                                            <select
+                                                                                                value={installmentLabel}
+                                                                                                onChange={e => setInstallmentLabel(e.target.value)}
+                                                                                                className="bg-subtle text-[9px] border border-white/10 rounded px-1 h-6 w-full outline-none mt-0.5"
+                                                                                                onClick={e => e.stopPropagation()}
+                                                                                            >
+                                                                                                <option value="">Tek Çekim</option>
+                                                                                                {(salesExpenses?.posCommissions || []).map((comm: any, idx: number) => (
+                                                                                                    <option key={idx} value={comm.installment}>{comm.installment}</option>
+                                                                                                ))}
+                                                                                            </select>
+                                                                                        )}
                                                                                     </div>
                                                                                 ) : (
                                                                                     <button
