@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { title, totalAmount, installmentCount, startDate, description, branch, type, direction, customerId, supplierId } = body;
+        const { title, totalAmount, installmentCount, startDate, description, branch, type, direction, customerId, supplierId, isExisting } = body;
 
         // Validation
         if (!title || !totalAmount || !installmentCount || !startDate) {
@@ -56,48 +56,55 @@ export async function POST(request: Request) {
 
             // HANDLE FINANCIAL EFFECTS (Cari Hesaplara İşle)
 
-            // 1. Receivables (Vadeli Satış) -> Müşteri Borçlanır
-            if (direction === 'IN' && customerId) {
-                // Create Sales Transaction (Without Kasa - Veresiye)
-                await tx.transaction.create({
-                    data: {
-                        type: 'Sales',
-                        amount: total,
-                        description: `Vadeli Satış Planı: ${title}`,
-                        date: start,
-                        branch: branch || 'Merkez',
-                        customerId: customerId
-                        // kasaId is null/undefined (Veresiye)
-                    }
-                });
+            // Eğer "Mevcut Bakiyeden Dönüştürme" (isExisting=true) seçildiyse:
+            // Yeni bir borç yaratmıyoruz. Müşteri/Tedarikçi zaten bakiyesinde bu tutarı taşıyor.
+            // Sadece bu bakiyeyi bir plana bağlamış olduk.
 
-                // Update Customer Balance (Increment = Borç Artışı to us)
-                await tx.customer.update({
-                    where: { id: customerId },
-                    data: { balance: { increment: total } }
-                });
-            }
+            if (!isExisting) {
+                // 1. Receivables (Vadeli Satış) -> Müşteri Borçlanır
+                if (direction === 'IN' && customerId) {
+                    // Create Sales Transaction (Without Kasa - Veresiye)
+                    await tx.transaction.create({
+                        data: {
+                            type: 'Sales',
+                            amount: total,
+                            description: `Vadeli Satış Planı: ${title}`,
+                            date: start,
+                            branch: branch || 'Merkez',
+                            customerId: customerId
+                            // kasaId is null/undefined (Veresiye)
+                        }
+                    });
 
-            // 2. Payables (Vadeli Borç/Mal Alımı) -> Tedarikçiye Borçlanırız
-            if (direction === 'OUT' && supplierId) {
-                // Create Purchase Transaction
-                await tx.transaction.create({
-                    data: {
-                        type: 'Purchase',
-                        amount: total,
-                        description: `Vadeli Borç Planı: ${title}`,
-                        date: start,
-                        branch: branch || 'Merkez',
-                        supplierId: supplierId
-                    }
-                });
+                    // Update Customer Balance (Increment = Borç Artışı to us)
+                    await tx.customer.update({
+                        where: { id: customerId },
+                        data: { balance: { increment: total } }
+                    });
+                }
 
-                // Update Supplier Balance (Decrement = Borçlanma / Alacağımız Azalır)
-                // Note: Supplier balance convention: (+): Alacağımız var, (-): Borcumuz var.
-                await tx.supplier.update({
-                    where: { id: supplierId },
-                    data: { balance: { decrement: total } }
-                });
+                // 2. Payables (Vadeli Borç/Mal Alımı) -> Tedarikçiye Borçlanırız
+                if (direction === 'OUT' && supplierId) {
+                    // Create Purchase Transaction
+                    await tx.transaction.create({
+                        data: {
+                            type: 'Purchase',
+                            amount: total,
+                            description: `Vadeli Borç Planı: ${title}`,
+                            date: start,
+                            branch: branch || 'Merkez',
+                            supplierId: supplierId
+                            // kasaId is null
+                        }
+                    });
+
+                    // Update Supplier Balance (Decrement = Borçlanma / Alacağımız Azalır)
+                    // Note: Supplier balance convention: (+): Alacağımız var, (-): Borcumuz var.
+                    await tx.supplier.update({
+                        where: { id: supplierId },
+                        data: { balance: { decrement: total } }
+                    });
+                }
             }
 
             return plan;
@@ -117,8 +124,8 @@ export async function GET(request: Request) {
         const branch = searchParams.get('branch');
 
         const whereClause: any = {};
-        if (branch && branch !== 'Tümü' && branch !== 'Merkez') { // Merkez sees all usually, or filter specifically
-            // whereClause.branch = branch; // Optional filtering
+        if (branch && branch !== 'Tümü' && branch !== 'Merkez') {
+            /* whereClause.branch = branch; */
         }
 
         const plans = await prisma.paymentPlan.findMany({

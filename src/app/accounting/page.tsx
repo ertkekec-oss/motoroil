@@ -224,7 +224,7 @@ export default function AccountingPage() {
 
     const [newPlan, setNewPlan] = useState({
         title: '', totalAmount: '', installmentCount: '', startDate: '', type: 'Kredi',
-        direction: 'OUT', customerId: '', supplierId: ''
+        direction: 'OUT', customerId: '', supplierId: '', isExisting: false
     });
 
     const saveNewPlan = async () => {
@@ -248,7 +248,7 @@ export default function AccountingPage() {
                 setShowScheduledModal(false);
                 setNewPlan({
                     title: '', totalAmount: '', installmentCount: '', startDate: '', type: 'Kredi',
-                    direction: 'OUT', customerId: '', supplierId: ''
+                    direction: 'OUT', customerId: '', supplierId: '', isExisting: false
                 });
                 // Re-fetch
                 const res2 = await fetch('/api/financials/payment-plans');
@@ -1503,6 +1503,21 @@ export default function AccountingPage() {
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
                                     </select>
+
+                                    {(newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId) && (
+                                        <div className="mt-2 bg-subtle/50 p-3 rounded border border-white/5 text-xs">
+                                            <div className="flex justify-between items-center mb-2 pb-2 border-b border-white/5">
+                                                <span className="text-muted">Mevcut Bakiye:</span>
+                                                <span className="font-bold">
+                                                    {Number((newPlan.direction === 'IN' ? customers : suppliers).find(c => c.id === (newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId))?.balance || 0).toLocaleString()} ₺
+                                                </span>
+                                            </div>
+                                            <label className="flex items-center gap-2 cursor-pointer select-none hover:text-white transition-colors">
+                                                <input type="checkbox" checked={newPlan.isExisting} onChange={e => setNewPlan({ ...newPlan, isExisting: e.target.checked })} className="checkbox checkbox-xs checkbox-primary rounded-sm" />
+                                                <span>Mevcut Bakiyeden Dönüştür (Yeni borç ekleme)</span>
+                                            </label>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-muted mb-4">
