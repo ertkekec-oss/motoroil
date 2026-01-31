@@ -676,7 +676,7 @@ export default function SettingsPage() {
                 <h2 style={{ fontSize: '14px', fontWeight: '900', marginBottom: '16px', paddingLeft: '8px', opacity: 0.5, letterSpacing: '1px', textTransform: 'uppercase' }}>⚙ Ayarlar</h2>
 
                 {[
-                    // { id: 'users', label: 'Personel Yönetimi', icon: '👤' }, // REMOVED as requested - duplicate of Team Management
+                    { id: 'staff', label: 'Ekip Yönetimi', icon: '👥' },
                     { id: 'branches', label: 'Şubeler & Depo', icon: '🏢' },
                     { id: 'profile', label: 'Hesabım', icon: '👤' },
                     { id: 'invoice', label: 'Fatura Ayarları', icon: '🧾' },
@@ -729,12 +729,12 @@ export default function SettingsPage() {
             {/* RIGHT CONTENT AREA */}
             <div style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
 
-                {/* 1. KULLANICILAR - REDESIGNED */}
-                {activeTab === 'users' && (
+                {/* 1. EKİP YÖNETİMİ - REDESIGNED */}
+                {activeTab === 'staff' && (
                     <div className="animate-fade-in-up">
                         <div className="flex-between mb-4">
                             <div>
-                                <h1 style={{ fontSize: '20px', fontWeight: '900', background: 'var(--gradient-text)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '2px' }}>Personel Yönetimi</h1>
+                                <h1 style={{ fontSize: '20px', fontWeight: '900', background: 'var(--gradient-text)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '2px' }}>Ekip Yönetimi</h1>
                                 <p style={{ fontSize: '11px', opacity: 0.5 }}>Sistem erişim yetkilerini ve personel listesini yönetin</p>
                             </div>
                             <div style={{ textAlign: 'right' }}>

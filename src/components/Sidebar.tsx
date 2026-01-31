@@ -42,13 +42,11 @@ export default function Sidebar() {
         { name: 'Tedarikçi Ağı', href: '/suppliers', icon: '🚚' },
         { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
         { name: 'Servis Masası', href: '/service', icon: '🛠️' },
-        { name: 'Ekip Yönetimi', href: '/staff', icon: '👤' },
         { name: 'Veri Analizi', href: '/reports', icon: '📊' },
         { name: 'Hizmet Özetleri', href: '/reports/daily', icon: '📅' },
         { name: 'Tedarikçi Raporları', href: '/reports/suppliers', icon: '🚚' },
         { name: 'Satış Monitörü', href: '/security/suspicious', icon: '🛡️' },
         { name: 'Entegrasyonlar', href: '/integrations', icon: '🔌' },
-        { name: 'Şube Ayarları', href: '/settings/branch', icon: '🏢' },
         { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
     ].filter(item => {
         const requiredPerm = permMap[item.href];
