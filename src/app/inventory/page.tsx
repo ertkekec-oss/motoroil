@@ -1035,6 +1035,15 @@ function InventoryContent() {
                                     <input type="text" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
                                         value={newProduct.code} onChange={e => setNewProduct({ ...newProduct, code: e.target.value })} placeholder="Örn: OTO-001" />
                                 </div>
+                                <div>
+                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Şube <span className="text-red-500">*</span></label>
+                                    <select className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={newProduct.branch} onChange={e => setNewProduct({ ...newProduct, branch: e.target.value })}>
+                                        {contextBranches.map(b => (
+                                            <option key={b.name} value={b.name}>{b.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-3 gap-4">

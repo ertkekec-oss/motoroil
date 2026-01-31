@@ -695,8 +695,16 @@ export default function CustomersPage() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>REFERANS KODU (Varsa)</label>
-                                    <input type="text" value={newCustomer.referredByCode} onChange={e => setNewCustomer({ ...newCustomer, referredByCode: e.target.value.toUpperCase() })} placeholder="DAVET KODU" style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
+                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ŞUBE <span style={{ color: 'red' }}>*</span></label>
+                                    <select
+                                        value={newCustomer.branch}
+                                        onChange={e => setNewCustomer({ ...newCustomer, branch: e.target.value })}
+                                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
+                                    >
+                                        {(branches || []).map(b => (
+                                            <option key={b.name} value={b.name}>{b.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 

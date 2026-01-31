@@ -495,18 +495,32 @@ export default function SuppliersPage() {
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="text-muted" style={{ fontSize: '12px' }}>TEDARİKÇİ SINIFI (KATEGORİ)</label>
-                                <select
-                                    value={newSupplier.category}
-                                    onChange={e => setNewSupplier({ ...newSupplier, category: e.target.value })}
-                                    style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
-                                >
-                                    <option value="">Sınıf Seçin...</option>
-                                    {(dbSuppClasses.length > 0 ? dbSuppClasses : ['Saha Tedarikçisi', 'Distribütör', 'Yedek Parça', 'Hizmet']).map(cls => (
-                                        <option key={cls} value={cls}>{cls}</option>
-                                    ))}
-                                </select>
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>TEDARİKÇİ SINIFI (KATEGORİ)</label>
+                                    <select
+                                        value={newSupplier.category}
+                                        onChange={e => setNewSupplier({ ...newSupplier, category: e.target.value })}
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                    >
+                                        <option value="">Sınıf Seçin...</option>
+                                        {(dbSuppClasses.length > 0 ? dbSuppClasses : ['Saha Tedarikçisi', 'Distribütör', 'Yedek Parça', 'Hizmet']).map(cls => (
+                                            <option key={cls} value={cls}>{cls}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>ŞUBE <span style={{ color: 'red' }}>*</span></label>
+                                    <select
+                                        value={newSupplier.branch}
+                                        onChange={e => setNewSupplier({ ...newSupplier, branch: e.target.value })}
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                    >
+                                        {(branches || []).map(b => (
+                                            <option key={b.name} value={b.name}>{b.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
