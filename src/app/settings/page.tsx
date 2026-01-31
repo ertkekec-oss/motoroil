@@ -676,9 +676,7 @@ export default function SettingsPage() {
                 <h2 style={{ fontSize: '14px', fontWeight: '900', marginBottom: '16px', paddingLeft: '8px', opacity: 0.5, letterSpacing: '1px', textTransform: 'uppercase' }}>⚙ Ayarlar</h2>
 
                 {[
-                    { id: 'staff', label: 'Ekip Yönetimi', icon: '👥' },
                     { id: 'branches', label: 'Şubeler & Depo', icon: '🏢' },
-                    { id: 'integrations', label: 'Entegrasyonlar', icon: '🔌' },
                     { id: 'profile', label: 'Hesabım', icon: '👤' },
                     { id: 'invoice', label: 'Fatura Ayarları', icon: '🧾' },
                     { id: 'services', label: 'Servis Ücretleri', icon: '🔧' },
@@ -730,35 +728,7 @@ export default function SettingsPage() {
             {/* RIGHT CONTENT AREA */}
             <div style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
 
-                {/* 1. EKİP YÖNETİMİ - FULL FEATURED */}
-                {activeTab === 'staff' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
-                        <div className="glass card" style={{ padding: '40px', borderRadius: '16px', textAlign: 'center', maxWidth: '600px' }}>
-                            <div style={{ fontSize: '48px', marginBottom: '20px' }}>👥</div>
-                            <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '12px' }}>Ekip Yönetimi</h2>
-                            <p style={{ opacity: 0.7, marginBottom: '24px' }}>Personel, vardiya, izin, bordro ve performans yönetimi</p>
-                            <a href="/staff" target="_blank" className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '14px', fontWeight: '700' }}>
-                                Ekip Yönetimine Git →
-                            </a>
-                        </div>
-                    </div>
-                )}
-
-                {/* 2. ENTEGRASYONLAR */}
-                {activeTab === 'integrations' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
-                        <div className="glass card" style={{ padding: '40px', borderRadius: '16px', textAlign: 'center', maxWidth: '600px' }}>
-                            <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔌</div>
-                            <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '12px' }}>Entegrasyonlar</h2>
-                            <p style={{ opacity: 0.7, marginBottom: '24px' }}>E-ticaret, muhasebe ve diğer sistem entegrasyonları</p>
-                            <a href="/integrations" target="_blank" className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '14px', fontWeight: '700' }}>
-                                Entegrasyonlara Git →
-                            </a>
-                        </div>
-                    </div>
-                )}
-
-                {/* 3. ŞUBELER & DEPO */}
+                {/* 1. ŞUBELER & DEPO */}
                 {activeTab === 'branches' && (
                     <div>
                         <h2 style={{ marginBottom: '20px' }}>Şubeler ve Dijital Arşiv</h2>

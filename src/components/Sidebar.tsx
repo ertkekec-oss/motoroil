@@ -43,6 +43,8 @@ export default function Sidebar() {
         { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
         { name: 'Servis Masası', href: '/service', icon: '🛠️' },
         { name: 'Veri Analizi', href: '/reports', icon: '📊' },
+        { name: 'Ekip Yönetimi', href: '/staff', icon: '👥' },
+        { name: 'Entegrasyonlar', href: '/integrations', icon: '🔌' },
         { name: 'Satış Monitörü', href: '/security/suspicious', icon: '🛡️' },
         { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
     ].filter(item => {
