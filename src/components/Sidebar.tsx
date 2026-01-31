@@ -2,20 +2,25 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { useApp } from "../contexts/AppContext";
 
 export default function Sidebar() {
     const pathname = usePathname();
-    const searchParams = useSearchParams();
     const { user: authUser, logout } = useAuth();
     const { currentUser, hasPermission, branches, activeBranchName, setActiveBranchName, suspiciousEvents } = useApp();
     const isSystemAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
     const displayUser = currentUser || authUser;
 
     // Hide sidebar when embedded in iframe
-    const isEmbedded = searchParams.get('embedded') === 'true';
+    const [isEmbedded, setIsEmbedded] = useState(false);
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setIsEmbedded(window.location.search.includes('embedded=true'));
+        }
+    }, []);
+
     if (isEmbedded) return null;
 
     // ... menuItems and logic ...
