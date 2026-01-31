@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import StaffManagementContent from '@/components/StaffManagementContent';
+import IntegrationsContent from '@/components/IntegrationsContent';
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState('branches');
@@ -676,6 +678,8 @@ export default function SettingsPage() {
                 <h2 style={{ fontSize: '14px', fontWeight: '900', marginBottom: '16px', paddingLeft: '8px', opacity: 0.5, letterSpacing: '1px', textTransform: 'uppercase' }}>⚙ Ayarlar</h2>
 
                 {[
+                    { id: 'staff', label: 'Ekip Yönetimi', icon: '👥' },
+                    { id: 'integrations', label: 'Entegrasyonlar', icon: '🔌' },
                     { id: 'branches', label: 'Şubeler & Depo', icon: '🏢' },
                     { id: 'profile', label: 'Hesabım', icon: '👤' },
                     { id: 'invoice', label: 'Fatura Ayarları', icon: '🧾' },
@@ -727,6 +731,12 @@ export default function SettingsPage() {
 
             {/* RIGHT CONTENT AREA */}
             <div style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
+
+                {/* 0. EKİP YÖNETİMİ */}
+                {activeTab === 'staff' && <StaffManagementContent />}
+
+                {/* 0. ENTEGRASYONLAR */}
+                {activeTab === 'integrations' && <IntegrationsContent />}
 
                 {/* 1. ŞUBELER & DEPO */}
                 {activeTab === 'branches' && (
