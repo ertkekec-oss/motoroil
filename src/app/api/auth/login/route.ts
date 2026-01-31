@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { comparePassword, createSession, hashPassword } from '@/lib/auth';
+import { logActivity } from '@/lib/audit';
 
 export async function POST(request: Request) {
     try {
@@ -38,8 +39,20 @@ export async function POST(request: Request) {
         // Create secure session cookie
         await createSession(staff);
 
+        // Log login activity
+        await logActivity({
+            userId: staff.id,
+            userName: staff.username,
+            action: 'LOGIN',
+            entity: 'User',
+            entityId: staff.id,
+            details: 'Sisteme giriş yapıldı.',
+            branch: staff.branch || 'Merkez'
+        });
+
         // Return user data (safely)
         return NextResponse.json({
+            id: staff.id,
             username: staff.username,
             role: staff.role || 'Personel',
             branch: staff.branch || 'Merkez',

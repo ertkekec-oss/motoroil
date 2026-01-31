@@ -341,14 +341,19 @@ model AuditLog {
   id        String   @id @default(cuid())
   userId    String?
   userName  String?
-  action    String
-  entity    String
+  action    String   // 'CREATE', 'UPDATE', 'DELETE'
+  entity    String   // 'Customer', 'Product', 'Transaction', etc.
   entityId  String?
+  oldData   Json?
+  newData   Json?
   details   String?
   ipAddress String?
+  branch    String?
   createdAt DateTime @default(now())
 
   @@index([action, entity])
+  @@index([entityId])
+  @@index([userId])
   @@index([createdAt])
 }
 

@@ -1,7 +1,7 @@
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession, hasPermission } from '@/lib/auth';
+import { logActivity } from '@/lib/audit';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +21,7 @@ export async function GET(
         }
 
         const customer = await prisma.customer.findUnique({
-            where: { id: customerId, deletedAt: null }, // Only fetch if not soft-deleted
+            where: { id: customerId, deletedAt: null },
             include: {
                 transactions: {
                     where: { deletedAt: null },
@@ -37,6 +37,17 @@ export async function GET(
         if (!customer) {
             return NextResponse.json({ success: false, error: 'Customer not found' }, { status: 404 });
         }
+
+        // Log the view action
+        await logActivity({
+            userId: session.id as string,
+            userName: session.username as string,
+            action: 'EXPORT', // Or create a 'VIEW' action
+            entity: 'Customer',
+            entityId: customerId,
+            details: `${customer.name} detayı görüntülendi.`,
+            branch: session.branch as string
+        });
 
         return NextResponse.json({ success: true, customer });
 
@@ -56,24 +67,39 @@ export async function PUT(
 
         const { id } = await params;
         const body = await request.json();
-        const { name, email, phone, address, taxNumber, taxOffice, contactPerson, iban, categoryId, supplierClass, customerClass, branch } = body;
+
+        // Fetch old data for audit log
+        const oldCustomer = await prisma.customer.findUnique({ where: { id } });
 
         const updatedCustomer = await prisma.customer.update({
             where: { id },
             data: {
-                name,
-                email,
-                phone,
-                address,
-                taxNumber,
-                taxOffice,
-                contactPerson,
-                iban,
-                categoryId,
-                supplierClass,
-                customerClass,
-                branch
+                name: body.name,
+                email: body.email,
+                phone: body.phone,
+                address: body.address,
+                taxNumber: body.taxNumber,
+                taxOffice: body.taxOffice,
+                contactPerson: body.contactPerson,
+                iban: body.iban,
+                categoryId: body.categoryId,
+                supplierClass: body.supplierClass,
+                customerClass: body.customerClass,
+                branch: body.branch
             }
+        });
+
+        // Log the update action
+        await logActivity({
+            userId: session.id as string,
+            userName: session.username as string,
+            action: 'UPDATE',
+            entity: 'Customer',
+            entityId: id,
+            oldData: oldCustomer,
+            newData: updatedCustomer,
+            details: `${updatedCustomer.name} bilgileri güncellendi.`,
+            branch: session.branch as string
         });
 
         return NextResponse.json({ success: true, customer: updatedCustomer });
@@ -98,10 +124,25 @@ export async function DELETE(
 
         const { id } = await params;
 
+        // Fetch old data for audit log
+        const oldCustomer = await prisma.customer.findUnique({ where: { id } });
+
         // SOFT DELETE
         await prisma.customer.update({
             where: { id },
             data: { deletedAt: new Date() }
+        });
+
+        // Log the delete action
+        await logActivity({
+            userId: session.id as string,
+            userName: session.username as string,
+            action: 'DELETE',
+            entity: 'Customer',
+            entityId: id,
+            oldData: oldCustomer,
+            details: `${oldCustomer?.name} silindi (Soft Delete).`,
+            branch: session.branch as string
         });
 
         return NextResponse.json({ success: true });
