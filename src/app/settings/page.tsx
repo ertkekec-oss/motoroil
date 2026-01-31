@@ -732,23 +732,29 @@ export default function SettingsPage() {
 
                 {/* 1. EKİP YÖNETİMİ - FULL FEATURED */}
                 {activeTab === 'staff' && (
-                    <div className="animate-fade-in-up" style={{ margin: '-40px', minHeight: 'calc(100vh - 100px)' }}>
-                        <iframe
-                            src="/staff?embedded=true"
-                            style={{ width: '100%', height: 'calc(100vh - 60px)', border: 'none' }}
-                            title="Ekip Yönetimi"
-                        />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+                        <div className="glass card" style={{ padding: '40px', borderRadius: '16px', textAlign: 'center', maxWidth: '600px' }}>
+                            <div style={{ fontSize: '48px', marginBottom: '20px' }}>👥</div>
+                            <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '12px' }}>Ekip Yönetimi</h2>
+                            <p style={{ opacity: 0.7, marginBottom: '24px' }}>Personel, vardiya, izin, bordro ve performans yönetimi</p>
+                            <a href="/staff" target="_blank" className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '14px', fontWeight: '700' }}>
+                                Ekip Yönetimine Git →
+                            </a>
+                        </div>
                     </div>
                 )}
 
                 {/* 2. ENTEGRASYONLAR */}
                 {activeTab === 'integrations' && (
-                    <div className="animate-fade-in-up" style={{ margin: '-40px', minHeight: 'calc(100vh - 100px)' }}>
-                        <iframe
-                            src="/integrations?embedded=true"
-                            style={{ width: '100%', height: 'calc(100vh - 60px)', border: 'none' }}
-                            title="Entegrasyonlar"
-                        />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+                        <div className="glass card" style={{ padding: '40px', borderRadius: '16px', textAlign: 'center', maxWidth: '600px' }}>
+                            <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔌</div>
+                            <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '12px' }}>Entegrasyonlar</h2>
+                            <p style={{ opacity: 0.7, marginBottom: '24px' }}>E-ticaret, muhasebe ve diğer sistem entegrasyonları</p>
+                            <a href="/integrations" target="_blank" className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '14px', fontWeight: '700' }}>
+                                Entegrasyonlara Git →
+                            </a>
+                        </div>
                     </div>
                 )}
 

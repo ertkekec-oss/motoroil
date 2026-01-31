@@ -745,26 +745,28 @@ export default function ReportsPage() {
 
                     {/* Daily Report Tab */}
                     {activeTab === 'daily' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            <div className="glass card" style={{ padding: '0', borderRadius: '16px', overflow: 'hidden', minHeight: '800px' }}>
-                                <iframe
-                                    src="/reports/daily?embedded=true"
-                                    style={{ width: '100%', height: '800px', border: 'none' }}
-                                    title="Gün Sonu Raporu"
-                                />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+                            <div className="glass card" style={{ padding: '40px', borderRadius: '16px', textAlign: 'center', maxWidth: '600px' }}>
+                                <div style={{ fontSize: '48px', marginBottom: '20px' }}>📅</div>
+                                <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '12px' }}>Gün Sonu Raporu</h2>
+                                <p style={{ opacity: 0.7, marginBottom: '24px' }}>Günlük satış ve hizmet özetlerini görüntüleyin</p>
+                                <a href="/reports/daily" target="_blank" className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '14px', fontWeight: '700' }}>
+                                    Raporu Aç →
+                                </a>
                             </div>
                         </div>
                     )}
 
                     {/* Suppliers Report Tab */}
                     {activeTab === 'suppliers' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            <div className="glass card" style={{ padding: '0', borderRadius: '16px', overflow: 'hidden', minHeight: '800px' }}>
-                                <iframe
-                                    src="/reports/suppliers?embedded=true"
-                                    style={{ width: '100%', height: '800px', border: 'none' }}
-                                    title="Tedarikçi Raporları"
-                                />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+                            <div className="glass card" style={{ padding: '40px', borderRadius: '16px', textAlign: 'center', maxWidth: '600px' }}>
+                                <div style={{ fontSize: '48px', marginBottom: '20px' }}>🚚</div>
+                                <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '12px' }}>Tedarikçi Raporları</h2>
+                                <p style={{ opacity: 0.7, marginBottom: '24px' }}>Tedarikçi performans ve alım analizlerini inceleyin</p>
+                                <a href="/reports/suppliers" target="_blank" className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '14px', fontWeight: '700' }}>
+                                    Raporu Aç →
+                                </a>
                             </div>
                         </div>
                     )}

@@ -13,16 +13,6 @@ export default function Sidebar() {
     const isSystemAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
     const displayUser = currentUser || authUser;
 
-    // Hide sidebar when embedded in iframe
-    const [isEmbedded, setIsEmbedded] = useState(false);
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setIsEmbedded(window.location.search.includes('embedded=true'));
-        }
-    }, []);
-
-    if (isEmbedded) return null;
-
     // ... menuItems and logic ...
 
     // UI mapping for permissions
