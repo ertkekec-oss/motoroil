@@ -158,7 +158,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (e) {
+            console.error('Logout error:', e);
+        }
         setUser(null);
         localStorage.removeItem('motoroil_user');
         localStorage.removeItem('motoroil_isLoggedIn');

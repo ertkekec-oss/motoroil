@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendMail } from '@/lib/mail';
+import { hashPassword } from '@/lib/auth';
 
 export async function GET() {
     try {
@@ -47,11 +48,13 @@ export async function POST(request: Request) {
             }).catch(e => console.error("Mail gönderilemedi:", e));
         }
 
+        const hashedPassword = await hashPassword(generatedPassword);
+
         const staff = await prisma.staff.create({
             data: {
                 username: username,
                 email: data.email,
-                password: generatedPassword, // In a real app, hash this!
+                password: hashedPassword,
                 name: data.name,
                 role: data.role,
                 branch: data.branch,
@@ -78,6 +81,11 @@ export async function PUT(request: Request) {
         // Parse types if necessary
         if (updateData.age) updateData.age = parseInt(updateData.age);
         if (updateData.salary) updateData.salary = parseFloat(updateData.salary);
+
+        // If password is being updated, hash it
+        if (updateData.password && !updateData.password.startsWith('$2')) {
+            updateData.password = await hashPassword(updateData.password);
+        }
 
         const staff = await prisma.staff.update({
             where: { id },
