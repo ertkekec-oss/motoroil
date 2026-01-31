@@ -11,7 +11,7 @@ export default function BranchSettingsPage() {
 
     // Memoize branches to prevent re-creation on every render
     const branches = useMemo(() =>
-        contextBranches?.length > 0 ? contextBranches.map(b => b.name) : ['Merkez', 'Kadıköy'],
+        contextBranches?.length > 0 ? contextBranches.map(b => b.name) : [],
         [contextBranches]
     );
 

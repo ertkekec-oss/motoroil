@@ -28,34 +28,10 @@ const USERS = [
         username: 'admin',
         password: 'admin123',
         role: 'Admin' as const,
-        branch: 'Merkez Depo',
+        branch: 'Merkez',
         name: 'Yönetici',
         permissions: ['*'] // Tüm yetkiler
-    },
-    {
-        username: 'kadikoy',
-        password: 'kadikoy123',
-        role: 'Personel' as const,
-        branch: 'Kadıköy Şube',
-        name: 'Ahmet Yılmaz',
-        permissions: ['pos', 'sales', 'inventory_view', 'service']
-    },
-    {
-        username: 'besiktas',
-        password: 'besiktas123',
-        role: 'Personel' as const,
-        branch: 'Beşiktaş Şube',
-        name: 'Mehmet Demir',
-        permissions: ['pos', 'sales', 'inventory_view', 'service']
-    },
-    {
-        username: 'izmir',
-        password: 'izmir123',
-        role: 'Personel' as const,
-        branch: 'İzmir Şube',
-        name: 'Ayşe Kaya',
-        permissions: ['pos', 'sales', 'inventory_view', 'service']
-    },
+    }
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {

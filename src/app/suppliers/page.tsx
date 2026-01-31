@@ -12,13 +12,14 @@ import Pagination from '@/components/Pagination';
 
 export default function SuppliersPage() {
     const router = useRouter();
-    const { suppliers } = useApp();
+    const { suppliers, currentUser, branches, hasPermission } = useApp();
     const { showSuccess, showError } = useModal();
 
     // UI States
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('all'); // all, active, passive, debt, credit
+    const [branchFilter, setBranchFilter] = useState(currentUser?.branch || 'all');
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
@@ -30,11 +31,13 @@ export default function SuppliersPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [newSupplier, setNewSupplier] = useState({
         name: '', phone: '', email: '', address: '', category: '',
-        taxNumber: '', taxOffice: '', contactPerson: '', iban: ''
+        taxNumber: '', taxOffice: '', contactPerson: '', iban: '',
+        branch: currentUser?.branch || 'Merkez'
     });
     const [editSupplier, setEditSupplier] = useState<any>({
         id: '', name: '', phone: '', email: '', address: '', category: '',
-        taxNumber: '', taxOffice: '', contactPerson: '', iban: ''
+        taxNumber: '', taxOffice: '', contactPerson: '', iban: '',
+        branch: ''
     });
 
     const [dbSuppClasses, setDbSuppClasses] = useState<string[]>([]);
@@ -76,6 +79,9 @@ export default function SuppliersPage() {
         if (activeTab === 'credit' && sup.balance <= 0) return false; // Alacaklı olduklarımız (Pozitif)
         if (activeTab === 'passive' && sup.isActive !== false) return false;
 
+        // Branch filter - Respect branch isolation
+        if (branchFilter !== 'all' && (sup.branch || 'Merkez') !== branchFilter) return false;
+
         return true;
     });
 
@@ -108,7 +114,7 @@ export default function SuppliersPage() {
             if (data.success) {
                 showSuccess('Başarılı', 'Tedarikçi başarıyla oluşturuldu.');
                 setIsModalOpen(false);
-                setNewSupplier({ name: '', phone: '', email: '', address: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '' });
+                setNewSupplier({ name: '', phone: '', email: '', address: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', branch: currentUser?.branch || 'Merkez' });
                 window.location.reload();
             } else {
                 showError('Hata', data.error);
@@ -264,6 +270,25 @@ export default function SuppliersPage() {
                                 </button>
                             ))}
                         </div>
+
+                        <select
+                            value={branchFilter}
+                            onChange={(e) => { setBranchFilter(e.target.value); setCurrentPage(1); }}
+                            disabled={!hasPermission('branch_administration')}
+                            style={{
+                                padding: '12px',
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                color: 'white',
+                                fontSize: '13px'
+                            }}
+                        >
+                            {hasPermission('branch_administration') && <option value="all">Tüm Şubeler</option>}
+                            {branches.map(b => (
+                                <option key={b.name} value={b.name}>{b.name}</option>
+                            ))}
+                        </select>
 
                         <div style={{ background: 'rgba(255,255,255,0.03)', padding: '5px', borderRadius: '12px', display: 'flex', border: '1px solid rgba(255,255,255,0.1)' }}>
                             <button

@@ -15,13 +15,17 @@ export default function CustomersPage() {
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('all');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid'); // New: View Toggle
-    const { customers, currentUser, hasPermission, suppClasses, custClasses } = useApp();
+    const { customers, currentUser, hasPermission, suppClasses, custClasses, branches } = useApp();
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
     const canDelete = hasPermission('delete_records');
 
     const [isProcessing, setIsProcessing] = useState(false);
     const [searchTerm, setSearchTerm] = useState(''); // New: Debounced Search
-    const [branchFilter, setBranchFilter] = useState('all');
+
+    // Default to user's branch if not system admin, otherwise 'all'
+    const initialBranch = currentUser?.branch || 'all';
+    const [branchFilter, setBranchFilter] = useState(initialBranch);
+
     const [showFilters, setShowFilters] = useState(false); // New: Collapse Filters
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -47,8 +51,10 @@ export default function CustomersPage() {
         if (activeTab === 'alacaklilar' && cust.balance >= 0) return false;
         if (activeTab === 'eticaret' && cust.category !== 'E-ticaret') return false;
 
-        // Branch filter
-        if (branchFilter !== 'all' && cust.branch !== branchFilter) return false;
+        // Branch filter - Improved to respect system admin vs local branch users
+        // If branchFilter is 'all', it shows everything (permitted for admins)
+        // If user is restricted to a branch, branchFilter will be their branch
+        if (branchFilter !== 'all' && (cust.branch || 'Merkez') !== branchFilter) return false;
 
         return true;
     });
@@ -78,7 +84,8 @@ export default function CustomersPage() {
         contactPerson: '',
         iban: '',
         customerClass: '',
-        referredByCode: ''
+        referredByCode: '',
+        branch: currentUser?.branch || 'Merkez'
     });
     const [editCustomer, setEditCustomer] = useState<any>({
         id: '',
@@ -91,7 +98,8 @@ export default function CustomersPage() {
         contactPerson: '',
         iban: '',
         customerClass: '',
-        referredByCode: ''
+        referredByCode: '',
+        branch: ''
     });
 
     const handleAddCustomer = async () => {
@@ -114,7 +122,7 @@ export default function CustomersPage() {
                 showSuccess("Başarılı", "Müşteri başarıyla oluşturuldu.");
                 setIsModalOpen(false);
 
-                setNewCustomer({ name: '', phone: '', email: '', address: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '' });
+                setNewCustomer({ name: '', phone: '', email: '', address: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '', branch: currentUser?.branch || 'Merkez' });
                 window.location.reload();
             } else {
                 showError("Hata", data.error || "Beklenmedik bir hata oluştu.");
@@ -352,12 +360,13 @@ export default function CustomersPage() {
                                 <select
                                     value={branchFilter}
                                     onChange={(e) => setBranchFilter(e.target.value)}
-                                    style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                    disabled={!hasPermission('branch_administration')}
+                                    style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }}
                                 >
-                                    <option value="all">Tüm Şubeler</option>
-                                    <option value="Merkez">Merkez</option>
-                                    <option value="Kadıköy">Kadıköy</option>
-                                    <option value="Beşiktaş">Beşiktaş</option>
+                                    {hasPermission('branch_administration') && <option value="all">Tüm Şubeler</option>}
+                                    {branches.map(b => (
+                                        <option key={b.name} value={b.name}>{b.name}</option>
+                                    ))}
                                 </select>
                             </div>
                         </div>

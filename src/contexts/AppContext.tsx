@@ -65,6 +65,7 @@ export interface Customer {
     email?: string;
     points?: number;
     referralCode?: string;
+    address?: string;
 }
 
 export interface Supplier {
@@ -80,6 +81,7 @@ export interface Supplier {
     taxOffice?: string;
     contactPerson?: string;
     iban?: string;
+    branch?: string;
 }
 
 export interface Branch {
