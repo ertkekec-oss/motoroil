@@ -36,6 +36,18 @@ export default function ReportsPage() {
         start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         end: new Date().toISOString().split('T')[0]
     });
+    const [paymentPlans, setPaymentPlans] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchPlans = async () => {
+            try {
+                const res = await fetch('/api/financials/payment-plans');
+                const data = await res.json();
+                if (data.success) setPaymentPlans(data.plans);
+            } catch (err) { console.error('Plans fetch error:', err); }
+        };
+        fetchPlans();
+    }, []);
 
     // Get unique branches from data
     const availableBranches = useMemo(() => {
@@ -156,13 +168,28 @@ export default function ReportsPage() {
         const netProfit = revenue - cogs - expenses;
         const profitMargin = revenue > 0 ? (netProfit / revenue) * 100 : 0;
 
-        // Hidden costs
-        const txCount = salesAnalytics.count;
-        const paperCost = txCount * 0.50;
-        const eDocCost = txCount * 1.25;
-        const posCost = revenue * 0.025;
-        const hiddenCosts = paperCost + eDocCost;
-        const realNetProfit = netProfit - hiddenCosts;
+        // Detailed Financial Status
+        const receivable = filteredCustomers.filter(c => Number(c.balance) > 0).reduce((a, b) => a + Number(b.balance), 0);
+        const payable = Math.abs(filteredCustomers.filter(c => Number(c.balance) < 0).reduce((a, b) => a + Number(b.balance), 0)) +
+            Math.abs(suppliers.filter(s => Number(s.balance) < 0).reduce((a, b) => a + Number(b.balance), 0));
+
+        let plannedReceivable = 0;
+        let plannedDebt = 0;
+
+        paymentPlans.forEach(plan => {
+            const isMatched = reportScope === 'all' || plan.branch === selectedBranch;
+            if (!isMatched) return;
+
+            plan.installments.forEach((inst: any) => {
+                if (inst.status === 'Pending') {
+                    if (plan.direction === 'IN') plannedReceivable += Number(inst.amount);
+                    else plannedDebt += Number(inst.amount);
+                }
+            });
+        });
+
+        const totalReceivable = receivable + plannedReceivable;
+        const totalPayable = payable + plannedDebt;
 
         return {
             revenue,
@@ -170,21 +197,31 @@ export default function ReportsPage() {
             cogs,
             grossProfit,
             netProfit,
-            realNetProfit,
             profitMargin,
-            hiddenCosts: { paper: paperCost, eDoc: eDocCost, pos: posCost, total: hiddenCosts }
+            receivable,
+            payable,
+            plannedReceivable,
+            plannedDebt,
+            totalReceivable,
+            totalPayable
         };
-    }, [salesAnalytics, expenseAnalytics]);
+    }, [salesAnalytics, expenseAnalytics, filteredCustomers, suppliers, paymentPlans, reportScope, selectedBranch]);
 
-    // Top Products by Stock Value (filtered by branch)
-    const topProducts = useMemo(() => {
-        return [...filteredProducts]
+    // Inventory Stats
+    const inventoryStats = useMemo(() => {
+        const totalQty = filteredProducts.reduce((a, b) => a + Number(b.stock), 0);
+        const totalValue = filteredProducts.reduce((a, b) => a + (Number(b.buyPrice || b.price) * Number(b.stock)), 0);
+        const lowStockCount = filteredProducts.filter(p => Number(p.stock) <= Number(p.minStock)).length;
+
+        const topProducts = [...filteredProducts]
             .map(p => ({
                 ...p,
                 stockValue: Number(p.price) * Number(p.stock)
             }))
             .sort((a, b) => b.stockValue - a.stockValue)
             .slice(0, 8);
+
+        return { totalQty, totalValue, lowStockCount, topProducts };
     }, [filteredProducts]);
 
     // Top Customers by Balance (filtered by branch)
@@ -500,48 +537,57 @@ export default function ReportsPage() {
                     {activeTab === 'finance' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-                            {/* Profitability Engine */}
-                            <div className="glass-plus" style={{ padding: '32px', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1))', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                                    <div>
-                                        <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px' }}>💎 Gerçek Karlılık Motoru</h2>
-                                        <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-                                            Gizli maliyetler dahil gerçek kar hesaplaması
-                                        </p>
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>VERİMLİLİK SKORU</div>
-                                        <div style={{ fontSize: '48px', fontWeight: '900', color: COLORS.success }}>
-                                            %{financialSummary.profitMargin.toFixed(1)}
+                            {/* Financial Detailed Table */}
+                            <div className="glass-plus" style={{ padding: '32px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                <h3 style={{ fontSize: '20px', fontWeight: '900', marginBottom: '24px' }}>🏛️ Detaylı Finansal Tablo</h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+
+                                    <div className="glass" style={{ padding: '24px', borderRadius: '16px' }}>
+                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>CİRO VE KARLILIK</div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            <div className="flex-between"><span>Toplam Ciro</span> <span style={{ fontWeight: '700' }}>₺{financialSummary.revenue.toLocaleString()}</span></div>
+                                            <div className="flex-between"><span>Tahmini Maliyet (COGS)</span> <span style={{ color: COLORS.danger }}>-₺{financialSummary.cogs.toLocaleString()}</span></div>
+                                            <div className="flex-between"><span>Operasyonel Giderler</span> <span style={{ color: COLORS.danger }}>-₺{financialSummary.expenses.toLocaleString()}</span></div>
+                                            <div className="flex-between" style={{ paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.1)', color: COLORS.success, fontWeight: '900' }}>
+                                                <span>Net Dönem Karı</span> <span>₺{financialSummary.netProfit.toLocaleString()}</span>
+                                            </div>
                                         </div>
                                     </div>
+
+                                    <div className="glass" style={{ padding: '24px', borderRadius: '16px' }}>
+                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>ALACAK VE BORÇ DURUMU</div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            <div className="flex-between"><span>Müşteri Alacakları (Güncel)</span> <span style={{ fontWeight: '700' }}>₺{financialSummary.receivable.toLocaleString()}</span></div>
+                                            <div className="flex-between"><span>Tedarikçi/Cari Borçlar</span> <span style={{ color: COLORS.danger }}>-₺{financialSummary.payable.toLocaleString()}</span></div>
+                                            <div className="flex-between" style={{ paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                                <span>Cari Net Durum</span> <span style={{ fontWeight: '700', color: (financialSummary.receivable - financialSummary.payable) >= 0 ? COLORS.success : COLORS.danger }}>₺{(financialSummary.receivable - financialSummary.payable).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="glass" style={{ padding: '24px', borderRadius: '16px' }}>
+                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>PLANLI (GELECEK) ÖDEMELER</div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            <div className="flex-between"><span>Planlı Alacaklar (Taksitler)</span> <span style={{ fontWeight: '700', color: COLORS.success }}>₺{financialSummary.plannedReceivable.toLocaleString()}</span></div>
+                                            <div className="flex-between"><span>Planlı Borçlar (Taksitler)</span> <span style={{ color: COLORS.danger }}>-₺{financialSummary.plannedDebt.toLocaleString()}</span></div>
+                                            <div className="flex-between" style={{ paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.1)', fontWeight: '900' }}>
+                                                <span>Toplam Net Alacak</span> <span style={{ color: COLORS.primary }}>₺{(financialSummary.totalReceivable - financialSummary.totalPayable).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
 
-                                {/* Profit Waterfall */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                    <div className="glass" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.primary}` }}>
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>TOPLAM CİRO</div>
-                                        <div style={{ fontSize: '36px', fontWeight: '900' }}>₺{financialSummary.revenue.toLocaleString()}</div>
+                                <div style={{ marginTop: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                    <div className="glass-plus" style={{ padding: '24px', borderRadius: '16px', background: 'rgba(16, 185, 129, 0.05)', border: `1px solid ${COLORS.success}55` }}>
+                                        <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px' }}>TOPLAM ŞİRKET ALACAĞI</div>
+                                        <div style={{ fontSize: '36px', fontWeight: '900', color: COLORS.success }}>₺{financialSummary.totalReceivable.toLocaleString()}</div>
+                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Cari + Gelecek Taksitler</div>
                                     </div>
-
-                                    <div className="glass" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.warning}` }}>
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>SATILAN MALLAR MALİYETİ (Tahmini %65)</div>
-                                        <div style={{ fontSize: '36px', fontWeight: '900', color: COLORS.warning }}>-₺{financialSummary.cogs.toLocaleString()}</div>
-                                    </div>
-
-                                    <div className="glass" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.danger}` }}>
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>KAYITLI GİDERLER</div>
-                                        <div style={{ fontSize: '36px', fontWeight: '900', color: COLORS.danger }}>-₺{financialSummary.expenses.toLocaleString()}</div>
-                                    </div>
-
-                                    <div className="glass" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.pink}` }}>
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>GİZLİ MALİYETLER (Kağıt + E-Belge)</div>
-                                        <div style={{ fontSize: '36px', fontWeight: '900', color: COLORS.pink }}>-₺{financialSummary.hiddenCosts.total.toLocaleString()}</div>
-                                    </div>
-
-                                    <div className="glass-plus" style={{ padding: '32px', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05))', border: `2px solid ${COLORS.success}` }}>
-                                        <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px' }}>GERÇEK NET KAR</div>
-                                        <div style={{ fontSize: '48px', fontWeight: '900', color: COLORS.success }}>₺{financialSummary.realNetProfit.toLocaleString()}</div>
+                                    <div className="glass-plus" style={{ padding: '24px', borderRadius: '16px', background: 'rgba(239, 68, 68, 0.05)', border: `1px solid ${COLORS.danger}55` }}>
+                                        <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px' }}>TOPLAM ŞİRKET BORCU</div>
+                                        <div style={{ fontSize: '36px', fontWeight: '900', color: COLORS.danger }}>₺{financialSummary.totalPayable.toLocaleString()}</div>
+                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Cari + Gelecek Taksitler</div>
                                     </div>
                                 </div>
                             </div>
@@ -575,10 +621,24 @@ export default function ReportsPage() {
                     {/* Inventory Tab */}
                     {activeTab === 'inventory' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                <div className="glass-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.primary}` }}>
+                                    <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '8px' }}>TOPLAM ENVANTER DEĞERİ (ALIŞ)</div>
+                                    <div style={{ fontSize: '36px', fontWeight: '900', color: 'white' }}>₺{inventoryStats.totalValue.toLocaleString()}</div>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Tüm stokların maliyet bedeli toplamı</div>
+                                </div>
+                                <div className="glass-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.warning}` }}>
+                                    <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '8px' }}>TOPLAM STOK ADEDİ</div>
+                                    <div style={{ fontSize: '36px', fontWeight: '900', color: 'white' }}>{inventoryStats.totalQty.toLocaleString()}</div>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Şu an depoda bulunan toplam ürün sayısı</div>
+                                </div>
+                            </div>
+
                             <div className="glass card" style={{ padding: '24px', borderRadius: '16px' }}>
                                 <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '20px' }}>📦 En Yüksek Stok Değerine Sahip Ürünler</h3>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
-                                    {topProducts.map((product, i) => (
+                                    {inventoryStats.topProducts.map((product, i) => (
                                         <div key={i} className="glass" style={{ padding: '20px', borderRadius: '12px', borderLeft: `4px solid ${COLORS.primary}` }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
                                                 <span style={{ fontSize: '24px' }}>📦</span>
@@ -589,7 +649,7 @@ export default function ReportsPage() {
                                             <div style={{ fontSize: '15px', fontWeight: '700', marginBottom: '8px' }}>{product.name}</div>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' }}>
                                                 <span>Stok: {product.stock}</span>
-                                                <span>Fiyat: ₺{Number(product.price).toLocaleString()}</span>
+                                                <span>Alış: ₺{Number(product.buyPrice || product.price).toLocaleString()}</span>
                                             </div>
                                             <div style={{ fontSize: '20px', fontWeight: '900', color: COLORS.primary }}>
                                                 ₺{product.stockValue.toLocaleString()}
