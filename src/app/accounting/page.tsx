@@ -210,7 +210,7 @@ export default function AccountingPage() {
     const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
 
     useEffect(() => {
-        if (activeTab === 'scheduled') {
+        if (activeTab === 'receivables' || activeTab === 'payables') {
             const fetchScheduled = async () => {
                 try {
                     const res = await fetch('/api/financials/payment-plans');
@@ -222,7 +222,10 @@ export default function AccountingPage() {
         }
     }, [activeTab]);
 
-    const [newPlan, setNewPlan] = useState({ title: '', totalAmount: '', installmentCount: '', startDate: '', type: 'Kredi' });
+    const [newPlan, setNewPlan] = useState({
+        title: '', totalAmount: '', installmentCount: '', startDate: '', type: 'Kredi',
+        direction: 'OUT', customerId: '', supplierId: ''
+    });
 
     const saveNewPlan = async () => {
         if (!newPlan.title || !newPlan.totalAmount || !newPlan.installmentCount || !newPlan.startDate) {
@@ -243,7 +246,10 @@ export default function AccountingPage() {
             if (data.success) {
                 showSuccess("Başarılı", "Ödeme Planı oluşturuldu.");
                 setShowScheduledModal(false);
-                setNewPlan({ title: '', totalAmount: '', installmentCount: '', startDate: '', type: 'Kredi' });
+                setNewPlan({
+                    title: '', totalAmount: '', installmentCount: '', startDate: '', type: 'Kredi',
+                    direction: 'OUT', customerId: '', supplierId: ''
+                });
                 // Re-fetch
                 const res2 = await fetch('/api/financials/payment-plans');
                 const data2 = await res2.json();
@@ -707,8 +713,8 @@ export default function AccountingPage() {
             </header>
 
             <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-                {['Alacaklar', 'Borçlar', 'Çek & Senet', 'Banka & Kasa', 'Giderler', 'Planlı Ödemeler', 'Finansal Hareketler'].map((label, i) => {
-                    const keys = ['receivables', 'payables', 'checks', 'banks', 'expenses', 'scheduled', 'transactions_list'];
+                {['Alacaklar', 'Borçlar', 'Çek & Senet', 'Banka & Kasa', 'Giderler', 'Finansal Hareketler'].map((label, i) => {
+                    const keys = ['receivables', 'payables', 'checks', 'banks', 'expenses', 'transactions_list'];
                     const key = keys[i];
                     return (
                         <button
@@ -742,6 +748,67 @@ export default function AccountingPage() {
                             </tbody>
                         </table>
                         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+
+                        {/* PLANLI ALACAKLAR & ÇEKLER */}
+                        <div className="mt-8 pt-6 border-t border-subtle">
+                            <div className="flex-between mb-4">
+                                <h3 className="text-lg font-bold">📆 Planlı Alacaklar & Vadeli Satışlar</h3>
+                                <button onClick={() => { setNewPlan({ ...newPlan, direction: 'IN', type: 'Taksitli Satış' }); setShowScheduledModal(true); }} className="btn btn-outline btn-sm text-xs">+ Plan Oluştur</button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {/* Çekler (Alınan) */}
+                                {checks.filter(c => c.type.includes('Alınan')).map(c => (
+                                    <div key={c.id} className="card glass-plus p-4 text-sm relative group">
+                                        <div className="absolute top-2 right-2 text-xs bg-subtle px-2 py-0.5 rounded">{c.status}</div>
+                                        <div className="font-bold mb-1">Cari: {c.customer?.name || '-'}</div>
+                                        <div className="text-xs text-muted">Vade: {new Date(c.dueDate).toLocaleDateString()}</div>
+                                        <div className="mt-2 font-black text-lg text-success">+{Number(c.amount).toLocaleString()} ₺</div>
+                                        <div className="text-[10px] text-muted">Belge: {c.type} / {c.bank}</div>
+                                        {c.status === 'Beklemede' && <button onClick={() => { setActiveCheck(c); setTargetKasaId(kasalar[0]?.id.toString() || ''); setShowCheckCollectModal(true); }} className="btn btn-xs btn-primary mt-2 w-full">Tahsil Et</button>}
+                                    </div>
+                                ))}
+
+                                {/* Planlı Alacaklar (IN) */}
+                                {scheduledPayments.filter(p => p.direction === 'IN' || (!p.direction && p.type !== 'Kredi')).map(plan => {
+                                    const paid = plan.installments.filter((i: any) => i.status === 'Paid').length;
+                                    const progress = (paid / plan.installments.length) * 100;
+                                    return (
+                                        <div key={plan.id} className="card glass-plus p-4 text-sm relative cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setExpandedPlanId(expandedPlanId === plan.id ? null : plan.id)}>
+                                            <div className="flex-between">
+                                                <div className="font-bold">{plan.title}</div>
+                                                <div className="text-xs bg-subtle px-2 rounded">{plan.type}</div>
+                                            </div>
+                                            <div className="text-xs text-muted mb-2">{plan.installmentCount} Taksit / {new Date(plan.startDate).toLocaleDateString()}</div>
+                                            <div className="w-full bg-subtle h-1.5 rounded-full overflow-hidden mt-1"><div className="bg-success h-full" style={{ width: `${progress}%` }}></div></div>
+                                            <div className="mt-2 flex-between items-end">
+                                                <div className="font-black text-lg text-success">{Number(plan.totalAmount).toLocaleString()} ₺</div>
+                                                <div className="text-[10px] text-muted">Detay ▼</div>
+                                            </div>
+
+                                            {/* Mini Installments Dropdown */}
+                                            {expandedPlanId === plan.id && (
+                                                <div className="absolute top-full left-0 right-0 z-10 bg-main border border-subtle shadow-xl rounded-b-xl p-2 mt-[-4px] animate-in fade-in zoom-in-95">
+                                                    <div className="max-h-[200px] overflow-y-auto custom-scrollbar">
+                                                        {plan.installments.map((inst: any) => (
+                                                            <div key={inst.id} className="flex-between p-2 border-b border-white/5 text-xs hover:bg-white/5">
+                                                                <div>{inst.installmentNo}. Taksit <span className="text-muted ml-1">{new Date(inst.dueDate).toLocaleDateString()}</span></div>
+                                                                <div className="text-right">
+                                                                    <div className="font-bold">{Number(inst.amount).toLocaleString()}</div>
+                                                                    {inst.status !== 'Paid' ? (
+                                                                        <button onClick={(e) => { e.stopPropagation(); if (confirm('Tahsilat onayı (Nakit)?')) handlePayInstallment(inst, kasalar.find(k => k.type === 'Nakit')?.id.toString() || '') }} className="text-primary hover:underline">Tahsil Et</button>
+                                                                    ) : <span className="text-success">Ödendi</span>}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                            {(checks.filter(c => c.type.includes('Alınan')).length === 0 && scheduledPayments.filter(p => p.direction === 'IN').length === 0) && <div className="text-center text-muted text-xs p-4">Planlı alacak bulunmuyor.</div>}
+                        </div>
                     </div>
                 )}
 
@@ -764,6 +831,67 @@ export default function AccountingPage() {
                             </tbody>
                         </table>
                         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+
+                        {/* PLANLI BORÇLAR (Krediler) & VERİLEN ÇEKLER */}
+                        <div className="mt-8 pt-6 border-t border-subtle">
+                            <div className="flex-between mb-4">
+                                <h3 className="text-lg font-bold">📤 Planlı Borçlar & Krediler</h3>
+                                <button onClick={() => { setNewPlan({ ...newPlan, direction: 'OUT', type: 'Kredi' }); setShowScheduledModal(true); }} className="btn btn-outline btn-sm text-xs">+ Plan Oluştur</button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {/* Çekler (Verilen) */}
+                                {checks.filter(c => c.type.includes('Verilen')).map(c => (
+                                    <div key={c.id} className="card glass-plus p-4 text-sm relative group">
+                                        <div className="absolute top-2 right-2 text-xs bg-subtle px-2 py-0.5 rounded">{c.status}</div>
+                                        <div className="font-bold mb-1">Cari: {c.supplier?.name || '-'}</div>
+                                        <div className="text-xs text-muted">Vade: {new Date(c.dueDate).toLocaleDateString()}</div>
+                                        <div className="mt-2 font-black text-lg text-danger">-{Number(c.amount).toLocaleString()} ₺</div>
+                                        <div className="text-[10px] text-muted">Belge: {c.type} / {c.bank}</div>
+                                        {c.status === 'Beklemede' && <button onClick={() => { setActiveCheck(c); setTargetKasaId(kasalar[0]?.id.toString() || ''); setShowCheckCollectModal(true); }} className="btn btn-xs btn-primary mt-2 w-full">Ödemeyi Onayla</button>}
+                                    </div>
+                                ))}
+
+                                {/* Planlı Borçlar (OUT) */}
+                                {scheduledPayments.filter(p => !p.direction || p.direction === 'OUT').map(plan => {
+                                    const paid = plan.installments.filter((i: any) => i.status === 'Paid').length;
+                                    const progress = (paid / plan.installments.length) * 100;
+                                    return (
+                                        <div key={plan.id} className="card glass-plus p-4 text-sm relative cursor-pointer hover:border-danger/50 transition-colors" onClick={() => setExpandedPlanId(expandedPlanId === plan.id ? null : plan.id)}>
+                                            <div className="flex-between">
+                                                <div className="font-bold">{plan.title}</div>
+                                                <div className="text-xs bg-subtle px-2 rounded">{plan.type}</div>
+                                            </div>
+                                            <div className="text-xs text-muted mb-2">{plan.installmentCount} Taksit / {new Date(plan.startDate).toLocaleDateString()}</div>
+                                            <div className="w-full bg-subtle h-1.5 rounded-full overflow-hidden mt-1"><div className="bg-danger h-full" style={{ width: `${progress}%` }}></div></div>
+                                            <div className="mt-2 flex-between items-end">
+                                                <div className="font-black text-lg text-danger">{Number(plan.totalAmount).toLocaleString()} ₺</div>
+                                                <div className="text-[10px] text-muted">Detay ▼</div>
+                                            </div>
+
+                                            {/* Mini Installments Dropdown */}
+                                            {expandedPlanId === plan.id && (
+                                                <div className="absolute top-full left-0 right-0 z-10 bg-main border border-subtle shadow-xl rounded-b-xl p-2 mt-[-4px] animate-in fade-in zoom-in-95">
+                                                    <div className="max-h-[200px] overflow-y-auto custom-scrollbar">
+                                                        {plan.installments.map((inst: any) => (
+                                                            <div key={inst.id} className="flex-between p-2 border-b border-white/5 text-xs hover:bg-white/5">
+                                                                <div>{inst.installmentNo}. Taksit <span className="text-muted ml-1">{new Date(inst.dueDate).toLocaleDateString()}</span></div>
+                                                                <div className="text-right">
+                                                                    <div className="font-bold">{Number(inst.amount).toLocaleString()}</div>
+                                                                    {inst.status !== 'Paid' ? (
+                                                                        <button onClick={(e) => { e.stopPropagation(); if (confirm('Ödeme onayı (Nakit)?')) handlePayInstallment(inst, kasalar.find(k => k.type === 'Nakit')?.id.toString() || '') }} className="text-danger hover:underline">Öde</button>
+                                                                    ) : <span className="text-success">Ödendi</span>}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                            {(checks.filter(c => c.type.includes('Verilen')).length === 0 && scheduledPayments.filter(p => !p.direction || p.direction === 'OUT').length === 0) && <div className="text-center text-muted text-xs p-4">Planlı borç bulunmuyor.</div>}
+                        </div>
                     </div>
                 )}
 
@@ -1339,6 +1467,73 @@ export default function AccountingPage() {
                                 <input type="number" className="input-field font-bold text-lg" placeholder="0.00" value={virmanData.amount} onChange={e => setVirmanData({ ...virmanData, amount: e.target.value })} />
                             </div>
                             <button onClick={executeVirman} disabled={isProcessing} className="btn btn-primary h-12">Transferi Gerçekleştir</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* SCHEDULED PLAN MODAL */}
+            {showScheduledModal && (
+                <div className="modal-overlay">
+                    <div className="card glass animate-in modal-content">
+                        <div className="flex-between mb-6">
+                            <h3>{newPlan.direction === 'IN' ? '📥 Yeni Vadeli Satış / Alacak Planı' : '📤 Yeni Kredi / Borç Planı'}</h3>
+                            <button onClick={() => setShowScheduledModal(false)} className="close-btn">&times;</button>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <div className="form-group">
+                                <label>Plan Adı / Açıklama</label>
+                                <input type="text" placeholder="Örn: X Müşteri Taksitli Satış" value={newPlan.title} onChange={e => setNewPlan({ ...newPlan, title: e.target.value })} className="input-field" />
+                            </div>
+
+                            <div className="form-group">
+                                <label>İlgili Cari (Opsiyonel)</label>
+                                <select
+                                    className="input-field"
+                                    value={newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId}
+                                    onChange={e => setNewPlan({
+                                        ...newPlan,
+                                        customerId: newPlan.direction === 'IN' ? e.target.value : '',
+                                        supplierId: newPlan.direction === 'OUT' ? e.target.value : ''
+                                    })}
+                                >
+                                    <option value="">Cari Seçiniz...</option>
+                                    {(newPlan.direction === 'IN' ? customers : suppliers).map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="form-group">
+                                    <label>Toplam Tutar</label>
+                                    <input type="number" value={newPlan.totalAmount} onChange={e => setNewPlan({ ...newPlan, totalAmount: e.target.value })} className="input-field" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Taksit Sayısı</label>
+                                    <input type="number" value={newPlan.installmentCount} onChange={e => setNewPlan({ ...newPlan, installmentCount: e.target.value })} className="input-field" />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="form-group">
+                                    <label>Başlangıç Tarihi</label>
+                                    <input type="date" value={newPlan.startDate} onChange={e => setNewPlan({ ...newPlan, startDate: e.target.value })} className="input-field" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Plan Türü</label>
+                                    <select value={newPlan.type} onChange={e => setNewPlan({ ...newPlan, type: e.target.value })} className="input-field">
+                                        <option value="Kredi">Kredi</option>
+                                        <option value="Taksitli Satış">Taksitli Satış</option>
+                                        <option value="Senet">Senet</option>
+                                        <option value="Diğer">Diğer</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button onClick={saveNewPlan} disabled={isProcessing} className="btn btn-primary w-full p-4 font-bold mt-2">
+                                {isProcessing ? 'İŞLENİYOR...' : 'PLANI OLUŞTUR'}
+                            </button>
                         </div>
                     </div>
                 </div>

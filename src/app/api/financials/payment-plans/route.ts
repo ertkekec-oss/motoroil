@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { title, totalAmount, installmentCount, startDate, description, branch, type } = body;
+        const { title, totalAmount, installmentCount, startDate, description, branch, type, direction, customerId, supplierId } = body;
 
         // Validation
         if (!title || !totalAmount || !installmentCount || !startDate) {
@@ -30,6 +30,9 @@ export async function POST(request: Request) {
                 description,
                 branch: branch || 'Merkez',
                 type: type || 'Kredi',
+                direction: direction || 'OUT',
+                customerId,
+                supplierId,
                 installments: {
                     create: Array.from({ length: count }).map((_, i) => {
                         const dueDate = new Date(start);

@@ -657,9 +657,13 @@ model PaymentPlan {
   installmentCount Int
   startDate       DateTime
   description     String?
-  type            String   @default("Kredi") // Kredi, Kira, Leasing, Diğer
+  type            String   @default("Kredi") // Kredi, Kira, Leasing, VadeliSatis
   status          String   @default("Active") // Active, Completed, Cancelled
   branch          String?  @default("Merkez")
+  
+  direction       String   @default("OUT") // OUT: Borç, IN: Alacak
+  customerId      String?
+  supplierId      String?
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
