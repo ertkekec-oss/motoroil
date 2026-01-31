@@ -363,6 +363,7 @@ model Branch {
   status    String           @default("Aktif")
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
+  deletedAt DateTime?        // Soft delete
   documents BranchDocument[]
 }
 
@@ -406,6 +407,7 @@ model Staff {
   lastActive    DateTime?       @default(now())
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
+  deletedAt     DateTime?       // Soft delete
   salary        Decimal?        @default(17002) @db.Decimal(10, 2)
   address       String?
   age           Int?
@@ -596,6 +598,7 @@ model Campaign {
   startDate    DateTime  @default(now())
   endDate      DateTime?
   isActive     Boolean   @default(true)
+  deletedAt    DateTime? // Soft delete
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 

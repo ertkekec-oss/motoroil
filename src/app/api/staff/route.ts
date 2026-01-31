@@ -9,6 +9,7 @@ export async function GET() {
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
         const staff = await prisma.staff.findMany({
+            where: { deletedAt: null }, // Only fetch active staff
             orderBy: { createdAt: 'desc' }
         });
         return NextResponse.json(staff);
@@ -72,9 +73,9 @@ export async function POST(request: Request) {
                 status: data.status || 'Boşta',
                 permissions: data.permissions || [],
                 // Additional Fields
-                age: data.age ? parseInt(data.age) : null,
+                age: data.age ? parseInt(data.age.toString()) : null,
                 address: data.address || null,
-                salary: data.salary ? parseFloat(data.salary) : 17002,
+                salary: data.salary ? parseFloat(data.salary.toString()) : 17002,
             }
         });
         return NextResponse.json(staff);
@@ -96,8 +97,8 @@ export async function PUT(request: Request) {
         const { id, ...updateData } = data;
 
         // Parse types if necessary
-        if (updateData.age) updateData.age = parseInt(updateData.age);
-        if (updateData.salary) updateData.salary = parseFloat(updateData.salary);
+        if (updateData.age) updateData.age = parseInt(updateData.age.toString());
+        if (updateData.salary) updateData.salary = parseFloat(updateData.salary.toString());
 
         // If password is being updated, hash it
         if (updateData.password && !updateData.password.startsWith('$2')) {
@@ -128,8 +129,10 @@ export async function DELETE(request: Request) {
 
         if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
-        await prisma.staff.delete({
-            where: { id }
+        // SOFT DELETE
+        await prisma.staff.update({
+            where: { id },
+            data: { deletedAt: new Date() }
         });
         return NextResponse.json({ success: true });
     } catch (error: any) {

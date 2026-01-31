@@ -21,12 +21,14 @@ export async function GET(
         }
 
         const customer = await prisma.customer.findUnique({
-            where: { id: customerId },
+            where: { id: customerId, deletedAt: null }, // Only fetch if not soft-deleted
             include: {
                 transactions: {
+                    where: { deletedAt: null },
                     orderBy: { date: 'desc' }
                 },
                 invoices: {
+                    where: { deletedAt: null },
                     orderBy: { invoiceDate: 'desc' }
                 }
             }
@@ -96,19 +98,10 @@ export async function DELETE(
 
         const { id } = await params;
 
-        // Check if there are transactions or invoices
-        const countTrans = await prisma.transaction.count({ where: { customerId: id } });
-        const countInvoices = await prisma.salesInvoice.count({ where: { customerId: id } });
-
-        if (countTrans > 0 || countInvoices > 0) {
-            return NextResponse.json({
-                success: false,
-                error: 'Bu müşterinin işlem geçmişi (fatura veya finansal hareket) olduğu için silinemez. Önce ilişkili kayıtları silmelisiniz.'
-            }, { status: 400 });
-        }
-
-        await prisma.customer.delete({
-            where: { id }
+        // SOFT DELETE
+        await prisma.customer.update({
+            where: { id },
+            data: { deletedAt: new Date() }
         });
 
         return NextResponse.json({ success: true });

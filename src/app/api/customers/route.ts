@@ -7,9 +7,12 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
     try {
         const customers = await prisma.customer.findMany({
+            where: { deletedAt: null },
             include: {
                 category: true,
-                transactions: true
+                transactions: {
+                    where: { deletedAt: null }
+                }
             },
             orderBy: {
                 updatedAt: 'desc'

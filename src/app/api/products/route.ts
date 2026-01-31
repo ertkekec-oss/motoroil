@@ -1,10 +1,14 @@
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getSession, hasPermission } from '@/lib/auth';
 
 export async function GET() {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
         const products = await prisma.product.findMany({
+            where: { deletedAt: null },
             orderBy: { createdAt: 'desc' },
             include: { stocks: true }
         });
@@ -16,13 +20,17 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
+        if (!hasPermission(session, 'inventory_manage')) {
+            return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
+        }
+
         const body = await request.json();
         const { name, code, barcode, brand, category, type, stock, price, buyPrice, supplier, branch,
             salesVat, salesVatIncluded, purchaseVat, purchaseVatIncluded,
             salesOiv, salesOtv, otvType } = body;
-
-        // Ürün her zaman Merkez'de oluşturulur (Global Definition)
-        // Ancak stok bilgisi varsa ilgili şubeye (veya Merkez'e) Stock kaydı olarak eklenir.
 
         const targetBranch = branch || 'Merkez';
 
@@ -34,11 +42,11 @@ export async function POST(request: Request) {
                 brand: brand || '',
                 category: category || 'Genel',
                 type: type || 'Ürün',
-                stock: 0, // Deprecated: Global stock (sum) or just 0, relying on Stock table
+                stock: 0,
                 price: parseFloat(price) || 0,
                 buyPrice: parseFloat(buyPrice) || 0,
                 supplier: supplier || '',
-                branch: 'Merkez', // Force global definition owner to Merkez
+                branch: 'Merkez',
                 salesVat: parseInt(salesVat) || 20,
                 salesVatIncluded: salesVatIncluded !== undefined ? salesVatIncluded : true,
                 purchaseVat: parseInt(purchaseVat) || 20,
