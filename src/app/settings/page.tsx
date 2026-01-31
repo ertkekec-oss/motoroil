@@ -174,6 +174,21 @@ export default function SettingsPage() {
     const [couponPage, setCouponPage] = useState(1);
     const couponsPerPage = 10;
 
+    const [resetOptions, setResetOptions] = useState({
+        customers: false,
+        inventory: false,
+        ecommerce: false,
+        pos: false,
+        receivables: false,
+        payables: false,
+        checks: false,
+        notes: false,
+        staff: false,
+        branches: false,
+        expenses: false,
+        all: false
+    });
+
     const exportCouponsExcel = () => {
         const data = coupons.map(c => ({
             'KOD': c.code,
@@ -2183,50 +2198,89 @@ export default function SettingsPage() {
 
                 {/* 5. SİSTEM SIFIRLAMA (DANGER ZONE) */}
                 {activeTab === 'reset' && (
-                    <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
-                        <h2 style={{ marginBottom: '20px', color: 'var(--danger)', fontSize: '24px' }}>⚠️ TEHLİKELİ BÖLGE</h2>
+                    <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+                        <h2 style={{ marginBottom: '20px', color: 'var(--danger)', fontSize: '24px', fontWeight: '900' }}>⚠️ KRİTİK SİSTEM SIFIRLAMA</h2>
 
-                        <div className="card glass" style={{ border: '2px solid var(--danger)', background: 'rgba(239, 68, 68, 0.05)', padding: '40px' }}>
+                        <div className="card glass" style={{ border: '2px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)', padding: '40px', borderRadius: '32px' }}>
                             <div style={{ fontSize: '64px', marginBottom: '20px' }}>🧨</div>
-                            <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '10px' }}>Tüm Verileri Sil ve Sıfırla</h3>
-                            <p className="text-muted" style={{ marginBottom: '30px', lineHeight: '1.6' }}>
-                                Bu işlem geri alınamaz! Onayladığınız takdirde sistemdeki:<br />
-                                <b>- Tüm Satış & Alış Faturaları</b><br />
-                                <b>- Tüm Ödeme & Tahsilat İşlemleri (Transactions)</b><br />
-                                <b>- Müşteri, Tedarikçi ve Kasa Bakiyeleri</b><br />
-                                kalıcı olarak silinecek ve <b>SIFIRLANACAKTIR.</b><br />
-                                (Stok kartları ve kullanıcılar silinmez.)
+                            <h3 style={{ fontSize: '22px', fontWeight: '900', marginBottom: '15px', color: 'white' }}>Veri Temizleme ve Yapılandırma</h3>
+                            <p className="text-muted" style={{ marginBottom: '30px', lineHeight: '1.6', fontSize: '14px' }}>
+                                Lütfen sıfırlamak istediğiniz modülleri seçin. Bu işlem seçilen kategorilerdeki tüm verileri <b>KALICI OLARAK</b> silecektir.
                             </p>
 
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '15px', textAlign: 'left', marginBottom: '40px', background: 'rgba(0,0,0,0.2)', padding: '25px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', padding: '10px', borderRadius: '12px', background: resetOptions.all ? 'rgba(239, 68, 68, 0.2)' : 'transparent' }}>
+                                    <input type="checkbox" checked={resetOptions.all} onChange={e => setResetOptions({ ...resetOptions, all: e.target.checked })} style={{ width: '18px', height: '18px', accentColor: 'var(--danger)' }} />
+                                    <span style={{ fontWeight: '800', fontSize: '14px', color: resetOptions.all ? 'white' : '#888' }}>HER ŞEYİ SİL (TAM SIFIRLAMA)</span>
+                                </label>
+
+                                <hr style={{ gridColumn: '1 / -1', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)', margin: '5px 0' }} />
+
+                                {[
+                                    { id: 'customers', label: 'Cariler' },
+                                    { id: 'inventory', label: 'Envanter' },
+                                    { id: 'ecommerce', label: 'E-ticaret Satışları' },
+                                    { id: 'pos', label: 'Mağaza Satışları' },
+                                    { id: 'receivables', label: 'Alacaklar' },
+                                    { id: 'payables', label: 'Borçlar' },
+                                    { id: 'checks', label: 'Çekler' },
+                                    { id: 'notes', label: 'Senetler' },
+                                    { id: 'staff', label: 'Personel' },
+                                    { id: 'branches', label: 'Şubeler' },
+                                    { id: 'expenses', label: 'Giderler' },
+                                ].map(opt => (
+                                    <label key={opt.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', padding: '10px', borderRadius: '12px', opacity: resetOptions.all ? 0.3 : 1 }}>
+                                        <input
+                                            type="checkbox"
+                                            disabled={resetOptions.all}
+                                            checked={resetOptions.all || (resetOptions as any)[opt.id]}
+                                            onChange={e => setResetOptions({ ...resetOptions, [opt.id]: e.target.checked })}
+                                            style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }}
+                                        />
+                                        <span style={{ fontWeight: '600', fontSize: '13px', color: (resetOptions as any)[opt.id] ? 'white' : '#666' }}>{opt.label}</span>
+                                    </label>
+                                ))}
+                            </div>
+
                             <div className="flex-col gap-4" style={{ alignItems: 'center' }}>
-                                <label style={{ fontSize: '12px', fontWeight: 'bold' }}>İşlemi onaylamak için aşağıya <span style={{ color: 'var(--danger)' }}>ONAYLIYORUM</span> yazın:</label>
-                                <input
-                                    type="text"
-                                    id="resetConfirmationInput"
-                                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--danger)', background: 'black', color: 'white', textAlign: 'center', fontSize: '16px', letterSpacing: '2px', width: '100%', maxWidth: '300px' }}
-                                    placeholder="ONAYLIYORUM"
-                                />
+                                <div style={{ width: '100%', maxWidth: '400px' }}>
+                                    <label style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', marginBottom: '10px', color: '#888' }}>
+                                        İşlemi onaylamak için <span style={{ color: 'var(--danger)' }}>ONAYLIYORUM</span> yazın:
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="resetConfirmationInput"
+                                        style={{ width: '100%', padding: '16px', borderRadius: '16px', border: '1px solid rgba(239, 68, 68, 0.3)', background: 'rgba(0,0,0,0.3)', color: 'white', textAlign: 'center', fontSize: '18px', letterSpacing: '4px', fontWeight: '900', outline: 'none' }}
+                                        placeholder="ONAYLIYORUM"
+                                    />
+                                </div>
 
                                 <button
+                                    disabled={!Object.values(resetOptions).some(v => v)}
                                     onClick={async () => {
                                         const input = (document.getElementById('resetConfirmationInput') as HTMLInputElement).value;
                                         if (input !== 'ONAYLIYORUM') {
-                                            showError('Hata', 'Lütfen onay kutusuna büyük harflerle ONAYLIYORUM yazın.');
+                                            showError('Hata', 'Lütfen onay kutusuna ONAYLIYORUM yazın.');
                                             return;
                                         }
 
                                         showConfirm(
-                                            'KRİTİK UYARI',
-                                            'SON UYARI: Tüm finansal verileriniz silinecek. Bu işlem geri alınamaz. Emin misiniz?',
+                                            'KRİTİK SİSTEM SIFIRLAMA',
+                                            'Seçilen veriler kalıcı olarak silinecektir. Devam etmek istediğinizden emin misiniz?',
                                             async () => {
                                                 try {
                                                     const res = await fetch('/api/admin/reset-data', {
                                                         method: 'POST',
-                                                        body: JSON.stringify({ confirmation: input })
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({
+                                                            confirmation: input,
+                                                            options: resetOptions,
+                                                            currentUsername: currentUser?.username
+                                                        })
                                                     });
                                                     const data = await res.json();
                                                     if (data.success) {
-                                                        showSuccess('SİSTEM SIFIRLANDI', '✅ Tüm veriler başarıyla silindi ve sistem sıfırlandı.');
+                                                        showSuccess('BAŞARILI', '✅ Seçilen veriler sıfırlandı.');
                                                         setTimeout(() => window.location.reload(), 2000);
                                                     } else {
                                                         showError('Hata', 'İşlem hatası: ' + data.error);
@@ -2238,9 +2292,21 @@ export default function SettingsPage() {
                                         );
                                     }}
                                     className="btn"
-                                    style={{ background: 'var(--danger)', color: 'white', fontWeight: 'bold', padding: '15px 30px', width: '100%', maxWidth: '300px', fontSize: '16px' }}
+                                    style={{
+                                        background: 'linear-gradient(45deg, #ef4444, #b91c1c)',
+                                        color: 'white',
+                                        fontWeight: '900',
+                                        padding: '18px 40px',
+                                        width: '100%',
+                                        maxWidth: '400px',
+                                        fontSize: '16px',
+                                        borderRadius: '18px',
+                                        boxShadow: '0 10px 30px rgba(239, 68, 68, 0.4)',
+                                        opacity: (!Object.values(resetOptions).some(v => v)) ? 0.5 : 1,
+                                        cursor: (!Object.values(resetOptions).some(v => v)) ? 'not-allowed' : 'pointer'
+                                    }}
                                 >
-                                    🔥 VERİLERİ SİL & SIFIRLA
+                                    🔥 SEÇİLİ VERİLERİ SİL & SIFIRLA
                                 </button>
                             </div>
                         </div>

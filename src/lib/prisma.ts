@@ -141,6 +141,22 @@ const prismaClientSingleton = () => {
                     },
                 },
             },
+            paymentPlan: {
+                totalAmount: {
+                    needs: { totalAmount: true },
+                    compute(plan) {
+                        return Number(plan.totalAmount);
+                    },
+                },
+            },
+            installment: {
+                amount: {
+                    needs: { amount: true },
+                    compute(inst) {
+                        return Number(inst.amount);
+                    },
+                },
+            },
         },
     });
 };
