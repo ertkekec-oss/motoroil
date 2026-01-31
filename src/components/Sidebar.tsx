@@ -38,6 +38,7 @@ export default function Sidebar() {
         { name: 'POS Terminal', href: '/', icon: '🏮' },
         { name: 'Finansal Yönetim', href: '/accounting', icon: '🏛️' },
         { name: 'Satış Yönetimi', href: '/sales', icon: '🧾' },
+        { name: 'Teklifler', href: '/quotes', icon: '📋' },
         { name: 'Cari Hesaplar', href: '/customers', icon: '🤝' },
         { name: 'Tedarikçi Ağı', href: '/suppliers', icon: '🚚' },
         { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
