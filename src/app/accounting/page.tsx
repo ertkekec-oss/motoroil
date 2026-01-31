@@ -204,6 +204,85 @@ export default function AccountingPage() {
     const [activeCheck, setActiveCheck] = useState<any>(null);
     const [targetKasaId, setTargetKasaId] = useState('');
 
+    // --- SCHEDULED PAYMENTS LOGIC ---
+    const [scheduledPayments, setScheduledPayments] = useState<any[]>([]);
+    const [showScheduledModal, setShowScheduledModal] = useState(false);
+    const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (activeTab === 'scheduled') {
+            const fetchScheduled = async () => {
+                try {
+                    const res = await fetch('/api/financials/payment-plans');
+                    const data = await res.json();
+                    if (data.success) setScheduledPayments(data.plans);
+                } catch (e) { console.error(e) }
+            };
+            fetchScheduled();
+        }
+    }, [activeTab]);
+
+    const [newPlan, setNewPlan] = useState({ title: '', totalAmount: '', installmentCount: '', startDate: '', type: 'Kredi' });
+
+    const saveNewPlan = async () => {
+        if (!newPlan.title || !newPlan.totalAmount || !newPlan.installmentCount || !newPlan.startDate) {
+            showWarning("Eksik Bilgi", "Lütfen tüm alanları doldurunuz.");
+            return;
+        }
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/financials/payment-plans', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...newPlan,
+                    branch: currentUser?.branch || 'Merkez'
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess("Başarılı", "Ödeme Planı oluşturuldu.");
+                setShowScheduledModal(false);
+                setNewPlan({ title: '', totalAmount: '', installmentCount: '', startDate: '', type: 'Kredi' });
+                // Re-fetch
+                const res2 = await fetch('/api/financials/payment-plans');
+                const data2 = await res2.json();
+                if (data2.success) setScheduledPayments(data2.plans);
+            } else {
+                showError("Hata", data.error || 'Oluşturulamadı');
+            }
+        } catch (e) {
+            showError("Hata", "Bir hata oluştu");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const handlePayInstallment = async (inst: any, kasaId: string) => {
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/financials/payment-plans/pay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ installmentId: inst.id, kasaId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess("Ödendi", "Taksit ödemesi başarıyla yapıldı.");
+                // Refresh
+                const res2 = await fetch('/api/financials/payment-plans');
+                const data2 = await res2.json();
+                if (data2.success) setScheduledPayments(data2.plans);
+            } else {
+                showError("Hata", data.error || 'Ödenemedi');
+            }
+        } catch (e) {
+            showError("Hata", "Bir sorun oluştu");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     const handleCollect = (item: any) => {
         router.push(`/payment?amount=${Math.abs(item.amount)}&title=${encodeURIComponent(item.title)}&ref=ACC-${item.id}`);
     };
@@ -628,8 +707,8 @@ export default function AccountingPage() {
             </header>
 
             <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-                {['Alacaklar', 'Borçlar', 'Çek & Senet', 'Banka & Kasa', 'Giderler', 'Finansal Hareketler'].map((label, i) => {
-                    const keys = ['receivables', 'payables', 'checks', 'banks', 'expenses', 'transactions_list'];
+                {['Alacaklar', 'Borçlar', 'Çek & Senet', 'Banka & Kasa', 'Giderler', 'Planlı Ödemeler', 'Finansal Hareketler'].map((label, i) => {
+                    const keys = ['receivables', 'payables', 'checks', 'banks', 'expenses', 'scheduled', 'transactions_list'];
                     const key = keys[i];
                     return (
                         <button
@@ -748,6 +827,88 @@ export default function AccountingPage() {
                             </tbody>
                         </table>
                         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                    </div>
+                )}
+
+                {activeTab === 'scheduled' && (
+                    <div className="animate-in">
+                        <div className="flex-between mb-4"><h3>Planlı Ödemeler & Krediler</h3><button onClick={() => setShowScheduledModal(true)} className="btn btn-primary">+ Yeni Plan Oluştur</button></div>
+                        <div className="flex flex-col gap-4">
+                            {scheduledPayments.map(plan => {
+                                const paidInstallments = plan.installments.filter((i: any) => i.status === 'Paid').length;
+                                const progress = (paidInstallments / plan.installments.length) * 100;
+
+                                return (
+                                    <div key={plan.id} className="card glass-plus p-4">
+                                        <div className="flex-between items-center cursor-pointer select-none" onClick={() => setExpandedPlanId(expandedPlanId === plan.id ? null : plan.id)}>
+                                            <div>
+                                                <h4 className="font-bold text-lg">{plan.title}</h4>
+                                                <div className="text-sm text-muted">{plan.branch || 'Merkez'} - {new Date(plan.startDate).toLocaleDateString()} Başlangıç</div>
+                                                <div className="text-xs text-muted mt-1 bg-subtle w-fit px-2 rounded">{plan.type}</div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="font-black text-xl">{Number(plan.totalAmount).toLocaleString()} ₺</div>
+                                                <div className="text-xs text-muted">{plan.installmentCount} Taksit</div>
+                                                <div className="text-[10px] text-muted">{expandedPlanId === plan.id ? '🔼 Kapat' : '🔽 Detay'}</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Progress Bar */}
+                                        <div className="mt-3 w-full bg-subtle/30 h-2 rounded-full overflow-hidden">
+                                            <div className="bg-primary/80 h-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                                        </div>
+                                        <div className="text-xs text-muted text-right mt-1">
+                                            %{Math.round(progress)} Ödendi ({paidInstallments}/{plan.installments.length})
+                                            {plan.status === 'Completed' && <span className="ml-2 text-success font-bold">TAMAMLANDI</span>}
+                                        </div>
+
+                                        {/* Installments Accordion */}
+                                        {expandedPlanId === plan.id && (
+                                            <div className="mt-4 border-t border-subtle/20 pt-4 animate-in fade-in zoom-in-95 duration-200">
+                                                <div className="overflow-x-auto">
+                                                    <table className="w-full text-sm">
+                                                        <thead><tr className="text-left text-muted text-xs border-b border-subtle/10"><th className="pb-2">No</th><th>Vade</th><th>Tutar</th><th>Durum</th><th></th></tr></thead>
+                                                        <tbody>
+                                                            {plan.installments.map((inst: any) => (
+                                                                <tr key={inst.id} className="hover:bg-white/5 border-b border-white/5 transition-colors">
+                                                                    <td className="p-2 py-3 font-bold text-accent">{inst.installmentNo}</td>
+                                                                    <td>{new Date(inst.dueDate).toLocaleDateString()}</td>
+                                                                    <td className="font-bold">{Number(inst.amount).toLocaleString()} ₺</td>
+                                                                    <td>
+                                                                        <span className={`px-2 py-0.5 rounded text-[10px] ${inst.status === 'Paid' ? 'bg-success/20 text-success' : 'bg-warning/10 text-warningBorder text-warning'}`}>
+                                                                            {inst.status === 'Paid' ? 'Ödendi' : 'Bekliyor'}
+                                                                        </span>
+                                                                        {inst.paidAt && <div className="text-[8px] text-muted mt-0.5">{new Date(inst.paidAt).toLocaleDateString()}</div>}
+                                                                    </td>
+                                                                    <td className="text-right">
+                                                                        {inst.status !== 'Paid' && (
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    if (confirm(`"${plan.title}" - ${inst.installmentNo}. Taksit ödenecek. Onaylıyor musunuz?`)) {
+                                                                                        const defKasa = kasalar.find(k => k.type === 'Nakit')?.id.toString() || kasalar[0]?.id.toString();
+                                                                                        if (defKasa) handlePayInstallment(inst, defKasa);
+                                                                                        else showError("Hata", "Kasa bulunamadı");
+                                                                                    }
+                                                                                }}
+                                                                                className="btn btn-xs btn-outline border-primary/50 text-primary hover:bg-primary hover:text-white"
+                                                                            >
+                                                                                Öde
+                                                                            </button>
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                            {scheduledPayments.length === 0 && <div className="text-center p-12 text-muted border border-dashed border-subtle rounded-xl">Henüz planlı bir ödeme bulunmuyor.</div>}
+                        </div>
                     </div>
                 )}
 

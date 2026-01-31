@@ -22,7 +22,7 @@ export default function Sidebar() {
         '/customers': 'customer_view',
         '/suppliers': 'supplier_view',
         '/inventory': 'inventory_view',
-        '/service': 'service_view', // New granular perm
+        '/service': 'service_view',
         '/sales': 'sales_archive',
         '/staff': 'staff_manage',
         '/reports': 'reports_view',
@@ -30,8 +30,7 @@ export default function Sidebar() {
         '/security/suspicious': 'security_access',
         '/integrations': 'settings_manage',
         '/settings/branch': 'settings_manage',
-        '/settings': 'settings_manage', // Corrected from staff_manage
-        '/ecommerce': 'ecommerce_view'
+        '/settings': 'settings_manage',
     };
 
     const menuItems = [
@@ -47,7 +46,6 @@ export default function Sidebar() {
         { name: 'Hizmet Özetleri', href: '/reports/daily', icon: '📅' },
         { name: 'Satış Monitörü', href: '/security/suspicious', icon: '🛡️' },
         { name: 'Entegrasyonlar', href: '/integrations', icon: '🔌' },
-        { name: 'E-Ticaret', href: '/ecommerce', icon: '🌍' },
         { name: 'Şube Ayarları', href: '/settings/branch', icon: '🏢' },
         { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
     ].filter(item => {

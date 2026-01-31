@@ -649,3 +649,41 @@ model Coupon {
   @@index([customerId])
   @@index([isUsed])
 }
+
+model PaymentPlan {
+  id              String   @id @default(cuid())
+  title           String   // Örn: İş Bankası Kredisi
+  totalAmount     Decimal  @db.Decimal(12, 2)
+  installmentCount Int
+  startDate       DateTime
+  description     String?
+  type            String   @default("Kredi") // Kredi, Kira, Leasing, Diğer
+  status          String   @default("Active") // Active, Completed, Cancelled
+  branch          String?  @default("Merkez")
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  installments    Installment[]
+}
+
+model Installment {
+  id            String      @id @default(cuid())
+  paymentPlanId String
+  paymentPlan   PaymentPlan @relation(fields: [paymentPlanId], references: [id], onDelete: Cascade)
+  
+  installmentNo Int         // 1, 2, 3...
+  dueDate       DateTime
+  amount        Decimal     @db.Decimal(12, 2)
+  status        String      @default("Pending") // Pending, Paid, Overdue
+  
+  paidAt        DateTime?
+  transactionId String?     // Ödeme yapıldığında oluşan transaction kaydı
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@index([paymentPlanId])
+  @@index([dueDate])
+  @@index([status])
+}
