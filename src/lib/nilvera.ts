@@ -124,9 +124,27 @@ export class NilveraService {
             };
         } catch (error: any) {
             console.error('Nilvera sendInvoice error:', error.response?.data || error.message);
+
+            let errorMsg = error.response?.data?.Message || error.message;
+            const data = error.response?.data;
+
+            // Detaylı validasyon hatalarını yakala
+            if (data) {
+                if (typeof data === 'string') {
+                    errorMsg = data;
+                } else if (data.ModelState) {
+                    // ASP.NET Validation Errors
+                    const errors = Object.values(data.ModelState).flat();
+                    if (errors.length > 0) errorMsg = errors.join(', ');
+                } else if (data.ValidationErrors && Array.isArray(data.ValidationErrors)) {
+                    // Nilvera Validation Errors
+                    errorMsg = data.ValidationErrors.map((e: any) => e.Message || e).join(', ');
+                }
+            }
+
             return {
                 success: false,
-                error: error.response?.data?.Message || error.message
+                error: `Nilvera Hatası: ${errorMsg}`
             };
         }
     }
