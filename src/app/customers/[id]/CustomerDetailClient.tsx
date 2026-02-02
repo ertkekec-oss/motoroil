@@ -357,15 +357,28 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             const data = await res.json();
             if (data.success) {
                 const order = data.order;
+                console.log('📦 Order data:', order);
+                console.log('📦 Order items (raw):', order.items);
+
                 setSelectedOrder(order);
 
                 // Initialize editable items
                 let initialItems = [];
                 try {
                     initialItems = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
-                } catch (e) { initialItems = []; }
+                } catch (e) {
+                    console.error('❌ Failed to parse order items:', e);
+                    initialItems = [];
+                }
 
-                setInvoiceItems(initialItems.map((it: any) => {
+                console.log('📦 Parsed items:', initialItems);
+
+                if (initialItems.length === 0) {
+                    showError("Hata", "Bu siparişte ürün bulunamadı. Sipariş detaylarını kontrol edin.");
+                    return;
+                }
+
+                const mappedItems = initialItems.map((it: any) => {
                     const qty = Number(it.qty || it.quantity || 1);
 
                     // Look up actual product to get real pricing/vat/otv if possible
@@ -390,6 +403,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                     return {
                         ...it,
+                        name: it.name || it.productName || 'Ürün',
                         qty,
                         price: netPrice,
                         vat: vatRate,
@@ -398,11 +412,18 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         oiv: oivRate,
                         productId: realProduct?.id || it.productId
                     };
-                }));
+                });
+
+                console.log('✅ Mapped invoice items:', mappedItems);
+
+                setInvoiceItems(mappedItems);
                 setDiscountValue(0);
                 setDiscountType('percent');
 
-                setInvoiceModalOpen(true);
+                // Open modal after state is set
+                setTimeout(() => {
+                    setInvoiceModalOpen(true);
+                }, 100);
             } else {
                 showError("Hata", data.error || "Sipariş detayları alınamadı.");
             }
