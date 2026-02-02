@@ -28,13 +28,13 @@ export class NilveraService {
         if (this.token) {
             return {
                 'Authorization': `Bearer ${this.token}`,
-                'Content-Type': 'application/json-patch+json',
+                'Content-Type': 'application/json',
                 'Accept': 'application/json'
             };
         }
         return {
             'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json-patch+json',
+            'Content-Type': 'application/json',
             'Accept': 'application/json'
         };
     }
@@ -48,7 +48,7 @@ export class NilveraService {
         }
 
         try {
-            const response = await axios.post(`${this.baseUrl}/General/Login`, {
+            const response = await axios.post(`${this.baseUrl}/general/Login`, {
                 UserName: this.username,
                 Password: this.password
             });
@@ -70,7 +70,7 @@ export class NilveraService {
 
     async checkUser(vkn: string): Promise<{ isEInvoiceUser: boolean; alias?: string }> {
         try {
-            const response = await axios.get(`${this.baseUrl}/General/CheckUser/${vkn}`, {
+            const response = await axios.get(`${this.baseUrl}/general/CheckUser/${vkn}`, {
                 headers: this.getHeaders()
             });
 
@@ -101,7 +101,6 @@ export class NilveraService {
 
     async getCompanyInfo(): Promise<any> {
         try {
-            // Dokümantasyona göre endpoint: /general/Company
             const response = await axios.get(`${this.baseUrl}/general/Company`, {
                 headers: this.getHeaders()
             });
@@ -116,7 +115,7 @@ export class NilveraService {
     }
 
     async sendInvoice(invoiceData: any, type: 'EFATURA' | 'EARSIV'): Promise<{ success: boolean; resultMsg?: string; formalId?: string; error?: string }> {
-        const endpoint = type === 'EFATURA' ? '/EInvoice/Send/Model' : '/EArchive/Send/Model';
+        const endpoint = type === 'EFATURA' ? '/einvoice/Send/Model' : '/earchive/Send/Model';
         try {
             // Nilvera endpointi tekil obje bekliyor ("Cannot deserialize JSON array...").
             const payload = invoiceData;

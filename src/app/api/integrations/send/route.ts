@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { NilveraService } from '@/lib/nilvera';
 
 /**
- * E-Fatura/e-Arşiv Gönderme API (Nilvera UBL Model - Katı Standart)
+ * E-Fatura/e-Arşiv Gönderme API (Nilvera UBL Model - Örnek Kod Uyumlu)
  * POST /api/integrations/send
  */
 export async function POST(req: NextRequest) {
@@ -91,7 +91,6 @@ export async function POST(req: NextRequest) {
 
         let totalTaxExclusiveAmount = 0;
         let totalTaxAmount = 0;
-        let kdv20Total = 0;
 
         const invoiceLines = invoiceItems.map((item: any, index: number) => {
             const qty = Number(item.qty || item.quantity || 1);
@@ -107,8 +106,6 @@ export async function POST(req: NextRequest) {
             totalTaxExclusiveAmount += baseAmount;
             totalTaxAmount += vatAmount;
 
-            if (vatRate === 20) kdv20Total += vatAmount;
-
             return {
                 Index: (index + 1).toString(),
                 Name: item.name || item.productName || 'Urun',
@@ -117,31 +114,30 @@ export async function POST(req: NextRequest) {
                 Price: price,
                 AllowanceTotal: allowanceTotal,
                 KDVPercent: vatRate,
-                KDVTotal: Number(vatAmount.toFixed(2))
+                KDVTotal: Number(vatAmount.toFixed(2)),
+                Taxes: null // Örnek kodda null geçilmiş, KDVPercent kullanılıyor.
             };
         });
 
         const uuid = crypto.randomUUID();
-        // Tarih formatı hassasiyeti (Dökümandaki gibi: 2022-07-01T23:16:59.8456278+03:00)
+        // Tarih formatı: Örnek kod dökümana göre hassas tarih bekliyor.
         const dateNow = new Date();
         const offset = "+03:00";
-        // toISOString milisaniyeyi 3 hane verir (.123Z), biz bunu 7 haneye tamamlayalım
-        const dateStr = dateNow.toISOString().replace('.000Z', '.0000000' + offset).replace('Z', '0000' + offset);
+        const dateStr = dateNow.toISOString().replace('Z', '0000000' + offset);
 
         const modelCore = {
             InvoiceInfo: {
                 UUID: uuid,
                 InvoiceType: "SATIS",
-                InvoiceSerieOrNumber: "", // Boş bırakınca GİB/Nilvera atar
+                InvoiceSerieOrNumber: "EFT", // Örnek kodda "EFT" kullanılmış. Boş bırakınca 500 alıyor olabiliriz.
                 InvoiceProfile: isEInvoiceUser ? "TEMELFATURA" : "EARSIVFATURA",
                 IssueDate: dateStr,
                 CurrencyCode: "TRY",
+                ExchangeRate: null,
                 LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
                 GeneralKDV1Total: 0,
                 GeneralKDV8Total: 0,
                 GeneralKDV18Total: 0,
-                GeneralKDV10Total: 0,
-                GeneralKDV20Total: Number(kdv20Total.toFixed(2)),
                 GeneralAllowanceTotal: 0,
                 PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2)),
                 KdvTotal: Number(totalTaxAmount.toFixed(2))
@@ -159,7 +155,7 @@ export async function POST(req: NextRequest) {
                 Phone: invoice.customer.phone || ''
             },
             InvoiceLines: invoiceLines,
-            Notes: ["Fatura Notu: " + (invoice.description || "")]
+            Notes: ["Elektronik Arşiv Faturası", "Fatura Notu: " + (invoice.description || "")]
         };
 
         const endpointType = isEInvoiceUser ? 'EFATURA' : 'EARSIV';
@@ -184,7 +180,7 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({
                 success: true,
-                message: `${endpointType} başarıyla gönderildi.`,
+                message: `${endpointType} gönderildi.`,
                 uuid: uuid
             });
         } else {
