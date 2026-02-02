@@ -45,7 +45,7 @@ export class NilveraService {
         }
 
         try {
-            const response = await axios.post(`${this.baseUrl}/general/Login`, {
+            const response = await axios.post(`${this.baseUrl}/General/Login`, {
                 UserName: this.username,
                 Password: this.password
             });
@@ -67,7 +67,7 @@ export class NilveraService {
 
     async checkUser(vkn: string): Promise<{ isEInvoiceUser: boolean; aliases?: any[] }> {
         try {
-            const response = await axios.get(`${this.baseUrl}/general/CheckUser/${vkn}`, {
+            const response = await axios.get(`${this.baseUrl}/General/CheckUser/${vkn}`, {
                 headers: this.getHeaders()
             });
             return {
@@ -93,7 +93,7 @@ export class NilveraService {
     }
 
     async sendInvoice(invoiceData: any, type: 'EFATURA' | 'EARSIV'): Promise<{ success: boolean; resultMsg?: string; formalId?: string; error?: string }> {
-        const endpoint = type === 'EFATURA' ? '/einvoice/Send/Model' : '/earchive/Send/Model';
+        const endpoint = type === 'EFATURA' ? '/EInvoice/Send/Model' : '/EArchive/Send/Model';
         try {
             const response = await axios.post(`${this.baseUrl}${endpoint}`, invoiceData, {
                 headers: this.getHeaders()
@@ -126,7 +126,7 @@ export class NilveraService {
 
     async sendDespatch(despatchData: any): Promise<{ success: boolean; resultMsg?: string; formalId?: string; error?: string }> {
         try {
-            const response = await axios.post(`${this.baseUrl}/edespatch/Send/Model`, despatchData, {
+            const response = await axios.post(`${this.baseUrl}/EDespatch/Send/Model`, despatchData, {
                 headers: this.getHeaders()
             });
             const result = Array.isArray(response.data) ? response.data[0] : response.data;
