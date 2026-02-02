@@ -1127,13 +1127,15 @@ export default function SalesPage() {
                                                                     <div className="flex-center gap-2" onClick={e => e.stopPropagation()}>
                                                                         {!inv.isFormal ? (
                                                                             <>
-                                                                                <button
-                                                                                    onClick={() => handleApproveInvoice(inv.id)}
-                                                                                    className="btn btn-primary"
-                                                                                    style={{ fontSize: '11px', padding: '6px 10px', background: 'var(--success)', border: 'none' }}
-                                                                                >
-                                                                                    ✅ Onayla
-                                                                                </button>
+                                                                                {inv.status !== 'Onaylandı' && (
+                                                                                    <button
+                                                                                        onClick={() => handleApproveInvoice(inv.id)}
+                                                                                        className="btn btn-primary"
+                                                                                        style={{ fontSize: '11px', padding: '6px 10px', background: 'var(--success)', border: 'none' }}
+                                                                                    >
+                                                                                        ✅ Onayla
+                                                                                    </button>
+                                                                                )}
                                                                                 <button
                                                                                     onClick={() => handleSendToELogo(inv.id, 'EFATURA')}
                                                                                     className="btn btn-primary"
