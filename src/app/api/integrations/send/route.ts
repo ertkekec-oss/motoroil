@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { NilveraService } from '@/lib/nilvera';
 
 /**
- * E-Fatura/e-Arşiv Gönderme API (Nilvera UBL Model)
+ * E-Fatura/e-Arşiv Gönderme API (Nilvera UBL Model - Katı Standart)
  * POST /api/integrations/send
  */
 export async function POST(req: NextRequest) {
@@ -91,10 +91,9 @@ export async function POST(req: NextRequest) {
 
         let totalTaxExclusiveAmount = 0;
         let totalTaxAmount = 0;
-        let totalDiscountAmount = 0;
         let kdv20Total = 0;
 
-        const invoiceLines = invoiceItems.map((item: any) => {
+        const invoiceLines = invoiceItems.map((item: any, index: number) => {
             const qty = Number(item.qty || item.quantity || 1);
             const price = Number(item.price || item.unitPrice || 0);
             const vatRate = Number(item.vat || item.vatRate || 20);
@@ -111,6 +110,7 @@ export async function POST(req: NextRequest) {
             if (vatRate === 20) kdv20Total += vatAmount;
 
             return {
+                Index: (index + 1).toString(),
                 Name: item.name || item.productName || 'Urun',
                 Quantity: qty,
                 UnitType: "C62",
@@ -122,20 +122,29 @@ export async function POST(req: NextRequest) {
         });
 
         const uuid = crypto.randomUUID();
-        // Tarih formatı: YYYY-MM-DDTHH:mm:ss.0000000+03:00 (Örnekteki gibi)
+        // Tarih formatı hassasiyeti (Dökümandaki gibi: 2022-07-01T23:16:59.8456278+03:00)
         const dateNow = new Date();
         const offset = "+03:00";
-        const dateStr = dateNow.toISOString().replace('Z', '0000000' + offset);
+        // toISOString milisaniyeyi 3 hane verir (.123Z), biz bunu 7 haneye tamamlayalım
+        const dateStr = dateNow.toISOString().replace('.000Z', '.0000000' + offset).replace('Z', '0000' + offset);
 
         const modelCore = {
             InvoiceInfo: {
                 UUID: uuid,
+                TemplateUUID: null, // Şablon UUID (Null olabilir ama alan var olmalı)
                 InvoiceType: "SATIS",
+                InvoiceSerieOrNumber: "", // Boş bırakınca GİB/Nilvera atar
                 InvoiceProfile: isEInvoiceUser ? "TEMELFATURA" : "EARSIVFATURA",
                 IssueDate: dateStr,
                 CurrencyCode: "TRY",
+                ExchangeRate: null,
                 LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
+                GeneralKDV1Total: 0,
+                GeneralKDV8Total: 0,
+                GeneralKDV18Total: 0,
+                GeneralKDV10Total: 0,
                 GeneralKDV20Total: Number(kdv20Total.toFixed(2)),
+                GeneralAllowanceTotal: 0,
                 PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2)),
                 KdvTotal: Number(totalTaxAmount.toFixed(2))
             },
@@ -152,17 +161,15 @@ export async function POST(req: NextRequest) {
                 Phone: invoice.customer.phone || ''
             },
             InvoiceLines: invoiceLines,
-            Notes: ["Elektronik Arşiv Faturası", "Fatura Notu: " + (invoice.description || "")]
+            Notes: ["Fatura Notu: " + (invoice.description || "")]
         };
 
-        let result;
         const endpointType = isEInvoiceUser ? 'EFATURA' : 'EARSIV';
-
         const finalPayload = isEInvoiceUser
-            ? { EInvoice: modelCore, CustomerAlias: customerAlias || "urn:mail:defaultpk@gib.gov.tr" }
+            ? { EInvoice: modelCore, CustomerAlias: customerAlias || null }
             : { ArchiveInvoice: modelCore };
 
-        result = await nilvera.sendInvoice(finalPayload, endpointType);
+        const result = await nilvera.sendInvoice(finalPayload, endpointType);
 
         if (result.success) {
             const formalId = result.formalId || uuid;
@@ -179,7 +186,7 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({
                 success: true,
-                message: `${endpointType} başarıyla kuyruğa eklendi.`,
+                message: `${endpointType} başarıyla gönderildi.`,
                 uuid: uuid
             });
         } else {
