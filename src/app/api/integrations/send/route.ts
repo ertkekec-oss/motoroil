@@ -131,13 +131,11 @@ export async function POST(req: NextRequest) {
         const modelCore = {
             InvoiceInfo: {
                 UUID: uuid,
-                TemplateUUID: null, // Şablon UUID (Null olabilir ama alan var olmalı)
                 InvoiceType: "SATIS",
                 InvoiceSerieOrNumber: "", // Boş bırakınca GİB/Nilvera atar
                 InvoiceProfile: isEInvoiceUser ? "TEMELFATURA" : "EARSIVFATURA",
                 IssueDate: dateStr,
                 CurrencyCode: "TRY",
-                ExchangeRate: null,
                 LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
                 GeneralKDV1Total: 0,
                 GeneralKDV8Total: 0,
