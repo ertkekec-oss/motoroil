@@ -4,11 +4,27 @@ import prisma from '@/lib/prisma';
 import { NilveraService } from '@/lib/nilvera';
 
 /**
- * Nilvera Tarih Formatı (Z Formatı - UTC)
+ * Nilvera için GİB Standartlarında Benzersiz Fatura Numarası Üretir
+ * Format: [SERI(3)][YIL(4)][SIRA(9)] -> TOPLAM 16 HANE
  */
+function generateGIBInvoiceNo(prefix: string) {
+    const now = new Date();
+    const year = now.getFullYear().toString();
+
+    // Testlerde çakışmayı önlemek için zaman damgasını (timestamp) baz alan bir sıra numarası üretelim
+    // Toplam 9 hane olacak şekilde: HHmmSS + 3 hane milisaniye (veya rastgele)
+    const timePart = now.getHours().toString().padStart(2, '0') +
+        now.getMinutes().toString().padStart(2, '0') +
+        now.getSeconds().toString().padStart(2, '0');
+
+    const randomPart = Math.floor(Math.random() * 999).toString().padStart(3, '0');
+    const sequence = (timePart + randomPart).slice(0, 9);
+
+    return `${prefix}${year}${sequence}`;
+}
+
 function getNilveraDate(dateInput?: string | Date) {
     const d = dateInput ? new Date(dateInput) : new Date();
-    // Milisaniye hassasiyetini 3 hanede tutup Z ekleyelim (Swagger standardı)
     return d.toISOString();
 }
 
@@ -48,7 +64,6 @@ export async function POST(req: NextRequest) {
         try {
             const info = await nilvera.getCompanyInfo();
             if (info) {
-                // Şema uyumu: info'dan gelen alanları Nilvera CompanyInfo şemasına eşle
                 companyInfo = {
                     TaxNumber: info.TaxNumber,
                     Name: info.Name || info.Title,
@@ -92,7 +107,7 @@ export async function POST(req: NextRequest) {
                 KDVTotal: Number(vat.toFixed(2)),
                 Taxes: [
                     {
-                        TaxCode: "0015", // KDV Standardı
+                        TaxCode: "0015",
                         Total: Number(vat.toFixed(2)),
                         Percent: vatRate
                     }
@@ -103,12 +118,15 @@ export async function POST(req: NextRequest) {
         const uuid = crypto.randomUUID();
         const dateStr = getNilveraDate(invoice.invoiceDate);
 
-        // Nilvera UBL Model (InvoiceInfo)
+        // Seri ve No üretimi (Zorunlu Alan!)
+        const prefix = isEInvoiceUser ? "EFT" : "ARS";
+        const invoiceNo = generateGIBInvoiceNo(prefix);
+
         const invoiceInfo: any = {
             UUID: uuid,
-            CustomizationID: "TR1.2", // Başarılı görseldeki "Özelleştirme No"
+            CustomizationID: "TR1.2",
             InvoiceType: "SATIS",
-            InvoiceSerieOrNumber: null,
+            InvoiceSerieOrNumber: invoiceNo, // Artık EA2026... formatında dolu gidiyor
             IssueDate: dateStr,
             CurrencyCode: "TRY",
             LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
@@ -119,7 +137,7 @@ export async function POST(req: NextRequest) {
         };
 
         if (isEInvoiceUser) {
-            invoiceInfo.InvoiceProfile = "TICARIFATURA"; // Başarılı görseldeki "Senaryo"
+            invoiceInfo.InvoiceProfile = "TICARIFATURA";
         } else {
             invoiceInfo.InvoiceProfile = "EARSIVFATURA";
             invoiceInfo.SalesPlatform = "NORMAL";
@@ -156,12 +174,12 @@ export async function POST(req: NextRequest) {
                 data: {
                     isFormal: true,
                     formalType: endpointType,
-                    formalId: result.formalId,
+                    formalId: result.formalId || invoiceNo,
                     formalUuid: uuid,
                     formalStatus: 'SENT'
                 }
             });
-            return NextResponse.json({ success: true, uuid: uuid, message: 'Fatura başarıyla gönderildi.' });
+            return NextResponse.json({ success: true, uuid: uuid, message: `Fatura (${invoiceNo}) başarıyla gönderildi.` });
         } else {
             return NextResponse.json({ success: false, error: result.error }, { status: 400 });
         }
