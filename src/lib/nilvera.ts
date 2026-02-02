@@ -43,7 +43,7 @@ export class NilveraService {
         }
 
         try {
-            const response = await axios.post(`${this.baseUrl}/auth/login`, {
+            const response = await axios.post(`${this.baseUrl}/general/Login`, {
                 UserName: this.username,
                 Password: this.password
             });
@@ -73,7 +73,7 @@ export class NilveraService {
             // If authorized but check failed (e.g. 404), return false. 
             // If unauthorized (401), throw error to alert connection failure.
             if (error.response?.status === 401 || error.response?.status === 403) {
-                throw new Error('Yetkisiz Erişim: API Key geçersiz.');
+                throw new Error('Yetkisiz Erişim: API Key veya Token geçersiz.');
             }
             // For other errors, we might assume user is not found or other non-critical issues for checking flow
             // BUT for connection test, we should surface errors.
