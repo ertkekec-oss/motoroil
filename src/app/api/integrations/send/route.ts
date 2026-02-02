@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
             UUID: uuid,
             CustomizationID: "TR1.2", // Başarılı görseldeki "Özelleştirme No"
             InvoiceType: "SATIS",
-            InvoiceSerieOrNumber: "",
+            InvoiceSerieOrNumber: null,
             IssueDate: dateStr,
             CurrencyCode: "TRY",
             LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
