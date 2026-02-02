@@ -1151,10 +1151,12 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                         value={it.productId || ''}
                                                                         onChange={(e) => {
                                                                             const selectedProduct = products.find(p => String(p.id) === e.target.value);
+                                                                            console.log('🔍 Selected product ID:', e.target.value);
+                                                                            console.log('🔍 Found product:', selectedProduct);
                                                                             if (selectedProduct) {
                                                                                 // Update all fields at once
                                                                                 const newItems = [...invoiceItems];
-                                                                                newItems[i] = {
+                                                                                const updatedItem = {
                                                                                     ...newItems[i],
                                                                                     productId: selectedProduct.id,
                                                                                     name: selectedProduct.name,
@@ -1164,10 +1166,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                     otvType: selectedProduct.otvType || 'Ö.T.V yok',
                                                                                     oiv: Number(selectedProduct.salesOiv || 0)
                                                                                 };
+                                                                                newItems[i] = updatedItem;
+                                                                                console.log('✅ Updated item:', updatedItem);
+                                                                                console.log('📦 All items before setState:', newItems);
                                                                                 setInvoiceItems(newItems);
                                                                                 console.log('✅ Product selected:', selectedProduct.name, {
                                                                                     price: selectedProduct.price,
-                                                                                    vat: selectedProduct.salesVat
+                                                                                    vat: selectedProduct.salesVat,
+                                                                                    updatedPrice: updatedItem.price,
+                                                                                    updatedVat: updatedItem.vat
                                                                                 });
                                                                             }
                                                                         }}
