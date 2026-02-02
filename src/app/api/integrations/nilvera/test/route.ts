@@ -37,9 +37,24 @@ export async function POST(request: Request) {
 
     } catch (error: any) {
         console.error('Nilvera Test Error:', error);
+
+        let errorMessage = 'Bağlantı kurulamadı.';
+        if (error.response?.data) {
+            if (typeof error.response.data === 'string') {
+                errorMessage = error.response.data;
+            } else if (error.response.data.Message) {
+                errorMessage = error.response.data.Message;
+                if (error.response.data.Detail) errorMessage += ` (${error.response.data.Detail})`;
+            } else {
+                errorMessage = JSON.stringify(error.response.data);
+            }
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
         return NextResponse.json({
             success: false,
-            error: error.response?.data?.Message || error.message || 'Bağlantı kurulamadı.'
+            error: errorMessage
         }, { status: 401 });
     }
 }
