@@ -5,17 +5,12 @@ export default function IntegrationsContent() {
     const { showSuccess, showError } = useModal();
     const [activeTab, setActiveTab] = useState<'efatura' | 'marketplace' | 'pos'>('efatura');
 
-    // E-Fatura Settings
+    // E-Fatura Settings (Nilvera Only)
     const [eFaturaSettings, setEFaturaSettings] = useState({
-        provider: 'elogo',
+        provider: 'nilvera', // Only Nilvera supported
         apiUrl: 'https://api.nilvera.com/v1',
         apiKey: '',
         apiSecret: '',
-        // eLogo Specific
-        elogoUsername: '',
-        elogoPass: '',
-        logoFirmCode: '',
-        // Common
         companyVkn: '',
         companyTitle: '',
         environment: 'test',
@@ -85,65 +80,26 @@ export default function IntegrationsContent() {
         setTestResults({ ...testResults, efatura: '⏳ Bağlantı test ediliyor...' });
 
         try {
-            if (eFaturaSettings.provider === 'elogo') {
-                const res = await fetch('/api/integrations/elogo/test', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: eFaturaSettings.elogoUsername,
-                        pass: eFaturaSettings.elogoPass,
-                        isTest: eFaturaSettings.environment === 'test'
-                    })
+            const res = await fetch('/api/integrations/nilvera/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    apiKey: eFaturaSettings.apiKey,
+                    environment: eFaturaSettings.environment,
+                    companyVkn: eFaturaSettings.companyVkn
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setTestResults({
+                    ...testResults,
+                    efatura: `✅ Nilvera Bağlantısı Başarılı!`
                 });
-                const data = await res.json();
-
-                if (!data.success) {
-                    console.error('eLogo Connection Error:', data);
-                    // Show detailed error in UI so user can read it
-                    let errorMsg = data.error || 'Bağlantı hatası';
-                    if (data.debug) {
-                        try {
-                            // If debug is XML/HTML, try to extract relevant parts or just show constraint
-                            errorMsg += `\n\nTeknik Detay: ${data.debug.substring(0, 200)}... (Konsola bakınız)`;
-                        } catch (e) { }
-                    }
-                    showError('Logo Bağlantı Başarısız', errorMsg);
-                }
-
-                if (data.success) {
-                    setTestResults({
-                        ...testResults,
-                        efatura: `✅ Bağlantı Başarılı! (Session: ${data.sessionId.substring(0, 10)}...)`
-                    });
-                } else {
-                    // Don't throw generic error, let showError handle it visually
-                    setTestResults({
-                        ...testResults,
-                        efatura: `❌ ${data.error}`
-                    });
-                }
-            } else if (eFaturaSettings.provider === 'nilvera') {
-                const res = await fetch('/api/integrations/nilvera/test', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        apiKey: eFaturaSettings.apiKey,
-                        environment: eFaturaSettings.environment,
-                        companyVkn: eFaturaSettings.companyVkn
-                    })
+            } else {
+                setTestResults({
+                    ...testResults,
+                    efatura: `❌ ${data.error}`
                 });
-                const data = await res.json();
-                if (data.success) {
-                    setTestResults({
-                        ...testResults,
-                        efatura: `✅ Nilvera Bağlantısı Başarılı!`
-                    });
-                } else {
-                    setTestResults({
-                        ...testResults,
-                        efatura: `❌ ${data.error}`
-                    });
-                }
             }
         } catch (error: any) {
             setTestResults({
@@ -281,10 +237,10 @@ export default function IntegrationsContent() {
                 <div className="card glass p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div className="flex items-center gap-4 border-b border-white/5 pb-6">
                         <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-3xl shadow-inner">
-                            {eFaturaSettings.provider === 'elogo' ? '🦅' : '📄'}
+                            📄
                         </div>
                         <div>
-                            <h3 className="text-xl font-black text-white">E-Fatura Entegrasyonu</h3>
+                            <h3 className="text-xl font-black text-white">E-Fatura Entegrasyonu (Nilvera)</h3>
                             <p className="text-sm text-white/40 mt-1">GİB uyumlu e-fatura servis sağlayıcı ayarları</p>
                         </div>
                         <div className="ml-auto">
@@ -292,30 +248,6 @@ export default function IntegrationsContent() {
                                 {eFaturaSettings.environment === 'production' ? '🚀 CANLI ORTAM' : '🧪 TEST ORTAMI'}
                             </span>
                         </div>
-                    </div>
-
-                    {/* Provider Selection */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <button
-                            onClick={() => setEFaturaSettings({ ...eFaturaSettings, provider: 'elogo' })}
-                            className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${eFaturaSettings.provider === 'elogo'
-                                ? 'bg-primary/20 border-primary text-white'
-                                : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10'
-                                }`}
-                        >
-                            <span className="text-2xl">🦅</span>
-                            <span className="font-bold">Logo (eLogo)</span>
-                        </button>
-                        <button
-                            onClick={() => setEFaturaSettings({ ...eFaturaSettings, provider: 'nilvera' })}
-                            className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${eFaturaSettings.provider === 'nilvera'
-                                ? 'bg-primary/20 border-primary text-white'
-                                : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10'
-                                }`}
-                        >
-                            <span className="text-2xl">📄</span>
-                            <span className="font-bold">Nilvera</span>
-                        </button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -347,41 +279,19 @@ export default function IntegrationsContent() {
                         </div>
 
                         <div className="space-y-6">
-                            {/* eLogo Specific Fields */}
-                            {eFaturaSettings.provider === 'elogo' && (
-                                <>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">eLogo Kullanıcı Adı</label>
-                                        <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" value={eFaturaSettings.elogoUsername} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, elogoUsername: e.target.value })} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">eLogo Şifre</label>
-                                        <input type="password" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" value={eFaturaSettings.elogoPass} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, elogoPass: e.target.value })} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Firma Kodu (Opsiyonel)</label>
-                                        <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" value={eFaturaSettings.logoFirmCode} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, logoFirmCode: e.target.value })} />
-                                    </div>
-                                </>
-                            )}
-
-                            {/* Nilvera Specific Fields */}
-                            {eFaturaSettings.provider === 'nilvera' && (
-                                <>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">API Adresi</label>
-                                        <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" value={eFaturaSettings.apiUrl} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiUrl: e.target.value })} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">API Key</label>
-                                        <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" value={eFaturaSettings.apiKey} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiKey: e.target.value })} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">API Secret</label>
-                                        <input type="password" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" value={eFaturaSettings.apiSecret} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiSecret: e.target.value })} />
-                                    </div>
-                                </>
-                            )}
+                            {/* Nilvera Fields */}
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">API Adresi</label>
+                                <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" value={eFaturaSettings.apiUrl} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiUrl: e.target.value })} />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">API Key</label>
+                                <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" value={eFaturaSettings.apiKey} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiKey: e.target.value })} />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">API Secret</label>
+                                <input type="password" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" value={eFaturaSettings.apiSecret} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiSecret: e.target.value })} />
+                            </div>
                         </div>
                     </div>
 
