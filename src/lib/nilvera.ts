@@ -1,26 +1,62 @@
 import axios from 'axios';
 
 export interface NilveraConfig {
-    apiKey: string;
+    apiKey?: string;
+    username?: string;
+    password?: string;
     environment: 'test' | 'production';
 }
 
 export class NilveraService {
-    private apiKey: string;
+    private apiKey?: string;
+    private username?: string;
+    private password?: string;
     private baseUrl: string;
+    private token?: string;
 
     constructor(config: NilveraConfig) {
         this.apiKey = config.apiKey;
+        this.username = config.username;
+        this.password = config.password;
         this.baseUrl = config.environment === 'production'
             ? 'https://api.nilvera.com'
             : 'https://apitest.nilvera.com';
     }
 
     private getHeaders() {
+        if (this.token) {
+            return {
+                'Authorization': `Bearer ${this.token}`,
+                'Content-Type': 'application/json'
+            };
+        }
         return {
             'Authorization': `Bearer ${this.apiKey}`,
             'Content-Type': 'application/json'
         };
+    }
+
+    async login(): Promise<void> {
+        if (!this.username || !this.password) {
+            if (this.apiKey) return; // API Key modunda login gerekmez
+            throw new Error('Kullanıcı adı ve şifre veya API Key gereklidir.');
+        }
+
+        try {
+            const response = await axios.post(`${this.baseUrl}/auth/login`, {
+                UserName: this.username,
+                Password: this.password
+            });
+
+            if (response.data && response.data.Token) {
+                this.token = response.data.Token;
+            } else {
+                throw new Error('Geçersiz kullanıcı adı veya şifre.');
+            }
+        } catch (error: any) {
+            console.error('Nilvera Login Error:', error.response?.data || error.message);
+            throw new Error('Giriş başarısız: ' + (error.response?.data?.Message || error.message));
+        }
     }
 
     async checkUser(vkn: string): Promise<{ isEInvoiceUser: boolean; aliases?: any[] }> {

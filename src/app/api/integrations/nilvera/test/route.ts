@@ -6,16 +6,23 @@ import prisma from '@/lib/prisma';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { apiKey, environment, companyVkn } = body;
+        const { apiKey, username, password, environment, companyVkn } = body;
 
-        if (!apiKey) {
-            return NextResponse.json({ success: false, error: 'API Key gereklidir.' }, { status: 400 });
+        if (!apiKey && (!username || !password)) {
+            return NextResponse.json({ success: false, error: 'API Key veya Kullanıcı Bilgileri gereklidir.' }, { status: 400 });
         }
 
         const nilveraService = new NilveraService({
             apiKey,
+            username,
+            password,
             environment: environment || 'test'
         });
+
+        // Autentikasyon (Login)
+        if (username && password) {
+            await nilveraService.login();
+        }
 
         // Test connection by checking a VKN (self VKN if provided, otherwise a fixed common one)
         const testVkn = companyVkn || '4840846711'; // Nilvera's own VKN or a dummy
