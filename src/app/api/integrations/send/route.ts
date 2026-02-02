@@ -66,9 +66,6 @@ export async function POST(req: NextRequest) {
             }, { status: 400 });
         }
 
-        // Nilvera: vkn 10 haneli olmalı, şahıs ise TCKN 11 haneli.
-        // Basit bir kontrol yapabiliriz veya direkt göndeririz.
-
         let isEInvoiceUser = false;
         let customerAlias = "";
         try {
@@ -80,23 +77,62 @@ export async function POST(req: NextRequest) {
             isEInvoiceUser = false;
         }
 
-        // Prepare invoice data (Nilvera expects PascalCase)
+        // Prepare invoice data
         const invoiceItems = Array.isArray(invoice.items) ? invoice.items : JSON.parse(JSON.stringify(invoice.items || []));
+
+        // Calculate Totals and Prepare Lines
+        let totalTaxExclusiveAmount = 0;
+        let totalTaxAmount = 0;
+        let totalDiscountAmount = 0;
+
+        const lines = invoiceItems.map((item: any) => {
+            const qty = Number(item.qty || item.quantity || 1);
+            const price = Number(item.price || item.unitPrice || 0);
+            const vatRate = Number(item.vat || item.vatRate || 20);
+            const discount = Number(item.discount || 0);
+
+            const lineTotal = qty * price;
+            const vatAmount = (lineTotal * vatRate) / 100;
+
+            totalTaxExclusiveAmount += lineTotal;
+            totalTaxAmount += vatAmount;
+            totalDiscountAmount += discount;
+
+            return {
+                Name: item.name || item.productName || 'Urun',
+                Quantity: qty,
+                UnitCode: "C62", // Adet
+                UnitPrice: price,
+                Taxes: [
+                    {
+                        TaxCode: "0015", // KDV
+                        Rate: vatRate,
+                        Amount: Number(vatAmount.toFixed(2))
+                    }
+                ],
+                DiscountAmount: discount
+            };
+        });
 
         // Determine scenario
         const scenario = isEInvoiceUser ? "TEMELFATURA" : "EARSIVFATURA";
 
         const invoiceData = {
-            InvoiceNumber: "", // Boş bırakıyoruz, Nilvera/GİB atayacak
-            UUID: crypto.randomUUID(), // Zorunlu: Her belge için benzersiz UUID
-            InvoiceDate: new Date(invoice.invoiceDate).toISOString().split('.')[0], // Milisaniyeleri temizle (YYYY-MM-DDTHH:mm:ss)
+            InvoiceNumber: "",
+            UUID: crypto.randomUUID(),
+            InvoiceDate: new Date(invoice.invoiceDate).toISOString().split('.')[0],
             CurrencyCode: invoice.currency || 'TRY',
-            InvoiceType: "SATIS", // Varsayılan Satış Faturası
-            InvoiceScenario: scenario, // Senaryo (TEMEL/EARSIV)
-            PaymentType: "EFT/HAVALE", // Varsayılan Ödeme Tipi (Zorunlu olabilir)
+            InvoiceType: "SATIS",
+            InvoiceScenario: scenario,
+            PaymentType: "EFT/HAVALE",
             Note: invoice.description || 'Fatura',
+
+            // Calculated Totals
+            TaxExclusiveAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
+            TaxAmount: Number(totalTaxAmount.toFixed(2)),
+            PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount - totalDiscountAmount).toFixed(2)),
+
             Receiver: {
-                // Şahıs (11 hane) ise Ad/Soyad ayrılmalı, Kurum (10 hane) ise Unvan (Name) kullanılmalı
                 Name: customerVkn.length === 10 ? invoice.customer.name : undefined,
                 FirstName: customerVkn.length === 11 ? (invoice.customer.name.split(' ').slice(0, -1).join(' ') || invoice.customer.name) : undefined,
                 FamilyName: customerVkn.length === 11 ? invoice.customer.name.split(' ').slice(-1).join(' ') : undefined,
@@ -109,57 +145,27 @@ export async function POST(req: NextRequest) {
                 Country: 'TURKIYE',
                 Email: invoice.customer.email || '',
                 Phone: invoice.customer.phone || '',
-                // E-Fatura için Alias zorunlu (yoksa default)
                 Alias: isEInvoiceUser ? (customerAlias || "urn:mail:defaultpk@gib.gov.tr") : undefined
             },
-            Lines: invoiceItems.map((item: any) => {
-                const qty = Number(item.qty || item.quantity || 1);
-                const price = Number(item.price || item.unitPrice || 0);
-                const vatRate = Number(item.vat || item.vatRate || 20);
-                const discount = Number(item.discount || 0);
-
-                // Vergi Hesabı
-                const totalAmount = qty * price; // brüt (indirim hariç) - basitleştirilmiş
-                // Not: Eğer indirim varsa matrah düşer ama şimdilik basit tutalım
-                const vatAmount = (totalAmount * vatRate) / 100;
-
-                return {
-                    Name: item.name || item.productName || 'Urun',
-                    Quantity: qty,
-                    UnitCode: "C62", // Adet
-                    UnitPrice: price,
-                    Taxes: [
-                        {
-                            TaxCode: "0015", // KDV
-                            Rate: vatRate,
-                            Amount: Number(vatAmount.toFixed(2))
-                        }
-                    ],
-                    DiscountAmount: discount
-                };
-            })
+            Lines: lines
         };
 
         let result;
         if (type === 'despatch') {
-            // e-İrsaliye
             result = await nilvera.sendDespatch(invoiceData);
         } else {
-            // e-Fatura or e-Arşiv
-            // sendInvoice metodu (data, type) alıyor. sendEArchive yok.
             const invoiceType = isEInvoiceUser ? 'EFATURA' : 'EARSIV';
             result = await nilvera.sendInvoice(invoiceData, invoiceType);
         }
 
         if (result.success) {
-            const uuid = result.formalId; // Service returns formalId
-            // Update invoice with formal ID
+            const uuid = result.formalId;
             await (prisma as any).salesInvoice.update({
                 where: { id: invoiceId },
                 data: {
                     isFormal: true,
                     formalType: type === 'despatch' ? 'EIRSALIYE' : (isEInvoiceUser ? 'EFATURA' : 'EARSIV'),
-                    formalId: uuid, // UUID'yi buraya, GIB numarasını başka yere kaydedebiliriz ama şimdilik UUID önemli
+                    formalId: uuid,
                     formalUuid: uuid,
                     formalStatus: 'SENT'
                 }
@@ -175,14 +181,14 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({
                 success: false,
                 error: result.error || 'Gönderim başarısız'
-            }, { status: 500 });
+            }, { status: 500 }); // Client shows error message from body
         }
 
     } catch (error: any) {
-        console.error('E-Fatura gönderim hatası:', error);
+        console.error('Integration/Send Error:', error);
         return NextResponse.json({
             success: false,
-            error: error.message || 'Sunucu hatası'
+            error: error.message || 'Entegrasyon hatası'
         }, { status: 500 });
     }
 }
