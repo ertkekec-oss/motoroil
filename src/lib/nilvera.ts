@@ -37,9 +37,11 @@ export class NilveraService {
     }
 
     async login(): Promise<void> {
+        // Öncelik API Key'de. Eğer API Key varsa login endpointine gitme.
+        if (this.apiKey) return;
+
         if (!this.username || !this.password) {
-            if (this.apiKey) return; // API Key modunda login gerekmez
-            throw new Error('Kullanıcı adı ve şifre veya API Key gereklidir.');
+            throw new Error('API Key veya Kullanıcı Adı/Şifre gereklidir.');
         }
 
         try {
@@ -55,6 +57,10 @@ export class NilveraService {
             }
         } catch (error: any) {
             console.error('Nilvera Login Error:', error.response?.data || error.message);
+            // Login endpointi 404 olabilir, bu durumda kullanıcıyı uyar.
+            if (error.response?.status === 404) {
+                throw new Error('Login servisi bulunamadı (404). Lütfen API Key kullanarak deneyin.');
+            }
             throw new Error('Giriş başarısız: ' + (error.response?.data?.Message || error.message));
         }
     }
