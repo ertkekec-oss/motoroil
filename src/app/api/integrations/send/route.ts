@@ -69,12 +69,14 @@ export async function POST(req: NextRequest) {
         // Basit bir kontrol yapabiliriz veya direkt göndeririz.
 
         let isEInvoiceUser = false;
+        let customerAlias = "";
         try {
             const userCheck = await nilvera.checkUser(customerVkn);
-            isEInvoiceUser = userCheck.isEInvoiceUser; // Case-sensitive fix
+            isEInvoiceUser = userCheck.isEInvoiceUser;
+            customerAlias = userCheck.alias || "";
         } catch (checkErr) {
             console.warn('User check failed, defaulting to e-Archive', checkErr);
-            isEInvoiceUser = false; // Hata durumunda e-Arşiv varsayalım (Test ortamında checkUser bazen hata verebilir)
+            isEInvoiceUser = false;
         }
 
         // Prepare invoice data (Nilvera expects PascalCase)
@@ -99,7 +101,9 @@ export async function POST(req: NextRequest) {
                 District: invoice.customer.district || 'MERKEZ',
                 Country: 'TURKIYE',
                 Email: invoice.customer.email || '',
-                Phone: invoice.customer.phone || ''
+                Phone: invoice.customer.phone || '',
+                // E-Fatura için Alias zorunlu (yoksa default)
+                Alias: isEInvoiceUser ? (customerAlias || "urn:mail:defaultpk@gib.gov.tr") : undefined
             },
             Lines: invoiceItems.map((item: any) => {
                 const qty = Number(item.qty || item.quantity || 1);

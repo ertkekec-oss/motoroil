@@ -66,22 +66,34 @@ export class NilveraService {
         }
     }
 
-    async checkUser(vkn: string): Promise<{ isEInvoiceUser: boolean; aliases?: any[] }> {
+    async checkUser(vkn: string): Promise<{ isEInvoiceUser: boolean; alias?: string }> {
         try {
             const response = await axios.get(`${this.baseUrl}/General/CheckUser/${vkn}`, {
                 headers: this.getHeaders()
             });
+
+            const data = response.data;
+            let isEInvoiceUser = false;
+            let alias = '';
+
+            if (Array.isArray(data) && data.length > 0) {
+                isEInvoiceUser = true;
+                // İlk bulduğumuz GİB aliasını alalım
+                const gibAlias = data.find((item: any) => item.Alias && item.Alias.includes('gib.gov.tr'));
+                alias = gibAlias ? gibAlias.Alias : data[0].Alias;
+            } else if (data && data.IsEInvoiceUser) {
+                isEInvoiceUser = true;
+                alias = data.Alias || data.Aliases?.[0] || '';
+            }
+
             return {
-                isEInvoiceUser: response.data.IsEInvoiceUser,
-                aliases: response.data.Aliases
+                isEInvoiceUser,
+                alias
             };
         } catch (error: any) {
             console.error('Nilvera checkUser error:', error.response?.data || error.message);
-
-            if (error.response?.status === 401 || error.response?.status === 403) {
-                throw new Error('Yetkisiz Erişim: API Key veya Token geçersiz. Lütfen API Key\'inizin başında/sonunda boşluk olmadığından ve doğru ortam (Test/Canlı) için üretildiğinden emin olun.');
-            }
-            throw error;
+            // Hata durumunda (örneğin 404) e-fatura kullanıcısı değil varsayalım
+            return { isEInvoiceUser: false };
         }
     }
 
