@@ -23,7 +23,16 @@ export async function GET(request: Request) {
             include: { customer: true },
             orderBy: { createdAt: 'desc' }
         });
-        return NextResponse.json({ success: true, invoices });
+
+        // Backend-Side Sanitation:
+        // Eğer formalId (UUID) yoksa, isFormal true olsa bile false say.
+        // Böylece UI'da "Gönder" butonu aktif olur.
+        const safeInvoices = invoices.map(inv => ({
+            ...inv,
+            isFormal: inv.isFormal && ((inv as any).formalId && (inv as any).formalId.length > 5)
+        }));
+
+        return NextResponse.json({ success: true, invoices: safeInvoices });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
