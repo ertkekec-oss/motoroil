@@ -1186,6 +1186,63 @@ export default function SalesPage() {
                                                                             <div className="flex-end mt-4" style={{ fontSize: '16px', fontWeight: 'bold' }}>
                                                                                 TOPLAM: {inv.totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
                                                                             </div>
+
+                                                                            {/* E-FATURA İŞLEMLERİ - BÜYÜK BUTONLAR */}
+                                                                            {!inv.isFormal && (
+                                                                                <div style={{ marginTop: '24px', padding: '20px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '12px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                                                                                    <h6 style={{ margin: '0 0 16px 0', color: '#3b82f6', fontSize: '14px', fontWeight: 'bold' }}>📄 E-DÖNÜŞÜM İŞLEMLERİ</h6>
+                                                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                                                                        <button
+                                                                                            onClick={() => handleSendToELogo(inv.id, 'EFATURA')}
+                                                                                            className="btn btn-primary"
+                                                                                            style={{
+                                                                                                padding: '16px 24px',
+                                                                                                fontSize: '15px',
+                                                                                                fontWeight: 'bold',
+                                                                                                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                                                                                border: 'none',
+                                                                                                borderRadius: '10px',
+                                                                                                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                                                                                                cursor: 'pointer',
+                                                                                                transition: 'all 0.3s ease'
+                                                                                            }}
+                                                                                        >
+                                                                                            🧾 e-Fatura / e-Arşiv Gönder
+                                                                                        </button>
+                                                                                        <button
+                                                                                            onClick={() => handleSendToELogo(inv.id, 'EIRSALIYE')}
+                                                                                            className="btn btn-outline"
+                                                                                            style={{
+                                                                                                padding: '16px 24px',
+                                                                                                fontSize: '15px',
+                                                                                                fontWeight: 'bold',
+                                                                                                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                                                                                color: 'white',
+                                                                                                border: 'none',
+                                                                                                borderRadius: '10px',
+                                                                                                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                                                                                                cursor: 'pointer',
+                                                                                                transition: 'all 0.3s ease'
+                                                                                            }}
+                                                                                        >
+                                                                                            🚚 e-İrsaliye Gönder
+                                                                                        </button>
+                                                                                    </div>
+                                                                                    <p style={{ margin: '12px 0 0 0', fontSize: '12px', color: 'rgba(255,255,255,0.5)', textAlign: 'center' }}>
+                                                                                        💡 Müşteri VKN durumuna göre otomatik olarak e-Fatura veya e-Arşiv gönderilir
+                                                                                    </p>
+                                                                                </div>
+                                                                            )}
+
+                                                                            {inv.isFormal && (
+                                                                                <div style={{ marginTop: '24px', padding: '20px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                                                                                    <h6 style={{ margin: '0 0 8px 0', color: '#10b981', fontSize: '14px', fontWeight: 'bold' }}>✅ Resmileştirildi</h6>
+                                                                                    <p style={{ margin: '0', fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
+                                                                                        <strong>UUID:</strong> {inv.formalId}<br />
+                                                                                        <strong>Tip:</strong> {inv.formalType}
+                                                                                    </p>
+                                                                                </div>
+                                                                            )}
                                                                         </div>
                                                                     </td>
                                                                 </tr>
