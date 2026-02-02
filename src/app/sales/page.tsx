@@ -157,27 +157,30 @@ export default function SalesPage() {
     };
 
     const handleSendToELogo = async (invoiceId: string, type: 'EARSIV' | 'EFATURA' | 'EIRSALIYE') => {
-        const title = type === 'EIRSALIYE' ? 'e-İrsaliye Gönder' : 'e-Dönüşüm Gönder';
+        const title = type === 'EIRSALIYE' ? 'e-İrsaliye Gönder' : 'e-Fatura Gönder';
         const msg = type === 'EIRSALIYE'
             ? 'Bu faturayı e-İrsaliye olarak resmileştirmek istiyor musunuz?'
-            : 'Bu faturayı e-Fatura/e-Arşiv olarak resmileştirmek istiyor musunuz? Müşteri durumuna göre otomatik belirlenecektir.';
+            : 'Bu faturayı e-Fatura/e-Arşiv olarak resmileştirmek istiyor musunuz? Müşteri VKN durumuna göre otomatik belirlenecektir.';
 
         showConfirm(title, msg, async () => {
             try {
-                const res = await fetch('/api/integrations/elogo/send', {
+                const res = await fetch('/api/integrations/send', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ invoiceId, type })
+                    body: JSON.stringify({
+                        invoiceId,
+                        type: type === 'EIRSALIYE' ? 'despatch' : 'invoice'
+                    })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showSuccess('Başarılı', `✅ Belge başarıyla gönderildi!\nResmi No: ${data.formalId}`);
+                    showSuccess('Başarılı', `✅ ${data.message}\\nUUID: ${data.uuid}\\nTip: ${data.type}`);
                     fetchInvoices();
                 } else {
-                    showError('Hata', '❌ Hata: ' + data.error);
+                    showError('Hata', '❌ ' + (data.error || 'Gönderim başarısız'));
                 }
-            } catch (e) {
-                showError('Hata', 'Giriş/Bağlantı hatası.');
+            } catch (e: any) {
+                showError('Hata', 'Bağlantı hatası: ' + e.message);
             }
         });
     };
