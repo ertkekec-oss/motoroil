@@ -22,12 +22,7 @@ export async function POST(req: NextRequest) {
         const invoice = await (prisma as any).salesInvoice.findUnique({
             where: { id: invoiceId },
             include: {
-                customer: true,
-                items: {
-                    include: {
-                        product: true
-                    }
-                }
+                customer: true
             }
         });
 
@@ -53,10 +48,10 @@ export async function POST(req: NextRequest) {
         const config = settings.config;
         const nilvera = new NilveraService({
             apiKey: config.apiKey,
-            apiSecret: config.apiSecret,
+            // apiSecret yok, constructor desteklemiyor
             environment: config.environment || 'test',
-            companyVkn: config.companyVkn,
-            companyTitle: config.companyTitle
+            username: config.username,
+            password: config.password
         });
 
         // Check if customer is e-Invoice user
@@ -68,31 +63,46 @@ export async function POST(req: NextRequest) {
             }, { status: 400 });
         }
 
-        const userCheck = await nilvera.checkUser(customerVkn);
-        const isEInvoiceUser = userCheck.IsEInvoiceUser;
+        // Nilvera: vkn 10 haneli olmalı, şahıs ise TCKN 11 haneli.
+        // Basit bir kontrol yapabiliriz veya direkt göndeririz.
+
+        let isEInvoiceUser = false;
+        try {
+            const userCheck = await nilvera.checkUser(customerVkn);
+            isEInvoiceUser = userCheck.isEInvoiceUser; // Case-sensitive fix
+        } catch (checkErr) {
+            console.warn('User check failed, defaulting to e-Archive', checkErr);
+            isEInvoiceUser = false; // Hata durumunda e-Arşiv varsayalım (Test ortamında checkUser bazen hata verebilir)
+        }
 
         // Prepare invoice data
+        // Items JSON array: [{ name, qty, price, ... }]
+        const invoiceItems = Array.isArray(invoice.items) ? invoice.items : JSON.parse(JSON.stringify(invoice.items || []));
+
         const invoiceData = {
-            invoiceNumber: invoice.invoiceNumber,
-            invoiceDate: invoice.date,
+            invoiceNumber: invoice.invoiceNo, // Schema: invoiceNo
+            invoiceDate: invoice.invoiceDate, // Schema: invoiceDate
             customer: {
                 name: invoice.customer.name,
                 taxNumber: customerVkn,
                 taxOffice: invoice.customer.taxOffice || 'Bilinmiyor',
                 address: invoice.customer.address || 'Adres bilgisi yok',
-                city: invoice.customer.city || '',
-                district: invoice.customer.district || '',
-                country: 'Türkiye'
+                city: invoice.customer.city || 'Istanbul', // Zorunlu alan olabilir
+                district: invoice.customer.district || 'Merkez',
+                country: 'Türkiye',
+                email: invoice.customer.email,
+                phone: invoice.customer.phone
             },
-            items: invoice.items.map((item: any) => ({
-                name: item.product?.name || item.description,
-                quantity: item.quantity,
-                unitPrice: item.unitPrice,
-                vatRate: item.vatRate || 20,
-                discount: item.discount || 0
+            items: invoiceItems.map((item: any) => ({
+                name: item.name || item.productName || 'Ürün',
+                quantity: Number(item.qty || item.quantity || 1),
+                unitPrice: Number(item.price || item.unitPrice || 0),
+                vatRate: Number(item.vat || item.vatRate || 20),
+                discount: Number(item.discount || 0),
+                unitType: 'C62' // Adet (Varsayılan)
             })),
-            notes: invoice.notes || '',
-            currency: invoice.currency || 'TRY'
+            notes: invoice.description || '',
+            currency: 'TRY'
         };
 
         let result;
@@ -101,29 +111,29 @@ export async function POST(req: NextRequest) {
             result = await nilvera.sendDespatch(invoiceData);
         } else {
             // e-Fatura or e-Arşiv
-            if (isEInvoiceUser) {
-                result = await nilvera.sendInvoice(invoiceData);
-            } else {
-                result = await nilvera.sendEArchive(invoiceData);
-            }
+            // sendInvoice metodu (data, type) alıyor. sendEArchive yok.
+            const invoiceType = isEInvoiceUser ? 'EFATURA' : 'EARSIV';
+            result = await nilvera.sendInvoice(invoiceData, invoiceType);
         }
 
         if (result.success) {
+            const uuid = result.formalId; // Service returns formalId
             // Update invoice with formal ID
             await (prisma as any).salesInvoice.update({
                 where: { id: invoiceId },
                 data: {
-                    formalType: isEInvoiceUser ? 'E_FATURA' : 'E_ARSIV',
-                    formalId: result.uuid,
-                    formalDate: new Date(),
-                    status: 'FORMALIZED'
+                    isFormal: true,
+                    formalType: type === 'despatch' ? 'EIRSALIYE' : (isEInvoiceUser ? 'EFATURA' : 'EARSIV'),
+                    formalId: uuid, // UUID'yi buraya, GIB numarasını başka yere kaydedebiliriz ama şimdilik UUID önemli
+                    formalUuid: uuid,
+                    formalStatus: 'SENT'
                 }
             });
 
             return NextResponse.json({
                 success: true,
                 message: `${isEInvoiceUser ? 'e-Fatura' : 'e-Arşiv'} başarıyla gönderildi`,
-                uuid: result.uuid,
+                uuid: uuid,
                 type: isEInvoiceUser ? 'E_FATURA' : 'E_ARSIV'
             });
         } else {
