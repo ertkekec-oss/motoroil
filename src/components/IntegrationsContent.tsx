@@ -20,32 +20,6 @@ export default function IntegrationsContent() {
         autoApprove: false
     });
 
-    // ... (rest of the code)
-
-    {/* Nilvera Fields */ }
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">API Key (Opsiyonel)</label>
-                                <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" placeholder="Varsa API Key giriniz" value={eFaturaSettings.apiKey} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiKey: e.target.value })} />
-                            </div>
-
-                            <div className="relative py-2">
-                                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-                                <div className="relative flex justify-center"><span className="bg-[#0f172a] px-2 text-xs text-white/40">VEYA KULLANICI BİLGİLERİ</span></div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Kullanıcı Adı</label>
-                                <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none" placeholder="örn: test01@nilvera.com" value={eFaturaSettings.username} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, username: e.target.value })} />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Şifre</label>
-                                <input type="password" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none" placeholder="Nilvera portal şifresi" value={eFaturaSettings.password} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, password: e.target.value })} />
-                            </div>
-
-    {/* Hidden legacy field just in case */ }
-    <input type="hidden" value={eFaturaSettings.apiSecret} />
-
-
     // POS Settings
     const [posSettings, setPosSettings] = useState({
         provider: 'odeal',
