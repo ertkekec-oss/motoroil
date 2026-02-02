@@ -15,9 +15,10 @@ export class NilveraService {
     private token?: string;
 
     constructor(config: NilveraConfig) {
-        this.apiKey = config.apiKey;
-        this.username = config.username;
-        this.password = config.password;
+        // API Key ve giriş bilgilerindeki olası boşlukları temizle
+        this.apiKey = config.apiKey?.trim();
+        this.username = config.username?.trim();
+        this.password = config.password?.trim();
         this.baseUrl = config.environment === 'production'
             ? 'https://api.nilvera.com'
             : 'https://apitest.nilvera.com';
@@ -76,18 +77,10 @@ export class NilveraService {
             };
         } catch (error: any) {
             console.error('Nilvera checkUser error:', error.response?.data || error.message);
-            // If authorized but check failed (e.g. 404), return false. 
-            // If unauthorized (401), throw error to alert connection failure.
+
             if (error.response?.status === 401 || error.response?.status === 403) {
-                throw new Error('Yetkisiz Erişim: API Key veya Token geçersiz.');
+                throw new Error('Yetkisiz Erişim: API Key veya Token geçersiz. Lütfen API Key\'inizin başında/sonunda boşluk olmadığından ve doğru ortam (Test/Canlı) için üretildiğinden emin olun.');
             }
-            // For other errors, we might assume user is not found or other non-critical issues for checking flow
-            // BUT for connection test, we should surface errors.
-            // Let's throw all errors if we are in a connection test context. 
-            // However, this Service is shared. Let's make it robust: 
-            // 401/403 -> Throw
-            // Network Error -> Throw
-            // 400 Bad Request -> Throw
             throw error;
         }
     }
@@ -99,8 +92,6 @@ export class NilveraService {
                 headers: this.getHeaders()
             });
 
-            // Nilvera typically returns a UUID and sometimes a status message
-            // Note: In real scenarios, Nilvera returns an array of results or a single object depending on the count
             const result = Array.isArray(response.data) ? response.data[0] : response.data;
 
             if (result && (result.UUID || result.Id)) {
