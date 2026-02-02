@@ -80,11 +80,15 @@ export async function POST(req: NextRequest) {
         // Prepare invoice data (Nilvera expects PascalCase)
         const invoiceItems = Array.isArray(invoice.items) ? invoice.items : JSON.parse(JSON.stringify(invoice.items || []));
 
+        // Determine scenario
+        const scenario = isEInvoiceUser ? "TEMELFATURA" : "EARSIVFATURA";
+
         const invoiceData = {
             InvoiceNumber: "", // Boş bırakıyoruz, Nilvera/GİB atayacak
             InvoiceDate: new Date(invoice.invoiceDate).toISOString(), // Tam ISO formatı
             CurrencyCode: invoice.currency || 'TRY',
             InvoiceType: "SATIS", // Varsayılan Satış Faturası
+            InvoiceScenario: scenario, // Eklendi: Senaryo (TEMEL/EARSIV)
             Note: invoice.description || '',
             Receiver: {
                 Name: invoice.customer.name,
