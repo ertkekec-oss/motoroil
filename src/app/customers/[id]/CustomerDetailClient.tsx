@@ -1152,12 +1152,23 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                         onChange={(e) => {
                                                                             const selectedProduct = products.find(p => String(p.id) === e.target.value);
                                                                             if (selectedProduct) {
-                                                                                updateItem('productId', selectedProduct.id);
-                                                                                updateItem('name', selectedProduct.name);
-                                                                                updateItem('price', Number(selectedProduct.salesPrice || 0));
-                                                                                updateItem('vat', Number(selectedProduct.salesVat || 20));
-                                                                                updateItem('otv', Number(selectedProduct.salesOtv || 0));
-                                                                                updateItem('otvType', selectedProduct.otvType || 'Ö.T.V yok');
+                                                                                // Update all fields at once
+                                                                                const newItems = [...invoiceItems];
+                                                                                newItems[i] = {
+                                                                                    ...newItems[i],
+                                                                                    productId: selectedProduct.id,
+                                                                                    name: selectedProduct.name,
+                                                                                    price: Number(selectedProduct.price || 0),
+                                                                                    vat: Number(selectedProduct.salesVat || 20),
+                                                                                    otv: Number(selectedProduct.salesOtv || 0),
+                                                                                    otvType: selectedProduct.otvType || 'Ö.T.V yok',
+                                                                                    oiv: Number(selectedProduct.salesOiv || 0)
+                                                                                };
+                                                                                setInvoiceItems(newItems);
+                                                                                console.log('✅ Product selected:', selectedProduct.name, {
+                                                                                    price: selectedProduct.price,
+                                                                                    vat: selectedProduct.salesVat
+                                                                                });
                                                                             }
                                                                         }}
                                                                         style={{
