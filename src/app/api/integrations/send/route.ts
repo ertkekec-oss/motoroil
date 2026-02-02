@@ -92,8 +92,9 @@ export async function POST(req: NextRequest) {
             InvoiceDate: new Date(invoice.invoiceDate).toISOString().split('.')[0], // Milisaniyeleri temizle (YYYY-MM-DDTHH:mm:ss)
             CurrencyCode: invoice.currency || 'TRY',
             InvoiceType: "SATIS", // Varsayılan Satış Faturası
-            InvoiceScenario: scenario, // Eklendi: Senaryo (TEMEL/EARSIV)
-            Note: invoice.description || '',
+            InvoiceScenario: scenario, // Senaryo (TEMEL/EARSIV)
+            PaymentType: "EFT/HAVALE", // Varsayılan Ödeme Tipi (Zorunlu olabilir)
+            Note: invoice.description || 'Fatura',
             Receiver: {
                 // Şahıs (11 hane) ise Ad/Soyad ayrılmalı, Kurum (10 hane) ise Unvan (Name) kullanılmalı
                 Name: customerVkn.length === 10 ? invoice.customer.name : undefined,

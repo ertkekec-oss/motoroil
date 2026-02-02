@@ -120,8 +120,28 @@ export class NilveraService {
             const payload = Array.isArray(invoiceData) ? invoiceData : [invoiceData];
 
             const response = await axios.post(`${this.baseUrl}${endpoint}`, payload, {
-                headers: this.getHeaders()
+                headers: this.getHeaders(),
+                validateStatus: () => true // 400 hatalarını catch'e düşürme, response'u inceleyelim
             });
+
+            if (response.status >= 400) {
+                // Hata detayını yakala
+                const errorData = response.data;
+                let msg = 'Bilinmeyen Hata';
+
+                if (errorData) {
+                    if (typeof errorData === 'string') msg = errorData;
+                    else if (errorData.Message) msg = errorData.Message;
+                    else if (errorData.Errors && Array.isArray(errorData.Errors)) msg = errorData.Errors.map((e: any) => e.Description || e.Message).join(', ');
+                    else if (errorData.ModelState) msg = Object.values(errorData.ModelState).flat().join(', ');
+                    else if (errorData.ValidationErrors) msg = errorData.ValidationErrors.map((e: any) => e.Message).join(', ');
+                }
+
+                return {
+                    success: false,
+                    error: `Nilvera API Hatası (${response.status}): ${msg}`
+                };
+            }
 
             const result = Array.isArray(response.data) ? response.data[0] : response.data;
 
