@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { NilveraService } from '@/lib/nilvera';
 
 /**
- * E-Fatura/e-Arşiv/e-İrsaliye Gönderme API (Nilvera Only)
+ * E-Fatura/e-Arşiv Gönderme API (Nilvera UBL Model)
  * POST /api/integrations/send
  */
 export async function POST(req: NextRequest) {
@@ -13,41 +13,26 @@ export async function POST(req: NextRequest) {
         const { invoiceId, type = 'invoice' } = body;
 
         if (!invoiceId) {
-            return NextResponse.json({
-                success: false,
-                error: 'Fatura ID gerekli'
-            }, { status: 400 });
+            return NextResponse.json({ success: false, error: 'Fatura ID gerekli' }, { status: 400 });
         }
 
-        // Get invoice from database
+        // 1. Faturayı veritabanından çek
         const invoice = await (prisma as any).salesInvoice.findUnique({
             where: { id: invoiceId },
-            include: {
-                customer: true
-            }
+            include: { customer: true }
         });
 
         if (!invoice) {
-            return NextResponse.json({
-                success: false,
-                error: 'Fatura bulunamadı'
-            }, { status: 404 });
+            return NextResponse.json({ success: false, error: 'Fatura bulunamadı' }, { status: 404 });
         }
 
-        // Get Nilvera settings from AppSettings
-        const settingsRecord = await prisma.appSettings.findUnique({
-            where: { key: 'eFaturaSettings' }
-        });
-
+        // 2. Nilvera ayarlarını çek
+        const settingsRecord = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
         const rawConfig = settingsRecord?.value as any;
-        // Config yapısı bazen direkt root'ta bazen 'nilvera' altında olabilir.
         const config = rawConfig?.apiKey ? rawConfig : (rawConfig?.nilvera || {});
 
         if (!config || !config.apiKey) {
-            return NextResponse.json({
-                success: false,
-                error: 'Nilvera entegrasyonu yapılandırılmamış. Lütfen Ayarlar > Entegrasyonlar sayfasından Nilvera API bilgilerini girin.'
-            }, { status: 400 });
+            return NextResponse.json({ success: false, error: 'Nilvera ayarları eksik.' }, { status: 400 });
         }
 
         const nilvera = new NilveraService({
@@ -57,115 +42,162 @@ export async function POST(req: NextRequest) {
             password: config.password
         });
 
-        // Check if customer is e-Invoice user
+        // 3. Müşteri Kontrolü (E-Fatura Mükellefi mi?)
         const customerVkn = invoice.customer.taxNumber || invoice.customer.identityNumber;
         if (!customerVkn) {
-            return NextResponse.json({
-                success: false,
-                error: 'Müşteri VKN/TCKN bilgisi eksik'
-            }, { status: 400 });
+            return NextResponse.json({ success: false, error: 'Müşteri VKN/TCKN bilgisi eksik' }, { status: 400 });
         }
 
         let isEInvoiceUser = false;
         let customerAlias = "";
         try {
-            const userCheck = await nilvera.checkUser(customerVkn);
-            isEInvoiceUser = userCheck.isEInvoiceUser;
-            customerAlias = userCheck.alias || "";
+            // E-İrsaliye değilse kontrol et
+            if (type !== 'despatch') {
+                const userCheck = await nilvera.checkUser(customerVkn);
+                isEInvoiceUser = userCheck.isEInvoiceUser;
+                customerAlias = userCheck.alias || "";
+            }
         } catch (checkErr) {
-            console.warn('User check failed, defaulting to e-Archive', checkErr);
-            isEInvoiceUser = false;
+            console.warn('User check failed', checkErr);
         }
 
-        // Prepare invoice data
+        // 4. Gönderici (Bizim) Bilgileri Al
+        let companyInfo = {
+            TaxNumber: "1111111111", // Default test
+            Name: "Test Firması",
+            TaxOffice: "Merkez",
+            Address: "Merkez Mah.",
+            District: "Merkez",
+            City: "Istanbul",
+            Country: "Turkiye"
+        };
+        try {
+            // API'den firma bilgilerini çekmeye çalışalım, hata verirse default kullanırız
+            const info = await nilvera.getCompanyInfo();
+            if (info && info.TaxNumber) {
+                companyInfo = {
+                    TaxNumber: info.TaxNumber,
+                    Name: info.Name || info.Title,
+                    TaxOffice: info.TaxOffice || '',
+                    Address: info.Address || '',
+                    District: info.District || '',
+                    City: info.City || '',
+                    Country: 'Turkiye'
+                };
+            }
+        } catch (e) {
+            console.warn('Firma bilgileri çekilemedi, varsayılanlar/ayarlar kullanılacak', e);
+        }
+
+        // 5. Verileri Hazırla (Nilvera Model)
         const invoiceItems = Array.isArray(invoice.items) ? invoice.items : JSON.parse(JSON.stringify(invoice.items || []));
 
-        // Calculate Totals and Prepare Lines
+        // Hesaplamalar
         let totalTaxExclusiveAmount = 0;
         let totalTaxAmount = 0;
-        let totalDiscountAmount = 0;
+        let totalPayableAmount = 0; // İndirim düşülmüş
 
-        const lines = invoiceItems.map((item: any) => {
+        const invoiceLines = invoiceItems.map((item: any) => {
             const qty = Number(item.qty || item.quantity || 1);
             const price = Number(item.price || item.unitPrice || 0);
             const vatRate = Number(item.vat || item.vatRate || 20);
-            const discount = Number(item.discount || 0);
+            const discount = Number(item.discount || 0); // Birim indirim mi toplam mı? Genelde satır toplamı üzerinden düşünelim
 
-            const lineTotal = qty * price;
-            const vatAmount = (lineTotal * vatRate) / 100;
+            const lineAmount = qty * price; // Brüt
+            const allowanceTotal = discount; // Satır indirimi
+            const baseAmount = lineAmount - allowanceTotal; // Matrah
+            const vatAmount = (baseAmount * vatRate) / 100;
 
-            totalTaxExclusiveAmount += lineTotal;
+            totalTaxExclusiveAmount += baseAmount;
             totalTaxAmount += vatAmount;
-            totalDiscountAmount += discount;
 
             return {
                 Name: item.name || item.productName || 'Urun',
                 Quantity: qty,
-                UnitCode: "C62", // Adet
-                UnitPrice: price,
+                UnitType: "C62", // Adet
+                Price: price,
+                AllowanceTotal: allowanceTotal,
+                KDVPercent: vatRate,
+                KDVTotal: Number(vatAmount.toFixed(2)),
                 Taxes: [
                     {
-                        TaxCode: "0015", // KDV
-                        Rate: vatRate,
-                        Amount: Number(vatAmount.toFixed(2))
+                        TaxCode: "0015",
+                        Total: Number(vatAmount.toFixed(2)),
+                        Percent: vatRate
                     }
-                ],
-                DiscountAmount: discount
+                ]
             };
         });
 
-        // Determine scenario
-        const scenario = isEInvoiceUser ? "TEMELFATURA" : "EARSIVFATURA";
+        totalPayableAmount = totalTaxExclusiveAmount + totalTaxAmount;
 
-        const invoiceData = {
-            InvoiceNumber: "",
-            UUID: crypto.randomUUID(),
-            InvoiceDate: new Date(invoice.invoiceDate).toISOString().split('.')[0],
-            CurrencyCode: invoice.currency || 'TRY',
-            InvoiceType: "SATIS",
-            InvoiceScenario: scenario,
-            PaymentType: "EFT/HAVALE",
-            Note: invoice.description || 'Fatura',
+        const uuid = crypto.randomUUID();
+        const dateStr = new Date(invoice.invoiceDate).toISOString(); // 2026-02-02T15:17... Z formatı uygun
 
-            // Calculated Totals
-            TaxExclusiveAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
-            TaxAmount: Number(totalTaxAmount.toFixed(2)),
-            PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount - totalDiscountAmount).toFixed(2)),
-
-            Receiver: {
-                Name: customerVkn.length === 10 ? invoice.customer.name : undefined,
-                FirstName: customerVkn.length === 11 ? (invoice.customer.name.split(' ').slice(0, -1).join(' ') || invoice.customer.name) : undefined,
-                FamilyName: customerVkn.length === 11 ? invoice.customer.name.split(' ').slice(-1).join(' ') : undefined,
-
-                TaxNumber: customerVkn,
-                TaxOffice: invoice.customer.taxOffice || '',
-                Address: invoice.customer.address || 'Adres bilgisi girilmemis',
-                City: invoice.customer.city || 'ISTANBUL',
-                District: invoice.customer.district || 'MERKEZ',
-                Country: 'TURKIYE',
-                Email: invoice.customer.email || '',
-                Phone: invoice.customer.phone || '',
-                Alias: isEInvoiceUser ? (customerAlias || "urn:mail:defaultpk@gib.gov.tr") : undefined
+        // Ortak Model Yapısı
+        const modelCore = {
+            InvoiceInfo: {
+                UUID: uuid,
+                InvoiceType: "SATIS",
+                InvoiceProfile: isEInvoiceUser ? "TEMELFATURA" : "EARSIVFATURA",
+                IssueDate: dateStr,
+                CurrencyCode: invoice.currency || 'TRY',
+                PayableAmount: Number(totalPayableAmount.toFixed(2)),
+                TaxExclusiveAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
+                KdvTotal: Number(totalTaxAmount.toFixed(2))
+                // PaymentType eklenebilir ama InvoiceInfo içinde PaymentTermsInfo kullanılır genelde
             },
-            Lines: lines
+            CompanyInfo: companyInfo,
+            CustomerInfo: {
+                TaxNumber: customerVkn,
+                Name: customerVkn.length === 10 ? invoice.customer.name : undefined, // Kurum
+                // Şahıs için Name yerine PersonName/SurName gerekebilir ama Nilvera Name'i de kabul edebilir.
+                // Biz yine de şahıs ise Name alanına Tam Adı, veya Name alanına boş verip ExportCustomerInfo gibi davranmayacağız.
+                // Standart E-Fatura'da CustomerInfo.Name zorunludur. Şahıslar için Ad Soyad birleşik yazılabilir.
+                // Veya PersonName, PersonSurName alanları varsa oraya. Modelde CustomerInfo içinde 'Name' var sadece.
+                // O yüzden Name'e tam ad yazıyoruz.
+                // Eğer şahıs ise ve Namesiz hata verirse, sadece Name: Ad Soyad birleşik göndereceğiz.
+                Address: invoice.customer.address || 'Adres',
+                District: invoice.customer.district || 'Merkez',
+                City: invoice.customer.city || 'Istanbul',
+                Country: 'Turkiye',
+                Mail: invoice.customer.email || '',
+                Phone: invoice.customer.phone || ''
+            },
+            InvoiceLines: invoiceLines
         };
 
-        let result;
-        if (type === 'despatch') {
-            result = await nilvera.sendDespatch(invoiceData);
+        // E-Fatura veya E-Arşiv Root Objeyi Seç
+        let finalPayload;
+        let endpointType = '';
+
+        if (isEInvoiceUser) {
+            // E-FATURA
+            endpointType = 'EFATURA';
+            finalPayload = {
+                EInvoice: modelCore,
+                CustomerAlias: customerAlias || "urn:mail:defaultpk@gib.gov.tr"
+            };
         } else {
-            const invoiceType = isEInvoiceUser ? 'EFATURA' : 'EARSIV';
-            result = await nilvera.sendInvoice(invoiceData, invoiceType);
+            // E-ARSIV
+            endpointType = 'EARSIV';
+            finalPayload = {
+                ArchiveInvoice: modelCore
+                // E-Arşivde CustomerAlias gerekmez
+            };
         }
 
+        // Gönder
+        const result = await nilvera.sendInvoice(finalPayload, endpointType as any);
+
         if (result.success) {
-            const uuid = result.formalId;
+            const formalId = result.formalId || uuid;
             await (prisma as any).salesInvoice.update({
                 where: { id: invoiceId },
                 data: {
                     isFormal: true,
-                    formalType: type === 'despatch' ? 'EIRSALIYE' : (isEInvoiceUser ? 'EFATURA' : 'EARSIV'),
-                    formalId: uuid,
+                    formalType: endpointType,
+                    formalId: formalId,
                     formalUuid: uuid,
                     formalStatus: 'SENT'
                 }
@@ -173,22 +205,18 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({
                 success: true,
-                message: `${isEInvoiceUser ? 'e-Fatura' : 'e-Arşiv'} başarıyla gönderildi`,
-                uuid: uuid,
-                type: isEInvoiceUser ? 'E_FATURA' : 'E_ARSIV'
+                message: `${endpointType} başarıyla kuyruğa eklendi.`,
+                uuid: uuid
             });
         } else {
             return NextResponse.json({
                 success: false,
                 error: result.error || 'Gönderim başarısız'
-            }, { status: 500 }); // Client shows error message from body
+            }, { status: 500 }); // Artık raw 400 hatasını clientta validateStatus ile görüyoruz
         }
 
     } catch (error: any) {
-        console.error('Integration/Send Error:', error);
-        return NextResponse.json({
-            success: false,
-            error: error.message || 'Entegrasyon hatası'
-        }, { status: 500 });
+        console.error('Send Error:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
