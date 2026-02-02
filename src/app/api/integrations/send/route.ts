@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
 
         const invoiceData = {
             InvoiceNumber: "", // Boş bırakıyoruz, Nilvera/GİB atayacak
-            InvoiceDate: new Date(invoice.invoiceDate).toISOString(), // Tam ISO formatı
+            InvoiceDate: new Date(invoice.invoiceDate).toISOString().split('.')[0], // Milisaniyeleri temizle (YYYY-MM-DDTHH:mm:ss)
             CurrencyCode: invoice.currency || 'TRY',
             InvoiceType: "SATIS", // Varsayılan Satış Faturası
             InvoiceScenario: scenario, // Eklendi: Senaryo (TEMEL/EARSIV)
@@ -95,20 +95,38 @@ export async function POST(req: NextRequest) {
                 TaxNumber: customerVkn,
                 TaxOffice: invoice.customer.taxOffice || '',
                 Address: invoice.customer.address || 'Adres bilgisi girilmemis',
-                City: invoice.customer.city || 'ISTANBUL', // Şehir zorunlu olabilir
+                City: invoice.customer.city || 'ISTANBUL',
                 District: invoice.customer.district || 'MERKEZ',
                 Country: 'TURKIYE',
                 Email: invoice.customer.email || '',
                 Phone: invoice.customer.phone || ''
             },
-            Lines: invoiceItems.map((item: any) => ({
-                Name: item.name || item.productName || 'Urun',
-                Quantity: Number(item.qty || item.quantity || 1),
-                UnitCode: "C62", // Adet
-                UnitPrice: Number(item.price || item.unitPrice || 0),
-                VatRate: Number(item.vat || item.vatRate || 20),
-                DiscountAmount: Number(item.discount || 0)
-            }))
+            Lines: invoiceItems.map((item: any) => {
+                const qty = Number(item.qty || item.quantity || 1);
+                const price = Number(item.price || item.unitPrice || 0);
+                const vatRate = Number(item.vat || item.vatRate || 20);
+                const discount = Number(item.discount || 0);
+
+                // Vergi Hesabı
+                const totalAmount = qty * price; // brüt (indirim hariç) - basitleştirilmiş
+                // Not: Eğer indirim varsa matrah düşer ama şimdilik basit tutalım
+                const vatAmount = (totalAmount * vatRate) / 100;
+
+                return {
+                    Name: item.name || item.productName || 'Urun',
+                    Quantity: qty,
+                    UnitCode: "C62", // Adet
+                    UnitPrice: price,
+                    Taxes: [
+                        {
+                            TaxCode: "0015", // KDV
+                            Rate: vatRate,
+                            Amount: Number(vatAmount.toFixed(2))
+                        }
+                    ],
+                    DiscountAmount: discount
+                };
+            })
         };
 
         let result;
