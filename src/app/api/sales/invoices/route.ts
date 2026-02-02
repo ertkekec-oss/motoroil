@@ -70,7 +70,7 @@ export async function POST(request: Request) {
                     totalAmount,
                     description,
                     items: items,
-                    isFormal: isFormal || status === 'Onaylandı',
+                    isFormal: isFormal, // Status 'Onaylandı' olsa bile otomatik formal yapma (GİB süreci ayrıdır)
                     status: status,
                     branch: String(targetBranch)
                 }
