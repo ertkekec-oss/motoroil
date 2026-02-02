@@ -4,17 +4,15 @@ import prisma from '@/lib/prisma';
 import { NilveraService } from '@/lib/nilvera';
 
 /**
- * Nilvera Tarih Formatlayıcı (YYYY-MM-DDTHH:mm:ss.0000000+03:00)
+ * Nilvera için tam uyumlu tarih (YYYY-MM-DDTHH:mm:ss.0000000+03:00)
  */
-function formatNilveraDate(date: Date) {
+function getNilveraDate() {
+    const now = new Date();
+    // Vercel UTC olsa bile biz +3 saat ekleyip Türkiye saatini simüle edelim
+    const trTime = new Date(now.getTime() + (3 * 60 * 60 * 1000));
     const pad = (n: number) => n.toString().padStart(2, '0');
-    const y = date.getFullYear();
-    const m = pad(date.getMonth() + 1);
-    const d = pad(date.getDate());
-    const h = pad(date.getHours());
-    const min = pad(date.getMinutes());
-    const s = pad(date.getSeconds());
-    return `${y}-${m}-${d}T${h}:${min}:${s}.0000000+03:00`;
+
+    return `${trTime.getUTCFullYear()}-${pad(trTime.getUTCMonth() + 1)}-${pad(trTime.getUTCDate())}T${pad(trTime.getUTCHours())}:${pad(trTime.getUTCMinutes())}:${pad(trTime.getUTCSeconds())}.0000000+03:00`;
 }
 
 export async function POST(req: NextRequest) {
@@ -51,34 +49,30 @@ export async function POST(req: NextRequest) {
         });
 
         const customerVkn = invoice.customer.taxNumber || invoice.customer.identityNumber;
-        if (!customerVkn) {
-            return NextResponse.json({ success: false, error: 'Müşteri VKN/TCKN bilgisi eksik' }, { status: 400 });
-        }
-
         let isEInvoiceUser = false;
         let customerAlias = "";
         try {
-            if (type !== 'despatch') {
-                const userCheck = await nilvera.checkUser(customerVkn);
-                isEInvoiceUser = userCheck.isEInvoiceUser;
-                customerAlias = userCheck.alias || "";
-            }
-        } catch (checkErr) {
-            console.warn('User check failed', checkErr);
+            const userCheck = await nilvera.checkUser(customerVkn);
+            isEInvoiceUser = userCheck.isEInvoiceUser;
+            customerAlias = userCheck.alias || "";
+        } catch (e) {
+            console.warn('User check error', e);
         }
 
         // Firma Bilgileri
         let companyInfo = {
             TaxNumber: "1111111111",
-            Name: "Test Firması",
-            TaxOffice: "Merkez",
-            Address: "Merkez",
+            Name: "Firma Adi",
+            TaxOffice: "",
+            Address: "Adres",
             District: "Merkez",
             City: "Istanbul",
             Country: "Turkiye",
-            Phone: "08500000000",
-            Mail: "info@test.com"
+            Phone: "",
+            Mail: "",
+            WebSite: ""
         };
+
         try {
             const info = await nilvera.getCompanyInfo();
             if (info && info.TaxNumber) {
@@ -91,55 +85,77 @@ export async function POST(req: NextRequest) {
                     City: info.City || '',
                     Country: info.Country || 'Turkiye',
                     Phone: info.Phone || '',
-                    Mail: info.Mail || ''
+                    Mail: info.Mail || '',
+                    WebSite: info.WebSite || ''
                 };
             }
-        } catch (e) {
-            console.warn('Firma bilgileri çekilemedi', e);
-        }
+        } catch (e) { }
 
         const invoiceItems = Array.isArray(invoice.items) ? invoice.items : JSON.parse(JSON.stringify(invoice.items || []));
-
         let totalTaxExclusiveAmount = 0;
         let totalTaxAmount = 0;
 
-        const invoiceLines = invoiceItems.map((item: any, index: number) => {
-            const qty = Number(item.qty || item.quantity || 1);
-            const price = Number(item.price || item.unitPrice || 0);
-            const vatRate = Number(item.vat || item.vatRate || 20);
+        const invoiceLines = invoiceItems.map((item: any, idx: number) => {
+            const qty = Number(item.qty || 1);
+            const price = Number(item.price || 0);
+            const vatRate = Number(item.vat || 20);
             const discount = Number(item.discount || 0);
 
-            const lineAmount = qty * price;
-            const baseAmount = lineAmount - discount;
-            const vatAmount = (baseAmount * vatRate) / 100;
+            const base = (qty * price) - discount;
+            const vat = (base * vatRate) / 100;
 
-            totalTaxExclusiveAmount += baseAmount;
-            totalTaxAmount += vatAmount;
+            totalTaxExclusiveAmount += base;
+            totalTaxAmount += vat;
 
             return {
-                Index: (index + 1).toString(),
-                Name: item.name || item.productName || 'Urun',
+                Index: (idx + 1).toString(),
+                SellerCode: null,
+                BuyerCode: null,
+                Name: item.name || 'Urun',
+                Description: null,
                 Quantity: qty,
                 UnitType: "C62",
                 Price: price,
                 AllowanceTotal: discount,
                 KDVPercent: vatRate,
-                KDVTotal: Number(vatAmount.toFixed(2)),
-                Taxes: null // Örnek koda göre null bırakıyoruz
+                KDVTotal: Number(vat.toFixed(2)),
+                Taxes: null,
+                DeliveryInfo: null,
+                ManufacturerCode: null,
+                BrandName: null,
+                ModelName: null,
+                Note: null,
+                OzelMatrahReason: null,
+                OzelMatrahTotal: null
             };
         });
 
         const uuid = crypto.randomUUID();
-        const dateStr = formatNilveraDate(new Date(invoice.invoiceDate));
+        const dateStr = getNilveraDate();
 
         const modelCore = {
             InvoiceInfo: {
                 UUID: uuid,
+                TemplateUUID: "cd1aff46-00ac-4a4f-96a2-6d58a3cb84f9", // Dökümandaki örnek Guid
+                TemplateBase64String: null,
                 InvoiceType: "SATIS",
-                InvoiceSerieOrNumber: "", // Boş bırakınca varsayılan seriyi kullanır
-                InvoiceProfile: isEInvoiceUser ? "TEMELFATURA" : "EARSIVFATURA",
+                InvoiceSerieOrNumber: "EFT", // Örnekteki Seri
                 IssueDate: dateStr,
                 CurrencyCode: "TRY",
+                ExchangeRate: null,
+                InvoiceProfile: isEInvoiceUser ? "TICARIFATURA" : "EARSIVFATURA", // Örnekte TICARIFATURA var
+                DespatchDocumentReference: null,
+                OrderReference: null,
+                OrderReferenceDocument: null,
+                AdditionalDocumentReferences: null,
+                TaxExemptionReasonInfo: null,
+                PaymentTermsInfo: null,
+                PaymentMeansInfo: null,
+                OKCInfo: null,
+                ReturnInvoiceInfo: null,
+                AccountingCost: null,
+                InvoicePeriod: null,
+                SGKInfo: null,
                 LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
                 GeneralKDV1Total: 0,
                 GeneralKDV8Total: 0,
@@ -152,16 +168,24 @@ export async function POST(req: NextRequest) {
             CustomerInfo: {
                 TaxNumber: customerVkn,
                 Name: invoice.customer.name,
-                TaxOffice: invoice.customer.taxOffice || '',
+                TaxOffice: invoice.customer.taxOffice || null,
+                PartyIdentifications: null,
+                AgentPartyIdentifications: null,
                 Address: invoice.customer.address || 'Adres',
                 District: invoice.customer.district || 'Merkez',
                 City: invoice.customer.city || 'Istanbul',
                 Country: 'Turkiye',
-                Mail: invoice.customer.email || '',
-                Phone: invoice.customer.phone || ''
+                PostalCode: null,
+                Phone: invoice.customer.phone || null,
+                Fax: null,
+                Mail: invoice.customer.email || null,
+                WebSite: null
             },
+            BuyerCustomerInfo: null,
+            ExportCustomerInfo: null,
+            TaxFreeInfo: null,
             InvoiceLines: invoiceLines,
-            Notes: ["Fatura Notu: " + (invoice.description || "")]
+            Notes: ["Elektronik Fatura", invoice.description || ""]
         };
 
         const endpointType = isEInvoiceUser ? 'EFATURA' : 'EARSIV';
@@ -169,35 +193,29 @@ export async function POST(req: NextRequest) {
             ? { EInvoice: modelCore, CustomerAlias: customerAlias || null }
             : { ArchiveInvoice: modelCore };
 
+        console.log(`Sending ${endpointType} to Nilvera. UUID: ${uuid}`);
+
         const result = await nilvera.sendInvoice(finalPayload, endpointType);
 
         if (result.success) {
-            const formalId = result.formalId || uuid;
             await (prisma as any).salesInvoice.update({
                 where: { id: invoiceId },
                 data: {
                     isFormal: true,
                     formalType: endpointType,
-                    formalId: formalId,
+                    formalId: result.formalId || uuid,
                     formalUuid: uuid,
                     formalStatus: 'SENT'
                 }
             });
 
-            return NextResponse.json({
-                success: true,
-                message: `${endpointType} gönderildi.`,
-                uuid: uuid
-            });
+            return NextResponse.json({ success: true, message: 'Başarıyla gönderildi', uuid: uuid });
         } else {
-            return NextResponse.json({
-                success: false,
-                error: result.error || 'Nilvera API Hatası'
-            }, { status: 400 });
+            return NextResponse.json({ success: false, error: result.error || 'Hata oluştu' }, { status: 400 });
         }
 
     } catch (error: any) {
-        console.error('Send Error:', error);
+        console.error('Integration/Send Error:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
