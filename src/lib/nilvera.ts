@@ -135,6 +135,9 @@ export class NilveraService {
                     else if (errorData.Errors && Array.isArray(errorData.Errors)) msg = errorData.Errors.map((e: any) => e.Description || e.Message).join(', ');
                     else if (errorData.ModelState) msg = Object.values(errorData.ModelState).flat().join(', ');
                     else if (errorData.ValidationErrors) msg = errorData.ValidationErrors.map((e: any) => e.Message).join(', ');
+                    else msg = JSON.stringify(errorData); // Hata formatını bilmiyorsak ham veriyi gösterelim
+                } else {
+                    msg = 'Sunucudan boş yanıt döndü.';
                 }
 
                 return {
