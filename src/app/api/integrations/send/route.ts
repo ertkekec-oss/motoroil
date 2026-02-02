@@ -93,7 +93,11 @@ export async function POST(req: NextRequest) {
             InvoiceScenario: scenario, // Eklendi: Senaryo (TEMEL/EARSIV)
             Note: invoice.description || '',
             Receiver: {
-                Name: invoice.customer.name,
+                // Şahıs (11 hane) ise Ad/Soyad ayrılmalı, Kurum (10 hane) ise Unvan (Name) kullanılmalı
+                Name: customerVkn.length === 10 ? invoice.customer.name : undefined,
+                FirstName: customerVkn.length === 11 ? (invoice.customer.name.split(' ').slice(0, -1).join(' ') || invoice.customer.name) : undefined,
+                FamilyName: customerVkn.length === 11 ? invoice.customer.name.split(' ').slice(-1).join(' ') : undefined,
+
                 TaxNumber: customerVkn,
                 TaxOffice: invoice.customer.taxOffice || '',
                 Address: invoice.customer.address || 'Adres bilgisi girilmemis',
