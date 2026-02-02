@@ -144,6 +144,9 @@ export class NilveraService {
             if (data) {
                 if (typeof data === 'string') {
                     errorMsg = data;
+                } else if (data.Errors && Array.isArray(data.Errors)) {
+                    // Nilvera "Errors" yapısı
+                    errorMsg = data.Errors.map((e: any) => e.Description || e.Message || e.Detail || JSON.stringify(e)).join(', ');
                 } else if (data.ModelState) {
                     // ASP.NET Validation Errors
                     const errors = Object.values(data.ModelState).flat();
@@ -151,6 +154,9 @@ export class NilveraService {
                 } else if (data.ValidationErrors && Array.isArray(data.ValidationErrors)) {
                     // Nilvera Validation Errors
                     errorMsg = data.ValidationErrors.map((e: any) => e.Message || e).join(', ');
+                } else if (data.Message && data.Message !== errorMsg) {
+                    // Eğer ana mesaj farklı bir detay içeriyorsa
+                    errorMsg = data.Message;
                 }
             }
 

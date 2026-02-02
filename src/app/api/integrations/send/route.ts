@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { NilveraService } from '@/lib/nilvera';
 
@@ -87,6 +88,7 @@ export async function POST(req: NextRequest) {
 
         const invoiceData = {
             InvoiceNumber: "", // Boş bırakıyoruz, Nilvera/GİB atayacak
+            UUID: crypto.randomUUID(), // Zorunlu: Her belge için benzersiz UUID
             InvoiceDate: new Date(invoice.invoiceDate).toISOString().split('.')[0], // Milisaniyeleri temizle (YYYY-MM-DDTHH:mm:ss)
             CurrencyCode: invoice.currency || 'TRY',
             InvoiceType: "SATIS", // Varsayılan Satış Faturası
