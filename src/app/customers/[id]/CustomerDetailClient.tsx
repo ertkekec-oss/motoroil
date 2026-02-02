@@ -389,9 +389,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     const otvRate = realProduct ? Number(realProduct.salesOtv || 0) : 0;
                     const oivRate = realProduct ? Number(realProduct.salesOiv || 0) : 0;
 
-                    const grossPrice = Number(it.price || it.unitPrice || 0); // POS stored gross
+                    // PRICE RESOLUTION LOGIC
+                    // 1. Try to get price from order item (it.price or it.unitPrice)
+                    // 2. If 0 and we found the product, use current product list price (realProduct.price)
+                    let grossPrice = Number(it.price || it.unitPrice || 0);
 
-                    // Net Price calculation
+                    if (grossPrice === 0 && realProduct) {
+                        grossPrice = Number(realProduct.price || 0);
+                        console.log(`⚠️ Price missing in order for ${it.name}, using list price: ${grossPrice}`);
+                    }
+
+                    // Net Price calculation (Gross -> Net)
                     let netPrice = grossPrice;
                     if (otvType === 'yüzdesel Ö.T.V') {
                         netPrice = grossPrice / ((1 + otvRate / 100) * (1 + vatRate / 100));
@@ -403,14 +411,14 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                     return {
                         ...it,
-                        name: it.name || it.productName || 'Ürün',
+                        productId: realProduct?.id || it.productId, // Ensure we map to the correct product ID if found
+                        name: it.name || it.productName || realProduct?.name || 'Ürün',
                         qty,
                         price: netPrice,
                         vat: vatRate,
                         otv: otvRate,
                         otvType: otvType,
-                        oiv: oivRate,
-                        productId: realProduct?.id || it.productId
+                        oiv: oivRate
                     };
                 });
 
