@@ -34,7 +34,19 @@ export class NilveraService {
             };
         } catch (error: any) {
             console.error('Nilvera checkUser error:', error.response?.data || error.message);
-            return { isEInvoiceUser: false };
+            // If authorized but check failed (e.g. 404), return false. 
+            // If unauthorized (401), throw error to alert connection failure.
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                throw new Error('Yetkisiz Erişim: API Key geçersiz.');
+            }
+            // For other errors, we might assume user is not found or other non-critical issues for checking flow
+            // BUT for connection test, we should surface errors.
+            // Let's throw all errors if we are in a connection test context. 
+            // However, this Service is shared. Let's make it robust: 
+            // 401/403 -> Throw
+            // Network Error -> Throw
+            // 400 Bad Request -> Throw
+            throw error;
         }
     }
 
