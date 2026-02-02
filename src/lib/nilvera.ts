@@ -26,7 +26,7 @@ export class NilveraService {
     private getHeaders() {
         return {
             'Authorization': `Bearer ${this.apiKey || this.token}`,
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json-patch+json',
             'Accept': 'application/json'
         };
     }
@@ -49,7 +49,10 @@ export class NilveraService {
     async checkUser(vkn: string): Promise<{ isEInvoiceUser: boolean; alias?: string }> {
         try {
             const response = await axios.get(`${this.baseUrl}/general/CheckUser/${vkn}`, {
-                headers: this.getHeaders()
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey || this.token}`,
+                    'Accept': 'application/json'
+                }
             });
             const data = response.data;
             let isEInvoiceUser = false;
@@ -71,7 +74,10 @@ export class NilveraService {
     async getCompanyInfo(): Promise<any> {
         try {
             const response = await axios.get(`${this.baseUrl}/general/Company`, {
-                headers: this.getHeaders()
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey || this.token}`,
+                    'Accept': 'application/json'
+                }
             });
             return response.data;
         } catch (error) {
@@ -89,22 +95,30 @@ export class NilveraService {
 
             if (response.status >= 400) {
                 const errorData = response.data;
-                let msg = 'Bilinmeyen Hata';
+                let msg = 'Geçersiz İstek';
+
                 if (errorData) {
                     if (typeof errorData === 'string') msg = errorData;
+                    else if (errorData.Errors) {
+                        msg = Array.isArray(errorData.Errors)
+                            ? errorData.Errors.map((e: any) => e.Description || e.Message || JSON.stringify(e)).join(' | ')
+                            : JSON.stringify(errorData.Errors);
+                    }
+                    else if (errorData.ModelState) {
+                        msg = Object.values(errorData.ModelState).flat().join(' | ');
+                    }
                     else if (errorData.Message) msg = errorData.Message;
-                    else if (errorData.Errors) msg = Array.isArray(errorData.Errors) ? errorData.Errors.map((e: any) => e.Description || e.Message).join(', ') : JSON.stringify(errorData.Errors);
-                    else if (errorData.ModelState) msg = Object.values(errorData.ModelState).flat().join(', ');
-                    else msg = JSON.stringify(errorData);
+                    else msg = JSON.stringify(errorData); // Hiçbir format uymuyorsa tüm objeyi görelim
                 }
-                return { success: false, error: `Nilvera Hatası (${response.status}): ${msg}` };
+
+                return { success: false, error: `Nilvera (${response.status}): ${msg}` };
             }
 
             const result = Array.isArray(response.data) ? response.data[0] : response.data;
             if (result && (result.UUID || result.InvoiceNumber || result.Id)) {
                 return {
                     success: true,
-                    formalId: result.UUID || result.InvoiceNumber || result.Id,
+                    formalId: result.InvoiceNumber || result.UUID || result.Id,
                     resultMsg: 'Başarılı'
                 };
             }

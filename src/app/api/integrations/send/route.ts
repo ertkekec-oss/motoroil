@@ -8,7 +8,8 @@ import { NilveraService } from '@/lib/nilvera';
  */
 function getNilveraDate(dateInput?: string | Date) {
     const d = dateInput ? new Date(dateInput) : new Date();
-    return d.toISOString(); // Swagger ve Node.js örneğinde Z formatı (UTC) kullanılmış
+    // Milisaniye hassasiyetini 3 hanede tutup Z ekleyelim (Swagger standardı)
+    return d.toISOString();
 }
 
 export async function POST(req: NextRequest) {
@@ -46,7 +47,21 @@ export async function POST(req: NextRequest) {
         let companyInfo = { TaxNumber: "1111111111", Name: "Firma", Address: "Adres", City: "Istanbul", Country: "Turkiye" };
         try {
             const info = await nilvera.getCompanyInfo();
-            if (info) companyInfo = { ...info, Name: info.Name || info.Title };
+            if (info) {
+                // Şema uyumu: info'dan gelen alanları Nilvera CompanyInfo şemasına eşle
+                companyInfo = {
+                    TaxNumber: info.TaxNumber,
+                    Name: info.Name || info.Title,
+                    TaxOffice: info.TaxOffice || '',
+                    Address: info.Address || '',
+                    District: info.District || '',
+                    City: info.City || '',
+                    Country: info.Country || 'Turkiye',
+                    Phone: info.Phone || '',
+                    Mail: info.Mail || '',
+                    WebSite: info.WebSite || ''
+                };
+            }
         } catch (e) { }
 
         const invoiceItems = Array.isArray(invoice.items) ? invoice.items : [];
@@ -77,7 +92,7 @@ export async function POST(req: NextRequest) {
                 KDVTotal: Number(vat.toFixed(2)),
                 Taxes: [
                     {
-                        TaxCode: "0015", // KDV
+                        TaxCode: "0015", // KDV Standardı
                         Total: Number(vat.toFixed(2)),
                         Percent: vatRate
                     }
@@ -88,9 +103,10 @@ export async function POST(req: NextRequest) {
         const uuid = crypto.randomUUID();
         const dateStr = getNilveraDate(invoice.invoiceDate);
 
-        // Ortak Alanlar
+        // Nilvera UBL Model (InvoiceInfo)
         const invoiceInfo: any = {
             UUID: uuid,
+            CustomizationID: "TR1.2", // Başarılı görseldeki "Özelleştirme No"
             InvoiceType: "SATIS",
             InvoiceSerieOrNumber: "",
             IssueDate: dateStr,
@@ -99,21 +115,16 @@ export async function POST(req: NextRequest) {
             KdvTotal: Number(totalTaxAmount.toFixed(2)),
             PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2)),
             GeneralKDV20Total: Number(totalKdv20.toFixed(2)),
-            GeneralKDV1Total: 0,
-            GeneralKDV8Total: 0,
-            GeneralKDV18Total: 0,
             GeneralAllowanceTotal: 0
         };
 
-        // E-Arşiv Özel Alanlar (Dökümandaki gibi)
-        if (!isEInvoiceUser) {
-            invoiceInfo.ISDespatch = false;
+        if (isEInvoiceUser) {
+            invoiceInfo.InvoiceProfile = "TICARIFATURA"; // Başarılı görseldeki "Senaryo"
+        } else {
+            invoiceInfo.InvoiceProfile = "EARSIVFATURA";
             invoiceInfo.SalesPlatform = "NORMAL";
             invoiceInfo.SendType = "ELEKTRONIK";
-            invoiceInfo.InvoiceProfile = "EARSIVFATURA";
-        } else {
-            // E-Fatura (Başarılı görseldeki gibi)
-            invoiceInfo.InvoiceProfile = "TICARIFATURA";
+            invoiceInfo.ISDespatch = false;
         }
 
         const modelCore = {
@@ -142,7 +153,13 @@ export async function POST(req: NextRequest) {
         if (result.success) {
             await (prisma as any).salesInvoice.update({
                 where: { id: invoiceId },
-                data: { isFormal: true, formalType: endpointType, formalId: result.formalId, formalUuid: uuid, formalStatus: 'SENT' }
+                data: {
+                    isFormal: true,
+                    formalType: endpointType,
+                    formalId: result.formalId,
+                    formalUuid: uuid,
+                    formalStatus: 'SENT'
+                }
             });
             return NextResponse.json({ success: true, uuid: uuid, message: 'Fatura başarıyla gönderildi.' });
         } else {
