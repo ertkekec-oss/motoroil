@@ -28,12 +28,14 @@ export class NilveraService {
         if (this.token) {
             return {
                 'Authorization': `Bearer ${this.token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json-patch+json',
+                'Accept': 'application/json'
             };
         }
         return {
             'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json-patch+json',
+            'Accept': 'application/json'
         };
     }
 
