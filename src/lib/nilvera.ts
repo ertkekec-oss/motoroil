@@ -85,6 +85,22 @@ export class NilveraService {
         }
     }
 
+    async getCompanyInfo(): Promise<any> {
+        try {
+            // Dokümantasyona göre endpoint: /general/Company
+            const response = await axios.get(`${this.baseUrl}/general/Company`, {
+                headers: this.getHeaders()
+            });
+            return response.data;
+        } catch (error: any) {
+            console.error('Nilvera getCompanyInfo error:', error.response?.data || error.message);
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                throw new Error('Yetkisiz Erişim: API Key geçersiz.');
+            }
+            throw error;
+        }
+    }
+
     async sendInvoice(invoiceData: any, type: 'EFATURA' | 'EARSIV'): Promise<{ success: boolean; resultMsg?: string; formalId?: string; error?: string }> {
         const endpoint = type === 'EFATURA' ? '/EInvoice/Send/Model' : '/EArchive/Send/Model';
         try {

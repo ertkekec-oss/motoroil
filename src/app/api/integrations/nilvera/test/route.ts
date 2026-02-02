@@ -22,17 +22,14 @@ export async function POST(request: Request) {
         // Login endpointi 404 hatası verdiği için (deprecated) kaldırıldı.
         // API Key ile doğrudan işlem yapılacak.
 
-        // Test connection by checking a VKN (self VKN if provided, otherwise a fixed common one)
-        const testVkn = companyVkn || '4840846711'; // Nilvera's own VKN or a dummy
-        const result = await nilveraService.checkUser(testVkn);
-
-        // If we get a response (even if user is not e-invoice user), it means the API Key is valid
-        // because unauthorized requests would throw 401.
+        // Test connection by fetching Company Info (no VKN required)
+        // This is more reliable than checking a VKN which might not exist
+        const companyInfo = await nilveraService.getCompanyInfo();
 
         return NextResponse.json({
             success: true,
-            message: 'Nilvera API Bağlantısı Başarılı!',
-            isEInvoiceUser: result.isEInvoiceUser
+            message: `Nilvera Bağlantısı Başarılı! Firma: ${companyInfo.Name || 'Bilinmiyor'}`,
+            companyInfo
         });
 
     } catch (error: any) {
