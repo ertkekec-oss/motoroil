@@ -116,8 +116,8 @@ export class NilveraService {
     async sendInvoice(invoiceData: any, type: 'EFATURA' | 'EARSIV'): Promise<{ success: boolean; resultMsg?: string; formalId?: string; error?: string }> {
         const endpoint = type === 'EFATURA' ? '/EInvoice/Send/Model' : '/EArchive/Send/Model';
         try {
-            // Nilvera toplu gönderim (List) bekleyebilir, bu yüzden array içine alıyoruz.
-            const payload = Array.isArray(invoiceData) ? invoiceData : [invoiceData];
+            // Nilvera endpointi tekil obje bekliyor ("Cannot deserialize JSON array...").
+            const payload = invoiceData;
 
             const response = await axios.post(`${this.baseUrl}${endpoint}`, payload, {
                 headers: this.getHeaders(),
