@@ -3,17 +3,12 @@ import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { NilveraService } from '@/lib/nilvera';
 
-function getNilveraDate() {
-    const now = new Date();
-    const trTime = new Date(now.getTime() + (3 * 60 * 60 * 1000));
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return `${trTime.getUTCFullYear()}-${pad(trTime.getUTCMonth() + 1)}-${pad(trTime.getUTCDate())}T${pad(trTime.getUTCHours())}:${pad(trTime.getUTCMinutes())}:${pad(trTime.getUTCSeconds())}.0000000+03:00`;
-}
-
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { invoiceId, type = 'invoice' } = body;
+
+        if (!invoiceId) return NextResponse.json({ success: false, error: 'Fatura ID gerekli' }, { status: 400 });
 
         const invoice = await (prisma as any).salesInvoice.findUnique({
             where: { id: invoiceId },
@@ -67,30 +62,54 @@ export async function POST(req: NextRequest) {
 
             return {
                 Index: (idx + 1).toString(),
+                SellerCode: null,
+                BuyerCode: null,
                 Name: item.name || 'Urun',
+                Description: null,
                 Quantity: qty,
                 UnitType: "C62",
                 Price: price,
                 AllowanceTotal: discount,
                 KDVPercent: vatRate,
                 KDVTotal: Number(vat.toFixed(2)),
-                Taxes: null
+                Taxes: null,
+                DeliveryInfo: null,
+                ManufacturerCode: null,
+                BrandName: null,
+                ModelName: null,
+                Note: null,
+                OzelMatrahReason: null,
+                OzelMatrahTotal: null
             };
         });
 
         const uuid = crypto.randomUUID();
-        const dateStr = getNilveraDate();
+        // Swagger örneğine göre standart ISO string (Z formatı)
+        const dateStr = new Date(invoice.invoiceDate).toISOString();
 
-        // Ekran görüntüsündeki MODEL ile tam uyumlu hiyerarşi
         const modelCore = {
             InvoiceInfo: {
                 UUID: uuid,
-                TemplateUUID: "123e4567-e89b-12d3-a456-426614174000", // Ekran görüntüsündeki Guid örneği
+                TemplateUUID: "cd1aff46-00ac-4a4f-96a2-6d58a3cb84f9",
+                TemplateBase64String: null,
                 InvoiceType: "SATIS",
                 InvoiceSerieOrNumber: "EFT",
                 IssueDate: dateStr,
                 CurrencyCode: "TRY",
-                InvoiceProfile: "TEMELFATURA", // Ekran görüntüsündeki default değer
+                ExchangeRate: null,
+                InvoiceProfile: "TEMELFATURA",
+                DespatchDocumentReference: null,
+                OrderReference: null,
+                OrderReferenceDocument: null,
+                AdditionalDocumentReferences: null,
+                TaxExemptionReasonInfo: null,
+                PaymentTermsInfo: null,
+                PaymentMeansInfo: null,
+                OKCInfo: null,
+                ReturnInvoiceInfo: null,
+                AccountingCost: null,
+                InvoicePeriod: null,
+                SGKInfo: null,
                 LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
                 GeneralKDV1Total: 0,
                 GeneralKDV8Total: 0,
@@ -105,11 +124,22 @@ export async function POST(req: NextRequest) {
             CustomerInfo: {
                 TaxNumber: customerVkn,
                 Name: invoice.customer.name,
+                TaxOffice: invoice.customer.taxOffice || null,
+                PartyIdentifications: null,
+                AgentPartyIdentifications: null,
                 Address: invoice.customer.address || 'Adres',
                 District: invoice.customer.district || 'Merkez',
                 City: invoice.customer.city || 'Istanbul',
                 Country: 'Turkiye',
+                PostalCode: null,
+                Phone: invoice.customer.phone || null,
+                Fax: null,
+                Mail: invoice.customer.email || null,
+                WebSite: null
             },
+            BuyerCustomerInfo: null,
+            ExportCustomerInfo: null,
+            TaxFreeInfo: null,
             InvoiceLines: invoiceLines,
             Notes: [invoice.description || "Fatura"]
         };
