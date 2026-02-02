@@ -1147,11 +1147,40 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             <td style={{ padding: '12px', textAlign: 'center', color: '#888' }}>{i + 1}</td>
                                                             <td style={{ padding: '12px' }}>
                                                                 <div className="flex-col">
-                                                                    <input
-                                                                        value={it.name}
-                                                                        onChange={(e) => updateItem('name', e.target.value)}
-                                                                        style={{ width: '100%', background: 'transparent', border: 'none', color: 'white', fontWeight: '600', padding: '4px' }}
-                                                                    />
+                                                                    <select
+                                                                        value={it.productId || ''}
+                                                                        onChange={(e) => {
+                                                                            const selectedProduct = products.find(p => String(p.id) === e.target.value);
+                                                                            if (selectedProduct) {
+                                                                                updateItem('productId', selectedProduct.id);
+                                                                                updateItem('name', selectedProduct.name);
+                                                                                updateItem('price', Number(selectedProduct.salesPrice || 0));
+                                                                                updateItem('vat', Number(selectedProduct.salesVat || 20));
+                                                                                updateItem('otv', Number(selectedProduct.salesOtv || 0));
+                                                                                updateItem('otvType', selectedProduct.otvType || 'Ö.T.V yok');
+                                                                            }
+                                                                        }}
+                                                                        style={{
+                                                                            width: '100%',
+                                                                            background: 'rgba(255,255,255,0.05)',
+                                                                            border: '1px solid rgba(255,255,255,0.1)',
+                                                                            color: 'white',
+                                                                            fontWeight: '600',
+                                                                            padding: '8px',
+                                                                            borderRadius: '8px',
+                                                                            cursor: 'pointer'
+                                                                        }}
+                                                                    >
+                                                                        <option value="">Ürün seçiniz...</option>
+                                                                        {products.map(p => (
+                                                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                    {it.name && it.name !== 'Ürün' && (
+                                                                        <div style={{ fontSize: '11px', color: '#888', marginTop: '4px', paddingLeft: '4px' }}>
+                                                                            Seçili: {it.name}
+                                                                        </div>
+                                                                    )}
                                                                     <div style={{ paddingLeft: '4px', marginTop: '4px', display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                                                                         {(it.otvType && it.otvType !== 'Ö.T.V yok') && (
                                                                             <span style={{ fontSize: '9px', background: 'rgba(255,100,0,0.15)', color: '#fdba74', padding: '1px 6px', borderRadius: '4px', border: '1px solid rgba(255,100,0,0.2)' }}>
