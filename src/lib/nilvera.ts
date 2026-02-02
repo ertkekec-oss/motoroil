@@ -24,16 +24,9 @@ export class NilveraService {
     }
 
     private getHeaders() {
-        if (this.token) {
-            return {
-                'Authorization': `Bearer ${this.token}`,
-                'Content-Type': 'application/json-patch+json',
-                'Accept': 'application/json'
-            };
-        }
         return {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json-patch+json',
+            'Authorization': `Bearer ${this.apiKey || this.token}`,
+            'Content-Type': 'application/json',
             'Accept': 'application/json'
         };
     }
@@ -87,7 +80,6 @@ export class NilveraService {
     }
 
     async sendInvoice(invoiceData: any, type: 'EFATURA' | 'EARSIV'): Promise<{ success: boolean; resultMsg?: string; formalId?: string; error?: string }> {
-        // Ekran görüntüsüne göre PascalCase endpointler
         const endpoint = type === 'EFATURA' ? '/EInvoice/Send/Model' : '/EArchive/Send/Model';
         try {
             const response = await axios.post(`${this.baseUrl}${endpoint}`, invoiceData, {
@@ -102,16 +94,17 @@ export class NilveraService {
                     if (typeof errorData === 'string') msg = errorData;
                     else if (errorData.Message) msg = errorData.Message;
                     else if (errorData.Errors) msg = Array.isArray(errorData.Errors) ? errorData.Errors.map((e: any) => e.Description || e.Message).join(', ') : JSON.stringify(errorData.Errors);
+                    else if (errorData.ModelState) msg = Object.values(errorData.ModelState).flat().join(', ');
                     else msg = JSON.stringify(errorData);
                 }
-                return { success: false, error: `Nilvera API Hatası (${response.status}): ${msg}` };
+                return { success: false, error: `Nilvera Hatası (${response.status}): ${msg}` };
             }
 
             const result = Array.isArray(response.data) ? response.data[0] : response.data;
-            if (result && (result.UUID || result.InvoiceNumber)) {
+            if (result && (result.UUID || result.InvoiceNumber || result.Id)) {
                 return {
                     success: true,
-                    formalId: result.UUID || result.InvoiceNumber,
+                    formalId: result.UUID || result.InvoiceNumber || result.Id,
                     resultMsg: 'Başarılı'
                 };
             }

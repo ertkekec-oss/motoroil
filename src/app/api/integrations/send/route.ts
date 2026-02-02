@@ -3,12 +3,18 @@ import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { NilveraService } from '@/lib/nilvera';
 
+/**
+ * Nilvera Tarih Formatı (Z Formatı - UTC)
+ */
+function getNilveraDate(dateInput?: string | Date) {
+    const d = dateInput ? new Date(dateInput) : new Date();
+    return d.toISOString(); // Swagger ve Node.js örneğinde Z formatı (UTC) kullanılmış
+}
+
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { invoiceId, type = 'invoice' } = body;
-
-        if (!invoiceId) return NextResponse.json({ success: false, error: 'Fatura ID gerekli' }, { status: 400 });
 
         const invoice = await (prisma as any).salesInvoice.findUnique({
             where: { id: invoiceId },
@@ -62,84 +68,66 @@ export async function POST(req: NextRequest) {
 
             return {
                 Index: (idx + 1).toString(),
-                SellerCode: null,
-                BuyerCode: null,
                 Name: item.name || 'Urun',
-                Description: null,
                 Quantity: qty,
                 UnitType: "C62",
                 Price: price,
                 AllowanceTotal: discount,
                 KDVPercent: vatRate,
                 KDVTotal: Number(vat.toFixed(2)),
-                Taxes: null,
-                DeliveryInfo: null,
-                ManufacturerCode: null,
-                BrandName: null,
-                ModelName: null,
-                Note: null,
-                OzelMatrahReason: null,
-                OzelMatrahTotal: null
+                Taxes: [
+                    {
+                        TaxCode: "0015", // KDV
+                        Total: Number(vat.toFixed(2)),
+                        Percent: vatRate
+                    }
+                ]
             };
         });
 
         const uuid = crypto.randomUUID();
-        // Swagger örneğine göre standart ISO string (Z formatı)
-        const dateStr = new Date(invoice.invoiceDate).toISOString();
+        const dateStr = getNilveraDate(invoice.invoiceDate);
+
+        // Ortak Alanlar
+        const invoiceInfo: any = {
+            UUID: uuid,
+            InvoiceType: "SATIS",
+            InvoiceSerieOrNumber: "",
+            IssueDate: dateStr,
+            CurrencyCode: "TRY",
+            LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
+            KdvTotal: Number(totalTaxAmount.toFixed(2)),
+            PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2)),
+            GeneralKDV20Total: Number(totalKdv20.toFixed(2)),
+            GeneralKDV1Total: 0,
+            GeneralKDV8Total: 0,
+            GeneralKDV18Total: 0,
+            GeneralAllowanceTotal: 0
+        };
+
+        // E-Arşiv Özel Alanlar (Dökümandaki gibi)
+        if (!isEInvoiceUser) {
+            invoiceInfo.ISDespatch = false;
+            invoiceInfo.SalesPlatform = "NORMAL";
+            invoiceInfo.SendType = "ELEKTRONIK";
+            invoiceInfo.InvoiceProfile = "EARSIVFATURA";
+        } else {
+            // E-Fatura (Başarılı görseldeki gibi)
+            invoiceInfo.InvoiceProfile = "TICARIFATURA";
+        }
 
         const modelCore = {
-            InvoiceInfo: {
-                UUID: uuid,
-                TemplateUUID: "cd1aff46-00ac-4a4f-96a2-6d58a3cb84f9",
-                TemplateBase64String: null,
-                InvoiceType: "SATIS",
-                InvoiceSerieOrNumber: "EFT",
-                IssueDate: dateStr,
-                CurrencyCode: "TRY",
-                ExchangeRate: null,
-                InvoiceProfile: "TEMELFATURA",
-                DespatchDocumentReference: null,
-                OrderReference: null,
-                OrderReferenceDocument: null,
-                AdditionalDocumentReferences: null,
-                TaxExemptionReasonInfo: null,
-                PaymentTermsInfo: null,
-                PaymentMeansInfo: null,
-                OKCInfo: null,
-                ReturnInvoiceInfo: null,
-                AccountingCost: null,
-                InvoicePeriod: null,
-                SGKInfo: null,
-                LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
-                GeneralKDV1Total: 0,
-                GeneralKDV8Total: 0,
-                GeneralKDV18Total: 0,
-                GeneralKDV10Total: 0,
-                GeneralKDV20Total: Number(totalKdv20.toFixed(2)),
-                GeneralAllowanceTotal: 0,
-                PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2)),
-                KdvTotal: Number(totalTaxAmount.toFixed(2))
-            },
+            InvoiceInfo: invoiceInfo,
             CompanyInfo: companyInfo,
             CustomerInfo: {
                 TaxNumber: customerVkn,
                 Name: invoice.customer.name,
-                TaxOffice: invoice.customer.taxOffice || null,
-                PartyIdentifications: null,
-                AgentPartyIdentifications: null,
+                TaxOffice: invoice.customer.taxOffice || "Merkez",
                 Address: invoice.customer.address || 'Adres',
                 District: invoice.customer.district || 'Merkez',
                 City: invoice.customer.city || 'Istanbul',
-                Country: 'Turkiye',
-                PostalCode: null,
-                Phone: invoice.customer.phone || null,
-                Fax: null,
-                Mail: invoice.customer.email || null,
-                WebSite: null
+                Country: 'Turkiye'
             },
-            BuyerCustomerInfo: null,
-            ExportCustomerInfo: null,
-            TaxFreeInfo: null,
             InvoiceLines: invoiceLines,
             Notes: [invoice.description || "Fatura"]
         };
@@ -156,7 +144,7 @@ export async function POST(req: NextRequest) {
                 where: { id: invoiceId },
                 data: { isFormal: true, formalType: endpointType, formalId: result.formalId, formalUuid: uuid, formalStatus: 'SENT' }
             });
-            return NextResponse.json({ success: true, uuid: uuid });
+            return NextResponse.json({ success: true, uuid: uuid, message: 'Fatura başarıyla gönderildi.' });
         } else {
             return NextResponse.json({ success: false, error: result.error }, { status: 400 });
         }
