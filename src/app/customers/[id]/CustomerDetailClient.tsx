@@ -1154,10 +1154,12 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                             console.log('🔍 Selected product ID:', e.target.value);
                                                                             console.log('🔍 Found product:', selectedProduct);
                                                                             if (selectedProduct) {
-                                                                                // Update all fields at once
-                                                                                const newItems = [...invoiceItems];
-                                                                                const updatedItem = {
-                                                                                    ...newItems[i],
+                                                                                // Create a deep copy to force React re-render
+                                                                                const currentItems = JSON.parse(JSON.stringify(invoiceItems));
+
+                                                                                // Update the specific item
+                                                                                currentItems[i] = {
+                                                                                    ...currentItems[i],
                                                                                     productId: selectedProduct.id,
                                                                                     name: selectedProduct.name,
                                                                                     price: Number(selectedProduct.price || 0),
@@ -1166,16 +1168,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                     otvType: selectedProduct.otvType || 'Ö.T.V yok',
                                                                                     oiv: Number(selectedProduct.salesOiv || 0)
                                                                                 };
-                                                                                newItems[i] = updatedItem;
-                                                                                console.log('✅ Updated item:', updatedItem);
-                                                                                console.log('📦 All items before setState:', newItems);
-                                                                                setInvoiceItems(newItems);
-                                                                                console.log('✅ Product selected:', selectedProduct.name, {
-                                                                                    price: selectedProduct.price,
-                                                                                    vat: selectedProduct.salesVat,
-                                                                                    updatedPrice: updatedItem.price,
-                                                                                    updatedVat: updatedItem.vat
-                                                                                });
+
+                                                                                console.log('✅ Updated item:', currentItems[i]);
+                                                                                console.log('📦 Setting new items array');
+
+                                                                                // Force update with new reference
+                                                                                setInvoiceItems(currentItems);
+
+                                                                                // Verify after a tick
+                                                                                setTimeout(() => {
+                                                                                    console.log('🔄 State should be updated now');
+                                                                                }, 100);
                                                                             }
                                                                         }}
                                                                         style={{
