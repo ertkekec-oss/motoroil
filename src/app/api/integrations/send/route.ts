@@ -77,34 +77,34 @@ export async function POST(req: NextRequest) {
             isEInvoiceUser = false; // Hata durumunda e-Arşiv varsayalım (Test ortamında checkUser bazen hata verebilir)
         }
 
-        // Prepare invoice data
-        // Items JSON array: [{ name, qty, price, ... }]
+        // Prepare invoice data (Nilvera expects PascalCase)
         const invoiceItems = Array.isArray(invoice.items) ? invoice.items : JSON.parse(JSON.stringify(invoice.items || []));
 
         const invoiceData = {
-            invoiceNumber: invoice.invoiceNo, // Schema: invoiceNo
-            invoiceDate: invoice.invoiceDate, // Schema: invoiceDate
-            customer: {
-                name: invoice.customer.name,
-                taxNumber: customerVkn,
-                taxOffice: invoice.customer.taxOffice || 'Bilinmiyor',
-                address: invoice.customer.address || 'Adres bilgisi yok',
-                city: invoice.customer.city || 'Istanbul', // Zorunlu alan olabilir
-                district: invoice.customer.district || 'Merkez',
-                country: 'Türkiye',
-                email: invoice.customer.email,
-                phone: invoice.customer.phone
+            InvoiceNumber: "", // Boş bırakıyoruz, Nilvera/GİB atayacak
+            InvoiceDate: new Date(invoice.invoiceDate).toISOString(), // Tam ISO formatı
+            CurrencyCode: invoice.currency || 'TRY',
+            InvoiceType: "SATIS", // Varsayılan Satış Faturası
+            Note: invoice.description || '',
+            Receiver: {
+                Name: invoice.customer.name,
+                TaxNumber: customerVkn,
+                TaxOffice: invoice.customer.taxOffice || '',
+                Address: invoice.customer.address || 'Adres bilgisi girilmemis',
+                City: invoice.customer.city || 'ISTANBUL', // Şehir zorunlu olabilir
+                District: invoice.customer.district || 'MERKEZ',
+                Country: 'TURKIYE',
+                Email: invoice.customer.email || '',
+                Phone: invoice.customer.phone || ''
             },
-            items: invoiceItems.map((item: any) => ({
-                name: item.name || item.productName || 'Ürün',
-                quantity: Number(item.qty || item.quantity || 1),
-                unitPrice: Number(item.price || item.unitPrice || 0),
-                vatRate: Number(item.vat || item.vatRate || 20),
-                discount: Number(item.discount || 0),
-                unitType: 'C62' // Adet (Varsayılan)
-            })),
-            notes: invoice.description || '',
-            currency: 'TRY'
+            Lines: invoiceItems.map((item: any) => ({
+                Name: item.name || item.productName || 'Urun',
+                Quantity: Number(item.qty || item.quantity || 1),
+                UnitCode: "C62", // Adet
+                UnitPrice: Number(item.price || item.unitPrice || 0),
+                VatRate: Number(item.vat || item.vatRate || 20),
+                DiscountAmount: Number(item.discount || 0)
+            }))
         };
 
         let result;
