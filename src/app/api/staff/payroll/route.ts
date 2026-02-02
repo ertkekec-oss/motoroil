@@ -1,76 +1,78 @@
-
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: Request) {
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const period = searchParams.get('period'); // e.g. "2024-02"
+    const branch = searchParams.get('branch');
+
+    const where: any = {};
+    if (period) where.period = period;
+
+    // Filter by staff branch if needed, but payroll links to staff. 
+    // If branch param exists, we filter staff.
+    if (branch && branch !== 'all') {
+        where.staff = { branch: branch };
+    }
+
     try {
-        const { searchParams } = new URL(request.url);
-        const period = searchParams.get('period');
-        const staffId = searchParams.get('staffId');
-
-        const where: any = {};
-        if (period) where.period = period;
-        if (staffId) where.staffId = staffId;
-
         const payrolls = await prisma.payroll.findMany({
             where,
-            include: {
-                staff: {
-                    select: { name: true, role: true, branch: true }
+            include: { staff: true },
+            orderBy: { staff: { name: 'asc' } }
+        });
+        return NextResponse.json({ success: true, payrolls });
+    } catch (error: any) {
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+}
+
+export async function POST(req: Request) {
+    try {
+        const body = await req.json();
+        const { period, staffIds } = body; // Array of staff IDs to generate for
+
+        if (!period) return NextResponse.json({ success: false, error: 'Dönem girilmelidir' }, { status: 400 });
+
+        let processed = 0;
+
+        // Use transaction? Or loop.
+        // For each staff, check if payroll exists for this period. If not, create.
+
+        const staffList = await prisma.staff.findMany({
+            where: {
+                deletedAt: null,
+                ...(staffIds && staffIds.length ? { id: { in: staffIds } } : {})
+            }
+        });
+
+        for (const staff of staffList) {
+            const exists = await prisma.payroll.findUnique({
+                where: {
+                    staffId_period: {
+                        staffId: staff.id,
+                        period: period
+                    }
                 }
-            },
-            orderBy: { createdAt: 'desc' }
-        });
+            });
 
-        return NextResponse.json(payrolls);
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch payrolls' }, { status: 500 });
-    }
-}
-
-export async function POST(request: Request) {
-    try {
-        const body = await request.json();
-        const { staffId, period, salary, bonus, deductions, note } = body;
-
-        const netPay = parseFloat(salary) + parseFloat(bonus || 0) - parseFloat(deductions || 0);
-
-        const payroll = await prisma.payroll.create({
-            data: {
-                staffId,
-                period,
-                salary,
-                bonus,
-                deductions,
-                netPay,
-                note,
-                status: 'Bekliyor'
+            if (!exists) {
+                await prisma.payroll.create({
+                    data: {
+                        staffId: staff.id,
+                        period,
+                        salary: staff.salary || 0,
+                        netPay: staff.salary || 0, // Logic for tax/deductions can go here later
+                        status: 'Bekliyor'
+                    }
+                });
+                processed++;
             }
-        });
+        }
 
-        return NextResponse.json(payroll);
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to create payroll record' }, { status: 500 });
-    }
-}
+        return NextResponse.json({ success: true, message: `${processed} adet bordro oluşturuldu.` });
 
-export async function PUT(request: Request) {
-    try {
-        const body = await request.json();
-        const { id, status } = body;
-
-        if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
-
-        const payroll = await prisma.payroll.update({
-            where: { id },
-            data: {
-                status,
-                paidAt: status === 'Ödendi' ? new Date() : null
-            }
-        });
-
-        return NextResponse.json(payroll);
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to update payroll status' }, { status: 500 });
+    } catch (error: any) {
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

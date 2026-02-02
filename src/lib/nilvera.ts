@@ -1,0 +1,100 @@
+import axios from 'axios';
+
+export interface NilveraConfig {
+    apiKey: string;
+    environment: 'test' | 'production';
+}
+
+export class NilveraService {
+    private apiKey: string;
+    private baseUrl: string;
+
+    constructor(config: NilveraConfig) {
+        this.apiKey = config.apiKey;
+        this.baseUrl = config.environment === 'production'
+            ? 'https://api.nilvera.com'
+            : 'https://apitest.nilvera.com';
+    }
+
+    private getHeaders() {
+        return {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json'
+        };
+    }
+
+    async checkUser(vkn: string): Promise<{ isEInvoiceUser: boolean; aliases?: any[] }> {
+        try {
+            const response = await axios.get(`${this.baseUrl}/general/CheckUser/${vkn}`, {
+                headers: this.getHeaders()
+            });
+            return {
+                isEInvoiceUser: response.data.IsEInvoiceUser,
+                aliases: response.data.Aliases
+            };
+        } catch (error: any) {
+            console.error('Nilvera checkUser error:', error.response?.data || error.message);
+            return { isEInvoiceUser: false };
+        }
+    }
+
+    async sendInvoice(invoiceData: any, type: 'EFATURA' | 'EARSIV'): Promise<{ success: boolean; resultMsg?: string; formalId?: string; error?: string }> {
+        const endpoint = type === 'EFATURA' ? '/einvoice/Send/Model' : '/earchive/Send/Model';
+        try {
+            const response = await axios.post(`${this.baseUrl}${endpoint}`, invoiceData, {
+                headers: this.getHeaders()
+            });
+
+            // Nilvera typically returns a UUID and sometimes a status message
+            // Note: In real scenarios, Nilvera returns an array of results or a single object depending on the count
+            const result = Array.isArray(response.data) ? response.data[0] : response.data;
+
+            if (result && (result.UUID || result.Id)) {
+                return {
+                    success: true,
+                    formalId: result.UUID, // Or ReferenceId
+                    resultMsg: 'Belge başarıyla kuyruğa eklendi.'
+                };
+            }
+
+            return {
+                success: false,
+                error: 'Nilvera geçersiz yanıt döndürdü.'
+            };
+        } catch (error: any) {
+            console.error('Nilvera sendInvoice error:', error.response?.data || error.message);
+            return {
+                success: false,
+                error: error.response?.data?.Message || error.message
+            };
+        }
+    }
+
+    async sendDespatch(despatchData: any): Promise<{ success: boolean; resultMsg?: string; formalId?: string; error?: string }> {
+        try {
+            const response = await axios.post(`${this.baseUrl}/edespatch/Send/Model`, despatchData, {
+                headers: this.getHeaders()
+            });
+            const result = Array.isArray(response.data) ? response.data[0] : response.data;
+
+            if (result && (result.UUID || result.Id)) {
+                return {
+                    success: true,
+                    formalId: result.UUID,
+                    resultMsg: 'İrsaliye başarıyla kuyruğa eklendi.'
+                };
+            }
+
+            return {
+                success: false,
+                error: 'Nilvera geçersiz yanıt döndürdü.'
+            };
+        } catch (error: any) {
+            console.error('Nilvera sendDespatch error:', error.response?.data || error.message);
+            return {
+                success: false,
+                error: error.response?.data?.Message || error.message
+            };
+        }
+    }
+}

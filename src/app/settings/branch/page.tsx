@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useFinancials } from '@/contexts/FinancialContext';
 import { useModal } from '@/contexts/ModalContext';
 
 export default function BranchSettingsPage() {
-    const { kasalar, currentUser, hasPermission, branches: contextBranches } = useApp();
+    const { currentUser, hasPermission, branches: contextBranches } = useApp();
+    const { kasalar } = useFinancials();
     const { showSuccess } = useModal();
     const isSystemAdmin = currentUser === null;
 

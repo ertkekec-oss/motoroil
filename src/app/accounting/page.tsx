@@ -4,23 +4,36 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
+import { useFinancials } from '@/contexts/FinancialContext';
+import { useCRM } from '@/contexts/CRMContext';
 import Pagination from '@/components/Pagination';
-
 
 export default function AccountingPage() {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState('receivables'); // receivables, payables, banks, expenses, checks
+    const [activeTab, setActiveTab] = useState('receivables');
     const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'this_week' | 'this_month' | 'custom'>('all');
     const [customRange, setCustomRange] = useState({ start: '', end: '' });
+
     const {
-        kasalar, setKasalar, addTransaction, currentUser, hasPermission,
-        customers, suppliers, addFinancialTransaction, checks, addCheck,
-        collectCheck, transactions, refreshCustomers, refreshTransactions,
-        refreshKasalar, refreshSuppliers, kasaTypes, activeBranchName, salesExpenses
+        currentUser, hasPermission,
+        activeBranchName
     } = useApp();
+
+    const {
+        customers, suppliers,
+        refreshCustomers, refreshSuppliers
+    } = useCRM();
+
+    const {
+        kasalar, setKasalar, addTransaction, addFinancialTransaction,
+        checks, addCheck, collectCheck, refreshChecks, transactions, refreshTransactions,
+        refreshKasalar, kasaTypes, salesExpenses
+
+    } = useFinancials();
+
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
 
-    const isSystemAdmin = currentUser === null;
+    const isSystemAdmin = currentUser === null || currentUser.role === 'ADMIN' || currentUser.role === 'Sistem Sahibi';
     const canDelete = hasPermission('delete_records');
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -36,7 +49,7 @@ export default function AccountingPage() {
         const custs = customers.filter(c => Number(c.balance) > 0).map(c => ({
             id: `cust-${c.id}`,
             title: `${c.name} (Müşteri)`,
-            date: c.lastVisit || new Date().toLocaleDateString('tr-TR'),
+            date: new Date().toLocaleDateString('tr-TR'),
             amount: Number(c.balance),
             due: 'Veresiye',
             status: 'Cari Bakiye',
@@ -70,7 +83,7 @@ export default function AccountingPage() {
         const custs = customers.filter(c => Number(c.balance) < 0).map(c => ({
             id: `cust-${c.id}`,
             title: `${c.name} (Müşteri)`,
-            date: c.lastVisit || new Date().toLocaleDateString('tr-TR'),
+            date: new Date().toLocaleDateString('tr-TR'),
             amount: Math.abs(Number(c.balance)),
             due: 'Fazla Ödeme / İade',
             status: 'Müşteri Alacağı',
@@ -86,7 +99,10 @@ export default function AccountingPage() {
         if (isAdmin && activeBranchName === 'Merkez') return list;
 
         const targetBranch = isAdmin ? activeBranchName : (currentUser?.branch || 'Merkez');
-        return list.filter(item => (item.branch || 'Merkez') === targetBranch);
+        return list.filter(item => {
+            const b = item.branch || 'Merkez';
+            return b === targetBranch || b === 'Global';
+        });
     };
 
     useEffect(() => {
@@ -102,7 +118,7 @@ export default function AccountingPage() {
     const expenses = useMemo(() => {
         return transactions.filter(t => t.type === 'Expense').map(t => ({
             id: t.id,
-            title: t.description?.replace('Gider: ', '').split(' (')[0] || t.description,
+            title: t.description?.replace('Gider: ', '')?.split(' (')[0] || t.description,
             category: t.description?.match(/\((.*?)\)/)?.[1] || 'Genel',
             date: new Date(t.date).toLocaleDateString('tr-TR'),
             rawDate: t.date,
@@ -174,11 +190,33 @@ export default function AccountingPage() {
             const dueDate = new Date(c.dueDate);
             const isMatched = !startDate || (dueDate >= startDate && (!endDate || dueDate <= endDate));
 
-            if (c.status === 'Beklemede' && isMatched) {
+            if ((c.status === 'Beklemede' || c.status === 'Portföyde') && isMatched) {
                 if (c.type.includes('Alınan')) filteredReceivables += Number(c.amount);
                 else filteredPayments += Number(c.amount);
             }
         });
+
+        // Add Current Account Balances (Cari Bakiyeler) only if viewing ALL time
+        // or if we decide open balances should always be visible.
+        // Usually, dashboard "Total" implies everything outstanding.
+        if (timeFilter === 'all') {
+            // Customer Balances (Receivables)
+            customers.forEach(c => {
+                if (Number(c.balance) > 0) filteredReceivables += Number(c.balance);
+            });
+
+            // Supplier Balances (Payables)
+            suppliers.forEach(s => {
+                if (Number(s.balance) < 0) filteredPayments += Math.abs(Number(s.balance));
+                // Supplier positive balance implies we overpaid or they owe us (Receivable)
+                else if (Number(s.balance) > 0) filteredReceivables += Number(s.balance);
+            });
+
+            // Handle Customer negative balances (we owe them / returns) -> Payment
+            customers.forEach(c => {
+                if (Number(c.balance) < 0) filteredPayments += Math.abs(Number(c.balance));
+            });
+        }
 
         // Expenses
         const filteredExpenses = transactions
@@ -192,7 +230,7 @@ export default function AccountingPage() {
         const netKasa = kasalar.reduce((a, b) => a + Number(b.balance), 0);
 
         return { filteredReceivables, filteredPayments, filteredExpenses, netKasa };
-    }, [scheduledPayments, checks, kasalar, transactions, timeFilter, customRange]);
+    }, [scheduledPayments, checks, kasalar, transactions, timeFilter, customRange, customers, suppliers]);
 
     const [showScheduledModal, setShowScheduledModal] = useState(false);
     const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
@@ -308,13 +346,18 @@ export default function AccountingPage() {
 
     // Filtered Kasa List based on Active Branch
     const filteredKasalar = useMemo(() => {
-        if (!activeBranchName || activeBranchName === 'all' || isSystemAdmin && activeBranchName === 'Tümü') return kasalar;
+        if (!activeBranchName || activeBranchName === 'all' || activeBranchName === 'Tümü') return kasalar;
 
-        const allowedIds = branchKasaMappings[activeBranchName];
-        if (!allowedIds || allowedIds.length === 0) return kasalar; // Fallback if no mapping exists
+        const isAdmin = isSystemAdmin || !hasPermission('branch_isolation');
+        // Consistent with filterByBranch: Merkez sees everything.
+        if (isAdmin && activeBranchName === 'Merkez') return kasalar;
 
-        return kasalar.filter(k => allowedIds.includes(k.id.toString()));
-    }, [kasalar, activeBranchName, branchKasaMappings, isSystemAdmin]);
+        // If specific branch is active, show only kasas belonging to that branch (or Global)
+        return kasalar.filter(k => {
+            if (!k.branch) return true; // Global/Unassigned -> Show everywhere
+            return k.branch === activeBranchName || k.branch === 'Global';
+        });
+    }, [kasalar, activeBranchName, currentUser, hasPermission]);
 
     const [showPayModal, setShowPayModal] = useState(false);
     const [activePayItem, setActivePayItem] = useState<any>(null);
@@ -515,8 +558,8 @@ export default function AccountingPage() {
             isCollected: false,
             cashAmount: '0',
             cardAmount: '0',
-            selectedCashboxId: kasalar.find(k => k.type === 'Nakit')?.id.toString() || '',
-            selectedCardBankId: kasalar.find(k => k.type === 'Banka')?.id.toString() || ''
+            selectedCashboxId: filteredKasalar.find(k => k.type === 'Nakit')?.id.toString() || '',
+            selectedCardBankId: filteredKasalar.find(k => k.type !== 'Nakit')?.id.toString() || ''
         });
         setShowModal(true);
     };
@@ -603,6 +646,13 @@ export default function AccountingPage() {
             });
             setShowCheckModal(false);
             setNewCheck({ type: 'Alınan Çek', number: '', bank: '', dueDate: '', amount: '', entityId: '', description: '' });
+
+            // Refresh actions
+            await refreshCustomers();
+            await refreshSuppliers();
+            await refreshTransactions();
+            await refreshChecks();
+
             showSuccess("Başarılı", "Evrak başarıyla kaydedildi.");
 
         } catch (error) {
@@ -830,16 +880,17 @@ export default function AccountingPage() {
     }, [activeTab]);
 
     return (
-        <div className="container p-4 md:p-8 animate-in">
-            <header className="flex-between mb-8">
-                <div>
-                    <h1 className="text-4xl font-black text-gradient">Muhasebe & Finans</h1>
-                    <p className="text-muted">Nakit akışı, alacak/borç ve kasa yönetimi</p>
+        <div className="w-full max-w-[1600px] p-4 md:p-8 animate-in text-left">
+            <header className="flex flex-col md:flex-row md:justify-between items-start gap-8 mb-12 w-full text-left">
+                <div className="text-left">
+                    <h1 className="text-3xl md:text-5xl font-black text-gradient mb-3">Muhasebe & Finans</h1>
+                    <p className="text-muted text-sm md:text-base font-medium">Nakit akışı, alacak/borç ve kasa yönetimi</p>
                 </div>
-                <div className="flex gap-4">
-                    <button onClick={() => { refreshCustomers(); refreshTransactions(); refreshKasalar(); refreshSuppliers(); }} className="btn btn-outline text-xs">🔄 Yenile</button>
+                <div className="flex gap-3 w-full md:w-auto text-left">
+                    <button onClick={() => { refreshCustomers(); refreshTransactions(); refreshKasalar(); refreshSuppliers(); }} className="btn btn-outline text-xs px-6 py-3 whitespace-nowrap">🔄 Verileri Yenile</button>
                 </div>
             </header>
+
 
             {/* DASHBOARD STATS */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -944,22 +995,28 @@ export default function AccountingPage() {
             <div className="card glass min-height-[500px]">
                 {activeTab === 'receivables' && (
                     <div>
-                        <div className="flex-between mb-4"><h3>Tahsil Edilecekler</h3><button onClick={() => openModal('receivable')} className="btn btn-primary">+ Tahsilat Ekle</button></div>
-                        <table className="w-full text-left">
-                            <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Cari Bilgisi</th><th>Vade</th><th>Kalan Tutar</th><th>Durum</th><th></th></tr></thead>
-                            <tbody>
-                                {paginate(filterByTime([...filterByBranch(receivables), ...customerReceivables])).map(item => (
-                                    <tr key={item.id} className="border-b border-subtle hover-bg transition-colors">
-                                        <td className="p-4"><div>{item.title}</div><div className="text-xs text-muted">{item.date}</div></td>
-                                        <td>{item.due}</td><td className="font-bold">{Math.abs(item.amount).toLocaleString()} ₺</td>
-                                        <td><span className="text-xs bg-subtle px-2 py-1 rounded">{item.status}</span></td>
-                                        <td className="text-right">
-                                            <button onClick={() => handleCollect(item)} className="btn btn-outline text-xs mr-2 border-primary text-primary hover:bg-primary hover:text-white">Tahsil Et</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 mb-4">
+                            <h3 className="text-xl font-bold">Tahsil Edilecekler</h3>
+                            <button onClick={() => openModal('receivable')} className="btn btn-primary w-full sm:w-auto text-sm">+ Tahsilat Ekle</button>
+                        </div>
+                        <div className="table-container overflow-x-auto">
+                            <table className="w-full text-left min-w-[600px]">
+                                <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Cari Bilgisi</th><th>Vade</th><th>Kalan Tutar</th><th>Durum</th><th></th></tr></thead>
+                                <tbody>
+                                    {paginate(filterByTime([...filterByBranch(receivables), ...customerReceivables])).map(item => (
+                                        <tr key={item.id} className="border-b border-subtle hover-bg transition-colors">
+                                            <td className="p-4"><div>{item.title}</div><div className="text-xs text-muted">{item.date}</div></td>
+                                            <td>{item.due}</td><td className="font-bold">{Math.abs(item.amount).toLocaleString()} ₺</td>
+                                            <td><span className="text-xs bg-subtle px-2 py-1 rounded">{item.status}</span></td>
+                                            <td className="text-right">
+                                                <button onClick={() => handleCollect(item)} className="btn btn-outline text-xs mr-2 border-primary text-primary hover:bg-primary hover:text-white">Tahsil Et</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
                         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
                         {/* PLANLI ALACAKLAR & ÇEKLER */}
@@ -1080,23 +1137,29 @@ export default function AccountingPage() {
                 )}
 
                 {activeTab === 'payables' && (
-                    <div>
-                        <div className="flex-between mb-4"><h3>Ödemeler</h3><button onClick={() => openModal('payable')} className="btn btn-primary">+ Ödeme Ekle</button></div>
-                        <table className="w-full text-left">
-                            <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Cari Bilgisi</th><th>Vade</th><th>Borç Tutarı</th><th>Durum</th><th></th></tr></thead>
-                            <tbody>
-                                {paginate(filterByTime([...filterByBranch(payables), ...supplierPayables])).map(item => (
-                                    <tr key={item.id} className="border-b border-subtle hover-bg transition-colors">
-                                        <td className="p-4"><div>{item.title}</div><div className="text-xs text-muted">{item.date}</div></td>
-                                        <td>{item.due}</td><td className="font-bold text-danger">{item.amount.toLocaleString()} ₺</td>
-                                        <td><span className="text-xs bg-subtle px-2 py-1 rounded">{item.status}</span></td>
-                                        <td className="text-right">
-                                            <button onClick={() => handlePay(item)} className="btn btn-outline text-xs mr-2 border-primary text-primary hover:bg-primary hover:text-white">Öde</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="animate-in">
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 mb-4">
+                            <h3 className="text-xl font-bold">Ödemeler</h3>
+                            <button onClick={() => openModal('payable')} className="btn btn-primary w-full sm:w-auto text-sm">+ Ödeme Ekle</button>
+                        </div>
+                        <div className="table-container overflow-x-auto">
+                            <table className="w-full text-left min-w-[600px]">
+                                <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Cari Bilgisi</th><th>Vade</th><th>Borç Tutarı</th><th>Durum</th><th></th></tr></thead>
+                                <tbody>
+                                    {paginate(filterByTime([...filterByBranch(payables), ...supplierPayables])).map(item => (
+                                        <tr key={item.id} className="border-b border-subtle hover-bg transition-colors">
+                                            <td className="p-4"><div>{item.title}</div><div className="text-xs text-muted">{item.date}</div></td>
+                                            <td>{item.due}</td><td className="font-bold text-danger">{item.amount.toLocaleString()} ₺</td>
+                                            <td><span className="text-xs bg-subtle px-2 py-1 rounded">{item.status}</span></td>
+                                            <td className="text-right">
+                                                <button onClick={() => handlePay(item)} className="btn btn-outline text-xs mr-2 border-primary text-primary hover:bg-primary hover:text-white">Öde</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
                         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
                         {/* PLANLI BORÇLAR (Krediler) & VERİLEN ÇEKLER */}
@@ -1191,63 +1254,69 @@ export default function AccountingPage() {
 
                 {activeTab === 'checks' && (
                     <div>
-                        <div className="flex-between mb-4"><h3>Çek & Senet Portföyü</h3><button onClick={() => setShowCheckModal(true)} className="btn btn-primary">+ Ekle</button></div>
-                        <table className="w-full text-left">
-                            <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Tür</th><th>Muhatap</th><th>Vade</th><th>Banka</th><th>Branch</th><th>Tutar</th><th>Durum</th><th></th></tr></thead>
-                            <tbody>
-                                {checks.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-muted">Kayıtlı evrak bulunmuyor.</td></tr>}
-                                {paginate(filterByTime(checks)).map(c => (
-                                    <tr key={c.id} className="border-b border-subtle hover-bg transition-colors">
-                                        <td className="p-4"><b>{c.type}</b></td>
-                                        <td>{c.customer?.name || c.supplier?.name || '-'}</td>
-                                        <td>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
-                                        <td className="text-muted">{c.bank}</td>
-                                        <td className="text-xs text-muted">{c.branch || 'Merkez'}</td>
-                                        <td className="font-bold">{Number(c.amount).toLocaleString()} ₺</td>
-                                        <td><span className="text-xs bg-subtle px-2 py-1 rounded">{c.status}</span></td>
-                                        <td className="text-right">
-                                            {c.status === 'Beklemede' && (
-                                                <button
-                                                    onClick={() => {
-                                                        setActiveCheck(c);
-                                                        setTargetKasaId(kasalar[0]?.id.toString() || '');
-                                                        setShowCheckCollectModal(true);
-                                                    }}
-                                                    className="btn btn-outline text-xs mr-2 border-primary text-primary hover:bg-primary hover:text-white"
-                                                >
-                                                    {c.type.includes('Alınan') ? 'Tahsil Et' : 'Öde'}
-                                                </button>
-                                            )}
-                                            {canDelete && <button disabled={isProcessing} onClick={() => {
-                                                if (isProcessing) return;
-                                                showConfirm(
-                                                    'Emin misiniz?',
-                                                    'Bu evrak kaydını silmek istediğinize emin misiniz?',
-                                                    async () => {
-                                                        setIsProcessing(true);
-                                                        try {
-                                                            const res = await fetch(`/api/checks/${c.id}`, { method: 'DELETE' });
-                                                            const data = await res.json();
-                                                            if (data.success) {
-                                                                showSuccess("Silindi", "Evrak başarıyla silindi.");
-                                                                window.location.reload();
-                                                            } else {
-                                                                showError("Hata", data.error || "Silinemedi.");
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 mb-4">
+                            <h3 className="text-xl font-bold">Çek & Senet Portföyü</h3>
+                            <button onClick={() => setShowCheckModal(true)} className="btn btn-primary w-full sm:w-auto text-sm">+ Ekle</button>
+                        </div>
+                        <div className="table-container">
+                            <table className="w-full text-left">
+                                <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Tür</th><th>Muhatap</th><th>Vade</th><th>Banka</th><th>Branch</th><th>Tutar</th><th>Durum</th><th></th></tr></thead>
+                                <tbody>
+                                    {checks.length === 0 && <tr><td colSpan={8} className="p-8 text-center text-muted">Kayıtlı evrak bulunmuyor.</td></tr>}
+                                    {paginate(filterByTime(checks)).map(c => (
+                                        <tr key={c.id} className="border-b border-subtle hover-bg transition-colors">
+                                            <td className="p-4"><b>{c.type}</b></td>
+                                            <td>{c.customer?.name || c.supplier?.name || '-'}</td>
+                                            <td>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
+                                            <td className="text-muted">{c.bank}</td>
+                                            <td className="text-xs text-muted">{c.branch || 'Merkez'}</td>
+                                            <td className="font-bold">{Number(c.amount).toLocaleString()} ₺</td>
+                                            <td><span className="text-xs bg-subtle px-2 py-1 rounded">{c.status}</span></td>
+                                            <td className="text-right">
+                                                {c.status === 'Beklemede' && (
+                                                    <button
+                                                        onClick={() => {
+                                                            setActiveCheck(c);
+                                                            setTargetKasaId(kasalar[0]?.id.toString() || '');
+                                                            setShowCheckCollectModal(true);
+                                                        }}
+                                                        className="btn btn-outline text-xs mr-2 border-primary text-primary hover:bg-primary hover:text-white"
+                                                    >
+                                                        {c.type.includes('Alınan') ? 'Tahsil Et' : 'Öde'}
+                                                    </button>
+                                                )}
+                                                {canDelete && <button disabled={isProcessing} onClick={() => {
+                                                    if (isProcessing) return;
+                                                    showConfirm(
+                                                        'Emin misiniz?',
+                                                        'Bu evrak kaydını silmek istediğinize emin misiniz?',
+                                                        async () => {
+                                                            setIsProcessing(true);
+                                                            try {
+                                                                const res = await fetch(`/api/checks/${c.id}`, { method: 'DELETE' });
+                                                                const data = await res.json();
+                                                                if (data.success) {
+                                                                    showSuccess("Silindi", "Evrak başarıyla silindi.");
+                                                                    window.location.reload();
+                                                                } else {
+                                                                    showError("Hata", data.error || "Silinemedi.");
+                                                                }
+                                                            } catch (err) {
+                                                                console.error(err);
+                                                                showError("Hata", "Silme işlemi sırasında bir hata oluştu.");
+                                                            } finally {
+                                                                setIsProcessing(false);
                                                             }
-                                                        } catch (err) {
-                                                            console.error(err);
-                                                            showError("Hata", "Silme işlemi sırasında bir hata oluştu.");
-                                                        } finally {
-                                                            setIsProcessing(false);
                                                         }
-                                                    }
-                                                );
-                                            }} className="btn btn-outline text-xs text-danger border-danger hover:bg-danger hover:text-white">{isProcessing ? 'SİLİNİYOR...' : 'Sil'}</button>}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                                    );
+                                                }} className="btn btn-outline text-xs text-danger border-danger hover:bg-danger hover:text-white">{isProcessing ? 'SİLİNİYOR...' : 'Sil'}</button>}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
                         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                     </div>
                 )}
@@ -1387,19 +1456,19 @@ export default function AccountingPage() {
 
                 {activeTab === 'banks' && (
                     <div>
-                        <div className="flex-between mb-4"><h3>Kasa & Banka Hesapları</h3><div className="flex gap-2">
-                            <button onClick={() => setShowVirmanModal(true)} className="btn btn-outline text-xs">Virman</button>
-                            {hasPermission('create_bank') && <button onClick={() => setShowAddBank(true)} className="btn btn-primary">+ Yeni Hesap</button>}
-                        </div></div>
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 mb-4">
+                            <h3 className="text-xl font-bold">Kasa & Banka Hesapları</h3>
+                            <div className="flex gap-2 w-full sm:w-auto">
+                                <button onClick={() => setShowVirmanModal(true)} className="btn btn-outline text-xs px-4 flex-1 sm:flex-none">Virman Transferi</button>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filteredKasalar.map(k => (
                                 <div key={k.id} className="card glass-plus relative overflow-hidden group">
                                     <div className="flex-between mb-2">
                                         <span className="text-[10px] tracking-widest uppercase text-muted bg-subtle px-2 py-1 rounded">{k.type}</span>
-                                        <div className="flex gap-2">
-                                            {canDelete && <button onClick={() => handleEditKasa(k)} className="text-muted hover:text-primary transition-colors">✏️</button>}
-                                            {canDelete && <button onClick={() => handleDeleteKasa(k.id.toString(), k.balance)} className="text-muted hover:text-danger transition-colors">🗑️</button>}
-                                        </div>
+                                        <span className="text-[10px] text-muted opacity-50">{k.branch || 'Merkez'}</span>
                                     </div>
                                     <h4 className="text-xl font-bold mb-1">{k.name}</h4>
                                     <div className="text-3xl font-black text-secondary">₺ {Number(k.balance).toLocaleString()}</div>
@@ -1413,38 +1482,44 @@ export default function AccountingPage() {
 
                 {activeTab === 'expenses' && (
                     <div>
-                        <div className="flex-between mb-4"><h3>Gider Kayıtları</h3><button onClick={() => { setIsEditingExpense(false); setShowExpenseModal(true); }} className="btn btn-primary">+ Gider Ekle</button></div>
-                        <table className="w-full text-left">
-                            <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Açıklama</th><th>Kategori</th><th>Tarih</th><th>Tutar</th><th>Ödeme</th><th></th></tr></thead>
-                            <tbody>
-                                {paginate(filterByTime(expenses)).map(e => (
-                                    <tr key={e.id} className="border-b border-subtle hover-bg transition-colors">
-                                        <td className="p-4"><b>{e.title}</b></td>
-                                        <td><span className="text-xs bg-subtle px-2 py-1 rounded">{e.category}</span></td>
-                                        <td className="text-muted">{e.date}</td>
-                                        <td className="font-bold text-danger">{e.amount.toLocaleString()} ₺</td>
-                                        <td className="text-xs text-muted">{e.method}</td>
-                                        <td className="text-right">
-                                            <button onClick={() => handleEditExpense(e)} className="btn btn-ghost text-xs">Düzenle</button>
-                                            {canDelete && <button onClick={() => handleDeleteExpense(e.id)} className="btn btn-ghost text-xs text-danger">Sil</button>}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 mb-4">
+                            <h3 className="text-xl font-bold">Gider Kayıtları</h3>
+                            <button onClick={() => { setIsEditingExpense(false); setShowExpenseModal(true); }} className="btn btn-primary w-full sm:w-auto text-sm">+ Gider Ekle</button>
+                        </div>
+                        <div className="table-container overflow-x-auto">
+                            <table className="w-full text-left min-w-[600px]">
+                                <thead className="text-muted text-xs border-b border-main"><tr><th className="p-3">Açıklama</th><th>Kategori</th><th>Tarih</th><th>Tutar</th><th>Ödeme</th><th></th></tr></thead>
+                                <tbody>
+                                    {paginate(filterByTime(expenses)).map(e => (
+                                        <tr key={e.id} className="border-b border-subtle hover-bg transition-colors">
+                                            <td className="p-4"><b>{e.title}</b></td>
+                                            <td><span className="text-xs bg-subtle px-2 py-1 rounded">{e.category}</span></td>
+                                            <td className="text-muted">{e.date}</td>
+                                            <td className="font-bold text-danger">{e.amount.toLocaleString()} ₺</td>
+                                            <td className="text-xs text-muted">{e.method}</td>
+                                            <td className="text-right">
+                                                <button onClick={() => handleEditExpense(e)} className="btn btn-ghost text-xs">Düzenle</button>
+                                                {canDelete && <button onClick={() => handleDeleteExpense(e.id)} className="btn btn-ghost text-xs text-danger">Sil</button>}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
                         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                     </div>
                 )}
 
                 {activeTab === 'transactions_list' && (
                     <div className="animate-in">
-                        <div className="flex-between mb-4">
-                            <h3>Tüm Finansal Hareketler</h3>
-                            <div className="flex gap-2">
-                                <button onClick={() => { refreshTransactions(); refreshKasalar(); }} className="btn btn-outline text-xs">🔄 Yenile</button>
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 mb-4">
+                            <h3 className="text-xl font-bold">Tüm Finansal Hareketler</h3>
+                            <div className="flex gap-2 w-full sm:w-auto">
+                                <button onClick={() => { refreshTransactions(); refreshKasalar(); }} className="btn btn-outline text-xs flex-1 sm:flex-none">🔄 Yenile</button>
                             </div>
                         </div>
-                        <div className="card glass-plus overflow-hidden">
+                        <div className="table-container">
                             <table className="w-full text-left">
                                 <thead className="text-muted text-xs border-b border-white/10">
                                     <tr>
@@ -1458,7 +1533,7 @@ export default function AccountingPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {transactions.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-muted">İşlem kaydı bulunmuyor.</td></tr>}
+                                    {transactions.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-muted">İşlem kaydı bulunmuyor.</td></tr>}
                                     {paginate(filterByTime([...transactions]).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())).map(t => {
                                         const cust = customers.find(c => c.id === t.customerId);
                                         const supp = suppliers.find(s => s.id === t.supplierId);
@@ -1478,7 +1553,11 @@ export default function AccountingPage() {
                                                         color: isInflow ? '#10b981' : '#ef4444',
                                                         border: `1px solid ${isInflow ? '#10b981' : '#ef4444'}`
                                                     }}>
-                                                        {t.type === 'Sales' ? 'SATIŞ' : t.type === 'Collection' ? 'TAHSİLAT' : t.type === 'Payment' ? 'ÖDEME' : (t.type === 'Transfer' ? 'VİRMAN' : 'GİDER')}
+                                                        {t.type === 'Sales' ? 'SATIŞ' :
+                                                            t.type === 'Collection' ? 'TAHSİLAT' :
+                                                                t.type === 'Payment' ? 'ÖDEME' :
+                                                                    t.type === 'Purchase' ? 'ALIŞ' :
+                                                                        t.type === 'Transfer' ? 'VİRMAN' : 'GİDER'}
                                                     </span>
                                                 </td>
                                                 <td>
@@ -1520,390 +1599,415 @@ export default function AccountingPage() {
                                     })}
                                 </tbody>
                             </table>
-                            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                         </div>
+                        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                     </div>
                 )}
+
+
             </div>
 
             {/* MODALS */}
-            {showModal && (
-                <div className="modal-overlay">
-                    <div className="card glass animate-in modal-content">
-                        <div className="flex-between mb-6"><h3>{modalType === 'receivable' ? '📥 Yeni Tahsilat' : '📤 Yeni Borç'} Kaydı</h3><button onClick={() => setShowModal(false)} className="close-btn">&times;</button></div>
-                        <div className="flex flex-col gap-4">
-                            <div className="form-group">
-                                <label>Cari (Müşteri/Tedarikçi)</label>
-                                <select value={newItem.entityId} onChange={e => setNewItem({ ...newItem, entityId: e.target.value })} className="input-field">
-                                    <option value="">Seçiniz...</option>
-                                    {(modalType === 'receivable' ? customers : suppliers).map(c => <option key={c.id} value={c.id.toString()}>{c.name} (Bakiye: {c.balance.toLocaleString()} ₺)</option>)}
-                                </select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+
+            {
+                showModal && (
+
+                    <div className="modal-overlay">
+                        <div className="card glass animate-in modal-content">
+                            <div className="flex-between mb-6"><h3>{modalType === 'receivable' ? '📥 Yeni Tahsilat' : '📤 Yeni Borç'} Kaydı</h3><button onClick={() => setShowModal(false)} className="close-btn">&times;</button></div>
+                            <div className="flex flex-col gap-4">
                                 <div className="form-group">
-                                    <label>Tutar</label>
-                                    <input type="number" placeholder="0.00" value={newItem.amount} onChange={e => setNewItem({ ...newItem, amount: e.target.value })} className="input-field" />
+                                    <label>Cari (Müşteri/Tedarikçi)</label>
+                                    <select value={newItem.entityId} onChange={e => setNewItem({ ...newItem, entityId: e.target.value })} className="input-field">
+                                        <option value="">Seçiniz...</option>
+                                        {(modalType === 'receivable' ? customers : suppliers).map(c => <option key={c.id} value={c.id.toString()}>{c.name} (Bakiye: {c.balance.toLocaleString()} ₺)</option>)}
+                                    </select>
                                 </div>
-                                <div className="form-group">
-                                    <label>Vade / Not</label>
-                                    <input type="text" placeholder="Gelecek Ay" value={newItem.due} onChange={e => setNewItem({ ...newItem, due: e.target.value })} className="input-field" />
-                                </div>
-                            </div>
-                            <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-                                <div className="flex-between mb-4"><span>Finansal kayıt oluşturulsun mu?</span><input type="checkbox" checked={newItem.isCollected} onChange={e => setNewItem({ ...newItem, isCollected: e.target.checked })} /></div>
-                                {newItem.isCollected && (
-                                    <div className="flex flex-col gap-3">
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="form-group"><label className="text-[10px] text-muted">Nakit</label><input type="number" value={newItem.cashAmount} onChange={e => setNewItem({ ...newItem, cashAmount: e.target.value })} className="input-field" /></div>
-                                            <div className="form-group"><label className="text-[10px] text-muted">Kasa</label><select value={newItem.selectedCashboxId} onChange={e => setNewItem({ ...newItem, selectedCashboxId: e.target.value })} className="input-field">{kasalar.filter(k => k.type === 'Nakit').map(k => <option key={k.id} value={k.id}>{k.name}</option>)}</select></div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="form-group"><label className="text-[10px] text-muted">Banka</label><input type="number" value={newItem.cardAmount} onChange={e => setNewItem({ ...newItem, cardAmount: e.target.value })} className="input-field" /></div>
-                                            <div className="form-group"><label className="text-[10px] text-muted">Banka Hesabı</label><select value={newItem.selectedCardBankId} onChange={e => setNewItem({ ...newItem, selectedCardBankId: e.target.value })} className="input-field">{kasalar.filter(k => k.type === 'Banka').map(k => <option key={k.id} value={k.id}>{k.name}</option>)}</select></div>
-                                        </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="form-group">
+                                        <label>Tutar</label>
+                                        <input type="number" placeholder="0.00" value={newItem.amount} onChange={e => setNewItem({ ...newItem, amount: e.target.value })} className="input-field" />
                                     </div>
-                                )}
+                                    <div className="form-group">
+                                        <label>Vade / Not</label>
+                                        <input type="text" placeholder="Gelecek Ay" value={newItem.due} onChange={e => setNewItem({ ...newItem, due: e.target.value })} className="input-field" />
+                                    </div>
+                                </div>
+                                <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                                    <div className="flex-between mb-4"><span>Finansal kayıt oluşturulsun mu?</span><input type="checkbox" checked={newItem.isCollected} onChange={e => setNewItem({ ...newItem, isCollected: e.target.checked })} /></div>
+                                    {newItem.isCollected && (
+                                        <div className="flex flex-col gap-3">
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div className="form-group"><label className="text-[10px] text-muted">Nakit</label><input type="number" value={newItem.cashAmount} onChange={e => setNewItem({ ...newItem, cashAmount: e.target.value })} className="input-field" /></div>
+                                                <div className="form-group"><label className="text-[10px] text-muted">Kasa</label><select value={newItem.selectedCashboxId} onChange={e => setNewItem({ ...newItem, selectedCashboxId: e.target.value })} className="input-field">
+                                                    <option value="">Seçiniz...</option>
+                                                    {filteredKasalar.filter(k => k.type === 'Nakit').map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
+                                                </select></div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div className="form-group"><label className="text-[10px] text-muted">Banka / POS</label><input type="number" value={newItem.cardAmount} onChange={e => setNewItem({ ...newItem, cardAmount: e.target.value })} className="input-field" /></div>
+                                                <div className="form-group"><label className="text-[10px] text-muted">Banka Hesabı</label><select value={newItem.selectedCardBankId} onChange={e => setNewItem({ ...newItem, selectedCardBankId: e.target.value })} className="input-field">
+                                                    <option value="">Seçiniz...</option>
+                                                    {filteredKasalar.filter(k => k.type !== 'Nakit').map(k => <option key={k.id} value={k.id}>{k.name} ({k.type})</option>)}
+                                                </select></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <button onClick={saveNewItem} disabled={isProcessing} className="btn btn-primary w-full p-4 font-bold mt-2">
+                                    {isProcessing ? 'İŞLENİYOR...' : 'KAYDET'}
+                                </button>
                             </div>
-                            <button onClick={saveNewItem} disabled={isProcessing} className="btn btn-primary w-full p-4 font-bold mt-2">
-                                {isProcessing ? 'İŞLENİYOR...' : 'KAYDET'}
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
-            {showCheckModal && (
-                <div className="modal-overlay">
-                    <div className="card glass animate-in modal-content">
-                        <div className="flex-between mb-6"><h3>🏷️ Yeni Çek / Senet Girişi</h3><button onClick={() => setShowCheckModal(false)} className="close-btn">&times;</button></div>
-                        <div className="flex flex-col gap-4">
-                            <div className="form-group">
-                                <label>Evrak Türü</label>
-                                <select value={newCheck.type} onChange={e => setNewCheck({ ...newCheck, type: e.target.value })} className="input-field">
-                                    <option>Alınan Çek</option><option>Verilen Çek</option><option>Alınan Senet</option><option>Verilen Senet</option>
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>Evrak Numarası</label>
-                                <input type="text" placeholder="Poliçe/Bono No" value={newCheck.number} onChange={e => setNewCheck({ ...newCheck, number: e.target.value })} className="input-field" />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+            {
+                showCheckModal && (
+                    <div className="modal-overlay">
+                        <div className="card glass animate-in modal-content">
+                            <div className="flex-between mb-6"><h3>🏷️ Yeni Çek / Senet Girişi</h3><button onClick={() => setShowCheckModal(false)} className="close-btn">&times;</button></div>
+                            <div className="flex flex-col gap-4">
                                 <div className="form-group">
-                                    <label>Tutar</label>
-                                    <input type="number" placeholder="0.00" value={newCheck.amount} onChange={e => setNewCheck({ ...newCheck, amount: e.target.value })} className="input-field" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Vade Tarihi</label>
-                                    <input type="date" value={newCheck.dueDate} onChange={e => setNewCheck({ ...newCheck, dueDate: e.target.value })} className="input-field" />
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label>İlgili Cari (Müşteri/Tedarikçi)</label>
-                                <select value={newCheck.entityId} onChange={e => setNewCheck({ ...newCheck, entityId: e.target.value })} className="input-field">
-                                    <option value="">Cari Seçin...</option>
-                                    {(newCheck.type.includes('Alınan') ? customers : suppliers).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>Açıklama</label>
-                                <input type="text" placeholder="Giriş Notu" value={newCheck.description} onChange={e => setNewCheck({ ...newCheck, description: e.target.value })} className="input-field" />
-                            </div>
-                            <button onClick={saveNewCheck} disabled={isProcessing} className="btn btn-primary w-full p-4 font-bold mt-2">
-                                {isProcessing ? 'İŞLENİYOR...' : 'EVRAKI KAYDET'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {showExpenseModal && (
-                <div className="modal-overlay">
-                    <div className="card glass animate-in modal-content">
-                        <div className="flex-between mb-6"><h3>{isEditingExpense ? '✏️ Gider Düzenle' : '💸 Yeni Gider Kaydı'}</h3><button onClick={() => setShowExpenseModal(false)} className="close-btn">&times;</button></div>
-                        <div className="flex flex-col gap-4">
-                            <div className="form-group">
-                                <label>Gider Açıklaması</label>
-                                <input type="text" placeholder="Örn: Elektrik Faturası vb." value={newExpense.title} onChange={e => setNewExpense({ ...newExpense, title: e.target.value })} className="input-field" />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="form-group">
-                                    <label>Kategori</label>
-                                    <select value={newExpense.category} onChange={e => setNewExpense({ ...newExpense, category: e.target.value })} className="input-field">
-                                        <option>Diğer</option><option>Kira</option><option>Maaş</option><option>Fatura</option><option>Malzeme</option><option>Yemek</option><option>Yakıt</option>
+                                    <label>Evrak Türü</label>
+                                    <select value={newCheck.type} onChange={e => setNewCheck({ ...newCheck, type: e.target.value })} className="input-field">
+                                        <option>Alınan Çek</option><option>Verilen Çek</option><option>Alınan Senet</option><option>Verilen Senet</option>
                                     </select>
                                 </div>
                                 <div className="form-group">
-                                    <label>Ödeme Yapılacak Kasa</label>
-                                    <select value={newExpense.kasaId} onChange={e => setNewExpense({ ...newExpense, kasaId: e.target.value })} className="input-field">
+                                    <label>Evrak Numarası</label>
+                                    <input type="text" placeholder="Poliçe/Bono No" value={newCheck.number} onChange={e => setNewCheck({ ...newCheck, number: e.target.value })} className="input-field" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="form-group">
+                                        <label>Tutar</label>
+                                        <input type="number" placeholder="0.00" value={newCheck.amount} onChange={e => setNewCheck({ ...newCheck, amount: e.target.value })} className="input-field" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Vade Tarihi</label>
+                                        <input type="date" value={newCheck.dueDate} onChange={e => setNewCheck({ ...newCheck, dueDate: e.target.value })} className="input-field" />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>İlgili Cari (Müşteri/Tedarikçi)</label>
+                                    <select value={newCheck.entityId} onChange={e => setNewCheck({ ...newCheck, entityId: e.target.value })} className="input-field">
+                                        <option value="">Cari Seçin...</option>
+                                        {(newCheck.type.includes('Alınan') ? customers : suppliers).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Açıklama</label>
+                                    <input type="text" placeholder="Giriş Notu" value={newCheck.description} onChange={e => setNewCheck({ ...newCheck, description: e.target.value })} className="input-field" />
+                                </div>
+                                <button onClick={saveNewCheck} disabled={isProcessing} className="btn btn-primary w-full p-4 font-bold mt-2">
+                                    {isProcessing ? 'İŞLENİYOR...' : 'EVRAKI KAYDET'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {
+                showExpenseModal && (
+                    <div className="modal-overlay">
+                        <div className="card glass animate-in modal-content">
+                            <div className="flex-between mb-6"><h3>{isEditingExpense ? '✏️ Gider Düzenle' : '💸 Yeni Gider Kaydı'}</h3><button onClick={() => setShowExpenseModal(false)} className="close-btn">&times;</button></div>
+                            <div className="flex flex-col gap-4">
+                                <div className="form-group">
+                                    <label>Gider Açıklaması</label>
+                                    <input type="text" placeholder="Örn: Elektrik Faturası vb." value={newExpense.title} onChange={e => setNewExpense({ ...newExpense, title: e.target.value })} className="input-field" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="form-group">
+                                        <label>Kategori</label>
+                                        <select value={newExpense.category} onChange={e => setNewExpense({ ...newExpense, category: e.target.value })} className="input-field">
+                                            <option>Diğer</option><option>Kira</option><option>Maaş</option><option>Fatura</option><option>Malzeme</option><option>Yemek</option><option>Yakıt</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Ödeme Yapılacak Kasa</label>
+                                        <select value={newExpense.kasaId} onChange={e => setNewExpense({ ...newExpense, kasaId: e.target.value })} className="input-field">
+                                            <option value="">Seçiniz...</option>
+                                            {filteredKasalar.map(k => (
+                                                <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString()} ₺)</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>Tutar (₺)</label>
+                                    <input type="number" placeholder="0.00" value={newExpense.amount} onChange={e => setNewExpense({ ...newExpense, amount: e.target.value })} className="input-field" style={{ border: '1px solid var(--danger)', color: 'var(--danger)' }} />
+                                </div>
+                                <button onClick={saveNewExpense} disabled={isProcessing} className="btn-danger w-full p-4 font-bold mt-2">
+                                    {isProcessing ? 'İŞLENİYOR...' : 'GİDERİ KAYDET'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {
+                showPayModal && activePayItem && (
+                    <div className="modal-overlay">
+                        <div className="card glass animate-in modal-content border border-danger/30 w-full max-w-lg mx-auto">
+                            <div className="flex-between mb-6"><h3>💸 Ödeme Formu</h3><button onClick={() => setShowPayModal(false)} className="close-btn">&times;</button></div>
+                            <div className="flex flex-col gap-4">
+                                <div className="p-4 bg-danger/10 rounded-xl border border-danger/20 text-center">
+                                    <div className="text-[10px] text-muted tracking-widest uppercase mb-1">ÖDENECEK TUTAR</div>
+                                    <div className="text-xl font-bold mb-1">{activePayItem.title}</div>
+                                    <div className="text-3xl font-black text-danger">₺ {Math.abs(activePayItem.amount).toLocaleString()}</div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="form-group">
+                                        <label>Nakit Ödeme</label>
+                                        <input type="number" value={payDetails.cash} onChange={e => setPayDetails({ ...payDetails, cash: e.target.value })} className="input-field" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Kasa</label>
+                                        <select value={payDetails.cashboxId} onChange={e => setPayDetails({ ...payDetails, cashboxId: e.target.value })} className="input-field">
+                                            <option value="">Seçiniz...</option>
+                                            {filteredKasalar.filter(k => k.type === 'Nakit').map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="form-group">
+                                        <label>Banka Ödeme</label>
+                                        <input type="number" value={payDetails.card} onChange={e => setPayDetails({ ...payDetails, card: e.target.value })} className="input-field" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Banka Hesabı</label>
+                                        <select value={payDetails.bankId} onChange={e => setPayDetails({ ...payDetails, bankId: e.target.value })} className="input-field">
+                                            <option value="">Seçiniz...</option>
+                                            {filteredKasalar.filter(k => k.type !== 'Nakit').map(k => <option key={k.id} value={k.id}>{k.name} ({k.type})</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+                                <button onClick={finalizePayment} disabled={isProcessing} className="btn-danger w-full p-4 font-bold mt-2">
+                                    {isProcessing ? 'HARCA / ÖDE' : 'KAYDET'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {
+                showKasaEditModal && editingKasa && (
+                    <div className="modal-overlay">
+                        <div className="card glass animate-in modal-content w-full max-w-sm mx-auto">
+                            <div className="flex-between mb-4"><h3>Hesap Düzenle</h3><button onClick={() => setShowKasaEditModal(false)} className="close-btn">&times;</button></div>
+                            <div className="flex flex-col gap-4">
+                                <div className="form-group">
+                                    <label>Hesap Tipi</label>
+                                    <select className="input-field" value={editingKasa.type} onChange={e => setEditingKasa({ ...editingKasa, type: e.target.value })}>
+                                        {(kasaTypes && kasaTypes.length > 0 ? kasaTypes : ['Nakit', 'Banka', 'POS', 'Kredi Kartı']).map(t => (
+                                            <option key={t} value={t}>{t}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Hesap Adı</label>
+                                    <input className="input-field" value={editingKasa.name} onChange={e => setEditingKasa({ ...editingKasa, name: e.target.value })} />
+                                </div>
+                                <button onClick={handleSaveKasaEdit} disabled={isProcessing} className="btn btn-primary w-full p-4 font-bold mt-2">Kaydet</button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {
+                showCheckCollectModal && activeCheck && (
+                    <div className="modal-overlay">
+                        <div className="card glass animate-in modal-content w-full max-w-sm mx-auto">
+                            <div className="flex-between mb-4">
+                                <h3>{activeCheck.type.includes('Alınan') ? '📥 Tahsilat Onayı' : '📤 Ödeme Onayı'}</h3>
+                                <button onClick={() => setShowCheckCollectModal(false)} className="close-btn">&times;</button>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                                    <div className="text-xs text-muted tracking-widest uppercase mb-1">{activeCheck.type}</div>
+                                    <div className="text-xl font-bold">{Number(activeCheck.amount).toLocaleString()} ₺</div>
+                                    <div className="text-sm opacity-70 mt-1">{activeCheck.bank} - {activeCheck.number}</div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>{activeCheck.type.includes('Alınan') ? 'Tahsilatın Yapılacağı' : 'Ödemenin Yapılacağı'} Kasa / Banka</label>
+                                    <select
+                                        className="input-field"
+                                        value={targetKasaId}
+                                        onChange={e => setTargetKasaId(e.target.value)}
+                                    >
                                         <option value="">Seçiniz...</option>
-                                        {filteredKasalar.map(k => (
+                                        {filteredKasalar.filter(k => k.name !== 'ÇEK / SENET PORTFÖYÜ').map(k => (
                                             <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString()} ₺)</option>
                                         ))}
                                     </select>
                                 </div>
-                            </div>
-                            <div className="form-group">
-                                <label>Tutar (₺)</label>
-                                <input type="number" placeholder="0.00" value={newExpense.amount} onChange={e => setNewExpense({ ...newExpense, amount: e.target.value })} className="input-field" style={{ border: '1px solid var(--danger)', color: 'var(--danger)' }} />
-                            </div>
-                            <button onClick={saveNewExpense} disabled={isProcessing} className="btn-danger w-full p-4 font-bold mt-2">
-                                {isProcessing ? 'İŞLENİYOR...' : 'GİDERİ KAYDET'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
-            {showPayModal && (
-                <div className="modal-overlay">
-                    <div className="card glass animate-in modal-content border border-danger/30">
-                        <div className="flex-between mb-6"><h3>💸 Ödeme Formu</h3><button onClick={() => setShowPayModal(false)} className="close-btn">&times;</button></div>
-                        <div className="flex flex-col gap-4">
-                            <div className="p-4 bg-danger/10 rounded-xl border border-danger/20 text-center">
-                                <div className="text-[10px] text-muted tracking-widest uppercase mb-1">ÖDENECEK TUTAR</div>
-                                <div className="text-xl font-bold mb-1">{activePayItem.title}</div>
-                                <div className="text-3xl font-black text-danger">₺ {Math.abs(activePayItem.amount).toLocaleString()}</div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="form-group">
-                                    <label>Nakit Ödeme</label>
-                                    <input type="number" value={payDetails.cash} onChange={e => setPayDetails({ ...payDetails, cash: e.target.value })} className="input-field" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Kasa</label>
-                                    <select value={payDetails.cashboxId} onChange={e => setPayDetails({ ...payDetails, cashboxId: e.target.value })} className="input-field">
-                                        {kasalar.filter(k => k.type === 'Nakit').map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="form-group">
-                                    <label>Banka Ödeme</label>
-                                    <input type="number" value={payDetails.card} onChange={e => setPayDetails({ ...payDetails, card: e.target.value })} className="input-field" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Banka Hesabı</label>
-                                    <select value={payDetails.bankId} onChange={e => setPayDetails({ ...payDetails, bankId: e.target.value })} className="input-field">
-                                        {kasalar.filter(k => k.type === 'Banka').map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-                            <button onClick={finalizePayment} disabled={isProcessing} className="btn-danger w-full p-4 font-bold mt-2">
-                                {isProcessing ? 'HARCA / ÖDE' : 'KAYDET'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* KASA EDIT MODAL */}
-            {showKasaEditModal && editingKasa && (
-                <div className="modal-overlay">
-                    <div className="card glass animate-in modal-content" style={{ width: '400px' }}>
-                        <div className="flex-between mb-4"><h3>Hesap Düzenle</h3><button onClick={() => setShowKasaEditModal(false)} className="close-btn">&times;</button></div>
-                        <div className="flex flex-col gap-4">
-                            <div className="form-group">
-                                <label>Hesap Tipi</label>
-                                <select className="input-field" value={editingKasa.type} onChange={e => setEditingKasa({ ...editingKasa, type: e.target.value })}>
-                                    {(kasaTypes && kasaTypes.length > 0 ? kasaTypes : ['Nakit', 'Banka', 'POS', 'Kredi Kartı']).map(t => (
-                                        <option key={t} value={t}>{t}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>Hesap Adı</label>
-                                <input className="input-field" value={editingKasa.name} onChange={e => setEditingKasa({ ...editingKasa, name: e.target.value })} />
-                            </div>
-                            <button onClick={handleSaveKasaEdit} disabled={isProcessing} className="btn btn-primary w-full p-3 font-bold">Kaydet</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* CHECK COLLECT MODAL */}
-            {showCheckCollectModal && activeCheck && (
-                <div className="modal-overlay">
-                    <div className="card glass animate-in modal-content" style={{ width: '400px' }}>
-                        <div className="flex-between mb-4">
-                            <h3>{activeCheck.type.includes('Alınan') ? '📥 Tahsilat Onayı' : '📤 Ödeme Onayı'}</h3>
-                            <button onClick={() => setShowCheckCollectModal(false)} className="close-btn">&times;</button>
-                        </div>
-                        <div className="flex flex-col gap-4">
-                            <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-                                <div className="text-xs text-muted tracking-widest uppercase mb-1">{activeCheck.type}</div>
-                                <div className="text-xl font-bold">{Number(activeCheck.amount).toLocaleString()} ₺</div>
-                                <div className="text-sm opacity-70 mt-1">{activeCheck.bank} - {activeCheck.number}</div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>{activeCheck.type.includes('Alınan') ? 'Tahsilatın Yapılacağı' : 'Ödemenin Yapılacağı'} Kasa / Banka</label>
-                                <select
-                                    className="input-field"
-                                    value={targetKasaId}
-                                    onChange={e => setTargetKasaId(e.target.value)}
+                                <button
+                                    onClick={handleExecuteCheckCollect}
+                                    disabled={isProcessing || !targetKasaId}
+                                    className="btn btn-primary w-full p-4 font-bold mt-2"
                                 >
-                                    <option value="">Seçiniz...</option>
-                                    {kasalar.filter(k => k.name !== 'ÇEK / SENET PORTFÖYÜ').map(k => (
-                                        <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString()} ₺)</option>
-                                    ))}
-                                </select>
+                                    {isProcessing ? 'İŞLENİYOR...' : 'İŞLEMİ TAMAMLA'}
+                                </button>
                             </div>
-
-                            <button
-                                onClick={handleExecuteCheckCollect}
-                                disabled={isProcessing || !targetKasaId}
-                                className="btn btn-primary w-full p-4 font-bold"
-                            >
-                                {isProcessing ? 'İŞLENİYOR...' : 'İŞLEMİ TAMAMLA'}
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
-            {/* ADD BANK MODAL */}
-            {showAddBank && (
-                <div className="modal-overlay">
-                    <div className="card glass animate-in modal-content" style={{ width: '400px' }}>
-                        <div className="flex-between mb-4"><h3>Yeni Hesap Ekle</h3><button onClick={() => setShowAddBank(false)} className="close-btn">&times;</button></div>
-                        <div className="flex-col gap-4">
-                            <div className="form-group">
-                                <label>Hesap Tipi</label>
-                                <select className="input-field" value={newBank.type} onChange={e => setNewBank({ ...newBank, type: e.target.value })}>
-                                    {(kasaTypes && kasaTypes.length > 0 ? kasaTypes : ['Nakit', 'Banka', 'POS', 'Kredi Kartı']).map(t => (
-                                        <option key={t} value={t}>{t}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>Hesap Adı</label>
-                                <input className="input-field" placeholder={newBank.type === 'Nakit Kasa' ? 'Örn: Şube Kasası' : 'Örn: Ziraat Bankası'} value={newBank.name} onChange={e => setNewBank({ ...newBank, name: e.target.value })} />
-                            </div>
-                            <button onClick={addNewBank} disabled={isProcessing} className="btn btn-primary">Oluştur</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* VIRMAN MODAL */}
-            {showVirmanModal && (
-                <div className="modal-overlay">
-                    <div className="card glass animate-in modal-content" style={{ width: '500px' }}>
-                        <div className="flex-between mb-4"><h3>Virman (Hesaplar Arası Transfer)</h3><button onClick={() => setShowVirmanModal(false)} className="close-btn">&times;</button></div>
-                        <div className="flex-col gap-4">
-                            <div className="grid grid-cols-2 gap-4">
+            {
+                showAddBank && (
+                    <div className="modal-overlay">
+                        <div className="card glass animate-in modal-content w-full max-w-sm mx-auto">
+                            <div className="flex-between mb-4"><h3>Yeni Hesap Ekle</h3><button onClick={() => setShowAddBank(false)} className="close-btn">&times;</button></div>
+                            <div className="flex flex-col gap-4">
                                 <div className="form-group">
-                                    <label>Hangi Hesaptan (Çıkış)</label>
-                                    <select className="input-field" value={virmanData.fromKasaId} onChange={e => setVirmanData({ ...virmanData, fromKasaId: e.target.value })}>
-                                        <option value="">Seçiniz...</option>
-                                        {kasalar.map(k => <option key={k.id} value={k.id}>{k.name} ({k.balance} ₺)</option>)}
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>Hangi Hesaba (Giriş)</label>
-                                    <select className="input-field" value={virmanData.toKasaId} onChange={e => setVirmanData({ ...virmanData, toKasaId: e.target.value })}>
-                                        <option value="">Seçiniz...</option>
-                                        {kasalar.filter(k => k.id.toString() !== virmanData.fromKasaId).map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label>Transfer Tutarı</label>
-                                <input type="number" className="input-field font-bold text-lg" placeholder="0.00" value={virmanData.amount} onChange={e => setVirmanData({ ...virmanData, amount: e.target.value })} />
-                            </div>
-                            <button onClick={executeVirman} disabled={isProcessing} className="btn btn-primary h-12">Transferi Gerçekleştir</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* SCHEDULED PLAN MODAL */}
-            {showScheduledModal && (
-                <div className="modal-overlay">
-                    <div className="card glass animate-in modal-content">
-                        <div className="flex-between mb-6">
-                            <h3>{newPlan.direction === 'IN' ? '📥 Yeni Vadeli Satış / Alacak Planı' : '📤 Yeni Kredi / Borç Planı'}</h3>
-                            <button onClick={() => setShowScheduledModal(false)} className="close-btn">&times;</button>
-                        </div>
-                        <div className="flex flex-col gap-4">
-                            <div className="form-group">
-                                <label>Plan Adı / Açıklama</label>
-                                <input type="text" placeholder="Örn: X Müşteri Taksitli Satış" value={newPlan.title} onChange={e => setNewPlan({ ...newPlan, title: e.target.value })} className="input-field" />
-                            </div>
-
-                            {newPlan.type !== 'Kredi' ? (
-                                <div className="form-group">
-                                    <label>İlgili Cari (Opsiyonel)</label>
-                                    <select
-                                        className="input-field"
-                                        value={newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId}
-                                        onChange={e => setNewPlan({
-                                            ...newPlan,
-                                            customerId: newPlan.direction === 'IN' ? e.target.value : '',
-                                            supplierId: newPlan.direction === 'OUT' ? e.target.value : ''
-                                        })}
-                                    >
-                                        <option value="">Cari Seçiniz...</option>
-                                        {(newPlan.direction === 'IN' ? customers : suppliers).map(c => (
-                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                    <label>Hesap Tipi</label>
+                                    <select className="input-field" value={newBank.type} onChange={e => setNewBank({ ...newBank, type: e.target.value })}>
+                                        {(kasaTypes && kasaTypes.length > 0 ? kasaTypes : ['Nakit', 'Banka', 'POS', 'Kredi Kartı']).map(t => (
+                                            <option key={t} value={t}>{t}</option>
                                         ))}
                                     </select>
-
-                                    {(newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId) && (
-                                        <div className="mt-2 bg-subtle/50 p-3 rounded border border-white/5 text-xs">
-                                            <div className="flex justify-between items-center mb-2 pb-2 border-b border-white/5">
-                                                <span className="text-muted">Mevcut Bakiye:</span>
-                                                <span className="font-bold">
-                                                    {Number((newPlan.direction === 'IN' ? customers : suppliers).find(c => c.id === (newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId))?.balance || 0).toLocaleString()} ₺
-                                                </span>
-                                            </div>
-                                            <label className="flex items-center gap-2 cursor-pointer select-none hover:text-white transition-colors">
-                                                <input type="checkbox" checked={newPlan.isExisting} onChange={e => setNewPlan({ ...newPlan, isExisting: e.target.checked })} className="checkbox checkbox-xs checkbox-primary rounded-sm" />
-                                                <span>Mevcut Bakiyeden Dönüştür (Yeni borç ekleme)</span>
-                                            </label>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-muted mb-4">
-                                    ℹ️ <b>Banka Kredisi</b> için cari seçimi zorunlu değildir. Banka adını üstteki "Plan Adı" alanına yazabilirsiniz.
-                                </div>
-                            )}
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="form-group">
-                                    <label>Toplam Tutar</label>
-                                    <input type="number" value={newPlan.totalAmount} onChange={e => setNewPlan({ ...newPlan, totalAmount: e.target.value })} className="input-field" />
                                 </div>
                                 <div className="form-group">
-                                    <label>Taksit Sayısı</label>
-                                    <input type="number" value={newPlan.installmentCount} onChange={e => setNewPlan({ ...newPlan, installmentCount: e.target.value })} className="input-field" />
+                                    <label>Hesap Adı</label>
+                                    <input className="input-field" placeholder={newBank.type === 'Nakit Kasa' ? 'Örn: Şube Kasası' : 'Örn: Ziraat Bankası'} value={newBank.name} onChange={e => setNewBank({ ...newBank, name: e.target.value })} />
                                 </div>
+                                <button onClick={addNewBank} disabled={isProcessing} className="btn btn-primary w-full p-4 font-bold mt-2">Oluştur</button>
                             </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="form-group">
-                                    <label>Başlangıç Tarihi</label>
-                                    <input type="date" value={newPlan.startDate} onChange={e => setNewPlan({ ...newPlan, startDate: e.target.value })} className="input-field" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Plan Türü</label>
-                                    <select value={newPlan.type} onChange={e => setNewPlan({ ...newPlan, type: e.target.value })} className="input-field">
-                                        <option value="Kredi">Kredi</option>
-                                        <option value="Taksitli Satış">Taksitli Satış</option>
-                                        <option value="Senet">Senet</option>
-                                        <option value="Diğer">Diğer</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <button onClick={saveNewPlan} disabled={isProcessing} className="btn btn-primary w-full p-4 font-bold mt-2">
-                                {isProcessing ? 'İŞLENİYOR...' : 'PLANI OLUŞTUR'}
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
+
+            {
+                showVirmanModal && (
+                    <div className="modal-overlay">
+                        <div className="card glass animate-in modal-content w-full max-w-md mx-auto">
+                            <div className="flex-between mb-4"><h3>Virman (Hesaplar Arası Transfer)</h3><button onClick={() => setShowVirmanModal(false)} className="close-btn">&times;</button></div>
+                            <div className="flex flex-col gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="form-group">
+                                        <label>Çıkış Hesabı</label>
+                                        <select className="input-field" value={virmanData.fromKasaId} onChange={e => setVirmanData({ ...virmanData, fromKasaId: e.target.value })}>
+                                            <option value="">Seçiniz...</option>
+                                            {filteredKasalar.map(k => <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString()} ₺)</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Giriş Hesabı</label>
+                                        <select className="input-field" value={virmanData.toKasaId} onChange={e => setVirmanData({ ...virmanData, toKasaId: e.target.value })}>
+                                            <option value="">Seçiniz...</option>
+                                            {filteredKasalar.filter(k => k.id.toString() !== virmanData.fromKasaId).map(k => <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString()} ₺)</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>Transfer Tutarı</label>
+                                    <input type="number" className="input-field font-bold text-lg" placeholder="0.00" value={virmanData.amount} onChange={e => setVirmanData({ ...virmanData, amount: e.target.value })} />
+                                </div>
+                                <button onClick={executeVirman} disabled={isProcessing} className="btn btn-primary w-full p-4 font-bold mt-2">Transferi Gerçekleştir</button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {
+                showScheduledModal && (
+                    <div className="modal-overlay">
+                        <div className="card glass animate-in modal-content">
+                            <div className="flex-between mb-6">
+                                <h3>{newPlan.direction === 'IN' ? '📥 Yeni Vadeli Satış / Alacak Planı' : '📤 Yeni Kredi / Borç Planı'}</h3>
+                                <button onClick={() => setShowScheduledModal(false)} className="close-btn">&times;</button>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                <div className="form-group">
+                                    <label>Plan Adı / Açıklama</label>
+                                    <input type="text" placeholder="Örn: X Müşteri Taksitli Satış" value={newPlan.title} onChange={e => setNewPlan({ ...newPlan, title: e.target.value })} className="input-field" />
+                                </div>
+
+                                {newPlan.type !== 'Kredi' ? (
+                                    <div className="form-group">
+                                        <label>İlgili Cari (Opsiyonel)</label>
+                                        <select
+                                            className="input-field"
+                                            value={newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId}
+                                            onChange={e => setNewPlan({
+                                                ...newPlan,
+                                                customerId: newPlan.direction === 'IN' ? e.target.value : '',
+                                                supplierId: newPlan.direction === 'OUT' ? e.target.value : ''
+                                            })}
+                                        >
+                                            <option value="">Cari Seçiniz...</option>
+                                            {(newPlan.direction === 'IN' ? customers : suppliers).map(c => (
+                                                <option key={c.id} value={c.id}>{c.name}</option>
+                                            ))}
+                                        </select>
+
+                                        {(newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId) && (
+                                            <div className="mt-2 bg-subtle/50 p-3 rounded border border-white/5 text-xs">
+                                                <div className="flex justify-between items-center mb-2 pb-2 border-b border-white/5">
+                                                    <span className="text-muted">Mevcut Bakiye:</span>
+                                                    <span className="font-bold">
+                                                        {Number((newPlan.direction === 'IN' ? customers : suppliers).find(c => c.id === (newPlan.direction === 'IN' ? newPlan.customerId : newPlan.supplierId))?.balance || 0).toLocaleString()} ₺
+                                                    </span>
+                                                </div>
+                                                <label className="flex items-center gap-2 cursor-pointer select-none hover:text-white transition-colors">
+                                                    <input type="checkbox" checked={newPlan.isExisting} onChange={e => setNewPlan({ ...newPlan, isExisting: e.target.checked })} className="checkbox checkbox-xs checkbox-primary rounded-sm" />
+                                                    <span>Mevcut Bakiyeden Dönüştür (Yeni borç ekleme)</span>
+                                                </label>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-muted mb-4">
+                                        ℹ️ <b>Banka Kredisi</b> için cari seçimi zorunlu değildir. Banka adını üstteki "Plan Adı" alanına yazabilirsiniz.
+                                    </div>
+                                )}
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="form-group">
+                                        <label>Toplam Tutar</label>
+                                        <input type="number" value={newPlan.totalAmount} onChange={e => setNewPlan({ ...newPlan, totalAmount: e.target.value })} className="input-field" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Taksit Sayısı</label>
+                                        <input type="number" value={newPlan.installmentCount} onChange={e => setNewPlan({ ...newPlan, installmentCount: e.target.value })} className="input-field" />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="form-group">
+                                        <label>Başlangıç Tarihi</label>
+                                        <input type="date" value={newPlan.startDate} onChange={e => setNewPlan({ ...newPlan, startDate: e.target.value })} className="input-field" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Plan Türü</label>
+                                        <select value={newPlan.type} onChange={e => setNewPlan({ ...newPlan, type: e.target.value })} className="input-field">
+                                            <option value="Kredi">Kredi</option>
+                                            <option value="Taksitli Satış">Taksitli Satış</option>
+                                            <option value="Senet">Senet</option>
+                                            <option value="Diğer">Diğer</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button onClick={saveNewPlan} disabled={isProcessing} className="btn btn-primary w-full p-4 font-bold mt-2">
+                                    {isProcessing ? 'İŞLENİYOR...' : 'PLANI OLUŞTUR'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
         </div>
     );
 }
+

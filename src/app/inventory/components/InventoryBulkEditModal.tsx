@@ -240,7 +240,7 @@ export default function InventoryBulkEditModal({
                 <div className="p-10 border-t border-white/10 bg-white/5 flex justify-end gap-6 items-center">
                     <button className="text-[11px] font-black uppercase tracking-[3px] text-muted hover:text-white transition-colors" onClick={onClose} disabled={isProcessing}>VAZGEÇ</button>
                     <button className="btn-primary px-12 py-5 text-base font-black tracking-[2px]" onClick={handleApply} disabled={isProcessing}>
-                        {isProcessing ? 'SİSTEME İŞLENİYOR...' : '🚀 MODİFİKASYONLARI ONAYLA'}
+                        {isProcessing ? 'SİSTEME İŞLENİYOR...' : '🚀 ONAYLA'}
                     </button>
                 </div>
             </div>

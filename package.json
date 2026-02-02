@@ -1,5 +1,5 @@
 {
-  "name": "motoroil",
+  "name": "periodya",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,6 +15,8 @@
     "@tailwindcss/postcss": "^4.1.18",
     "@tanstack/react-query": "^5.90.20",
     "@types/nodemailer": "^7.0.9",
+    "@types/uuid": "^10.0.0",
+    "axios": "^1.13.4",
     "bcryptjs": "^3.0.3",
     "fast-xml-parser": "^5.3.3",
     "html5-qrcode": "^2.3.8",
@@ -29,6 +31,8 @@
     "react-virtualized-auto-sizer": "^2.0.2",
     "react-window": "^2.2.5",
     "recharts": "^3.7.0",
+    "uuid": "^13.0.0",
+    "winston": "^3.19.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useModal } from '@/contexts/ModalContext';
 import { useApp } from '@/contexts/AppContext';
+import { useFinancials } from '@/contexts/FinancialContext';
 
 import SupplierPurchaseModal from '@/components/modals/SupplierPurchaseModal';
 import TransactionDetailModal from '@/components/modals/TransactionDetailModal';
@@ -15,7 +16,7 @@ import Pagination from '@/components/Pagination';
 export default function SupplierDetailClient({ supplierId, supplierData, displayHistory }: { supplierId: string, supplierData: any, displayHistory: any[] }) {
     const router = useRouter();
     const { showSuccess, showError, showWarning } = useModal();
-    const { collectCheck, kasalar } = useApp();
+    const { collectCheck, kasalar } = useFinancials();
     const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
 
     // Check Collection States
@@ -328,7 +329,7 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                                                             <td><span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '10px' }}>{c.status}</span></td>
                                                             <td style={{ textAlign: 'right', fontWeight: '700', color: '#fff' }}>{Number(c.amount).toLocaleString()} ₺</td>
                                                             <td style={{ textAlign: 'center' }}>
-                                                                {c.status === 'Beklemede' && (
+                                                                {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
                                                                     <button
                                                                         onClick={() => { setActiveCheck(c); setTargetKasaId(String(kasalar[0]?.id || '')); setShowCheckCollectModal(true); }}
                                                                         style={{ fontSize: '10px', padding: '5px 10px', background: '#3b82f6', border: 'none', color: 'white', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}

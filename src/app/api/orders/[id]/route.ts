@@ -1,6 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { stornoJournalEntry } from '@/lib/accounting';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -81,6 +82,18 @@ export async function DELETE(
 
                 // Delete Transaction
                 await tx.transaction.delete({ where: { id: t.id } });
+            }
+
+            // 4. Handle Accounting Reversal (Storno)
+            try {
+                const journal = await tx.journal.findFirst({
+                    where: { sourceId: id, sourceType: 'Order' }
+                });
+                if (journal) {
+                    await stornoJournalEntry(journal.id, 'Satış İptal Edildi (POS)');
+                }
+            } catch (err) {
+                console.error('[Accounting Reversal Error]:', err);
             }
 
             // 3. Delete Order

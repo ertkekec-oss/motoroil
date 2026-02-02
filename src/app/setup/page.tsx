@@ -10,7 +10,7 @@ export default function SetupWizard() {
         // Database Settings
         dbHost: 'localhost',
         dbPort: '3306',
-        dbName: 'motoroil_db',
+        dbName: 'periodya_db',
         dbUser: 'root',
         dbPassword: '',
 
@@ -21,7 +21,7 @@ export default function SetupWizard() {
         adminPasswordConfirm: '',
 
         // Company Info
-        companyName: 'MOTOROIL',
+        companyName: 'PERIODYA',
         companyAddress: '',
         companyPhone: '',
         companyTaxNo: '',
@@ -92,9 +92,9 @@ export default function SetupWizard() {
             }
 
             // Save indicator to localStorage
-            localStorage.setItem('motoroil_setup_complete', 'true');
+            localStorage.setItem('periodya_setup_complete', 'true');
             // We can still store some config locally for UI if needed, but DB is primary
-            localStorage.setItem('motoroil_config', JSON.stringify({
+            localStorage.setItem('periodya_config', JSON.stringify({
                 companyName: setupData.companyName,
                 adminEmail: setupData.adminEmail
             }));
@@ -139,7 +139,7 @@ export default function SetupWizard() {
                         WebkitTextFillColor: 'transparent',
                         marginBottom: '12px'
                     }}>
-                        MOTOROIL ERP
+                        PERIODYA ERP
                     </h1>
                     <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '16px' }}>
                         Kurulum Sihirbazı
@@ -427,7 +427,7 @@ export default function SetupWizard() {
                                     type="text"
                                     value={setupData.companyName}
                                     onChange={(e) => setSetupData({ ...setupData, companyName: e.target.value })}
-                                    placeholder="MOTOROIL"
+                                    placeholder="PERIODYA"
                                     style={{
                                         width: '100%',
                                         padding: '14px',
@@ -555,7 +555,7 @@ export default function SetupWizard() {
                             Kurulum Tamamlandı!
                         </h2>
                         <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.6)', marginBottom: '32px' }}>
-                            MOTOROIL ERP sistemi başarıyla kuruldu ve kullanıma hazır.
+                            PERIODYA ERP sistemi başarıyla kuruldu ve kullanıma hazır.
                         </p>
                         <div style={{
                             background: 'rgba(16, 185, 129, 0.1)',

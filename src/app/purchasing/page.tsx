@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useInventory } from '@/contexts/InventoryContext';
+import { useCRM } from '@/contexts/CRMContext';
 import { useModal } from '@/contexts/ModalContext';
 
 export default function PurchasingPage() {
@@ -10,7 +12,8 @@ export default function PurchasingPage() {
     const [view, setView] = useState('list'); // 'list' | 'new_invoice'
     const { showSuccess, showError } = useModal();
 
-    const { suppliers, products } = useApp();
+    const { products } = useInventory();
+    const { suppliers } = useCRM();
     const [invoices, setInvoices] = useState<any[]>([]);
 
     useEffect(() => {

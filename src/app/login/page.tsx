@@ -98,7 +98,7 @@ export default function LoginPage() {
                         letterSpacing: '-2px',
                         fontWeight: 'bold'
                     }}>
-                        MOTOR<span style={{ color: 'var(--primary)' }}>OIL</span>
+                        PERIOD<span style={{ color: 'var(--primary)' }}>YA</span>
                     </h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '8px' }}>
                         Bisiklet & Motosiklet Yönetim Sistemi
@@ -294,7 +294,7 @@ export default function LoginPage() {
                     fontSize: '11px',
                     color: 'var(--text-muted)'
                 }}>
-                    © 2026 MotorOil - Tüm hakları saklıdır
+                    © 2026 Periodya - Tüm hakları saklıdır
                 </div>
             </div>
             {/* Forgot Password Modal */}

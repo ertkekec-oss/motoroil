@@ -179,22 +179,22 @@ export default function ServiceDashboard() {
                                             <tr key={job.id} className="group hover:bg-white/[0.04] transition-colors">
                                                 <td className="p-6 pl-8">
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-black text-white group-hover:text-primary transition-colors">{job.id}</span>
-                                                        <span className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Referans İş Emri</span>
+                                                        <span className="text-sm font-black text-white group-hover:text-primary transition-colors">#{job.id.slice(-6).toUpperCase()}</span>
+                                                        <span className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Servis Kaydı</span>
                                                     </div>
                                                 </td>
                                                 <td className="p-6">
                                                     <div className="flex flex-col">
-                                                        <span className="text-[15px] font-bold text-white/90">{job.vehicle}</span>
+                                                        <span className="text-[15px] font-bold text-white/90">{job.vehicle || (job.vehicleBrand ? `${job.vehicleBrand} ${job.vehicleSerial || ''}` : 'Belirtilmemiş')}</span>
                                                         <div className="flex items-center gap-2 mt-1">
                                                             <span className="px-2 py-0.5 rounded bg-black/40 border border-white/10 text-[10px] font-black text-white/60 tracking-wider font-mono">
-                                                                {job.plate}
+                                                                {job.plate || 'PLAKASIZ'}
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="p-6">
-                                                    <div className="text-sm font-bold text-white/60">{job.entry}</div>
+                                                    <div className="text-sm font-bold text-white/60">{job.entry || new Date(job.createdAt).toLocaleDateString('tr-TR')}</div>
                                                 </td>
                                                 <td className="p-6">
                                                     <div className="flex">
@@ -208,8 +208,8 @@ export default function ServiceDashboard() {
                                                 </td>
                                                 <td className="p-6">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-black text-white/40 ring-1 ring-white/10">{job.technician.split(' ').map((n: string) => n[0]).join('')}</div>
-                                                        <span className="text-sm font-bold text-white/70">{job.technician}</span>
+                                                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-black text-white/40 ring-1 ring-white/10">{(job.technician || 'Personel').split(' ').map((n: string) => n[0]).join('')}</div>
+                                                        <span className="text-sm font-bold text-white/70">{job.technician || 'Atanmadı'}</span>
                                                     </div>
                                                 </td>
                                                 <td className="p-6 pr-8 text-right">
@@ -340,11 +340,11 @@ export default function ServiceDashboard() {
                                         <div className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-3">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-sm font-bold text-white/40 italic">Mevcut Kilometre</span>
-                                                <span className="text-lg font-black text-white">{selectedService.km.toLocaleString()} KM</span>
+                                                <span className="text-lg font-black text-white">{(selectedService.km || 0).toLocaleString()} KM</span>
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="text-sm font-bold text-white/40 italic">Sorumlu Teknisyen</span>
-                                                <span className="text-sm font-black text-secondary">{selectedService.technician}</span>
+                                                <span className="text-sm font-black text-secondary">{selectedService.technician || 'Atanmadı'}</span>
                                             </div>
                                             <div className="pt-3 border-t border-white/5">
                                                 <div className="px-3 py-1.5 rounded-xl bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase text-center">

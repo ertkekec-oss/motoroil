@@ -2,9 +2,14 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useModal } from '@/contexts/ModalContext';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFinancials } from '@/contexts/FinancialContext';
+import { useInventory } from '@/contexts/InventoryContext';
+import { useCRM } from '@/contexts/CRMContext';
+import { useSettings } from '@/contexts/SettingsContext';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -12,39 +17,182 @@ import StaffManagementContent from '@/components/StaffManagementContent';
 import IntegrationsContent from '@/components/IntegrationsContent';
 
 export default function SettingsPage() {
+    const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('branches');
+
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab) setActiveTab(tab);
+    }, [searchParams]);
     const [definitionTab, setDefinitionTab] = useState('brands');
     const [campaignSubTab, setCampaignSubTab] = useState('loyalty');
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
+
+    useEffect(() => {
+        console.log('SettingsPage Mounted. Debugging Modal Context:');
+        console.log('showSuccess:', typeof showSuccess, showSuccess);
+        console.log('showError:', typeof showError, showError);
+    }, [showSuccess, showError]);
+
     const { user: currentUser } = useAuth(); // Fix: Get currentUser from AuthContext
+
     const {
         branches: contextBranches,
         refreshBranches,
-        serviceSettings,
-        updateServiceSettings,
-        brands, setBrands,
-        prodCats, setProdCats,
-        allBrands, allCats,
-        custClasses, setCustClasses,
-        suppClasses, setSuppClasses,
-        warranties, setWarranties,
-        refreshSettings,
         staff: users,
         refreshStaff,
-        invoiceSettings, updateInvoiceSettings,
-        salesExpenses, updateSalesExpenses,
-        campaigns, refreshCampaigns,
-        coupons, refreshCoupons,
-        referralSettings: contextReferralSettings, updateReferralSettings,
-        kasaTypes, setKasaTypes,
-        paymentMethods, updatePaymentMethods, kasalar
     } = useApp();
 
-    const [newPaymentMethod, setNewPaymentMethod] = useState({ label: '', type: 'cash', linkedKasaId: '' });
+    const {
+        kasalar, setKasalar,
+        kasaTypes, setKasaTypes,
+        paymentMethods, updatePaymentMethods,
+        refreshKasalar, salesExpenses, updateSalesExpenses
+    } = useFinancials();
+
+    const {
+        products
+    } = useInventory();
+
+    const {
+        customers, suppliers,
+        custClasses, setCustClasses,
+        suppClasses, setSuppClasses
+    } = useCRM();
+
+    const {
+        campaigns, refreshCampaigns,
+        coupons, refreshCoupons,
+        serviceSettings, updateServiceSettings,
+        invoiceSettings, updateInvoiceSettings,
+        referralSettings: contextReferralSettings, updateReferralSettings,
+        warranties, setWarranties,
+        brands, setBrands, prodCats, setProdCats,
+        allBrands, allCats
+    } = useSettings();
+
+    const [newPaymentMethod, setNewPaymentMethod] = useState({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' });
+    const [editingPaymentMethodId, setEditingPaymentMethodId] = useState<string | null>(null);
+    const [showKasaDefinitions, setShowKasaDefinitions] = useState(false);
+
+    const addPaymentMethodDefinition = async () => {
+        if (!newPaymentMethod.label) return showError('Hata', 'Buton adı zorunludur.');
+
+        let updatedMethods;
+        if (editingPaymentMethodId) {
+            updatedMethods = paymentMethods.map((pm: any) =>
+                pm.id === editingPaymentMethodId ? { ...newPaymentMethod, id: pm.id } : pm
+            );
+            setEditingPaymentMethodId(null);
+        } else {
+            const id = Math.random().toString(36).substr(2, 9);
+            const icon = newPaymentMethod.type === 'cash' ? '💵' : (newPaymentMethod.type === 'card' ? '💳' : '🏦');
+            updatedMethods = [...paymentMethods, { ...newPaymentMethod, id, icon }];
+        }
+
+        try {
+            await updatePaymentMethods(updatedMethods);
+            showSuccess('Başarılı', 'Hesap tanımı kaydedildi.');
+            setNewPaymentMethod({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' });
+        } catch (e) {
+            showError('Hata', 'Kaydedilemedi.');
+        }
+    };
+
+    const removePaymentMethodDefinition = (id: string) => {
+        showConfirm('Emin misiniz?', 'Bu ödeme tanımı silinecek. Şubelerdeki aktif hesapları etkilemez ancak yeni şubelerde seçilemez.', async () => {
+            const updatedMethods = paymentMethods.filter((pm: any) => pm.id !== id);
+            await updatePaymentMethods(updatedMethods);
+            showSuccess('Başarılı', 'Tanım silindi.');
+        });
+    };
+
+    const startEditingPaymentMethod = (pm: any) => {
+        setNewPaymentMethod({
+            label: pm.label,
+            type: pm.type,
+            icon: pm.icon,
+            linkedKasaId: pm.linkedKasaId || ''
+        });
+        setEditingPaymentMethodId(pm.id);
+        setShowKasaDefinitions(true);
+    };
     const [smtpSettings, setSmtpSettings] = useState({ email: '', password: '' });
 
     const [profilePass, setProfilePass] = useState({ old: '', new: '', confirm: '' });
     const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Personel', branch: 'Merkez', username: '', password: '' });
+
+    // KASA MANAGEMENT STATES
+    const [showKasaModal, setShowKasaModal] = useState(false);
+    const [editingKasa, setEditingKasa] = useState<any>(null);
+    const [newKasa, setNewKasa] = useState({ name: '', type: 'Nakit', branch: 'Merkez', balance: 0 });
+    const [isProcessingKasa, setIsProcessingKasa] = useState(false);
+
+    const handleSaveKasa = async () => {
+        if (!newKasa.name) { showError('Hata', 'Hesap adı giriniz.'); return; }
+
+        setIsProcessingKasa(true);
+        try {
+            const payload = {
+                name: newKasa.name,
+                type: newKasa.type,
+                branch: newKasa.branch,
+                balance: Number(newKasa.balance) || 0
+            };
+
+            let res;
+            if (editingKasa) {
+                res = await fetch(`/api/kasalar/${editingKasa.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } else {
+                res = await fetch('/api/kasalar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            }
+
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'API Hatası');
+
+            showSuccess('Başarılı', 'Hesap kaydedildi.');
+            setShowKasaModal(false);
+            setEditingKasa(null);
+            setNewKasa({ name: '', type: 'Nakit', branch: 'Merkez', balance: 0 });
+
+            if (refreshKasalar) refreshKasalar();
+        } catch (e: any) {
+            console.error('Kasa Error:', e);
+            showError('Hata', e.message || 'İşlem başarısız.');
+        } finally { setIsProcessingKasa(false); }
+    };
+
+    const handleDeleteKasa = async (id: string) => {
+        showConfirm('Silmek istiyor musunuz?', 'Hesap kalıcı silinecek ve tüm geçmiş kayıtlar etkilenebilir.', async () => {
+            try {
+                await fetch(`/api/kasalar/${id}`, { method: 'DELETE' });
+                showSuccess('Silindi', 'Hesap başarıyla silindi.');
+                if (refreshKasalar) refreshKasalar();
+            } catch (e) {
+                showError('Hata', 'Silinemedi.');
+            }
+        });
+    };
+
+    const startEditingKasa = (k: any) => {
+        setEditingKasa(k);
+        setNewKasa({
+            name: k.name,
+            type: k.type,
+            branch: k.branch || 'Merkez',
+            balance: Number(k.balance) || 0
+        });
+        setShowKasaModal(true);
+    };
+
 
     const handlePasswordChange = async () => {
         if (profilePass.new !== profilePass.confirm) {
@@ -365,7 +513,12 @@ export default function SettingsPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ [key]: newList })
             });
-        } catch (e) { showError('Hata', 'Kayıt yapılamadı.'); }
+            // Optional: Show success
+            if (showSuccess) showSuccess('Başarılı', 'Kayıt eklendi');
+        } catch (e) {
+            console.error('Save definition failed:', e);
+            if (showError) showError('Hata', 'Kayıt yapılamadı.');
+        }
     };
 
     const removeDefinition = async (key: string, item: string, list: string[], setList: any) => {
@@ -379,8 +532,49 @@ export default function SettingsPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ [key]: newList })
             });
-        } catch (e) { showError('Hata', 'Kayıt güncellenemedi.'); }
+            if (showSuccess) showSuccess('Başarılı', 'Kayıt silindi');
+        } catch (e) {
+            console.error('Remove definition failed:', e);
+            if (showError) showError('Hata', 'Kayıt güncellenemedi.');
+        }
     };
+
+    // ... existing render code ...
+
+    <button
+        onClick={() => {
+            const e = { key: 'Enter' } as any;
+            // Trigger manual logic same as Enter
+            if (definitionTab === 'payment_methods') {
+                const id = Math.random().toString(36).substr(2, 9);
+                const icon = newPaymentMethod.type === 'cash' ? '💵' : (newPaymentMethod.type === 'card' ? '💳' : '🏦');
+                const newVal = {
+                    id,
+                    label: newItemInput || 'Yeni Hesap',
+                    type: newPaymentMethod.type,
+                    icon,
+                    linkedKasaId: ''
+                };
+                updatePaymentMethods([...paymentMethods, newVal]).then(() => {
+                    setNewItemInput('');
+                    if (showSuccess) showSuccess('Başarılı', 'Ödeme yöntemi eklendi.');
+                }).catch(err => {
+                    console.error(err);
+                    if (showError) showError('Hata', 'Eklenemedi');
+                });
+            } else {
+                if (definitionTab === 'brands') addDefinition('brands', brands, setBrands);
+                else if (definitionTab === 'prod_cat') addDefinition('prod_cat', prodCats, setProdCats);
+                else if (definitionTab === 'cust_class') addDefinition('custClasses', custClasses, setCustClasses);
+                else if (definitionTab === 'supp_class') addDefinition('suppClasses', suppClasses, setSuppClasses);
+                else if (definitionTab === 'warranties') addDefinition('warranties', warranties, setWarranties);
+            }
+        }}
+        className="btn btn-primary"
+        style={{ padding: '0 24px', borderRadius: '12px', fontSize: '20px' }}
+    >
+        +
+    </button>
 
     // --- 4. BİLDİRİM AYARLARI ---
     const [notifSettings, setNotifSettings] = useState({
@@ -460,6 +654,37 @@ export default function SettingsPage() {
     const [newBranch, setNewBranch] = useState({ name: '', type: 'Şube', city: '', address: '', phone: '', manager: '', status: 'Aktif' });
     const [editingBranchId, setEditingBranchId] = useState<number | null>(null);
     const [selectedBranchDocs, setSelectedBranchDocs] = useState<number | null>(null); // Branch ID
+
+    // --- BRANCH - KASA MAPPING STATE ---
+    const [branchDefaults, setBranchDefaults] = useState<Record<string, any>>({});
+
+    useEffect(() => {
+        // Load branch defaults from settings
+        fetch('/api/settings').then(r => r.json()).then(d => {
+            if (d.branch_defaults) setBranchDefaults(d.branch_defaults);
+        });
+    }, []);
+
+    const updateBranchDefault = (branchId: number | string, key: string, value: string) => {
+        setBranchDefaults(prev => ({
+            ...prev,
+            [branchId]: {
+                ...prev[branchId],
+                [key]: value
+            }
+        }));
+    };
+
+    const saveBranchDefaults = async () => {
+        try {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ branch_defaults: branchDefaults })
+            });
+            showSuccess('Başarılı', 'Şube-Kasa eşleşmeleri kaydedildi.');
+        } catch (e) { showError('Hata', 'Kaydedilemedi'); }
+    };
 
     const addBranch = async () => {
         if (!newBranch.name) return;
@@ -668,6 +893,76 @@ export default function SettingsPage() {
         } catch (e) {
             showError('Hata', 'Sunucu hatası.');
         }
+    };
+
+    const quickAddPaymentMethod = async () => {
+        if (!newItemInput) return;
+        const id = Math.random().toString(36).substr(2, 9);
+        // Default to cash for quick add
+        const newMethod = { id, label: newItemInput, type: 'cash', icon: '💰', linkedKasaId: '' };
+        const updatedMethods = [...paymentMethods, newMethod];
+
+        try {
+            await updatePaymentMethods(updatedMethods);
+            setNewItemInput('');
+            showSuccess('Başarılı', 'Ödeme yöntemi eklendi (Nakit). Detaylar için Finans ayarlarına gidin.');
+        } catch (e) {
+            showError('Hata', 'Kaydedilemedi.');
+        }
+    };
+
+    const quickRemovePaymentMethod = async (id: string) => {
+        const updatedMethods = paymentMethods.filter((pm: any) => pm.id !== id);
+        try {
+            await updatePaymentMethods(updatedMethods);
+            showSuccess('Silindi', 'Ödeme yöntemi silindi.');
+        } catch (e) { showError('Hata', 'Silinemedi'); }
+    };
+
+    // Helper to render active list
+    const activeListRender = () => {
+        if (definitionTab === 'payment_methods') {
+            return paymentMethods.map((pm: any, i: number) => (
+                <div key={pm.id || i} className="flex-between" style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                    <div className="flex items-center gap-2">
+                        <span>{pm.icon || '💰'}</span>
+                        <div className="flex-col">
+                            <span style={{ fontSize: '12px', fontWeight: '600' }}>{pm.label}</span>
+                            <span style={{ fontSize: '10px', opacity: 0.5 }}>{pm.type === 'card' ? 'Kredi Kartı' : 'Nakit'}</span>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => quickRemovePaymentMethod(pm.id)}
+                        style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '14px' }}
+                    >
+                        🗑️
+                    </button>
+                </div>
+            ));
+        }
+
+        const list = definitionTab === 'brands' ? brands :
+            definitionTab === 'prod_cat' ? prodCats :
+                definitionTab === 'cust_class' ? custClasses :
+                    definitionTab === 'supp_class' ? suppClasses : warranties;
+
+        return list.map((item: string, i: number) => (
+            <div key={i} className="flex-between" style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                <span style={{ fontSize: '12px', fontWeight: '600' }}>{item}</span>
+                <button
+                    onClick={() => {
+                        if (definitionTab === 'brands') removeDefinition('brands', item, brands, setBrands);
+                        if (definitionTab === 'prod_cat') removeDefinition('prodCat', item, prodCats, setProdCats);
+                        if (definitionTab === 'cust_class') removeDefinition('custClasses', item, custClasses, setCustClasses);
+                        if (definitionTab === 'supp_class') removeDefinition('suppClasses', item, suppClasses, setSuppClasses);
+                        if (definitionTab === 'warranties') removeDefinition('warranties', item, warranties, setWarranties);
+                    }}
+                    style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '14px' }}
+                >
+                    🗑️
+                </button>
+            </div>
+        ));
     };
 
     return (
@@ -881,6 +1176,155 @@ export default function SettingsPage() {
                                     )}
                                 </div>
                             ))}
+                        </div>
+
+                        {/* KASA & BANKA YÖNETİMİ (Revamped) */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 mb-8">
+
+                            {/* SOL PANEL: ÖDEME YÖNTEMLERİ (Anasayfa Butonları) */}
+                            <div className="card glass overflow-hidden border border-white/5">
+                                <div className="p-4 border-b border-white/5 bg-white/5 flex-between">
+                                    <div>
+                                        <h3 className="font-bold flex items-center gap-2">🔘 Ödeme Yöntemi Butonları</h3>
+                                        <p className="text-[10px] text-muted">Anasayfadaki hızlı işlem butonlarını tanımlayın.</p>
+                                    </div>
+                                    <button onClick={() => setShowKasaDefinitions(!showKasaDefinitions)} className="btn btn-xs btn-primary">
+                                        {showKasaDefinitions ? 'KAPAT' : '+ YENİ BUTON'}
+                                    </button>
+                                </div>
+
+                                {showKasaDefinitions && (
+                                    <div className="p-4 bg-black/40 border-b border-white/5 animate-fade-in">
+                                        <div className="flex flex-col gap-3 mb-4">
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="form-group">
+                                                    <label className="text-[9px] font-black opacity-50 mb-1 block uppercase">Buton Adı</label>
+                                                    <input value={newPaymentMethod.label} onChange={e => setNewPaymentMethod({ ...newPaymentMethod, label: e.target.value })} className="w-full bg-black/50 border border-white/10 rounded p-2 text-xs" placeholder="Nakit, Bonus, Havale..." />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="text-[9px] font-black opacity-50 mb-1 block uppercase">İşlem Tipi</label>
+                                                    <select value={newPaymentMethod.type} onChange={e => setNewPaymentMethod({ ...newPaymentMethod, type: e.target.value as any })} className="w-full bg-black/50 border border-white/10 rounded p-2 text-xs">
+                                                        <option value="cash">Nakit (Kasa)</option>
+                                                        <option value="card">Kredi Kartı / POS</option>
+                                                        <option value="transfer">Havale / EFT</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button onClick={addPaymentMethodDefinition} className="btn btn-primary btn-sm flex-1 font-bold">
+                                                    {editingPaymentMethodId ? 'GÜNCELLE' : 'EKLE'}
+                                                </button>
+                                                {editingPaymentMethodId && <button onClick={() => { setEditingPaymentMethodId(null); setNewPaymentMethod({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' }); }} className="btn btn-ghost btn-sm">İptal</button>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="p-4">
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {paymentMethods.map(pm => (
+                                            <div key={pm.id} className="flex-between p-3 bg-white/5 border border-white/5 rounded-xl group hover:bg-white/10 transition-all">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-xl p-2 bg-white/5 rounded-lg">{pm.icon}</span>
+                                                    <div>
+                                                        <div className="text-xs font-black uppercase tracking-wider">{pm.label}</div>
+                                                        <div className="text-[9px] text-muted lowercase opacity-60">tip: {pm.type}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                                    <button onClick={() => startEditingPaymentMethod(pm)} className="text-primary p-2 hover:bg-primary/20 rounded-lg">✏️</button>
+                                                    <button onClick={() => removePaymentMethodDefinition(pm.id)} className="text-danger p-2 hover:bg-danger/20 rounded-lg">×</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <div className="flex-between p-3 bg-primary/10 border border-primary/20 rounded-xl">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-xl p-2 bg-white/5 rounded-lg">📖</span>
+                                                <div>
+                                                    <div className="text-xs font-black uppercase tracking-wider">VERESİYE</div>
+                                                    <div className="text-[9px] text-primary lowercase opacity-60">sistem tarafından sabitlenmiştir</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* SAĞ PANEL: KASA & BANKA HESAPLARI */}
+                            <div className="card glass overflow-hidden border border-white/5">
+                                <div className="p-4 border-b border-white/5 bg-white/5 flex-between">
+                                    <div>
+                                        <h3 className="font-bold flex items-center gap-2">🏛️ Kasa & Banka Hesapları</h3>
+                                        <p className="text-[10px] text-muted">Gerçek para giriş-çıkışı yapılan hesaplar.</p>
+                                    </div>
+                                    <button onClick={() => { setEditingKasa(null); setNewKasa({ name: '', type: 'Nakit', branch: 'Merkez', balance: 0 }); setShowKasaModal(!showKasaModal); }} className="btn btn-xs btn-secondary">
+                                        {showKasaModal ? 'KAPAT' : '+ YENİ HESAP'}
+                                    </button>
+                                </div>
+
+                                {showKasaModal && (
+                                    <div className="p-4 bg-black/40 border-b border-white/5 animate-fade-in">
+                                        <div className="grid grid-cols-2 gap-3 mb-4">
+                                            <div className="form-group col-span-2">
+                                                <label className="text-[9px] font-black opacity-50 mb-1 block uppercase">Hesap Adı</label>
+                                                <input value={newKasa.name} onChange={e => setNewKasa({ ...newKasa, name: e.target.value })} className="w-full bg-black/50 border border-white/10 rounded p-2 text-sm" placeholder="Örn: Merkez Nakit, Garanti Bankası vb." />
+                                            </div>
+                                            <div className="form-group">
+                                                <label className="text-[9px] font-black opacity-50 mb-1 block uppercase">Tipi</label>
+                                                <select value={newKasa.type} onChange={e => setNewKasa({ ...newKasa, type: e.target.value })} className="w-full bg-black/50 border border-white/10 rounded p-2 text-xs">
+                                                    {kasaTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="form-group">
+                                                <label className="text-[9px] font-black opacity-50 mb-1 block uppercase">Şube</label>
+                                                <select value={newKasa.branch} onChange={e => setNewKasa({ ...newKasa, branch: e.target.value })} className="w-full bg-black/50 border border-white/10 rounded p-2 text-xs">
+                                                    <option value="Global">Küresel (Tüm Şubeler)</option>
+                                                    {contextBranches.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>)}
+                                                </select>
+                                            </div>
+                                            {!editingKasa && (
+                                                <div className="form-group col-span-2">
+                                                    <label className="text-[9px] font-black opacity-50 mb-1 block uppercase">Açılış Bakiyesi</label>
+                                                    <input type="number" value={newKasa.balance} onChange={e => setNewKasa({ ...newKasa, balance: Number(e.target.value) })} className="w-full bg-black/50 border border-white/10 rounded p-2 text-sm" placeholder="0.00" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <button onClick={handleSaveKasa} disabled={isProcessingKasa} className="btn btn-secondary w-full font-bold">
+                                            {isProcessingKasa ? 'İŞLENİYOR...' : (editingKasa ? 'GÜNCELLE' : 'HESABI OLUŞTUR')}
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className="p-4">
+                                    <div className="flex flex-col gap-2">
+                                        {kasalar.map(k => (
+                                            <div key={k.id} className="p-3 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-all group">
+                                                <div className="flex-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-full bg-secondary/20 flex-center text-secondary font-black text-xs">
+                                                            {k.type.substring(0, 1).toUpperCase()}
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-xs font-black uppercase text-white/90">{k.name}</div>
+                                                            <div className="flex items-center gap-2 opacity-60">
+                                                                <span className="text-[9px] border border-white/10 px-1 rounded">{k.branch || 'Merkez'}</span>
+                                                                <span className="text-[9px] uppercase">{k.type}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className="text-xs font-black text-secondary">₺{(Number(k.balance) || 0).toLocaleString()}</div>
+                                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all mt-1">
+                                                            <button onClick={() => startEditingKasa(k)} className="text-primary text-[10px] hover:underline">Düzenle</button>
+                                                            <button onClick={() => handleDeleteKasa(String(k.id))} className="text-danger text-[10px] hover:underline">Sil</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -1318,7 +1762,7 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        {/* INFO BOX */}
+
                         <div className="card" style={{ marginTop: '24px', background: 'rgba(59, 130, 246, 0.05)', border: '1px solid var(--primary)' }}>
                             <h4 style={{ color: 'var(--primary)', marginBottom: '8px' }}>💡 Nasıl Çalışır?</h4>
                             <ul style={{ fontSize: '13px', lineHeight: '1.8', color: 'var(--text-muted)', paddingLeft: '20px' }}>
@@ -1332,117 +1776,228 @@ export default function SettingsPage() {
                 )}
 
                 {/* 4. TANIMLAR */}
+                {/* 4. SİSTEM TANIMLARI - REDESIGNED */}
                 {activeTab === 'definitions' && (
-                    <div className="animate-fade-in-up">
-                        <div className="flex-between mb-4">
-                            <h2 style={{ fontSize: '18px', fontWeight: '900' }}>Sistem Tanımları</h2>
-                            <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-card)', padding: '4px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
+                    <div className="animate-fade-in-up" style={{ height: 'calc(100vh - 140px)', display: 'flex', flexDirection: 'column' }}>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '24px', height: '100%' }}>
+
+                            {/* SIDEBAR */}
+                            <div className="card glass-dark" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
+                                <h3 style={{ fontSize: '12px', fontWeight: '900', color: 'var(--text-muted)', marginBottom: '8px', paddingLeft: '8px' }}>TANIMLAR</h3>
                                 {[
-                                    { id: 'brands', label: 'Marka', icon: '🏷️' },
-                                    { id: 'prod_cat', label: 'Kat.', icon: '📂' },
-                                    { id: 'cust_class', label: 'Cari', icon: '👥' },
-                                    { id: 'warranties', label: 'Garanti', icon: '🛡️' },
-                                    { id: 'kasa_types', label: 'Ödeme', icon: '💳' }
+                                    { id: 'brands', label: 'Markalar', icon: '🏷️', desc: 'Ürün markaları' },
+                                    { id: 'prod_cat', label: 'Ürün Kategorileri', icon: '📂', desc: 'Stok grupları' },
+                                    { id: 'cust_class', label: 'Cari Sınıfları', icon: '👥', desc: 'Müşteri tipleri' },
+                                    { id: 'supp_class', label: 'Tedarikçi Sınıfları', icon: '🏭', desc: 'Tedarikçi tipleri' },
+                                    { id: 'warranties', label: 'Garanti Süreleri', icon: '🛡️', desc: 'Garanti seçenekleri' },
+                                    { id: 'payment_methods', label: 'Ödeme Yöntemleri', icon: '💳', desc: 'Kasa ve banka hesapları', highlight: true }
                                 ].map(t => (
                                     <button
                                         key={t.id}
-                                        onClick={() => setDefinitionTab(t.id)}
+                                        onClick={() => { setDefinitionTab(t.id); setNewItemInput(''); }}
                                         style={{
-                                            padding: '6px 12px',
-                                            borderRadius: '8px',
-                                            fontSize: '11px',
-                                            fontWeight: '800',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            background: definitionTab === t.id ? 'var(--primary)' : 'transparent',
-                                            color: definitionTab === t.id ? 'white' : 'var(--text-muted)'
+                                            display: 'flex', alignItems: 'center', gap: '12px',
+                                            padding: '12px 14px', borderRadius: '12px',
+                                            border: '1px solid',
+                                            borderColor: definitionTab === t.id ? 'var(--primary)' : 'transparent',
+                                            background: definitionTab === t.id ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                                            color: definitionTab === t.id ? 'white' : 'var(--text-muted)',
+                                            textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s',
+                                            position: 'relative', overflow: 'hidden'
                                         }}
                                     >
-                                        {t.icon} {t.label}
+                                        <span style={{ fontSize: '18px' }}>{t.icon}</span>
+                                        <div className="flex-col">
+                                            <span style={{ fontSize: '13px', fontWeight: '700', color: definitionTab === t.id ? 'white' : 'var(--text-main)' }}>{t.label}</span>
+                                            <span style={{ fontSize: '10px', opacity: 0.6 }}>{t.desc}</span>
+                                        </div>
+                                        {definitionTab === t.id && (
+                                            <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '4px', background: 'var(--primary)' }} />
+                                        )}
                                     </button>
                                 ))}
                             </div>
-                        </div>
 
-                        {definitionTab === 'kasa_types' ? (
-                            <div className="card glass" style={{ padding: '0', overflow: 'hidden' }}>
-                                <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-light)', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '10px', alignItems: 'end' }}>
-                                    <div className="flex-col gap-1">
-                                        <label style={{ fontSize: '9px', fontWeight: '900', opacity: 0.5 }}>BUTON ADI</label>
-                                        <input value={newPaymentMethod.label} onChange={e => setNewPaymentMethod({ ...newPaymentMethod, label: e.target.value })} style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', color: 'white', fontSize: '12px' }} placeholder="Nakit, Bonus..." />
-                                    </div>
-                                    <div className="flex-col gap-1">
-                                        <label style={{ fontSize: '9px', fontWeight: '900', opacity: 0.5 }}>İŞLEM TİPİ</label>
-                                        <select value={newPaymentMethod.type} onChange={e => setNewPaymentMethod({ ...newPaymentMethod, type: e.target.value })} style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', color: 'white', fontSize: '12px' }}>
-                                            <option value="cash">Nakit (Kasa)</option>
-                                            <option value="card">Kredi Kartı / POS</option>
-                                            <option value="transfer">Havale / EFT</option>
-                                        </select>
-                                    </div>
-                                    <div className="flex-col gap-1">
-                                        <label style={{ fontSize: '9px', fontWeight: '900', opacity: 0.5 }}>HESAP</label>
-                                        <select value={newPaymentMethod.linkedKasaId} onChange={e => setNewPaymentMethod({ ...newPaymentMethod, linkedKasaId: e.target.value })} style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', color: 'white', fontSize: '12px' }}>
-                                            <option value="">Seçiniz...</option>
-                                            {kasalar.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
-                                        </select>
-                                    </div>
-                                    <button onClick={() => { /* ... (Same logic as before) ... */ }} className="btn btn-primary" style={{ height: '32px', fontSize: '11px', fontWeight: '900' }}>+ EKLE</button>
-                                </div>
-                                <table style={{ width: '100%', textAlign: 'left', fontSize: '12px' }}>
-                                    <thead>
-                                        <tr style={{ opacity: 0.4, fontSize: '10px', padding: '10px' }}>
-                                            <th style={{ padding: '12px 16px' }}>BUTON ADI</th>
-                                            <th>BAĞLI HESAP</th>
-                                            <th style={{ textAlign: 'right', paddingRight: '16px' }}>İŞLEM</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paymentMethods.map(pm => (
-                                            <tr key={pm.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                                                <td style={{ padding: '12px 16px', fontWeight: '700' }}>{pm.icon} {pm.label}</td>
-                                                <td style={{ opacity: 0.6 }}>{kasalar.find(k => k.id === pm.linkedKasaId)?.name || 'Eşleşmemiş'}</td>
-                                                <td style={{ textAlign: 'right', paddingRight: '16px' }}><button className="text-danger" style={{ background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}>×</button></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <div className="card glass" style={{ maxWidth: '400px', padding: '20px' }}>
-                                <div className="flex-col gap-1 mb-4">
-                                    <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>YENİ KAYIT EKLE (ENTER)</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Yazıp Enter'a basın..."
-                                        value={newItemInput}
-                                        onChange={e => setNewItemInput(e.target.value)}
-                                        onKeyDown={e => {
-                                            if (e.key === 'Enter') {
-                                                if (definitionTab === 'brands') addDefinition('brands', brands, setBrands);
-                                                if (definitionTab === 'prod_cat') addDefinition('prodCats', prodCats, setProdCats);
-                                                if (definitionTab === 'cust_class') addDefinition('custClasses', custClasses, setCustClasses);
-                                                if (definitionTab === 'supp_class') addDefinition('suppClasses', suppClasses, setSuppClasses);
-                                                if (definitionTab === 'warranties') addDefinition('warranties', warranties, setWarranties);
-                                            }
-                                        }}
-                                        style={{ padding: '10px 14px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white', width: '100%', fontSize: '13px' }}
-                                    />
-                                </div>
-                                <div className="flex-col gap-2" style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
-                                    {(
-                                        definitionTab === 'brands' ? brands :
-                                            definitionTab === 'prod_cat' ? prodCats :
-                                                definitionTab === 'cust_class' ? custClasses :
-                                                    definitionTab === 'supp_class' ? suppClasses : warranties
-                                    ).map((item, i) => (
-                                        <div key={i} className="flex-between" style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)' }}>
-                                            <span style={{ fontSize: '12px', fontWeight: '600' }}>{item}</span>
-                                            <button style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '14px' }}>🗑️</button>
+                            {/* MAIN CONTENT Area */}
+                            <div className="flex-col gap-6" style={{ overflowY: 'auto', paddingRight: '10px' }}>
+
+                                {/* Header & Input */}
+                                <div className="card glass p-6">
+                                    <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px' }}>
+                                        {definitionTab === 'brands' && 'Marka Tanımları'}
+                                        {definitionTab === 'prod_cat' && 'Ürün Kategorileri'}
+                                        {definitionTab === 'cust_class' && 'Cari Sınıfları'}
+                                        {definitionTab === 'supp_class' && 'Tedarikçi Sınıfları'}
+                                        {definitionTab === 'warranties' && 'Garanti Seçenekleri'}
+                                        {definitionTab === 'payment_methods' && 'Ödeme Yöntemleri'}
+                                    </h2>
+                                    <p className="text-muted mb-6" style={{ fontSize: '13px' }}>
+                                        Bu liste genel sistemde seçilebilir seçenekler olarak görünecektir.
+                                    </p>
+
+                                    <div className="flex gap-4 items-end">
+                                        <div style={{ flex: 1 }}>
+                                            <label style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '6px', color: 'var(--text-muted)' }}>YENİ EKLE</label>
+                                            <div className="flex gap-2">
+                                                {/* Payment Method Type Selector */}
+                                                {definitionTab === 'payment_methods' && (
+                                                    <select
+                                                        value={newPaymentMethod.type}
+                                                        onChange={(e) => setNewPaymentMethod({ ...newPaymentMethod, type: e.target.value as any })}
+                                                        style={{
+                                                            padding: '14px', borderRadius: '12px', background: 'var(--bg-deep)',
+                                                            border: '1px solid var(--border-light)', color: 'white', fontWeight: 'bold', width: '140px'
+                                                        }}
+                                                    >
+                                                        <option value="cash">Nakit</option>
+                                                        <option value="card">Kredi Kartı</option>
+                                                        <option value="transfer">Havale/EFT</option>
+                                                    </select>
+                                                )}
+
+                                                <input
+                                                    type="text"
+                                                    placeholder={definitionTab === 'payment_methods' ? "Hesap Adı (örn: Akbank)" : "Yeni değer yazın..."}
+                                                    value={newItemInput}
+                                                    onChange={e => setNewItemInput(e.target.value)}
+                                                    onKeyDown={e => {
+                                                        if (e.key === 'Enter') {
+                                                            if (definitionTab === 'payment_methods') {
+                                                                // Use the local newPaymentMethod state + input
+                                                                const id = Math.random().toString(36).substr(2, 9);
+                                                                const icon = newPaymentMethod.type === 'cash' ? '💵' : (newPaymentMethod.type === 'card' ? '💳' : '🏦');
+                                                                const newVal = {
+                                                                    id,
+                                                                    label: newItemInput || 'Yeni Hesap',
+                                                                    type: newPaymentMethod.type,
+                                                                    icon,
+                                                                    linkedKasaId: ''
+                                                                };
+                                                                // Manual update call
+                                                                const updated = [...paymentMethods, newVal];
+                                                                updatePaymentMethods(updated).then(() => {
+                                                                    setNewItemInput('');
+                                                                    if (showSuccess) showSuccess('Başarılı', 'Ödeme yöntemi eklendi.');
+                                                                }).catch(() => {
+                                                                    if (showError) showError('Hata', 'Eklenemedi');
+                                                                });
+                                                            } else {
+                                                                // Standard Definitions
+                                                                if (definitionTab === 'brands') addDefinition('brands', brands, setBrands);
+                                                                else if (definitionTab === 'prod_cat') addDefinition('prod_cat', prodCats, setProdCats);
+                                                                else if (definitionTab === 'cust_class') addDefinition('custClasses', custClasses, setCustClasses);
+                                                                else if (definitionTab === 'supp_class') addDefinition('suppClasses', suppClasses, setSuppClasses);
+                                                                else if (definitionTab === 'warranties') addDefinition('warranties', warranties, setWarranties);
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="w-full"
+                                                    style={{
+                                                        padding: '14px 20px', borderRadius: '12px', background: 'var(--bg-deep)',
+                                                        border: '1px solid var(--border-light)', color: 'white', fontSize: '15px'
+                                                    }}
+                                                />
+                                                <button
+                                                    onClick={() => {
+                                                        const e = { key: 'Enter' } as any;
+                                                        // Trigger manual logic same as Enter
+                                                        if (definitionTab === 'payment_methods') {
+                                                            const id = Math.random().toString(36).substr(2, 9);
+                                                            const icon = newPaymentMethod.type === 'cash' ? '💵' : (newPaymentMethod.type === 'card' ? '💳' : '🏦');
+                                                            const newVal = {
+                                                                id,
+                                                                label: newItemInput || 'Yeni Hesap',
+                                                                type: newPaymentMethod.type,
+                                                                icon,
+                                                                linkedKasaId: ''
+                                                            };
+                                                            updatePaymentMethods([...paymentMethods, newVal]).then(() => {
+                                                                setNewItemInput('');
+                                                                showSuccess('Başarılı', 'Ödeme yöntemi eklendi.');
+                                                            });
+                                                        } else {
+                                                            if (definitionTab === 'brands') addDefinition('brands', brands, setBrands);
+                                                            else if (definitionTab === 'prod_cat') addDefinition('prod_cat', prodCats, setProdCats);
+                                                            else if (definitionTab === 'cust_class') addDefinition('custClasses', custClasses, setCustClasses);
+                                                            else if (definitionTab === 'supp_class') addDefinition('suppClasses', suppClasses, setSuppClasses);
+                                                            else if (definitionTab === 'warranties') addDefinition('warranties', warranties, setWarranties);
+                                                        }
+                                                    }}
+                                                    className="btn btn-primary"
+                                                    style={{ padding: '0 24px', borderRadius: '12px', fontSize: '20px' }}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
                                         </div>
-                                    ))}
+                                    </div>
                                 </div>
+
+                                {/* LIST AREA */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+                                    {definitionTab === 'payment_methods' ?
+                                        paymentMethods.map((pm: any, i: number) => (
+                                            <div key={pm.id || i} className="card glass-hover animate-scale-in" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <div className="flex items-center gap-3">
+                                                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
+                                                        {pm.icon || '💰'}
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontWeight: 'bold' }}>{pm.label}</div>
+                                                        <div style={{ fontSize: '11px', opacity: 0.5 }}>
+                                                            {pm.type === 'card' ? 'Kredi Kartı' : pm.type === 'transfer' ? 'Banka' : 'Nakit'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => quickRemovePaymentMethod(pm.id)}
+                                                    style={{ width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', background: 'rgba(255,50,50,0.1)', color: 'var(--danger)', border: 'none', cursor: 'pointer' }}
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        ))
+                                        : (
+                                            (definitionTab === 'brands' ? brands :
+                                                definitionTab === 'prod_cat' ? prodCats :
+                                                    definitionTab === 'cust_class' ? custClasses :
+                                                        definitionTab === 'supp_class' ? suppClasses : warranties
+                                            ).map((item: string, i: number) => (
+                                                <div key={i} className="card glass-hover animate-scale-in" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <span style={{ fontWeight: '600' }}>{item}</span>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (definitionTab === 'brands') removeDefinition('brands', item, brands, setBrands);
+                                                            else if (definitionTab === 'prod_cat') removeDefinition('prodCats', item, prodCats, setProdCats);
+                                                            else if (definitionTab === 'cust_class') removeDefinition('custClasses', item, custClasses, setCustClasses);
+                                                            else if (definitionTab === 'supp_class') removeDefinition('suppClasses', item, suppClasses, setSuppClasses);
+                                                            else if (definitionTab === 'warranties') removeDefinition('warranties', item, warranties, setWarranties);
+                                                        }}
+                                                        style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px', background: 'transparent', color: 'var(--danger)', border: '1px solid rgba(255,50,50,0.2)', cursor: 'pointer' }}
+                                                    >
+                                                        🗑️
+                                                    </button>
+                                                </div>
+                                            ))
+                                        )}
+                                </div>
+
+                                {/* Empty State Hint */}
+                                {(definitionTab !== 'payment_methods' ? (
+                                    (definitionTab === 'brands' ? brands :
+                                        definitionTab === 'prod_cat' ? prodCats :
+                                            definitionTab === 'cust_class' ? custClasses :
+                                                definitionTab === 'supp_class' ? suppClasses : warranties
+                                    ).length === 0
+                                ) : paymentMethods.length === 0) && (
+                                        <div className="flex-center flex-col text-muted" style={{ padding: '40px', opacity: 0.5 }}>
+                                            <span style={{ fontSize: '30px', marginBottom: '10px' }}>📝</span>
+                                            <span>Liste boş. Yeni eklemek için yukarıdaki alanı kullanın.</span>
+                                        </div>
+                                    )}
                             </div>
-                        )}
+                        </div>
                     </div>
                 )}
 

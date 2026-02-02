@@ -38,7 +38,7 @@ export const sendMail = async ({ to, subject, text, html }: { to: string, subjec
     try {
         // 2. Maili Gönder
         const info = await transporter.sendMail({
-            from: `"MotorOil Sistem" <${smtpConfig.email}>`,
+            from: `"Periodya Sistem" <${smtpConfig.email}>`,
             to: to,
             subject: subject,
             text: text,

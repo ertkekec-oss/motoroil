@@ -64,13 +64,25 @@ export async function POST(request: Request) {
                 }
             }
 
-            // 3. Update Supplier Balance
+            // 3. Create Financial Transaction (for tracking in Finansal Hareketler)
+            const transaction = await tx.transaction.create({
+                data: {
+                    type: 'Purchase',
+                    amount: totalAmount,
+                    description: `Alış Faturası: ${invoiceNo} - ${(await tx.supplier.findUnique({ where: { id: supplierId } }))?.name || 'Tedarikçi'}`,
+                    kasaId: null, // Alış genelde vadeli, ödeme ayrı yapılır
+                    supplierId: supplierId,
+                    branch: session.branch as string || 'Merkez'
+                }
+            });
+
+            // 4. Update Supplier Balance
             await tx.supplier.update({
                 where: { id: supplierId },
                 data: { balance: { decrement: totalAmount } }
             });
 
-            // 4. Log Activity
+            // 5. Log Activity
             await logActivity({
                 userId: session.id as string,
                 userName: session.username as string,
@@ -82,10 +94,20 @@ export async function POST(request: Request) {
                 branch: session.branch as string
             });
 
-            return invoice;
+            return { invoice, transaction };
         });
 
-        return NextResponse.json({ success: true, invoiceId: result.id });
+        // Create Accounting Journal Entry (in background, non-blocking)
+        (async () => {
+            try {
+                const { createJournalFromTransaction } = await import('@/lib/accounting');
+                await createJournalFromTransaction(result.transaction);
+            } catch (err) {
+                console.error('[Muhasebe Entegrasyon Hatası - Alış]:', err);
+            }
+        })();
+
+        return NextResponse.json({ success: true, invoiceId: result.invoice.id });
     } catch (error: any) {
         console.error('Purchasing Create Error:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });

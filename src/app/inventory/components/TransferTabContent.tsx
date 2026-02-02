@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { useApp, Product, StockTransfer } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/AppContext';
+import { useInventory, Product, StockTransfer } from '@/contexts/InventoryContext';
 import { useModal } from '@/contexts/ModalContext';
 
 interface TransferTabContentProps {
@@ -20,14 +21,13 @@ export default function TransferTabContent({
     searchTerm,
     setSearchTerm
 }: TransferTabContentProps) {
+    const { currentUser, activeBranchName } = useApp();
     const {
         stockTransfers,
         refreshStockTransfers,
         startStockTransfer,
         finalizeTransfer,
-        currentUser,
-        activeBranchName
-    } = useApp();
+    } = useInventory();
     const { showSuccess, showWarning, showError, showConfirm } = useModal();
 
     const [isTransferMode, setIsTransferMode] = useState(false);

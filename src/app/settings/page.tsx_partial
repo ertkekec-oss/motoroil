@@ -1,0 +1,70 @@
+
+    // Helper to render active list
+    const activeListRender = () => {
+        if (definitionTab === 'payment_methods') {
+            return paymentMethods.map((pm: any, i: number) => (
+                <div key={pm.id || i} className="flex-between" style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                    <div className="flex items-center gap-2">
+                        <span>{pm.icon || '💰'}</span>
+                        <div className="flex-col">
+                            <span style={{ fontSize: '12px', fontWeight: '600' }}>{pm.label}</span>
+                            <span style={{ fontSize: '10px', opacity: 0.5 }}>{pm.type === 'card' ? 'Kredi Kartı' : 'Nakit'}</span>
+                        </div>
+                    </div>
+                    <button
+                         onClick={() => quickRemovePaymentMethod(pm.id)}
+                         style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '14px' }}
+                    >
+                        🗑️
+                    </button>
+                </div>
+            ));
+        }
+
+        const list = definitionTab === 'brands' ? brands :
+                     definitionTab === 'prod_cat' ? prodCats :
+                     definitionTab === 'cust_class' ? custClasses :
+                     definitionTab === 'supp_class' ? suppClasses : warranties;
+
+        return list.map((item: string, i: number) => (
+             <div key={i} className="flex-between" style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                <span style={{ fontSize: '12px', fontWeight: '600' }}>{item}</span>
+                <button
+                    onClick={() => {
+                        if (definitionTab === 'brands') removeDefinition('brands', item, brands, setBrands);
+                        if (definitionTab === 'prod_cat') removeDefinition('prodCat', item, prodCats, setProdCats);
+                        if (definitionTab === 'cust_class') removeDefinition('custClasses', item, custClasses, setCustClasses);
+                        if (definitionTab === 'supp_class') removeDefinition('suppClasses', item, suppClasses, setSuppClasses);
+                        if (definitionTab === 'warranties') removeDefinition('warranties', item, warranties, setWarranties);
+                    }}
+                    style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '14px' }}
+                >
+                    🗑️
+                </button>
+            </div>
+        ));
+    };
+
+    const quickAddPaymentMethod = async () => {
+        if (!newItemInput) return;
+        const id = Math.random().toString(36).substr(2, 9);
+        // Default to cash for quick add
+        const newMethod = { id, label: newItemInput, type: 'cash', icon: '💰', linkedKasaId: '' };
+        const updatedMethods = [...paymentMethods, newMethod];
+        
+        try {
+            await updatePaymentMethods(updatedMethods);
+            setNewItemInput('');
+            showSuccess('Başarılı', 'Ödeme yöntemi eklendi (Nakit). Detaylar için Finans ayarlarına gidin.');
+        } catch (e) {
+            showError('Hata', 'Kaydedilemedi.');
+        }
+    };
+
+    const quickRemovePaymentMethod = async (id: string) => {
+         const updatedMethods = paymentMethods.filter((pm: any) => pm.id !== id);
+         try {
+            await updatePaymentMethods(updatedMethods);
+            showSuccess('Silindi', 'Ödeme yöntemi silindi.');
+         } catch(e) { showError('Hata', 'Silinemedi'); }
+    };

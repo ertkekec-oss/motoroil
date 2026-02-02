@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useApp } from '@/contexts/AppContext';
 
 export default function NotificationsPage() {
     const [summary, setSummary] = useState<any>(null);

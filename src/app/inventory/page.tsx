@@ -1,12 +1,13 @@
-
 "use client";
 
 import { useState, useRef, useMemo, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import * as XLSX from 'xlsx';
-import { useApp, Product } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/AppContext';
+import { useInventory, Product as ContextProduct } from '@/contexts/InventoryContext';
 import { useDebounce } from '@/hooks';
 import { useModal } from '@/contexts/ModalContext';
+import { useSettings } from '@/contexts/SettingsContext';
 import InventoryTable from './components/InventoryTable';
 import InventoryTransferModal from './components/InventoryTransferModal';
 import InventoryBulkEditModal from './components/InventoryBulkEditModal';
@@ -17,6 +18,7 @@ import CriticalStockBanner from './components/CriticalStockBanner';
 import ProcurementModal from './components/ProcurementModal';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import Pagination from '@/components/Pagination';
+import BulkPriceEntryContent from './components/BulkPriceEntryContent';
 
 
 export default function InventoryPage() {
@@ -33,9 +35,13 @@ function InventoryContent() {
     const initialFilter = searchParams.get('filter') as any || 'none';
 
     const [activeTab, setActiveTab] = useState(initialTab);
-    const { products, setProducts, currentUser, hasPermission, requestProductCreation, branches: contextBranches, brands: dbBrands, prodCats: dbCategories, refreshSettings, activeBranchName } = useApp();
+    const { currentUser, hasPermission, branches: contextBranches, activeBranchName } = useApp();
+    const {
+        products, setProducts, requestProductCreation
+    } = useInventory();
+    const { brands: dbBrands, prodCats: dbCategories, refreshSettings: refreshInventorySettings } = useSettings();
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
-    const isSystemAdmin = currentUser === null || currentUser.role === 'ADMIN';
+    const isSystemAdmin = !currentUser || currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || currentUser.role?.toLowerCase().includes('admin') || currentUser.role?.toLowerCase().includes('müdür');
     const canEdit = hasPermission('inventory_edit');
     const canDelete = hasPermission('delete_records');
     const [isProcessing, setIsProcessing] = useState(false);
@@ -94,7 +100,7 @@ function InventoryContent() {
     // Modal açıldığında da verileri tazele
     useEffect(() => {
         if (showAddModal || !!selectedProduct) {
-            refreshSettings();
+            refreshInventorySettings();
         }
     }, [showAddModal, selectedProduct]);
 
@@ -518,69 +524,94 @@ function InventoryContent() {
     const handleExcelUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+
+        setIsProcessing(true); // Show loading state
+
         const reader = new FileReader();
-        reader.onload = (evt) => {
-            const bstr = evt.target?.result;
-            const wb = XLSX.read(bstr, { type: 'binary' });
-            const wsname = wb.SheetNames[0];
-            const ws = wb.Sheets[wsname];
-            const data: any[] = XLSX.utils.sheet_to_json(ws);
-            const currentProducts = [...(products || [])];
-            let updatedCount = 0;
-            let addedCount = 0;
-            data.forEach((row: any, index) => {
-                if (!row['Ürün Adı']) { return; }
-                let code = row['Stok Kodu'] ? String(row['Stok Kodu']).trim() : '';
-                if (!code) {
-                    let suffix = 1;
-                    let candidateCode = '';
-                    do {
-                        candidateCode = `OTO-${(currentProducts.length + suffix).toString().padStart(5, '0')}`;
-                        suffix++;
-                    } while (currentProducts.some(p => p.code === candidateCode));
-                    code = candidateCode;
-                }
-                const sVatInc = row['Satış Dahil']?.toString().toUpperCase() === 'E';
-                const pVatInc = row['Alış Dahil']?.toString().toUpperCase() === 'E';
-                const existingIndex = currentProducts.findIndex(p => p.code === code);
-                const productData = {
-                    name: row['Ürün Adı'],
-                    code: code,
-                    barcode: (row['Barkod'] || '').toString(),
-                    category: row['Kategori'] || 'Genel',
-                    brand: row['Marka'] || 'Bilinmiyor',
-                    buyPrice: parseFloat(row['Alış Fiyatı']) || 0,
-                    purchaseVat: parseInt(row['Alış KDV']) || 20,
-                    purchaseVatIncluded: pVatInc,
-                    price: parseFloat(row['Satış Fiyatı']) || 0,
-                    salesVat: parseInt(row['Satış KDV']) || 20,
-                    salesVatIncluded: sVatInc,
-                    stock: parseInt(row['Stok']) || 0,
-                    status: (parseInt(row['Stok']) || 0) <= 0 ? 'out' : ((parseInt(row['Stok']) || 0) <= 5 ? 'low' : 'ok'),
-                    supplier: row['Tedarikçi'] || '',
-                    branch: row['Şube'] || 'Merkez'
-                };
-                if (existingIndex > -1) {
-                    currentProducts[existingIndex] = { ...currentProducts[existingIndex], ...(productData as any) };
-                    updatedCount++;
+        reader.onload = async (evt) => {
+            try {
+                const bstr = evt.target?.result;
+                const wb = XLSX.read(bstr, { type: 'binary' });
+                const wsname = wb.SheetNames[0];
+                const ws = wb.Sheets[wsname];
+                const data: any[] = XLSX.utils.sheet_to_json(ws);
+
+                const productsToImport: any[] = [];
+                const currentProducts = [...(products || [])];
+
+                data.forEach((row: any, index) => {
+                    if (!row['Ürün Adı']) { return; }
+
+                    let code = row['Stok Kodu'] ? String(row['Stok Kodu']).trim() : '';
+                    if (!code) {
+                        let suffix = 1;
+                        let candidateCode = '';
+                        do {
+                            candidateCode = `OTO-${(currentProducts.length + index + suffix).toString().padStart(5, '0')}`;
+                            suffix++;
+                        } while (currentProducts.some(p => p.code === candidateCode) || productsToImport.some(p => p.code === candidateCode));
+                        code = candidateCode;
+                    }
+
+                    const sVatInc = row['Satış Dahil']?.toString().toUpperCase() === 'E';
+                    const pVatInc = row['Alış Dahil']?.toString().toUpperCase() === 'E';
+
+                    productsToImport.push({
+                        name: row['Ürün Adı'],
+                        code: code,
+                        barcode: (row['Barkod'] || '').toString(),
+                        category: row['Kategori'] || 'Genel',
+                        brand: row['Marka'] || 'Bilinmiyor',
+                        buyPrice: parseFloat(row['Alış Fiyatı']) || 0,
+                        purchaseVat: parseInt(row['Alış KDV']) || 20,
+                        purchaseVatIncluded: pVatInc,
+                        price: parseFloat(row['Satış Fiyatı']) || 0,
+                        salesVat: parseInt(row['Satış KDV']) || 20,
+                        salesVatIncluded: sVatInc,
+                        stock: parseInt(row['Stok']) || 0,
+                        supplier: row['Tedarikçi'] || '',
+                        branch: row['Şube'] || activeBranchName || 'Merkez'
+                    });
+                });
+
+                if (productsToImport.length > 0) {
+                    showSuccess('Yükleniyor...', `${productsToImport.length} ürün işleniyor, lütfen bekleyin.`);
+
+                    const res = await fetch('/api/products/import', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ products: productsToImport })
+                    });
+
+                    const result = await res.json();
+
+                    if (result.success) {
+                        // Refresh products from server
+                        const pRes = await fetch('/api/products');
+                        const pData = await pRes.json();
+                        if (pData.success) setProducts(pData.products);
+
+                        showSuccess(
+                            'İşlem Tamamlandı',
+                            `${result.results.created} yeni ürün eklendi. ${result.results.updated} ürün güncellendi.` +
+                            (result.results.errors.length > 0 ? `\n${result.results.errors.length} hata oluştu.` : '')
+                        );
+                    } else {
+                        showError('Yükleme Hatası', result.error || 'Bilinmeyen hata');
+                    }
                 } else {
-                    currentProducts.push({
-                        ...productData,
-                        id: Date.now() + index + Math.random(),
-                        type: row['Tip'] || 'Diğer'
-                    } as any);
-                    addedCount++;
+                    showWarning('Geçerli Ürün Bulunamadı', 'Dosyada eklenecek geçerli ürün verisi bulunamadı.');
                 }
-            });
-            if (updatedCount > 0 || addedCount > 0) {
-                setProducts(currentProducts);
-                showSuccess('Yükleme Tamamlandı', `${addedCount} yeni ürün eklendi.\n${updatedCount} mevcut ürün güncellendi.`);
-            } else {
-                showWarning('Geçerli Ürün Bulunamadı', 'Yüklenecek geçerli ürün bulunamadı. Lütfen sütun başlıklarını kontrol edin.');
+
+            } catch (error: any) {
+                console.error('Excel parse error:', error);
+                showError('Dosya Hatası', 'Excel dosyası okunurken bir hata oluştu: ' + error.message);
+            } finally {
+                setIsProcessing(false);
+                if (fileInputRef.current) fileInputRef.current.value = '';
             }
         };
         reader.readAsBinaryString(file);
-        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     const exportToExcel = () => {
@@ -793,41 +824,53 @@ function InventoryContent() {
             {/* --- UNIFIED TOOLBAR --- */}
             {/* --- UNIFIED TOOLBAR --- */}
             {!isCounting ? (
-                <div className="flex items-center gap-3 mb-6 z-20 relative overflow-x-auto pb-2 scrollbar-none no-scrollbar flex-nowrap min-w-0">
-                    <div className="flex p-1 bg-subtle backdrop-blur-md rounded-xl border border-subtle whitespace-nowrap">
-                        <button
-                            onClick={() => setActiveTab('all')}
-                            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-main hover:bg-subtle'}`}
-                        >
-                            <span>📦</span>
-                            Envanter Listesi
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('transfers')}
-                            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'transfers' ? 'bg-main text-main shadow-lg' : 'text-muted hover:text-main hover:bg-subtle'}`}
-                        >
-                            <span>🚛</span>
-                            Transfer & Sevkiyat
-                        </button>
+                <div className="flex items-center justify-between gap-4 mb-6 z-20 relative">
+                    {/* Left: Scrollable Tabs */}
+                    <div className="flex-shrink-0">
+                        <div className="flex p-1 bg-subtle backdrop-blur-md rounded-xl border border-subtle whitespace-nowrap">
+                            <button
+                                onClick={() => setActiveTab('all')}
+                                className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-main hover:bg-subtle'}`}
+                            >
+                                <span>📦</span>
+                                Envanter Listesi
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('transfers')}
+                                className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'transfers' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-main hover:bg-subtle'}`}
+                            >
+                                <span>🚛</span>
+                                Transfer & Sevkiyat
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('bulk-price')}
+                                className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'bulk-price' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-main hover:bg-subtle'}`}
+                            >
+                                <span>💰</span>
+                                Fiyat Girişi
+                            </button>
+                        </div>
                     </div>
 
-
-                    <InventoryFilterBar
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
-                        isFilterOpen={isFilterOpen}
-                        setIsFilterOpen={setIsFilterOpen}
-                        filterCategory={filterCategory}
-                        setFilterCategory={setFilterCategory}
-                        filterBrand={filterBrand}
-                        setFilterBrand={setFilterBrand}
-                        stockSort={stockSort}
-                        setStockSort={setStockSort}
-                        specialFilter={specialFilter}
-                        setSpecialFilter={setSpecialFilter}
-                        categories={dbCategories.length > 0 ? dbCategories : categories}
-                        brands={dbBrands.length > 0 ? dbBrands : brands}
-                    />
+                    {/* Right: Search & Filters (Outside overflow container) */}
+                    <div className="flex items-center gap-4 z-30">
+                        <InventoryFilterBar
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            isFilterOpen={isFilterOpen}
+                            setIsFilterOpen={setIsFilterOpen}
+                            filterCategory={filterCategory}
+                            setFilterCategory={setFilterCategory}
+                            filterBrand={filterBrand}
+                            setFilterBrand={setFilterBrand}
+                            stockSort={stockSort}
+                            setStockSort={setStockSort}
+                            specialFilter={specialFilter}
+                            setSpecialFilter={setSpecialFilter}
+                            categories={dbCategories.length > 0 ? dbCategories : categories}
+                            brands={dbBrands.length > 0 ? dbBrands : brands}
+                        />
+                    </div>
                 </div>
             ) : (
                 <div className="flex items-center justify-between mb-6 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
@@ -902,13 +945,44 @@ function InventoryContent() {
                         setSearchTerm={setSearchTerm}
                     />
                 )}
+
+                {activeTab === 'bulk-price' && (
+                    <BulkPriceEntryContent
+                        products={filteredProducts}
+                        isProcessing={isProcessing}
+                        onSave={async (updates) => {
+                            if (isProcessing) return;
+                            setIsProcessing(true);
+                            try {
+                                const res = await fetch('/api/products/bulk', {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ updates })
+                                });
+                                if (res.ok) {
+                                    const pRes = await fetch('/api/products');
+                                    const pData = await pRes.json();
+                                    if (pData.success) setProducts(pData.products);
+                                    showSuccess('Fiyatlar Güncellendi', 'Tüm fiyat ve KDV değişiklikleri başarıyla işlendi.');
+                                    setActiveTab('all');
+                                } else {
+                                    showError('Hata', 'Toplu fiyat güncelleme işlemi başarısız oldu.');
+                                }
+                            } catch (err) {
+                                showError('Hata', 'İşlem sırasında bir sistem hatası oluştu.');
+                            } finally {
+                                setIsProcessing(false);
+                            }
+                        }}
+                    />
+                )}
             </div>
 
             {/* --- BULK ACTION FLOATING BAR --- */}
             {selectedIds.length > 0 && (
                 <div style={{
-                    position: 'fixed', bottom: '40px', left: '50%', transform: 'translateX(-50%)',
-                    zIndex: 2500, display: 'flex', alignItems: 'center', gap: '40px',
+                    position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
+                    zIndex: 99999, display: 'flex', alignItems: 'center', gap: '40px',
                     padding: '20px 40px', borderRadius: '30px',
                     background: 'rgba(8, 9, 17, 0.95)',
                     border: '1px solid var(--primary)',
@@ -927,8 +1001,7 @@ function InventoryContent() {
                         {[
                             { id: 'category', icon: '🏷️', label: 'Kategori' },
                             { id: 'vat', icon: '🏛️', label: 'KDV' },
-                            { id: 'barcode', icon: '🔍', label: 'Barkod' },
-                            { id: 'price', icon: '💰', label: 'Fiyat' }
+                            { id: 'barcode', icon: '🔍', label: 'Barkod' }
                         ].map(action => (
                             <button
                                 key={action.id}

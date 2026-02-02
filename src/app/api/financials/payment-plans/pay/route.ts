@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { createAccountingSlip, createJournalFromTransaction } from '@/lib/accounting';
 
 export async function POST(request: Request) {
     try {
@@ -109,7 +110,7 @@ export async function POST(request: Request) {
                             const commissionAmount = (installmentAmount * rate) / 100;
 
                             // Create Expense Transaction
-                            await tx.transaction.create({
+                            const commTrx = await tx.transaction.create({
                                 data: {
                                     type: 'Expense',
                                     amount: commissionAmount,
@@ -119,6 +120,9 @@ export async function POST(request: Request) {
                                     branch: installment.paymentPlan.branch || 'Merkez'
                                 }
                             });
+
+                            // Auto-Generate Journal Entry for commission
+                            await createJournalFromTransaction(commTrx);
 
                             // Deduct from Kasa
                             await tx.kasa.update({

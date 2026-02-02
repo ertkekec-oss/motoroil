@@ -59,8 +59,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     localStorage.removeItem('user');
                 }
 
-                const storedUser = localStorage.getItem('motoroil_user');
-                const isLoggedIn = localStorage.getItem('motoroil_isLoggedIn');
+                // Migration: motoroil_ -> periodya_
+                const moUser = localStorage.getItem('motoroil_user');
+                const moIsLoggedIn = localStorage.getItem('motoroil_isLoggedIn');
+                if (moUser || moIsLoggedIn) {
+                    if (moUser) localStorage.setItem('periodya_user', moUser);
+                    if (moIsLoggedIn) localStorage.setItem('periodya_isLoggedIn', moIsLoggedIn);
+                    localStorage.removeItem('motoroil_user');
+                    localStorage.removeItem('motoroil_isLoggedIn');
+                }
+
+                const storedUser = localStorage.getItem('periodya_user');
+                const isLoggedIn = localStorage.getItem('periodya_isLoggedIn');
 
                 if (isLoggedIn === 'true' && storedUser) {
                     const userData = JSON.parse(storedUser);
@@ -96,8 +106,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (res.ok) {
                 const userData = await res.json();
                 setUser(userData);
-                localStorage.setItem('motoroil_user', JSON.stringify(userData));
-                localStorage.setItem('motoroil_isLoggedIn', 'true');
+                localStorage.setItem('periodya_user', JSON.stringify(userData));
+                localStorage.setItem('periodya_isLoggedIn', 'true');
                 return true;
             }
             return false;
@@ -114,8 +124,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('Logout error:', e);
         }
         setUser(null);
-        localStorage.removeItem('motoroil_user');
-        localStorage.removeItem('motoroil_isLoggedIn');
+        localStorage.removeItem('periodya_user');
+        localStorage.removeItem('periodya_isLoggedIn');
         router.push('/login');
     };
 

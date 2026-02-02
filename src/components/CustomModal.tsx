@@ -100,11 +100,15 @@ export default function CustomModal({
                                 setIsProcessing(true);
                                 try {
                                     await onConfirm();
+                                    // Note: We don't call onClose() here because onConfirm 
+                                    // usually triggers showSuccess/Error which replaces the modal state.
                                 } catch (e) {
                                     console.error("Modal Action Failed:", e);
+                                    setIsProcessing(false);
                                 }
+                            } else {
+                                onClose();
                             }
-                            onClose();
                         }}
                         disabled={isProcessing}
                         className="flex-1 btn btn-primary py-5 text-sm"

@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useCRM } from '@/contexts/CRMContext';
+import { useFinancials } from '@/contexts/FinancialContext';
 import { useModal } from '@/contexts/ModalContext';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -11,7 +13,9 @@ import {
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#6366f1'];
 
 export default function SupplierReportsPage() {
-    const { suppliers, transactions, branches } = useApp();
+    const { branches } = useApp();
+    const { suppliers } = useCRM();
+    const { transactions } = useFinancials();
     const [selectedBranch, setSelectedBranch] = useState('all');
     const [dateRange, setDateRange] = useState({
         start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],

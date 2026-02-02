@@ -3,9 +3,15 @@
 
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useFinancials } from '@/contexts/FinancialContext';
+import { useInventory } from '@/contexts/InventoryContext';
+import { useCRM } from '@/contexts/CRMContext';
 
 export default function TreasuryPage() {
-    const { products, customers, suppliers, transactions, currentUser } = useApp();
+    const { currentUser } = useApp();
+    const { products } = useInventory();
+    const { customers, suppliers } = useCRM();
+    const { transactions } = useFinancials();
     const isSystemAdmin = currentUser === null || currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür');
 
     if (!isSystemAdmin) {

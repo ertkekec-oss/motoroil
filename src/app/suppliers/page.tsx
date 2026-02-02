@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useCRM } from '@/contexts/CRMContext';
 import { useModal } from '@/contexts/ModalContext';
 import SupplierPurchaseModal from '@/components/modals/SupplierPurchaseModal';
 import { formatCurrency } from '@/lib/utils';
@@ -12,7 +13,8 @@ import Pagination from '@/components/Pagination';
 
 export default function SuppliersPage() {
     const router = useRouter();
-    const { suppliers, currentUser, branches, hasPermission, activeBranchName } = useApp();
+    const { currentUser, branches, hasPermission, activeBranchName } = useApp();
+    const { suppliers, suppClasses: dbSuppClasses } = useCRM();
     const { showSuccess, showError } = useModal();
 
     // UI States
@@ -48,20 +50,7 @@ export default function SuppliersPage() {
         branch: ''
     });
 
-    const [dbSuppClasses, setDbSuppClasses] = useState<string[]>([]);
-
-    useEffect(() => {
-        const fetchDefinitions = async () => {
-            try {
-                const res = await fetch('/api/settings');
-                const data = await res.json();
-                if (data && !data.error) {
-                    if (data.suppClasses) setDbSuppClasses(data.suppClasses);
-                }
-            } catch (e) { console.error('Settings fetch error:', e); }
-        };
-        fetchDefinitions();
-    }, []);
+    // dbSuppClasses is now coming from useCRM()
 
     const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
     const [selectedSup, setSelectedSup] = useState<any>(null);

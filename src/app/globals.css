@@ -111,18 +111,76 @@ body::before {
 /* Layout System */
 .main-content {
   flex: 1;
-  margin-left: 260px;
+  margin-left: 240px;
   /* Offset for fixed sidebar */
-  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
   position: relative;
-  transition: margin-left 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--bg-deep);
 }
 
 @media (max-width: 1024px) {
   .main-content {
-    margin-left: 0;
+    margin-left: 0 !important;
+    padding-top: 64px;
+    padding-bottom: 80px;
+    /* Space for MobileNav if present */
+  }
+
+  .sidebar-fixed {
+    transform: translateX(-100%);
+    width: 280px !important;
+  }
+
+  .sidebar-open .sidebar-fixed {
+    transform: translateX(0);
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
   }
 }
+
+/* Mobile Utilities */
+.hide-mobile {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.show-mobile {
+  display: none !important;
+
+  @media (max-width: 768px) {
+    display: flex !important;
+  }
+}
+
+.flex-mobile-col {
+  @media (max-width: 768px) {
+    flex-direction: column !important;
+  }
+}
+
+.grid-mobile-1 {
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Table Responsiveness */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  table {
+    min-width: 600px;
+    /* Force horizontal scroll for tables on small screens */
+  }
+}
+
 
 /* Glassmorphism & UI Components */
 .glass {

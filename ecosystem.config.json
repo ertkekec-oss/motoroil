@@ -1,5 +1,5 @@
 {
-    "name": "motoroil",
+    "name": "periodya",
     "script": "npm",
     "args": "start",
     "env": {

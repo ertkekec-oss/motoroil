@@ -2,18 +2,21 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useInventory } from '@/contexts/InventoryContext';
 import { useModal } from '@/contexts/ModalContext';
 
 export default function SuspiciousActivityPage() {
     const {
-        pendingProducts,
-        approveProduct,
-        rejectProduct,
         suspiciousEvents: events,
         clearSuspiciousEvents,
         branches,
         currentUser
     } = useApp();
+    const {
+        pendingProducts,
+        approveProduct,
+        rejectProduct,
+    } = useInventory();
     const { showSuccess, showError } = useModal();
     const [filter, setFilter] = useState<'all' | 'today' | 'week'>('today');
     const [branchFilter, setBranchFilter] = useState('all');

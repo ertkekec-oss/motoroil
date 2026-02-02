@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { createJournalFromSale, createJournalFromTransaction } from '@/lib/accounting';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,20 +9,18 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { items, total, kasaId, description, paymentMode, customerName, customerId, earnedPoints, pointsUsed, couponCode, referenceCode, branch } = body;
 
-        console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode }); // Debug log
+        console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode });
 
-        // 1. Kasa ID Güvenli Seçim (Fallback Logic)
+        // 1. Kasa ID Güvenli Seçim
         let targetKasaId = (kasaId === 'CashKasa' || !kasaId) ? undefined : kasaId;
 
-        // Normalize payment mode for backend logic
+        // Normalize payment mode
         const effectivePaymentMode = (paymentMode === 'card' || paymentMode === 'credit_card') ? 'credit_card' : paymentMode;
 
         if (!targetKasaId) {
-            // Eğer Kredi Kartı ise POS tipinde kasa ara, yoksa ilk aktif kasayı al
             if (effectivePaymentMode === 'credit_card') {
                 const posKasa = await prisma.kasa.findFirst({ where: { isActive: true, type: { contains: 'POS' } } });
                 targetKasaId = posKasa?.id;
-                // If no POS kasa found, look for Banka
                 if (!targetKasaId) {
                     const bankKasa = await prisma.kasa.findFirst({ where: { isActive: true, type: 'Banka' } });
                     targetKasaId = bankKasa?.id;
@@ -31,7 +30,6 @@ export async function POST(request: Request) {
                 targetKasaId = bankKasa?.id;
             }
 
-            // General Fallback
             if (!targetKasaId) {
                 const anyKasa = await prisma.kasa.findFirst({ where: { isActive: true } });
                 targetKasaId = anyKasa?.id;
@@ -40,7 +38,7 @@ export async function POST(request: Request) {
 
         if (!targetKasaId) {
             console.error('Kasa Bulunamadı: Hiçbir aktif kasa yok.');
-            return NextResponse.json({ success: false, error: 'Sistemde aktif kasa bulunamadı. Lütfen ayarlardan en az bir kasa ekleyin.' }, { status: 400 });
+            return NextResponse.json({ success: false, error: 'Sistemde aktif kasa bulunamadı.' }, { status: 400 });
         }
 
         // 2. Sipariş No
@@ -50,7 +48,6 @@ export async function POST(request: Request) {
         const finalTotal = parseFloat(total);
 
         const result = await prisma.$transaction(async (tx) => {
-            // A. Create Order
             const order = await tx.order.create({
                 data: {
                     marketplace: 'POS',
@@ -71,17 +68,15 @@ export async function POST(request: Request) {
             if (Array.isArray(items)) {
                 for (const item of items) {
                     if (item.productId) {
-                        try {
-                            await tx.product.update({
-                                where: { id: String(item.productId) },
-                                data: { stock: { decrement: Number(item.qty || item.quantity || 1) } }
-                            });
-                        } catch (e) { console.error("Stock update error (ignoring):", e); }
+                        await tx.product.update({
+                            where: { id: String(item.productId) },
+                            data: { stock: { decrement: Number(item.qty || item.quantity || 1) } }
+                        }).catch(e => console.error("Stock update error:", e));
                     }
                 }
             }
 
-            // C. Update Kasa (Only if NOT account sale)
+            // C. Update Kasa
             if (effectivePaymentMode !== 'account') {
                 await tx.kasa.update({
                     where: { id: targetKasaId },
@@ -98,7 +93,6 @@ export async function POST(request: Request) {
                 transactionDesc = `POS Satışı (${modeLabel}) - ${customerName || 'Perakende'}`;
             }
 
-            // Append REF for invoicing logic
             transactionDesc += ` | REF:${order.id}`;
 
             await tx.transaction.create({
@@ -112,92 +106,66 @@ export async function POST(request: Request) {
                 }
             });
 
-            // E. Update Customer Balance & Points
+            // E. Update Customer Balance
             if (customerId) {
                 const updateData: any = {};
                 if (effectivePaymentMode === 'account') {
                     updateData.balance = { increment: finalTotal };
                 }
-
-                // Add earned points and deduct used points
                 const netPoints = (earnedPoints || 0) - (pointsUsed || 0);
                 if (netPoints !== 0) {
                     updateData.points = { increment: netPoints };
                 }
-
                 if (Object.keys(updateData).length > 0) {
-                    await tx.customer.update({
-                        where: { id: customerId },
-                        data: updateData
-                    });
+                    await tx.customer.update({ where: { id: customerId }, data: updateData });
                 }
             }
 
-            // F. Update Coupon Usage
+            // F. Coupon
             if (couponCode) {
                 const coupon = await tx.coupon.findUnique({ where: { code: couponCode } }) as any;
                 if (coupon) {
-                    const newUsedCount = (coupon.usedCount || 0) + 1;
-                    const isNowUsed = coupon.usageLimit > 0 && newUsedCount >= coupon.usageLimit;
-
                     await tx.coupon.update({
                         where: { code: couponCode },
-                        data: {
-                            usedCount: newUsedCount,
-                            isUsed: isNowUsed,
-                            usedAt: new Date()
-                        }
+                        data: { usedCount: (coupon.usedCount || 0) + 1, lastUsedAt: new Date() }
                     });
                 }
             }
 
-            // G. Handle Bank Commission Expense
+            // G. Bank Commission
             if (effectivePaymentMode === 'credit_card') {
                 try {
                     const settingsRes = await tx.appSettings.findUnique({ where: { key: 'salesExpenses' } });
                     const salesExpenses = settingsRes?.value as any;
 
                     if (salesExpenses?.posCommissions) {
-                        // Determine which installment config to use
                         const instLabelRaw = body.installmentLabel;
                         const instCount = body.installments || body.installmentCount || 1;
                         const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
 
-                        let commissionConfig;
-
-                        // Priority 1: Exact label match from frontend selection
-                        if (instLabelRaw) {
-                            commissionConfig = salesExpenses.posCommissions.find((c: any) => c.installment === instLabelRaw);
-                        }
-
-                        // Priority 2: Fallback to constructed label (backward compatibility)
-                        if (!commissionConfig) {
-                            commissionConfig = salesExpenses.posCommissions.find((c: any) =>
-                                c.installment === instLabelFallback || (instCount === 1 && c.installment === 'Tek Çekim')
-                            );
-                        }
-
-                        // Priority 3: Fallback to first available if strictly needed
-                        if (!commissionConfig && salesExpenses.posCommissions.length > 0) {
-                            commissionConfig = salesExpenses.posCommissions[0];
-                        }
+                        let commissionConfig = salesExpenses.posCommissions.find((c: any) =>
+                            c.installment === instLabelRaw ||
+                            c.installment === instLabelFallback ||
+                            (instCount === 1 && c.installment === 'Tek Çekim')
+                        );
 
                         if (commissionConfig && Number(commissionConfig.rate) > 0) {
                             const rate = Number(commissionConfig.rate);
                             const commissionAmount = (finalTotal * rate) / 100;
 
-                            // 1. Create Expense Transaction
-                            await tx.transaction.create({
+                            const commTrx = await tx.transaction.create({
                                 data: {
                                     type: 'Expense',
                                     amount: commissionAmount,
-                                    description: `Banka POS Komisyon Gideri (${commissionConfig.installment}) - Satış: ${orderNumber}`,
+                                    description: `Banka POS Komisyon Gideri (${commissionConfig.installment})`,
                                     kasaId: targetKasaId,
-                                    date: new Date()
+                                    date: new Date(),
+                                    branch: branch || 'Merkez'
                                 }
                             });
 
-                            // 2. Deduct from Kasa (Net result reflects reality)
+                            await createJournalFromTransaction(commTrx, tx);
+
                             await tx.kasa.update({
                                 where: { id: targetKasaId },
                                 data: { balance: { decrement: commissionAmount } }
@@ -205,8 +173,28 @@ export async function POST(request: Request) {
                         }
                     }
                 } catch (commErr) {
-                    console.error('Commission Error (ignored to not block sale):', commErr);
+                    console.error('Commission Error:', commErr);
                 }
+            }
+
+            // H. Accounting Enrichment
+            const enrichedItems = [];
+            if (Array.isArray(items)) {
+                for (const item of items) {
+                    const p = await tx.product.findUnique({ where: { id: String(item.productId) } });
+                    enrichedItems.push({
+                        ...item,
+                        vat: p?.salesVat || 20,
+                        price: p?.price || item.price,
+                    });
+                }
+            }
+
+            // I. Create Journal
+            try {
+                await createJournalFromSale(order, enrichedItems, targetKasaId, tx);
+            } catch (accErr) {
+                console.error('[Accounting Sync Error]:', accErr);
             }
 
             return order;

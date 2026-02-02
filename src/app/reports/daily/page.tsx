@@ -3,10 +3,13 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useFinancials } from '@/contexts/FinancialContext';
 
 export default function DailyReportPage() {
-    const { currentUser, hasPermission, transactions, kasalar, branches } = useApp();
-    const isSystemAdmin = currentUser === null || currentUser.role === 'ADMIN' || currentUser.role === 'Sistem Sahibi';
+    const { currentUser, hasPermission, branches } = useApp();
+    const { transactions, kasalar } = useFinancials();
+
+    const isSystemAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
     const canViewAll = isSystemAdmin || !hasPermission('branch_isolation');
 
     const [adminActiveTab, setAdminActiveTab] = useState<'overall' | 'branch'>(canViewAll ? 'overall' : 'branch');
@@ -231,7 +234,7 @@ export default function DailyReportPage() {
                                             {t.type === 'Sales' ? '💰' : t.type === 'Expense' ? '🧾' : t.type === 'Collection' ? '📥' : '💼'}
                                         </div>
                                         <div>
-                                            <div className="font-bold text-white/90 group-hover:text-white transition-colors">{t.description?.split(' | REF:')[0]}</div>
+                                            <div className="font-bold text-white/90 group-hover:text-white transition-colors">{(t.description || 'İşlem').split(' | REF:')[0]}</div>
                                             <div className="flex items-center gap-3">
                                                 <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${t.type === 'Sales' ? 'bg-orange-500/20 text-orange-400' :
                                                     t.type === 'Collection' ? 'bg-emerald-500/20 text-emerald-400' :

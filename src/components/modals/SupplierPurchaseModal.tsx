@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useInventory } from '@/contexts/InventoryContext';
 import { useModal } from '@/contexts/ModalContext';
 
 interface PurchaseModalProps {
@@ -13,7 +14,7 @@ interface PurchaseModalProps {
 }
 
 export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, supplierName, onSuccess }: PurchaseModalProps) {
-    const { products } = useApp();
+    const { products } = useInventory();
     const { showSuccess, showError } = useModal();
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 

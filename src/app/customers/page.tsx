@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useCRM } from '@/contexts/CRMContext';
 import { useModal } from '@/contexts/ModalContext';
 import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
@@ -15,7 +16,8 @@ export default function CustomersPage() {
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('all');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid'); // New: View Toggle
-    const { customers, currentUser, hasPermission, suppClasses, custClasses, branches, activeBranchName } = useApp();
+    const { currentUser, hasPermission, branches, activeBranchName } = useApp();
+    const { customers, suppClasses, custClasses } = useCRM();
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
     const canDelete = hasPermission('delete_records');
 
@@ -232,9 +234,18 @@ export default function CustomersPage() {
         );
     };
 
-    // Calculate Stats
-    const totalReceivable = customers.filter(c => c.balance > 0).reduce((sum, c) => sum + c.balance, 0);
-    const totalPayable = customers.filter(c => c.balance < 0).reduce((sum, c) => sum + Math.abs(c.balance), 0);
+    // Calculate Stats - USE RAW CUSTOMERS LIST, NOT FILTERED
+    const totalReceivable = customers.reduce((sum, c) => {
+        const netBalance = Number(c.balance);
+        const portfolioChecks = (c.checks || [])
+            .filter((check: any) => check.type.includes('Alınan'))
+            .reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
+
+        // If balance > 0, it's a receivable
+        // Add checks as they are also assets/receivables in portfolio
+        return sum + (netBalance > 0 ? netBalance : 0) + portfolioChecks;
+    }, 0);
+    const totalPayable = customers.filter(c => Number(c.balance) < 0).reduce((sum, c) => sum + Math.abs(Number(c.balance)), 0);
 
     return (
         <div className="container" style={{ padding: '30px', maxWidth: '1600px', margin: '0 auto' }}>
@@ -386,190 +397,200 @@ export default function CustomersPage() {
             {/* CONTENT AREA */}
             {viewMode === 'grid' ? (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
-                    {paginatedCustomers.map(cust => (
-                        <div
-                            key={cust.id}
-                            className="card glass hover-scale"
-                            style={{
-                                padding: '0',
-                                overflow: 'hidden',
-                                border: '1px solid rgba(255,255,255,0.08)',
-                                background: 'linear-gradient(135deg, rgba(15,17,26,0.95) 0%, rgba(20,22,35,0.95) 100%)',
-                                backdropFilter: 'blur(10px)',
-                                transition: 'all 0.3s ease'
-                            }}
-                        >
-                            {/* Header with gradient */}
-                            <div style={{
-                                padding: '20px 24px',
-                                background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(37,99,235,0.05) 100%)',
-                                borderBottom: '1px solid rgba(59,130,246,0.1)'
-                            }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                                    {/* Avatar */}
-                                    <div style={{
-                                        width: '56px',
-                                        height: '56px',
-                                        borderRadius: '16px',
-                                        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: '24px',
-                                        fontWeight: '900',
-                                        color: 'white',
-                                        boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
-                                        border: '2px solid rgba(255,255,255,0.1)'
-                                    }}>
-                                        {cust.name?.charAt(0).toUpperCase()}
-                                    </div>
+                    {paginatedCustomers.map(cust => {
+                        // Calculate effective balance
+                        const portfolioChecks = (cust.checks || [])
+                            .filter((c: any) => c.type.includes('Alınan') && ['Portföyde', 'Beklemede'].includes(c.status))
+                            .reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
 
-                                    {/* Balance Badge */}
-                                    <div style={{ textAlign: 'right' }}>
-                                        <div style={{
-                                            fontSize: '20px',
-                                            fontWeight: '900',
-                                            color: cust.balance > 0 ? '#ef4444' : (cust.balance < 0 ? '#10b981' : '#94a3b8'),
-                                            textShadow: cust.balance !== 0 ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
-                                        }}>
-                                            {formatCurrency(Math.abs(cust.balance))}
-                                        </div>
-                                        <div style={{
-                                            fontSize: '10px',
-                                            fontWeight: '700',
-                                            color: cust.balance > 0 ? '#ef4444' : (cust.balance < 0 ? '#10b981' : '#64748b'),
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.5px',
-                                            marginTop: '2px'
-                                        }}>
-                                            {cust.balance > 0 ? '● Borçlu' : (cust.balance < 0 ? '● Alacaklı' : '● Dengeli')}
-                                        </div>
-                                    </div>
-                                </div>
+                        const rawBalance = Number(cust.balance);
+                        const effectiveBalance = rawBalance + portfolioChecks;
 
-                                {/* Customer Name */}
-                                <h3 style={{
-                                    margin: '0 0 8px 0',
-                                    fontSize: '18px',
-                                    fontWeight: '800',
-                                    color: 'white',
-                                    letterSpacing: '-0.3px',
-                                    lineHeight: '1.3'
+                        return (
+                            <div
+                                key={cust.id}
+                                className="card glass hover-scale"
+                                style={{
+                                    padding: '0',
+                                    overflow: 'hidden',
+                                    border: '1px solid rgba(255,255,255,0.08)',
+                                    background: 'linear-gradient(135deg, rgba(15,17,26,0.95) 0%, rgba(20,22,35,0.95) 100%)',
+                                    backdropFilter: 'blur(10px)',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                {/* Header with gradient */}
+                                <div style={{
+                                    padding: '20px 24px',
+                                    background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(37,99,235,0.05) 100%)',
+                                    borderBottom: '1px solid rgba(59,130,246,0.1)'
                                 }}>
-                                    {cust.name}
-                                </h3>
-
-                                {/* Points & Referral Code */}
-                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                                    <span style={{
-                                        fontSize: '11px',
-                                        fontWeight: '700',
-                                        color: '#10b981',
-                                        background: 'rgba(16,185,129,0.1)',
-                                        padding: '4px 10px',
-                                        borderRadius: '6px',
-                                        border: '1px solid rgba(16,185,129,0.2)'
-                                    }}>
-                                        ⭐ {Number(cust.points || 0).toFixed(0)} Puan
-                                    </span>
-                                    <span style={{
-                                        fontSize: '11px',
-                                        fontWeight: '700',
-                                        color: '#8b5cf6',
-                                        background: 'rgba(139,92,246,0.1)',
-                                        padding: '4px 10px',
-                                        borderRadius: '6px',
-                                        border: '1px solid rgba(139,92,246,0.2)'
-                                    }}>
-                                        🔑 {cust.referralCode}
-                                    </span>
-                                </div>
-
-                                {/* Category & Branch */}
-                                <div style={{ display: 'flex', gap: '6px', fontSize: '11px', color: '#94a3b8', fontWeight: '600' }}>
-                                    <span>{cust.category || 'Genel'}</span>
-                                    <span>•</span>
-                                    <span>{cust.branch || 'Merkez'}</span>
-                                </div>
-                            </div>
-
-                            {/* Contact Info */}
-                            <div style={{ padding: '16px 24px', background: 'rgba(0,0,0,0.2)' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#cbd5e1' }}>
-                                        <span style={{ fontSize: '16px' }}>📞</span>
-                                        <span style={{ fontWeight: '500' }}>{cust.phone || '-'}</span>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#cbd5e1' }}>
-                                        <span style={{ fontSize: '16px' }}>📧</span>
-                                        <span style={{
-                                            fontWeight: '500',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap'
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                        {/* Avatar */}
+                                        <div style={{
+                                            width: '56px',
+                                            height: '56px',
+                                            borderRadius: '16px',
+                                            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontSize: '24px',
+                                            fontWeight: '900',
+                                            color: 'white',
+                                            boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
+                                            border: '2px solid rgba(255,255,255,0.1)'
                                         }}>
-                                            {cust.email || '-'}
+                                            {cust.name?.charAt(0).toUpperCase()}
+                                        </div>
+
+                                        {/* Balance Badge */}
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{
+                                                fontSize: '20px',
+                                                fontWeight: '900',
+                                                color: effectiveBalance > 0 ? '#ef4444' : (effectiveBalance < 0 ? '#10b981' : '#94a3b8'),
+                                                textShadow: effectiveBalance !== 0 ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
+                                            }}>
+                                                {formatCurrency(Math.abs(effectiveBalance))}
+                                            </div>
+                                            <div style={{
+                                                fontSize: '10px',
+                                                fontWeight: '700',
+                                                color: effectiveBalance > 0 ? '#ef4444' : (effectiveBalance < 0 ? '#10b981' : '#64748b'),
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.5px',
+                                                marginTop: '2px'
+                                            }}>
+                                                {effectiveBalance > 0 ? '● Borçlu' : (effectiveBalance < 0 ? '● Alacaklı' : '● Dengeli')}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Customer Name */}
+                                    <h3 style={{
+                                        margin: '0 0 8px 0',
+                                        fontSize: '18px',
+                                        fontWeight: '800',
+                                        color: 'white',
+                                        letterSpacing: '-0.3px',
+                                        lineHeight: '1.3'
+                                    }}>
+                                        {cust.name}
+                                    </h3>
+
+                                    {/* Points & Referral Code */}
+                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                                        <span style={{
+                                            fontSize: '11px',
+                                            fontWeight: '700',
+                                            color: '#10b981',
+                                            background: 'rgba(16,185,129,0.1)',
+                                            padding: '4px 10px',
+                                            borderRadius: '6px',
+                                            border: '1px solid rgba(16,185,129,0.2)'
+                                        }}>
+                                            ⭐ {Number(cust.points || 0).toFixed(0)} Puan
+                                        </span>
+                                        <span style={{
+                                            fontSize: '11px',
+                                            fontWeight: '700',
+                                            color: '#8b5cf6',
+                                            background: 'rgba(139,92,246,0.1)',
+                                            padding: '4px 10px',
+                                            borderRadius: '6px',
+                                            border: '1px solid rgba(139,92,246,0.2)'
+                                        }}>
+                                            🔑 {cust.referralCode}
                                         </span>
                                     </div>
+
+                                    {/* Category & Branch */}
+                                    <div style={{ display: 'flex', gap: '6px', fontSize: '11px', color: '#94a3b8', fontWeight: '600' }}>
+                                        <span>{cust.category || 'Genel'}</span>
+                                        <span>•</span>
+                                        <span>{cust.branch || 'Merkez'}</span>
+                                    </div>
+                                </div>
+
+                                {/* Contact Info */}
+                                <div style={{ padding: '16px 24px', background: 'rgba(0,0,0,0.2)' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#cbd5e1' }}>
+                                            <span style={{ fontSize: '16px' }}>📞</span>
+                                            <span style={{ fontWeight: '500' }}>{cust.phone || '-'}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#cbd5e1' }}>
+                                            <span style={{ fontSize: '16px' }}>📧</span>
+                                            <span style={{
+                                                fontWeight: '500',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap'
+                                            }}>
+                                                {cust.email || '-'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div style={{
+                                    padding: '16px 24px',
+                                    background: 'rgba(0,0,0,0.3)',
+                                    borderTop: '1px solid rgba(255,255,255,0.05)',
+                                    display: 'flex',
+                                    gap: '8px'
+                                }}>
+                                    <Link
+                                        href={`/customers/${cust.id}`}
+                                        className="btn btn-primary"
+                                        style={{
+                                            flex: 1,
+                                            textAlign: 'center',
+                                            padding: '12px',
+                                            fontSize: '13px',
+                                            fontWeight: '700',
+                                            textDecoration: 'none',
+                                            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                            border: 'none',
+                                            boxShadow: '0 4px 12px rgba(59,130,246,0.3)'
+                                        }}
+                                    >
+                                        📋 Detay & İşlemler
+                                    </Link>
+                                    <a
+                                        href={`tel:${cust.phone}`}
+                                        className="btn btn-outline"
+                                        style={{
+                                            padding: '12px 16px',
+                                            fontSize: '18px',
+                                            background: 'rgba(255,255,255,0.05)',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        📞
+                                    </a>
+                                    <a
+                                        href={`https://wa.me/${cust.phone?.replace(/\s/g, '')}`}
+                                        target="_blank"
+                                        className="btn btn-outline"
+                                        style={{
+                                            padding: '12px 16px',
+                                            fontSize: '18px',
+                                            color: '#25D366',
+                                            background: 'rgba(37,211,102,0.1)',
+                                            border: '1px solid rgba(37,211,102,0.3)',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        💬
+                                    </a>
                                 </div>
                             </div>
-
-                            {/* Action Buttons */}
-                            <div style={{
-                                padding: '16px 24px',
-                                background: 'rgba(0,0,0,0.3)',
-                                borderTop: '1px solid rgba(255,255,255,0.05)',
-                                display: 'flex',
-                                gap: '8px'
-                            }}>
-                                <Link
-                                    href={`/customers/${cust.id}`}
-                                    className="btn btn-primary"
-                                    style={{
-                                        flex: 1,
-                                        textAlign: 'center',
-                                        padding: '12px',
-                                        fontSize: '13px',
-                                        fontWeight: '700',
-                                        textDecoration: 'none',
-                                        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                                        border: 'none',
-                                        boxShadow: '0 4px 12px rgba(59,130,246,0.3)'
-                                    }}
-                                >
-                                    📋 Detay & İşlemler
-                                </Link>
-                                <a
-                                    href={`tel:${cust.phone}`}
-                                    className="btn btn-outline"
-                                    style={{
-                                        padding: '12px 16px',
-                                        fontSize: '18px',
-                                        background: 'rgba(255,255,255,0.05)',
-                                        border: '1px solid rgba(255,255,255,0.1)',
-                                        transition: 'all 0.2s'
-                                    }}
-                                >
-                                    📞
-                                </a>
-                                <a
-                                    href={`https://wa.me/${cust.phone?.replace(/\s/g, '')}`}
-                                    target="_blank"
-                                    className="btn btn-outline"
-                                    style={{
-                                        padding: '12px 16px',
-                                        fontSize: '18px',
-                                        color: '#25D366',
-                                        background: 'rgba(37,211,102,0.1)',
-                                        border: '1px solid rgba(37,211,102,0.3)',
-                                        transition: 'all 0.2s'
-                                    }}
-                                >
-                                    💬
-                                </a>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             ) : (
                 <div className="card glass" style={{ overflow: 'hidden' }}>

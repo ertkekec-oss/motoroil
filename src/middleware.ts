@@ -2,9 +2,25 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = new TextEncoder().encode(
-    process.env.JWT_SECRET || 'motoroil-super-secret-key-12345'
-);
+// SECURITY: JWT_SECRET must be set in production
+const getJWTSecret = () => {
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error('CRITICAL SECURITY ERROR: JWT_SECRET environment variable must be set in production!');
+        }
+        return 'dev-only-secret-key-change-in-production';
+    }
+
+    if (secret.length < 32) {
+        throw new Error('JWT_SECRET must be at least 32 characters long for security');
+    }
+
+    return secret;
+};
+
+const JWT_SECRET = new TextEncoder().encode(getJWTSecret());
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;

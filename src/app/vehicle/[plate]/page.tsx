@@ -63,7 +63,7 @@ export default async function VehicleHistoryPage({ params }: { params: Promise<{
         <div style={{ background: '#0f172a', minHeight: '100vh', color: 'white', fontFamily: 'sans-serif' }}>
             {/* Header */}
             <div style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)', padding: '30px 20px', textAlign: 'center', boxShadow: '0 4px 20px rgba(245, 158, 11, 0.3)' }}>
-                <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>MotorOil</h1>
+                <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>Periodya</h1>
                 <div style={{ fontSize: '14px', opacity: 0.9 }}>Dijital Servis Karnesi</div>
             </div>
 
@@ -132,8 +132,8 @@ export default async function VehicleHistoryPage({ params }: { params: Promise<{
             </div>
 
             <div style={{ textAlign: 'center', padding: '40px 20px', color: '#475569', fontSize: '12px' }}>
-                <p>Bu kayıtlar MotorOil Servis Sistemi tarafından oluşturulmuştur.</p>
-                <Link href="https://www.motoroil.com.tr" style={{ color: '#f59e0b', textDecoration: 'none' }}>www.motoroil.com.tr</Link>
+                <p>Bu kayıtlar Periodya Servis Sistemi tarafından oluşturulmuştur.</p>
+                <Link href="https://www.periodya.com.tr" style={{ color: '#f59e0b', textDecoration: 'none' }}>www.periodya.com.tr</Link>
             </div>
         </div>
     );

@@ -3,6 +3,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/contexts/AppContext';
+import { useFinancials } from '@/contexts/FinancialContext';
+import { useInventory } from '@/contexts/InventoryContext';
+import { useCRM } from '@/contexts/CRMContext';
 import { useModal } from '@/contexts/ModalContext';
 import DailyReportContent from '@/components/DailyReportContent';
 import SupplierReportContent from '@/components/SupplierReportContent';
@@ -24,7 +27,10 @@ const COLORS = {
 };
 
 export default function ReportsPage() {
-    const { transactions, products, customers, suppliers, kasalar, branches, currentUser, hasPermission } = useApp();
+    const { branches, currentUser, hasPermission } = useApp();
+    const { transactions, kasalar } = useFinancials();
+    const { products } = useInventory();
+    const { customers, suppliers } = useCRM();
     const { showSuccess, showError } = useModal();
 
     const isSystemAdmin = currentUser === null;
@@ -38,6 +44,15 @@ export default function ReportsPage() {
         start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         end: new Date().toISOString().split('T')[0]
     });
+    // Performance Optimization: Debounce date changes
+    const [localDateRange, setLocalDateRange] = useState(dateRange);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDateRange(localDateRange);
+        }, 800);
+        return () => clearTimeout(timer);
+    }, [localDateRange]);
     const [paymentPlans, setPaymentPlans] = useState<any[]>([]);
 
     useEffect(() => {
@@ -350,15 +365,15 @@ export default function ReportsPage() {
                         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: 'var(--bg-card)', padding: '12px 20px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
                             <input
                                 type="date"
-                                value={dateRange.start}
-                                onChange={e => setDateRange({ ...dateRange, start: e.target.value })}
+                                value={localDateRange.start}
+                                onChange={e => setLocalDateRange({ ...localDateRange, start: e.target.value })}
                                 style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '13px', outline: 'none' }}
                             />
                             <span style={{ color: 'var(--text-muted)' }}>→</span>
                             <input
                                 type="date"
-                                value={dateRange.end}
-                                onChange={e => setDateRange({ ...dateRange, end: e.target.value })}
+                                value={localDateRange.end}
+                                onChange={e => setLocalDateRange({ ...localDateRange, end: e.target.value })}
                                 style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '13px', outline: 'none' }}
                             />
                         </div>

@@ -20,7 +20,8 @@ export async function GET(request: Request) {
             });
             return NextResponse.json(pending);
         } else {
-            return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+            // Default to empty array instead of 400 for better client stability
+            return NextResponse.json([]);
         }
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -62,6 +63,25 @@ export async function PUT(request: Request) {
         const { id, type, status } = data;
 
         if (type === 'product') {
+            if (status === 'approved') {
+                const pendingData = await prisma.pendingProduct.findUnique({ where: { id } });
+                if (pendingData) {
+                    const pData = pendingData.productData as any;
+                    await prisma.product.create({
+                        data: {
+                            name: pData.name,
+                            code: pData.code || `SKU-${Date.now()}`,
+                            barcode: pData.barcode || '',
+                            brand: pData.brand || '',
+                            category: pData.category || 'Genel',
+                            price: pData.price || 0,
+                            buyPrice: pData.buyPrice || 0,
+                            stock: pData.stock || 0,
+                            branch: pData.branch || 'Merkez'
+                        }
+                    });
+                }
+            }
             const pending = await prisma.pendingProduct.update({
                 where: { id },
                 data: { status }

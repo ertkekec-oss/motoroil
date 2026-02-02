@@ -1,11 +1,18 @@
 
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getAccountForKasa, syncKasaBalancesToLedger } from '@/lib/accounting';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+
+import { authorize } from '@/lib/auth';
+
 export async function GET() {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+
     try {
         const kasalar = await prisma.kasa.findMany({
             where: { isActive: true },
@@ -26,30 +33,49 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+
     try {
         const body = await request.json();
-        const { name, type, balance } = body;
+        const { name, type, balance, branch } = body;
+        const branchName = branch || 'Merkez';
 
-        // Check if exists (including inactive)
+        console.log(`[KASA_POST] Adding kasa: ${name}, Type: ${type}, Branch: ${branchName}`);
+
+        // 1. Check if an match (Name + Branch) exists (case-insensitive)
         const existing = await prisma.kasa.findFirst({
-            where: { name }
+            where: {
+                name: { equals: name, mode: 'insensitive' },
+                branch: { equals: branchName, mode: 'insensitive' }
+            }
         });
 
         if (existing) {
-            // If inactive, reactivate it
             if (!existing.isActive) {
+                console.log(`[KASA_POST] Reactivating inactive kasa: ${existing.id}`);
                 const reactivated = await prisma.kasa.update({
                     where: { id: existing.id },
                     data: {
                         isActive: true,
                         type: type || existing.type,
-                        // Don't reset balance, keep history? Or user expects reset?
-                        // Let's keep balance as is for integrity, user can do adjustment if needed.
+                        branch: branchName // Ensure it takes the correct casing from request
                     }
                 });
+
+                // Sync with Accounting
+                try {
+                    await getAccountForKasa(reactivated.id, branchName);
+                    // If balance > 0, we might need a sync but usually reactivation doesn't change balance
+                } catch (e) { console.error('Accounting Sync Error:', e); }
+
                 return NextResponse.json({ success: true, kasa: reactivated });
             } else {
-                return NextResponse.json({ success: false, error: 'Bu isimde bir kasa zaten var.' }, { status: 400 });
+                console.log(`[KASA_POST] Active duplicate found: ${existing.name} in branch ${existing.branch}`);
+                return NextResponse.json({
+                    success: false,
+                    error: `BU ŞUBEDE ZATEN VAR: "${existing.name}" (Şube: ${existing.branch})`
+                }, { status: 400 });
             }
         }
 
@@ -57,12 +83,27 @@ export async function POST(request: Request) {
             data: {
                 name,
                 type,
-                balance: balance || 0
+                balance: balance || 0,
+                branch: branchName
             }
         });
 
+        // Sync with Accounting immediately
+        try {
+            await getAccountForKasa(kasa.id, branchName);
+
+            // If there's an opening balance, create opening slip
+            if (Number(balance) !== 0) {
+                await syncKasaBalancesToLedger(branchName);
+            }
+        } catch (e) {
+            console.error('Accounting Sync Error (Create):', e);
+        }
+
+        console.log(`[KASA_POST] Created new kasa: ${kasa.id}`);
         return NextResponse.json({ success: true, kasa });
     } catch (error: any) {
+        console.error('[KASA_POST] Error:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

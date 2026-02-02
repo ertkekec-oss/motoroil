@@ -5,6 +5,10 @@ import { useState, useEffect, useMemo, Fragment } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/contexts/AppContext';
+import { useFinancials } from '@/contexts/FinancialContext';
+import { useInventory } from '@/contexts/InventoryContext';
+import { useCRM } from '@/contexts/CRMContext';
+import { useSettings } from '@/contexts/SettingsContext';
 import { useModal } from '@/contexts/ModalContext';
 import StatementModal from '@/components/modals/StatementModal';
 import Pagination from '@/components/Pagination';
@@ -140,7 +144,11 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     };
 
     const { showSuccess, showError, showConfirm } = useModal();
-    const { currentUser, refreshCustomers, refreshTransactions, products, warranties: warrantyPeriods, collectCheck, kasalar } = useApp();
+    const { currentUser } = useApp();
+    const { refreshCustomers } = useCRM();
+    const { refreshTransactions, collectCheck, kasalar } = useFinancials();
+    const { products } = useInventory();
+    const { warranties: warrantyPeriods } = useSettings();
 
     // Statement Modal State
     const [statementOpen, setStatementOpen] = useState(false);
@@ -224,6 +232,33 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [taxEditIndex, setTaxEditIndex] = useState<number | null>(null);
     const [discountType, setDiscountType] = useState<'percent' | 'amount'>('percent');
     const [discountValue, setDiscountValue] = useState(0);
+
+    // RETURN LOGIC STATES
+    const [processingIds, setProcessingIds] = useState<string[]>([]);
+    const [completedIds, setCompletedIds] = useState<string[]>([]);
+
+    const handleReturnTransaction = (id: string) => {
+        showConfirm("İade/İptal Onayı", "Bu işlemi iptal etmek ve iade almak istediğinize emin misiniz?\n\nBu işlem:\n• Stokları geri yükler\n• Bakiyeyi günceller\n• Kasa işlemini tersine çevirir", async () => {
+            setProcessingIds(prev => [...prev, id]);
+            try {
+                const res = await fetch(`/api/financials/transactions?id=${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    showSuccess("Başarılı", "İşlem iade alındı/iptal edildi.");
+                    setCompletedIds(prev => [...prev, id]);
+                    // Don't refresh immediately to show locked state
+                    // router.refresh();
+                } else {
+                    showError("Hata", data.error || "İşlem yapılamadı.");
+                }
+            } catch (e) {
+                showError("Hata", "Bağlantı hatası.");
+            } finally {
+                setProcessingIds(prev => prev.filter(pid => pid !== id));
+            }
+        });
+    };
+
     // Warranty State
     const [warrantyModalOpen, setWarrantyModalOpen] = useState(false);
     const [warranties, setWarranties] = useState<any[]>(customer.warranties || []);
@@ -242,8 +277,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             .filter(item => item.type === 'Fatura')
             .map(inv => ({
                 id: inv.id,
-                number: inv.desc.split(' - ')[0],
-                date: inv.date.split(' ')[0],
+                number: (inv.desc || '').split(' - ')[0] || 'Fatura',
+                date: (inv.date || '').split(' ')[0] || 'Bilinmiyor',
                 total: inv.amount,
                 items: inv.items || []
             }));
@@ -410,14 +445,30 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
     // Safe Access Helper
     const val = (v: any, def: any = '') => v !== null && v !== undefined ? v : def;
-    const balance = val(customer?.balance, 0);
+
+    // Calculate effective balance including portfolio checks
+    const portfolioChecks = (customer.checks || [])
+        .filter((c: any) => c.type.includes('Alınan') && ['Portföyde', 'Beklemede'].includes(c.status))
+        .reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
+
+    const rawBalance = Number(val(customer?.balance, 0));
+    const balance = rawBalance + (rawBalance >= 0 ? portfolioChecks : portfolioChecks);
+    // Wait, if balance is negative (Customer Credited), adding check (Asset) should reduce the credit?
+    // No. 
+    // Scenario 1: Customer owes 1000. Balance = 1000. Check 1000 received. Balance becomes 0.
+    // Display should be 1000 (Risk/Open). So 0 + 1000 = 1000. Correct.
+    // Scenario 2: Customer balance 0. Check 1000 received. Balance = -1000 (Creditor)? No, usually Check receipt credits the customer account.
+    // If I invoice 1000, 120 Debt 1000. Balance 1000.
+    // Receive Check 1000. 120 Credit 1000. Balance 0.
+    // I want to see 1000. So Net Balance (0) + Portfolio Check (1000) = 1000. Correct.
+
     const balanceColor = balance > 0 ? '#ef4444' : '#10b981'; // Borçlu: Red, Alacaklı: Green
 
     // Filter History
     const filteredHistory = historyList.filter(item => {
         if (activeTab === 'all') return true;
         if (activeTab === 'sales') return item.type === 'Fatura' || item.type === 'Satış';
-        if (activeTab === 'payments') return item.type === 'Tahsilat' || item.type === 'Ödeme';
+        if (activeTab === 'payments') return item.type === 'Tahsilat' || item.type === 'Ödeme' || item.type === 'Gider';
         return true;
     });
 
@@ -489,7 +540,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     <button
                                         onClick={() => {
                                             const plate = services[0].plate;
-                                            const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri MotorOil güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.kech.tr/vehicle/${plate}`;
+                                            const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.kech.tr/vehicle/${plate}`;
                                             window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                         }}
                                         className="btn btn-primary"
@@ -594,7 +645,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         <button
                                             onClick={() => {
                                                 const plate = services[0].plate;
-                                                const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri MotorOil güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.kech.tr/vehicle/${plate}`;
+                                                const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.kech.tr/vehicle/${plate}`;
                                                 window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                             }}
                                             className="btn btn-primary"
@@ -830,7 +881,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             <td><span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '11px' }}>{c.status}</span></td>
                                             <td style={{ textAlign: 'right', fontWeight: 'bold', paddingRight: '20px' }}>{Number(c.amount).toLocaleString()} ₺</td>
                                             <td style={{ textAlign: 'right' }}>
-                                                {c.status === 'Beklemede' && (
+                                                {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
                                                     <button
                                                         onClick={() => {
                                                             setActiveCheck(c);
@@ -893,18 +944,42 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             </td>
                                             <td style={{ textAlign: 'right', paddingRight: '20px' }}>
                                                 {item.type === 'Satış' && (
-                                                    <div style={{ display: 'flex', gap: '5px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                                    <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (!completedIds.includes(item.id) && !processingIds.includes(item.id)) {
+                                                                    handleReturnTransaction(item.id);
+                                                                }
+                                                            }}
+                                                            disabled={completedIds.includes(item.id) || processingIds.includes(item.id)}
+                                                            style={{
+                                                                padding: '6px 8px',
+                                                                background: completedIds.includes(item.id) ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
+                                                                color: completedIds.includes(item.id) ? '#666' : '#ef4444',
+                                                                border: completedIds.includes(item.id) ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(239, 68, 68, 0.3)',
+                                                                borderRadius: '8px',
+                                                                fontSize: '11px',
+                                                                fontWeight: 'bold',
+                                                                cursor: completedIds.includes(item.id) ? 'default' : 'pointer',
+                                                                whiteSpace: 'nowrap',
+                                                                opacity: processingIds.includes(item.id) ? 0.7 : 1
+                                                            }}
+                                                            title="İade Al / İptal Et"
+                                                        >
+                                                            {processingIds.includes(item.id) ? '⏳ İşleniyor...' : (completedIds.includes(item.id) ? '✅ İade Edildi' : '↩️ İade')}
+                                                        </button>
                                                         {item.orderId && (
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
-                                                                style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
+                                                                style={{ padding: '6px 8px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap' }}
                                                             >
                                                                 🧾 Faturalandır
                                                             </button>
                                                         )}
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); handleOpenPlanModal(item); }}
-                                                            style={{ padding: '6px 12px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
+                                                            style={{ padding: '6px 8px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap' }}
                                                         >
                                                             📅 Vadelendir
                                                         </button>
@@ -1359,15 +1434,32 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         value={newWarranty.productId}
                                         onChange={(e) => {
                                             const inv = customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId);
-                                            const prod = inv?.items.find((p: any) => (p.productId || p.id || '').toString() === e.target.value);
-                                            setNewWarranty({ ...newWarranty, productId: e.target.value, productName: prod?.name || '' });
+                                            const prodItem = inv?.items.find((p: any) => (p.productId || p.id || '').toString() === e.target.value);
+
+                                            // Find real product name from Inventory if missing in Item
+                                            let pName = prodItem?.name || '';
+                                            if (!pName && prodItem?.productId) {
+                                                const realProd = products.find(p => p.id === prodItem.productId);
+                                                if (realProd) pName = realProd.name;
+                                            }
+
+                                            setNewWarranty({ ...newWarranty, productId: e.target.value, productName: pName });
                                         }}
                                         style={{ padding: '12px', borderRadius: '8px', background: 'var(--bg-deep)', color: 'white', border: '1px solid var(--border-light)' }}
                                     >
                                         <option value="">Seçiniz...</option>
-                                        {customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId)?.items.map((p: any) => (
-                                            <option key={p.productId || p.id} value={p.productId || p.id}>{p.name}</option>
-                                        ))}
+                                        {customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId)?.items.map((p: any) => {
+                                            let displayName = p.name;
+                                            if (!displayName && p.productId) {
+                                                const realProd = products.find((prod: any) => prod.id === p.productId);
+                                                if (realProd) displayName = realProd.name;
+                                            }
+                                            return (
+                                                <option key={p.productId || p.id || Math.random()} value={p.productId || p.id}>
+                                                    {displayName || 'İsimsiz Ürün'}
+                                                </option>
+                                            );
+                                        })}
                                     </select>
                                 </div>
                             )}
@@ -1391,7 +1483,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         onChange={(e) => setNewWarranty({ ...newWarranty, period: e.target.value })}
                                         style={{ padding: '12px', borderRadius: '8px', background: 'var(--bg-deep)', color: 'white', border: '1px solid var(--border-light)' }}
                                     >
-                                        {warrantyPeriods.map(p => (
+                                        {(warrantyPeriods && warrantyPeriods.length > 0 ? warrantyPeriods : ['6 Ay', '1 Yıl', '2 Yıl', '3 Yıl', '5 Yıl']).map(p => (
                                             <option key={p} value={p}>{p}</option>
                                         ))}
                                     </select>

@@ -4,14 +4,37 @@ import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+
+import { authorize } from '@/lib/auth';
+
 export async function GET() {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+
     try {
+        // Optimize: Use select to fetch only necessary fields instead of full include
         const customers = await prisma.customer.findMany({
             where: { deletedAt: null },
-            include: {
-                category: true,
-                transactions: {
-                    where: { deletedAt: null }
+            select: {
+                id: true,
+                name: true,
+                phone: true,
+                branch: true,
+                balance: true,
+                email: true,
+                address: true,
+                supplierClass: true,
+                customerClass: true,
+                points: true,
+                referralCode: true,
+                updatedAt: true,
+                category: {
+                    select: { name: true }
+                },
+                // Fetch open checks only (lighter query)
+                checks: {
+                    where: { status: { in: ['Portföyde', 'Beklemede', 'Karşılıksız'] } },
+                    select: { id: true, amount: true, dueDate: true, status: true }
                 }
             },
             orderBy: {
@@ -33,15 +56,16 @@ export async function GET() {
             customerClass: c.customerClass || '',
             points: Number(c.points || 0),
             referralCode: c.referralCode || '',
-            lastVisit: c.updatedAt.toISOString().split('T')[0]
+            lastVisit: c.updatedAt.toISOString().split('T')[0],
+            checks: c.checks || []
         }));
 
         return NextResponse.json({ success: true, customers: formattedCustomers });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
-
 }
+
 
 export async function POST(request: Request) {
     try {

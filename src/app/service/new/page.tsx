@@ -4,12 +4,17 @@ import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useModal } from '@/contexts/ModalContext';
 import { useApp } from '@/contexts/AppContext';
+import { useInventory } from '@/contexts/InventoryContext';
+import { useCRM } from '@/contexts/CRMContext';
+import { useSettings } from '@/contexts/SettingsContext';
 
 function ServiceAcceptanceContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { showSuccess, showError } = useModal();
-    const { customers, products, serviceSettings } = useApp();
+    const { products } = useInventory();
+    const { customers } = useCRM();
+    const { serviceSettings } = useSettings();
     const [vehicleType, setVehicleType] = useState('moto'); // 'moto' or 'bike'
 
     const [selectedParts, setSelectedParts] = useState<{ id: string | number, name: string, price: number, quantity: number, originalId: string | number, isWarranty?: boolean }[]>([]);

@@ -142,9 +142,9 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
                         {/* Header */}
                         <div className="doc-header">
                             <div className="brand-section">
-                                <div className="brand-logo">M</div>
+                                <div className="brand-logo">P</div>
                                 <div>
-                                    <div className="brand-name">MOTOR OIL</div>
+                                    <div className="brand-name">PERIODYA</div>
                                     <div className="doc-type-label">{entityType === 'CUSTOMER' ? 'MÜŞTERİ HESAP EKSTRESİ' : 'TEDARİKÇİ HESAP EKSTRESİ'}</div>
                                 </div>
                             </div>
@@ -173,7 +173,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
                             </div>
                             <div className="party-box text-right">
                                 <div className="party-label">DÜZENLEYEN</div>
-                                <div className="party-name">MOTOR OIL GARAJ</div>
+                                <div className="party-name">PERIODYA GARAJ</div>
                                 <div className="party-details">
                                     Merkez Mahallesi, Sanayi Sokak<br />
                                     No: 124, Kadıköy / İstanbul<br />

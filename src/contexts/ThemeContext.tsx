@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Load theme from localStorage on mount
     useEffect(() => {
         setMounted(true);
-        const savedTheme = localStorage.getItem('motoroil-theme') as Theme;
+        const savedTheme = (localStorage.getItem('periodya-theme') || localStorage.getItem('motoroil-theme')) as Theme;
         if (savedTheme) {
             setThemeState(savedTheme);
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -28,7 +28,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const setTheme = (newTheme: Theme) => {
         setThemeState(newTheme);
-        localStorage.setItem('motoroil-theme', newTheme);
+        localStorage.setItem('periodya-theme', newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
     };
 

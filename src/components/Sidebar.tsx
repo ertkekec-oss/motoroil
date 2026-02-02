@@ -9,8 +9,9 @@ import { useApp } from "../contexts/AppContext";
 export default function Sidebar() {
     const pathname = usePathname();
     const { user: authUser, logout } = useAuth();
-    const { currentUser, hasPermission, branches, activeBranchName, setActiveBranchName, suspiciousEvents } = useApp();
-    const isSystemAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
+    const { currentUser, hasPermission, branches, activeBranchName, setActiveBranchName, suspiciousEvents, isSidebarOpen, setIsSidebarOpen } = useApp();
+
+    const isSystemAdmin = currentUser === null || currentUser?.role === 'SUPER_ADMIN' || (currentUser?.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
     const displayUser = currentUser || authUser;
 
     // ... menuItems and logic ...
@@ -24,14 +25,14 @@ export default function Sidebar() {
         '/inventory': 'inventory_view',
         '/service': 'service_view',
         '/sales': 'sales_archive',
-        '/staff': 'staff_manage',
         '/reports': 'reports_view',
         '/reports/daily': 'reports_view',
         '/reports/suppliers': 'reports_view',
-        '/security/suspicious': 'security_access',
+        // '/security/suspicious': 'security_access',
         '/integrations': 'settings_manage',
         '/settings/branch': 'settings_manage',
         '/settings': 'settings_manage',
+        '/advisor': 'finance_view',
     };
 
     const menuItems = [
@@ -44,9 +45,15 @@ export default function Sidebar() {
         { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
         { name: 'Servis Masası', href: '/service', icon: '🛠️' },
         { name: 'Veri Analizi', href: '/reports', icon: '📊' },
-        { name: 'Satış Monitörü', href: '/security/suspicious', icon: '🛡️' },
+        { name: 'Kaçak Satış Tespit', href: '/security/suspicious', icon: '🚨' },
+        { name: 'Mali Müşavir', href: '/advisor', icon: '💼' },
         { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
+        { name: 'Yardım & Kılavuz', href: '/help', icon: '❓' },
     ].filter(item => {
+        // Admin users see everything
+        if (isSystemAdmin) return true;
+
+        // For non-admin users, check permissions
         const requiredPerm = permMap[item.href];
         if (!requiredPerm) return true; // default public items
         return hasPermission(requiredPerm);
@@ -59,25 +66,49 @@ export default function Sidebar() {
     if (!displayUser) return null;
 
     return (
-        <aside style={{
-            width: '240px',
-            background: 'var(--bg-card)',
-            backdropFilter: 'blur(30px) saturate(150%)',
-            borderRight: '1px solid var(--border-light)',
-            position: 'fixed',
-            top: 0,
-            bottom: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            zIndex: 100,
-            overflow: 'hidden',
-            fontFamily: "'Outfit', sans-serif"
-        }}>
+        <aside
+            className={`sidebar-fixed ${isSidebarOpen ? 'active' : ''}`}
+            style={{
+                width: '240px',
+                background: 'var(--bg-card)',
+                backdropFilter: 'blur(30px) saturate(150%)',
+                borderRight: '1px solid var(--border-light)',
+                position: 'fixed',
+                top: 0,
+                bottom: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                zIndex: 2000,
+                overflow: 'hidden',
+                fontFamily: "'Outfit', sans-serif",
+                transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}>
+            {/* MOBILE CLOSE BUTTON */}
+            <button
+                className="show-mobile"
+                onClick={() => setIsSidebarOpen(false)}
+                style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid var(--border-light)',
+                    color: 'white',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    zIndex: 2001,
+                    cursor: 'pointer'
+                }}
+            >
+                ✕
+            </button>
+
             {/* LOGO & BRANCH */}
             <div style={{ flexShrink: 0 }}>
                 <div style={{ padding: '32px 24px 20px 24px' }}>
                     <h1 style={{ fontSize: '26px', fontWeight: '900', letterSpacing: '-1.5px', marginBottom: '4px' }}>
-                        MOTOR<span style={{ color: 'var(--primary)', opacity: 0.9 }}>OIL</span>
+                        PERIOD<span style={{ color: 'var(--primary)', opacity: 0.9 }}>YA</span>
                     </h1>
                     <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--primary)', letterSpacing: '2px', opacity: 0.6 }}>SYSTEM V3.0</div>
                 </div>

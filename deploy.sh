@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# MOTOROIL ERP - Natro Quick Deploy Script
+# PERIODYA ERP - Natro Quick Deploy Script
 # Bu script Natro sunucusunda çalıştırılmalıdır
 
-echo "🚀 MOTOROIL ERP Deployment Başlıyor..."
+echo "🚀 PERIODYA ERP Deployment Başlıyor..."
 
 # Renk kodları
 GREEN='\033[0;32m'
@@ -51,7 +51,7 @@ fi
 
 # 6. Eski instance'ı durdur
 echo -e "${YELLOW}🛑 Eski instance durduruluyor...${NC}"
-pm2 delete motoroil 2>/dev/null || true
+pm2 delete periodya 2>/dev/null || true
 
 # 7. Yeni instance'ı başlat
 echo -e "${YELLOW}▶️  Uygulama başlatılıyor...${NC}"
@@ -67,5 +67,5 @@ echo -e "${YELLOW}📊 Uygulama durumu:${NC}"
 pm2 status
 
 echo -e "${GREEN}✅ Deployment tamamlandı!${NC}"
-echo -e "${GREEN}🌐 Site: https://motoroil.natro.app${NC}"
-echo -e "${YELLOW}📝 Logları izlemek için: pm2 logs motoroil${NC}"
+echo -e "${GREEN}🌐 Site: https://periodya.natro.app${NC}"
+echo -e "${YELLOW}📝 Logları izlemek için: pm2 logs periodya${NC}"

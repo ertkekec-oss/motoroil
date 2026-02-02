@@ -1,4 +1,4 @@
-# 🟢 MOTOROIL GELİŞTİRME DURUM RAPORU (GÜNCEL)
+# 🟢 PERIODYA GELİŞTİRME DURUM RAPORU (GÜNCEL)
 
 **Tarih:** 27 Ocak 2026 - 22:55
 **Son Durum:** ✅ E-Ticaret Stok Eşleştirme ve Şube Yönetimi Altyapısı tamamlandı.
@@ -13,9 +13,10 @@
     *   **Veritabanı Entegrasyonu:** Şube sistemi tarayıcı hafızasından kurtarılıp gerçek veritabanı tablosuna (`Branch`) taşındı.
     *   **Senkronizasyon:** Ayarlar sayfasından eklenen bir şube veya depo, anında tüm sistemde (Personel, Stok, Transfer ekranları) güncelleniyor.
 
-3.  **Servis Uyarı Sistemi İyileştirmesi:**
-    *   **Mükerrer Kayıt Önleme:** Aynı müşteriye ait servis uyarılarının çift görünmesi engellendi.
-    *   **Akıllı Seçim:** Sistem, plakası kayıtlı olan veya aciliyeti yüksek (Gecikmiş) olan servisi önceliklendirerek gösteriyor.
+3.  **E-Dönüşüm Entegrasyonu (eLogo & Nilvera):**
+    *   **Çift Sağlayıcı Desteği:** Sistem artık hem **eLogo** hem de **Nilvera** servis sağlayıcılarını desteklemektedir. Ayarlar kısmından kolayca geçiş yapılabilir.
+    *   **Nilvera Optimizasyonu:** Nilvera API v1 ile tam uyumlu, JSON model bazlı hızlı gönderim altyapısı kuruldu.
+    *   **e-Fatura & e-Arşiv & e-İrsaliye:** Her iki sağlayıcı üzerinden de tüm resmi belge tipleri gönderilebilmektedir.
 
 ## 🕒 Önceki Tamamlananlar (Son 24 Saat)
 *   Services & CRM Modülü (WhatsApp, QR Karne, Randevu Takibi).
@@ -31,10 +32,7 @@
 - Transfer fişi oluşturma (Merkez -> Şube).
 - Mal kabul onayı.
 
-### 2. E-Fatura Entegrasyonu (Nilvera) 📄
-Satışı yapılan ürünlerin tek tıkla resmileştirilmesi.
-
-### 3. Personel Prim Sistemi 💰
+### 2. Personel Prim Sistemi 💰
 Servis personelinin yaptığı işe göre otomatik prim hak edişi hesaplaması.
 
 ---

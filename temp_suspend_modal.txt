@@ -1,0 +1,43 @@
+
+      {showSuspendModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(5px)' }} onClick={() => setShowSuspendModal(false)}>
+          <div style={{ background: 'var(--bg-card)', width: '400px', borderRadius: '16px', padding: '24px', border: '1px solid var(--border-light)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', fontWeight: '800' }}>⏳ SATIŞI BEKLEMEYE AL</h3>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', marginBottom: '16px' }}>Bu satış işlemini daha sonra tamamlamak üzere geçici olarak kaydedin.</p>
+            
+            <input 
+                type="text" 
+                placeholder="Hatırlatıcı Not (Örn: 34 ABC 123, Ahmet Bey...)" 
+                value={suspenseLabel}
+                onChange={(e) => setSuspenseLabel(e.target.value)}
+                autoFocus
+                style={{
+                    width: '100%',
+                    padding: '12px',
+                    marginBottom: '16px',
+                    borderRadius: '8px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'white'
+                }}
+            />
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+                <button 
+                    onClick={handleSuspendSale}
+                    disabled={!suspenseLabel}
+                    className="btn-primary"
+                    style={{ flex: 1, padding: '12px', borderRadius: '8px', opacity: !suspenseLabel ? 0.5 : 1 }}
+                >
+                    KAYDET & PARK ET
+                </button>
+                <button 
+                    onClick={() => setShowSuspendModal(false)}
+                    style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', cursor: 'pointer' }}
+                >
+                    İPTAL
+                </button>
+            </div>
+          </div>
+        </div>
+      )}

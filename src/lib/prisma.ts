@@ -157,6 +157,34 @@ const prismaClientSingleton = () => {
                     },
                 },
             },
+            account: {
+                balance: {
+                    needs: { balance: true },
+                    compute(acc) {
+                        return Number(acc.balance);
+                    },
+                },
+            },
+            journal: {
+                totalDebt: {
+                    needs: { totalDebt: true },
+                    compute(j) { return Number(j.totalDebt); },
+                },
+                totalCredit: {
+                    needs: { totalCredit: true },
+                    compute(j) { return Number(j.totalCredit); },
+                },
+            },
+            journalItem: {
+                debt: {
+                    needs: { debt: true },
+                    compute(i) { return Number(i.debt); },
+                },
+                credit: {
+                    needs: { credit: true },
+                    compute(i) { return Number(i.credit); },
+                },
+            },
         },
     });
 };

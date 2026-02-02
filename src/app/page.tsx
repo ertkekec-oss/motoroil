@@ -3,23 +3,31 @@
 import { useState, useEffect, useMemo, Suspense, useCallback, useRef } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
+import { useFinancials } from '@/contexts/FinancialContext';
+import { useInventory } from '@/contexts/InventoryContext';
+import { useCRM } from '@/contexts/CRMContext';
+import { useSales } from '@/contexts/SalesContext';
+import { useSettings } from '@/contexts/SettingsContext';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 
 function POSContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { activeBranchName } = useApp();
+  const { products, stockTransfers } = useInventory();
   const {
-    products, kasalar, processSale, customers, transactions, salesExpenses,
-    campaigns, stockTransfers, suspendedSales, suspendSale, removeSuspendedSale,
-    refreshTransactions,
-    paymentMethods,
-    referralSettings,
-    appSettings,
-    updateAppSetting,
-    refreshCustomers,
-    custClasses // Added for customer class selection
-  } = useApp();
+    kasalar, transactions, refreshTransactions,
+    paymentMethods, salesExpenses
+  } = useFinancials();
+  const { customers, refreshCustomers, custClasses } = useCRM();
+  const {
+    processSale, suspendedSales, suspendSale, removeSuspendedSale
+  } = useSales();
+  const {
+    campaigns, referralSettings, appSettings, updateAppSetting
+  } = useSettings();
+
   const { showSuccess, showError, showWarning, showConfirm } = useModal();
 
   // --- POS STATES ---
@@ -121,11 +129,23 @@ function POSContent() {
       .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
     const dailyExpense = (transactions || [])
-      .filter(t => (t.type === 'Expense' || t.type === 'Payment') && new Date(t.date) >= today)
+      .filter(t => t.type === 'Expense' && new Date(t.date) >= today)
       .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
-    // Kar hesaplama (basit: ciro - gider, gerçekte maliyet hesabı gerekir)
-    const dailyProfit = dailyRevenue - dailyExpense;
+    // Calculate COGS (Cost of Goods Sold) from today's sales
+    let dailyCOGS = 0;
+    const todaySales = (transactions || [])
+      .filter(t => (t.type === 'Sales' || t.type === 'SalesInvoice') && new Date(t.date) >= today);
+
+    // For each sale, calculate the cost based on items sold
+    // This is a simplified calculation - ideally we'd track actual COGS per sale
+    // For now, we'll estimate based on average margin or use a default ratio
+    // Auto parts typically have 35-45% gross margin, so COGS ≈ 55-65% of revenue
+    // TODO: Track actual COGS in sales records for accurate profit calculation
+    dailyCOGS = dailyRevenue * 0.60; // Assuming 40% gross margin
+
+    // Real Profit = Revenue - COGS - Operating Expenses
+    const dailyProfit = dailyRevenue - dailyCOGS - dailyExpense;
 
     const totalCash = (kasalar || [])
       .filter(k => k.type === 'Nakit')
@@ -257,12 +277,38 @@ function POSContent() {
     return customers.find(c => c.name === selectedCustomer);
   }, [selectedCustomer, customers]);
 
+  // Auto-select Kasa when paymentMode or activeBranchName changes
+  useEffect(() => {
+    if (!paymentMode || paymentMode === 'account') {
+      setSelectedKasa('');
+      return;
+    }
+
+    const filtered = (kasalar || []).filter(k => {
+      // Branch filter
+      const branchMatch = !k.branch || k.branch === 'Global' || k.branch === activeBranchName;
+      if (!branchMatch) return false;
+
+      // Type filter mapping
+      if (paymentMode === 'cash') return k.type === 'Nakit';
+      if (paymentMode === 'card') return k.type === 'Kredi Kartı' || k.type.includes('POS');
+      if (paymentMode === 'transfer') return k.type === 'Banka' || k.type === 'Havale';
+      return false;
+    });
+
+    if (filtered.length === 1) {
+      setSelectedKasa(filtered[0].id);
+    } else if (selectedKasa && !filtered.find(f => String(f.id) === String(selectedKasa))) {
+      setSelectedKasa('');
+    }
+  }, [paymentMode, kasalar, activeBranchName]);
+
   const handleFinalize = async () => {
     if (cart.length === 0) return;
     if (!paymentMode) return showWarning("Hata", "Lütfen bir ödeme yöntemi seçiniz.");
 
-    if ((paymentMode === 'cash' || paymentMode === 'transfer' || paymentMode === 'card') && !selectedKasa) {
-      return showWarning("Hata", "Lütfen işlem yapılacak kasa/banka/POS hesabını seçiniz.");
+    if (paymentMode !== 'account' && !selectedKasa) {
+      return showWarning("Hata", `Lütfen işlem yapılacak ${paymentMode === 'cash' ? 'kasayı' : (paymentMode === 'card' ? 'POS hesabını' : 'bankayı')} seçiniz.`);
     }
 
     if (paymentMode === 'account' && selectedCustomer === 'Perakende Müşteri') {
@@ -414,21 +460,22 @@ function POSContent() {
   };
 
   return (
-    <div style={{
+    <div className="flex flex-mobile-col" style={{
       padding: '16px',
       color: 'white',
       width: '100%',
       minHeight: '100vh',
-      display: 'flex',
       gap: '16px',
       background: 'var(--bg-main)'
     }}>
+
 
       {/* SOL PANEL (Satış ve Liste) */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
 
         {/* ÜST DASHBOARD - 4 KART */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
 
           {/* GÜNLÜK CİRO */}
           <div className="stat-card-modern" style={{
@@ -551,7 +598,8 @@ function POSContent() {
         </div>
 
         {/* ANA GÖVDE: SEPET + KARTLAR (ARAMA BARI SEPETİN ÜSTÜNDE) */}
-        <div style={{ flex: 1, display: 'flex', gap: '16px', minHeight: 0 }}>
+        <div className="flex flex-mobile-col" style={{ flex: 1, gap: '16px', minHeight: 0 }}>
+
 
           {/* SOL KOLON: ARAMA + SEPET */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', minWidth: 0 }}>
@@ -652,7 +700,8 @@ function POSContent() {
       </div>
 
       {/* SAĞ PANEL (SATIŞ ÖZETİ) */}
-      <div style={{ width: '400px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="flex-col" style={{ width: '100%', maxWidth: '400px', gap: '16px', alignSelf: 'flex-start' }}>
+
         <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
           <div style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
             <h2 style={{ margin: 0, fontSize: '14px', fontWeight: '800', opacity: 0.5 }}>SATIŞ ÖZETİ</h2>
@@ -750,20 +799,11 @@ function POSContent() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
                 {[
                   ...(paymentMethods || []),
-                  { id: 'account', label: 'VERESİYE', icon: '📖', type: 'account', linkedKasaId: '' }
+                  { id: 'account', label: 'VERESİYE', icon: '📖', type: 'account' }
                 ].map((m: any) => (
                   <button
                     key={m.id}
-                    onClick={() => {
-                      setPaymentMode(m.type);
-                      if (m.linkedKasaId) {
-                        setSelectedKasa(m.linkedKasaId);
-                      } else {
-                        if (m.type === 'cash') setSelectedKasa(kasalar.find(k => !['Banka', 'POS', 'Sanal POS', 'Havale'].some(t => k.type.includes(t)))?.id || '');
-                        if (m.type === 'transfer') setSelectedKasa(kasalar.find(k => k.type.includes('Banka') || k.type.includes('Havale'))?.id || '');
-                        if (m.type === 'card') setSelectedKasa(kasalar.find(k => k.type.includes('POS') || k.type.includes('Kredi') || k.type.includes('Banka'))?.id || '');
-                      }
-                    }}
+                    onClick={() => setPaymentMode(m.type)}
                     className="payment-btn"
                     style={{
                       padding: '12px',
@@ -785,10 +825,12 @@ function POSContent() {
               </div>
             </div>
 
-            {/* Kasa/Banka/Taksit Seçimi */}
-            {paymentMode === 'cash' && (
+            {/* Kasa/Banka Seçimi (Unified) */}
+            {paymentMode && paymentMode !== 'account' && (
               <div className="animate-fade-in" style={{ marginBottom: '12px' }}>
-                <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>KASA</label>
+                <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>
+                  {paymentMode === 'cash' ? 'KASA SEÇİMİ' : (paymentMode === 'card' ? 'POS / BANKA SEÇİMİ' : 'HAVALE / BANKA SEÇİMİ')}
+                </label>
                 <select
                   value={selectedKasa}
                   onChange={e => setSelectedKasa(e.target.value)}
@@ -804,32 +846,15 @@ function POSContent() {
                   }}
                 >
                   <option value="">Seçiniz...</option>
-                  {kasalar?.filter(k => !['Banka', 'POS', 'Sanal POS', 'Havale'].some(t => k.type.includes(t))).map(k => (
-                    <option key={k.id} value={k.id}>{k.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
+                  {(kasalar || []).filter(k => {
+                    const branchMatch = !k.branch || k.branch === 'Global' || k.branch === activeBranchName;
+                    if (!branchMatch) return false;
 
-            {paymentMode === 'transfer' && (
-              <div className="animate-fade-in" style={{ marginBottom: '12px' }}>
-                <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>BANKA</label>
-                <select
-                  value={selectedKasa}
-                  onChange={e => setSelectedKasa(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    borderRadius: '8px',
-                    color: 'white',
-                    fontSize: '12px',
-                    fontWeight: '600'
-                  }}
-                >
-                  <option value="">Seçiniz...</option>
-                  {kasalar?.filter(k => k.type.includes('Banka') || k.type.includes('Havale')).map(k => (
+                    if (paymentMode === 'cash') return k.type === 'Nakit';
+                    if (paymentMode === 'card') return k.type === 'Kredi Kartı' || k.type.includes('POS');
+                    if (paymentMode === 'transfer') return k.type === 'Banka' || k.type === 'Havale';
+                    return false;
+                  }).map(k => (
                     <option key={k.id} value={k.id}>{k.name}</option>
                   ))}
                 </select>
@@ -838,28 +863,6 @@ function POSContent() {
 
             {paymentMode === 'card' && (
               <div className="animate-fade-in" style={{ marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div>
-                  <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>POS HESABI / BANKA</label>
-                  <select
-                    value={selectedKasa}
-                    onChange={e => setSelectedKasa(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      borderRadius: '8px',
-                      color: 'white',
-                      fontSize: '12px',
-                      fontWeight: '600'
-                    }}
-                  >
-                    <option value="">Seçiniz...</option>
-                    {kasalar?.filter(k => k.type.includes('POS') || k.type.includes('Kredi') || k.type.includes('Banka')).map(k => (
-                      <option key={k.id} value={k.id}>{k.name}</option>
-                    ))}
-                  </select>
-                </div>
                 <div>
                   <label style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', fontWeight: '700' }}>TAKSİT</label>
                   <select
@@ -888,6 +891,68 @@ function POSContent() {
                 </div>
               </div>
             )}
+            {suspendedSales.length > 0 && (
+              <button
+                onClick={() => setShowResumptionModal(true)}
+                className="animate-pulse"
+                style={{
+                  width: '100%',
+                  marginBottom: '8px',
+                  padding: '10px',
+                  borderRadius: '10px',
+                  background: 'rgba(59, 130, 246, 0.2)',
+                  border: '1px solid rgba(59, 130, 246, 0.4)',
+                  color: '#60a5fa',
+                  fontWeight: '700',
+                  fontSize: '12px',
+                  cursor: 'pointer'
+                }}
+              >
+                📂 BEKLEYEN SATIŞLAR ({suspendedSales.length})
+              </button>
+            )}
+
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+              <button
+                disabled={cart.length === 0}
+                onClick={() => setShowSuspendModal(true)}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  borderRadius: '10px',
+                  background: 'rgba(234, 179, 8, 0.1)',
+                  border: '1px solid rgba(234, 179, 8, 0.3)',
+                  color: '#fbbf24',
+                  fontWeight: '700',
+                  fontSize: '13px',
+                  cursor: cart.length === 0 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                ⏳ BEKLEMEYE AL
+              </button>
+              <button
+                disabled={cart.length === 0}
+                onClick={() => {
+                  // Using browser confirm is fine here for quick action
+                  if (window.confirm('Sepeti temizlemek istediğinize emin misiniz?')) setCart([]);
+                }}
+                style={{
+                  padding: '12px',
+                  borderRadius: '10px',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  color: '#f87171',
+                  fontWeight: '700',
+                  fontSize: '13px',
+                  cursor: cart.length === 0 ? 'not-allowed' : 'pointer',
+                  width: '48px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}
+              >
+                🗑️
+              </button>
+            </div>
+
             <button disabled={isProcessing || !paymentMode || cart.length === 0} onClick={handleFinalize} className="btn-primary" style={{ width: '100%', padding: '16px', borderRadius: '12px', fontSize: '15px', fontWeight: '800' }}>{isProcessing ? 'İŞLENİYOR...' : 'ONAYLA ➔'}</button>
           </div>
         </div>
@@ -1186,6 +1251,49 @@ function POSContent() {
                 className="btn btn-ghost"
                 style={{ width: '100%', padding: '14px', borderRadius: '12px', fontSize: '13px', fontWeight: '700', color: 'var(--text-muted)' }}
               >PENCEREYİ KAPAT</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSuspendModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(5px)' }} onClick={() => setShowSuspendModal(false)}>
+          <div style={{ background: 'var(--bg-card)', width: '400px', borderRadius: '16px', padding: '24px', border: '1px solid var(--border-light)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', fontWeight: '800' }}>⏳ SATIŞI BEKLEMEYE AL</h3>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', marginBottom: '16px' }}>Bu satış işlemini daha sonra tamamlamak üzere geçici olarak kaydedin.</p>
+
+            <input
+              type="text"
+              placeholder="Hatırlatıcı Not (Örn: 34 ABC 123, Ahmet Bey...)"
+              value={suspenseLabel}
+              onChange={(e) => setSuspenseLabel(e.target.value)}
+              autoFocus
+              style={{
+                width: '100%',
+                padding: '12px',
+                marginBottom: '16px',
+                borderRadius: '8px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: 'white'
+              }}
+            />
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={handleSuspendSale}
+                disabled={!suspenseLabel}
+                className="btn-primary"
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', opacity: !suspenseLabel ? 0.5 : 1 }}
+              >
+                KAYDET & PARK ET
+              </button>
+              <button
+                onClick={() => setShowSuspendModal(false)}
+                style={{ padding: '12px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', cursor: 'pointer' }}
+              >
+                İPTAL
+              </button>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-# ⚡ HIZLI BAŞLANGIÇ - MOTOROIL ERP
+# ⚡ HIZLI BAŞLANGIÇ - PERIODYA ERP
 
 ## 🚀 Sistemi Başlat
 ```bash

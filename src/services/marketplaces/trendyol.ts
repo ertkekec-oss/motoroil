@@ -24,7 +24,7 @@ export class TrendyolService implements IMarketplaceService {
             const response = await fetch(`${this.baseUrl}/${this.config.supplierId}/orders?size=1`, {
                 headers: {
                     'Authorization': this.getAuthHeader(),
-                    'User-Agent': `${this.config.supplierId} - MotorOil ERP`
+                    'User-Agent': `${this.config.supplierId} - Periodya ERP`
                 }
             });
 
@@ -45,7 +45,7 @@ export class TrendyolService implements IMarketplaceService {
                 headers: {
                     'Authorization': this.getAuthHeader(),
                     'Content-Type': 'application/json',
-                    'User-Agent': `${this.config.supplierId} - MotorOil ERP`
+                    'User-Agent': `${this.config.supplierId} - Periodya ERP`
                 },
                 body: JSON.stringify({
                     cargoProvider: cargoProviderCode
@@ -77,7 +77,7 @@ export class TrendyolService implements IMarketplaceService {
             const response = await fetch(url, {
                 headers: {
                     'Authorization': this.getAuthHeader(),
-                    'User-Agent': `${this.config.supplierId} - MotorOil ERP`
+                    'User-Agent': `${this.config.supplierId} - Periodya ERP`
                 }
             });
 
@@ -133,7 +133,7 @@ export class TrendyolService implements IMarketplaceService {
             const response = await fetch(url, {
                 headers: {
                     'Authorization': this.getAuthHeader(),
-                    'User-Agent': `${this.config.supplierId} - MotorOil ERP`
+                    'User-Agent': `${this.config.supplierId} - Periodya ERP`
                 }
             });
 
