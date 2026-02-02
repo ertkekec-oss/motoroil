@@ -33,22 +33,24 @@ export async function POST(req: NextRequest) {
             }, { status: 404 });
         }
 
-        // Get Nilvera settings
-        const settings = await (prisma as any).integrationSettings.findFirst({
-            where: { type: 'efatura' }
+        // Get Nilvera settings from AppSettings
+        const settingsRecord = await prisma.appSettings.findUnique({
+            where: { key: 'eFaturaSettings' }
         });
 
-        if (!settings || !settings.config?.apiKey) {
+        const rawConfig = settingsRecord?.value as any;
+        // Config yapısı bazen direkt root'ta bazen 'nilvera' altında olabilir.
+        const config = rawConfig?.apiKey ? rawConfig : (rawConfig?.nilvera || {});
+
+        if (!config || !config.apiKey) {
             return NextResponse.json({
                 success: false,
                 error: 'Nilvera entegrasyonu yapılandırılmamış. Lütfen Ayarlar > Entegrasyonlar sayfasından Nilvera API bilgilerini girin.'
             }, { status: 400 });
         }
 
-        const config = settings.config;
         const nilvera = new NilveraService({
             apiKey: config.apiKey,
-            // apiSecret yok, constructor desteklemiyor
             environment: config.environment || 'test',
             username: config.username,
             password: config.password
