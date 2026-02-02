@@ -8,21 +8,19 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { apiKey, username, password, environment, companyVkn } = body;
 
-        if (!apiKey && (!username || !password)) {
-            return NextResponse.json({ success: false, error: 'API Key veya Kullanıcı Bilgileri gereklidir.' }, { status: 400 });
+        if (!apiKey) {
+            return NextResponse.json({ success: false, error: 'Entegrasyon için API Key zorunludur. Otomatik giriş (Login) servisi yanıt vermediği için lütfen Nilvera Portal üzerinden aldığınız API Key\'i giriniz.' }, { status: 400 });
         }
 
         const nilveraService = new NilveraService({
             apiKey,
-            username,
+            username, // Opsiyonel, loglama için kalabilir
             password,
             environment: environment || 'test'
         });
 
-        // Autentikasyon (Login)
-        if (username && password) {
-            await nilveraService.login();
-        }
+        // Login endpointi 404 hatası verdiği için (deprecated) kaldırıldı.
+        // API Key ile doğrudan işlem yapılacak.
 
         // Test connection by checking a VKN (self VKN if provided, otherwise a fixed common one)
         const testVkn = companyVkn || '4840846711'; // Nilvera's own VKN or a dummy
