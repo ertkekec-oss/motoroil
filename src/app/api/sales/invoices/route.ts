@@ -315,6 +315,16 @@ export async function POST(request: Request) {
                         }
                     }
 
+                    // GÜVENLİK KONTROLÜ: E-Arşiv için yanlış seri (10B, EFT) seçildiyse düzelt
+                    if (!currentAttemptIsEInvoice) {
+                        // Eğer seçilen seri bilinen bir e-Fatura serisi ise veya "10B" ise
+                        const invalidPrefixes = ["10B", "EFT", "10A", "101"];
+                        if (invalidPrefixes.includes(officialSeriesPrefix)) {
+                            console.warn(`[SERIES FIX] Invalid e-Archive series detected (${officialSeriesPrefix}). Swapping to 'ARS'.`);
+                            officialSeriesPrefix = "ARS";
+                        }
+                    }
+
                     // NILVERA OTOMATIK NUMARALAMA
                     // Sadece seri kodunu gönder (3 hane), Nilvera otomatik numara üretir
                     // Örnek: "101" -> Nilvera "101000000112" üretir
@@ -382,11 +392,11 @@ export async function POST(request: Request) {
                                     // TCKN (11 hane) -> INTERNET Satışı + InternetSaleInfo
                                     // VKN (10 hane) -> NORMAL Satış (InternetSaleInfo YOK)
                                     // 500 HATASI DEBUG İÇİN GEÇİCİ OLARAK HEP "NORMAL"
-                                    SalesPlatform: "NORMAL"
+                                    SalesPlatform: "NORMAL",
 
                                     /* INTERNET SATIŞI GEÇİCİ OLARAK KAPALI
                                     SalesPlatform: customerVkn.length === 11 ? "INTERNET" : "NORMAL",
-
+    
                                     ...(customerVkn.length === 11 ? {
                                         InternetSaleInfo: {
                                             Website: "www.periodya.com",
