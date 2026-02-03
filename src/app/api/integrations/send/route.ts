@@ -3,14 +3,41 @@ import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { NilveraService } from '@/lib/nilvera';
 
-function generateGIBInvoiceNo(prefix: string) {
+// Nilvera için seri ve sıra numarası oluştur
+// Format: {Seri}{SıraNo} örn: 101000000112
+// Seri: 101 (Nilvera'da kayıtlı bir seri olmalı)
+async function generateInvoiceSerieAndNumber() {
+    // Bugünün tarihine göre sıra numarası oluştur
     const now = new Date();
-    const year = now.getFullYear().toString();
-    const timePart = now.getHours().toString().padStart(2, '0') +
-        now.getMinutes().toString().padStart(2, '0') +
-        now.getSeconds().toString().padStart(2, '0');
-    const randomPart = Math.floor(Math.random() * 999).toString().padStart(3, '0');
-    return `${prefix}${year}${timePart}${randomPart}`;
+    const year = now.getFullYear();
+
+    // Veritabanından bugün için son sıra numarasını al
+    const lastInvoice = await (prisma as any).salesInvoice.findFirst({
+        where: {
+            invoiceDate: {
+                gte: new Date(year, 0, 1), // Yılın başından itibaren
+            },
+            formalUuid: { not: null }
+        },
+        orderBy: { createdAt: 'desc' }
+    });
+
+    // Son numarayı parse et veya 1'den başla
+    let nextNumber = 1;
+    if (lastInvoice?.formalUuid) {
+        // formalUuid'den sıra numarasını çıkar (örn: "101000000112" -> 112)
+        const match = lastInvoice.formalUuid.match(/^101(\d+)$/);
+        if (match) {
+            nextNumber = parseInt(match[1]) + 1;
+        }
+    }
+
+    // Seri: 101 (Nilvera'da kayıtlı)
+    // Sıra No: 9 haneli, sıfırlarla doldurulmuş
+    const serie = "101";
+    const sequenceNumber = nextNumber.toString().padStart(9, '0');
+
+    return `${serie}${sequenceNumber}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -53,8 +80,7 @@ export async function POST(req: NextRequest) {
         } catch (e) { }
 
         async function attemptSending(isEInvoice: boolean, alias?: string) {
-            const prefix = isEInvoice ? "EFT" : "ARS";
-            const invoiceNo = generateGIBInvoiceNo(prefix);
+            const invoiceNo = await generateInvoiceSerieAndNumber();
             const uuid = crypto.randomUUID();
 
             const invoiceItems = Array.isArray(invoice.items) ? invoice.items : [];
@@ -74,39 +100,42 @@ export async function POST(req: NextRequest) {
                 if (vatRate === 20) totalKdv20 += vat;
 
                 return {
-                    Index: (idx + 1).toString(),
+                    Index: idx + 1,
                     Name: item.name || 'Urun',
                     Quantity: qty,
                     UnitType: "C62",
-                    Price: price,
-                    AllowanceTotal: discount,
-                    KDVPercent: vatRate,
-                    KDVTotal: Number(vat.toFixed(2)),
-                    Taxes: [{ TaxCode: "0015", Total: Number(vat.toFixed(2)), Percent: vatRate }]
+                    UnitPrice: price,
+                    VatRate: vatRate,
+                    VatAmount: Number(vat.toFixed(2)),
+                    LineExtensionAmount: Number(base.toFixed(2))
                 };
             });
 
+            // Tarih ve saat formatı
+            const invoiceDate = new Date(invoice.invoiceDate);
+            const issueDate = invoiceDate.toISOString().split('T')[0]; // YYYY-MM-DD
+            const issueTime = invoiceDate.toTimeString().split(' ')[0]; // HH:MM:SS
+
             const invoiceInfo: any = {
                 UUID: uuid,
-                CustomizationID: "TR1.2",
                 InvoiceType: "SATIS",
+                InvoiceProfile: isEInvoice ? "TICARIFATURA" : "EARSIVFATURA",
+                ProfileID: "TR1.2",
                 InvoiceSerieOrNumber: invoiceNo,
-                IssueDate: new Date(invoice.invoiceDate).toISOString(),
+                IssueDate: issueDate,
+                IssueTime: issueTime,
                 CurrencyCode: "TRY",
                 LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
-                KdvTotal: Number(totalTaxAmount.toFixed(2)),
-                PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2)),
-                GeneralKDV20Total: Number(totalKdv20.toFixed(2)),
-                GeneralAllowanceTotal: 0
+                TaxExclusiveAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
+                TaxInclusiveAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2)),
+                PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2))
             };
 
+            // E-Fatura için ek alanlar
             if (isEInvoice) {
-                invoiceInfo.InvoiceProfile = "TICARIFATURA";
-            } else {
-                invoiceInfo.InvoiceProfile = "EARSIVFATURA";
                 invoiceInfo.SalesPlatform = "NORMAL";
                 invoiceInfo.SendType = "ELEKTRONIK";
-                invoiceInfo.ISDespatch = false;
+                invoiceInfo.DeliveryType = "ELEKTRONIK";
             }
 
             const payload = {
@@ -125,11 +154,15 @@ export async function POST(req: NextRequest) {
             };
 
             // ALTIN KURAL: E-Fatura ise CustomerAlias ŞART, E-Arşiv ise YASAK!
+            let sendResult;
             if (isEInvoice) {
-                return await nilvera.sendInvoice({ EInvoice: payload, CustomerAlias: alias }, 'EFATURA');
+                sendResult = await nilvera.sendInvoice({ EInvoice: payload, CustomerAlias: alias }, 'EFATURA');
             } else {
-                return await nilvera.sendInvoice({ ArchiveInvoice: payload }, 'EARSIV');
+                sendResult = await nilvera.sendInvoice({ ArchiveInvoice: payload }, 'EARSIV');
             }
+
+            // Fatura numarasını da dönelim
+            return { ...sendResult, invoiceNo };
         }
 
         // Mükellef sorgula
@@ -168,7 +201,11 @@ export async function POST(req: NextRequest) {
         if (result.success) {
             await (prisma as any).salesInvoice.update({
                 where: { id: invoiceId },
-                data: { isFormal: true, formalStatus: 'SENT', formalUuid: result.formalId }
+                data: {
+                    isFormal: true,
+                    formalStatus: 'SENT',
+                    formalUuid: result.invoiceNo // Fatura numarasını kaydediyoruz
+                }
             });
             return NextResponse.json({ success: true, message: 'Başarıyla gönderildi.' });
         } else {

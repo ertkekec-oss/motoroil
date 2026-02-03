@@ -174,10 +174,11 @@ export default function SalesPage() {
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showSuccess('Başarılı', `✅ ${data.message}\\nUUID: ${data.uuid}\\nTip: ${data.type}`);
+                    showSuccess('Başarılı', `✅ ${data.message}\nUUID: ${data.uuid}\nTip: ${data.type}`);
                     fetchInvoices();
                 } else {
-                    showError('Hata', '❌ ' + (data.error || 'Gönderim başarısız'));
+                    const technicalDetail = (data.errorCode ? ` (Hata Kodu: ${data.errorCode})` : '') + (data.details ? `\nDetay: ${data.details}` : '');
+                    showError('Hata', '❌ ' + (data.error || 'Gönderim başarısız') + technicalDetail);
                 }
             } catch (e: any) {
                 showError('Hata', 'Bağlantı hatası: ' + e.message);

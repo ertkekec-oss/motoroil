@@ -78,22 +78,29 @@ export async function POST(req: NextRequest) {
                     Name: item.name || 'Urun',
                     Quantity: qty,
                     UnitType: "C62",
-                    Price: price,
+                    UnitPrice: price,
                     AllowanceTotal: discount,
-                    KDVPercent: vatRate,
-                    KDVTotal: Number(vat.toFixed(2)),
+                    VatRate: vatRate,
+                    VatTotal: Number(vat.toFixed(2)),
                     Taxes: [{ TaxCode: "0015", Total: Number(vat.toFixed(2)), Percent: vatRate }]
                 };
             });
+
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toTimeString().split(' ')[0];
 
             const invoiceInfo: any = {
                 UUID: uuid,
                 CustomizationID: "TR1.2",
                 InvoiceType: "SATIS",
                 InvoiceSerieOrNumber: invoiceNo,
-                IssueDate: new Date(invoice.invoiceDate || invoice.createdAt).toISOString(),
+                IssueDate: dateStr,
+                IssueTime: timeStr,
                 CurrencyCode: "TRY",
                 LineExtensionAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
+                TaxExclusiveAmount: Number(totalTaxExclusiveAmount.toFixed(2)),
+                TaxInclusiveAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2)),
                 KdvTotal: Number(totalTaxAmount.toFixed(2)),
                 PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2)),
                 GeneralKDV20Total: Number(totalKdv20.toFixed(2)),
@@ -167,13 +174,21 @@ export async function POST(req: NextRequest) {
             });
             return NextResponse.json({ success: true, message: 'Başarıyla gönderildi.', formalId: result.formalId });
         } else {
-            let errMsg = result.error || 'Fatura gönderilemedi.';
-            if (result.errorCode === 401) errMsg = 'Nilvera API Yetkilendirme Hatası.';
-
-            return NextResponse.json({ success: false, error: errMsg }, { status: 400 });
+            return NextResponse.json({
+                success: false,
+                error: result.error,
+                errorType: 'NilveraAPIError',
+                errorCode: result.errorCode
+            }, { status: 400 });
         }
 
     } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        console.error('FORMAL SEND GLOBAL CATCH:', error);
+        return NextResponse.json({
+            success: false,
+            error: error.message,
+            errorType: error.name,
+            stack: error.stack
+        }, { status: 500 });
     }
 }

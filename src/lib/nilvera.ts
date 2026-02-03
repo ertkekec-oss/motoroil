@@ -37,66 +37,60 @@ export class NilveraService {
         };
     }
 
-    async checkUser(vkn: string): Promise<{ isEInvoiceUser: boolean; alias?: string }> {
+    async checkUser(vkn: string): Promise<{ isEInvoiceUser: boolean; alias?: string; rawData?: any }> {
         if (!vkn) return { isEInvoiceUser: false };
         const cleanVkn = vkn.replace(/\s/g, '');
 
         try {
             const response = await axios.get(`${this.baseUrl}/general/CheckUser/${cleanVkn}`, {
-                headers: this.getHeaders()
+                headers: this.getHeaders(),
+                validateStatus: () => true
             });
 
             const data = response.data;
             let isEInvoiceUser = false;
             let alias = '';
 
-            // Nilvera yanıtı array ise (En yaygın durum)
+            // 1. Array formatı (En yaygın)
             if (Array.isArray(data) && data.length > 0) {
                 isEInvoiceUser = true;
-
-                // ÖNCELİK 1: Posta Kutusu (PK) olan ve GIB içeren etiket
                 const pkGib = data.find((item: any) =>
                     (item.Alias || item.alias || "").toLowerCase().includes('pk') &&
                     (item.Alias || item.alias || "").toLowerCase().includes('gib.gov.tr')
                 );
-
-                // ÖNCELİK 2: Herhangi bir PK etiketi
                 const anyPk = data.find((item: any) =>
                     (item.Alias || item.alias || "").toLowerCase().includes('pk') ||
                     (item.Type || item.type || "").toLowerCase() === 'pk'
                 );
-
-                // ÖNCELİK 3: Herhangi bir etiket
                 const first = data[0];
-                const firstAlias = typeof first === 'string' ? first : (first.Alias || first.alias || '');
+                const firstAlias = typeof first === 'string' ? first : (first.Alias || first.alias || first.Role || first.name || '');
 
                 alias = (pkGib?.Alias || pkGib?.alias) || (anyPk?.Alias || anyPk?.alias) || firstAlias;
             }
-            // Yanıt tekil obje ise
-            else if (data && typeof data === 'object') {
+            // 2. Obje formatı
+            else if (data && typeof data === 'object' && !Array.isArray(data)) {
                 if (data.IsEInvoiceUser || data.isEInvoiceUser || data.UserType === 'EFATURA') {
                     isEInvoiceUser = true;
                 }
-
-                // Bazı objelerde direkt Alias veya Aliases listesi olabilir
                 const rawAlias = data.Alias || data.alias || data.SelectedAlias;
-                const rawAliases = data.Aliases || data.aliases;
+                const rawAliases = data.Aliases || data.aliases || data.aliasesList || data.Items;
 
                 if (rawAlias) {
                     alias = rawAlias;
                     isEInvoiceUser = true;
                 } else if (Array.isArray(rawAliases) && rawAliases.length > 0) {
-                    const firstA = rawAliases[0];
-                    alias = typeof firstA === 'string' ? firstA : (firstA.Alias || firstA.alias || '');
+                    alias = rawAliases[0].Alias || rawAliases[0].alias || (typeof rawAliases[0] === 'string' ? rawAliases[0] : '');
                     isEInvoiceUser = true;
                 }
             }
 
-            // Eğer hala alias bulunamadıysa ama isEInvoiceUser true ise, Nilvera'nın e-fatura olduğunu bildiği bir durumdayız
-            return { isEInvoiceUser, alias };
+            return {
+                isEInvoiceUser,
+                alias: alias?.toString().trim(),
+                rawData: data // Debug için ham veriyi de dönüyoruz
+            };
         } catch (error: any) {
-            // Eğer 404 dönüyorsa genellikle kullanıcı sistemde kayıtlı değildir (e-Arşiv)
-            return { isEInvoiceUser: false };
+            return { isEInvoiceUser: false, rawData: error.response?.data };
         }
     }
 
@@ -121,14 +115,28 @@ export class NilveraService {
 
             if (response.status >= 400) {
                 const errorData = response.data;
-                let msg = 'İşlem Başarısız';
+                console.error('NILVERA RAW ERROR:', JSON.stringify(errorData, null, 2));
+
+                let detailedMsg = '';
                 if (errorData) {
-                    if (typeof errorData === 'string') msg = errorData;
-                    else if (errorData.Errors) msg = Array.isArray(errorData.Errors) ? errorData.Errors.map((e: any) => e.Description || e.Message || JSON.stringify(e)).join(' | ') : JSON.stringify(errorData.Errors);
-                    else if (errorData.Message) msg = errorData.Message;
-                    else if (errorData.ModelState) msg = Object.values(errorData.ModelState).flat().join(' | ');
+                    if (typeof errorData === 'string') {
+                        detailedMsg = errorData;
+                    } else if (errorData.Errors && Array.isArray(errorData.Errors)) {
+                        detailedMsg = errorData.Errors.map((e: any) => `[${e.Code || 'Hata'}] ${e.Description || e.Message}`).join(' | ');
+                    } else if (errorData.ModelState) {
+                        detailedMsg = Object.values(errorData.ModelState).flat().join(' | ');
+                    } else if (errorData.Message || errorData.message) {
+                        detailedMsg = errorData.Message || errorData.message;
+                    } else {
+                        detailedMsg = JSON.stringify(errorData);
+                    }
                 }
-                return { success: false, error: msg, errorCode: response.status };
+
+                return {
+                    success: false,
+                    error: detailedMsg || `Bilinmeyen API Hatası (${response.status})`,
+                    errorCode: response.status
+                };
             }
 
             const result = Array.isArray(response.data) ? response.data[0] : response.data;
