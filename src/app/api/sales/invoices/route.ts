@@ -381,6 +381,10 @@ export async function POST(request: Request) {
                                     // KRİTİK KURAL (Tablo):
                                     // TCKN (11 hane) -> INTERNET Satışı + InternetSaleInfo
                                     // VKN (10 hane) -> NORMAL Satış (InternetSaleInfo YOK)
+                                    // 500 HATASI DEBUG İÇİN GEÇİCİ OLARAK HEP "NORMAL"
+                                    SalesPlatform: "NORMAL"
+
+                                    /* INTERNET SATIŞI GEÇİCİ OLARAK KAPALI
                                     SalesPlatform: customerVkn.length === 11 ? "INTERNET" : "NORMAL",
 
                                     ...(customerVkn.length === 11 ? {
@@ -393,6 +397,7 @@ export async function POST(request: Request) {
                                             CargoTrackingNumber: "1234567890" // "YOK" kabul edilmez
                                         }
                                     } : {})
+                                    */
                                 }
                             }
                         };
