@@ -317,11 +317,10 @@ export async function POST(request: Request) {
                         }
                     }
 
-                    // SAYAÇ SENKRONİZASYONU
-                    // DOĞRU FORMAT: SERİ(3) + SAYAÇ(9) = 12 HANE (YIL YOK!)
-                    // Örnek: 101000000112
-                    const nextNumberPadded = (ordinal + 1).toString().padStart(9, '0');
-                    const invNo = `${officialSeriesPrefix}${nextNumberPadded}`;
+                    // NILVERA OTOMATIK NUMARALAMA
+                    // Sadece seri kodunu gönder (3 hane), Nilvera otomatik numara üretir
+                    // Örnek: "101" -> Nilvera "101000000112" üretir
+                    const invNo = officialSeriesPrefix;
 
                     const metaYesterday = new Date(now);
                     metaYesterday.setDate(metaYesterday.getDate() - 1);
@@ -334,8 +333,8 @@ export async function POST(request: Request) {
                             // PROFİL SEÇİMİ: E-Fatura için TICARIFATURA, E-Arşiv için EARSIVFATURA
                             InvoiceProfile: currentAttemptIsEInvoice ? "TICARIFATURA" : "EARSIVFATURA",
                             ProfileID: "TR1.2", // GİB UBL 2.1 Standardı
-                            // DOĞRU FORMAT: SERİ(3) + SIRA(9) = 12 karakter (YIL YOK!)
-                            // Örnek: 101000000112
+                            // Sadece seri kodu (3 hane), Nilvera otomatik tam numara üretir
+                            // Örnek: "101" -> Nilvera "101000000112" üretir
                             InvoiceSerieOrNumber: invNo,
                             IssueDate: issueDateOnly,
                             // E-Fatura veya İnternet Satışı (PaymentDate içeriyor) -> Zorunlu

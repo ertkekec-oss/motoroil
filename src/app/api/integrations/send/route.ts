@@ -3,41 +3,11 @@ import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { NilveraService } from '@/lib/nilvera';
 
-// Nilvera için seri ve sıra numarası oluştur
-// Format: {Seri}{SıraNo} örn: 101000000112
-// Seri: 101 (Nilvera'da kayıtlı bir seri olmalı)
-async function generateInvoiceSerieAndNumber() {
-    // Bugünün tarihine göre sıra numarası oluştur
-    const now = new Date();
-    const year = now.getFullYear();
-
-    // Veritabanından bugün için son sıra numarasını al
-    const lastInvoice = await (prisma as any).salesInvoice.findFirst({
-        where: {
-            invoiceDate: {
-                gte: new Date(year, 0, 1), // Yılın başından itibaren
-            },
-            formalUuid: { not: null }
-        },
-        orderBy: { createdAt: 'desc' }
-    });
-
-    // Son numarayı parse et veya 1'den başla
-    let nextNumber = 1;
-    if (lastInvoice?.formalUuid) {
-        // formalUuid'den sıra numarasını çıkar (örn: "101000000112" -> 112)
-        const match = lastInvoice.formalUuid.match(/^101(\d+)$/);
-        if (match) {
-            nextNumber = parseInt(match[1]) + 1;
-        }
-    }
-
-    // Seri: 101 (Nilvera'da kayıtlı)
-    // Sıra No: 9 haneli, sıfırlarla doldurulmuş
-    const serie = "101";
-    const sequenceNumber = nextNumber.toString().padStart(9, '0');
-
-    return `${serie}${sequenceNumber}`;
+// Nilvera için seri kodu
+// Nilvera otomatik olarak tam fatura numarasını üretir
+// Örnek: "101" -> Nilvera "101000000112" üretir
+function getInvoiceSeries() {
+    return "101";
 }
 
 export async function POST(req: NextRequest) {
@@ -80,7 +50,7 @@ export async function POST(req: NextRequest) {
         } catch (e) { }
 
         async function attemptSending(isEInvoice: boolean, alias?: string) {
-            const invoiceNo = await generateInvoiceSerieAndNumber();
+            const invoiceNo = getInvoiceSeries();
             const uuid = crypto.randomUUID();
 
             const invoiceItems = Array.isArray(invoice.items) ? invoice.items : [];
