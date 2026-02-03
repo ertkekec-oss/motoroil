@@ -81,10 +81,13 @@ export async function POST(req: NextRequest) {
                 };
             });
 
-            // Tarih ve saat formatı
-            const invoiceDate = new Date(invoice.invoiceDate);
-            const issueDate = invoiceDate.toISOString().split('T')[0]; // YYYY-MM-DD
-            const issueTime = invoiceDate.toTimeString().split(' ')[0]; // HH:MM:SS
+            // Tarih ve saat formatı - TRT (UTC+3) ZORUNLU
+            // Sunucu UTC çalışsa bile Türkiye saatine göre işlem yapmalıyız
+            const now = new Date();
+            const trTime = new Date(now.getTime() + (3 * 60 * 60 * 1000));
+
+            const issueDate = trTime.toISOString().split('T')[0]; // YYYY-MM-DD
+            const issueTime = trTime.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
 
             const invoiceInfo: any = {
                 UUID: uuid,
