@@ -214,9 +214,7 @@ export async function POST(request: Request) {
                     currentAttemptIsEInvoice = true;
                 }
 
-                // TEMPORARY TEST: Force all to e-Invoice
-                currentAttemptIsEInvoice = true;
-                if (!currentAlias) currentAlias = "urn:mail:defaultpk@nilvera.com";
+
 
                 // E-ARŞİV İÇİN VKN (10 Hane) ve DUMMY TCKN ENGELİ
                 // Eğer E-Arşiv ve VKN 10 haneli VEYA '11111111111' ise (İnternet satışında kabul edilmez)
