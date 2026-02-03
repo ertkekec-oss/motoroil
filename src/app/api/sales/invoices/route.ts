@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { getSession, hasPermission } from '@/lib/auth';
 import { logActivity } from '@/lib/audit';
 import { NilveraService } from '@/lib/nilvera';
+import { NilveraInvoiceService } from '@/services/nilveraService';
 import crypto from 'crypto';
 import axios from 'axios';
 
@@ -65,384 +66,82 @@ export async function POST(request: Request) {
                 if (!invoice) return NextResponse.json({ success: false, error: 'Fatura bulunamadı' }, { status: 200 });
 
                 const settingsRecord = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
-                const rawConfig = settingsRecord?.value as any;
-                const config = rawConfig?.apiKey ? rawConfig : (rawConfig?.nilvera || {});
+                const config = (settingsRecord?.value as any) || {};
 
-                const nilvera = new NilveraService({
+                // Initialize the new professional service
+                const nilveraService = new NilveraInvoiceService({
                     apiKey: config.apiKey,
-                    baseUrl: config.apiUrl,
-                    environment: config.environment || 'test'
+                    baseUrl: config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com'
                 });
 
-                // Fetch official records from Nilvera to ensure VKN match
-                const portalInfo = await nilvera.getCompanyInfo();
-                const companyVkn = portalInfo?.TaxNumber || config.companyVkn || "1111111111";
-                const companyTitle = portalInfo?.Name || portalInfo?.Title || config.companyTitle || "Firma Ünvanı";
+                // Prepare Data for the service
+                const items = (invoice.items as any[]) || [];
+                const invoiceLines = items.map(i => ({
+                    Name: i.name || "URUN",
+                    Quantity: parseFloat(i.qty?.toString() || "0"),
+                    UnitType: "C62",
+                    Price: parseFloat(i.price?.toString() || "0"),
+                    VatRate: parseFloat(i.vat?.toString() || "20")
+                }));
 
-                let customerVkn = (invoice.customer.taxNumber || invoice.customer.identityNumber || "").trim();
+                const totalNet = invoiceLines.reduce((sum, l) => sum + (l.Quantity * l.Price), 0);
+                const totalTax = invoiceLines.reduce((sum, l) => sum + (l.Quantity * l.Price * (l.VatRate / 100)), 0);
 
-                function sanitize(text: string, removeNumbers: boolean = false) {
-                    if (!text) return "";
-                    let cleaned = text
-                        .replace(/İ/g, "I").replace(/ı/g, "i")
-                        .replace(/Ğ/g, "G").replace(/ğ/g, "g")
-                        .replace(/Ü/g, "U").replace(/ü/g, "u")
-                        .replace(/Ş/g, "S").replace(/ş/g, "s")
-                        .replace(/Ö/g, "O").replace(/ö/g, "o")
-                        .replace(/Ç/g, "C").replace(/ç/g, "c");
-
-                    if (removeNumbers) {
-                        cleaned = cleaned.replace(/[0-9]/g, "");
+                const sendResult = await nilveraService.processAndSend({
+                    customer: {
+                        TaxNumber: (invoice.customer.taxNumber || invoice.customer.identityNumber || "11111111111").trim(),
+                        Name: invoice.customer.name,
+                        Address: invoice.customer.address || "ADRES",
+                        District: invoice.customer.district || "KADIKOY",
+                        City: invoice.customer.city || "ISTANBUL",
+                        Country: "TR"
+                    },
+                    company: {
+                        TaxNumber: config.companyVkn || "1111111111",
+                        Name: config.companyTitle || "FIRMA UNVANI",
+                        Address: config.companyAddress || "ADRES",
+                        District: config.portalDistrict || "KADIKOY",
+                        City: config.portalCity || "ISTANBUL",
+                        Country: "TR"
+                    },
+                    lines: invoiceLines,
+                    amounts: {
+                        base: Number(totalNet.toFixed(2)),
+                        tax: Number(totalTax.toFixed(2)),
+                        total: Number((totalNet + totalTax).toFixed(2))
+                    },
+                    isInternetSale: (invoice.customer.taxNumber || invoice.customer.identityNumber || "").length === 11,
+                    internetInfo: {
+                        WebSite: "www.periodya.com",
+                        PaymentMethod: "KREDIKARTI",
+                        PaymentDate: new Date().toISOString().split('T')[0],
+                        TransporterName: "TEST LOJISTIK"
                     }
+                });
 
-                    return cleaned.replace(/[^a-zA-Z0-9\s]/g, "").toUpperCase().trim();
-                }
-
-                function generateStandardInvoiceNo(isEInvoice: boolean) {
-                    const prefix = isEInvoice ? "EFT" : "ARS";
-                    const year = new Date().getFullYear().toString();
-                    const seq = Math.floor(Math.random() * 999999999).toString().padStart(9, '0');
-                    return `${prefix}${year}${seq}`;
-                }
-
-                let lastPayload: any = null;
-                async function attemptSending(isEInvoice: boolean, alias?: string) {
-                    const invNo = generateStandardInvoiceNo(isEInvoice);
-                    const now = new Date();
-
-                    const items = (invoice.items as any[]) || [];
-                    let totalLineExtension = 0;
-                    let totalTaxAmount = 0;
-
-                    const invoiceLines = items.map((i, idx) => {
-                        const qty = parseFloat(i.qty?.toString() || "0");
-                        const price = parseFloat(i.price?.toString() || "0");
-                        const vatRate = parseFloat(i.vat?.toString() || "20");
-                        const lineExtension = Number((qty * price).toFixed(2));
-                        const lineVat = Number((lineExtension * (vatRate / 100)).toFixed(2));
-
-                        totalLineExtension += lineExtension;
-                        totalTaxAmount += lineVat;
-
-                        return {
-                            Index: idx + 1,
-                            Name: sanitize(i.name || "URUN").substring(0, 50),
-                            Quantity: qty,
-                            UnitType: "C62",
-                            UnitPrice: price,
-                            VatRate: vatRate,
-                            VatAmount: Number(lineVat.toFixed(2)),
-                            LineExtensionAmount: Number(lineExtension.toFixed(2))
-                        };
+                if (sendResult.success) {
+                    await (prisma as any).salesInvoice.update({
+                        where: { id: invoiceId },
+                        data: { isFormal: true, formalStatus: 'SENT', formalUuid: sendResult.data?.formalId || sendResult.data?.UUID }
                     });
-
-                    const finalNet = Number(totalLineExtension.toFixed(2));
-                    const finalTax = Number(totalTaxAmount.toFixed(2));
-                    const finalTotal = Number((finalNet + finalTax).toFixed(2));
-
-                    // ADRES VE ILCE TEMIZLIGI
-                    let compCity = sanitize(portalInfo?.City || config.portalCity || "ISTANBUL");
-                    let compDist = sanitize(portalInfo?.District || config.portalDistrict || "KADIKOY", true);
-                    if (compCity === "ISTANBUL" && (compDist === "MERKEZ" || !compDist)) compDist = "KADIKOY";
-
-                    let custCity = sanitize(invoice.customer.city || "ISTANBUL");
-                    let custDist = sanitize(invoice.customer.district || "KADIKOY", true);
-                    if (custCity === "ISTANBUL" && (custDist === "MERKEZ" || !custDist)) custDist = "KADIKOY";
-
-                    const payload: any = {
-                        InvoiceInfo: {
-                            UUID: crypto.randomUUID(),
-                            InvoiceType: "SATIS",
-                            InvoiceProfile: isEInvoice ? "TEMELFATURA" : "EARSIVFATURA",
-                            InvoiceSerieOrNumber: invNo, // 16 Hane: ARS + YIL + 9 Rakam
-                            IssueDate: now.toISOString().split('T')[0],
-                            CurrencyCode: "TRY",
-                            LineExtensionAmount: finalNet,
-                            TaxExclusiveAmount: finalNet,
-                            TaxInclusiveAmount: finalTotal,
-                            PayableAmount: finalTotal
-                        },
-                        CompanyInfo: {
-                            TaxNumber: companyVkn,
-                            Name: sanitize(companyTitle).substring(0, 100),
-                            Address: sanitize(portalInfo?.Address || config.companyAddress || "ADRES").substring(0, 200),
-                            District: compDist,
-                            City: compCity,
-                            Country: "TR"
-                        },
-                        CustomerInfo: {
-                            TaxNumber: customerVkn,
-                            Name: sanitize(invoice.customer.name).substring(0, 100),
-                            Address: sanitize(invoice.customer.address || "ADRES").substring(0, 200),
-                            District: custDist,
-                            City: custCity,
-                            Country: "TR"
-                        },
-                        InvoiceLines: invoiceLines
-                    };
-
-                    if (isEInvoice) {
-                        const finalRequest = { EInvoice: payload, CustomerAlias: alias };
-                        lastPayload = finalRequest;
-                        console.log(`Sending to Nilvera [EF]:`, JSON.stringify(finalRequest, null, 2));
-                        return await nilvera.sendInvoice(finalRequest, 'EFATURA');
-                    } else {
-                        (payload.InvoiceInfo as any).SalesPlatform = "NORMAL";
-                        (payload.InvoiceInfo as any).SendType = "ELEKTRONIK";
-                        const finalRequest = { ArchiveInvoice: payload };
-                        lastPayload = finalRequest;
-                        console.log(`Sending to Nilvera [EA]:`, JSON.stringify(finalRequest, null, 2));
-                        return await nilvera.sendInvoice(finalRequest, 'EARSIV');
-                    }
-                }
-
-                // 1. ADIM: ALİAS SORGULA VE SERİLERİ ÇEK
-
-                // KENDİNE FATURA ENGELİ (Critical Fix)
-                // Gönderici ve Alıcı VKN aynıysa (Test hatası), müşteri VKN'yi dummy TCKN yap.
-                if (companyVkn === customerVkn) {
-                    console.warn(`[SELF-INVOICE DETECTED] Sender: ${companyVkn} == Receiver: ${customerVkn}. Swapping receiver to 11111111111.`);
-                    customerVkn = "11111111111";
-                }
-
-                let userCheck = await nilvera.checkUser(customerVkn);
-                let currentAttemptIsEInvoice = userCheck.isEInvoiceUser && !!userCheck.alias;
-                let currentAlias = userCheck.alias;
-
-                if (userCheck.isEInvoiceUser && !currentAlias && config.environment === 'test') {
-                    currentAlias = "urn:mail:defaultpk@nilvera.com";
-                    currentAttemptIsEInvoice = true;
-                }
-
-
-
-                // E-ARŞİV İÇİN VKN (10 Hane) ve DUMMY TCKN ENGELİ
-                // Eğer E-Arşiv ve VKN 10 haneli VEYA '11111111111' ise (İnternet satışında kabul edilmez)
-                // Bunu geçerli Test TCKN (10000000146) ve 'Nihai Tüketici' olarak değiştir.
-                let finalCustomerName = sanitize(invoice.customer.name).substring(0, 100);
-                if (!currentAttemptIsEInvoice && (customerVkn.length === 10 || customerVkn === "11111111111")) {
-                    console.warn(`[E-ARCHIVE VKN FIX] Customer has invalid VKN/TCKN (${customerVkn}) for e-Archive Internet Sale. Swapping to 10000000146.`);
-                    customerVkn = "10000000146"; // Değişkeni güncelle (GİB Test TCKN)
-                    finalCustomerName = "Nihai Tüketici";
-                }
-
-                // SERİLERİ NILVERA'DAN CANLI ÇEK (TAHMİN ETME!)
-                let officialSeriesPrefix = currentAttemptIsEInvoice ? "EFT" : "ARS";
-                let officialSeriesResponse: any = null;
-                try {
-                    const seriesEndpoint = currentAttemptIsEInvoice ? '/EInvoice/Series' : '/EArchive/Series';
-                    const seriesRes = await (axios as any).get(`${config.apiUrl || (config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com')}${seriesEndpoint}`, {
-                        headers: { 'Authorization': `Bearer ${config.apiKey}` }
-                    });
-                    officialSeriesResponse = seriesRes.data;
-
-                    const activeSeries = officialSeriesResponse?.Content?.find((s: any) => s.IsActive && s.IsDefault) || officialSeriesResponse?.Content?.[0];
-                    if (activeSeries && activeSeries.Name) {
-                        officialSeriesPrefix = activeSeries.Name;
-                    }
-                } catch (seriesErr) {
-                    console.error("SERIES FETCH ERROR:", seriesErr);
-                }
-
-                // 2. ADIM: KUSURSUZ PAYLOAD OLUŞTURMA (422 KATİLLERİ)
-                try {
-                    const items = (invoice.items as any[]) || [];
-                    let totalLineExtension = 0;
-                    let totalTaxAmount = 0;
-
-                    const invoiceLines = items.map((i, idx) => {
-                        const qty = parseFloat(i.qty?.toString() || "0");
-                        const price = parseFloat(i.price?.toString() || "0");
-                        const vatRate = parseFloat(i.vat?.toString() || "20");
-                        const lineNet = Number((qty * price).toFixed(2));
-                        const lineVat = Number((lineNet * (vatRate / 100)).toFixed(2));
-                        totalLineExtension += lineNet;
-                        totalTaxAmount += lineVat;
-
-                        return {
-                            Index: idx + 1,
-                            Name: sanitize(i.name || "URUN").substring(0, 50),
-                            Quantity: qty,
-                            UnitType: "C62", // ADET yerine C62 (UBL Standardı)
-                            Price: price,
-                            KDVPercent: vatRate,
-                            KDVTotal: Number(lineVat.toFixed(2)),
-                            LineExtensionAmount: Number(lineNet.toFixed(2))
-                        };
-                    });
-
-                    const taxExclusiveAmount = Number(totalLineExtension.toFixed(2));
-                    const taxAmount = Number(totalTaxAmount.toFixed(2));
-                    const taxInclusiveAmount = Number((taxExclusiveAmount + taxAmount).toFixed(2));
-                    const payableAmount = taxInclusiveAmount;
-
-                    if (isNaN(taxExclusiveAmount) || isNaN(taxInclusiveAmount) || isNaN(payableAmount)) {
-                        throw new Error("Payload Hazırlık Hatası: Tutar alanları hesaplanamadı (NaN)");
-                    }
-
-                    // BUGÜNKÜ TARİH KULLAN (Geriye tarihli fatura yasak!)
-                    // SERVER TIME (UTC) YERİNE TURKEY TIME (UTC+3) KULLAN
-                    const utcNow = new Date();
-                    const now = new Date(utcNow.getTime() + (3 * 60 * 60 * 1000));
-                    const currentYear = now.getFullYear().toString();
-
-                    // ISSUE TIME İLERİ ALINMALI (PaymentDate < IssueTime kuralı için)
-                    const futureNow = new Date(now.getTime() + 10000); // 10 saniye ileri
-
-                    // TARİH FORMATI: Kullanıcı isteği üzerine tam ISO formatı (Tarih+Saat)
-                    // Örnek: "2026-02-04T10:45:03"
-                    const fullIssueDate = `${now.toISOString().split('T')[0]}T${futureNow.toISOString().split('T')[1].split('.')[0]}`;
-
-                    // PaymentDate ŞİMDİKİ ZAMAN (IssueTime'dan önce kalmalı)
-                    const paymentDateFull = `${now.toISOString().split('T')[0]}T${now.toISOString().split('T')[1].split('.')[0]}`;
-
-                    // 10B2026000000691 FORMATI İÇİN CANLI SAYAÇ HESABI
-                    let ordinal = 0;
-
-                    // SERİ SEÇİMİ: Nilvera E-Arşiv 'Default' seriyi baz alır ve sadece numara bekler.
-                    // Önce 'IsDefault' olanı buluyoruz. (Örn: 10B)
-                    const activeSeries = officialSeriesResponse?.Content?.find((s: any) => s.IsActive && s.IsDefault)
-                        || officialSeriesResponse?.Content?.find((s: any) => s.Name === (currentAttemptIsEInvoice ? "EFT" : "ARS") && s.IsActive)
-                        || officialSeriesResponse?.Content?.[0];
-
-                    if (activeSeries && activeSeries.Name) {
-                        officialSeriesPrefix = activeSeries.Name;
-                        if (activeSeries.Details) {
-                            const yearDetail = activeSeries.Details.find((d: any) => d.Year === currentYear);
-                            if (yearDetail) {
-                                ordinal = yearDetail.OrdinalNumber || 0;
-                            }
-                        }
-                    }
-
-                    // GÜVENLİK KONTROLÜ: E-Arşiv için yanlış seri (10B, EFT) seçildiyse düzelt
-                    if (!currentAttemptIsEInvoice) {
-                        // Eğer seçilen seri bilinen bir e-Fatura serisi ise veya "10B" ise
-                        const invalidPrefixes = ["10B", "EFT", "10A", "101"];
-                        if (invalidPrefixes.includes(officialSeriesPrefix)) {
-                            console.warn(`[SERIES FIX] Invalid e-Archive series detected (${officialSeriesPrefix}). Swapping to 'ARS'.`);
-                            officialSeriesPrefix = "ARS";
-                        }
-                    }
-
-                    // NILVERA OTOMATIK NUMARALAMA
-                    // Sadece seri kodunu gönder (3 hane), Nilvera otomatik numara üretir
-                    // Örnek: "101" -> Nilvera "101000000112" üretir
-                    const invNo = officialSeriesPrefix;
-
-                    const metaYesterday = new Date(now);
-                    metaYesterday.setDate(metaYesterday.getDate() - 1);
-                    const paymentDate = `${metaYesterday.getFullYear()}-${(metaYesterday.getMonth() + 1).toString().padStart(2, '0')}-${metaYesterday.getDate().toString().padStart(2, '0')}T00:00:00`;
-
-                    const basePayload: any = {
-                        InvoiceInfo: {
-                            UUID: crypto.randomUUID(),
-                            InvoiceType: "SATIS",
-                            // PROFİL SEÇİMİ: E-Fatura için TICARIFATURA, E-Arşiv için EARSIVFATURA
-                            InvoiceProfile: currentAttemptIsEInvoice ? "TICARIFATURA" : "EARSIVFATURA",
-                            // Sadece seri kodu (3 hane), Nilvera otomatik tam numara üretir
-                            // Örnek: "101" -> Nilvera "101000000112" üretir
-                            InvoiceSerieOrNumber: invNo,
-                            IssueDate: fullIssueDate,
-                            // Kullanıcı örneğinde IssueTime yok, IssueDate tam formatlı
-
-                            CurrencyCode: "TRY",
-                            LineExtensionAmount: taxExclusiveAmount,
-                            GeneralKDV20Total: taxAmount,
-                            KdvTotal: taxAmount,
-                            TaxExclusiveAmount: taxExclusiveAmount,
-                            TaxInclusiveAmount: taxInclusiveAmount,
-                            PayableAmount: payableAmount
-                            // SalesPlatform, SendType, DeliveryType alanları kaldırıldı (UBL şema hatası)
-                        },
-                        CompanyInfo: {
-                            TaxNumber: companyVkn,
-                            Name: sanitize(companyTitle).substring(0, 100),
-                            Address: sanitize(portalInfo?.Address || config.companyAddress || "ADRES").substring(0, 200),
-                            District: sanitize(portalInfo?.District || config.portalDistrict || "KADIKOY", true),
-                            City: sanitize(portalInfo?.City || config.portalCity || "ISTANBUL"),
-                            Country: "TR"
-                        },
-                        CustomerInfo: (() => {
-                            let custAddress = sanitize(invoice.customer.address || "ADRES").substring(0, 150);
-                            // GİB KURALI: İnternet satışında kargo adresi detaylı olmalı (No/Daire)
-                            if (customerVkn.length === 11 && !custAddress.match(/\bNo:\d+/i)) {
-                                custAddress += " No:1";
-                            }
-                            return {
-                                TaxNumber: customerVkn,
-                                Name: finalCustomerName,
-                                Address: custAddress,
-                                District: sanitize(invoice.customer.district || "KADIKOY", true),
-                                City: sanitize(invoice.customer.city || "ISTANBUL"),
-                                Country: "TR"
-                            };
-                        })(),
-                        InvoiceLines: invoiceLines
-                    };
-
-                    const finalPayload: any = currentAttemptIsEInvoice
-                        ? { EInvoice: basePayload, CustomerAlias: currentAlias }
-                        : {
-                            ArchiveInvoice: {
-                                ...basePayload,
-                                InvoiceInfo: {
-                                    ...basePayload.InvoiceInfo,
-                                    // KRİTİK KURAL (Tablo):
-                                    // TCKN (11 hane) -> INTERNET Satışı + InternetInfo
-                                    // VKN (10 hane) -> NORMAL Satış (InternetInfo YOK)
-                                    SalesPlatform: customerVkn.length === 11 ? "INTERNET" : "NORMAL",
-
-                                    ...(customerVkn.length === 11 ? {
-                                        InternetInfo: {
-                                            WebSite: "www.periodya.com",
-                                            PaymentMethod: "KREDIKARTI",
-                                            PaymentDate: paymentDateFull.split('T')[0], // Sadece Tarih (YYYY-MM-DD) veya full
-                                            TransporterName: "TEST LOJISTIK"
-                                        }
-                                    } : {})
-                                }
-                            }
-                        };
-
-                    lastPayload = finalPayload;
-                    const sendResult = await nilvera.sendInvoice(finalPayload, currentAttemptIsEInvoice ? 'EFATURA' : 'EARSIV');
-
-                    if (sendResult.success) {
-                        await (prisma as any).salesInvoice.update({
-                            where: { id: invoiceId },
-                            data: { isFormal: true, formalStatus: 'SENT', formalUuid: sendResult.formalId }
-                        });
-                        return NextResponse.json({
-                            success: true,
-                            message: 'Fatura başarıyla gönderildi.',
-                            formalId: sendResult.formalId,
-                            type: currentAttemptIsEInvoice ? 'EFATURA' : 'EARSIV'
-                        });
-                    }
-
                     return NextResponse.json({
-                        success: false,
-                        error: sendResult.errorCode === 422 ? "UBL Hatası: Tarih/Enum/Şema Uyuşmazlığı" : sendResult.error,
-                        errorCode: sendResult.errorCode,
-                        details: `HATA: ${sendResult.error} | PAYLOAD: ${JSON.stringify(lastPayload)} | OFFICIAL_SERIES: ${JSON.stringify(officialSeriesResponse)}`
-                    }, { status: 200 });
-
-                } catch (vErr: any) {
-                    return NextResponse.json({
-                        success: false,
-                        error: `Payload Hazırlık Hatası: ${vErr.message}`
-                    }, { status: 200 });
+                        success: true,
+                        message: 'Fatura başarıyla gönderildi.',
+                        formalId: sendResult.data?.formalId || sendResult.data?.UUID
+                    });
                 }
-            } catch (err: any) {
-                console.error('CRITICAL FORMAL SEND ERROR:', err);
+
                 return NextResponse.json({
                     success: false,
-                    error: err.message,
-                    details: 'Formal Send bloğu içinde bir hata oluştu.'
+                    error: sendResult.data?.Errors?.[0]?.Description || sendResult.error || "Fatura gönderilemedi.",
+                    details: sendResult.data
                 }, { status: 200 });
+
+            } catch (err: any) {
+                console.error('CRITICAL FORMAL SEND ERROR:', err);
+                return NextResponse.json({ success: false, error: err.message }, { status: 200 });
             }
-            return; // formalOnly ise aşağı devam etme
+            return;
         }
 
         // ORIGINAL INVOICE CREATION LOGIC
