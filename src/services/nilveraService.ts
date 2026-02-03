@@ -250,7 +250,12 @@ export class NilveraInvoiceService {
             }
 
             console.log("[NilveraService] SUCCESS:", response.data);
-            return { success: true, status: response.status, data: response.data };
+            return {
+                success: true,
+                status: response.status,
+                data: response.data,
+                type: isEInvoiceUser ? 'EFATURA' : 'EARSIV' // Hangi tipte gönderildiğini dön
+            };
         } catch (error: any) {
             console.error("[NilveraService] Exception:", error.message);
             return {

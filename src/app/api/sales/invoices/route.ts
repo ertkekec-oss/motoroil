@@ -120,14 +120,18 @@ export async function POST(request: Request) {
                 });
 
                 if (sendResult.success) {
+                    const formalId = sendResult.data?.UUID || sendResult.data?.formalId || sendResult.data?.Id;
+
                     await (prisma as any).salesInvoice.update({
                         where: { id: invoiceId },
-                        data: { isFormal: true, formalStatus: 'SENT', formalUuid: sendResult.data?.formalId || sendResult.data?.UUID }
+                        data: { isFormal: true, formalStatus: 'SENT', formalUuid: formalId }
                     });
+
                     return NextResponse.json({
                         success: true,
                         message: 'Fatura başarıyla gönderildi.',
-                        formalId: sendResult.data?.formalId || sendResult.data?.UUID
+                        formalId: formalId,
+                        type: sendResult.type // EFATURA veya EARSIV
                     });
                 }
 
