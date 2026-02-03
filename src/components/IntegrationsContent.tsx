@@ -82,7 +82,7 @@ export default function IntegrationsContent() {
         setTestResults({ ...testResults, efatura: '⏳ Bağlantı test ediliyor...' });
 
         try {
-            const res = await fetch('/api/integrations/nilvera/test', {
+            const res = await fetch('/api/sales/formal-test', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

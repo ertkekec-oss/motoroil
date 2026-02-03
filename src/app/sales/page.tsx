@@ -164,7 +164,7 @@ export default function SalesPage() {
 
         showConfirm(title, msg, async () => {
             try {
-                const res = await fetch('/api/integrations/send', {
+                const res = await fetch('/api/sales/formal-send', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
