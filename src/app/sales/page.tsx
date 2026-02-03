@@ -472,7 +472,7 @@ export default function SalesPage() {
     // Reset to page 1 when filters or TAB change
     useEffect(() => {
         setCurrentPage(1);
-    }, [statusFilter, dateFilter, customStartDate, customEndDate, activeTab]);
+    }, [statusFilter, dateFilter, customStartDate, customEndDate, activeTab, invoiceSubTab]);
 
     const paginate = (list: any[]) => {
         if (!list) return [];
@@ -1135,9 +1135,9 @@ export default function SalesPage() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {realInvoices.length === 0 ? (
+                                                {activeList.length === 0 ? (
                                                     <tr><td colSpan={6} style={{ textAlign: 'center', padding: '40px' }} className="text-muted">Fatura bulunamadı.</td></tr>
-                                                ) : paginate(realInvoices).map(inv => {
+                                                ) : paginate(activeList).map(inv => {
                                                     const isExpanded = expandedOrderId === inv.id;
                                                     return (
                                                         <Fragment key={inv.id}>
@@ -1386,9 +1386,9 @@ export default function SalesPage() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {wayslips.length === 0 ? (
+                                                {activeList.length === 0 ? (
                                                     <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px' }} className="text-muted">İrsaliye bulunamadı.</td></tr>
-                                                ) : wayslips.map((irs) => (
+                                                ) : paginate(activeList).map((irs) => (
                                                     <tr key={irs.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                                                         <td style={{ padding: '16px 12px' }}>
                                                             <div style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{irs.formalId || irs.invoiceNo || irs.id}</div>

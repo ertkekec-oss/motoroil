@@ -28,11 +28,11 @@ export async function GET() {
                 if (result.success && result.data?.Content) {
                     nilveraInvoices = result.data.Content.map((inv: any) => ({
                         id: inv.UUID,
-                        supplier: inv.SupplierName || inv.SupplierVknTckn,
-                        date: new Date(inv.IssueDate).toLocaleDateString('tr-TR'),
-                        msg: `e-Fatura: ${inv.InvoiceNumber}`,
+                        supplier: inv.SupplierName || inv.SupplierVknTckn || "Bilinmeyen Tedarikçi",
+                        date: inv.IssueDate ? new Date(inv.IssueDate).toLocaleDateString('tr-TR') : '-',
+                        msg: `e-Fatura: ${inv.InvoiceNumber || 'No Yok'}`,
                         total: Number(inv.PayableAmount || 0),
-                        status: 'Bekliyor', // Yeni gelenler için 'Bekliyor' diyebiliriz ki UI'da sarı yansın
+                        status: 'Bekliyor',
                         isFormal: true,
                         invoiceNo: inv.InvoiceNumber
                     }));

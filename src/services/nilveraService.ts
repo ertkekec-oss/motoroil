@@ -288,19 +288,25 @@ export class NilveraInvoiceService {
     async getIncomingInvoices(page: number = 1, pageSize: number = 20) {
         try {
             const now = new Date();
-            const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+            const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
 
-            const startDate = lastMonth.toISOString().split('T')[0];
+            const startDate = threeMonthsAgo.toISOString().split('T')[0];
             const endDate = now.toISOString().split('T')[0];
+
+            console.log(`[NilveraService] Fetching Incoming: url=${this.config.baseUrl}/EInvoice/Incoming, page=${page}, range=${startDate}-${endDate}`);
 
             const res = await axios.get(
                 `${this.config.baseUrl}/EInvoice/Incoming?PageIndex=${page}&PageSize=${pageSize}&StartDate=${startDate}&EndDate=${endDate}`,
                 { headers: this.getHeaders() }
             );
+
+            console.log(`[NilveraService] Received result. TotalCount=${res.data?.TotalCount || 0}, ContentSize=${res.data?.Content?.length || 0}`);
+
             return { success: true, data: res.data };
         } catch (error: any) {
-            console.error("[NilveraService] Incoming Invoices Error:", error.message);
-            return { success: false, error: error.message };
+            const detail = error.response?.data || error.message;
+            console.error("[NilveraService] Incoming Invoices Error:", detail);
+            return { success: false, error: typeof detail === 'object' ? JSON.stringify(detail) : detail };
         }
     }
 }
