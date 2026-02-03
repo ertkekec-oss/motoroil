@@ -39,6 +39,20 @@ export async function POST(req: NextRequest) {
         // 1. ADIM: Mükellef Sorgula
         let userCheck = await nilvera.checkUser(customerVkn);
 
+        let companyInfo: any = { TaxNumber: "1111111111", Name: "Firma", Address: "Adres", District: "Merkez", City: "Istanbul", Country: "Turkiye" };
+        try {
+            const info = await nilvera.getCompanyInfo();
+            if (info) {
+                companyInfo = {
+                    TaxNumber: info.TaxNumber,
+                    Name: info.Name || info.Title,
+                    Address: info.Address || "Adres",
+                    District: info.District || "Merkez",
+                    City: info.City || "Istanbul",
+                    Country: info.Country || "Turkiye"
+                };
+            }
+        } catch (e) { }
         async function attemptSending(isEInvoice: boolean, alias?: string) {
             const prefix = isEInvoice ? "EFT" : "ARS";
             const invoiceNo = generateGIBInvoiceNo(prefix);
@@ -98,11 +112,12 @@ export async function POST(req: NextRequest) {
 
             const payload = {
                 InvoiceInfo: invoiceInfo,
-                CompanyInfo: {}, // Nilvera API zaten hesaptan çeker eğer boşsa
+                CompanyInfo: companyInfo, // Artık boş değil, dolu gidiyor
                 CustomerInfo: {
                     TaxNumber: customerVkn,
                     Name: invoice.customer.name,
                     Address: invoice.customer.address || "Adres",
+                    District: invoice.customer.district || "Merkez", // Eksik olan ilçe eklendi
                     City: invoice.customer.city || "Istanbul",
                     Country: "Turkiye"
                 },
