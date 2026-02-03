@@ -36,7 +36,6 @@ export async function POST(req: NextRequest) {
 
         const customerVkn = (invoice.customer.taxNumber || invoice.customer.identityNumber || "").trim();
 
-        // 1. ADIM: Kendi Firma Bilgilerini Çek (Her iki deneme için de lazım)
         let companyInfo: any = { TaxNumber: "1111111111", Name: "Firma", Address: "Adres", District: "Merkez", City: "Istanbul", Country: "Turkiye" };
         try {
             const info = await nilvera.getCompanyInfo();
@@ -52,7 +51,6 @@ export async function POST(req: NextRequest) {
             }
         } catch (e) { }
 
-        // Gönderme Fonksiyonu (Scope içindeki değişkenleri kullanır)
         async function attemptSending(isEInvoice: boolean, alias?: string) {
             const prefix = isEInvoice ? "EFT" : "ARS";
             const invoiceNo = generateGIBInvoiceNo(prefix);
@@ -125,28 +123,33 @@ export async function POST(req: NextRequest) {
                 Notes: [invoice.description || "Fatura"]
             };
 
-            const typeKey = isEInvoice ? 'EFATURA' : 'EARSIV';
-            const finalWrapper = isEInvoice
-                ? { EInvoice: payload, CustomerAlias: alias || null }
-                : { ArchiveInvoice: payload };
-
-            return await nilvera.sendInvoice(finalWrapper, typeKey);
+            // ALTIN KURAL: E-Fatura ise CustomerAlias ŞART, E-Arşiv ise YASAK!
+            if (isEInvoice) {
+                return await nilvera.sendInvoice({ EInvoice: payload, CustomerAlias: alias }, 'EFATURA');
+            } else {
+                return await nilvera.sendInvoice({ ArchiveInvoice: payload }, 'EARSIV');
+            }
         }
 
-        // 2. ADIM: Mükellef Sorgula ve İlk Deneme
+        // Mükellef sorgula
         let userCheck = await nilvera.checkUser(customerVkn);
+
+        // İlk Deneme
         let result = await attemptSending(userCheck.isEInvoiceUser, userCheck.alias);
 
-        // 3. ADIM: Eğer 422 Hatası Alırsak (Mükellef Tipi Yanlışsa) TERSİNE ZORLA
+        // 422 Mükellef Tipi Hatası Aldıysak Tersi İçin Zorla
         if (!result.success && result.errorCode === 422) {
-            console.log("Mükellef tipi uyuşmazlığı (422), tersi deneniyor...");
             let forcedIsEInvoice = !userCheck.isEInvoiceUser;
             let forcedAlias = userCheck.alias;
 
-            // Eğer e-Faturaya zorlanıyorsak ve Alias yoksa, tekrar bulmayı dene
+            // E-Faturaya dönüyorsak etiketi tekrar bulmaya çalış
             if (forcedIsEInvoice && !forcedAlias) {
-                const retryCheck = await nilvera.checkUser(customerVkn);
-                forcedAlias = retryCheck.alias || "defaultpk"; // Son çare yaygın alias
+                const retry = await nilvera.checkUser(customerVkn);
+                forcedAlias = retry.alias;
+            }
+
+            if (forcedIsEInvoice && !forcedAlias) {
+                return NextResponse.json({ success: false, error: 'Müşteri e-Fatura mükellefi ancak sisteme kayıtlı bir etiketi (Alias) bulunamadı.' }, { status: 400 });
             }
 
             result = await attemptSending(forcedIsEInvoice, forcedAlias);
@@ -159,11 +162,7 @@ export async function POST(req: NextRequest) {
             });
             return NextResponse.json({ success: true, message: 'Başarıyla gönderildi.' });
         } else {
-            // Hata Alias kaynaklıysa kullanıcıya daha net bilgi verelim
-            let errorMsg = result.error || "Bilinmeyen Hata";
-            if (errorMsg.includes("CustomerAlias")) errorMsg = "Müşterinin e-Fatura etiket bilgisi (Alias) bulunamadı veya geçersiz.";
-
-            return NextResponse.json({ success: false, error: errorMsg }, { status: 400 });
+            return NextResponse.json({ success: false, error: result.error || 'Fatura gönderilemedi.' }, { status: 400 });
         }
 
     } catch (error: any) {

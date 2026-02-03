@@ -41,26 +41,31 @@ export class NilveraService {
             });
 
             const data = response.data;
-            console.log(`Nilvera CheckUser (${cleanVkn}) Response:`, JSON.stringify(data));
-
             let isEInvoiceUser = false;
             let alias = '';
 
-            // Nilvera yanıt yapısı array veya tekil obje olabilir
+            // Nilvera yanıtı array ise (En yaygın durum)
             if (Array.isArray(data) && data.length > 0) {
                 isEInvoiceUser = true;
-                // 'gib.gov.tr' içeren alias varsa önceliklendir
-                const gibAlias = data.find((item: any) => item.Alias && item.Alias.toLowerCase().includes('gib.gov.tr'));
-                alias = gibAlias ? gibAlias.Alias : data[0].Alias;
-            } else if (data && (data.IsEInvoiceUser === true || data.Alias || (Array.isArray(data.Aliases) && data.Aliases.length > 0))) {
+                // ÖNCELİK 1: İçinde 'pk' ve 'gib.gov.tr' geçen Posta Kutusu etiketi
+                const bestPk = data.find((item: any) =>
+                    item.Alias &&
+                    item.Alias.toLowerCase().includes('pk') &&
+                    item.Alias.toLowerCase().includes('gib.gov.tr')
+                );
+                // ÖNCELİK 2: Herhangi bir 'pk' etiketi
+                const secondaryPk = data.find((item: any) => item.Alias && item.Alias.toLowerCase().includes('pk'));
+
+                alias = bestPk?.Alias || secondaryPk?.Alias || data[0].Alias;
+            }
+            // Yanıt tekil obje ise
+            else if (data && data.IsEInvoiceUser) {
                 isEInvoiceUser = true;
-                alias = data.Alias || (data.Aliases && data.Aliases[0]) || '';
+                alias = data.Alias || (Array.isArray(data.Aliases) ? data.Aliases[0] : '');
             }
 
             return { isEInvoiceUser, alias };
-        } catch (error: any) {
-            console.error(`Nilvera CheckUser (${cleanVkn}) Error:`, error.response?.data || error.message);
-            // Hata 404 ise genellikle e-fatura kullanıcısı değildir
+        } catch (error) {
             return { isEInvoiceUser: false };
         }
     }
@@ -86,33 +91,19 @@ export class NilveraService {
 
             if (response.status >= 400) {
                 const errorData = response.data;
-                let msg = 'Geçersiz İstek';
-
+                let msg = 'İşlem Başarısız';
                 if (errorData) {
                     if (typeof errorData === 'string') msg = errorData;
-                    else if (errorData.Errors) {
-                        msg = Array.isArray(errorData.Errors)
-                            ? errorData.Errors.map((e: any) => e.Description || e.Message || JSON.stringify(e)).join(' | ')
-                            : JSON.stringify(errorData.Errors);
-                    } else if (errorData.ModelState) {
-                        msg = Object.values(errorData.ModelState).flat().join(' | ');
-                    } else if (errorData.Message) msg = errorData.Message;
+                    else if (errorData.Errors) msg = Array.isArray(errorData.Errors) ? errorData.Errors.map((e: any) => e.Description || e.Message || JSON.stringify(e)).join(' | ') : JSON.stringify(errorData.Errors);
+                    else if (errorData.Message) msg = errorData.Message;
+                    else if (errorData.ModelState) msg = Object.values(errorData.ModelState).flat().join(' | ');
                 }
-
-                return {
-                    success: false,
-                    error: msg,
-                    errorCode: response.status
-                };
+                return { success: false, error: msg, errorCode: response.status };
             }
 
             const result = Array.isArray(response.data) ? response.data[0] : response.data;
             if (result && (result.UUID || result.InvoiceNumber || result.Id)) {
-                return {
-                    success: true,
-                    formalId: result.InvoiceNumber || result.UUID || result.Id,
-                    resultMsg: 'Başarılı'
-                };
+                return { success: true, formalId: result.InvoiceNumber || result.UUID || result.Id };
             }
             return { success: false, error: 'Nilvera geçersiz yanıt döndürdü.' };
         } catch (error: any) {
