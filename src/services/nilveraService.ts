@@ -160,8 +160,8 @@ export class NilveraInvoiceService {
 
         const invoiceInfo: any = {
             UUID: crypto.randomUUID(),
-            InvoiceType: "SATIS",
-            InvoiceProfile: isEInvoiceUser ? "TICARIFATURA" : "EARSIVFATURA",
+            InvoiceType: 0, // SATIS (Doküman: Sayısal 0 olmalı)
+            InvoiceProfile: isEInvoiceUser ? 2 : 5, // 2: TICARIFATURA, 5: EARSIVFATURA
             InvoiceSerieOrNumber: series,
             IssueDate: issueDate,
             CurrencyCode: "TRY",
@@ -184,7 +184,7 @@ export class NilveraInvoiceService {
         }
 
         const payload = isEInvoiceUser
-            ? { EInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines }, CustomerAlias: alias }
+            ? { EInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines }, CustomerAlias: alias.toString() }
             : { ArchiveInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines } };
 
         const endpoint = isEInvoiceUser ? '/EInvoice/Send/Model' : '/EArchive/Send/Model';
@@ -196,19 +196,31 @@ export class NilveraInvoiceService {
             });
 
             if (response.status >= 400) {
-                // Akıllı Hata Mesajı Çıkarma
+                // Akıllı Hata Mesajı Çıkarma (Object Object engelleyici)
                 let errMsg = "Nilvera API Hatası";
                 const d = response.data;
-                if (d?.Errors && Array.isArray(d.Errors)) errMsg = d.Errors.map((e: any) => e.Description).join(" | ");
-                else if (d?.Message) errMsg = d.Message;
-                else if (typeof d === 'string') errMsg = d;
 
-                return { success: false, status: response.status, error: errMsg, data: d };
+                if (d?.Errors && Array.isArray(d.Errors)) {
+                    errMsg = d.Errors.map((e: any) => `[${e.Code}] ${e.Description}`).join(" | ");
+                } else if (d?.Message) {
+                    errMsg = d.Message;
+                } else if (d?.ModelState) {
+                    errMsg = Object.values(d.ModelState).flat().join(" | ");
+                } else if (typeof d === 'object') {
+                    errMsg = JSON.stringify(d);
+                } else {
+                    errMsg = String(d);
+                }
+
+                return { success: false, status: response.status, error: errMsg, data: d, payload };
             }
 
             return { success: true, status: response.status, data: response.data };
         } catch (error: any) {
-            return { success: false, error: error.message };
+            return {
+                success: false,
+                error: error.response?.data ? JSON.stringify(error.response.data) : error.message
+            };
         }
     }
 }
