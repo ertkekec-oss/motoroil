@@ -179,22 +179,28 @@ export class NilveraInvoiceService {
         if (!isEInvoiceUser) {
             invoiceInfo.GeneralKDV20Total = Number(params.amounts.tax.toFixed(2));
             invoiceInfo.KdvTotal = Number(params.amounts.tax.toFixed(2));
-
-            // E-ARSIV OZEL ZORUNLU ALANLAR (Sayısal Enum ve Boolean)
-            invoiceInfo.SalesPlatform = params.isInternetSale ? 1 : 0; // 0: NORMAL, 1: INTERNET
-            invoiceInfo.SendType = 2; // 2: ELEKTRONIK (Nullable hatasını çözer)
             invoiceInfo.ISDespatch = true; // İrsaliye yerine geçer ibaresi
 
-            if (params.isInternetSale && params.internetInfo) {
+            if (params.isInternetSale) {
+                // E-ARSIV Ozel: INTERNET SATISI
+                invoiceInfo.SalesPlatform = 1; // 1: INTERNET
+                invoiceInfo.SendType = 2;      // 2: ELEKTRONIK
+
                 const internetData = {
-                    WebSite: params.internetInfo.WebSite,
-                    PaymentMethod: params.internetInfo.PaymentMethod,
-                    PaymentDate: params.internetInfo.PaymentDate || issueDate.split('T')[0],
-                    TransporterName: params.internetInfo.TransporterName || "TEST KARGO",
-                    TransporterVknTckn: "11111111111"
+                    WebSite: params.internetInfo?.WebSite || "www.kech.tr",
+                    PaymentMethod: "KREDIKARTI/BANKAKARTI", // Nilvera'nın beklediği tam format
+                    PaymentDate: params.internetInfo?.PaymentDate || issueDate.split('T')[0],
+                    TransporterName: params.internetInfo?.TransporterName || "ARAS KARGO",
+                    TransporterRegisterNumber: "11111111111", // Zorunlu: Kargo VKN/TCKN
+                    TransportDate: issueDate // Zorunlu: Taşıma Tarihi (Fatura tarihi ile aynı)
                 };
                 invoiceInfo.InternetInfo = internetData;
                 invoiceInfo.InternetSalesInformation = internetData;
+            } else {
+                // E-ARSIV Ozel: MAGAZA SATISI (En Güvenli Yol)
+                invoiceInfo.SalesPlatform = 0; // 0: NORMAL (Kargo kontrolünü kapatır)
+                invoiceInfo.SendType = 1;      // 1: KAGIT (Veya 2: ELEKTRONIK olabilir)
+                // InternetInfo nesnesi tamamen OMIT ediliyor (Hata almayı engeller)
             }
         }
 

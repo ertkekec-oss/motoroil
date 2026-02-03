@@ -114,12 +114,12 @@ export async function POST(request: Request) {
                         tax: Number(totalTax.toFixed(2)),
                         total: Number((totalNet + totalTax).toFixed(2))
                     },
-                    isInternetSale: (invoice.customer.taxNumber || invoice.customer.identityNumber || "").length === 11,
+                    isInternetSale: false, // Varsayılan olarak mağaza satışı (Hataları önlemek için)
                     internetInfo: {
-                        WebSite: "www.periodya.com",
-                        PaymentMethod: "KREDIKARTI",
+                        WebSite: "www.kech.tr",
+                        PaymentMethod: "KREDIKARTI/BANKAKARTI",
                         PaymentDate: new Date().toISOString().split('T')[0],
-                        TransporterName: "TEST LOJISTIK"
+                        TransporterName: "ARAS KARGO"
                     }
                 });
 
