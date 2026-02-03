@@ -318,9 +318,10 @@ export async function POST(request: Request) {
                     }
 
                     // SAYAÇ SENKRONİZASYONU
-                    // HER İKİ TİP İÇİN DE: SERİ(3) + YIL(4) + SAYAÇ(9) = 16 HANE
+                    // DOĞRU FORMAT: SERİ(3) + SAYAÇ(9) = 12 HANE (YIL YOK!)
+                    // Örnek: 101000000112
                     const nextNumberPadded = (ordinal + 1).toString().padStart(9, '0');
-                    const invNo = `${officialSeriesPrefix}${currentYear}${nextNumberPadded}`;
+                    const invNo = `${officialSeriesPrefix}${nextNumberPadded}`;
 
                     const metaYesterday = new Date(now);
                     metaYesterday.setDate(metaYesterday.getDate() - 1);
@@ -333,8 +334,8 @@ export async function POST(request: Request) {
                             // PROFİL SEÇİMİ: E-Fatura için TICARIFATURA, E-Arşiv için EARSIVFATURA
                             InvoiceProfile: currentAttemptIsEInvoice ? "TICARIFATURA" : "EARSIVFATURA",
                             ProfileID: "TR1.2", // GİB UBL 2.1 Standardı
-                            // HER İKİ TİP İÇİN DE: InvoiceSerieOrNumber (16 karakter)
-                            // Format: SERİ(3) + YIL(4) + SIRA(9) = 16 karakter
+                            // DOĞRU FORMAT: SERİ(3) + SIRA(9) = 12 karakter (YIL YOK!)
+                            // Örnek: 101000000112
                             InvoiceSerieOrNumber: invNo,
                             IssueDate: issueDateOnly,
                             // E-Fatura veya İnternet Satışı (PaymentDate içeriyor) -> Zorunlu
