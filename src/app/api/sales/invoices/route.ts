@@ -283,18 +283,20 @@ export async function POST(request: Request) {
                     }
 
                     // BUGÜNKÜ TARİH KULLAN (Geriye tarihli fatura yasak!)
-                    const now = new Date();
+                    // SERVER TIME (UTC) YERİNE TURKEY TIME (UTC+3) KULLAN
+                    const utcNow = new Date();
+                    const now = new Date(utcNow.getTime() + (3 * 60 * 60 * 1000));
                     const currentYear = now.getFullYear().toString();
 
                     // ISSUE TIME İLERİ ALINMALI (PaymentDate < IssueTime kuralı için)
                     const futureNow = new Date(now.getTime() + 10000); // 10 saniye ileri
 
                     // TARİH FORMATI: Nilvera UBL için Date ve Time AYRI olmalı
-                    const issueDateOnly = `${currentYear}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
-                    const issueTimeOnly = `${futureNow.getHours().toString().padStart(2, '0')}:${futureNow.getMinutes().toString().padStart(2, '0')}:${futureNow.getSeconds().toString().padStart(2, '0')}`;
+                    const issueDateOnly = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+                    const issueTimeOnly = futureNow.toISOString().split('T')[1].split('.')[0]; // Format: HH:MM:SS
 
                     // PaymentDate ŞİMDİKİ ZAMAN (IssueTime'dan önce kalmalı)
-                    const paymentDateFull = `${issueDateOnly}T${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+                    const paymentDateFull = `${issueDateOnly}T${now.toISOString().split('T')[1].split('.')[0]}`;
 
                     // 10B2026000000691 FORMATI İÇİN CANLI SAYAÇ HESABI
                     let ordinal = 0;
