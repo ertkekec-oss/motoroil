@@ -36,16 +36,14 @@ export async function POST(req: NextRequest) {
 
         const customerVkn = (invoice.customer.taxNumber || invoice.customer.identityNumber || "").trim();
 
-        // 1. ADIM: Mükellef Sorgula
-        let userCheck = await nilvera.checkUser(customerVkn);
-
+        // 1. ADIM: Kendi Firma Bilgilerini Çek (Her iki deneme için de lazım)
         let companyInfo: any = { TaxNumber: "1111111111", Name: "Firma", Address: "Adres", District: "Merkez", City: "Istanbul", Country: "Turkiye" };
         try {
             const info = await nilvera.getCompanyInfo();
             if (info) {
                 companyInfo = {
                     TaxNumber: info.TaxNumber,
-                    Name: info.Name || info.Title,
+                    Name: info.Name || info.Title || "Firma",
                     Address: info.Address || "Adres",
                     District: info.District || "Merkez",
                     City: info.City || "Istanbul",
@@ -53,6 +51,8 @@ export async function POST(req: NextRequest) {
                 };
             }
         } catch (e) { }
+
+        // Gönderme Fonksiyonu (Scope içindeki değişkenleri kullanır)
         async function attemptSending(isEInvoice: boolean, alias?: string) {
             const prefix = isEInvoice ? "EFT" : "ARS";
             const invoiceNo = generateGIBInvoiceNo(prefix);
@@ -112,12 +112,12 @@ export async function POST(req: NextRequest) {
 
             const payload = {
                 InvoiceInfo: invoiceInfo,
-                CompanyInfo: companyInfo, // Artık boş değil, dolu gidiyor
+                CompanyInfo: companyInfo,
                 CustomerInfo: {
                     TaxNumber: customerVkn,
                     Name: invoice.customer.name,
                     Address: invoice.customer.address || "Adres",
-                    District: invoice.customer.district || "Merkez", // Eksik olan ilçe eklendi
+                    District: invoice.customer.district || "Merkez",
                     City: invoice.customer.city || "Istanbul",
                     Country: "Turkiye"
                 },
@@ -133,13 +133,23 @@ export async function POST(req: NextRequest) {
             return await nilvera.sendInvoice(finalWrapper, typeKey);
         }
 
-        // 2. ADIM: İlk Deneme
+        // 2. ADIM: Mükellef Sorgula ve İlk Deneme
+        let userCheck = await nilvera.checkUser(customerVkn);
         let result = await attemptSending(userCheck.isEInvoiceUser, userCheck.alias);
 
-        // 3. ADIM: Eğer 422 Hatası Alırsak (Mükellef Tipi Yanlışsa) Tersini Dene
+        // 3. ADIM: Eğer 422 Hatası Alırsak (Mükellef Tipi Yanlışsa) TERSİNE ZORLA
         if (!result.success && result.errorCode === 422) {
             console.log("Mükellef tipi uyuşmazlığı (422), tersi deneniyor...");
-            result = await attemptSending(!userCheck.isEInvoiceUser, userCheck.alias);
+            let forcedIsEInvoice = !userCheck.isEInvoiceUser;
+            let forcedAlias = userCheck.alias;
+
+            // Eğer e-Faturaya zorlanıyorsak ve Alias yoksa, tekrar bulmayı dene
+            if (forcedIsEInvoice && !forcedAlias) {
+                const retryCheck = await nilvera.checkUser(customerVkn);
+                forcedAlias = retryCheck.alias || "defaultpk"; // Son çare yaygın alias
+            }
+
+            result = await attemptSending(forcedIsEInvoice, forcedAlias);
         }
 
         if (result.success) {
@@ -149,7 +159,11 @@ export async function POST(req: NextRequest) {
             });
             return NextResponse.json({ success: true, message: 'Başarıyla gönderildi.' });
         } else {
-            return NextResponse.json({ success: false, error: result.error }, { status: 400 });
+            // Hata Alias kaynaklıysa kullanıcıya daha net bilgi verelim
+            let errorMsg = result.error || "Bilinmeyen Hata";
+            if (errorMsg.includes("CustomerAlias")) errorMsg = "Müşterinin e-Fatura etiket bilgisi (Alias) bulunamadı veya geçersiz.";
+
+            return NextResponse.json({ success: false, error: errorMsg }, { status: 400 });
         }
 
     } catch (error: any) {
