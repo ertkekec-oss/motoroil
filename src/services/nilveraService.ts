@@ -177,10 +177,13 @@ export class NilveraInvoiceService {
         }
 
         if (!isEInvoiceUser) {
-            invoiceInfo.GeneralKDV20Total = params.amounts.tax;
-            invoiceInfo.KdvTotal = params.amounts.tax;
-            invoiceInfo.SalesPlatform = params.isInternetSale ? "INTERNET" : "NORMAL";
-            invoiceInfo.SendMethod = 0; // 0: Elektronik, 1: Kağıt (e-Arşiv için önemli)
+            invoiceInfo.GeneralKDV20Total = Number(params.amounts.tax.toFixed(2));
+            invoiceInfo.KdvTotal = Number(params.amounts.tax.toFixed(2));
+
+            // E-ARSIV OZEL ZORUNLU ALANLAR (Sayısal Enum ve Boolean)
+            invoiceInfo.SalesPlatform = params.isInternetSale ? 1 : 0; // 0: NORMAL, 1: INTERNET
+            invoiceInfo.SendType = 2; // 2: ELEKTRONIK (Nullable hatasını çözer)
+            invoiceInfo.ISDespatch = true; // İrsaliye yerine geçer ibaresi
 
             if (params.isInternetSale && params.internetInfo) {
                 const internetData = {
@@ -188,10 +191,10 @@ export class NilveraInvoiceService {
                     PaymentMethod: params.internetInfo.PaymentMethod,
                     PaymentDate: params.internetInfo.PaymentDate || issueDate.split('T')[0],
                     TransporterName: params.internetInfo.TransporterName || "TEST KARGO",
-                    TransporterVknTckn: "11111111111" // Dummy VKN for transporter
+                    TransporterVknTckn: "11111111111"
                 };
                 invoiceInfo.InternetInfo = internetData;
-                invoiceInfo.InternetSalesInformation = internetData; // Redundant field
+                invoiceInfo.InternetSalesInformation = internetData;
             }
         }
 
