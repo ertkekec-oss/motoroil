@@ -389,25 +389,18 @@ export async function POST(request: Request) {
                                 InvoiceInfo: {
                                     ...basePayload.InvoiceInfo,
                                     // KRİTİK KURAL (Tablo):
-                                    // TCKN (11 hane) -> INTERNET Satışı + InternetSaleInfo
-                                    // VKN (10 hane) -> NORMAL Satış (InternetSaleInfo YOK)
-                                    // 500 HATASI DEBUG İÇİN GEÇİCİ OLARAK HEP "NORMAL"
-                                    SalesPlatform: "NORMAL",
-
-                                    /* INTERNET SATIŞI GEÇİCİ OLARAK KAPALI
+                                    // TCKN (11 hane) -> INTERNET Satışı + InternetInfo
+                                    // VKN (10 hane) -> NORMAL Satış (InternetInfo YOK)
                                     SalesPlatform: customerVkn.length === 11 ? "INTERNET" : "NORMAL",
-    
+
                                     ...(customerVkn.length === 11 ? {
-                                        InternetSaleInfo: {
-                                            Website: "www.periodya.com",
-                                            PaymentType: "KREDIKARTI",
-                                            PaymentDate: paymentDateFull, // Full DateTime (YYYY-MM-DDTHH:mm:ss)
-                                            // Nilvera'nın BEKLEDİĞİ doğru alan adları:
-                                            CargoCompany: "TEST LOJISTIK",   // "YOK" kabul edilmez
-                                            CargoTrackingNumber: "1234567890" // "YOK" kabul edilmez
+                                        InternetInfo: {
+                                            WebSite: "www.periodya.com",
+                                            PaymentMethod: "KREDIKARTI",
+                                            PaymentDate: paymentDateFull.split('T')[0], // Sadece Tarih (YYYY-MM-DD) veya full
+                                            TransporterName: "TEST LOJISTIK"
                                         }
                                     } : {})
-                                    */
                                 }
                             }
                         };
