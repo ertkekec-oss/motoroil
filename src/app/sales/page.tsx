@@ -480,7 +480,12 @@ export default function SalesPage() {
     };
 
     // Derived states for current view
-    const activeList = activeTab === 'online' ? filteredOnlineOrders : (activeTab === 'store' ? storeOrders : realInvoices);
+    const activeList = activeTab === 'online'
+        ? filteredOnlineOrders
+        : (activeTab === 'store'
+            ? storeOrders
+            : (invoiceSubTab === 'sales' ? realInvoices : (invoiceSubTab === 'incoming' ? purchaseInvoices : wayslips)));
+
     const totalPages = Math.ceil((activeList?.length || 0) / ordersPerPage);
 
     // For online tab compatibility (keeping variable name if used elsewhere, or just using paginate())
@@ -1317,9 +1322,9 @@ export default function SalesPage() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {purchaseInvoices.length === 0 ? (
+                                                {activeList.length === 0 ? (
                                                     <tr><td colSpan={5} style={{ textAlign: 'center', padding: '40px' }} className="text-muted">Gelen fatura bulunamadı.</td></tr>
-                                                ) : paginate(purchaseInvoices).map((inv, idx) => (
+                                                ) : paginate(activeList).map((inv, idx) => (
                                                     <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                                                         <td style={{ padding: '16px 12px' }}>
                                                             <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{inv.supplier}</div>

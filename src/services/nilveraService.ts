@@ -287,8 +287,14 @@ export class NilveraInvoiceService {
     }
     async getIncomingInvoices(page: number = 1, pageSize: number = 20) {
         try {
+            const now = new Date();
+            const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+
+            const startDate = lastMonth.toISOString().split('T')[0];
+            const endDate = now.toISOString().split('T')[0];
+
             const res = await axios.get(
-                `${this.config.baseUrl}/EInvoice/Incoming?PageIndex=${page}\u0026PageSize=${pageSize}`,
+                `${this.config.baseUrl}/EInvoice/Incoming?PageIndex=${page}&PageSize=${pageSize}&StartDate=${startDate}&EndDate=${endDate}`,
                 { headers: this.getHeaders() }
             );
             return { success: true, data: res.data };
