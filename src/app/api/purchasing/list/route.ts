@@ -1,33 +1,68 @@
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { NilveraInvoiceService } from '@/services/nilveraService';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const invoices = await prisma.purchaseInvoice.findMany({
-            include: {
-                supplier: true
-            },
-            orderBy: {
-                invoiceDate: 'desc'
-            }
+        // 1. Get Local Invoices
+        const localInvoices = await prisma.purchaseInvoice.findMany({
+            include: { supplier: true },
+            orderBy: { invoiceDate: 'desc' }
         });
 
-        // Map to UI format
-        const formatted = invoices.map(inv => ({
-            id: inv.invoiceNo,
+        // 2. Try to fetch from Nilvera
+        let nilveraInvoices: any[] = [];
+        try {
+            const settingsRecord = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
+            const config = (settingsRecord?.value as any) || {};
+
+            if (config.apiKey) {
+                const nilvera = new NilveraInvoiceService({
+                    apiKey: config.apiKey,
+                    baseUrl: config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com'
+                });
+
+                const result = await nilvera.getIncomingInvoices();
+                if (result.success && result.data?.Content) {
+                    nilveraInvoices = result.data.Content.map((inv: any) => ({
+                        id: inv.UUID,
+                        supplier: inv.SupplierName || inv.SupplierVknTckn,
+                        date: new Date(inv.IssueDate).toLocaleDateString('tr-TR'),
+                        msg: `e-Fatura: ${inv.InvoiceNumber}`,
+                        total: Number(inv.PayableAmount || 0),
+                        status: 'Bekliyor', // Yeni gelenler için 'Bekliyor' diyebiliriz ki UI'da sarı yansın
+                        isFormal: true,
+                        invoiceNo: inv.InvoiceNumber
+                    }));
+                }
+            }
+        } catch (nilErr) {
+            console.error("[PurchasingList] Nilvera fetch failed:", nilErr);
+        }
+
+        // Map local to UI format
+        const formattedLocal = localInvoices.map(inv => ({
+            id: inv.id,
+            invoiceNo: inv.invoiceNo,
             supplier: inv.supplier.name,
             date: inv.invoiceDate.toLocaleDateString('tr-TR'),
             msg: inv.description || `${(inv.items as any[])?.length || 0} Kalem Ürün Girişi`,
-            total: inv.totalAmount,
+            total: Number(inv.totalAmount),
             status: inv.status === 'Bekliyor' ? 'Bekliyor' : 'Onaylandı',
-            target: 'Merkez Depo' // Simplification
+            isFormal: false
         }));
 
-        return NextResponse.json({ success: true, invoices: formatted });
+        // Combined results
+        const combined = [...nilveraInvoices, ...formattedLocal].sort((a, b) => {
+            // Sort by date equivalent if possible, otherwise keep order
+            return 0; // Simplified for now
+        });
+
+        return NextResponse.json({ success: true, invoices: combined });
     } catch (error: any) {
+        console.error("[PurchasingList] Error:", error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
