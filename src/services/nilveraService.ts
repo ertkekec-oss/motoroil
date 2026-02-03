@@ -135,11 +135,11 @@ export class NilveraInvoiceService {
         const trNow = new Date(new Date().getTime() + (3 * 60 * 60 * 1000));
         const issueDate = trNow.toISOString().split('.')[0]; // YYYY-MM-DDTHH:mm:ss formatını garanti eder
 
-        const isTotalExempt = params.amounts.tax === 0;
+        const anyLineExempt = params.lines.some(l => l.VatRate === 0);
 
         const invoiceInfo: any = {
             UUID: crypto.randomUUID(),
-            InvoiceType: 0, // SATIS
+            InvoiceType: anyLineExempt ? 2 : 0, // 2: ISTISNA, 0: SATIS
             InvoiceProfile: isEInvoiceUser ? 2 : 5,
             InvoiceSerieOrNumber: series,
             IssueDate: issueDate,
@@ -150,13 +150,19 @@ export class NilveraInvoiceService {
             PayableAmount: params.amounts.total
         };
 
-        // Eğer fatura toplamı vergisiz ise başlık seviyesinde de istisna belirtilmeli
-        if (isTotalExempt) {
+        // Eğer fatura istisna içeriyorsa, dokümana göre TaxExemptionReasonInfo objesi içine konmalı
+        if (anyLineExempt) {
+            invoiceInfo.TaxExemptionReasonInfo = {
+                KDVExemptionReasonCode: "351", // İstisna Olmayan Diğer
+                KDVExemptionReason: "Diger"
+            };
+
+            // Redundant Fields (Bazı versiyonlar için doğrudan header'da da dursun)
             if (isEInvoiceUser) {
-                invoiceInfo.TaxExemptionReasonCode = "350";
+                invoiceInfo.TaxExemptionReasonCode = "351";
                 invoiceInfo.TaxExemptionReason = "Diger";
             } else {
-                invoiceInfo.KDVExemptionReasonCode = "350";
+                invoiceInfo.KDVExemptionReasonCode = "351";
                 invoiceInfo.KDVExemptionReason = "Diger";
             }
         }
