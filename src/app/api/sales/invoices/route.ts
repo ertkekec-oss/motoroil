@@ -131,15 +131,23 @@ export async function POST(request: Request) {
                     });
                 }
 
+                // Hata mesajını frontend için sterilize et ([object Object] engelleyici)
+                const errorDetail = sendResult.error || "Bilinmeyen API Hatası";
+                const technicalDetails = typeof sendResult.data === 'object' ? JSON.stringify(sendResult.data) : String(sendResult.data);
+
                 return NextResponse.json({
                     success: false,
-                    error: sendResult.data?.Errors?.[0]?.Description || sendResult.error || "Fatura gönderilemedi.",
-                    details: sendResult.data
+                    error: errorDetail,
+                    details: technicalDetails
                 }, { status: 200 });
 
             } catch (err: any) {
                 console.error('CRITICAL FORMAL SEND ERROR:', err);
-                return NextResponse.json({ success: false, error: err.message }, { status: 200 });
+                return NextResponse.json({
+                    success: false,
+                    error: "Sistemsel Hata",
+                    details: err.message
+                }, { status: 200 });
             }
             return;
         }

@@ -131,9 +131,9 @@ export class NilveraInvoiceService {
         // 2. Doğru seriyi çek
         const series = await this.getDefaultSeries(type);
 
-        // 3. Tarih ve Diğer Hazırlıklar...
+        // 3. Tarih ve Diğer Hazırlıklar (Milisaniye ve 'Z' karakterinden tamamen arındırılmış)
         const trNow = new Date(new Date().getTime() + (3 * 60 * 60 * 1000));
-        const issueDate = trNow.toISOString().split('.')[0];
+        const issueDate = trNow.toISOString().split('.')[0]; // YYYY-MM-DDTHH:mm:ss formatını garanti eder
 
         // 4. Model Normalizasyonu
         const invoiceLines = params.lines.map((line, idx) => {
