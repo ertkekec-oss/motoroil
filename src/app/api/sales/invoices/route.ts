@@ -95,7 +95,8 @@ export async function POST(request: Request) {
                         Address: invoice.customer.address || "ADRES",
                         District: invoice.customer.district || "KADIKOY",
                         City: invoice.customer.city || "ISTANBUL",
-                        Country: "TR"
+                        Country: "TR",
+                        TaxOffice: invoice.customer.taxOffice || "KADIKOY"
                     },
                     company: {
                         TaxNumber: config.companyVkn || "1111111111",
@@ -104,7 +105,8 @@ export async function POST(request: Request) {
                         Address: config.companyAddress || "ADRES",
                         District: config.portalDistrict || "KADIKOY",
                         City: config.portalCity || "ISTANBUL",
-                        Country: "TR"
+                        Country: "TR",
+                        TaxOffice: config.portalTaxOffice || "KADIKOY"
                     },
                     lines: invoiceLines,
                     amounts: {

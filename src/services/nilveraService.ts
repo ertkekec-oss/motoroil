@@ -20,6 +20,7 @@ export interface CustomerInfo {
     TaxNumber: string;
     Name: string;
     Email?: string;
+    TaxOffice?: string;
     Address: string;
     District: string;
     City: string;
@@ -37,6 +38,7 @@ export interface CompanyInfo {
     TaxNumber: string;
     Name: string;
     Email?: string;
+    TaxOffice?: string;
     Address: string;
     District: string;
     City: string;
@@ -135,7 +137,8 @@ export class NilveraInvoiceService {
 
         // 3. Tarih ve Diğer Hazırlıklar (Milisaniye ve 'Z' karakterinden tamamen arındırılmış)
         const trNow = new Date(new Date().getTime() + (3 * 60 * 60 * 1000));
-        const issueDate = trNow.toISOString().split('.')[0]; // YYYY-MM-DDTHH:mm:ss formatını garanti eder
+        const issueDate = trNow.toISOString().split('.')[0]; // YYYY-MM-DDTHH:mm:ss
+        const issueTime = issueDate.split('T')[1]; // HH:mm:ss
 
         const anyLineExempt = params.lines.some(l => l.VatRate === 0);
         const isTotalExempt = params.amounts.tax === 0;
@@ -148,6 +151,7 @@ export class NilveraInvoiceService {
             InvoiceProfile: isEInvoiceUser ? 2 : 5,
             InvoiceSerieOrNumber: series,
             IssueDate: issueDate,
+            IssueTime: issueTime, // e-Arşiv için kritik
             CurrencyCode: "TRY",
             LineExtensionAmount: params.amounts.base,
             TaxExclusiveAmount: params.amounts.base,
@@ -183,7 +187,7 @@ export class NilveraInvoiceService {
                     WebSite: params.internetInfo.WebSite,
                     PaymentMethod: params.internetInfo.PaymentMethod,
                     PaymentDate: params.internetInfo.PaymentDate || issueDate.split('T')[0],
-                    TransporterName: params.internetInfo.TransporterName,
+                    TransporterName: params.internetInfo.TransporterName || "TEST KARGO",
                     TransporterVknTckn: "11111111111" // Dummy VKN for transporter
                 };
                 invoiceInfo.InternetInfo = internetData;
