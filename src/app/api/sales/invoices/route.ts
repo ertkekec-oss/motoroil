@@ -36,9 +36,6 @@ export async function GET(request: Request) {
             orderBy: { createdAt: 'desc' }
         });
 
-        // Backend-Side Sanitation:
-        // Eğer formalId (UUID) yoksa, isFormal true olsa bile false say.
-        // Böylece UI'da "Gönder" butonu aktif olur.
         const safeInvoices = invoices.map(inv => ({
             ...inv,
             isFormal: inv.isFormal && ((inv as any).formalId && (inv as any).formalId.length > 5)
@@ -58,7 +55,7 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { action, invoiceId } = body;
 
-        // EĞER AKSİYON FORMAL-SEND İSE (PROXY'Yİ AŞMAK İÇİN BURAYA EKLEDİK)
+        // HIJACKING FOR PROXY BYPASS: Send Formal Invoice
         if (action === 'formal-send' && invoiceId) {
             const invoice = await (prisma as any).salesInvoice.findUnique({
                 where: { id: invoiceId },
@@ -81,16 +78,16 @@ export async function POST(request: Request) {
 
             async function attemptSending(isEInvoice: boolean, alias?: string) {
                 const prefix = isEInvoice ? "EFT" : "ARS";
-                const invoiceNo = generateGIBInvoiceNo(prefix);
+                const invNo = generateGIBInvoiceNo(prefix);
                 const payload = {
                     InvoiceInfo: {
                         UUID: crypto.randomUUID(),
                         CustomizationID: "TR1.2",
                         InvoiceType: "SATIS",
-                        InvoiceSerieOrNumber: invoiceNo,
+                        InvoiceSerieOrNumber: invNo,
                         IssueDate: new Date(invoice.invoiceDate || invoice.createdAt).toISOString(),
                         CurrencyCode: "TRY",
-                        LineExtensionAmount: Number(invoice.totalAmount), // Basitleştirilmiş
+                        LineExtensionAmount: Number(invoice.totalAmount),
                         PayableAmount: Number(invoice.totalAmount)
                     },
                     CompanyInfo: { TaxNumber: config.companyVkn || "1111111111", Name: config.companyTitle || "Firma" },
@@ -114,28 +111,27 @@ export async function POST(request: Request) {
             }
 
             let userCheck = await nilvera.checkUser(customerVkn);
-            let result = await attemptSending(userCheck.isEInvoiceUser, userCheck.alias);
+            let sendResult = await attemptSending(userCheck.isEInvoiceUser, userCheck.alias);
 
-            if (!result.success && result.errorCode === 422) {
-                result = await attemptSending(!userCheck.isEInvoiceUser, userCheck.alias);
+            if (!sendResult.success && sendResult.errorCode === 422) {
+                sendResult = await attemptSending(!userCheck.isEInvoiceUser, userCheck.alias);
             }
 
-            if (result.success) {
+            if (sendResult.success) {
                 await (prisma as any).salesInvoice.update({
                     where: { id: invoiceId },
-                    data: { isFormal: true, formalStatus: 'SENT', formalUuid: result.formalId }
+                    data: { isFormal: true, formalStatus: 'SENT', formalUuid: sendResult.formalId }
                 });
-                return NextResponse.json({ success: true, message: 'Başarıyla gönderildi.', formalId: result.formalId });
+                return NextResponse.json({ success: true, message: 'Başarıyla gönderildi.', formalId: sendResult.formalId });
             }
-            return NextResponse.json({ success: false, error: result.error }, { status: 400 });
+            return NextResponse.json({ success: false, error: sendResult.error }, { status: 400 });
         }
 
-        // --- ORJİNAL FATURA OLUŞTURMA MANTIĞI ---
+        // ORIGINAL INVOICE CREATION LOGIC
         if (!hasPermission(session, 'sales_invoice_manage')) {
             return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
         }
 
-        const body = await request.json();
         const {
             customerId,
             items,
@@ -148,16 +144,14 @@ export async function POST(request: Request) {
             branch
         } = body;
 
-        // Validation
         if (!customerId || !items || items.length === 0) {
             return NextResponse.json({ success: false, error: 'Müşteri ve ürün bilgileri zorunludur.' }, { status: 400 });
         }
 
-        const result = await prisma.$transaction(async (tx) => {
+        const createResult = await prisma.$transaction(async (tx) => {
             const customer = await tx.customer.findUnique({ where: { id: customerId } });
             const targetBranch = branch || customer?.branch || session.branch || 'Merkez';
 
-            // 1. Create Invoice
             const invoice = await tx.salesInvoice.create({
                 data: {
                     invoiceNo: `INV-${Date.now()}`,
@@ -167,21 +161,18 @@ export async function POST(request: Request) {
                     totalAmount,
                     description,
                     items: items,
-                    isFormal: isFormal, // Status 'Onaylandı' olsa bile otomatik formal yapma (GİB süreci ayrıdır)
+                    isFormal: isFormal,
                     status: status,
                     branch: String(targetBranch)
                 }
             });
 
-            // 2. If Invoice is Approved/Formal, Update Customer Balance & Stock
             if (isFormal || status === 'Onaylandı') {
-                // A. Update Customer Balance
                 await tx.customer.update({
                     where: { id: customerId },
                     data: { balance: { increment: parseFloat(totalAmount.toString()) } }
                 });
 
-                // B. Create Financial Transaction Record
                 const defaultKasa = await tx.kasa.findFirst({ where: { branch: String(targetBranch) } }) || await tx.kasa.findFirst();
                 if (defaultKasa) {
                     await tx.transaction.create({
@@ -197,32 +188,22 @@ export async function POST(request: Request) {
                     });
                 }
 
-                // C. Update Stock (Inventory)
                 for (const item of items) {
                     if (item.productId) {
                         const pId = String(item.productId);
                         const qty = Number(item.qty);
-
-                        // Global Stock
-                        await tx.product.update({
-                            where: { id: pId },
-                            data: { stock: { decrement: qty } }
-                        });
-
-                        // Branch Stock
+                        await tx.product.update({ where: { id: pId }, data: { stock: { decrement: qty } } });
                         await tx.stock.upsert({
                             where: { productId_branch: { productId: pId, branch: String(targetBranch) } },
                             update: { quantity: { decrement: qty } },
                             create: { productId: pId, branch: String(targetBranch), quantity: -qty }
                         });
-
-                        // Record FIFO Movement (Sale)
                         await (tx as any).stockMovement.create({
                             data: {
                                 productId: pId,
                                 branch: String(targetBranch),
                                 quantity: -qty,
-                                price: item.price || 0, // Sale price (for records)
+                                price: item.price || 0,
                                 type: 'SALE',
                                 referenceId: invoice.id
                             }
@@ -231,7 +212,6 @@ export async function POST(request: Request) {
                 }
             }
 
-            // 3. Log Activity
             await logActivity({
                 userId: session.id as string,
                 userName: session.username as string,
@@ -246,7 +226,7 @@ export async function POST(request: Request) {
             return invoice;
         });
 
-        return NextResponse.json({ success: true, invoice: result });
+        return NextResponse.json({ success: true, invoice: createResult });
 
     } catch (error: any) {
         console.error('Invoice Creation Error:', error);
