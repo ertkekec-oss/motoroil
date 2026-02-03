@@ -282,10 +282,8 @@ export async function POST(request: Request) {
                         throw new Error("Payload Hazırlık Hatası: Tutar alanları hesaplanamadı (NaN)");
                     }
 
-                    // --- NILVERA TEST ORTAMI SENKRONİZASYONU ---
-                    // Test ortamında bugünkü tarih kabul edilmiyor, 1 gün geriye al
+                    // BUGÜNKÜ TARİH KULLAN (Geriye tarihli fatura yasak!)
                     const now = new Date();
-                    now.setDate(now.getDate() - 1); // DÜN
                     const currentYear = now.getFullYear().toString();
 
                     // ISSUE TIME İLERİ ALINMALI (PaymentDate < IssueTime kuralı için)
@@ -332,7 +330,6 @@ export async function POST(request: Request) {
                             InvoiceType: "SATIS",
                             // PROFİL SEÇİMİ: E-Fatura için TICARIFATURA, E-Arşiv için EARSIVFATURA
                             InvoiceProfile: currentAttemptIsEInvoice ? "TICARIFATURA" : "EARSIVFATURA",
-                            ProfileID: "TR1.2", // GİB UBL 2.1 Standardı
                             // Sadece seri kodu (3 hane), Nilvera otomatik tam numara üretir
                             // Örnek: "101" -> Nilvera "101000000112" üretir
                             InvoiceSerieOrNumber: invNo,
@@ -344,13 +341,8 @@ export async function POST(request: Request) {
                             LineExtensionAmount: taxExclusiveAmount,
                             TaxExclusiveAmount: taxExclusiveAmount,
                             TaxInclusiveAmount: taxInclusiveAmount,
-                            PayableAmount: payableAmount,
-                            // E-Fatura: Her zaman NORMAL + ELEKTRONIK
-                            // E-Arşiv B2C (TCKN): INTERNET + KAGIT + KARGO
-                            // E-Arşiv B2B (VKN): NORMAL + ELEKTRONIK
-                            SalesPlatform: currentAttemptIsEInvoice ? "NORMAL" : (customerVkn.length === 11 ? "INTERNET" : "NORMAL"),
-                            SendType: currentAttemptIsEInvoice ? "ELEKTRONIK" : (customerVkn.length === 11 ? "KAGIT" : "ELEKTRONIK"),
-                            DeliveryType: currentAttemptIsEInvoice ? "ELEKTRONIK" : (customerVkn.length === 11 ? "KARGO" : "ELEKTRONIK")
+                            PayableAmount: payableAmount
+                            // SalesPlatform, SendType, DeliveryType alanları kaldırıldı (UBL şema hatası)
                         },
                         CompanyInfo: {
                             TaxNumber: companyVkn,

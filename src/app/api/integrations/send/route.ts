@@ -90,7 +90,6 @@ export async function POST(req: NextRequest) {
                 UUID: uuid,
                 InvoiceType: "SATIS",
                 InvoiceProfile: isEInvoice ? "TICARIFATURA" : "EARSIVFATURA",
-                ProfileID: "TR1.2",
                 InvoiceSerieOrNumber: invoiceNo,
                 IssueDate: issueDate,
                 IssueTime: issueTime,
@@ -101,12 +100,7 @@ export async function POST(req: NextRequest) {
                 PayableAmount: Number((totalTaxExclusiveAmount + totalTaxAmount).toFixed(2))
             };
 
-            // E-Fatura için ek alanlar
-            if (isEInvoice) {
-                invoiceInfo.SalesPlatform = "NORMAL";
-                invoiceInfo.SendType = "ELEKTRONIK";
-                invoiceInfo.DeliveryType = "ELEKTRONIK";
-            }
+
 
             const payload = {
                 InvoiceInfo: invoiceInfo,
