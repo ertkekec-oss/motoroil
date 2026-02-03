@@ -199,7 +199,8 @@ export class NilveraInvoiceService {
             } else {
                 // E-ARSIV Ozel: MAGAZA SATISI (En Güvenli Yol)
                 invoiceInfo.SalesPlatform = 0; // 0: NORMAL (Kargo kontrolünü kapatır)
-                invoiceInfo.SendType = 1;      // 1: KAGIT (Veya 2: ELEKTRONIK olabilir)
+                invoiceInfo.SendType = 2;      // 2: ELEKTRONIK
+                invoiceInfo.SendMethod = 0;    // 0: Elektronik (Redundant field check)
                 // InternetInfo nesnesi tamamen OMIT ediliyor (Hata almayı engeller)
             }
         }
