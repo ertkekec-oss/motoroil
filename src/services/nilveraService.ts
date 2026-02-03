@@ -19,6 +19,7 @@ export interface InvoiceLine {
 export interface CustomerInfo {
     TaxNumber: string;
     Name: string;
+    Email?: string;
     Address: string;
     District: string;
     City: string;
@@ -35,6 +36,7 @@ export interface InternetInfo {
 export interface CompanyInfo {
     TaxNumber: string;
     Name: string;
+    Email?: string;
     Address: string;
     District: string;
     City: string;
@@ -174,13 +176,18 @@ export class NilveraInvoiceService {
             invoiceInfo.GeneralKDV20Total = params.amounts.tax;
             invoiceInfo.KdvTotal = params.amounts.tax;
             invoiceInfo.SalesPlatform = params.isInternetSale ? "INTERNET" : "NORMAL";
+            invoiceInfo.SendMethod = 0; // 0: Elektronik, 1: Kağıt (e-Arşiv için önemli)
+
             if (params.isInternetSale && params.internetInfo) {
-                invoiceInfo.InternetInfo = {
+                const internetData = {
                     WebSite: params.internetInfo.WebSite,
                     PaymentMethod: params.internetInfo.PaymentMethod,
                     PaymentDate: params.internetInfo.PaymentDate || issueDate.split('T')[0],
-                    TransporterName: params.internetInfo.TransporterName
+                    TransporterName: params.internetInfo.TransporterName,
+                    TransporterVknTckn: "11111111111" // Dummy VKN for transporter
                 };
+                invoiceInfo.InternetInfo = internetData;
+                invoiceInfo.InternetSalesInformation = internetData; // Redundant field
             }
         }
 
@@ -216,7 +223,7 @@ export class NilveraInvoiceService {
 
         const payload = isEInvoiceUser
             ? { EInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines }, CustomerAlias: alias.toString() }
-            : { ArchiveInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines } };
+            : { EArchive: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines } };
 
         console.log(`[NilveraService] FINAL PAYLOAD:`, JSON.stringify(payload, null, 2));
 

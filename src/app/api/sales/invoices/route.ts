@@ -91,6 +91,7 @@ export async function POST(request: Request) {
                     customer: {
                         TaxNumber: (invoice.customer.taxNumber || invoice.customer.identityNumber || "11111111111").trim(),
                         Name: invoice.customer.name,
+                        Email: invoice.customer.email || "destek@kech.tr",
                         Address: invoice.customer.address || "ADRES",
                         District: invoice.customer.district || "KADIKOY",
                         City: invoice.customer.city || "ISTANBUL",
@@ -99,6 +100,7 @@ export async function POST(request: Request) {
                     company: {
                         TaxNumber: config.companyVkn || "1111111111",
                         Name: config.companyTitle || "FIRMA UNVANI",
+                        Email: config.portalEmail || "destek@kech.tr",
                         Address: config.companyAddress || "ADRES",
                         District: config.portalDistrict || "KADIKOY",
                         City: config.portalCity || "ISTANBUL",
