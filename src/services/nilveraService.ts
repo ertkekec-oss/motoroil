@@ -135,29 +135,6 @@ export class NilveraInvoiceService {
         const trNow = new Date(new Date().getTime() + (3 * 60 * 60 * 1000));
         const issueDate = trNow.toISOString().split('.')[0]; // YYYY-MM-DDTHH:mm:ss formatını garanti eder
 
-        // 4. Model Normalizasyonu
-        const invoiceLines = params.lines.map((line, idx) => {
-            const lineExtensionAmount = Number((line.Quantity * line.Price).toFixed(2));
-            const baseLine: any = {
-                Index: idx + 1,
-                Name: line.Name,
-                Quantity: line.Quantity,
-                UnitType: line.UnitType || "C62",
-                LineExtensionAmount: lineExtensionAmount
-            };
-
-            if (isEInvoiceUser) {
-                baseLine.UnitPrice = line.Price;
-                baseLine.VatRate = line.VatRate;
-                baseLine.VatAmount = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
-            } else {
-                baseLine.Price = line.Price;
-                baseLine.KDVPercent = line.VatRate;
-                baseLine.KDVTotal = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
-            }
-            return baseLine;
-        });
-
         const invoiceInfo: any = {
             UUID: crypto.randomUUID(),
             InvoiceType: 0, // SATIS (Doküman: Sayısal 0 olmalı)
@@ -172,6 +149,9 @@ export class NilveraInvoiceService {
         };
 
         if (!isEInvoiceUser) {
+            // E-Arşiv için vergi toplamları zorunludur
+            invoiceInfo.GeneralKDV20Total = params.amounts.tax;
+            invoiceInfo.KdvTotal = params.amounts.tax;
             invoiceInfo.SalesPlatform = params.isInternetSale ? "INTERNET" : "NORMAL";
             if (params.isInternetSale && params.internetInfo) {
                 invoiceInfo.InternetInfo = {
@@ -182,6 +162,40 @@ export class NilveraInvoiceService {
                 };
             }
         }
+
+        // 4. Model Normalizasyonu (İstisna Sebebi Korumalı)
+        const invoiceLines = params.lines.map((line, idx) => {
+            const lineExtensionAmount = Number((line.Quantity * line.Price).toFixed(2));
+            const baseLine: any = {
+                Index: idx + 1,
+                Name: line.Name,
+                Quantity: line.Quantity,
+                UnitType: (line.UnitType || "C62").toUpperCase(),
+                LineExtensionAmount: lineExtensionAmount
+            };
+
+            // KDV 0 ise istisna sebebi ekle (Hata 422 Engeli)
+            const isExempt = line.VatRate === 0;
+
+            if (isEInvoiceUser) {
+                baseLine.UnitPrice = line.Price;
+                baseLine.VatRate = line.VatRate;
+                baseLine.VatAmount = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
+                if (isExempt) {
+                    baseLine.TaxExemptionReasonCode = "350";
+                    baseLine.TaxExemptionReason = "Diger";
+                }
+            } else {
+                baseLine.Price = line.Price;
+                baseLine.KDVPercent = line.VatRate;
+                baseLine.KDVTotal = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
+                if (isExempt) {
+                    baseLine.KDVExemptionReasonCode = "350";
+                    baseLine.KDVExemptionReason = "Diger";
+                }
+            }
+            return baseLine;
+        });
 
         const payload = isEInvoiceUser
             ? { EInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines }, CustomerAlias: alias.toString() }
