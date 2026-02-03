@@ -5,6 +5,7 @@ export interface NilveraConfig {
     username?: string;
     password?: string;
     environment: 'test' | 'production';
+    baseUrl?: string;
 }
 
 export class NilveraService {
@@ -18,9 +19,14 @@ export class NilveraService {
         this.apiKey = config.apiKey?.trim();
         this.username = config.username?.trim();
         this.password = config.password?.trim();
-        this.baseUrl = config.environment === 'production'
-            ? 'https://api.nilvera.com'
-            : 'https://apitest.nilvera.com';
+
+        if (config.baseUrl) {
+            this.baseUrl = config.baseUrl.endsWith('/') ? config.baseUrl.slice(0, -1) : config.baseUrl;
+        } else {
+            this.baseUrl = config.environment === 'production'
+                ? 'https://api.nilvera.com'
+                : 'https://apitest.nilvera.com';
+        }
     }
 
     private getHeaders() {
@@ -47,25 +53,49 @@ export class NilveraService {
             // Nilvera yanıtı array ise (En yaygın durum)
             if (Array.isArray(data) && data.length > 0) {
                 isEInvoiceUser = true;
-                // ÖNCELİK 1: İçinde 'pk' ve 'gib.gov.tr' geçen Posta Kutusu etiketi
-                const bestPk = data.find((item: any) =>
-                    item.Alias &&
-                    item.Alias.toLowerCase().includes('pk') &&
-                    item.Alias.toLowerCase().includes('gib.gov.tr')
-                );
-                // ÖNCELİK 2: Herhangi bir 'pk' etiketi
-                const secondaryPk = data.find((item: any) => item.Alias && item.Alias.toLowerCase().includes('pk'));
 
-                alias = bestPk?.Alias || secondaryPk?.Alias || data[0].Alias;
+                // ÖNCELİK 1: Posta Kutusu (PK) olan ve GIB içeren etiket
+                const pkGib = data.find((item: any) =>
+                    (item.Alias || item.alias || "").toLowerCase().includes('pk') &&
+                    (item.Alias || item.alias || "").toLowerCase().includes('gib.gov.tr')
+                );
+
+                // ÖNCELİK 2: Herhangi bir PK etiketi
+                const anyPk = data.find((item: any) =>
+                    (item.Alias || item.alias || "").toLowerCase().includes('pk') ||
+                    (item.Type || item.type || "").toLowerCase() === 'pk'
+                );
+
+                // ÖNCELİK 3: Herhangi bir etiket
+                const first = data[0];
+                const firstAlias = typeof first === 'string' ? first : (first.Alias || first.alias || '');
+
+                alias = (pkGib?.Alias || pkGib?.alias) || (anyPk?.Alias || anyPk?.alias) || firstAlias;
             }
             // Yanıt tekil obje ise
-            else if (data && data.IsEInvoiceUser) {
-                isEInvoiceUser = true;
-                alias = data.Alias || (Array.isArray(data.Aliases) ? data.Aliases[0] : '');
+            else if (data && typeof data === 'object') {
+                if (data.IsEInvoiceUser || data.isEInvoiceUser || data.UserType === 'EFATURA') {
+                    isEInvoiceUser = true;
+                }
+
+                // Bazı objelerde direkt Alias veya Aliases listesi olabilir
+                const rawAlias = data.Alias || data.alias || data.SelectedAlias;
+                const rawAliases = data.Aliases || data.aliases;
+
+                if (rawAlias) {
+                    alias = rawAlias;
+                    isEInvoiceUser = true;
+                } else if (Array.isArray(rawAliases) && rawAliases.length > 0) {
+                    const firstA = rawAliases[0];
+                    alias = typeof firstA === 'string' ? firstA : (firstA.Alias || firstA.alias || '');
+                    isEInvoiceUser = true;
+                }
             }
 
+            // Eğer hala alias bulunamadıysa ama isEInvoiceUser true ise, Nilvera'nın e-fatura olduğunu bildiği bir durumdayız
             return { isEInvoiceUser, alias };
-        } catch (error) {
+        } catch (error: any) {
+            // Eğer 404 dönüyorsa genellikle kullanıcı sistemde kayıtlı değildir (e-Arşiv)
             return { isEInvoiceUser: false };
         }
     }

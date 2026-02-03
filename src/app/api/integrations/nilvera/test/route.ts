@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { apiKey, username, password, environment, companyVkn } = body;
+        const { apiKey, username, password, environment, companyVkn, apiUrl } = body;
 
         if (!apiKey) {
             return NextResponse.json({ success: false, error: 'Entegrasyon için API Key zorunludur. Otomatik giriş (Login) servisi yanıt vermediği için lütfen Nilvera Portal üzerinden aldığınız API Key\'i giriniz.' }, { status: 400 });
@@ -14,6 +14,7 @@ export async function POST(request: Request) {
 
         const nilveraService = new NilveraService({
             apiKey,
+            baseUrl: apiUrl,
             username, // Opsiyonel, loglama için kalabilir
             password,
             environment: environment || 'test'

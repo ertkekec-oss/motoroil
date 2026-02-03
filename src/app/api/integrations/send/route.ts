@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
 
         const nilvera = new NilveraService({
             apiKey: config.apiKey,
+            baseUrl: config.apiUrl,
             environment: config.environment || 'test'
         });
 
@@ -134,25 +135,34 @@ export async function POST(req: NextRequest) {
         // Mükellef sorgula
         let userCheck = await nilvera.checkUser(customerVkn);
 
-        // İlk Deneme
-        let result = await attemptSending(userCheck.isEInvoiceUser, userCheck.alias);
+        // İlk Deneme Kararı
+        let isEInvoice = userCheck.isEInvoiceUser;
+        let alias = userCheck.alias;
 
-        // 422 Mükellef Tipi Hatası Aldıysak Tersi İçin Zorla
+        // E-Fatura ama etiketi yoksa, kullanıcıyı uyaralım (veya e-arşiv deneyebiliriz ama 422 alırız)
+        // Ancak bazı durumlarda checkUser hatalı "false" dönebilir, o yüzden e-arşiv denemek bir fallback'tir.
+
+        let result = await attemptSending(isEInvoice, alias);
+
+        // 422 Mükellef Tipi Hatası Aldıysak (Genellikle e-Arşiv gönderdik ama e-Fatura çıktı)
         if (!result.success && result.errorCode === 422) {
-            let forcedIsEInvoice = !userCheck.isEInvoiceUser;
-            let forcedAlias = userCheck.alias;
+            // Tam tersini dene
+            isEInvoice = !isEInvoice;
 
-            // E-Faturaya dönüyorsak etiketi tekrar bulmaya çalış
-            if (forcedIsEInvoice && !forcedAlias) {
+            // Eğer e-Fatura'ya döndüysek etiket ŞART
+            if (isEInvoice) {
                 const retry = await nilvera.checkUser(customerVkn);
-                forcedAlias = retry.alias;
+                alias = retry.alias;
+
+                if (!alias) {
+                    return NextResponse.json({
+                        success: false,
+                        error: 'Müşteri e-Fatura mükellefi olarak tespit edildi ancak gönderim için gerekli olan sistem etiketi (Posta Kutusu Alias) Nilvera üzerinde bulunamadı. Lütfen müşterinin e-fatura bilgilerini kontrol ediniz veya Nilvera panelinden sorgulayınız.'
+                    }, { status: 400 });
+                }
             }
 
-            if (forcedIsEInvoice && !forcedAlias) {
-                return NextResponse.json({ success: false, error: 'Müşteri e-Fatura mükellefi ancak sisteme kayıtlı bir etiketi (Alias) bulunamadı.' }, { status: 400 });
-            }
-
-            result = await attemptSending(forcedIsEInvoice, forcedAlias);
+            result = await attemptSending(isEInvoice, alias);
         }
 
         if (result.success) {
@@ -162,7 +172,11 @@ export async function POST(req: NextRequest) {
             });
             return NextResponse.json({ success: true, message: 'Başarıyla gönderildi.' });
         } else {
-            return NextResponse.json({ success: false, error: result.error || 'Fatura gönderilemedi.' }, { status: 400 });
+            // Hata mesajını biraz daha detaylı verelim
+            let errMsg = result.error || 'Fatura gönderilemedi.';
+            if (result.errorCode === 401) errMsg = 'Nilvera API Yetkilendirme Hatası. Lütfen API Key\'inizi kontrol edin.';
+
+            return NextResponse.json({ success: false, error: errMsg }, { status: 400 });
         }
 
     } catch (error: any) {
