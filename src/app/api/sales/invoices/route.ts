@@ -124,7 +124,12 @@ export async function POST(request: Request) {
 
                     await (prisma as any).salesInvoice.update({
                         where: { id: invoiceId },
-                        data: { isFormal: true, formalStatus: 'SENT', formalUuid: formalId }
+                        data: {
+                            isFormal: true,
+                            formalStatus: 'SENT',
+                            formalUuid: formalId,
+                            formalType: sendResult.type // EFATURA veya EARSIV
+                        }
                     });
 
                     return NextResponse.json({
@@ -154,6 +159,36 @@ export async function POST(request: Request) {
                 }, { status: 200 });
             }
             return;
+        }
+
+        // --- PDF GÖRÜNTÜLEME PROXY ---
+        if (action === 'get-pdf' && invoiceId) {
+            try {
+                const invoice = await (prisma as any).salesInvoice.findUnique({ where: { id: invoiceId } });
+                if (!invoice || !invoice.formalUuid) return NextResponse.json({ error: 'Fatura bulunamadı' }, { status: 404 });
+
+                const settingsRecord = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
+                const config = (settingsRecord?.value as any) || {};
+
+                const isEInvoice = invoice.formalType === 'EFATURA';
+                const module = isEInvoice ? 'einvoice' : 'earchive';
+                const baseUrl = config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
+
+                const pdfResponse = await axios.get(`${baseUrl}/${module}/Download/${invoice.formalUuid}/PDF`, {
+                    headers: { 'Authorization': `Bearer ${config.apiKey}` },
+                    responseType: 'arraybuffer'
+                });
+
+                return new NextResponse(pdfResponse.data, {
+                    headers: {
+                        'Content-Type': 'application/pdf',
+                        'Content-Disposition': `inline; filename="Fatura-${invoice.formalUuid}.pdf"`
+                    }
+                });
+            } catch (err: any) {
+                console.error("PDF Fetch Error:", err);
+                return NextResponse.json({ success: false, error: 'PDF alınamadı.' }, { status: 500 });
+            }
         }
 
         // ORIGINAL INVOICE CREATION LOGIC

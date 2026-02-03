@@ -12,7 +12,7 @@ import { useCRM } from '@/contexts/CRMContext';
 import Pagination from '@/components/Pagination';
 
 export default function SalesPage() {
-    const { showSuccess, showError, showConfirm, showWarning } = useModal();
+    const { showSuccess, showError, showConfirm, showWarning, closeModal } = useModal();
     const [activeTab, setActiveTab] = useState('online');
     const [view, setView] = useState<'list' | 'new_wayslip'>('list');
 
@@ -156,6 +156,24 @@ export default function SalesPage() {
         });
     };
 
+    const handleViewPDF = async (invoiceId: string) => {
+        closeModal(); // Modalı kapat
+        try {
+            const res = await fetch('/api/sales/invoices', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get-pdf', invoiceId })
+            });
+            if (!res.ok) throw new Error('PDF alınamadı');
+
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        } catch (err: any) {
+            showError('Hata', 'PDF görüntüleme hatası: ' + err.message);
+        }
+    };
+
     const handleSendToELogo = async (invoiceId: string, type: 'EARSIV' | 'EFATURA' | 'EIRSALIYE') => {
         const title = type === 'EIRSALIYE' ? 'e-İrsaliye Gönder' : 'e-Fatura Gönder';
         const msg = type === 'EIRSALIYE'
@@ -174,7 +192,12 @@ export default function SalesPage() {
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showSuccess('Başarılı', `✅ ${data.message}\nUUID: ${data.uuid}\nTip: ${data.type}`);
+                    showSuccess(
+                        'Başarılı',
+                        `✅ ${data.message}\nUUID: ${data.formalId}\nTip: ${data.type}`,
+                        () => handleViewPDF(invoiceId),
+                        '📄 PDF Görüntüle'
+                    );
                     fetchInvoices();
                 } else {
                     const technicalDetail = (data.errorCode ? ` (Hata Kodu: ${data.errorCode})` : '') + (data.details ? `\nDetay: ${data.details}` : '');
@@ -1238,12 +1261,21 @@ export default function SalesPage() {
                                                                             )}
 
                                                                             {inv.isFormal && (
-                                                                                <div style={{ marginTop: '24px', padding: '20px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                                                                                    <h6 style={{ margin: '0 0 8px 0', color: '#10b981', fontSize: '14px', fontWeight: 'bold' }}>✅ Resmileştirildi</h6>
-                                                                                    <p style={{ margin: '0', fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
-                                                                                        <strong>UUID:</strong> {inv.formalId}<br />
-                                                                                        <strong>Tip:</strong> {inv.formalType}
-                                                                                    </p>
+                                                                                <div style={{ marginTop: '24px', padding: '20px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                                    <div>
+                                                                                        <h6 style={{ margin: '0 0 8px 0', color: '#10b981', fontSize: '14px', fontWeight: 'bold' }}>✅ Resmileştirildi</h6>
+                                                                                        <p style={{ margin: '0', fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
+                                                                                            <strong>UUID:</strong> {inv.formalId}<br />
+                                                                                            <strong>Tip:</strong> {inv.formalType}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                    <button
+                                                                                        onClick={() => handleViewPDF(inv.id)}
+                                                                                        className="btn btn-primary"
+                                                                                        style={{ padding: '10px 16px', fontSize: '13px', background: '#10b981', border: 'none' }}
+                                                                                    >
+                                                                                        📄 PDF Görüntüle
+                                                                                    </button>
                                                                                 </div>
                                                                             )}
                                                                         </div>

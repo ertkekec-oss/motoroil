@@ -85,13 +85,13 @@ export default function CustomModal({
 
                 {/* Dynamic Actions */}
                 <div className="flex gap-4">
-                    {type === 'confirm' && (
+                    {(type === 'confirm' || (onConfirm && type !== 'confirm')) && (
                         <button
                             onClick={onClose}
                             disabled={isProcessing}
                             className="flex-1 btn btn-secondary py-5 text-sm"
                         >
-                            {cancelText}
+                            {type === 'confirm' ? cancelText : 'Kapat'}
                         </button>
                     )}
                     <button

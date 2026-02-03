@@ -18,11 +18,11 @@ interface ModalState {
 }
 
 interface ModalContextType {
-    showModal: (config: Omit<ModalState, 'isOpen'>) => void;
-    showSuccess: (title: string, message: string) => void;
-    showError: (title: string, message: string) => void;
-    showWarning: (title: string, message: string) => void;
-    showConfirm: (title: string, message: string, onConfirm: () => void) => void;
+    showModal: (config: ModalState) => void;
+    showSuccess: (title: string, message: string, onConfirm?: () => void, confirmText?: string) => void;
+    showError: (title: string, message: string, onConfirm?: () => void, confirmText?: string) => void;
+    showWarning: (title: string, message: string, onConfirm?: () => void, confirmText?: string) => void;
+    showConfirm: (title: string, message: string, onConfirm: () => void, confirmText?: string, cancelText?: string) => void;
     closeModal: () => void;
 }
 
@@ -40,20 +40,20 @@ export function ModalProvider({ children }: { children: ReactNode }) {
         setModal({ ...config, isOpen: true });
     };
 
-    const showSuccess = (title: string, message: string) => {
-        showModal({ title, message, type: 'success' });
+    const showSuccess = (title: string, message: string, onConfirm?: () => void, confirmText?: string) => {
+        showModal({ title, message, type: 'success', onConfirm, confirmText });
     };
 
-    const showError = (title: string, message: string) => {
-        showModal({ title, message, type: 'error' });
+    const showError = (title: string, message: string, onConfirm?: () => void, confirmText?: string) => {
+        showModal({ title, message, type: 'error', onConfirm, confirmText });
     };
 
-    const showWarning = (title: string, message: string) => {
-        showModal({ title, message, type: 'warning' });
+    const showWarning = (title: string, message: string, onConfirm?: () => void, confirmText?: string) => {
+        showModal({ title, message, type: 'warning', onConfirm, confirmText });
     };
 
-    const showConfirm = (title: string, message: string, onConfirm: () => void) => {
-        showModal({ title, message, type: 'confirm', onConfirm });
+    const showConfirm = (title: string, message: string, onConfirm: () => void, confirmText?: string, cancelText?: string) => {
+        showModal({ title, message, type: 'confirm', onConfirm, confirmText, cancelText });
     };
 
     const closeModal = () => {
