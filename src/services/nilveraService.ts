@@ -223,7 +223,7 @@ export class NilveraInvoiceService {
 
         const payload = isEInvoiceUser
             ? { EInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines }, CustomerAlias: alias.toString() }
-            : { EArchive: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines } };
+            : { ArchiveInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines } };
 
         console.log(`[NilveraService] FINAL PAYLOAD:`, JSON.stringify(payload, null, 2));
 
