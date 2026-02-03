@@ -75,11 +75,15 @@ export class NilveraInvoiceService {
                 const defaultAliasObj = data.find((d: any) => findAlias(d)?.toLowerCase().includes('defaultpk'));
                 const finalAlias = defaultAliasObj ? findAlias(defaultAliasObj) : findAlias(data[0]);
 
-                return { isEInvoiceUser: true, alias: finalAlias };
+                return {
+                    isEInvoiceUser: true,
+                    alias: finalAlias || "urn:mail:defaultpk@nilvera.com" // Kritik Fallback: Alias yoksa default ata
+                };
             }
             return { isEInvoiceUser: false };
         } catch (error) {
             console.error("Nilvera Check Error:", error);
+            // Hata durumunda e-Arşiv olarak devam etmesi daha güvenli
             return { isEInvoiceUser: false };
         }
     }
@@ -88,11 +92,12 @@ export class NilveraInvoiceService {
      * 2. Adım: Varsayılan Seri Çekme
      */
     async getDefaultSeries(type: 'EFATURA' | 'EARSIV'): Promise<string> {
-        const endpoint = type === 'EFATURA' ? '/EInvoice/Series' : '/EArchive/Series';
+        const module = type === 'EFATURA' ? 'einvoice' : 'earchive';
         try {
-            const res = await axios.get(`${this.config.baseUrl}${endpoint}`, { headers: this.getHeaders() });
+            // Dokümana göre: Filtreli çekmek daha garantidir
+            const res = await axios.get(`${this.config.baseUrl}/${module}/Series?IsDefault=true&IsActive=true`, { headers: this.getHeaders() });
             const content = res.data?.Content || [];
-            const defaultSeries = content.find((s: any) => s.IsActive && s.IsDefault) || content.find((s: any) => s.IsActive) || content[0];
+            const defaultSeries = content[0]; // IsDefault=true filtresiyle geldiği için ilk eleman varsayılan olandır
 
             let seriesName = defaultSeries?.Name || (type === 'EFATURA' ? 'EFT' : 'ARS');
 
@@ -118,13 +123,8 @@ export class NilveraInvoiceService {
         isInternetSale?: boolean,
         internetInfo?: InternetInfo
     }) {
-        // 1. Mükellefiyete göre karar ver
+        // 1. Mükellefiyete göre karar ver (Alias fallback içerde yapılıyor)
         const { isEInvoiceUser, alias } = await this.checkTaxpayer(params.customer.TaxNumber);
-
-        // KRİTİK: Eğer mükellef ama Alias yoksa hata ver
-        if (isEInvoiceUser && !alias) {
-            return { success: false, error: "Alıcı e-Fatura mükellefi ancak sistemsel bir etiket (Alias) bulunamadı." };
-        }
 
         const type = isEInvoiceUser ? 'EFATURA' : 'EARSIV';
 
