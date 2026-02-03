@@ -157,20 +157,24 @@ export default function SalesPage() {
     };
 
     const handleViewPDF = async (invoiceId: string) => {
-        closeModal(); // Modalı kapat
         try {
             const res = await fetch('/api/sales/invoices', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'get-pdf', invoiceId })
             });
-            if (!res.ok) throw new Error('PDF alınamadı');
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || 'PDF alınamadı');
+            }
 
             const blob = await res.blob();
             const url = window.URL.createObjectURL(blob);
             window.open(url, '_blank');
+            closeModal(); // Her şey başarılıysa modalı kapat
         } catch (err: any) {
-            showError('Hata', 'PDF görüntüleme hatası: ' + err.message);
+            showError('Hata', 'İşlem başarısız: ' + err.message + '. Lütfen birkaç saniye sonra faturayı liste ekranından görüntülemeyi deneyin.');
         }
     };
 

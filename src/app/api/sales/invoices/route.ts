@@ -180,8 +180,14 @@ export async function POST(request: Request) {
 
                 const pdfResponse = await axios.get(`${baseUrl}/${module}/Download/${invoice.formalUuid}/PDF`, {
                     headers: { 'Authorization': `Bearer ${config.apiKey}` },
-                    responseType: 'arraybuffer'
+                    responseType: 'arraybuffer',
+                    validateStatus: () => true
                 });
+
+                if (pdfResponse.status >= 400) {
+                    console.error("[PDF Proxy Error]:", pdfResponse.status, pdfResponse.data?.toString());
+                    return NextResponse.json({ success: false, error: 'Fatura henüz hazırlanıyor veya bulunamadı.' }, { status: pdfResponse.status });
+                }
 
                 return new NextResponse(pdfResponse.data, {
                     headers: {
@@ -190,8 +196,8 @@ export async function POST(request: Request) {
                     }
                 });
             } catch (err: any) {
-                console.error("PDF Fetch Error:", err);
-                return NextResponse.json({ success: false, error: 'PDF alınamadı.' }, { status: 500 });
+                console.error("CRITICAL PDF Fetch Error:", err.message);
+                return NextResponse.json({ success: false, error: 'PDF sunucusuyla bağlantı hatası.' }, { status: 500 });
             }
         }
 
