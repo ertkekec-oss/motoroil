@@ -266,9 +266,9 @@ export async function POST(request: Request) {
                             Name: sanitize(i.name || "URUN").substring(0, 50),
                             Quantity: qty,
                             UnitType: "C62", // ADET yerine C62 (UBL Standardı)
-                            UnitPrice: price,
-                            VatRate: vatRate,
-                            VatAmount: Number(lineVat.toFixed(2)),
+                            Price: price,
+                            KDVPercent: vatRate,
+                            KDVTotal: Number(lineVat.toFixed(2)),
                             LineExtensionAmount: Number(lineNet.toFixed(2))
                         };
                     });
@@ -291,12 +291,12 @@ export async function POST(request: Request) {
                     // ISSUE TIME İLERİ ALINMALI (PaymentDate < IssueTime kuralı için)
                     const futureNow = new Date(now.getTime() + 10000); // 10 saniye ileri
 
-                    // TARİH FORMATI: Nilvera UBL için Date ve Time AYRI olmalı
-                    const issueDateOnly = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-                    const issueTimeOnly = futureNow.toISOString().split('T')[1].split('.')[0]; // Format: HH:MM:SS
+                    // TARİH FORMATI: Kullanıcı isteği üzerine tam ISO formatı (Tarih+Saat)
+                    // Örnek: "2026-02-04T10:45:03"
+                    const fullIssueDate = `${now.toISOString().split('T')[0]}T${futureNow.toISOString().split('T')[1].split('.')[0]}`;
 
                     // PaymentDate ŞİMDİKİ ZAMAN (IssueTime'dan önce kalmalı)
-                    const paymentDateFull = `${issueDateOnly}T${now.toISOString().split('T')[1].split('.')[0]}`;
+                    const paymentDateFull = `${now.toISOString().split('T')[0]}T${now.toISOString().split('T')[1].split('.')[0]}`;
 
                     // 10B2026000000691 FORMATI İÇİN CANLI SAYAÇ HESABI
                     let ordinal = 0;
@@ -335,12 +335,13 @@ export async function POST(request: Request) {
                             // Sadece seri kodu (3 hane), Nilvera otomatik tam numara üretir
                             // Örnek: "101" -> Nilvera "101000000112" üretir
                             InvoiceSerieOrNumber: invNo,
-                            IssueDate: issueDateOnly,
-                            // E-Fatura veya İnternet Satışı (PaymentDate içeriyor) -> Zorunlu
-                            // Normal E-Arşiv -> HİÇ GÖNDERME (Otomatik Zamanlama)
-                            ...(currentAttemptIsEInvoice || customerVkn.length === 11 ? { IssueTime: issueTimeOnly } : {}),
+                            IssueDate: fullIssueDate,
+                            // Kullanıcı örneğinde IssueTime yok, IssueDate tam formatlı
+
                             CurrencyCode: "TRY",
                             LineExtensionAmount: taxExclusiveAmount,
+                            GeneralKDV20Total: taxAmount,
+                            KdvTotal: taxAmount,
                             TaxExclusiveAmount: taxExclusiveAmount,
                             TaxInclusiveAmount: taxInclusiveAmount,
                             PayableAmount: payableAmount
