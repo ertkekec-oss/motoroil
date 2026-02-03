@@ -136,10 +136,13 @@ export class NilveraInvoiceService {
         const issueDate = trNow.toISOString().split('.')[0]; // YYYY-MM-DDTHH:mm:ss formatını garanti eder
 
         const anyLineExempt = params.lines.some(l => l.VatRate === 0);
+        const isTotalExempt = params.amounts.tax === 0;
+
+        console.log(`[NilveraService] Processing Invoice: totalTax=${params.amounts.tax}, anyExempt=${anyLineExempt}, type=${isEInvoiceUser ? 'EF' : 'EA'}`);
 
         const invoiceInfo: any = {
             UUID: crypto.randomUUID(),
-            InvoiceType: anyLineExempt ? 2 : 0, // 2: ISTISNA, 0: SATIS
+            InvoiceType: (anyLineExempt || isTotalExempt) ? 2 : 0, // 2: ISTISNA, 0: SATIS
             InvoiceProfile: isEInvoiceUser ? 2 : 5,
             InvoiceSerieOrNumber: series,
             IssueDate: issueDate,
@@ -150,21 +153,21 @@ export class NilveraInvoiceService {
             PayableAmount: params.amounts.total
         };
 
-        // Eğer fatura istisna içeriyorsa, dokümana göre TaxExemptionReasonInfo objesi içine konmalı
-        if (anyLineExempt) {
-            invoiceInfo.TaxExemptionReasonInfo = {
-                KDVExemptionReasonCode: "351", // İstisna Olmayan Diğer
-                KDVExemptionReason: "Diger"
+        // KDV Muafiyet Bilgileri (Garantici ve Yedekli Yapı)
+        if (anyLineExempt || isTotalExempt) {
+            const exemptionData = {
+                KDVExemptionReasonCode: "351",
+                KDVExemptionReason: "Diger",
+                TaxExemptionReasonCode: "351",
+                TaxExemptionReason: "Diger"
             };
 
-            // Redundant Fields (Bazı versiyonlar için doğrudan header'da da dursun)
-            if (isEInvoiceUser) {
-                invoiceInfo.TaxExemptionReasonCode = "351";
-                invoiceInfo.TaxExemptionReason = "Diger";
-            } else {
-                invoiceInfo.KDVExemptionReasonCode = "351";
-                invoiceInfo.KDVExemptionReason = "Diger";
-            }
+            // Header seviyesinde nesne olarak ve doğrudan ekle
+            invoiceInfo.TaxExemptionReasonInfo = exemptionData;
+            invoiceInfo.KdvExemptionReasonInfo = exemptionData;
+
+            // Redundant fields at root of InvoiceInfo
+            Object.assign(invoiceInfo, exemptionData);
         }
 
         if (!isEInvoiceUser) {
@@ -181,38 +184,32 @@ export class NilveraInvoiceService {
             }
         }
 
-        // 4. Model Normalizasyonu (İstisna Sebebi Korumalı)
+        // 4. Model Normalizasyonu (Tüm yedekli alan isimlerini dolduruyoruz)
         const invoiceLines = params.lines.map((line, idx) => {
             const lineExtensionAmount = Number((line.Quantity * line.Price).toFixed(2));
+            const vatAmount = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
+
             const baseLine: any = {
                 Index: idx + 1,
                 Name: line.Name,
                 Quantity: line.Quantity,
                 UnitType: (line.UnitType || "C62").toUpperCase(),
-                LineExtensionAmount: lineExtensionAmount
+                LineExtensionAmount: lineExtensionAmount,
+                // Hem e-fatura hem e-arşiv alanlarını beraber gönderiyoruz (Garantici yaklaşım)
+                UnitPrice: line.Price,
+                Price: line.Price,
+                VatRate: line.VatRate,
+                KDVPercent: line.VatRate,
+                VatAmount: vatAmount,
+                KDVTotal: vatAmount
             };
 
             const isExempt = line.VatRate === 0;
-
-            if (isEInvoiceUser) {
-                baseLine.UnitPrice = line.Price;
-                baseLine.VatRate = line.VatRate;
-                baseLine.VatAmount = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
-                if (isExempt) {
-                    baseLine.TaxExemptionReasonCode = "350";
-                    baseLine.TaxExemptionReason = "Diger";
-                }
-            } else {
-                baseLine.Price = line.Price;
-                baseLine.KDVPercent = line.VatRate;
-                baseLine.KDVTotal = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
-                if (isExempt) {
-                    // E-Arşiv için her iki alternatifi de gönderelim (Garantici yaklaşım)
-                    baseLine.KDVExemptionReasonCode = "350";
-                    baseLine.KDVExemptionReason = "Diger";
-                    baseLine.TaxExemptionReasonCode = "350";
-                    baseLine.TaxExemptionReason = "Diger";
-                }
+            if (isExempt) {
+                baseLine.TaxExemptionReasonCode = "351";
+                baseLine.TaxExemptionReason = "Diger";
+                baseLine.KDVExemptionReasonCode = "351";
+                baseLine.KDVExemptionReason = "Diger";
             }
             return baseLine;
         });
@@ -220,6 +217,8 @@ export class NilveraInvoiceService {
         const payload = isEInvoiceUser
             ? { EInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines }, CustomerAlias: alias.toString() }
             : { ArchiveInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines } };
+
+        console.log(`[NilveraService] FINAL PAYLOAD:`, JSON.stringify(payload, null, 2));
 
         const endpoint = isEInvoiceUser ? '/EInvoice/Send/Model' : '/EArchive/Send/Model';
 
@@ -230,12 +229,13 @@ export class NilveraInvoiceService {
             });
 
             if (response.status >= 400) {
+                console.error("[NilveraService] Error Response:", response.data);
                 // Akıllı Hata Mesajı Çıkarma (Object Object engelleyici)
                 let errMsg = "Nilvera API Hatası";
                 const d = response.data;
 
                 if (d?.Errors && Array.isArray(d.Errors)) {
-                    errMsg = d.Errors.map((e: any) => `[${e.Code}] ${e.Description}`).join(" | ");
+                    errMsg = d.Errors.map((e: any) => `[${e.Code}] ${e.Description} - ${e.Detail || ''}`).join(" | ");
                 } else if (d?.Message) {
                     errMsg = d.Message;
                 } else if (d?.ModelState) {
@@ -249,8 +249,10 @@ export class NilveraInvoiceService {
                 return { success: false, status: response.status, error: errMsg, data: d, payload };
             }
 
+            console.log("[NilveraService] SUCCESS:", response.data);
             return { success: true, status: response.status, data: response.data };
         } catch (error: any) {
+            console.error("[NilveraService] Exception:", error.message);
             return {
                 success: false,
                 error: error.response?.data ? JSON.stringify(error.response.data) : error.message
