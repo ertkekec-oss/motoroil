@@ -42,7 +42,8 @@ export class NilveraService {
         const cleanVkn = vkn.replace(/\s/g, '');
 
         try {
-            const response = await axios.get(`${this.baseUrl}/general/CheckUser/${cleanVkn}`, {
+            // DOĞRU ENDPOINT: GlobalCompany/Check
+            const response = await axios.get(`${this.baseUrl}/general/GlobalCompany/Check/TaxNumber/${cleanVkn}?globalUserType=Invoice`, {
                 headers: this.getHeaders(),
                 validateStatus: () => true
             });
@@ -51,45 +52,18 @@ export class NilveraService {
             let isEInvoiceUser = false;
             let alias = '';
 
-            // 1. Array formatı (En yaygın)
+            // Yanıt boş dizi ise mükellef değildir.
             if (Array.isArray(data) && data.length > 0) {
                 isEInvoiceUser = true;
-                const pkGib = data.find((item: any) =>
-                    (item.Alias || item.alias || "").toLowerCase().includes('pk') &&
-                    (item.Alias || item.alias || "").toLowerCase().includes('gib.gov.tr')
-                );
-                const anyPk = data.find((item: any) =>
-                    (item.Alias || item.alias || "").toLowerCase().includes('pk') ||
-                    (item.Type || item.type || "").toLowerCase() === 'pk'
-                );
-                const first = data[0];
-                const firstAlias = typeof first === 'string' ? first : (first.Alias || first.alias || first.Role || first.name || '');
-
-                alias = (pkGib?.Alias || pkGib?.alias) || (anyPk?.Alias || anyPk?.alias) || firstAlias;
-            }
-            // 2. Obje formatı
-            else if (data && typeof data === 'object' && !Array.isArray(data)) {
-                if (data.IsEInvoiceUser || data.isEInvoiceUser || data.UserType === 'EFATURA') {
-                    isEInvoiceUser = true;
-                }
-                const rawAlias = data.Alias || data.alias || data.SelectedAlias;
-                const rawAliases = data.Aliases || data.aliases || data.aliasesList || data.Items;
-
-                if (rawAlias) {
-                    alias = rawAlias;
-                    isEInvoiceUser = true;
-                } else if (Array.isArray(rawAliases) && rawAliases.length > 0) {
-                    alias = rawAliases[0].Alias || rawAliases[0].alias || (typeof rawAliases[0] === 'string' ? rawAliases[0] : '');
-                    isEInvoiceUser = true;
-                }
+                // İlk bulduğumuz alias'ı veya default olanı alalım
+                // Genellikle: urn:mail:defaultpk@... olan tercih edilir ama herhangi biri de olur
+                const defaultAlias = data.find((d: any) => d.Alias && d.Alias.includes('defaultpk'));
+                alias = defaultAlias ? defaultAlias.Alias : data[0].Alias;
             }
 
-            return {
-                isEInvoiceUser,
-                alias: alias?.toString().trim(),
-                rawData: data // Debug için ham veriyi de dönüyoruz
-            };
+            return { isEInvoiceUser, alias, rawData: data };
         } catch (error: any) {
+            console.error("User Check Error Details:", error.response?.data || error.message);
             return { isEInvoiceUser: false, rawData: error.response?.data };
         }
     }
