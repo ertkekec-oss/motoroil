@@ -69,9 +69,13 @@ export class NilveraInvoiceService {
             );
             const data = res.data;
             if (Array.isArray(data) && data.length > 0) {
-                // Return default alias or first one
-                const defaultAlias = data.find((d: any) => d.Alias && d.Alias.includes('defaultpk'));
-                return { isEInvoiceUser: true, alias: defaultAlias ? defaultAlias.Alias : data[0].Alias };
+                // Alias veya alias alanlarından birini bul
+                const findAlias = (item: any) => item.Alias || item.alias || item.identifier;
+
+                const defaultAliasObj = data.find((d: any) => findAlias(d)?.toLowerCase().includes('defaultpk'));
+                const finalAlias = defaultAliasObj ? findAlias(defaultAliasObj) : findAlias(data[0]);
+
+                return { isEInvoiceUser: true, alias: finalAlias };
             }
             return { isEInvoiceUser: false };
         } catch (error) {
@@ -92,7 +96,7 @@ export class NilveraInvoiceService {
 
             let seriesName = defaultSeries?.Name || (type === 'EFATURA' ? 'EFT' : 'ARS');
 
-            // Güvenlik: E-Arşiv için yanlış seri (E-Fatura serisi) seçilmesini engelle
+            // Güvenlik: E-Arşiv için yanlış seri seçilmesini engelle
             if (type === 'EARSIV' && (seriesName === '10B' || seriesName === 'EFT')) {
                 seriesName = 'ARS';
             }
@@ -104,7 +108,7 @@ export class NilveraInvoiceService {
     }
 
     /**
-     * 3. Adım: Akıllı Gönderim (Dinamik Model Yönetimi)
+     * 3. Adım: Akıllı Gönderim
      */
     async processAndSend(params: {
         customer: CustomerInfo,
@@ -116,16 +120,22 @@ export class NilveraInvoiceService {
     }) {
         // 1. Mükellefiyete göre karar ver
         const { isEInvoiceUser, alias } = await this.checkTaxpayer(params.customer.TaxNumber);
+
+        // KRİTİK: Eğer mükellef ama Alias yoksa hata ver
+        if (isEInvoiceUser && !alias) {
+            return { success: false, error: "Alıcı e-Fatura mükellefi ancak sistemsel bir etiket (Alias) bulunamadı." };
+        }
+
         const type = isEInvoiceUser ? 'EFATURA' : 'EARSIV';
 
         // 2. Doğru seriyi çek
         const series = await this.getDefaultSeries(type);
 
-        // 3. Tarih Formatı (Zorunlu Türkiye Saati +3 Offset)
+        // 3. Tarih ve Diğer Hazırlıklar...
         const trNow = new Date(new Date().getTime() + (3 * 60 * 60 * 1000));
         const issueDate = trNow.toISOString().split('.')[0];
 
-        // 4. Model Normalizasyonu (Kritik Alanlar)
+        // 4. Model Normalizasyonu
         const invoiceLines = params.lines.map((line, idx) => {
             const lineExtensionAmount = Number((line.Quantity * line.Price).toFixed(2));
             const baseLine: any = {
@@ -137,12 +147,10 @@ export class NilveraInvoiceService {
             };
 
             if (isEInvoiceUser) {
-                // E-Fatura İsimlendirmesi (VatRate, VatAmount, UnitPrice)
                 baseLine.UnitPrice = line.Price;
                 baseLine.VatRate = line.VatRate;
                 baseLine.VatAmount = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
             } else {
-                // E-Arşiv İsimlendirmesi (KDVPercent, KDVTotal, Price)
                 baseLine.Price = line.Price;
                 baseLine.KDVPercent = line.VatRate;
                 baseLine.KDVTotal = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
@@ -163,12 +171,8 @@ export class NilveraInvoiceService {
             PayableAmount: params.amounts.total
         };
 
-        // E-Arşiv Spesifik Alanlar
         if (!isEInvoiceUser) {
-            invoiceInfo.GeneralKDV20Total = params.amounts.tax;
-            invoiceInfo.KdvTotal = params.amounts.tax;
             invoiceInfo.SalesPlatform = params.isInternetSale ? "INTERNET" : "NORMAL";
-
             if (params.isInternetSale && params.internetInfo) {
                 invoiceInfo.InternetInfo = {
                     WebSite: params.internetInfo.WebSite,
@@ -180,25 +184,9 @@ export class NilveraInvoiceService {
         }
 
         const payload = isEInvoiceUser
-            ? {
-                EInvoice: {
-                    InvoiceInfo: invoiceInfo,
-                    CompanyInfo: params.company,
-                    CustomerInfo: params.customer,
-                    InvoiceLines: invoiceLines
-                },
-                CustomerAlias: alias
-            }
-            : {
-                ArchiveInvoice: {
-                    InvoiceInfo: invoiceInfo,
-                    CompanyInfo: params.company,
-                    CustomerInfo: params.customer,
-                    InvoiceLines: invoiceLines
-                }
-            };
+            ? { EInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines }, CustomerAlias: alias }
+            : { ArchiveInvoice: { InvoiceInfo: invoiceInfo, CompanyInfo: params.company, CustomerInfo: params.customer, InvoiceLines: invoiceLines } };
 
-        // 4. Gönderim
         const endpoint = isEInvoiceUser ? '/EInvoice/Send/Model' : '/EArchive/Send/Model';
 
         try {
@@ -206,18 +194,21 @@ export class NilveraInvoiceService {
                 headers: this.getHeaders(),
                 validateStatus: () => true
             });
-            return {
-                success: response.status < 400,
-                status: response.status,
-                data: response.data,
-                payload: payload // Debug için
-            };
+
+            if (response.status >= 400) {
+                // Akıllı Hata Mesajı Çıkarma
+                let errMsg = "Nilvera API Hatası";
+                const d = response.data;
+                if (d?.Errors && Array.isArray(d.Errors)) errMsg = d.Errors.map((e: any) => e.Description).join(" | ");
+                else if (d?.Message) errMsg = d.Message;
+                else if (typeof d === 'string') errMsg = d;
+
+                return { success: false, status: response.status, error: errMsg, data: d };
+            }
+
+            return { success: true, status: response.status, data: response.data };
         } catch (error: any) {
-            return {
-                success: false,
-                error: error.message,
-                data: error.response?.data
-            };
+            return { success: false, error: error.message };
         }
     }
 }
