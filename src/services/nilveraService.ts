@@ -135,10 +135,12 @@ export class NilveraInvoiceService {
         const trNow = new Date(new Date().getTime() + (3 * 60 * 60 * 1000));
         const issueDate = trNow.toISOString().split('.')[0]; // YYYY-MM-DDTHH:mm:ss formatını garanti eder
 
+        const isTotalExempt = params.amounts.tax === 0;
+
         const invoiceInfo: any = {
             UUID: crypto.randomUUID(),
-            InvoiceType: 0, // SATIS (Doküman: Sayısal 0 olmalı)
-            InvoiceProfile: isEInvoiceUser ? 2 : 5, // 2: TICARIFATURA, 5: EARSIVFATURA
+            InvoiceType: 0, // SATIS
+            InvoiceProfile: isEInvoiceUser ? 2 : 5,
             InvoiceSerieOrNumber: series,
             IssueDate: issueDate,
             CurrencyCode: "TRY",
@@ -148,8 +150,18 @@ export class NilveraInvoiceService {
             PayableAmount: params.amounts.total
         };
 
+        // Eğer fatura toplamı vergisiz ise başlık seviyesinde de istisna belirtilmeli
+        if (isTotalExempt) {
+            if (isEInvoiceUser) {
+                invoiceInfo.TaxExemptionReasonCode = "350";
+                invoiceInfo.TaxExemptionReason = "Diger";
+            } else {
+                invoiceInfo.KDVExemptionReasonCode = "350";
+                invoiceInfo.KDVExemptionReason = "Diger";
+            }
+        }
+
         if (!isEInvoiceUser) {
-            // E-Arşiv için vergi toplamları zorunludur
             invoiceInfo.GeneralKDV20Total = params.amounts.tax;
             invoiceInfo.KdvTotal = params.amounts.tax;
             invoiceInfo.SalesPlatform = params.isInternetSale ? "INTERNET" : "NORMAL";
@@ -174,7 +186,6 @@ export class NilveraInvoiceService {
                 LineExtensionAmount: lineExtensionAmount
             };
 
-            // KDV 0 ise istisna sebebi ekle (Hata 422 Engeli)
             const isExempt = line.VatRate === 0;
 
             if (isEInvoiceUser) {
@@ -190,8 +201,11 @@ export class NilveraInvoiceService {
                 baseLine.KDVPercent = line.VatRate;
                 baseLine.KDVTotal = Number((lineExtensionAmount * (line.VatRate / 100)).toFixed(2));
                 if (isExempt) {
+                    // E-Arşiv için her iki alternatifi de gönderelim (Garantici yaklaşım)
                     baseLine.KDVExemptionReasonCode = "350";
                     baseLine.KDVExemptionReason = "Diger";
+                    baseLine.TaxExemptionReasonCode = "350";
+                    baseLine.TaxExemptionReason = "Diger";
                 }
             }
             return baseLine;
