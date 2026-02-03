@@ -164,12 +164,12 @@ export default function SalesPage() {
 
         showConfirm(title, msg, async () => {
             try {
-                const res = await fetch('/api/sales/formal-invoice-send', {
+                const res = await fetch('/api/sales/invoices', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         invoiceId,
-                        type: type === 'EIRSALIYE' ? 'despatch' : 'invoice'
+                        action: 'formal-send'
                     })
                 });
                 const data = await res.json();
