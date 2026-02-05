@@ -16,19 +16,28 @@ export async function GET() {
         let nilveraInvoices: any[] = [];
         try {
             const settingsRecord = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
-            const config = (settingsRecord?.value as any) || {};
+            const rawConfig = settingsRecord?.value as any;
+
+            // Supporting both flat and nested config structures
+            const config = rawConfig?.apiKey ? rawConfig : (rawConfig?.nilvera || {});
 
             if (config.apiKey) {
+                console.log("[PurchasingList] Fetching from Nilvera with API Key...");
                 const nilvera = new NilveraInvoiceService({
                     apiKey: config.apiKey,
                     baseUrl: config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com'
                 });
 
                 const result = await nilvera.getIncomingInvoices();
-                if (result.success && result.data?.Content) {
-                    nilveraInvoices = result.data.Content.map((inv: any) => ({
-                        id: inv.UUID,
-                        supplier: inv.SupplierName || inv.SupplierVknTckn || "Bilinmeyen Tedarikçi",
+                console.log("[PurchasingList] Nilvera Result Success:", result.success);
+
+                if (result.success) {
+                    const content = result.data?.Content || (Array.isArray(result.data) ? result.data : []);
+                    console.log("[PurchasingList] Received Items Count:", content.length);
+
+                    nilveraInvoices = content.map((inv: any) => ({
+                        id: inv.UUID || inv.Id,
+                        supplier: inv.SupplierName || inv.SupplierTitle || inv.SupplierVknTckn || "Bilinmeyen Tedarikçi",
                         date: inv.IssueDate ? new Date(inv.IssueDate).toLocaleDateString('tr-TR') : '-',
                         msg: `e-Fatura: ${inv.InvoiceNumber || 'No Yok'}`,
                         total: Number(inv.PayableAmount || 0),
@@ -36,10 +45,14 @@ export async function GET() {
                         isFormal: true,
                         invoiceNo: inv.InvoiceNumber
                     }));
+                } else {
+                    console.error("[PurchasingList] Nilvera Error:", result.error);
                 }
+            } else {
+                console.warn("[PurchasingList] Nilvera API Key is missing in settings.");
             }
-        } catch (nilErr) {
-            console.error("[PurchasingList] Nilvera fetch failed:", nilErr);
+        } catch (nilErr: any) {
+            console.error("[PurchasingList] Nilvera fetch CRITICAL failure:", nilErr.message);
         }
 
         // Map local to UI format
@@ -56,8 +69,9 @@ export async function GET() {
 
         // Combined results
         const combined = [...nilveraInvoices, ...formattedLocal].sort((a, b) => {
-            // Sort by date equivalent if possible, otherwise keep order
-            return 0; // Simplified for now
+            const dateA = new Date(a.date.split('.').reverse().join('-')).getTime();
+            const dateB = new Date(b.date.split('.').reverse().join('-')).getTime();
+            return dateB - dateA;
         });
 
         return NextResponse.json({ success: true, invoices: combined });

@@ -1,10 +1,13 @@
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getRequestContext } from '@/lib/api-context';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
-        const notifications = await prisma.notification.findMany({
+        const ctx = await getRequestContext(req);
+        const notifications = await (prisma as any).notification.findMany({
+            where: { userId: ctx.userId },
             orderBy: { createdAt: 'desc' },
             take: 50
         });
@@ -14,14 +17,17 @@ export async function GET() {
     }
 }
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const data = await request.json();
-        const notification = await prisma.notification.create({
+        const ctx = await getRequestContext(req);
+        const data = await req.json();
+        const notification = await (prisma as any).notification.create({
             data: {
-                type: data.type || 'info',
-                icon: data.icon,
-                text: data.text
+                userId: ctx.userId,
+                type: data.type || 'INFO',
+                title: data.title || 'Bildirim',
+                message: data.message || data.text,
+                link: data.link
             }
         });
         return NextResponse.json(notification);

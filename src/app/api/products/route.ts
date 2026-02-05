@@ -31,14 +31,16 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { name, code, barcode, brand, category, type, stock, price, buyPrice, supplier, branch,
             salesVat, salesVatIncluded, purchaseVat, purchaseVatIncluded,
-            salesOiv, salesOtv, otvType } = body;
+            salesOiv, salesOtv, otvType, isParent, variantsData, unit,
+            currency, purchaseCurrency } = body;
 
         const targetBranch = branch || 'Merkez';
         const initialQty = parseFloat(stock) || 0;
         const bPrice = parseFloat(buyPrice) || 0;
 
         const product = await prisma.$transaction(async (tx) => {
-            const newProduct = await tx.product.create({
+            // 1. Create the Main Product (Parent)
+            const mainProduct = await tx.product.create({
                 data: {
                     name,
                     code: code || `SKU-${Date.now()}`,
@@ -46,11 +48,14 @@ export async function POST(request: Request) {
                     brand: brand || '',
                     category: category || 'Genel',
                     type: type || 'Ürün',
-                    stock: initialQty,
+                    stock: isParent ? 0 : initialQty,
                     price: parseFloat(price) || 0,
+                    currency: currency || 'TRY',
                     buyPrice: bPrice,
+                    purchaseCurrency: purchaseCurrency || 'TRY',
                     supplier: supplier || '',
                     branch: 'Merkez',
+                    unit: unit || 'Adet',
                     salesVat: parseInt(salesVat) || 20,
                     salesVatIncluded: salesVatIncluded !== undefined ? salesVatIncluded : true,
                     purchaseVat: parseInt(purchaseVat) || 20,
@@ -58,26 +63,79 @@ export async function POST(request: Request) {
                     salesOiv: parseFloat(salesOiv) || 0,
                     salesOtv: parseFloat(salesOtv) || 0,
                     otvType: otvType || 'Ö.T.V yok',
-                    stocks: {
+                    isParent: isParent || false,
+                    stocks: !isParent ? {
                         create: {
                             branch: targetBranch,
                             quantity: initialQty
                         }
-                    }
+                    } : undefined
                 },
                 include: { stocks: true }
             });
 
-            // Record initial movement for FIFO
-            if (initialQty > 0) {
-                await (tx as any).stockMovement.create({
+            // 2. If it's a parent, create children (variants)
+            if (isParent && variantsData && Array.isArray(variantsData)) {
+                for (const v of variantsData) {
+                    const childProduct = await tx.product.create({
+                        data: {
+                            name: `${name} (${v.variantLabel})`,
+                            code: v.code || `${mainProduct.code}-${v.variantLabel.replace(/\s+/g, '-').toUpperCase()}`,
+                            barcode: v.barcode || '',
+                            brand: brand || '',
+                            category: category || 'Genel',
+                            type: 'Varyant',
+                            stock: parseFloat(v.stock) || 0,
+                            price: parseFloat(v.price) || mainProduct.price,
+                            currency: currency || 'TRY',
+                            buyPrice: parseFloat(v.buyPrice) || bPrice,
+                            purchaseCurrency: purchaseCurrency || 'TRY',
+                            supplier: supplier || '',
+                            branch: 'Merkez',
+                            parentId: mainProduct.id,
+                            unit: unit || 'Adet',
+                            salesVat: mainProduct.salesVat,
+                            purchaseVat: mainProduct.purchaseVat,
+                            stocks: {
+                                create: {
+                                    branch: targetBranch,
+                                    quantity: parseFloat(v.stock) || 0
+                                }
+                            },
+                            variantValues: {
+                                create: (v.attributeValueIds || []).map((id: string) => ({
+                                    attributeValueId: id
+                                }))
+                            }
+                        }
+                    });
+
+                    // Initial movement for child
+                    if (parseFloat(v.stock) > 0) {
+                        await tx.stockMovement.create({
+                            data: {
+                                productId: childProduct.id,
+                                branch: targetBranch,
+                                quantity: parseFloat(v.stock),
+                                price: parseFloat(v.buyPrice) || bPrice,
+                                type: 'ADJUSTMENT',
+                                referenceId: 'START'
+                            }
+                        });
+                    }
+                }
+            }
+
+            // Record initial movement for standalone product
+            if (!isParent && initialQty > 0) {
+                await tx.stockMovement.create({
                     data: {
-                        productId: newProduct.id,
+                        productId: mainProduct.id,
                         branch: targetBranch,
                         quantity: initialQty,
                         price: bPrice,
                         type: 'ADJUSTMENT',
-                        details: 'Başlangıç stoğu'
+                        referenceId: 'START'
                     }
                 });
             }
@@ -88,13 +146,13 @@ export async function POST(request: Request) {
                 userName: session.username as string,
                 action: 'CREATE',
                 entity: 'Product',
-                entityId: newProduct.id,
-                newData: newProduct,
-                details: `${newProduct.name} ürünü oluşturuldu (Başlangıç stoğu: ${initialQty}).`,
+                entityId: mainProduct.id,
+                newData: mainProduct,
+                details: `${mainProduct.name} ${isParent ? 'ana ürün' : 'ürünü'} oluşturuldu.`,
                 branch: session.branch as string
             });
 
-            return newProduct;
+            return mainProduct;
         });
 
         return NextResponse.json({ success: true, product });

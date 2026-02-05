@@ -91,12 +91,21 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
     const { showError } = useModal();
-    const { user: authUser } = useAuth();
+    const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // 1. BRANCH STATE
     const [branches, setBranches] = useState<Branch[]>([]);
-    const [activeBranchName, setActiveBranchName] = useState<string>('Merkez');
+
+    // Improved Initialization: Try to get branch name IMMEDIATELY for faster parallel loading
+    const [activeBranchName, setActiveBranchName] = useState<string>(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('periodya_activeBranch') || localStorage.getItem('motoroil_activeBranch') || '';
+        }
+        return '';
+    });
+
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
 
     const refreshBranches = async () => {
         try {
@@ -112,12 +121,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setActiveBranchName(name);
         localStorage.setItem('periodya_activeBranch', name);
     };
-
-    useEffect(() => {
-        const savedBranch = localStorage.getItem('periodya_activeBranch') || localStorage.getItem('motoroil_activeBranch');
-        if (savedBranch) setActiveBranchName(savedBranch);
-        refreshBranches();
-    }, []);
 
     // 2. STAFF & USER STATE
     const [staff, setStaff] = useState<Staff[]>([]);
@@ -137,8 +140,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
-        refreshStaff();
-    }, []);
+        if (isAuthenticated) {
+            // CRITICAL: Ensure loading screen is visible during transition
+            setIsInitialLoading(true);
+
+            // Parallel start: don't wait for branches if we already know which one to use
+            if (!activeBranchName && authUser?.branch) {
+                setActiveBranchName(authUser.branch);
+            }
+
+            // Load both core requirements in parallel
+            Promise.all([refreshBranches(), refreshStaff()]).finally(() => {
+                const savedBranch = localStorage.getItem('periodya_activeBranch') || localStorage.getItem('motoroil_activeBranch');
+
+                // Determine initial branch preference if still empty
+                if (!activeBranchName) {
+                    if (savedBranch) {
+                        setActiveBranchName(savedBranch);
+                    } else if (authUser?.branch) {
+                        setActiveBranchName(authUser.branch);
+                    } else {
+                        setActiveBranchName('Merkez');
+                    }
+                }
+
+                setIsInitialLoading(false);
+            });
+        } else if (!authLoading) {
+            setIsInitialLoading(false);
+        }
+    }, [isAuthenticated, authLoading, authUser?.branch]);
 
     useEffect(() => {
         if (authUser) {
@@ -192,8 +223,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
-        refreshNotifications();
-    }, []);
+        if (isAuthenticated) {
+            refreshNotifications();
+        }
+    }, [isAuthenticated]);
 
     // 4. SECURITY
     const [suspiciousEvents, setSuspiciousEvents] = useState<SuspiciousEvent[]>([]);
@@ -208,8 +241,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
-        refreshSecurity();
-    }, []);
+        if (isAuthenticated) {
+            refreshSecurity();
+        }
+    }, [isAuthenticated]);
 
     const addSuspiciousEvent = async (event: SuspiciousEvent) => {
         try {
@@ -232,6 +267,50 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const recordSale = () => setLastSaleTime(new Date());
 
+    // --- RENDER CLOCK / LOADING GATE ---
+    if ((isInitialLoading || authLoading) && isAuthenticated) {
+        return (
+            <div style={{
+                background: 'var(--bg-deep)',
+                height: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontFamily: "'Outfit', sans-serif"
+            }}>
+                <div style={{ fontSize: '40px', marginBottom: '20px' }}>⏳</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>Verileriniz Hazırlanıyor</div>
+                <div style={{ fontSize: '14px', opacity: 0.6 }}>Lütfen bekleyin, şube ve personel ayarları senkronize ediliyor...</div>
+
+                {/* Subtle loading bar animation could be added here */}
+                <div style={{
+                    marginTop: '30px',
+                    width: '200px',
+                    height: '4px',
+                    background: 'rgba(255,255,255,0.1)',
+                    borderRadius: '2px',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{
+                        width: '40%',
+                        height: '100%',
+                        background: 'var(--primary)',
+                        animation: 'loading-bar 2s infinite ease-in-out'
+                    }}></div>
+                </div>
+                <style jsx>{`
+                    @keyframes loading-bar {
+                        0% { transform: translateX(-100%); width: 30%; }
+                        50% { width: 60%; }
+                        100% { transform: translateX(330%); width: 30%; }
+                    }
+                `}</style>
+            </div>
+        );
+    }
+
     return (
         <AppContext.Provider value={{
             currentUser, setCurrentUser, hasPermission, staff, refreshStaff,
@@ -240,17 +319,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             suspiciousEvents, addSuspiciousEvent, clearSuspiciousEvents, lastSaleTime, recordSale,
             isSidebarOpen, setIsSidebarOpen
         }}>
-            <FinancialProvider activeBranchName={activeBranchName}>
-                <InventoryProvider>
-                    <CRMProvider>
-                        <SalesProvider activeBranchName={activeBranchName}>
-                            <SettingsProvider>
-                                {children}
-                            </SettingsProvider>
-                        </SalesProvider>
-                    </CRMProvider>
-                </InventoryProvider>
-            </FinancialProvider>
+            {/* 
+                Performance Optimization: Mount non-branch-dependent providers higher 
+                so they can start fetching data in parallel while AppProvider resolves branches.
+            */}
+            <InventoryProvider>
+                <CRMProvider>
+                    <SettingsProvider>
+                        {activeBranchName ? (
+                            <FinancialProvider activeBranchName={activeBranchName}>
+                                <SalesProvider activeBranchName={activeBranchName}>
+                                    {children}
+                                </SalesProvider>
+                            </FinancialProvider>
+                        ) : (
+                            /* Fallback to render children even without branch if we're not authenticated 
+                               (though AppProvider usually gated by LayoutContent)
+                            */
+                            !isAuthenticated ? children : null
+                        )}
+                    </SettingsProvider>
+                </CRMProvider>
+            </InventoryProvider>
         </AppContext.Provider>
     );
 }

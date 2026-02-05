@@ -377,6 +377,12 @@ export default function AccountingPage() {
     const [showCheckModal, setShowCheckModal] = useState(false);
     const [newCheck, setNewCheck] = useState({ type: 'Alınan Çek', number: '', bank: '', dueDate: '', amount: '', entityId: '', description: '' });
 
+    const [showStatementModal, setShowStatementModal] = useState(false);
+    const [statementTransactions, setStatementTransactions] = useState<any[]>([]);
+    const [processedTransactions, setProcessedTransactions] = useState<Set<string>>(new Set());
+    const [selectedStatementKasaId, setSelectedStatementKasaId] = useState('');
+    const [isParsing, setIsParsing] = useState(false);
+
     const [showExpenseModal, setShowExpenseModal] = useState(false);
     const [newExpense, setNewExpense] = useState({ id: '', title: '', category: 'Diğer', amount: '', date: new Date().toISOString().split('T')[0], method: 'Nakit', kasaId: '' });
     const [isEditingExpense, setIsEditingExpense] = useState(false);
@@ -798,6 +804,111 @@ export default function AccountingPage() {
         });
     };
 
+
+    const handleStatementUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsParsing(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch('/api/financials/statements/parse', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.success && data.transactions) {
+                // Initialize transactions with default 'spending' action
+                const initialTxs = data.transactions.map((t: any) => ({
+                    ...t,
+                    action: 'spending', // 'spending', 'payment', 'ignore'
+                    targetId: 'Diğer' // Default expense category
+                }));
+                setStatementTransactions(initialTxs);
+                setShowStatementModal(true);
+                showSuccess("Başarılı", `${data.transactions.length} işlem okundu.`);
+            } else {
+                showError("Hata", data.error || "Okunamadı");
+            }
+        } catch (err) {
+            console.error(err);
+            showError("Hata", "Dosya yüklenirken hata oluştu.");
+        } finally {
+            setIsParsing(false);
+            // Reset input
+            e.target.value = '';
+        }
+    };
+
+    const processStatement = async () => {
+        if (!selectedStatementKasaId) {
+            showWarning("Seçim Yapın", "Lütfen işlemlerin aktarılacağı (bağlı) kredi kartı/banka hesabını seçiniz.");
+            return;
+        }
+
+        if (isProcessing) return;
+        setIsProcessing(true);
+        let successCount = 0;
+
+        try {
+            for (const tx of statementTransactions) {
+                if (processedTransactions.has(tx.id) || tx.action === 'ignore') continue;
+
+                try {
+                    // Create Transaction based on action
+                    if (tx.action === 'spending') {
+                        // Expense (Gider)
+                        await addFinancialTransaction({
+                            type: 'Expense',
+                            description: `Ekstre: ${tx.description} (${tx.targetId})`,
+                            amount: tx.amount,
+                            kasaId: selectedStatementKasaId
+                            // date: tx.date // Date format might need conversion DD.MM.YYYY -> YYYY-MM-DD
+                        });
+                    } else if (tx.action === 'payment') {
+                        // Supplier Payment (Borç Ödeme)
+                        // This reduces Supplier Balance and reduces Kasa Balance (Spending)
+                        await addFinancialTransaction({
+                            type: 'Payment', // Payment to Supplier
+                            description: `Ekstre Ödemesi: ${tx.description}`,
+                            amount: tx.amount, // Payment amount is positive in addFinancialTransaction usually
+                            kasaId: selectedStatementKasaId,
+                            supplierId: tx.targetId
+                        });
+                    }
+                    successCount++;
+                    setProcessedTransactions(prev => new Set(prev).add(tx.id));
+
+                } catch (e) {
+                    console.error("Tx fail", tx);
+                }
+            }
+
+            // Remove processed ones from list? Or just close?
+            // Let's filter out processed ones
+            setStatementTransactions(prev => prev.filter(t => !processedTransactions.has(t.id) && t.action === 'ignore')); // Keep ignored? Or just close.
+
+            if (successCount > 0) {
+                showSuccess("İşlem Tamamlandı", `${successCount} adet işlem başarıyla kaydedildi.`);
+                setShowStatementModal(false);
+                setStatementTransactions([]);
+                refreshTransactions();
+                refreshKasalar();
+                refreshSuppliers();
+            } else {
+                showWarning("İşlem Yok", "Kaydedilecek işlem seçilmedi.");
+            }
+
+        } catch (e) {
+            showError("Hata", "İşlemler kaydedilirken bir hata oluştu.");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     const addNewBank = async () => {
         if (!newBank.name) return;
         if (isProcessing) return;
@@ -806,7 +917,11 @@ export default function AccountingPage() {
             const res = await fetch('/api/kasalar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newBank.name.toUpperCase(), type: newBank.type === 'Nakit Kasa' ? 'Nakit' : 'Banka', balance: 0 })
+                body: JSON.stringify({
+                    name: newBank.name.toUpperCase(),
+                    type: newBank.type === 'Nakit Kasa' ? 'Nakit' : newBank.type,
+                    balance: 0
+                })
             });
             const data = await res.json();
             if (data.success) {
@@ -1459,7 +1574,12 @@ export default function AccountingPage() {
                         <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 mb-4">
                             <h3 className="text-xl font-bold">Kasa & Banka Hesapları</h3>
                             <div className="flex gap-2 w-full sm:w-auto">
-                                <button onClick={() => setShowVirmanModal(true)} className="btn btn-outline text-xs px-4 flex-1 sm:flex-none">Virman Transferi</button>
+                                <label className="btn btn-outline text-xs px-4 flex gap-2 cursor-pointer border-dashed border-white/40 hover:border-primary hover:text-primary">
+                                    {isParsing ? 'Okunuyor...' : '📄 Ekstre Yükle (PDF)'}
+                                    <input type="file" accept=".pdf" className="hidden" onChange={handleStatementUpload} disabled={isParsing} />
+                                </label>
+                                <button onClick={() => setShowVirmanModal(true)} className="btn btn-outline text-xs px-4 flex-1 sm:flex-none">Virman</button>
+                                <button onClick={() => setShowAddBank(true)} className="btn btn-primary text-xs px-4">+ Yeni Hesap</button>
                             </div>
                         </div>
 
@@ -1648,7 +1768,7 @@ export default function AccountingPage() {
                                                 <div className="form-group"><label className="text-[10px] text-muted">Banka / POS</label><input type="number" value={newItem.cardAmount} onChange={e => setNewItem({ ...newItem, cardAmount: e.target.value })} className="input-field" /></div>
                                                 <div className="form-group"><label className="text-[10px] text-muted">Banka Hesabı</label><select value={newItem.selectedCardBankId} onChange={e => setNewItem({ ...newItem, selectedCardBankId: e.target.value })} className="input-field">
                                                     <option value="">Seçiniz...</option>
-                                                    {filteredKasalar.filter(k => k.type !== 'Nakit').map(k => <option key={k.id} value={k.id}>{k.name} ({k.type})</option>)}
+                                                    {filteredKasalar.filter(k => k.type !== 'Nakit' && (modalType === 'payable' || k.type !== 'Kredi Kartı')).map(k => <option key={k.id} value={k.id}>{k.name} ({k.type})</option>)}
                                                 </select></div>
                                             </div>
                                         </div>
@@ -1843,7 +1963,7 @@ export default function AccountingPage() {
                                         onChange={e => setTargetKasaId(e.target.value)}
                                     >
                                         <option value="">Seçiniz...</option>
-                                        {filteredKasalar.filter(k => k.name !== 'ÇEK / SENET PORTFÖYÜ').map(k => (
+                                        {filteredKasalar.filter(k => k.name !== 'ÇEK / SENET PORTFÖYÜ' && (!activeCheck.type.includes('Alınan') || k.type !== 'Kredi Kartı')).map(k => (
                                             <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString()} ₺)</option>
                                         ))}
                                     </select>
@@ -2007,6 +2127,118 @@ export default function AccountingPage() {
                         </div>
                     </div>
                 )}
+
+            {
+                showStatementModal && (
+                    <div className="modal-overlay">
+                        <div className="card glass animate-in modal-content w-full max-w-4xl mx-auto h-[80vh] flex flex-col">
+                            <div className="flex-between mb-4 border-b border-white/5 pb-4">
+                                <div>
+                                    <h3 className="font-bold text-lg">📄 Akıllı Ekstre İşleme</h3>
+                                    <p className="text-xs text-muted">PDF ekstreden okunan işlemleri doğrulayıp sisteme aktarın.</p>
+                                </div>
+                                <button onClick={() => setShowStatementModal(false)} className="close-btn">&times;</button>
+                            </div>
+
+                            <div className="form-group mb-4">
+                                <label>İşlemlerin Aktarılacağı Hesap (Kredi Kartı / Banka)</label>
+                                <select
+                                    className="input-field font-bold text-primary"
+                                    value={selectedStatementKasaId}
+                                    onChange={e => setSelectedStatementKasaId(e.target.value)}
+                                >
+                                    <option value="">Hesap Seçiniz...</option>
+                                    {filteredKasalar.filter(k => k.type !== 'Nakit').map(k => (
+                                        <option key={k.id} value={k.id}>{k.name} ({k.type}) - {Number(k.balance).toLocaleString()} ₺</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="flex-1 overflow-auto custom-scrollbar border border-white/5 rounded-xl bg-white/5">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="text-xs text-muted bg-black/20 sticky top-0 z-10 backdrop-blur-md">
+                                        <tr>
+                                            <th className="p-3">Tarih</th>
+                                            <th>Açıklama</th>
+                                            <th className="text-right">Tutar</th>
+                                            <th className="p-3 w-[150px]">İşlem Türü</th>
+                                            <th className="p-3 w-[200px]">Hedef (Kategori/Cari)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {statementTransactions.map((tx, idx) => (
+                                            <tr key={tx.id} className={tx.action === 'ignore' ? 'opacity-50 grayscale' : 'hover:bg-white/5 transition-colors'}>
+                                                <td className="p-3 text-xs whitespace-nowrap">{tx.date}</td>
+                                                <td className="text-xs font-mono">{tx.description}</td>
+                                                <td className="text-right font-bold text-danger">-{Number(tx.amount).toLocaleString()} ₺</td>
+                                                <td className="p-2">
+                                                    <select
+                                                        className={`w-full bg-transparent border rounded px-1 py-1 text-xs outline-none ${tx.action === 'spending' ? 'border-warning text-warning' :
+                                                            tx.action === 'payment' ? 'border-info text-info' : 'border-white/10 text-muted'
+                                                            }`}
+                                                        value={tx.action}
+                                                        onChange={e => {
+                                                            const newTxs = [...statementTransactions];
+                                                            newTxs[idx].action = e.target.value;
+                                                            // Set default target based on action
+                                                            if (e.target.value === 'spending') newTxs[idx].targetId = 'Diğer';
+                                                            else if (e.target.value === 'payment') newTxs[idx].targetId = suppliers[0]?.id || '';
+                                                            setStatementTransactions(newTxs);
+                                                        }}
+                                                    >
+                                                        <option value="spending">Gider Fişi</option>
+                                                        <option value="payment">Cari Ödeme</option>
+                                                        <option value="ignore">Yoksay</option>
+                                                    </select>
+                                                </td>
+                                                <td className="p-2">
+                                                    {tx.action === 'spending' && (
+                                                        <select
+                                                            className="w-full bg-subtle/50 rounded px-2 py-1 text-xs outline-none"
+                                                            value={tx.targetId}
+                                                            onChange={e => {
+                                                                const newTxs = [...statementTransactions];
+                                                                newTxs[idx].targetId = e.target.value;
+                                                                setStatementTransactions(newTxs);
+                                                            }}
+                                                        >
+                                                            <option>Diğer</option><option>Kira</option><option>Maaş</option><option>Fatura</option><option>Malzeme</option><option>Yemek</option><option>Yakıt</option><option>Aidat</option><option>Vergi</option><option>Bakım</option>
+                                                        </select>
+                                                    )}
+                                                    {tx.action === 'payment' && (
+                                                        <select
+                                                            className="w-full bg-subtle/50 rounded px-2 py-1 text-xs outline-none"
+                                                            value={tx.targetId}
+                                                            onChange={e => {
+                                                                const newTxs = [...statementTransactions];
+                                                                newTxs[idx].targetId = e.target.value;
+                                                                setStatementTransactions(newTxs);
+                                                            }}
+                                                        >
+                                                            {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                                        </select>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div className="pt-4 border-t border-white/5 flex justify-end gap-3">
+                                <div className="text-xs text-muted self-center">
+                                    {statementTransactions.filter(t => t.action !== 'ignore').length} işlem kaydedilecek
+                                </div>
+                                <button onClick={() => setShowStatementModal(false)} className="btn btn-ghost">Vazgeç</button>
+                                <button onClick={processStatement} disabled={isProcessing} className="btn btn-primary px-8 font-bold">
+                                    {isProcessing ? 'İŞLENİYOR...' : 'ONAYLA VE KAYDET'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
         </div>
     );
 }

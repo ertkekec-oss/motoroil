@@ -68,6 +68,7 @@ export default function SettingsPage() {
         referralSettings: contextReferralSettings, updateReferralSettings,
         warranties, setWarranties,
         brands, setBrands, prodCats, setProdCats,
+        vehicleTypes, setVehicleTypes,
         allBrands, allCats,
         appSettings, updateAppSetting
     } = useSettings();
@@ -600,6 +601,7 @@ export default function SettingsPage() {
                 else if (definitionTab === 'cust_class') addDefinition('custClasses', custClasses, setCustClasses);
                 else if (definitionTab === 'supp_class') addDefinition('suppClasses', suppClasses, setSuppClasses);
                 else if (definitionTab === 'warranties') addDefinition('warranties', warranties, setWarranties);
+                else if (definitionTab === 'vehicle_types') addDefinition('vehicleTypes', vehicleTypes, setVehicleTypes);
             }
         }}
         className="btn btn-primary"
@@ -1924,6 +1926,7 @@ export default function SettingsPage() {
                                     { id: 'cust_class', label: 'Cari Sınıfları', icon: '👥', desc: 'Müşteri tipleri' },
                                     { id: 'supp_class', label: 'Tedarikçi Sınıfları', icon: '🏭', desc: 'Tedarikçi tipleri' },
                                     { id: 'warranties', label: 'Garanti Süreleri', icon: '🛡️', desc: 'Garanti seçenekleri' },
+                                    { id: 'vehicle_types', label: 'Taşıt Türleri', icon: '🛵', desc: 'Araç tipleri' },
                                     { id: 'payment_methods', label: 'Ödeme Yöntemleri', icon: '💳', desc: 'Kasa ve banka hesapları', highlight: true }
                                 ].map(t => (
                                     <button
@@ -1963,6 +1966,7 @@ export default function SettingsPage() {
                                         {definitionTab === 'cust_class' && 'Cari Sınıfları'}
                                         {definitionTab === 'supp_class' && 'Tedarikçi Sınıfları'}
                                         {definitionTab === 'warranties' && 'Garanti Seçenekleri'}
+                                        {definitionTab === 'vehicle_types' && 'Taşıt Türleri'}
                                         {definitionTab === 'payment_methods' && 'Ödeme Yöntemleri'}
                                     </h2>
                                     <p className="text-muted mb-6" style={{ fontSize: '13px' }}>
@@ -2022,6 +2026,7 @@ export default function SettingsPage() {
                                                                 else if (definitionTab === 'cust_class') addDefinition('custClasses', custClasses, setCustClasses);
                                                                 else if (definitionTab === 'supp_class') addDefinition('suppClasses', suppClasses, setSuppClasses);
                                                                 else if (definitionTab === 'warranties') addDefinition('warranties', warranties, setWarranties);
+                                                                else if (definitionTab === 'vehicle_types') addDefinition('vehicleTypes', vehicleTypes, setVehicleTypes);
                                                             }
                                                         }
                                                     }}
@@ -2055,6 +2060,7 @@ export default function SettingsPage() {
                                                             else if (definitionTab === 'cust_class') addDefinition('custClasses', custClasses, setCustClasses);
                                                             else if (definitionTab === 'supp_class') addDefinition('suppClasses', suppClasses, setSuppClasses);
                                                             else if (definitionTab === 'warranties') addDefinition('warranties', warranties, setWarranties);
+                                                            else if (definitionTab === 'vehicle_types') addDefinition('vehicleTypes', vehicleTypes, setVehicleTypes);
                                                         }
                                                     }}
                                                     className="btn btn-primary"
@@ -2095,7 +2101,8 @@ export default function SettingsPage() {
                                             (definitionTab === 'brands' ? brands :
                                                 definitionTab === 'prod_cat' ? prodCats :
                                                     definitionTab === 'cust_class' ? custClasses :
-                                                        definitionTab === 'supp_class' ? suppClasses : warranties
+                                                        definitionTab === 'supp_class' ? suppClasses :
+                                                            definitionTab === 'vehicle_types' ? vehicleTypes : warranties
                                             ).map((item: string, i: number) => (
                                                 <div key={i} className="card glass-hover animate-scale-in" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <span style={{ fontWeight: '600' }}>{item}</span>
@@ -2106,6 +2113,7 @@ export default function SettingsPage() {
                                                             else if (definitionTab === 'cust_class') removeDefinition('custClasses', item, custClasses, setCustClasses);
                                                             else if (definitionTab === 'supp_class') removeDefinition('suppClasses', item, suppClasses, setSuppClasses);
                                                             else if (definitionTab === 'warranties') removeDefinition('warranties', item, warranties, setWarranties);
+                                                            else if (definitionTab === 'vehicle_types') removeDefinition('vehicleTypes', item, vehicleTypes, setVehicleTypes);
                                                         }}
                                                         style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px', background: 'transparent', color: 'var(--danger)', border: '1px solid rgba(255,50,50,0.2)', cursor: 'pointer' }}
                                                     >
@@ -2121,7 +2129,8 @@ export default function SettingsPage() {
                                     (definitionTab === 'brands' ? brands :
                                         definitionTab === 'prod_cat' ? prodCats :
                                             definitionTab === 'cust_class' ? custClasses :
-                                                definitionTab === 'supp_class' ? suppClasses : warranties
+                                                definitionTab === 'supp_class' ? suppClasses :
+                                                    definitionTab === 'vehicle_types' ? vehicleTypes : warranties
                                     ).length === 0
                                 ) : paymentMethods.length === 0) && (
                                         <div className="flex-center flex-col text-muted" style={{ padding: '40px', opacity: 0.5 }}>

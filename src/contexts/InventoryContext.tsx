@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useModal } from './ModalContext';
 import { useAuth } from './AuthContext';
+import { useModal } from './ModalContext';
 
 export interface Product {
     id: number | string;
@@ -14,7 +14,9 @@ export interface Product {
     type: string;
     stock: number;
     price: number;
+    currency?: string;
     buyPrice: number;
+    purchaseCurrency?: string;
     status: 'ok' | 'low' | 'out' | 'warning';
     supplier: string;
     branch?: string;
@@ -25,6 +27,7 @@ export interface Product {
     salesOtv?: number;
     otvType?: string;
     salesOiv?: number;
+    unit?: string;
     minStock?: number;
     stocks?: any[];
 }
@@ -169,11 +172,14 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     };
 
 
+    const { isAuthenticated } = useAuth();
     useEffect(() => {
-        refreshProducts();
-        refreshStockTransfers();
-        refreshPending();
-    }, []);
+        if (isAuthenticated) {
+            refreshProducts();
+            refreshStockTransfers();
+            refreshPending();
+        }
+    }, [isAuthenticated]);
 
     return (
         <InventoryContext.Provider value={{

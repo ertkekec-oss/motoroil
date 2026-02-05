@@ -5,6 +5,7 @@ import { useInventory, Product } from './InventoryContext';
 import { useFinancials } from './FinancialContext';
 import { useCRM } from './CRMContext';
 import { useModal } from './ModalContext';
+import { useAuth } from './AuthContext';
 
 export interface SuspendedSale {
     id: string;
@@ -61,9 +62,12 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
         } catch (e) { console.error('Remove suspended sale failed', e); }
     };
 
+    const { isAuthenticated } = useAuth();
     useEffect(() => {
-        refreshSuspended();
-    }, []);
+        if (isAuthenticated) {
+            refreshSuspended();
+        }
+    }, [isAuthenticated]);
 
     const processSale = async (saleData: any) => {
         const saleBranch = saleData.branch || activeBranchName || 'Merkez';

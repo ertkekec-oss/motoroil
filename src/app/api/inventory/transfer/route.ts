@@ -1,14 +1,16 @@
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getRequestContext } from '@/lib/api-context';
 
-export async function GET(request: Request) {
+export async function GET(req: NextRequest) {
     try {
-        const { searchParams } = new URL(request.url);
+        const { searchParams } = new URL(req.url);
         const status = searchParams.get('status');
         const branch = searchParams.get('branch');
 
-        const where: any = {};
+        const ctx = await getRequestContext(req);
+        const where: any = { companyId: ctx.companyId };
         if (status) where.status = status;
         if (branch) {
             where.OR = [
@@ -29,9 +31,10 @@ export async function GET(request: Request) {
     }
 }
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const body = await request.json();
+        const ctx = await getRequestContext(req);
+        const body = await req.json();
         const { productId, fromBranch, toBranch, qty, requestedBy, notes } = body;
 
         if (!productId || !fromBranch || !toBranch || !qty || qty <= 0) {
@@ -65,11 +68,12 @@ export async function POST(request: Request) {
             });
 
             // 3. Bildirim Oluştur
-            await tx.notification.create({
+            await (tx as any).notification.create({
                 data: {
-                    type: 'stock',
-                    icon: '🚚',
-                    text: `${fromBranch} -> ${toBranch}: ${qty} adet ${sourceProduct.name} yola çıktı.`
+                    userId: ctx.userId,
+                    type: 'INFO',
+                    title: 'Stok Transferi Başlatıldı',
+                    message: `${fromBranch} -> ${toBranch}: ${qty} adet ${sourceProduct.name} yola çıktı.`
                 }
             });
 
@@ -82,9 +86,10 @@ export async function POST(request: Request) {
     }
 }
 
-export async function PUT(request: Request) {
+export async function PUT(req: NextRequest) {
     try {
-        const body = await request.json();
+        const ctx = await getRequestContext(req);
+        const body = await req.json();
         const { id, action, receivedBy } = body; // action: 'RECEIVE' or 'CANCEL'
 
         const transfer = await prisma.stockTransfer.findUnique({ where: { id } });
@@ -129,11 +134,12 @@ export async function PUT(request: Request) {
                 });
 
                 // 3. Bildirim Oluştur
-                await tx.notification.create({
+                await (tx as any).notification.create({
                     data: {
-                        type: 'success',
-                        icon: '✅',
-                        text: `${transfer.toBranch} şubesi ${transfer.qty} adet ${transfer.productName} kabul etti.`
+                        userId: ctx.userId,
+                        type: 'SUCCESS',
+                        title: 'Transfer Kabul Edildi',
+                        message: `${transfer.toBranch} şubesi ${transfer.qty} adet ${transfer.productName} kabul etti.`
                     }
                 });
 
@@ -151,11 +157,12 @@ export async function PUT(request: Request) {
                 });
 
                 // 3. Bildirim Oluştur
-                await tx.notification.create({
+                await (tx as any).notification.create({
                     data: {
-                        type: 'danger',
-                        icon: '❌',
-                        text: `${transfer.fromBranch} -> ${transfer.toBranch} transferi iptal edildi: ${transfer.productName}`
+                        userId: ctx.userId,
+                        type: 'ERROR',
+                        title: 'Transfer İptal Edildi',
+                        message: `${transfer.fromBranch} -> ${transfer.toBranch} transferi iptal edildi: ${transfer.productName}`
                     }
                 });
 

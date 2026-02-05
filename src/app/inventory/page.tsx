@@ -69,7 +69,7 @@ function InventoryContent() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [newProduct, setNewProduct] = useState({
         code: '', productCode: '', barcode: '', name: '', brand: '', category: 'Motosiklet', type: 'Diğer',
-        stock: 0, price: 0, buyPrice: 0, status: 'ok', supplier: '', gtip: '', gtin: '',
+        stock: 0, price: 0, currency: 'TRY', buyPrice: 0, purchaseCurrency: 'TRY', status: 'ok', supplier: '', gtip: '', gtin: '', unit: 'Adet',
         salesVat: 20, salesVatIncluded: true, purchaseVat: 20, purchaseVatIncluded: true,
         salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok', branch: activeBranchName || 'Merkez'
     });
@@ -97,10 +97,18 @@ function InventoryContent() {
     const [showScanner, setShowScanner] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+    const [variantAttributes, setVariantAttributes] = useState<any[]>([]);
+    const [useVariants, setUseVariants] = useState(false);
+    const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
+    const [generatedVariants, setGeneratedVariants] = useState<any[]>([]);
+
     // Modal açıldığında da verileri tazele
     useEffect(() => {
         if (showAddModal || !!selectedProduct) {
             refreshInventorySettings();
+            fetch('/api/products/attributes').then(res => res.json()).then(data => {
+                if (data.success) setVariantAttributes(data.attributes);
+            });
         }
     }, [showAddModal, selectedProduct]);
 
@@ -436,11 +444,15 @@ function InventoryContent() {
         try {
             const mandatoryFields = [
                 { field: 'name', label: 'Ürün Adı' },
-                { field: 'code', label: 'Stok Kodu' },
-                { field: 'buyPrice', label: 'Alış Fiyatı' },
-                { field: 'price', label: 'Satış Fiyatı' },
-                { field: 'stock', label: 'Stok Miktarı' }
+                { field: 'code', label: 'Stok Kodu' }
             ];
+
+            // If not using variants, buyPrice, price and stock are mandatory
+            if (!useVariants) {
+                mandatoryFields.push({ field: 'buyPrice', label: 'Alış Fiyatı' });
+                mandatoryFields.push({ field: 'price', label: 'Satış Fiyatı' });
+                mandatoryFields.push({ field: 'stock', label: 'Stok Miktarı' });
+            }
 
             for (const item of mandatoryFields) {
                 if (!newProduct[item.field as keyof typeof newProduct] && newProduct[item.field as keyof typeof newProduct] !== 0) {
@@ -452,18 +464,15 @@ function InventoryContent() {
 
             const prodToAdd = {
                 ...newProduct,
+                isParent: useVariants,
+                variantsData: useVariants ? generatedVariants : undefined,
                 status: (newProduct.stock <= 0 ? 'out' : (newProduct.stock <= 5 ? 'low' : 'ok')) as 'ok' | 'low' | 'out' | 'warning'
             };
 
             if (!hasPermission('approve_products')) {
                 requestProductCreation(prodToAdd);
                 setShowAddModal(false);
-                setNewProduct({
-                    code: '', productCode: '', barcode: '', name: '', brand: '', category: 'Motosiklet', type: 'Diğer',
-                    stock: 0, price: 0, buyPrice: 0, status: 'ok', supplier: '', gtip: '', gtin: '',
-                    salesVat: 20, salesVatIncluded: true, purchaseVat: 20, purchaseVatIncluded: true,
-                    salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok', branch: activeBranchName || 'Merkez'
-                });
+                resetNewProduct();
                 showSuccess('Ürün Talebi Oluşturuldu', 'Yönetici onayı bekleniyor.');
             } else {
                 try {
@@ -478,13 +487,7 @@ function InventoryContent() {
                         const pData = await pRes.json();
                         if (pData.success) setProducts(pData.products);
                         setShowAddModal(false);
-                        const defaultCat = dbCategories.length > 0 ? dbCategories[0] : 'Motosiklet';
-                        setNewProduct({
-                            code: '', productCode: '', barcode: '', name: '', brand: '', category: defaultCat, type: 'Diğer',
-                            stock: 0, price: 0, buyPrice: 0, status: 'ok', supplier: '', gtip: '', gtin: '',
-                            salesVat: 20, salesVatIncluded: true, purchaseVat: 20, purchaseVatIncluded: true,
-                            salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok', branch: activeBranchName || 'Merkez'
-                        });
+                        resetNewProduct();
                         showSuccess('Yeni Ürün Eklendi', 'Ürün başarıyla eklendi.');
                     } else {
                         showError('Kayıt Hatası', `Ürün kaydedilirken bir hata oluştu: ${data.error || 'Bilinmeyen hata'}`);
@@ -497,6 +500,50 @@ function InventoryContent() {
         } finally {
             setIsProcessing(false);
         }
+    };
+
+    const resetNewProduct = () => {
+        const defaultCat = dbCategories.length > 0 ? dbCategories[0] : 'Motosiklet';
+        setNewProduct({
+            code: '', productCode: '', barcode: '', name: '', brand: '', category: defaultCat, type: 'Diğer',
+            stock: 0, price: 0, currency: 'TRY', buyPrice: 0, purchaseCurrency: 'TRY', status: 'ok', supplier: '', gtip: '', gtin: '', unit: 'Adet',
+            salesVat: 20, salesVatIncluded: true, purchaseVat: 20, purchaseVatIncluded: true,
+            salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok', branch: activeBranchName || 'Merkez'
+        });
+        setUseVariants(false);
+        setSelectedAttributes([]);
+        setGeneratedVariants([]);
+    };
+
+    const generateCombinations = () => {
+        const selectedAttrs = variantAttributes.filter(a => selectedAttributes.includes(a.id));
+        if (selectedAttrs.length === 0) return;
+
+        const cartesian = (...a: any[][]) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+        const attrValues = selectedAttrs.map(a => a.values.map((v: any) => ({ attrId: a.id, valueId: v.id, label: v.value, attrName: a.name })));
+
+        let combos: any[][] = [];
+        if (attrValues.length === 1) {
+            combos = attrValues[0].map(v => [v]);
+        } else {
+            combos = cartesian(...attrValues);
+        }
+
+        const variants = combos.map(combo => {
+            const label = combo.map(c => c.label).join(' - ');
+            const ids = combo.map(c => c.valueId);
+            return {
+                variantLabel: label,
+                attributeValueIds: ids,
+                code: `${newProduct.code}-${label.replace(/\s+/g, '').toUpperCase()}`,
+                barcode: '',
+                price: newProduct.price,
+                buyPrice: newProduct.buyPrice,
+                stock: 0
+            };
+        });
+
+        setGeneratedVariants(variants);
     };
 
     const applyAdjustmentRule = () => {
@@ -1149,7 +1196,7 @@ function InventoryContent() {
 
                         <div className="space-y-6">
                             {/* Temel Bilgiler */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div>
                                     <label className="text-xs font-bold text-muted uppercase mb-1 block">Ürün Adı <span className="text-red-500">*</span></label>
                                     <input type="text" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
@@ -1160,7 +1207,19 @@ function InventoryContent() {
                                     <input type="text" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
                                         value={newProduct.code} onChange={e => setNewProduct({ ...newProduct, code: e.target.value })} placeholder="Örn: OTO-001" />
                                 </div>
-                                {/* Şube seçimi kaldırıldı - Ürünler global olarak tanımlanır */}
+                                <div>
+                                    <label className="text-xs font-bold text-muted uppercase mb-1 block">Satış Birimi</label>
+                                    <select className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                                        value={newProduct.unit} onChange={e => setNewProduct({ ...newProduct, unit: e.target.value })}>
+                                        <option value="Adet">Adet</option>
+                                        <option value="KG">Kilogram (KG)</option>
+                                        <option value="Litre">Litre (L)</option>
+                                        <option value="Metre">Metre (M)</option>
+                                        <option value="Paket">Paket</option>
+                                        <option value="Koli">Koli</option>
+                                        <option value="Set">Set</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -1197,60 +1256,114 @@ function InventoryContent() {
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
                             <h3 className="text-sm font-bold text-white/80 border-b border-white/10 pb-2">📦 Fiyatlandırma & Vergi Yönetimi</h3>
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {/* Alış Fiyatı */}
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted uppercase block">Alış Fiyatı</label>
-                                    <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                        value={newProduct.buyPrice} onChange={e => setNewProduct({ ...newProduct, buyPrice: parseFloat(e.target.value) })} />
+                                    <div className="flex gap-2 relative">
+                                        <input
+                                            type="number"
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none min-w-0"
+                                            placeholder="0.00"
+                                            value={newProduct.buyPrice}
+                                            onChange={e => setNewProduct({ ...newProduct, buyPrice: parseFloat(e.target.value) })}
+                                        />
+                                        <div className="w-24 shrink-0">
+                                            <select
+                                                className="w-full h-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none appearance-none cursor-pointer text-center font-bold"
+                                                value={newProduct.purchaseCurrency}
+                                                onChange={e => setNewProduct({ ...newProduct, purchaseCurrency: e.target.value })}
+                                            >
+                                                <option value="TRY">₺ TRY</option>
+                                                <option value="USD">$ USD</option>
+                                                <option value="EUR">€ EUR</option>
+                                                <option value="GBP">£ GBP</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Alış KDV */}
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted uppercase block">Alış KDV</label>
-                                    <div className="flex gap-2">
-                                        <select className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={newProduct.purchaseVat} onChange={e => setNewProduct({ ...newProduct, purchaseVat: parseInt(e.target.value) })}>
-                                            <option value="0">%0</option>
-                                            <option value="1">%1</option>
-                                            <option value="10">%10</option>
-                                            <option value="20">%20</option>
-                                        </select>
-                                        <div className="flex items-center">
-                                            <input type="checkbox" className="w-5 h-5 accent-primary"
+                                    <div className="flex items-center gap-2 h-[46px]">
+                                        <div className="relative flex-1 h-full">
+                                            <select
+                                                className="w-full h-full bg-black/40 border border-white/10 rounded-xl px-3 text-sm focus:border-primary outline-none appearance-none cursor-pointer"
+                                                value={newProduct.purchaseVat}
+                                                onChange={e => setNewProduct({ ...newProduct, purchaseVat: parseInt(e.target.value) })}
+                                            >
+                                                <option value="0">%0</option>
+                                                <option value="1">%1</option>
+                                                <option value="10">%10</option>
+                                                <option value="20">%20</option>
+                                            </select>
+                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">▼</span>
+                                        </div>
+                                        <label className="flex items-center gap-2 cursor-pointer h-full px-2 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
+                                            <input
+                                                type="checkbox"
+                                                className="w-5 h-5 accent-primary rounded cursor-pointer"
                                                 checked={newProduct.purchaseVatIncluded}
                                                 onChange={e => setNewProduct({ ...newProduct, purchaseVatIncluded: e.target.checked })}
-                                                title="KDV Dahil mi?"
                                             />
-                                        </div>
+                                            <span className="text-[10px] font-bold text-muted uppercase leading-none">Dahil</span>
+                                        </label>
                                     </div>
                                 </div>
 
                                 {/* Satış Fiyatı */}
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted uppercase block">Satış Fiyatı</label>
-                                    <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                        value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })} />
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="number"
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none min-w-0"
+                                            placeholder="0.00"
+                                            value={newProduct.price}
+                                            onChange={e => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
+                                        />
+                                        <div className="w-24 shrink-0">
+                                            <select
+                                                className="w-full h-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none appearance-none cursor-pointer text-center font-bold"
+                                                value={newProduct.currency}
+                                                onChange={e => setNewProduct({ ...newProduct, currency: e.target.value })}
+                                            >
+                                                <option value="TRY">₺ TRY</option>
+                                                <option value="USD">$ USD</option>
+                                                <option value="EUR">€ EUR</option>
+                                                <option value="GBP">£ GBP</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Satış KDV */}
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted uppercase block">Satış KDV</label>
-                                    <div className="flex gap-2">
-                                        <select className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                                            value={newProduct.salesVat} onChange={e => setNewProduct({ ...newProduct, salesVat: parseInt(e.target.value) })}>
-                                            <option value="0">%0</option>
-                                            <option value="1">%1</option>
-                                            <option value="10">%10</option>
-                                            <option value="20">%20</option>
-                                        </select>
-                                        <div className="flex items-center">
-                                            <input type="checkbox" className="w-5 h-5 accent-primary"
+                                    <div className="flex items-center gap-2 h-[46px]">
+                                        <div className="relative flex-1 h-full">
+                                            <select
+                                                className="w-full h-full bg-black/40 border border-white/10 rounded-xl px-3 text-sm focus:border-primary outline-none appearance-none cursor-pointer"
+                                                value={newProduct.salesVat}
+                                                onChange={e => setNewProduct({ ...newProduct, salesVat: parseInt(e.target.value) })}
+                                            >
+                                                <option value="0">%0</option>
+                                                <option value="1">%1</option>
+                                                <option value="10">%10</option>
+                                                <option value="20">%20</option>
+                                            </select>
+                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">▼</span>
+                                        </div>
+                                        <label className="flex items-center gap-2 cursor-pointer h-full px-2 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
+                                            <input
+                                                type="checkbox"
+                                                className="w-5 h-5 accent-primary rounded cursor-pointer"
                                                 checked={newProduct.salesVatIncluded}
                                                 onChange={e => setNewProduct({ ...newProduct, salesVatIncluded: e.target.checked })}
-                                                title="KDV Dahil mi?"
                                             />
-                                        </div>
+                                            <span className="text-[10px] font-bold text-muted uppercase leading-none">Dahil</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -1302,6 +1415,121 @@ function InventoryContent() {
                                         value={(newProduct as any).gtip || ''} onChange={e => setNewProduct({ ...newProduct, gtip: e.target.value } as any)} placeholder="12.34.56.78.90" />
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <h3 className="text-sm font-bold text-white/80">🎨 Varyant Yapılandırması</h3>
+                                <div className="flex items-center gap-2 bg-black/40 p-1.5 rounded-lg border border-white/10">
+                                    <span className="text-[10px] font-black uppercase text-muted">VARYANT KULLAN</span>
+                                    <input
+                                        type="checkbox"
+                                        className="w-4 h-4 accent-primary cursor-pointer"
+                                        checked={useVariants}
+                                        onChange={e => setUseVariants(e.target.checked)}
+                                    />
+                                </div>
+                            </div>
+
+                            {useVariants && (
+                                <div className="space-y-4 animate-fade-in">
+                                    <div className="flex flex-wrap gap-2">
+                                        {variantAttributes.map(attr => (
+                                            <button
+                                                key={attr.id}
+                                                onClick={() => {
+                                                    if (selectedAttributes.includes(attr.id)) {
+                                                        setSelectedAttributes(prev => prev.filter(id => id !== attr.id));
+                                                    } else {
+                                                        setSelectedAttributes(prev => [...prev, attr.id]);
+                                                    }
+                                                }}
+                                                className={`px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wide border transition-all ${selectedAttributes.includes(attr.id)
+                                                    ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
+                                                    : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'
+                                                    }`}
+                                            >
+                                                {attr.name}
+                                            </button>
+                                        ))}
+                                        <a href="/inventory/variants" target="_blank" className="px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wide bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all">
+                                            + Yeni Özellik Tanımla
+                                        </a>
+                                    </div>
+
+                                    {selectedAttributes.length > 0 && (
+                                        <div className="space-y-4">
+                                            <button
+                                                onClick={generateCombinations}
+                                                className="w-full py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-black hover:bg-white/10 transition-all"
+                                            >
+                                                🔄 KOMBİNASYONLARI OLUŞTUR
+                                            </button>
+
+                                            {generatedVariants.length > 0 && (
+                                                <div className="max-h-64 overflow-y-auto space-y-2 pr-2 custom-scroll">
+                                                    {generatedVariants.map((v, idx) => (
+                                                        <div key={idx} className="p-3 bg-black/40 border border-white/5 rounded-xl grid grid-cols-4 gap-2 items-end">
+                                                            <div className="col-span-1">
+                                                                <div className="text-[9px] font-black text-muted uppercase mb-1">{v.variantLabel}</div>
+                                                                <input
+                                                                    type="text"
+                                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-1.5 text-[10px] outline-none"
+                                                                    value={v.code}
+                                                                    onChange={e => {
+                                                                        const copy = [...generatedVariants];
+                                                                        copy[idx].code = e.target.value;
+                                                                        setGeneratedVariants(copy);
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <div className="col-span-1">
+                                                                <div className="text-[9px] font-black text-muted uppercase mb-1">STOK</div>
+                                                                <input
+                                                                    type="number"
+                                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-1.5 text-[10px] outline-none"
+                                                                    value={v.stock}
+                                                                    onChange={e => {
+                                                                        const copy = [...generatedVariants];
+                                                                        copy[idx].stock = parseFloat(e.target.value);
+                                                                        setGeneratedVariants(copy);
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <div className="col-span-1">
+                                                                <div className="text-[9px] font-black text-muted uppercase mb-1">ALIŞ</div>
+                                                                <input
+                                                                    type="number"
+                                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-1.5 text-[10px] outline-none"
+                                                                    value={v.buyPrice}
+                                                                    onChange={e => {
+                                                                        const copy = [...generatedVariants];
+                                                                        copy[idx].buyPrice = parseFloat(e.target.value);
+                                                                        setGeneratedVariants(copy);
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <div className="col-span-1">
+                                                                <div className="text-[9px] font-black text-muted uppercase mb-1">SATIŞ</div>
+                                                                <input
+                                                                    type="number"
+                                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-1.5 text-[10px] outline-none"
+                                                                    value={v.price}
+                                                                    onChange={e => {
+                                                                        const copy = [...generatedVariants];
+                                                                        copy[idx].price = parseFloat(e.target.value);
+                                                                        setGeneratedVariants(copy);
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         <button onClick={handleSaveNewProduct} className="w-full btn btn-primary py-4 mt-4 font-bold text-lg shadow-lg shadow-primary/20 hover:scale-[1.01] transition-transform">

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 import { useModal } from './ModalContext';
 
 export interface Transaction {
@@ -211,11 +212,15 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
         } catch (e) { console.error('Sales expenses save error', e); }
     };
 
+    const { isAuthenticated } = useAuth();
+
     useEffect(() => {
-        refreshKasalar();
-        refreshTransactions();
-        refreshChecks();
-    }, []);
+        if (isAuthenticated) {
+            refreshKasalar();
+            refreshTransactions();
+            refreshChecks();
+        }
+    }, [isAuthenticated]);
 
     return (
         <FinancialContext.Provider value={{

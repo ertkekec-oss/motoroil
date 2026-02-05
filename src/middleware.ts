@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
 
     // 2. Auth Related Paths - Allowed
     const publicPaths = ['/login', '/reset-password', '/api/auth/login'];
-    if (publicPaths.some(path => pathname.startsWith(path))) {
+    if (pathname === '/' || publicPaths.some(path => pathname.startsWith(path))) {
         return NextResponse.next();
     }
 

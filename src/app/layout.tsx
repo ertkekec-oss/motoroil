@@ -11,6 +11,7 @@ import "./globals.css";
 import SalesMonitor from "../components/SalesMonitor";
 import ChatWidget from "../components/ChatWidget";
 import { MobileNav } from "../components/MobileNav";
+import { GrowthBanner } from "../components/GrowthBanner";
 
 function MobileHeader() {
   const { isSidebarOpen, setIsSidebarOpen } = useApp();
@@ -79,12 +80,12 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthenticated && !isLoginPage && !isResetPage) {
+  if (!isAuthenticated && !isLoginPage && !isResetPage && pathname !== '/') {
     // Redirection is handled in AuthContext
     return null;
   }
 
-  if (isLoginPage || isResetPage) {
+  if (isLoginPage || isResetPage || (!isAuthenticated && pathname === '/')) {
     return <>{children}</>;
   }
 
@@ -116,6 +117,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           if (isSidebarOpen && window.innerWidth < 1024) setIsSidebarOpen(false);
         }}
       >
+        <GrowthBanner />
         {children}
 
         {/* Global Security Monitor */}

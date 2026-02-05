@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 export interface Campaign {
     id: string;
@@ -48,7 +49,9 @@ interface SettingsContextType {
     setBrands: React.Dispatch<React.SetStateAction<string[]>>;
     prodCats: string[];
     setProdCats: React.Dispatch<React.SetStateAction<string[]>>;
-    setWarranties: React.Dispatch<React.SetStateAction<string[]>>; // Added this
+    setWarranties: React.Dispatch<React.SetStateAction<string[]>>;
+    vehicleTypes: string[];
+    setVehicleTypes: React.Dispatch<React.SetStateAction<string[]>>;
     allBrands: string[];
     allCats: string[];
 }
@@ -65,6 +68,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const [appSettings, setAppSettings] = useState<Record<string, any>>({});
     const [brands, setBrands] = useState<string[]>([]);
     const [prodCats, setProdCats] = useState<string[]>([]);
+    const [vehicleTypes, setVehicleTypes] = useState<string[]>(['Motosiklet', 'Bisiklet']);
 
     const refreshSettings = async () => {
         try {
@@ -79,6 +83,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 if (data.warranties) setWarranties(data.warranties);
                 if (data.brands) setBrands(data.brands);
                 if (data.prodCats) setProdCats(data.prodCats);
+                if (data.vehicleTypes) setVehicleTypes(data.vehicleTypes);
             }
         } catch (e) { console.error('Settings fetch failed', e); }
     };
@@ -129,11 +134,15 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         } catch (e) { console.error('Update setting failed', e); }
     };
 
+    const { isAuthenticated } = useAuth();
+
     useEffect(() => {
-        refreshSettings();
-        refreshCampaigns();
-        refreshCoupons();
-    }, []);
+        if (isAuthenticated) {
+            refreshSettings();
+            refreshCampaigns();
+            refreshCoupons();
+        }
+    }, [isAuthenticated]);
 
     return (
         <SettingsContext.Provider value={{
@@ -141,10 +150,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
             serviceSettings, updateServiceSettings,
             invoiceSettings, updateInvoiceSettings,
             referralSettings, updateReferralSettings,
-            warranties, updateWarranties, setWarranties, // Added setWarranties
+            warranties, updateWarranties, setWarranties,
             appSettings, updateAppSetting, refreshSettings,
             brands, setBrands, allBrands: brands,
-            prodCats, setProdCats, allCats: prodCats
+            prodCats, setProdCats, allCats: prodCats,
+            vehicleTypes, setVehicleTypes
         }}>
             {children}
         </SettingsContext.Provider>

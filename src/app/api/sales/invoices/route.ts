@@ -55,9 +55,14 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { action, invoiceId } = body;
 
-        // HIJACKING FOR PROXY BYPASS: Send Formal Invoice
+        // HIJACKING FOR PROXY BYPASS: Send Formal Invoice / Despatch
         if (action === 'formal-send' && invoiceId) {
             try {
+                console.log('[Formal Send] Incoming Body:', body);
+                const { type, formalType, shipmentDate, shipmentTime, plateNumber, driverName, driverSurname, driverId } = body;
+                const requestedType = formalType || type;
+                console.log('[Formal Send] Requested Type:', requestedType);
+
                 const invoice = await (prisma as any).salesInvoice.findUnique({
                     where: { id: invoiceId },
                     include: { customer: true }
@@ -74,7 +79,7 @@ export async function POST(request: Request) {
                     baseUrl: config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com'
                 });
 
-                // Prepare Data for the service
+                // Prepare Data
                 const items = (invoice.items as any[]) || [];
                 const invoiceLines = items.map(i => ({
                     Name: i.name || "URUN",
@@ -84,47 +89,82 @@ export async function POST(request: Request) {
                     VatRate: parseFloat(i.vat?.toString() || "20")
                 }));
 
-                const totalNet = invoiceLines.reduce((sum, l) => sum + (l.Quantity * l.Price), 0);
-                const totalTax = invoiceLines.reduce((sum, l) => sum + (l.Quantity * l.Price * (l.VatRate / 100)), 0);
+                let sendResult;
 
-                const sendResult = await nilveraService.processAndSend({
-                    customer: {
-                        TaxNumber: (invoice.customer.taxNumber || invoice.customer.identityNumber || "11111111111").trim(),
-                        Name: invoice.customer.name,
-                        Email: invoice.customer.email || "destek@kech.tr",
-                        Address: invoice.customer.address || "ADRES",
-                        District: invoice.customer.district || "KADIKOY",
-                        City: invoice.customer.city || "ISTANBUL",
-                        Country: "TR",
-                        TaxOffice: invoice.customer.taxOffice || "KADIKOY"
-                    },
-                    company: {
-                        TaxNumber: config.companyVkn || "1111111111",
-                        Name: config.companyTitle || "FIRMA UNVANI",
-                        Email: config.portalEmail || "destek@kech.tr",
-                        Address: config.companyAddress || "ADRES",
-                        District: config.portalDistrict || "KADIKOY",
-                        City: config.portalCity || "ISTANBUL",
-                        Country: "TR",
-                        TaxOffice: config.portalTaxOffice || "KADIKOY"
-                    },
-                    lines: invoiceLines,
-                    amounts: {
-                        base: Number(totalNet.toFixed(2)),
-                        tax: Number(totalTax.toFixed(2)),
-                        total: Number((totalNet + totalTax).toFixed(2))
-                    },
-                    isInternetSale: false, // Varsayılan olarak mağaza satışı (Hataları önlemek için)
-                    internetInfo: {
-                        WebSite: "www.kech.tr",
-                        PaymentMethod: "KREDIKARTI/BANKAKARTI",
-                        PaymentDate: new Date().toISOString().split('T')[0],
-                        TransporterName: "ARAS KARGO"
-                    }
-                });
+                if (requestedType?.toString().toUpperCase() === 'EIRSALIYE') {
+                    sendResult = await nilveraService.processAndSendDespatch({
+                        customer: {
+                            TaxNumber: (invoice.customer.taxNumber || invoice.customer.identityNumber || "11111111111").trim(),
+                            Name: invoice.customer.name,
+                            Email: invoice.customer.email || "destek@kech.tr",
+                            Address: invoice.customer.address || "ADRES",
+                            District: invoice.customer.district || "KADIKOY",
+                            City: invoice.customer.city || "ISTANBUL",
+                            Country: "TR",
+                            TaxOffice: invoice.customer.taxOffice || "KADIKOY"
+                        },
+                        company: {
+                            TaxNumber: config.companyVkn || "1111111111",
+                            Name: config.companyTitle || "FIRMA UNVANI",
+                            Email: config.portalEmail || "destek@kech.tr",
+                            Address: config.companyAddress || "ADRES",
+                            District: config.portalDistrict || "KADIKOY",
+                            City: config.portalCity || "ISTANBUL",
+                            Country: "TR",
+                            TaxOffice: config.portalTaxOffice || "KADIKOY"
+                        },
+                        lines: invoiceLines,
+                        description: invoice.description || "İrsaliye",
+                        shipmentDate,
+                        shipmentTime,
+                        plateNumber,
+                        driverName,
+                        driverSurname,
+                        driverId
+                    });
+                } else {
+                    const totalNet = invoiceLines.reduce((sum, l) => sum + (l.Quantity * l.Price), 0);
+                    const totalTax = invoiceLines.reduce((sum, l) => sum + (l.Quantity * l.Price * (l.VatRate / 100)), 0);
+
+                    sendResult = await nilveraService.processAndSend({
+                        customer: {
+                            TaxNumber: (invoice.customer.taxNumber || invoice.customer.identityNumber || "11111111111").trim(),
+                            Name: invoice.customer.name,
+                            Email: invoice.customer.email || "destek@kech.tr",
+                            Address: invoice.customer.address || "ADRES",
+                            District: invoice.customer.district || "KADIKOY",
+                            City: invoice.customer.city || "ISTANBUL",
+                            Country: "TR",
+                            TaxOffice: invoice.customer.taxOffice || "KADIKOY"
+                        },
+                        company: {
+                            TaxNumber: config.companyVkn || "1111111111",
+                            Name: config.companyTitle || "FIRMA UNVANI",
+                            Email: config.portalEmail || "destek@kech.tr",
+                            Address: config.companyAddress || "ADRES",
+                            District: config.portalDistrict || "KADIKOY",
+                            City: config.portalCity || "ISTANBUL",
+                            Country: "TR",
+                            TaxOffice: config.portalTaxOffice || "KADIKOY"
+                        },
+                        lines: invoiceLines,
+                        amounts: {
+                            base: Number(totalNet.toFixed(2)),
+                            tax: Number(totalTax.toFixed(2)),
+                            total: Number((totalNet + totalTax).toFixed(2))
+                        },
+                        isInternetSale: false,
+                        internetInfo: {
+                            WebSite: "www.kech.tr",
+                            PaymentMethod: "KREDIKARTI/BANKAKARTI",
+                            PaymentDate: new Date().toISOString().split('T')[0],
+                            TransporterName: "ARAS KARGO"
+                        }
+                    });
+                }
 
                 if (sendResult.success) {
-                    const formalId = sendResult.data?.UUID || sendResult.data?.formalId || sendResult.data?.Id;
+                    const formalId = sendResult.data?.UUID || sendResult.data?.formalId || sendResult.data?.Id || sendResult.data?.DespatchNumber;
 
                     await (prisma as any).salesInvoice.update({
                         where: { id: invoiceId },
@@ -132,19 +172,18 @@ export async function POST(request: Request) {
                             isFormal: true,
                             formalStatus: 'SENT',
                             formalUuid: formalId,
-                            formalType: sendResult.type // EFATURA veya EARSIV
+                            formalType: sendResult.type // EFATURA, EARSIV veya EIRSALIYE
                         }
                     });
 
                     return NextResponse.json({
                         success: true,
-                        message: 'Fatura başarıyla gönderildi.',
+                        message: `${sendResult.type === 'EIRSALIYE' ? 'İrsaliye' : 'Fatura'} başarıyla gönderildi.`,
                         formalId: formalId,
-                        type: sendResult.type // EFATURA veya EARSIV
+                        type: sendResult.type
                     });
                 }
 
-                // Hata mesajını frontend için sterilize et ([object Object] engelleyici)
                 const errorDetail = sendResult.error || "Bilinmeyen API Hatası";
                 const technicalDetails = typeof sendResult.data === 'object' ? JSON.stringify(sendResult.data) : String(sendResult.data);
 
@@ -162,7 +201,6 @@ export async function POST(request: Request) {
                     details: err.message
                 }, { status: 200 });
             }
-            return;
         }
 
         // --- PDF GÖRÜNTÜLEME PROXY ---
@@ -174,11 +212,15 @@ export async function POST(request: Request) {
                 const settingsRecord = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
                 const config = (settingsRecord?.value as any) || {};
 
-                const isEInvoice = invoice.formalType === 'EFATURA';
-                const module = isEInvoice ? 'einvoice' : 'earchive';
-                const baseUrl = config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
+                const formalType = invoice.formalType;
+                let module = 'earchive';
+                if (formalType === 'EFATURA') module = 'einvoice';
+                if (formalType === 'EIRSALIYE') module = 'edespatch';
 
-                const pdfResponse = await axios.get(`${baseUrl}/${module}/Download/${invoice.formalUuid}/PDF`, {
+                const baseUrl = config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
+                const endpoint = `${baseUrl}/${module}/Download/${invoice.formalUuid}/PDF`;
+
+                const pdfResponse = await axios.get(endpoint, {
                     headers: { 'Authorization': `Bearer ${config.apiKey}` },
                     responseType: 'arraybuffer',
                     validateStatus: () => true

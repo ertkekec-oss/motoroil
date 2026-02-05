@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     // !! WARN !!
     ignoreBuildErrors: true,
   },
+  serverExternalPackages: ["iyzipay", "pdf-parse"],
   async headers() {
     return [
       {

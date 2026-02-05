@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Product } from '@/contexts/AppContext';
+import { Product } from '@/contexts/InventoryContext';
 
 interface InventoryDetailModalProps {
     isOpen: boolean;
@@ -142,6 +142,23 @@ export default function InventoryDetailModal({
                                             className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none text-white transition-colors font-mono"
                                         />
                                     </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-muted uppercase mb-1 block">Satış Birimi</label>
+                                        <select
+                                            value={selectedProduct.unit || 'Adet'}
+                                            onChange={(e) => setSelectedProduct({ ...selectedProduct, unit: e.target.value })}
+                                            disabled={!canEdit}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none text-white transition-colors appearance-none"
+                                        >
+                                            <option value="Adet">Adet</option>
+                                            <option value="KG">Kilogram (KG)</option>
+                                            <option value="Litre">Litre (L)</option>
+                                            <option value="Metre">Metre (M)</option>
+                                            <option value="Paket">Paket</option>
+                                            <option value="Koli">Koli</option>
+                                            <option value="Set">Set</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div className="col-span-2">
                                     <label className="text-xs font-bold text-muted uppercase mb-1 block">Açıklama</label>
@@ -163,15 +180,25 @@ export default function InventoryDetailModal({
                                     <div className="space-y-4">
                                         <div>
                                             <label className="text-xs font-bold text-muted uppercase mb-1 block">Alış Fiyatı (Net)</label>
-                                            <div className="relative">
+                                            <div className="flex gap-2">
                                                 <input
                                                     type="number"
                                                     value={selectedProduct.buyPrice}
                                                     onChange={(e) => setSelectedProduct({ ...selectedProduct, buyPrice: parseFloat(e.target.value) })}
                                                     disabled={!canEdit}
-                                                    className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none text-white transition-colors font-mono pl-8"
+                                                    className="flex-[2] bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none text-white transition-colors font-mono"
                                                 />
-                                                <span className="absolute left-3 top-3 text-muted">₺</span>
+                                                <select
+                                                    value={selectedProduct.purchaseCurrency || 'TRY'}
+                                                    onChange={(e) => setSelectedProduct({ ...selectedProduct, purchaseCurrency: e.target.value })}
+                                                    disabled={!canEdit}
+                                                    className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none text-white transition-colors appearance-none"
+                                                >
+                                                    <option value="TRY">₺ TRY</option>
+                                                    <option value="USD">$ USD</option>
+                                                    <option value="EUR">€ EUR</option>
+                                                    <option value="GBP">£ GBP</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">
@@ -208,15 +235,25 @@ export default function InventoryDetailModal({
                                     <div className="space-y-4">
                                         <div>
                                             <label className="text-xs font-bold text-muted uppercase mb-1 block">Satış Fiyatı (Net)</label>
-                                            <div className="relative">
+                                            <div className="flex gap-2">
                                                 <input
                                                     type="number"
                                                     value={selectedProduct.price}
                                                     onChange={(e) => setSelectedProduct({ ...selectedProduct, price: parseFloat(e.target.value) })}
                                                     disabled={!canEdit}
-                                                    className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none text-white transition-colors font-mono pl-8"
+                                                    className="flex-[2] bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none text-white transition-colors font-mono"
                                                 />
-                                                <span className="absolute left-3 top-3 text-muted">₺</span>
+                                                <select
+                                                    value={selectedProduct.currency || 'TRY'}
+                                                    onChange={(e) => setSelectedProduct({ ...selectedProduct, currency: e.target.value })}
+                                                    disabled={!canEdit}
+                                                    className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none text-white transition-colors appearance-none"
+                                                >
+                                                    <option value="TRY">₺ TRY</option>
+                                                    <option value="USD">$ USD</option>
+                                                    <option value="EUR">€ EUR</option>
+                                                    <option value="GBP">£ GBP</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">

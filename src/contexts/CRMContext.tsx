@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 export interface Customer {
     id: number | string;
@@ -87,14 +88,18 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
         } catch (e) { console.error('Classes fetch failed', e); }
     };
 
+    const { isAuthenticated } = useAuth();
+
     useEffect(() => {
-        // Parallel fetch for better performance
-        Promise.all([
-            refreshCustomers(),
-            refreshSuppliers(),
-            refreshClasses()
-        ]);
-    }, []);
+        if (isAuthenticated) {
+            // Parallel fetch for better performance
+            Promise.all([
+                refreshCustomers(),
+                refreshSuppliers(),
+                refreshClasses()
+            ]);
+        }
+    }, [isAuthenticated]);
 
     return (
         <CRMContext.Provider value={{

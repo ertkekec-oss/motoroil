@@ -9,12 +9,19 @@ import { useCRM } from '@/contexts/CRMContext';
 import { useSales } from '@/contexts/SalesContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useSearchParams, useRouter } from 'next/navigation';
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, Legend
+} from 'recharts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUpsell } from '@/hooks/useUpsell';
+import LandingPage from '@/components/LandingPage';
 
 
 function POSContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { activeBranchName } = useApp();
+  const { currentUser, activeBranchName } = useApp();
   const { products, stockTransfers } = useInventory();
   const {
     kasalar, transactions, refreshTransactions,
@@ -44,6 +51,25 @@ function POSContent() {
   const [pointsToUse, setPointsToUse] = useState(0);
   const [validCoupon, setValidCoupon] = useState<any>(null);
   const [referenceCode, setReferenceCode] = useState('');
+  const [insightsData, setInsightsData] = useState<any>(null);
+
+  const { isAuthenticated } = useAuth();
+  const { checkUpsell } = useUpsell();
+
+  // --- FETCH INSIGHTS ---
+  useEffect(() => {
+    const fetchInsights = async () => {
+      if (!isAuthenticated) return;
+      try {
+        const res = await fetch('/api/user/insights');
+        const data = await res.json();
+        setInsightsData(data);
+      } catch (err) {
+        console.error('Insights fetch error:', err);
+      }
+    };
+    fetchInsights();
+  }, [isAuthenticated]);
 
 
   // Customer Selection & Adding
@@ -307,6 +333,10 @@ function POSContent() {
     if (cart.length === 0) return;
     if (!paymentMode) return showWarning("Hata", "Lütfen bir ödeme yöntemi seçiniz.");
 
+    // Contextual Upsell Check
+    const canContinue = await checkUpsell('INVOICE_PAGE');
+    if (!canContinue) return;
+
     if (paymentMode !== 'account' && !selectedKasa) {
       return showWarning("Hata", `Lütfen işlem yapılacak ${paymentMode === 'cash' ? 'kasayı' : (paymentMode === 'card' ? 'POS hesabını' : 'bankayı')} seçiniz.`);
     }
@@ -473,6 +503,61 @@ function POSContent() {
       {/* SOL PANEL (Satış ve Liste) */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
 
+        {/* KİŞİSELLEŞTİRİLMİŞ KARŞILAMA VE INSIGHTLAR */}
+        <div style={{ marginBottom: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
+            <div>
+              <h2 style={{ fontSize: '24px', fontWeight: '900', margin: 0, letterSpacing: '-0.5px' }}>
+                Hoş geldin, <span style={{ color: 'var(--primary)' }}>{currentUser?.name?.split(' ')[0] || 'Kullanıcı'}</span> 👋
+              </h2>
+              <p style={{ fontSize: '13px', opacity: 0.5, margin: '4px 0 0 0' }}>Sistemdeki genel durumun ve sana özel ipuçları aşağıda.</p>
+            </div>
+          </div>
+
+          {insightsData?.insights?.length > 0 && (
+            <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '8px', scrollbarWidth: 'none' }}>
+              {insightsData.insights.map((insight: any, idx: number) => (
+                <div
+                  key={idx}
+                  onClick={() => insight.href && router.push(insight.href)}
+                  style={{
+                    minWidth: '300px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: '16px',
+                    padding: '16px',
+                    cursor: insight.href ? 'pointer' : 'default',
+                    transition: '0.3s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    position: 'relative',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                  }}
+                  onMouseOver={(e) => insight.href && (e.currentTarget.style.borderColor = 'var(--primary)')}
+                  onMouseOut={(e) => insight.href && (e.currentTarget.style.borderColor = 'var(--border-light)')}
+                >
+                  <div style={{ fontSize: '24px' }}>
+                    {insight.type === 'growth' ? '🚀' :
+                      insight.type === 'onboarding' ? '📋' :
+                        insight.type === 'predictive' ? '🔮' :
+                          insight.type === 'billing' ? '💸' : '💡'}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: '800', fontSize: '14px', marginBottom: '2px' }}>{insight.title}</div>
+                    <div style={{ fontSize: '12px', opacity: 0.6, lineHeight: '1.4' }}>{insight.message}</div>
+                    {insight.cta && (
+                      <div style={{ color: 'var(--primary)', fontWeight: '900', fontSize: '11px', marginTop: '6px' }}>
+                        {insight.cta} ➔
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* ÜST DASHBOARD - 4 KART */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
@@ -596,6 +681,124 @@ function POSContent() {
             )}
           </div>
         </div>
+
+        {/* --- PHASE 10: VISUAL INSIGHTS (TRENDS & FORECASTS) --- */}
+        {insightsData?.stats?.weeklyTrend && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 animate-fade-in" style={{ marginBottom: '8px' }}>
+
+            {/* 1. WEEKLY TREND (7D) */}
+            <div className="lg:col-span-6 bg-card-modern" style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-light)',
+              borderRadius: '20px',
+              padding: '20px',
+              minHeight: '260px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '900', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.5px' }}>📈 HAFTALIK SATIŞ TRENDİ</h3>
+                <span style={{ fontSize: '10px', background: 'var(--primary-dark)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: '800' }}>SON 7 GÜN</span>
+              </div>
+              <ResponsiveContainer width="100%" height={180}>
+                <AreaChart data={insightsData.stats.weeklyTrend}>
+                  <defs>
+                    <linearGradient id="colorTrend" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <Tooltip
+                    contentStyle={{ background: '#171717', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                    itemStyle={{ color: '#3b82f6', fontWeight: 'bold' }}
+                    labelStyle={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}
+                    formatter={(val: any) => [`₺${Number(val).toLocaleString()}`, 'Ciro']}
+                  />
+                  <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorTrend)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* 2. CATEGORY ANALYSIS */}
+            <div className="lg:col-span-3 bg-card-modern" style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-light)',
+              borderRadius: '20px',
+              padding: '20px',
+              minHeight: '260px',
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <h3 style={{ fontSize: '14px', fontWeight: '900', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.5px', marginBottom: '16px' }}>🍰 KATEGORİ DAĞILIMI</h3>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ResponsiveContainer width="100%" height={160}>
+                  <PieChart>
+                    <Pie
+                      data={insightsData.stats.categoryAnalysis}
+                      innerRadius={50}
+                      outerRadius={70}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {insightsData.stats.categoryAnalysis.map((entry: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ background: '#000', border: 'none', borderRadius: '8px', fontSize: '12px' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
+                {insightsData.stats.categoryAnalysis.slice(0, 3).map((cat: any, i: number) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', opacity: 0.7 }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][i % 5] }}></div>
+                    {cat.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. FORECAST CARDS */}
+            <div className="lg:col-span-3 space-y-4">
+              <div style={{
+                background: 'linear-gradient(135deg, #1e1b4b, #1e293b)',
+                border: '1px solid rgba(99, 102, 241, 0.3)',
+                borderRadius: '20px',
+                padding: '18px',
+                height: 'calc(50% - 8px)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '40px', opacity: 0.1 }}>🔮</div>
+                <div style={{ fontSize: '10px', fontWeight: '900', color: '#818cf8', letterSpacing: '1px', marginBottom: '12px' }}>GELECEK HAFTA TAHMİNİ</div>
+                <div style={{ fontSize: '24px', fontWeight: '900', color: 'white' }}>
+                  ₺{insightsData.stats.forecast.nextWeekRevenue.toLocaleString()}
+                </div>
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '8px' }}>
+                  Güven Skoru: %{insightsData.stats.forecast.confidence}
+                </div>
+              </div>
+
+              <div style={{
+                background: 'linear-gradient(135deg, #064e3b, #065f46)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '20px',
+                padding: '18px',
+                height: 'calc(50% - 8px)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '40px', opacity: 0.1 }}>🔋</div>
+                <div style={{ fontSize: '10px', fontWeight: '900', color: '#6ee7b7', letterSpacing: '1px', marginBottom: '12px' }}>AYLIK BÜYÜME HIZI</div>
+                <div style={{ fontSize: '24px', fontWeight: '900', color: 'white' }}>
+                  %{insightsData.stats.docGrowth > 0 ? '+' : ''}{insightsData.stats.docGrowth}
+                </div>
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '8px' }}>
+                  {insightsData.stats.thisMonthDocs}/ {insightsData.stats.lastMonthDocs} Fatura
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
 
         {/* ANA GÖVDE: SEPET + KARTLAR (ARAMA BARI SEPETİN ÜSTÜNDE) */}
         <div className="flex flex-mobile-col" style={{ flex: 1, gap: '16px', minHeight: 0 }}>
@@ -1304,6 +1507,16 @@ function POSContent() {
 }
 
 export default function Home() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div style={{ padding: '40px', color: 'white', textAlign: 'center', background: 'var(--bg-deep)', height: '100vh' }}>Yükleniyor...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <LandingPage />;
+  }
+
   return (
     <Suspense fallback={<div style={{ padding: '40px', color: 'white', textAlign: 'center' }}>Yükleniyor...</div>}>
       <POSContent />

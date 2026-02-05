@@ -14,8 +14,22 @@ function ServiceAcceptanceContent() {
     const { showSuccess, showError } = useModal();
     const { products } = useInventory();
     const { customers } = useCRM();
-    const { serviceSettings } = useSettings();
-    const [vehicleType, setVehicleType] = useState('moto'); // 'moto' or 'bike'
+    const { serviceSettings, vehicleTypes } = useSettings();
+    const [vehicleType, setVehicleType] = useState('Motosiklet');
+
+    useEffect(() => {
+        if (vehicleTypes && vehicleTypes.length > 0 && !vehicleTypes.includes(vehicleType)) {
+            // If current selection is not in list, select first available
+            if (vehicleTypes.includes('Motosiklet')) setVehicleType('Motosiklet');
+            else setVehicleType(vehicleTypes[0]);
+        }
+    }, [vehicleTypes]);
+
+    const isMotorized = (type: string) => {
+        const t = type.toLowerCase();
+        return !t.includes('bisiklet') && !t.includes('bicycle') && !t.includes('bike');
+    };
+
 
     const [selectedParts, setSelectedParts] = useState<{ id: string | number, name: string, price: number, quantity: number, originalId: string | number, isWarranty?: boolean }[]>([]);
     const [isLaborWarranty, setIsLaborWarranty] = useState(false);
@@ -155,7 +169,7 @@ function ServiceAcceptanceContent() {
             serialNumber: warranty.serialNo,
             plate: warranty.serialNo
         }));
-        setVehicleType('bike');
+        setVehicleType('Bisiklet');
         setWarrantyModalOpen(false);
         showSuccess('Ürün Seçildi', 'Garanti kapsamındaki ürün bilgileri dolduruldu.');
     };
@@ -184,7 +198,7 @@ function ServiceAcceptanceContent() {
     };
 
     const totalParts = selectedParts.reduce((acc, curr) => acc + (curr.isWarranty ? 0 : curr.price * curr.quantity), 0);
-    const laborCost = vehicleType === 'moto' ? (serviceSettings?.motoMaintenancePrice || 750) : (serviceSettings?.bikeMaintenancePrice || 350);
+    const laborCost = isMotorized(vehicleType) ? (serviceSettings?.motoMaintenancePrice || 750) : (serviceSettings?.bikeMaintenancePrice || 350);
     const activeLaborCost = isLaborWarranty ? 0 : laborCost;
     const totalCost = (totalParts + activeLaborCost) * 1.2;
 
@@ -220,7 +234,7 @@ function ServiceAcceptanceContent() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     customerId: finalCustomerId,
-                    plate: vehicleType === 'moto' ? formData.plate : formData.serialNumber,
+                    plate: isMotorized(vehicleType) ? formData.plate : formData.serialNumber,
                     vehicleBrand: formData.brand,
                     vehicleSerial: formData.serialNumber,
                     vehicleType,
@@ -322,19 +336,16 @@ function ServiceAcceptanceContent() {
                             {/* Vehicle Type Switcher */}
                             <div className="col-span-full mb-4">
                                 <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1 mb-3 block text-center">Taşıt Türü</label>
-                                <div className="flex p-1.5 bg-black/40 rounded-2xl border border-white/5 w-fit mx-auto">
-                                    <button
-                                        onClick={() => setVehicleType('moto')}
-                                        className={`px-12 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${vehicleType === 'moto' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-white/20 hover:text-white/40'}`}
-                                    >
-                                        🏍️ Motosiklet
-                                    </button>
-                                    <button
-                                        onClick={() => setVehicleType('bike')}
-                                        className={`px-12 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${vehicleType === 'bike' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-white/20 hover:text-white/40'}`}
-                                    >
-                                        🚲 Bisiklet
-                                    </button>
+                                <div className="flex flex-wrap justify-center gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5 w-fit mx-auto max-w-full">
+                                    {(vehicleTypes && vehicleTypes.length > 0 ? vehicleTypes : ['Motosiklet', 'Bisiklet']).map((t) => (
+                                        <button
+                                            key={t}
+                                            onClick={() => setVehicleType(t)}
+                                            className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${vehicleType === t ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-white/20 hover:text-white/40'}`}
+                                        >
+                                            {t === 'Motosiklet' ? '🏍️' : t === 'Bisiklet' ? '🚲' : '🛵'} {t}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
 
@@ -382,7 +393,7 @@ function ServiceAcceptanceContent() {
                             </div>
 
                             {/* Dynamic Fields */}
-                            {vehicleType === 'moto' ? (
+                            {isMotorized(vehicleType) ? (
                                 <>
                                     <div className="space-y-2">
                                         <label className="text-[11px] font-black text-white/40 uppercase tracking-widest ml-1">Araç Plakası</label>
@@ -520,7 +531,7 @@ function ServiceAcceptanceContent() {
                                         <div className="flex items-center gap-4">
                                             <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-lg">🔧</div>
                                             <div>
-                                                <div className="font-black text-white text-[15px]">Standart {vehicleType === 'moto' ? 'Motosiklet' : 'Bisiklet'} Bakım Hizmeti</div>
+                                                <div className="font-black text-white text-[15px]">Standart {vehicleType} Bakım Hizmeti</div>
                                                 {isLaborWarranty && <div className="text-[10px] font-black text-success uppercase tracking-widest mt-0.5">🛡️ Garanti Kapsamı</div>}
                                             </div>
                                         </div>

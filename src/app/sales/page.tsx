@@ -12,7 +12,7 @@ import { useCRM } from '@/contexts/CRMContext';
 import Pagination from '@/components/Pagination';
 
 export default function SalesPage() {
-    const { showSuccess, showError, showConfirm, showWarning, closeModal } = useModal();
+    const { showSuccess, showError, showConfirm, showWarning, showQuotaExceeded, closeModal } = useModal();
     const [activeTab, setActiveTab] = useState('online');
     const [view, setView] = useState<'list' | 'new_wayslip'>('list');
 
@@ -179,10 +179,14 @@ export default function SalesPage() {
     };
 
     const handleSendToELogo = async (invoiceId: string, type: 'EARSIV' | 'EFATURA' | 'EIRSALIYE') => {
-        const title = type === 'EIRSALIYE' ? 'e-İrsaliye Gönder' : 'e-Fatura Gönder';
-        const msg = type === 'EIRSALIYE'
-            ? 'Bu faturayı e-İrsaliye olarak resmileştirmek istiyor musunuz?'
-            : 'Bu faturayı e-Fatura/e-Arşiv olarak resmileştirmek istiyor musunuz? Müşteri VKN durumuna göre otomatik belirlenecektir.';
+        if (type === 'EIRSALIYE') {
+            setSelectedInvoiceForDespatch(invoiceId);
+            setShowDespatchModal(true);
+            return;
+        }
+
+        const title = 'e-Fatura Gönder';
+        const msg = 'Bu faturayı e-Fatura/e-Arşiv olarak resmileştirmek istiyor musunuz? Müşteri VKN durumuna göre otomatik belirlenecektir.';
 
         showConfirm(title, msg, async () => {
             try {
@@ -203,7 +207,12 @@ export default function SalesPage() {
                         '📄 PDF Görüntüle'
                     );
                     fetchInvoices();
+                    if (invoiceSubTab === 'wayslips') fetchWayslips();
                 } else {
+                    if (data.error?.includes('QUOTA_EXCEEDED')) {
+                        showQuotaExceeded();
+                        return;
+                    }
                     const technicalDetail = (data.errorCode ? ` (Hata Kodu: ${data.errorCode})` : '') + (data.details ? `\nDetay: ${data.details}` : '');
                     showError('Hata', '❌ ' + (data.error || 'Gönderim başarısız') + technicalDetail);
                 }
@@ -211,6 +220,50 @@ export default function SalesPage() {
                 showError('Hata', 'Bağlantı hatası: ' + e.message);
             }
         });
+    };
+
+    const [showDespatchModal, setShowDespatchModal] = useState(false);
+    const [selectedInvoiceForDespatch, setSelectedInvoiceForDespatch] = useState<string | null>(null);
+    const [despatchForm, setDespatchForm] = useState({
+        plateNumber: '',
+        driverName: '',
+        driverSurname: '',
+        driverId: '',
+        shipmentDate: new Date().toISOString().split('T')[0],
+        shipmentTime: new Date().toTimeString().split(' ')[0]
+    });
+
+    const handleFinalSendDespatch = async () => {
+        if (!selectedInvoiceForDespatch) return;
+
+        try {
+            const res = await fetch('/api/sales/invoices', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    invoiceId: selectedInvoiceForDespatch,
+                    action: 'formal-send',
+                    formalType: 'EIRSALIYE',
+                    ...despatchForm
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess(
+                    'Başarılı',
+                    `✅ e-İrsaliye başarıyla gönderildi.\nUUID: ${data.formalId}`,
+                    () => handleViewPDF(selectedInvoiceForDespatch),
+                    '📄 PDF Görüntüle'
+                );
+                setShowDespatchModal(false);
+                fetchInvoices();
+                if (invoiceSubTab === 'wayslips') fetchWayslips();
+            } else {
+                showError('Hata', '❌ ' + (data.error || 'Gönderim başarısız'));
+            }
+        } catch (e: any) {
+            showError('Hata', 'Bağlantı hatası: ' + e.message);
+        }
     };
 
     const [newWayslipData, setNewWayslipData] = useState({
@@ -1801,6 +1854,127 @@ export default function SalesPage() {
                                 >Oluştur ve Kaydet</button>
                             </div>
                         </div>
+                    </div>
+                )}
+                {/* E-IRSALIYE DETAILS MODAL */}
+                {showDespatchModal && (
+                    <div className="modal-backdrop px-4">
+                        <div className="modal-content glass shadow-2xl" style={{ maxWidth: '600px', width: '100%', borderRadius: '24px', overflow: 'hidden' }}>
+                            <div className="p-6">
+                                <div className="flex justify-between items-center mb-6 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <h3 className="text-xl font-bold m-0 flex items-center gap-2">
+                                        <span style={{ fontSize: '1.5rem' }}>🚚</span> e-İrsaliye Detayları
+                                    </h3>
+                                    <button
+                                        onClick={() => setShowDespatchModal(false)}
+                                        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors text-white/60 hover:text-white"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+
+                                <p className="text-white/60 mb-8 leading-relaxed" style={{ fontSize: '14px' }}>
+                                    Lütfen sevkiyat ve taşıma bilgilerini eksiksiz doldurunuz. Bu bilgiler resmî e-İrsaliye belgesi üzerinde yer alacaktır.
+                                </p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                                    <div className="form-group">
+                                        <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>PLAKA NO</label>
+                                        <input
+                                            type="text"
+                                            className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all placeholder:text-white/20"
+                                            placeholder="34 ABC 123"
+                                            value={despatchForm.plateNumber}
+                                            onChange={e => setDespatchForm({ ...despatchForm, plateNumber: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>SÜRÜCÜ TCKN</label>
+                                        <input
+                                            type="text"
+                                            className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all placeholder:text-white/20"
+                                            placeholder="11 haneli kimlik no"
+                                            maxLength={11}
+                                            value={despatchForm.driverId}
+                                            onChange={e => setDespatchForm({ ...despatchForm, driverId: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>SÜRÜCÜ ADI</label>
+                                        <input
+                                            type="text"
+                                            className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all placeholder:text-white/20"
+                                            placeholder="Ad"
+                                            value={despatchForm.driverName}
+                                            onChange={e => setDespatchForm({ ...despatchForm, driverName: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>SÜRÜCÜ SOYADI</label>
+                                        <input
+                                            type="text"
+                                            className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all placeholder:text-white/20"
+                                            placeholder="Soyad"
+                                            value={despatchForm.driverSurname}
+                                            onChange={e => setDespatchForm({ ...despatchForm, driverSurname: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>FİİLİ SEVK TARİHİ</label>
+                                        <input
+                                            type="date"
+                                            className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all"
+                                            value={despatchForm.shipmentDate}
+                                            onChange={e => setDespatchForm({ ...despatchForm, shipmentDate: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>FİİLİ SEVK SAATİ</label>
+                                        <input
+                                            type="time"
+                                            className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all"
+                                            value={despatchForm.shipmentTime}
+                                            onChange={e => setDespatchForm({ ...despatchForm, shipmentTime: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end mt-10 gap-4">
+                                    <button
+                                        onClick={() => setShowDespatchModal(false)}
+                                        className="px-8 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-white font-medium transition-all"
+                                    >
+                                        İptal
+                                    </button>
+                                    <button
+                                        onClick={handleFinalSendDespatch}
+                                        className="px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all"
+                                    >
+                                        Resmileştir ve Gönder
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <style jsx>{`
+                            .modal-backdrop {
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background: rgba(0,0,0,0.85);
+                                backdrop-filter: blur(12px);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                z-index: 1000;
+                            }
+                            .glass {
+                                background: rgba(23, 23, 23, 0.8);
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                backdrop-filter: blur(20px);
+                            }
+                        `}</style>
                     </div>
                 )}
             </div >

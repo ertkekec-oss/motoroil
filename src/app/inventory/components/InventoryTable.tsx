@@ -11,6 +11,7 @@ interface Product {
     stock: number;
     price: number;
     branch?: string;
+    unit?: string;
     status?: 'out' | 'low' | 'ok' | 'warning';
     _restricted?: boolean;
     [key: string]: any;
@@ -130,7 +131,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                         <>
                                             <div className="w-32 px-4 flex flex-col justify-center">
                                                 <div className="text-[10px] text-white/30 uppercase font-black mb-1">SİSTEM</div>
-                                                <div className="text-lg font-bold text-white/50 tabular-nums">{item.stock}</div>
+                                                <div className="text-lg font-bold text-white/50 tabular-nums">{item.stock} {item.unit || 'Adet'}</div>
                                             </div>
                                             <div className="w-64 px-4" onClick={e => e.stopPropagation()}>
                                                 <div className="relative group/input">
@@ -168,7 +169,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                                         <div className={`w-1.5 h-1.5 rounded-full ${item.stock <= 0 ? 'bg-red-500' :
                                                             item.stock <= 5 ? 'bg-amber-500' : 'bg-emerald-500'
                                                             }`}></div>
-                                                        <span className="text-[12px] font-medium text-white/80">{item.stock} Stok</span>
+                                                        <span className="text-[12px] font-medium text-white/80">{item.stock} {item.unit || 'Adet'}</span>
                                                         <span className="text-[10px] text-white/30 ml-1">{item.branch || 'Merkez'}</span>
                                                     </div>
                                                     {branchStocks.length > 0 && (
@@ -187,7 +188,12 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                                     <span className="text-[10px] text-white/20 italic">Gizli</span>
                                                 ) : (
                                                     <div className="flex flex-col items-end">
-                                                        <div className="text-white/90 font-bold text-[14px] tabular-nums">{Number(item.price).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                                                        <div className="text-white/90 font-bold text-[14px] tabular-nums">
+                                                            {Number(item.price).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+                                                            <span className="ml-1 text-xs opacity-70">
+                                                                {item.currency === 'USD' ? '$' : item.currency === 'EUR' ? '€' : item.currency === 'GBP' ? '£' : '₺'}
+                                                            </span>
+                                                        </div>
                                                         {item.salesVat > 0 && <div className="text-[9px] text-white/30 tabular-nums">+{item.salesVat}% KDV</div>}
                                                     </div>
                                                 )}
