@@ -88,9 +88,12 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
-        refreshCustomers();
-        refreshSuppliers();
-        refreshClasses();
+        // Parallel fetch for better performance
+        Promise.all([
+            refreshCustomers(),
+            refreshSuppliers(),
+            refreshClasses()
+        ]);
     }, []);
 
     return (

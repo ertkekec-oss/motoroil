@@ -54,20 +54,8 @@ export async function GET() {
             }
         }
 
-        // 3. SYNC KASALAR (Ensure all financial vaults have ledger accounts)
-        try {
-            const allKasalar = await prisma.kasa.findMany();
-            for (const kasa of allKasalar) {
-                try {
-                    await getAccountForKasa(kasa.id, kasa.branch || 'Merkez');
-                } catch (kasaError) {
-                    console.error(`Sync Failed for Kasa ${kasa.name}:`, kasaError);
-                    // Continue to next kasa
-                }
-            }
-        } catch (syncError) {
-            console.error("Sync Kasalar Error:", syncError);
-        }
+        // 3. (REMOVED REDUNDANT SYNC)
+        // Kasa sync is now handled via manual /api/financials/accounts/sync or background tasks
 
         // 4. Fetch all accounts sorted by code
         console.log('[Accounts API] Fetching all accounts...');
@@ -182,8 +170,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: 'Hesap kodu, adı ve tipi zorunludur.' }, { status: 400 });
         }
 
-        // Check uniqueness
-        const existing = await prisma.account.findUnique({ where: { code } });
+        // Check uniqueness (code + branch compound unique)
+        const existing = await prisma.account.findFirst({
+            where: { code, branch: 'Merkez' }
+        });
         if (existing) {
             return NextResponse.json({ success: false, error: 'Bu hesap kodu zaten kullanılıyor.' }, { status: 400 });
         }

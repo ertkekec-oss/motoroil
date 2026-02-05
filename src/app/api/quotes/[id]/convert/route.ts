@@ -2,12 +2,11 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id: quoteId } = await params;
         const session = await getSession();
         if (!session) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-
-        const quoteId = params.id;
 
         const result = await prisma.$transaction(async (tx) => {
             // 1. Fetch Quote

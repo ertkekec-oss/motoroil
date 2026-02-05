@@ -4,13 +4,18 @@ import { useState, useMemo, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
 import { useInventory } from '@/contexts/InventoryContext';
 import { useCRM } from '@/contexts/CRMContext';
+import { useApp } from '@/contexts/AppContext';
 import QuoteList from '@/components/QuoteList';
 import QuoteForm from '@/components/QuoteForm';
+import QuotePreviewModal from '@/components/modals/QuotePreviewModal';
 
 export default function QuotesPage() {
     const { showSuccess, showError } = useModal();
+    const { branches } = useApp();
     const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
     const [editingQuote, setEditingQuote] = useState<any>(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [previewQuote, setPreviewQuote] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
     const [quotes, setQuotes] = useState<any[]>([]);
@@ -77,8 +82,8 @@ export default function QuotesPage() {
     };
 
     const handlePreview = (quote: any) => {
-        // Ideally open a print-friendly modal or page
-        showSuccess('Bilgi', 'Baskı önizleme özelliği hazırlandığında aktif edilecektir.');
+        setPreviewQuote(quote);
+        setIsPreviewOpen(true);
     };
 
     return (
@@ -181,6 +186,13 @@ export default function QuotesPage() {
                     </div>
                 )}
             </div>
-        </div>
+
+            <QuotePreviewModal
+                isOpen={isPreviewOpen}
+                onClose={() => setIsPreviewOpen(false)}
+                quote={previewQuote}
+                branches={branches}
+            />
+        </div >
     );
 }

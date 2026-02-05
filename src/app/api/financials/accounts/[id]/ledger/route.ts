@@ -3,8 +3,8 @@ import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const { id } = params;
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const startDateStr = searchParams.get('startDate');
     const endDateStr = searchParams.get('endDate');

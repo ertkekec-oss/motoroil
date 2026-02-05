@@ -1820,6 +1820,25 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </div>
                 </div>
             )}
+
+            {/* STATEMENT MODAL */}
+            <StatementModal
+                isOpen={statementOpen}
+                onClose={() => setStatementOpen(false)}
+                title={statementType === 'detailed' ? 'Detaylı Cari Hesap Ekstresi' : 'Özet Cari Hesap Ekstresi'}
+                entity={{
+                    name: customer.name,
+                    phone: customer.phone,
+                    email: customer.email,
+                    address: customer.address,
+                    taxNumber: customer.taxNumber,
+                    taxOffice: customer.taxOffice,
+                    balance: balance
+                }}
+                transactions={historyList}
+                type={statementType}
+                entityType="CUSTOMER"
+            />
         </div >
     );
 }

@@ -18,7 +18,7 @@ import IntegrationsContent from '@/components/IntegrationsContent';
 
 export default function SettingsPage() {
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState('branches');
+    const [activeTab, setActiveTab] = useState('company');
 
     useEffect(() => {
         const tab = searchParams.get('tab');
@@ -68,12 +68,44 @@ export default function SettingsPage() {
         referralSettings: contextReferralSettings, updateReferralSettings,
         warranties, setWarranties,
         brands, setBrands, prodCats, setProdCats,
-        allBrands, allCats
+        allBrands, allCats,
+        appSettings, updateAppSetting
     } = useSettings();
 
     const [newPaymentMethod, setNewPaymentMethod] = useState({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' });
     const [editingPaymentMethodId, setEditingPaymentMethodId] = useState<string | null>(null);
     const [showKasaDefinitions, setShowKasaDefinitions] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [tempCompanyInfo, setTempCompanyInfo] = useState<any>(null);
+
+    useEffect(() => {
+        if (activeTab === 'company' && appSettings) {
+            setTempCompanyInfo({
+                company_name: appSettings.company_name || '',
+                company_slogan: appSettings.company_slogan || '',
+                company_email: appSettings.company_email || '',
+                company_website: appSettings.company_website || '',
+                company_address: appSettings.company_address || '',
+                company_phone: appSettings.company_phone || ''
+            });
+        }
+    }, [activeTab, appSettings]);
+
+    const handleSaveCompany = async () => {
+        setIsSaving(true);
+        try {
+            for (const [key, value] of Object.entries(tempCompanyInfo)) {
+                if (appSettings[key] !== value) {
+                    await updateAppSetting(key, value);
+                }
+            }
+            showSuccess('Başarılı', 'Firma bilgileri güncellendi.');
+        } catch (e) {
+            showError('Hata', 'Bilgiler kaydedilemedi.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const addPaymentMethodDefinition = async () => {
         if (!newPaymentMethod.label) return showError('Hata', 'Buton adı zorunludur.');
@@ -973,6 +1005,7 @@ export default function SettingsPage() {
                 <h2 style={{ fontSize: '14px', fontWeight: '900', marginBottom: '16px', paddingLeft: '8px', opacity: 0.5, letterSpacing: '1px', textTransform: 'uppercase' }}>⚙ Ayarlar</h2>
 
                 {[
+                    { id: 'company', label: 'Firma Profili', icon: '🏢' },
                     { id: 'staff', label: 'Ekip Yönetimi', icon: '👥' },
                     { id: 'integrations', label: 'Entegrasyonlar', icon: '🔌' },
                     { id: 'branches', label: 'Şubeler & Depo', icon: '🏢' },
@@ -1027,7 +1060,107 @@ export default function SettingsPage() {
             {/* RIGHT CONTENT AREA */}
             <div style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
 
-                {/* 0. EKİP YÖNETİMİ */}
+                {/* 0. FİRMA PROFİLİ */}
+                {activeTab === 'company' && (
+                    <div style={{ maxWidth: '600px' }} className="animate-fade-in-up">
+                        <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px' }}>Firma Profili</h2>
+                        <p className="text-muted mb-8" style={{ fontSize: '14px' }}>Belgelerde ve tekliflerde görünecek genel firma bilgilerini düzenleyin.</p>
+
+                        <div className="card glass flex-col gap-6" style={{ padding: '24px' }}>
+                            <div className="flex-col gap-2">
+                                <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>FİRMA ADI</label>
+                                <input
+                                    type="text"
+                                    value={tempCompanyInfo?.company_name || ""}
+                                    onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_name: e.target.value })}
+                                    placeholder="Örn: MOTOROIL"
+                                    style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white', fontWeight: '800' }}
+                                />
+                            </div>
+
+                            <div className="flex-col gap-2">
+                                <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>SLOGAN / ALT BAŞLIK</label>
+                                <input
+                                    type="text"
+                                    value={tempCompanyInfo?.company_slogan || ""}
+                                    onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_slogan: e.target.value })}
+                                    placeholder="Örn: Profesyonel Oto Servis ve Bakım"
+                                    style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="flex-col gap-2">
+                                    <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>GENEL E-POSTA</label>
+                                    <input
+                                        type="email"
+                                        value={tempCompanyInfo?.company_email || ""}
+                                        onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_email: e.target.value })}
+                                        placeholder="info@firma.com"
+                                        style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                    />
+                                </div>
+                                <div className="flex-col gap-2">
+                                    <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>WEB SİTESİ</label>
+                                    <input
+                                        type="text"
+                                        value={tempCompanyInfo?.company_website || ""}
+                                        onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_website: e.target.value })}
+                                        placeholder="www.firma.com.tr"
+                                        style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex-col gap-2">
+                                <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>VARSAYILAN ADRES (ŞUBE BİLGİSİ YOKSA)</label>
+                                <textarea
+                                    rows={3}
+                                    value={tempCompanyInfo?.company_address || ""}
+                                    onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_address: e.target.value })}
+                                    placeholder="Firma açık adresi..."
+                                    style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                />
+                            </div>
+
+                            <div className="flex-col gap-2">
+                                <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>VARSAYILAN TELEFON</label>
+                                <input
+                                    type="text"
+                                    value={tempCompanyInfo?.company_phone || ""}
+                                    onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_phone: e.target.value })}
+                                    placeholder="+90 (---) --- -- --"
+                                    style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                />
+                            </div>
+
+                            <button
+                                onClick={handleSaveCompany}
+                                disabled={isSaving}
+                                className="btn btn-primary h-12"
+                                style={{
+                                    width: '100%',
+                                    marginTop: '10px',
+                                    fontSize: '14px',
+                                    fontWeight: '900',
+                                    gap: '10px'
+                                }}
+                            >
+                                {isSaving ? '⏳ KAYDEDİLİYOR...' : '💾 DEĞİŞİKLİKLERİ KAYDET'}
+                            </button>
+
+                            <div style={{ marginTop: '10px', padding: '15px', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '12px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                                <p style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '700' }}>💡 Bilgi:</p>
+                                <p style={{ fontSize: '11px', opacity: 0.7, marginTop: '5px' }}>
+                                    Bu bilgiler sistem genelindeki belgelerde (teklif, fatura vb.) varsayılan olarak kullanılır.
+                                    Şube bazlı belgelerde ilgili şubenin kendi adres ve telefonu önceliklidir.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* 1. EKİP YÖNETİMİ */}
                 {activeTab === 'staff' && <StaffManagementContent />}
 
                 {/* 0. ENTEGRASYONLAR */}

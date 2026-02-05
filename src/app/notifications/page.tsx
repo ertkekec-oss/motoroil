@@ -21,6 +21,15 @@ export default function NotificationsPage() {
         }
     };
 
+    const deleteAllNotifications = async () => {
+        try {
+            await fetch('/api/notifications', { method: 'DELETE' });
+            fetchSummary();
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     useEffect(() => {
         fetchSummary();
         const interval = setInterval(fetchSummary, 30000); // Poll every 30s
@@ -37,8 +46,21 @@ export default function NotificationsPage() {
         pendingCounts = [],
         recentEcommerceSales = [],
         activeServices = [],
-        expiringWarranties = []
+        expiringWarranties = [],
+        systemNotifications = [],
+        securityEvents = []
     } = summary || {};
+
+    const deleteNotification = async (id: string) => {
+        try {
+            const res = await fetch(`/api/notifications?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                fetchSummary();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const NotificationCard = ({ title, icon, color, items, renderItem, emptyText }: any) => (
         <div className="card glass relative overflow-hidden group hover:border-white/10 transition-all duration-300">
@@ -72,11 +94,21 @@ export default function NotificationsPage() {
 
     return (
         <div className="container p-6 mx-auto max-w-[1600px] min-h-screen">
-            <header className="mb-10">
-                <h1 className="text-3xl font-black text-white bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/50">
-                    Bildirim Merkezi
-                </h1>
-                <p className="text-white/40 mt-2 font-medium">Operasyonel uyarılar ve onay bekleyen işlemler</p>
+            <header className="mb-10 flex justify-between items-end">
+                <div>
+                    <h1 className="text-3xl font-black text-white bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/50">
+                        Bildirim Merkezi
+                    </h1>
+                    <p className="text-white/40 mt-2 font-medium">Operasyonel uyarılar ve onay bekleyen işlemler</p>
+                </div>
+                {systemNotifications.length > 0 && (
+                    <button
+                        onClick={deleteAllNotifications}
+                        className="btn btn-ghost text-xs text-white/30 hover:text-red-400 font-bold tracking-widest"
+                    >
+                        TÜMÜNÜ TEMİZLE
+                    </button>
+                )}
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -148,12 +180,12 @@ export default function NotificationsPage() {
                     renderItem={(item: any) => (
                         <div className="flex justify-between items-center">
                             <div>
-                                <div className="font-bold text-white/90">{item.description || 'Satış'}</div>
-                                <div className="text-xs text-white/50">{new Date(item.date).toLocaleDateString()}</div>
+                                <div className="font-bold text-white/90">{item.marketplace} ({item.orderNumber})</div>
+                                <div className="text-xs text-white/50">{item.customerName}</div>
                             </div>
                             <div className="text-right">
-                                <div className="font-bold text-green-400">₺{Number(item.amount).toLocaleString()}</div>
-                                <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-400">Yeni</span>
+                                <div className="font-bold text-green-400">₺{Number(item.totalAmount).toLocaleString()}</div>
+                                <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-400">Yeni Sipariş</span>
                             </div>
                         </div>
                     )}
@@ -179,7 +211,7 @@ export default function NotificationsPage() {
                     )}
                 />
 
-                {/* 6. GARANTİ BİTİMİNE AZ KALANLAR */}
+                {/* 6. GARANTI BİTİMİNE AZ KALANLAR */}
                 <NotificationCard
                     title="Garanti Bitiyor (2 Ay)"
                     icon="🛡️"
@@ -199,6 +231,54 @@ export default function NotificationsPage() {
                         </div>
                     )}
                 />
+
+                {/* 7. SİSTEM BİLDİRİMLERİ */}
+                <div className="md:col-span-2 xl:col-span-3">
+                    <NotificationCard
+                        title="Sistem Bildirimleri"
+                        icon="🔔"
+                        color="bg-primary/20 text-primary"
+                        items={systemNotifications}
+                        emptyText="Yeni sistem bildirimi yok."
+                        renderItem={(item: any) => (
+                            <div className="flex justify-between items-start group/item">
+                                <div className="flex gap-4">
+                                    <div className="text-xl mt-1">{item.icon || '📢'}</div>
+                                    <div>
+                                        <div className="text-white/90 font-medium leading-relaxed">{item.text}</div>
+                                        <div className="text-xs text-white/30 mt-1 font-bold">{new Date(item.createdAt).toLocaleString('tr-TR')}</div>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => deleteNotification(item.id)}
+                                    className="opacity-0 group-hover/item:opacity-100 p-2 hover:bg-white/10 rounded-lg transition-all text-white/30 hover:text-red-400"
+                                >
+                                    🗑️
+                                </button>
+                            </div>
+                        )}
+                    />
+                </div>
+
+                {/* 8. GÜVENLİK OLAYLARI */}
+                <div className="md:col-span-1">
+                    <NotificationCard
+                        title="Şüpheli İşlemler"
+                        icon="⚠️"
+                        color="bg-red-500/20 text-red-400"
+                        items={securityEvents}
+                        emptyText="Şüpheli işlem tespit edilmedi."
+                        renderItem={(item: any) => (
+                            <div className="flex flex-col gap-1">
+                                <div className="font-bold text-red-400">{item.detectedPhrase}</div>
+                                <div className="text-[10px] text-white/40 flex justify-between">
+                                    <span>{item.staff || 'Bilinmiyor'} • {item.branch || 'Merkez'}</span>
+                                    <span>{new Date(item.timestamp).toLocaleTimeString('tr-TR')}</span>
+                                </div>
+                            </div>
+                        )}
+                    />
+                </div>
 
             </div>
         </div>

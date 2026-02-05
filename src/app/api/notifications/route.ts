@@ -53,8 +53,8 @@ export async function DELETE(request: Request) {
         if (id) {
             await prisma.notification.delete({ where: { id } });
         } else {
-            // Delete all read notifications
-            await prisma.notification.deleteMany({ where: { isRead: true } });
+            // Delete all notifications
+            await prisma.notification.deleteMany({});
         }
         return NextResponse.json({ success: true });
     } catch (error: any) {

@@ -17,7 +17,7 @@ export async function GET() {
         try {
             // @ts-ignore
             pendingInvoices = await prisma.salesInvoice.findMany({
-                where: { status: 'Draft' }, // Adjust status as needed
+                where: { status: 'Taslak' }, // Changed from 'Draft' to match schema default
                 take: 10,
                 orderBy: { createdAt: 'desc' },
                 include: { customer: true }
@@ -42,15 +42,13 @@ export async function GET() {
         // For now, empty array as model is not confirmed.
 
         // 4. E-Ticaret Satışları (E-commerce Sales)
-        // Transactions from 'E-ticaret' category
-        const recentEcommerceSales = await prisma.transaction.findMany({
+        // Orders from marketplaces
+        const recentEcommerceSales = await prisma.order.findMany({
             where: {
-                type: 'Sales',
-                category: 'E-ticaret',
-                date: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
+                orderDate: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
             },
             take: 20,
-            orderBy: { date: 'desc' }
+            orderBy: { orderDate: 'desc' }
         });
 
         // 5. Servis Uyarıları (Service Warnings)
@@ -78,6 +76,18 @@ export async function GET() {
             orderBy: { endDate: 'asc' }
         });
 
+        // 7. Genel Sistem Bildirimleri (Notification Model)
+        const systemNotifications = await prisma.notification.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 50
+        });
+
+        // 8. Güvenlik Olayları
+        const securityEvents = await prisma.securityEvent.findMany({
+            orderBy: { timestamp: 'desc' },
+            take: 20
+        });
+
         return NextResponse.json({
             success: true,
             data: {
@@ -86,7 +96,9 @@ export async function GET() {
                 pendingCounts,
                 recentEcommerceSales,
                 activeServices,
-                expiringWarranties
+                expiringWarranties,
+                systemNotifications,
+                securityEvents
             }
         });
 

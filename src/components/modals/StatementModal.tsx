@@ -45,53 +45,95 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
                 return { processedTransactions: [], totals: { totalDebt: 0, totalCredit: 0, balance: entity.balance || 0 } };
             }
 
-            let runningBalance = 0;
-            let totalDebt = 0;
-            let totalCredit = 0;
             const isCustomer = entityType === 'CUSTOMER';
-
             const sorted = [...transactions].sort((a, b) => {
                 const dA = new Date(a?.rawDate || a?.date || 0).getTime();
                 const dB = new Date(b?.rawDate || b?.date || 0).getTime();
                 return (isNaN(dA) ? 0 : dA) - (isNaN(dB) ? 0 : dB);
             });
 
-            const processed = sorted.map(t => {
+            // Step 1: Mapped all transactions to Debt/Credit
+            let totalProcessedDebt = 0;
+            let totalProcessedCredit = 0;
+            const mapped = sorted.map(t => {
                 let debt = 0;
                 let credit = 0;
                 const tType = t?.type || '';
                 const amount = Number(t?.amount) || 0;
 
                 if (isCustomer) {
-                    if (['Fatura', 'Satış', 'Gider', 'Sales'].some(k => tType.includes(k))) debt = Math.abs(amount);
+                    // For Customer: Debt (Sales/Invoices) increases their debt to us. Credit (Collections/Payments) decreases it.
+                    if (['Fatura', 'Satış', 'Gider', 'Sales', 'Borç'].some(k => tType.includes(k))) debt = Math.abs(amount);
                     else credit = Math.abs(amount);
                 } else {
-                    if (['Ödeme', 'Payment'].some(k => tType.includes(k))) debt = Math.abs(amount);
+                    // For Supplier: Debt (Payments/Refunds) decreases our debt to them. Credit (Purchases/Invoices) increases it.
+                    if (['Ödeme', 'Tahsilat', 'Payment', 'Giriş'].some(k => tType.includes(k))) debt = Math.abs(amount);
                     else credit = Math.abs(amount);
                 }
+                totalProcessedDebt += debt;
+                totalProcessedCredit += credit;
+                return { ...t, debt, credit };
+            });
 
-                totalDebt += debt;
-                totalCredit += credit;
-                if (isCustomer) runningBalance += (debt - credit);
-                else runningBalance += (credit - debt);
-                return { ...t, debt, credit, balance: runningBalance };
+            // Step 2: Handle Opening Balance if current total doesn't match entity balance
+            const currentBalanceInEntity = Number(entity.balance) || 0;
+            // Balance = Opening + (Debt - Credit)  => Opening = Balance - (Debt - Credit)
+            // This applies to "Asset" orientation where Positive means they owe us.
+            const netProcessed = totalProcessedDebt - totalProcessedCredit;
+            const openingBalance = currentBalanceInEntity - netProcessed;
+
+            const finalProcessed = [];
+            let totalDebt = 0;
+            let totalCredit = 0;
+            let rb = openingBalance;
+
+            if (Math.abs(openingBalance) > 0.01) {
+                totalDebt += (openingBalance > 0 ? openingBalance : 0);
+                totalCredit += (openingBalance < 0 ? Math.abs(openingBalance) : 0);
+                finalProcessed.push({
+                    date: '—',
+                    type: 'Devir',
+                    desc: 'Dönem Başı Devreden Bakiye',
+                    debt: openingBalance > 0 ? openingBalance : 0,
+                    credit: openingBalance < 0 ? Math.abs(openingBalance) : 0,
+                    balance: openingBalance
+                });
+            }
+
+            mapped.forEach(t => {
+                rb += (t.debt - t.credit);
+                totalDebt += t.debt;
+                totalCredit += t.credit;
+                finalProcessed.push({ ...t, balance: rb });
             });
 
             if (type === 'summary') {
                 const groups: Record<string, any> = {};
-                allProcessedHistory(processed, groups);
+                // Include opening balance as its own group in summary
+                if (Math.abs(openingBalance) > 0.01) {
+                    groups['Devir'] = { date: '—', type: 'Devir', desc: 'Dönem Başı Devreden Bakiye', debt: openingBalance > 0 ? openingBalance : 0, credit: openingBalance < 0 ? Math.abs(openingBalance) : 0, balance: 0 };
+                }
 
-                let groupBalance = 0;
-                const summarized = Object.values(groups).map(g => {
-                    if (isCustomer) groupBalance += (g.debt - g.credit);
-                    else groupBalance += (g.credit - g.debt);
-                    return { ...g, balance: groupBalance };
+                mapped.forEach(t => {
+                    const key = t.type;
+                    if (!groups[key]) {
+                        groups[key] = { date: '—', type: t.type, desc: `${t.type} İşlemleri Toplamı`, debt: 0, credit: 0, balance: 0 };
+                    }
+                    groups[key].debt += t.debt;
+                    groups[key].credit += t.credit;
                 });
-                return { processedTransactions: summarized, totals: { totalDebt, totalCredit, balance: runningBalance } };
+
+                let summaryRb = 0;
+                const summarized = Object.values(groups).map(g => {
+                    summaryRb += (g.debt - g.credit);
+                    return { ...g, balance: summaryRb };
+                });
+                return { processedTransactions: summarized, totals: { totalDebt, totalCredit, balance: rb } };
             }
 
-            return { processedTransactions: processed, totals: { totalDebt, totalCredit, balance: runningBalance } };
+            return { processedTransactions: finalProcessed, totals: { totalDebt, totalCredit, balance: rb } };
         } catch (e) {
+            console.error('Statement Calculation Error:', e);
             return { processedTransactions: [], totals: { totalDebt: 0, totalCredit: 0, balance: 0 } };
         }
     }, [transactions, entityType, entity, type]);
