@@ -1178,3 +1178,51 @@ model UpsellEvent {
   @@index([type])
   @@index([converted])
 }
+
+// ------------------------------------------
+// CMS & WEBSITE MANAGEMENT (NEW)
+// ------------------------------------------
+
+model CmsPage {
+  id            String       @id @default(cuid())
+  slug          String       @unique // "index", "privacy", etc.
+  title         String
+  description   String?      // SEO Meta Description
+  keywords      String?      // SEO Keywords
+  isActive      Boolean      @default(true)
+  sections      CmsSection[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model CmsSection {
+  id          String   @id @default(cuid())
+  pageId      String
+  type        String   // HERO, FEATURES, COMPARISON, ROLES, STATS, FAQ, CONTACT, FOOTER
+  order       Int      @default(0)
+  content     Json     // { title: "", subtitle: "", items: [], settings: { fontSize: "16px", ... } }
+  isActive    Boolean  @default(true)
+  
+  page        CmsPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+
+model CmsMenu {
+  id        String   @id @default(cuid())
+  name      String   // "Header", "Footer"
+  items     Json     // [{ label: "Hizmetler", link: "/#features" }, ...]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CmsGeneralSettings {
+  id            String   @id @default(cuid())
+  logoUrl       String?
+  faviconUrl    String?
+  siteTitle     String   @default("Periodya")
+  footerText    String?
+  primaryColor  String   @default("#446ee7")
+  contactEmail  String?
+  whatsappNumber String?
+  customCss     String?
+  updatedAt     DateTime @updatedAt
+}

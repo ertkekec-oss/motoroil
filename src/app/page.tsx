@@ -558,150 +558,30 @@ function POSContent() {
           )}
         </div>
 
-        {/* ÜST DASHBOARD - 4 KART */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* ÜST DASHBOARD - GÖRSEL ANALİZLER */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-
-          {/* GÜNLÜK CİRO */}
-          <div className="stat-card-modern" style={{
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.08))',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            padding: '18px',
-            borderRadius: '16px',
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 8px 32px rgba(16, 185, 129, 0.1)'
+          {/* 1. WEEKLY TREND (7D) - Genişletilmiş ve Üste Taşınmış */}
+          <div className="lg:col-span-6 bg-card-modern" style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-light)',
+            borderRadius: '20px',
+            padding: '20px',
+            minHeight: '180px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
           }}>
-            <div style={{ position: 'absolute', top: '-20px', right: '-20px', fontSize: '70px', opacity: 0.08, pointerEvents: 'none', zIndex: 0 }}>💰</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px', position: 'relative', zIndex: 10 }}>
-              <div style={{ fontSize: '10px', fontWeight: '800', color: '#6ee7b7', letterSpacing: '1px' }}>GÜNLÜK CİRO</div>
-              <button
-                onClick={() => setHideRevenue(!hideRevenue)}
-                className="privacy-btn"
-                style={{
-                  background: hideRevenue ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255,255,255,0.15)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: '8px',
-                  padding: '6px 12px',
-                  cursor: 'pointer'
-                }}
-              >{hideRevenue ? '👁️' : '🙈'}</button>
-            </div>
-            <div style={{ fontSize: '28px', fontWeight: '900', color: '#10b981', textShadow: '0 2px 10px rgba(16, 185, 129, 0.3)' }}>
-              {hideRevenue ? '₺*****' : `₺${stats.revenue.toLocaleString()}`}
-            </div>
-          </div>
-
-          {/* GÜNLÜK KAR */}
-          <div className="stat-card-modern" style={{
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08))',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
-            padding: '18px',
-            borderRadius: '16px',
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
-          }}>
-            <div style={{ position: 'absolute', top: '-20px', right: '-20px', fontSize: '70px', opacity: 0.08, pointerEvents: 'none', zIndex: 0 }}>📈</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px', position: 'relative', zIndex: 10 }}>
-              <div style={{ fontSize: '10px', fontWeight: '800', color: '#93c5fd', letterSpacing: '1px' }}>GÜNLÜK KAR</div>
-              <button
-                onClick={() => setHideProfit(!hideProfit)}
-                className="privacy-btn"
-                style={{
-                  background: hideProfit ? 'rgba(59, 130, 246, 0.3)' : 'rgba(255,255,255,0.15)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: '8px',
-                  padding: '6px 12px',
-                  cursor: 'pointer'
-                }}
-              >{hideProfit ? '👁️' : '🙈'}</button>
-            </div>
-            <div style={{ fontSize: '28px', fontWeight: '900', color: stats.profit >= 0 ? '#3b82f6' : '#ef4444', textShadow: '0 2px 10px rgba(59, 130, 246, 0.3)' }}>
-              {hideProfit ? '₺*****' : `₺${stats.profit.toLocaleString()}`}
-            </div>
-          </div>
-
-          {/* GÜNLÜK GİDER */}
-          <div className="stat-card-modern" style={{
-            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.08))',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            padding: '18px',
-            borderRadius: '16px',
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 8px 32px rgba(239, 68, 68, 0.1)'
-          }}>
-            <div style={{ position: 'absolute', top: '-20px', right: '-20px', fontSize: '70px', opacity: 0.08, pointerEvents: 'none', zIndex: 0 }}>💸</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px', position: 'relative', zIndex: 10 }}>
-              <div style={{ fontSize: '10px', fontWeight: '800', color: '#fca5a5', letterSpacing: '1px' }}>GÜNLÜK GİDER</div>
-              <button
-                onClick={() => setHideExpense(!hideExpense)}
-                className="privacy-btn"
-                style={{
-                  background: hideExpense ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255,255,255,0.15)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: '8px',
-                  padding: '6px 12px',
-                  cursor: 'pointer'
-                }}
-              >{hideExpense ? '👁️' : '🙈'}</button>
-            </div>
-            <div style={{ fontSize: '28px', fontWeight: '900', color: '#ef4444', textShadow: '0 2px 10px rgba(239, 68, 68, 0.3)' }}>
-              {hideExpense ? '₺*****' : `₺${stats.expense.toLocaleString()}`}
-            </div>
-          </div>
-
-          {/* BİLDİRİMLER */}
-          <div
-            onClick={() => router.push('/notifications')}
-            className="stat-card-modern"
-            style={{
-              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(245, 158, 11, 0.3)',
-              padding: '18px',
-              borderRadius: '16px',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 8px 32px rgba(245, 158, 11, 0.1)',
-              cursor: 'pointer'
-            }}
-          >
-            <div style={{ position: 'absolute', top: '-20px', right: '-20px', fontSize: '70px', opacity: 0.08 }}>🔔</div>
-            <div style={{ fontSize: '10px', fontWeight: '800', color: '#fcd34d', letterSpacing: '1px', marginBottom: '10px' }}>BİLDİRİMLER</div>
-            <div style={{ fontSize: '28px', fontWeight: '900', color: '#f59e0b', textShadow: '0 2px 10px rgba(245, 158, 11, 0.3)' }}>
-              {stats.criticalStock + stats.inTransit}
-            </div>
-            {(stats.criticalStock + stats.inTransit) > 0 && (
-              <div className="pulse-dot" style={{ position: 'absolute', top: '12px', right: '12px', background: '#f59e0b', width: '10px', height: '10px', borderRadius: '50%' }}></div>
-            )}
-          </div>
-        </div>
-
-        {/* --- PHASE 10: VISUAL INSIGHTS (TRENDS & FORECASTS) --- */}
-        {insightsData?.stats?.weeklyTrend && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 animate-fade-in" style={{ marginBottom: '8px' }}>
-
-            {/* 1. WEEKLY TREND (7D) */}
-            <div className="lg:col-span-6 bg-card-modern" style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-light)',
-              borderRadius: '20px',
-              padding: '20px',
-              minHeight: '260px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: '900', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.5px' }}>📈 HAFTALIK SATIŞ TRENDİ</h3>
-                <span style={{ fontSize: '10px', background: 'var(--primary-dark)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: '800' }}>SON 7 GÜN</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '18px' }}>📈</span>
+                <h3 style={{ fontSize: '12px', fontWeight: '900', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.5px', margin: 0 }}>HAFTALIK SATIŞ TRENDİ</h3>
               </div>
-              <ResponsiveContainer width="100%" height={180}>
+              <span style={{ fontSize: '9px', background: 'var(--primary-dark)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: '800' }}>SON 7 GÜN</span>
+            </div>
+            {insightsData?.stats?.weeklyTrend ? (
+              <ResponsiveContainer width="100%" height={120}>
                 <AreaChart data={insightsData.stats.weeklyTrend}>
                   <defs>
-                    <linearGradient id="colorTrend" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient id="colorTrendPos" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                     </linearGradient>
@@ -709,32 +589,40 @@ function POSContent() {
                   <Tooltip
                     contentStyle={{ background: '#171717', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                     itemStyle={{ color: '#3b82f6', fontWeight: 'bold' }}
-                    labelStyle={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}
+                    labelStyle={{ color: 'rgba(255,255,255,0.5)', fontSize: '10px' }}
                     formatter={(val: any) => [`₺${Number(val).toLocaleString()}`, 'Ciro']}
                   />
-                  <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorTrend)" />
+                  <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorTrendPos)" />
                 </AreaChart>
               </ResponsiveContainer>
-            </div>
+            ) : (
+              <div style={{ height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.3, fontSize: '12px' }}>Veri yükleniyor...</div>
+            )}
+          </div>
 
-            {/* 2. CATEGORY ANALYSIS */}
-            <div className="lg:col-span-3 bg-card-modern" style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-light)',
-              borderRadius: '20px',
-              padding: '20px',
-              minHeight: '260px',
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
-              <h3 style={{ fontSize: '14px', fontWeight: '900', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.5px', marginBottom: '16px' }}>🍰 KATEGORİ DAĞILIMI</h3>
+          {/* 2. CATEGORY ANALYSIS - Üste Taşınmış */}
+          <div className="lg:col-span-3 bg-card-modern" style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-light)',
+            borderRadius: '20px',
+            padding: '20px',
+            minHeight: '180px',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <span style={{ fontSize: '18px' }}>🍰</span>
+              <h3 style={{ fontSize: '12px', fontWeight: '900', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.5px', margin: 0 }}>KATEGORİ DAĞILIMI</h3>
+            </div>
+            {insightsData?.stats?.categoryAnalysis ? (
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ResponsiveContainer width="100%" height={160}>
+                <ResponsiveContainer width="100%" height={100}>
                   <PieChart>
                     <Pie
                       data={insightsData.stats.categoryAnalysis}
-                      innerRadius={50}
-                      outerRadius={70}
+                      innerRadius={35}
+                      outerRadius={45}
                       paddingAngle={5}
                       dataKey="value"
                     >
@@ -742,61 +630,99 @@ function POSContent() {
                         <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]} />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{ background: '#000', border: 'none', borderRadius: '8px', fontSize: '12px' }} />
+                    <Tooltip contentStyle={{ background: '#000', border: 'none', borderRadius: '8px', fontSize: '10px' }} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
-                {insightsData.stats.categoryAnalysis.slice(0, 3).map((cat: any, i: number) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', opacity: 0.7 }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][i % 5] }}></div>
-                    {cat.name}
-                  </div>
-                ))}
-              </div>
-            </div>
+            ) : (
+              <div style={{ height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.3, fontSize: '12px' }}>Veri yükleniyor...</div>
+            )}
+          </div>
 
-            {/* 3. FORECAST CARDS */}
-            <div className="lg:col-span-3 space-y-4">
-              <div style={{
-                background: 'linear-gradient(135deg, #1e1b4b, #1e293b)',
-                border: '1px solid rgba(99, 102, 241, 0.3)',
-                borderRadius: '20px',
-                padding: '18px',
-                height: 'calc(50% - 8px)',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
-                <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '40px', opacity: 0.1 }}>🔮</div>
-                <div style={{ fontSize: '10px', fontWeight: '900', color: '#818cf8', letterSpacing: '1px', marginBottom: '12px' }}>GELECEK HAFTA TAHMİNİ</div>
+          {/* BİLDİRİMLER - Kapsayıcı Grid İçinde Korundu */}
+          <div
+            onClick={() => router.push('/notifications')}
+            className="lg:col-span-3 stat-card-modern"
+            style={{
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.08))',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              padding: '20px',
+              borderRadius: '20px',
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 8px 32px rgba(245, 158, 11, 0.1)',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              minHeight: '180px'
+            }}
+          >
+            <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '60px', opacity: 0.1 }}>🔔</div>
+            <div style={{ fontSize: '10px', fontWeight: '800', color: '#fcd34d', letterSpacing: '1px', marginBottom: '8px' }}>BİLDİRİMLER</div>
+            <div style={{ fontSize: '36px', fontWeight: '900', color: '#f59e0b', textShadow: '0 2px 10px rgba(245, 158, 11, 0.3)' }}>
+              {stats.criticalStock + stats.inTransit}
+            </div>
+            <div style={{ fontSize: '11px', opacity: 0.6, marginTop: '4px' }}>Kritik Stok & Bekleyen Sevkiyat</div>
+            {(stats.criticalStock + stats.inTransit) > 0 && (
+              <div className="pulse-dot" style={{ position: 'absolute', top: '15px', right: '15px', background: '#f59e0b', width: '10px', height: '10px', borderRadius: '50%' }}></div>
+            )}
+          </div>
+        </div>
+
+        {/* --- PHASE 10: FORECAST CARDS (Kalanlar) --- */}
+        {insightsData?.stats?.forecast && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-fade-in" style={{ marginBottom: '8px' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #1e1b4b, #1e293b)',
+              border: '1px solid rgba(99, 102, 241, 0.3)',
+              borderRadius: '20px',
+              padding: '18px',
+              position: 'relative',
+              overflow: 'hidden',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <div style={{ fontSize: '10px', fontWeight: '900', color: '#818cf8', letterSpacing: '1px', marginBottom: '8px' }}>GELECEK HAFTA TAHMİNİ</div>
                 <div style={{ fontSize: '24px', fontWeight: '900', color: 'white' }}>
                   ₺{insightsData.stats.forecast.nextWeekRevenue.toLocaleString()}
                 </div>
-                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '8px' }}>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '24px', opacity: 0.2 }}>🔮</div>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>
                   Güven Skoru: %{insightsData.stats.forecast.confidence}
                 </div>
               </div>
+            </div>
 
-              <div style={{
-                background: 'linear-gradient(135deg, #064e3b, #065f46)',
-                border: '1px solid rgba(16, 185, 129, 0.3)',
-                borderRadius: '20px',
-                padding: '18px',
-                height: 'calc(50% - 8px)',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
-                <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '40px', opacity: 0.1 }}>🔋</div>
-                <div style={{ fontSize: '10px', fontWeight: '900', color: '#6ee7b7', letterSpacing: '1px', marginBottom: '12px' }}>AYLIK BÜYÜME HIZI</div>
+            <div style={{
+              background: 'linear-gradient(135deg, #064e3b, #065f46)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              borderRadius: '20px',
+              padding: '18px',
+              position: 'relative',
+              overflow: 'hidden',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <div style={{ fontSize: '10px', fontWeight: '900', color: '#6ee7b7', letterSpacing: '1px', marginBottom: '8px' }}>AYLIK BÜYÜME HIZI</div>
                 <div style={{ fontSize: '24px', fontWeight: '900', color: 'white' }}>
                   %{insightsData.stats.docGrowth > 0 ? '+' : ''}{insightsData.stats.docGrowth}
                 </div>
-                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '8px' }}>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '24px', opacity: 0.2 }}>🔋</div>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>
                   {insightsData.stats.thisMonthDocs}/ {insightsData.stats.lastMonthDocs} Fatura
                 </div>
               </div>
             </div>
-
           </div>
         )}
 

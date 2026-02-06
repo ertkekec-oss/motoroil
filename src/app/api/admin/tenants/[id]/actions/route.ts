@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
     try {
         const session: any = await getSession();
         // Sadece SUPER_ADMIN yetkisi
@@ -11,10 +11,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
             return NextResponse.json({ error: 'Forbidden: Requires SUPER_ADMIN' }, { status: 403 });
         }
 
-        const tenantId = params.id;
+        const { id: tenantId } = await paramsPromise;
         const { action, payload } = await req.json();
 
-        const subscription = await prisma.subscription.findUnique({ where: { tenantId } });
+        const subscription = await (prisma as any).subscription.findUnique({ where: { tenantId } });
         if (!subscription) {
             return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
         }
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         switch (action) {
             case 'CHANGE_PLAN':
                 // payload: { planId, reason }
-                await prisma.subscription.update({
+                await (prisma as any).subscription.update({
                     where: { id: subscription.id },
                     data: { planId: payload.planId }
                 });
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
                 // payload: { days }
                 const currentEnd = new Date(subscription.endDate);
                 const newEnd = new Date(currentEnd.setDate(currentEnd.getDate() + (payload.days || 7)));
-                await prisma.subscription.update({
+                await (prisma as any).subscription.update({
                     where: { id: subscription.id },
                     data: {
                         endDate: newEnd,
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
             case 'SET_STATUS':
                 // payload: { status }
-                await prisma.subscription.update({
+                await (prisma as any).subscription.update({
                     where: { id: subscription.id },
                     data: { status: payload.status }
                 });
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         }
 
         // Log Action
-        await prisma.subscriptionHistory.create({
+        await (prisma as any).subscriptionHistory.create({
             data: {
                 subscriptionId: subscription.id,
                 action: `ADMIN_${action}`,

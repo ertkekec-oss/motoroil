@@ -32,10 +32,22 @@ export async function POST(req: NextRequest) {
         });
 
         // 3. Create Subscription (Trial Plan)
-        // Find a trial plan or just create with default values
-        const trialPlan = await (prisma as any).plan.findFirst({
+        let trialPlan = await (prisma as any).plan.findFirst({
             where: { price: 0, isActive: true }
         });
+
+        // Eğer ücretsiz plan yoksa oluştur (FK hatasını önlemek için)
+        if (!trialPlan) {
+            trialPlan = await (prisma as any).plan.create({
+                data: {
+                    id: 'trial-default',
+                    name: 'Free Trial',
+                    price: 0,
+                    isActive: true,
+                    description: '14 Günlük Ücretsiz Deneme'
+                }
+            });
+        }
 
         const now = new Date();
         const endDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000); // 14 days trial
@@ -43,7 +55,7 @@ export async function POST(req: NextRequest) {
         await (prisma as any).subscription.create({
             data: {
                 tenantId: tenant.id,
-                planId: trialPlan?.id || 'default_trial_id',
+                planId: trialPlan.id,
                 status: 'ACTIVE',
                 period: 'TRIAL',
                 startDate: now,

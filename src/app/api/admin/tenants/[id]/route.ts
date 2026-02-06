@@ -3,16 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
     try {
         const session: any = await getSession();
         if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
-        const tenantId = params.id;
+        const { id: tenantId } = await paramsPromise;
 
-        const tenant = await prisma.tenant.findUnique({
+        const tenant = await (prisma as any).tenant.findUnique({
             where: { id: tenantId },
             include: {
                 subscription: {
@@ -41,32 +41,38 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         // Son 6 ay invoice trendi vb. eklenebilir.
         // Hız için şimdilik temel snapshot.
 
-        const invoiceCount = await prisma.salesInvoice.count({
+        const invoiceCount = await (prisma as any).salesInvoice.count({
             where: {
-                companyId: { in: tenant.companies.map(c => c.id) },
+                companyId: { in: tenant.companies.map((c: any) => c.id) },
                 isFormal: true,
                 createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) }
             }
         });
 
-        const totalInvoices = await prisma.salesInvoice.count({
+        const totalInvoices = await (prisma as any).salesInvoice.count({
             where: {
-                companyId: { in: tenant.companies.map(c => c.id) },
+                companyId: { in: tenant.companies.map((c: any) => c.id) },
                 isFormal: true
             }
         });
 
         // Subscription History
-        const subHistory = await prisma.subscriptionHistory.findMany({
+        const subHistory = await (prisma as any).subscriptionHistory.findMany({
             where: { subscriptionId: tenant.subscription?.id },
             orderBy: { createdAt: 'desc' },
             take: 10
         });
 
         // External Requests (Son hatalar)
-        const recentErrors = await prisma.externalRequest.findMany({
+        const invoices = await (prisma as any).salesInvoice.findMany({
+            where: { companyId: { in: tenant.companies.map((c: any) => c.id) } },
+            select: { id: true },
+            take: 100
+        });
+
+        const recentErrors = await (prisma as any).externalRequest.findMany({
             where: {
-                entityId: { in: (await prisma.salesInvoice.findMany({ where: { companyId: { in: tenant.companies.map(c => c.id) } }, select: { id: true }, take: 100 })).map(i => i.id) },
+                entityId: { in: invoices.map((i: any) => i.id) },
                 status: 'FAILED'
             },
             orderBy: { updatedAt: 'desc' },

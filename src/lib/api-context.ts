@@ -20,11 +20,31 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
 
     const companyId = req.headers.get('X-Company-Id');
 
-    // Kullanıcı detaylarını ve Tenant bilgisini çek
-    const user = await (prisma as any).user.findUnique({
+    // 1. Önce SaaS kullanıcısı mı diye bak (Tenant bazlı işlemler için)
+    let user = await (prisma as any).user.findUnique({
         where: { id: session.id },
         select: { id: true, tenantId: true, role: true, lastActiveAt: true }
     });
+
+    let isStaff = false;
+
+    // 2. Eğer User tablosunda yoksa Staff tablosuna bak (Adminler ve Personeller burada olabilir)
+    if (!user) {
+        const staff = await (prisma as any).staff.findUnique({
+            where: { id: session.id },
+            select: { id: true, role: true, lastActive: true }
+        });
+
+        if (staff) {
+            isStaff = true;
+            user = {
+                id: staff.id,
+                tenantId: 'PLATFORM_ADMIN',
+                role: (staff.role || 'Staff').toUpperCase(),
+                lastActiveAt: staff.lastActive
+            };
+        }
+    }
 
     if (!user) {
         throw new Error("UNAUTHORIZED: Kullanıcı veritabanında bulunamadı.");
@@ -35,13 +55,19 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
     }
 
     // --- ACTIVITY TRACKING ---
-    // Update lastActiveAt if it's been more than 1 minute since last update
     const now = new Date();
     if (!user.lastActiveAt || (now.getTime() - new Date(user.lastActiveAt).getTime() > 60000)) {
-        (prisma as any).user.update({
-            where: { id: user.id },
-            data: { lastActiveAt: now }
-        }).catch((err: any) => console.error("LastActive update failed:", err));
+        if (isStaff) {
+            (prisma as any).staff.update({
+                where: { id: user.id },
+                data: { lastActive: now }
+            }).catch((err: any) => console.error("Staff LastActive update failed:", err));
+        } else {
+            (prisma as any).user.update({
+                where: { id: user.id },
+                data: { lastActiveAt: now }
+            }).catch((err: any) => console.error("LastActive update failed:", err));
+        }
     }
 
     return {
@@ -54,12 +80,6 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
 }
 
 export async function assertCompanyAccess(userId: string, companyId: string) {
-    // 1. Super Admin veya Platform Admin ise her yere girebilir mi?
-    // Şimdilik strict kontrol yapalım: UserCompanyAccess kaydı var mı?
-
-    // Ayrıca Tenant kontrolü de yapılmalı:
-    // Kullanıcının tenant'ı ile Company'nin tenant'ı aynı mı?
-
     const access = await (prisma as any).userCompanyAccess.findUnique({
         where: {
             userId_companyId: {
@@ -78,13 +98,9 @@ export async function assertCompanyAccess(userId: string, companyId: string) {
     });
 
     if (!access) {
-        // Belki kullanıcı Tenant Admin'dir ve UserCompanyAccess tablosuna henüz eklenmemiştir?
-        // Ancak Golden Template "Bu kontrol User ↔ Company access tablosunu kontrol eder" diyor.
-        // O yüzden strict davranıyoruz.
         throw new Error("FORBIDDEN: Bu şirkete erişim yetkiniz yok.");
     }
 
-    // Çifte Güvenlik: Tenant Mismatch Kontrolü
     if (access.user.tenantId && access.company.tenantId && access.user.tenantId !== access.company.tenantId) {
         throw new Error("SECURITY ALERT: Cross-Tenant Access Attempt Detected!");
     }
@@ -93,20 +109,21 @@ export async function assertCompanyAccess(userId: string, companyId: string) {
 }
 
 export async function assertSubscriptionIsActive(tenantId: string) {
+    if (tenantId === 'PLATFORM_ADMIN') return true;
+
     const subscription = await (prisma as any).subscription.findUnique({
         where: { tenantId }
     });
 
     if (!subscription || subscription.status === 'TRIAL_EXPIRED' || subscription.status === 'PAST_DUE' || subscription.status === 'SUSPENDED') {
-        // Trial süresi bitmiş veya ödemesi alınamamış olabilir.
-        // Soft bir uyarı yerine strict bir blok koyuyoruz.
         throw new Error("PAYMENT_REQUIRED: Aboneliğiniz aktif değil. Lütfen planınızı güncelleyin.");
     }
     return true;
 }
 
 export async function featureGate(ctx: RequestContext, featureKey: string) {
-    // 1. Tenant'ın aktif planını bul
+    if (ctx.tenantId === 'PLATFORM_ADMIN') return true;
+
     const subscription = await (prisma as any).subscription.findUnique({
         where: { tenantId: ctx.tenantId },
         include: {
@@ -126,14 +143,6 @@ export async function featureGate(ctx: RequestContext, featureKey: string) {
         throw new Error("FORBIDDEN: Abonelik bulunamadı.");
     }
 
-    // 2. Plan özelliklerini kontrol et
-    // PlanFeature tablosunda featureId ile eşleşen bir kayıt var mı?
-    // featureKey (örn: 'e_invoice') üzerinden featureId'yi bulmamız lazım veya
-    // Feature tablosunda 'key' alanı üzerinden de gidebiliriz.
-
-    // Performans için öneri: Bu feature listesi Redis'te veya Session'da cache'lenebilir.
-    // Şimdilik DB'den doğrudan kontrol ediyoruz.
-
     const hasFeature = subscription.plan.features.some(pf => pf.feature.key === featureKey);
 
     if (!hasFeature) {
@@ -144,7 +153,8 @@ export async function featureGate(ctx: RequestContext, featureKey: string) {
 }
 
 export async function quotaGate(ctx: RequestContext, resourceKey: string) {
-    // 1. Plan Limitlerini Getir
+    if (ctx.tenantId === 'PLATFORM_ADMIN') return true;
+
     const subscription = await (prisma as any).subscription.findUnique({
         where: { tenantId: ctx.tenantId },
         include: {
@@ -159,21 +169,16 @@ export async function quotaGate(ctx: RequestContext, resourceKey: string) {
     if (!subscription) throw new Error("Abonelik bulunamadı.");
 
     const limitObj = subscription.plan.limits.find(l => l.resource === resourceKey);
-    // Eğer limit tanımlanmamışsa varsayılan olarak engelle (veya serbest bırak? Güvenlik için engellemek veya 0 demek mantıklı)
-    // -1 genellikle sınırsız demektir.
     const limit = limitObj ? limitObj.limit : 0;
 
     if (limit === -1) return true;
 
-    // 2. Kullanımı Hesapla
     let usage = 0;
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
     if (resourceKey === 'monthly_documents') {
-        // Bu ay kesilen toplam fatura sayısı (e-fatura + e-arşiv)
-        // Tenant altındaki company'lerin toplamı, çünkü limit tenant'a aittir.
         const companies = await (prisma as any).company.findMany({
             where: { tenantId: ctx.tenantId },
             select: { id: true }
@@ -183,7 +188,7 @@ export async function quotaGate(ctx: RequestContext, resourceKey: string) {
         usage = await (prisma as any).salesInvoice.count({
             where: {
                 companyId: { in: companyIds },
-                isFormal: true, // Sadece resmileşmiş faturalar
+                isFormal: true,
                 createdAt: {
                     gte: startOfMonth,
                     lte: endOfMonth

@@ -1,228 +1,730 @@
 
 "use client";
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import '../app/landing.css';
 
 export default function LandingPage() {
-  return (
-    <div className="m-container">
-      {/* Navbar */}
-      <nav className="m-nav">
-        <div className="m-logo">
-          Periodya<span>.</span>
-        </div>
-        <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
-          <div className="m-nav-links" style={{ display: 'flex', gap: '20px' }}>
-            <a href="#features" style={{ textDecoration: 'none', color: 'var(--m-text-muted)', fontSize: '15px' }}>Özellikler</a>
-            <a href="#pricing" style={{ textDecoration: 'none', color: 'var(--m-text-muted)', fontSize: '15px' }}>Fiyatlandırma</a>
-            <a href="#security" style={{ textDecoration: 'none', color: 'var(--m-text-muted)', fontSize: '15px' }}>Güvenlik</a>
+  const [cms, setCms] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [demoLoading, setDemoLoading] = useState(false);
+  const [activeRole, setActiveRole] = useState(1);
+  const router = useRouter();
+
+  const handleDemo = async () => {
+    if (demoLoading) return;
+    setDemoLoading(true);
+    try {
+      const res = await fetch('/api/auth/demo', { method: 'POST' });
+      if (res.ok) {
+        window.location.href = '/'; // Hard redirect to refresh all contexts
+      } else {
+        const data = await res.json();
+        alert('Demo girişi başarısız: ' + (data.error || 'Bilinmeyen hata'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Bağlantı hatası oluştu.');
+    } finally {
+      setDemoLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetch('/api/public/landing')
+      .then(res => res.json())
+      .then(data => {
+        setCms(data);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const primaryColor = cms?.settings?.primaryColor || '#446ef2';
+  const logoUrl = cms?.settings?.logoUrl;
+  const [scrolled, setScrolled] = useState(false);
+  const [bannerVisible, setBannerVisible] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const CheckIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#8b5cf6' }}>
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  );
+
+  const XIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#ef4444' }}>
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  );
+
+  const ChevronIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', opacity: 0.7 }}>
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  );
+
+  const renderSection = (section: any) => {
+    const { type, content } = section;
+
+    switch (type) {
+      case 'BANNER':
+        if (!bannerVisible) return null;
+        return (
+          <div className="m-top-banner" key={section.id} style={{ position: 'relative' }}>
+            <span
+              style={{ fontSize: content.titleSize, color: content.titleColor }}
+              dangerouslySetInnerHTML={{ __html: content.text }}
+            ></span>
+            {content.linkUrl && <a href={content.linkUrl} target="_blank" rel="noopener noreferrer">{content.linkText || 'Learn more'}</a>}
+            <button onClick={() => setBannerVisible(false)} style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '20px', opacity: 0.6 }}>×</button>
           </div>
-          <Link href="/login" className="m-btn m-btn-outline" style={{ border: 'none' }}>Giriş Yap</Link>
-          <Link href="/register" className="m-btn m-btn-primary">Başlayın</Link>
+        );
+
+      case 'HERO':
+        return (
+          <header className="m-hero" key={section.id}>
+            <div className="m-hero-bg"></div>
+            {content.badgeText && (
+              <div className="m-pill-row">
+                {content.badgeText.split(';').map((pill: string, idx: number) => (
+                  <div className="m-pill" key={idx}>
+                    {pill.trim()}
+                  </div>
+                ))}
+                {content.reviewsText && <span className="text-[13px] text-slate-400 font-medium self-center ml-2">{content.reviewsText}</span>}
+              </div>
+            )}
+            <h1
+              style={{ fontSize: content.titleSize, color: content.titleColor }}
+              dangerouslySetInnerHTML={{ __html: content.title }}
+            ></h1>
+            <p
+              style={{ fontSize: content.subtitleSize, color: content.subtitleColor }}
+              dangerouslySetInnerHTML={{ __html: content.subtitle }}
+            ></p>
+            <div className="m-hero-btns">
+              <Link href={content.primaryBtnUrl || "/register"} className="m-btn m-btn-primary" style={{ padding: '14px 36px', fontSize: '15px' }}>{content.primaryBtnText || 'Try It Free'}</Link>
+              <button onClick={() => content.secondaryBtnUrl ? router.push(content.secondaryBtnUrl) : handleDemo()} className="m-btn m-btn-outline" style={{ padding: '14px 36px', fontSize: '15px' }}>{content.secondaryBtnText || 'Book a Demo'}</button>
+            </div>
+            {content.noteText && <div className="m-hero-note">{content.noteText}</div>}
+
+            <div style={{ marginTop: '40px', position: 'relative', maxWidth: '1000px', margin: '40px auto 0' }}>
+              <div className="m-card-white" style={{ padding: '20px', borderRadius: '24px', boxShadow: '0 40px 120px rgba(0,0,0,0.1)' }}>
+                <div style={{ background: '#f8faff', borderRadius: '16px', height: '320px', overflow: 'hidden' }}>
+                  <img src={content.visualUrl || 'https://databox.com/wp-content/uploads/2023/04/databox-dashboards.png'} alt="Visual" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              </div>
+              {content.showFloatingCard && (
+                <div className="hidden lg:block" style={{
+                  position: 'absolute',
+                  right: '-40px',
+                  bottom: '40px',
+                  width: '320px',
+                  background: '#fff',
+                  padding: '32px',
+                  borderRadius: '24px',
+                  boxShadow: '0 40px 80px rgba(0,0,0,0.12)',
+                  textAlign: 'left',
+                  border: '1px solid #f2f4f7'
+                }}>
+                  <h4 className="text-[18px] font-black mb-6">{content.floatingCardTitle || 'Explore Features'}</h4>
+                  {content.floatingCardVisualUrl ? (
+                    <div style={{ background: '#f8faff', borderRadius: '12px', height: '200px', overflow: 'hidden' }}>
+                      <img src={content.floatingCardVisualUrl} alt="Floating Visual" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-3">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+                        <div key={i} className="aspect-square bg-slate-50 rounded-xl flex items-center justify-center text-xl hover:bg-blue-50 cursor-pointer transition">
+                          <div className="w-6 h-6 bg-blue-100 rounded-md"></div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </header>
+        );
+
+      case 'PARTNERS':
+        return (
+          <div style={{ padding: '60px 0', borderBottom: '1px solid #f2f4f7', background: '#fff' }} key={section.id}>
+            <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-12 items-center px-10">
+              {(content.items || ['toast', 'bambooHR', 'SmartBug', 'CONAIR', 'dentsu', 'wistia', 'AVIDLY', 'NEW BREED+']).map((p: any, i: number) => (
+                p.url ? (
+                  <img key={i} src={p.url} alt={p.name} className="h-8 md:h-10 grayscale opacity-40 hover:opacity-100 transition-all object-contain" />
+                ) : (
+                  <span key={i} className="text-xl font-black uppercase tracking-tighter opacity-30 grayscale contrast-125" style={{ pointerEvents: 'none' }}>{typeof p === 'string' ? p : p.name}</span>
+                )
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'COMPARISON':
+        return (
+          <section className="m-section" style={{ background: '#fff' }} key={section.id}>
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+              <h2 className="mb-6">
+                <span className="text-[#0d0e12]">{content.topTitle || 'Business intelligence, '}</span>
+                <span className="grad-text">{content.mainTitle || 'without the baggage'}</span>
+              </h2>
+              <p className="m-intro mb-12" dangerouslySetInnerHTML={{ __html: content.subtitle || content.desc || 'Databox removes the complicated setup, steep price, and long learning curve. Your data finally works at the speed of your business.' }}></p>
+              <div className="m-compare-container">
+                <div className="m-compare-card before">
+                  <h4>{content.beforeTitle || 'BEFORE DATABOX'}</h4>
+                  <ul className="m-compare-list">
+                    {(content.beforeList || [
+                      'Per-seat licenses and consulting fees put BI out of reach.',
+                      'ETL projects, custom code, SQL queries, and IT backlogs stall momentum.',
+                      'You submit tickets and wait days for new metrics or ad-hoc reports.',
+                      'Fragmented tools lead to silos, debates, and more questions.',
+                      'Leaders miss opportunities because performance updates come too late.'
+                    ]).map((item: string, i: number) => (
+                      <li key={i}><XIcon /> {item}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="m-compare-card after">
+                  <h4>{content.afterTitle || 'AFTER DATABOX'}</h4>
+                  <ul className="m-compare-list">
+                    {(content.afterList || [
+                      'Unlimited users on every plan—BI for all, no extra fees.',
+                      'Go live fast with 130+ integrations, 200+ templates, and no-code metric builder.',
+                      'Self-serve dashboards & AI summaries give you answers instantly.',
+                      'Unified datasets end "which number is right?" debates for good.',
+                      'Real-time dashboards and automated reports keep leaders informed when it matters.'
+                    ]).map((item: string, i: number) => (
+                      <li key={i}><CheckIcon /> {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'METRICS':
+        return (
+          <section className="m-section" key={section.id}>
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+              <h2 className="mb-4">
+                <span className="block text-[#9333ea] mb-2">{content.topTitle || '20,000+ scaling teams & agencies'}</span>
+                <span className="block text-[#0d0e12]">{content.mainTitle || 'drive results that matter'}</span>
+              </h2>
+              <div className="m-grid-container m-grid-3" style={{ marginTop: '30px' }}>
+                {(content.items || [
+                  { stat: '↑ 55%', label: 'increase in sales YoY', logo: 'https://databox.com/wp-content/uploads/2023/04/first-response.png' },
+                  { stat: '↓ 50%', label: 'decrease in overall reporting costs', logo: 'https://databox.com/wp-content/uploads/2023/04/market-launcher.png' },
+                  { stat: '↓ 60%', label: 'reduction in time spent creating reports', logo: 'https://databox.com/wp-content/uploads/2023/04/hero-factory.png' }
+                ]).map((c: any, i: number) => (
+                  <div key={i} className="m-metric-card">
+                    <div>
+                      <div className="m-metric-stat">{c.stat}</div>
+                      <div className="m-metric-label">{c.label}</div>
+                    </div>
+                    <div className="m-metric-footer">
+                      <a href={c.linkUrl || '#'} className="m-metric-link">{c.linkText || 'Read case study →'}</a>
+                      <img src={c.logo} alt="Client Logo" className="m-metric-logo" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'FEATURES':
+      case 'GRID':
+        return (
+          <section className="m-section" style={{ background: content.bg || '#fcfcfd' }} key={section.id}>
+            <h2
+              style={{ fontSize: content.titleSize, color: content.titleColor }}
+              dangerouslySetInnerHTML={{ __html: content.title }}
+            ></h2>
+            <p
+              className="m-intro"
+              style={{ fontSize: content.subtitleSize, color: content.subtitleColor }}
+              dangerouslySetInnerHTML={{ __html: content.subtitle }}
+            ></p>
+            <div className={`m-grid-container ${content.cols === 2 ? 'm-grid-2' : 'm-grid-3'}`}>
+              {(content.items || []).map((c: any, i: number) => (
+                <div key={i} className="m-card-white">
+                  <div className="m-card-icon" style={{ fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {(c.icon && (c.icon.startsWith('http') || c.icon.startsWith('/'))) ? (
+                      <img src={c.icon} alt={c.title} className="w-10 h-10 object-contain" />
+                    ) : (
+                      <span>{c.icon || (i + 1)}</span>
+                    )}
+                  </div>
+                  <h3>{c.title}</h3>
+                  <p>{c.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+
+      case 'ROLES':
+        return (
+          <section className="m-section" key={section.id}>
+            <h2
+              style={{ fontSize: content.titleSize, color: content.titleColor }}
+              dangerouslySetInnerHTML={{ __html: content.title }}
+            ></h2>
+            <p
+              className="m-intro"
+              style={{ fontSize: content.subtitleSize, color: content.subtitleColor }}
+              dangerouslySetInnerHTML={{ __html: content.desc || content.subtitle }}
+            ></p>
+            <div className="m-accordion-container" style={{ marginTop: '15px' }}>
+              {(content.items || []).map((role: any, idx: number) => (
+                <div
+                  key={idx}
+                  className={`m-role-card ${activeRole === idx ? 'active' : ''}`}
+                  onMouseEnter={() => setActiveRole(idx)}
+                >
+                  <div className="m-role-title">{role.title}</div>
+                  <div className="m-role-content">
+                    <p className="m-role-desc">{role.desc}</p>
+                    <ul className="m-role-list">
+                      {(role.list || role.items || []).map((li: string, j: number) => (
+                        <li key={j}>{li}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="m-role-icon-bottom">{role.icon || '👤'}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+
+      case 'EXPLORE':
+        return (
+          <section className="m-section" key={section.id}>
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+              <h2 className="mb-4">
+                <span className="text-[#0d0e12]">{content.topTitle || 'Unlock data. '}</span>
+                <span className="text-[#9333ea]">{content.mainTitle || 'Empower decisions.'}</span>
+              </h2>
+              <p className="m-intro mb-12">{content.subtitle || content.desc || "Your data is useless unless your team can quickly put it to work..."}</p>
+              <div className="m-grid-container m-grid-3" style={{ gap: '24px' }}>
+                {(content.items || [
+                  {
+                    title: 'Make better decisions, together', desc: 'Send the right data to the right people, in the right format, at the right time.', icon: (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    )
+                  },
+                  {
+                    title: 'Measure what matters most', desc: 'Focus on what matters most to your growth.', icon: (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    )
+                  },
+                  {
+                    title: 'Draw better conclusions', desc: 'Know the why behind the number.', icon: (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    )
+                  },
+                  {
+                    title: 'Enable "DIY BI"', desc: 'Empower your entire team to self-serve data.', icon: (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                    )
+                  },
+                  {
+                    title: 'Provide clarity at a glance', desc: 'Understand your performance instantly.', icon: (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    )
+                  },
+                  {
+                    title: 'Share versions and visions', desc: 'Move faster without second-guessing the source or meaning.', icon: (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                    )
+                  }
+                ]).map((c: any, i: number) => (
+                  <div key={i} className="m-feature-block">
+                    <div className="m-feature-icon">
+                      {typeof c.icon === 'string' ? (
+                        <span className="text-3xl">{c.icon}</span>
+                      ) : (
+                        c.icon
+                      )}
+                    </div>
+                    <h3>{c.title}</h3>
+                    <div className="summary">{c.desc}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: '48px' }} className="text-center">
+                <button
+                  onClick={() => content.primaryBtnUrl ? router.push(content.primaryBtnUrl) : undefined}
+                  className="m-btn m-btn-primary"
+                  style={{ padding: '14px 40px', borderRadius: '8px', fontSize: '15px' }}
+                >
+                  {content.primaryBtnText || 'Why choose Databox'}
+                </button>
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'PRICING':
+        return (
+          <section className="m-section" style={{ background: '#fcfcfd' }} key={section.id}>
+            <h2
+              style={{ fontSize: content.titleSize, color: content.titleColor }}
+              dangerouslySetInnerHTML={{ __html: content.title || 'Start for free, upgrade as you grow' }}
+            ></h2>
+            <p
+              className="m-intro"
+              style={{ fontSize: content.subtitleSize, color: content.subtitleColor }}
+              dangerouslySetInnerHTML={{ __html: content.subtitle }}
+            ></p>
+            <div className="m-grid-container m-grid-3" style={{ marginTop: '15px' }}>
+              {(content.items || [
+                { title: 'Free', price: '0', desc: 'For individuals exploring data.', list: ['3 Dashboards', '1 App connection', 'Daily updates'] },
+                { title: 'Starter', price: '47', desc: 'For small teams getting started.', list: ['Unlimited Dashboards', '5 App connections', 'Hourly updates', 'Priority support'] },
+                { title: 'Professional', price: '135', desc: 'For growing agencies and teams.', list: ['Everything in Starter', 'White-labeling', 'API Access', 'Custom domain'] }
+              ]).map((tier: any, i: number) => (
+                <div key={i} className={`m-card-white ${i === 1 ? 'border-blue-500 ring-4 ring-blue-50' : ''}`}>
+                  <h3 className="text-xl font-black mb-2">{tier.title}</h3>
+                  <div className="text-4xl font-black mb-4">${tier.price}<span className="text-sm text-slate-400 font-medium">/mo</span></div>
+                  <p className="text-sm text-slate-500 mb-8">{tier.desc}</p>
+                  <ul className="m-list mb-8">
+                    {(tier.list || []).map((li: string, j: number) => (
+                      <li key={j} className="text-sm"><CheckIcon /> {li}</li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => tier.url ? router.push(tier.url) : (i === 0 ? router.push('/register') : handleDemo())}
+                    className={`w-full m-btn ${i === 1 ? 'm-btn-primary' : 'm-btn-outline'}`}
+                  >
+                    {tier.btnText || (i === 0 ? 'Try It Free' : 'Get Started')}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+
+      case 'FAQ':
+        return (
+          <section className="m-section" key={section.id}>
+            <h2
+              style={{ fontSize: content.titleSize, color: content.titleColor }}
+              dangerouslySetInnerHTML={{ __html: content.title || 'Frequently Asked Questions' }}
+            ></h2>
+            <div className="max-w-3xl mx-auto mt-16 text-left space-y-4">
+              {(content.items || [
+                { q: 'Is there a free trial?', a: 'Yes! You can start for free with no credit card required.' },
+                { q: 'Can I connect my own data?', a: 'Databox supports 130+ native integrations and any custom data via API or SQL.' },
+                { q: 'How is Databox different from PowerBI?', a: 'Databox is designed for teams that need answers fast, without the complexity of IT-heavy tools.' }
+              ]).map((item: any, i: number) => (
+                <div key={i} className="p-6 bg-white border border-slate-200 rounded-2xl hover:border-blue-500 transition cursor-help">
+                  <h4 className="text-[17px] font-black mb-3">{item.question || item.q}</h4>
+                  <p className="text-[15px] text-slate-500 leading-relaxed">{item.answer || item.a}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+
+      case 'CTA':
+        return (
+          <section className="m-section m-cta-block" key={section.id}>
+            <h2 className="text-[clamp(32px,5vw,56px)] font-black text-center mb-12" dangerouslySetInnerHTML={{ __html: content.title || 'Make better decisions,<br />together, faster' }}>
+            </h2>
+            <div className="flex justify-center gap-4 flex-wrap">
+              <Link href={content.primaryBtnUrl || '/register'} className="m-btn" style={{ background: '#fff', color: '#000', padding: '14px 40px', borderRadius: '8px', fontWeight: 800 }}>{content.primaryBtnText || 'Try It Free'}</Link>
+              <button onClick={() => content.secondaryBtnUrl ? router.push(content.secondaryBtnUrl) : handleDemo()} className="m-btn" style={{ background: 'transparent', color: '#fff', border: '1px solid #fff', padding: '14px 40px', borderRadius: '8px', fontWeight: 800 }}>{content.secondaryBtnText || 'Book a Demo'}</button>
+            </div>
+          </section>
+        );
+
+      case 'NAV':
+        return (
+          <nav className={`m-nav ${scrolled ? 'scrolled' : ''}`} key={section.id}>
+            <div className="m-logo">
+              {cms?.settings?.logoUrl ? (
+                <img src={cms.settings.logoUrl} alt="Logo" className="h-8" />
+              ) : (
+                <div className="m-logo-icon"><span></span><span></span><span></span></div>
+              )}
+              {cms?.settings?.siteTitle || 'databox'}
+              <div className="hidden md:flex gap-8 ml-12 text-[14px] font-bold text-slate-700">
+                {(content.menuItems || [
+                  { title: 'Products ⌵', url: '#' },
+                  { title: 'Solutions ⌵', url: '#' },
+                  { title: 'Resources ⌵', url: '#' },
+                  { title: 'Pricing', url: '#' }
+                ]).map((item: any, i: number) => (
+                  <span key={i} className="flex items-center cursor-pointer hover:text-blue-600 transition" onClick={() => item.url !== '#' && router.push(item.url)}>
+                    {item.title.replace(' ⌵', '')} {item.title.includes('⌵') && <ChevronIcon />}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-4 items-center">
+              <Link href={content.loginUrl || "/login"} className="text-[14px] font-bold text-slate-700 hover:text-slate-900 transition mr-2">{content.loginText || 'Login'}</Link>
+              <button onClick={() => content.secondaryBtnUrl ? router.push(content.secondaryBtnUrl) : handleDemo()} className="m-btn m-btn-outline" style={{ padding: '10px 20px', borderRadius: '8px' }}>{content.secondaryBtnText || 'Book a Demo'}</button>
+              <Link href={content.primaryBtnUrl || "/register"} className="m-btn m-btn-primary" style={{ padding: '10px 24px', borderRadius: '8px' }}>{content.primaryBtnText || 'Try It Free'}</Link>
+            </div>
+          </nav>
+        );
+      case 'FOOTER':
+        return (
+          <footer className="m-footer-dark" key={section.id}>
+            <div className="m-footer-grid">
+              <div>
+                <div className="m-logo" style={{ color: '#fff', marginBottom: '20px' }}>
+                  {cms?.settings?.logoUrl ? (
+                    <img src={cms.settings.logoUrl} alt="Logo" className="h-8" />
+                  ) : (
+                    <div className="m-logo-icon"><span></span><span></span><span></span></div>
+                  )}
+                  {cms?.settings?.siteTitle || 'databox'}
+                </div>
+                <div className="m-footer-info" dangerouslySetInnerHTML={{ __html: content.desc || 'Databox Inc.<br/>HQ: Boston, MA, USA' }}></div>
+                <div className="m-footer-tagline mt-8">{content.subtitle || 'Modern BI for teams that needs answers now'}</div>
+                <div className="flex gap-4 mb-12 opacity-60">
+                  {/* Social links could be here */}
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="w-5 h-5 bg-white/20 rounded-full"></div>
+                  ))}
+                </div>
+              </div>
+
+              {(content.items || []).map((col: any, i: number) => (
+                <div key={i} className="m-footer-col">
+                  {col.topTitle && <div className="text-[10px] font-black text-blue-400 mb-1 uppercase tracking-widest">{col.topTitle}</div>}
+                  <h5>{col.title}</h5>
+                  <ul>
+                    {(col.list || []).map((li: string, j: number) => {
+                      const [text, url] = li.split('|');
+                      return (
+                        <li key={j}>
+                          <Link href={url || '#'}>{text}</Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: '100px', borderTop: '1px solid #1e293b', paddingTop: '40px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
+              © {new Date().getFullYear()} {cms?.settings?.siteTitle || 'Databox'} Inc.
+            </div>
+          </footer>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Helper to render Navigation
+  const renderNav = () => {
+    return (
+      <nav className={`m-nav ${scrolled ? 'scrolled' : ''}`}>
+        <div className="m-logo">
+          {cms?.settings?.logoUrl ? (
+            <img src={cms.settings.logoUrl} alt="Logo" className="h-8" />
+          ) : (
+            <div className="m-logo-icon"><span></span><span></span><span></span></div>
+          )}
+          {cms?.settings?.siteTitle || 'databox'}
+          <div className="hidden md:flex gap-8 ml-12 text-[14px] font-bold text-slate-700">
+            <span className="flex items-center cursor-pointer hover:text-blue-600 transition">Products <ChevronIcon /></span>
+            <span className="flex items-center cursor-pointer hover:text-blue-600 transition">Solutions <ChevronIcon /></span>
+            <span className="flex items-center cursor-pointer hover:text-blue-600 transition">Resources <ChevronIcon /></span>
+            <span className="flex items-center cursor-pointer hover:text-blue-600 transition">Pricing</span>
+          </div>
+        </div>
+        <div className="flex gap-4 items-center">
+          <Link href="/login" className="text-[14px] font-bold text-slate-700 hover:text-slate-900 transition mr-2">Login</Link>
+          <button onClick={handleDemo} className="m-btn m-btn-outline" style={{ padding: '10px 20px', borderRadius: '8px' }}>Book a Demo</button>
+          <Link href="/register" className="m-btn m-btn-primary" style={{ padding: '10px 24px', borderRadius: '8px' }}>Try It Free</Link>
         </div>
       </nav>
+    );
+  };
 
-      {/* Hero Section */}
-      <header className="m-hero">
-        <h1>Birlikte çalışma şekliniz için<br />esnek bir platform</h1>
-        <p>E-Fatura, stok ve finansal süreçlerinizi tek bir platformda toplayın. İşletmenizin tüm ihtiyaçları için özelleştirilebilir iş akışları oluşturun.</p>
+  if (loading) {
+    return (
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#fff'
+      }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          border: '4px solid #f3f3f3',
+          borderTop: '4px solid #3498db',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }} />
+        <style dangerouslySetInnerHTML={{
+          __html: `
+          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        `}} />
+      </div>
+    );
+  }
 
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-          <Link href="/register" className="m-btn m-btn-primary" style={{ padding: '16px 48px', fontSize: '18px' }}>Hemen Ücretsiz Başlayın ➔</Link>
-        </div>
-        <div style={{ marginTop: '20px', color: 'var(--m-text-muted)', fontSize: '14px' }}>Kredi kartı gerekmez • Sınırsız deneme</div>
+  const sections = cms?.sections || [];
 
-        <div className="m-hero-visual">
-          <img src="/monday_hero.png" alt="Periodya Platform" className="m-hero-img" />
-        </div>
-      </header>
-
-      {/* Social Proof */}
-      <section className="m-brands">
-        <h2>Pek çok entegrasyon ve partner ile tam uyumlu</h2>
-        <div className="m-brands-list">
-          <div style={{ fontWeight: 900, fontSize: '20px' }}>GELİR İDARESİ</div>
-          <div style={{ fontWeight: 900, fontSize: '20px' }}>NILVERA</div>
-          <div style={{ fontWeight: 900, fontSize: '20px' }}>IYZICO</div>
-          <div style={{ fontWeight: 900, fontSize: '20px' }}>TRENDYOL</div>
-          <div style={{ fontWeight: 900, fontSize: '20px' }}>HEPSİBURADA</div>
-        </div>
-      </section>
-
-      {/* Features Storytelling */}
-      <section id="features" className="m-feature">
-        <div className="m-feature-text">
-          <div style={{ color: 'var(--m-blue)', fontWeight: '700', marginBottom: '10px' }}>OTOMASYON</div>
-          <h2>Evrak işlerini değil, işinizi yönetin</h2>
-          <p>E-Fatura ve E-Arşiv süreçlerinizi saniyeler içinde tamamlayın. GİB entegrasyonu sayesinde hata yapma riskini ortadan kaldırın.</p>
-          <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px' }}>
-            <li style={{ marginBottom: '10px' }}>✅ Tek tıkla toplu fatura kesimi</li>
-            <li style={{ marginBottom: '10px' }}>✅ Otomatik cari bakiye güncellemeleri</li>
-            <li style={{ marginBottom: '10px' }}>✅ WhatsApp üzerinden fatura gönderimi</li>
-          </ul>
-        </div>
-        <div className="m-feature-visual">
-          <img src="/monday_invoices.png" alt="Automation" />
-        </div>
-      </section >
-
-      <section className="m-feature">
-        <div className="m-feature-text">
-          <div style={{ color: 'var(--m-pink)', fontWeight: '700', marginBottom: '10px' }}>STOK & ENVANTER</div>
-          <h2>Nerede olursanız olun stoklarınız kontrol altında</h2>
-          <p>Farklı şubelerinizdeki stok durumunu anlık takip edin. Kritik stok uyarıları ile ürününüzün bitmesini beklemeyin.</p>
-          <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px' }}>
-            <li style={{ marginBottom: '10px' }}>✅ Şubeler arası stok transferi</li>
-            <li style={{ marginBottom: '10px' }}>✅ Barkod okuyucu desteği</li>
-            <li style={{ marginBottom: '10px' }}>✅ Karlılık analiz raporları</li>
-          </ul>
-        </div>
-        <div className="m-feature-visual">
-          <img src="/monday_inventory.png" alt="Inventory" />
-        </div>
-      </section >
-
-      {/* Pricing Section (NEW) */}
-      < section id="pricing" style={{ padding: '100px 20px', textAlign: 'center', background: '#f8fafc' }
-      }>
-        <h2 style={{ fontSize: '48px', fontWeight: '800', marginBottom: '16px' }}>Her boyutta işletme için uygun</h2>
-        <p style={{ color: 'var(--m-text-muted)', fontSize: '18px', marginBottom: '60px' }}>Gizli ücret yok, karmaşık sözleşmeler yok. İhtiyacınız olanı seçin.</p>
-
-        <div className="pricing-grid">
-          <div className="pricing-card">
-            <h3>Starter</h3>
-            <div className="pricing-price">₺499<span>/ay</span></div>
-            <p style={{ color: 'var(--m-text-muted)', fontSize: '14px' }}>Yeni başlayan küçük işletmeler için ideal.</p>
-            <ul className="pricing-features">
-              <li>Ayda 100 Fatura</li>
-              <li>1 Kullanıcı</li>
-              <li>1 Şube</li>
-              <li>E-Fatura Entegrasyonu</li>
-              <li>Temel Raporlama</li>
-            </ul>
-            <Link href="/register" className="m-btn m-btn-outline" style={{ border: '1px solid var(--m-blue)', color: 'var(--m-blue)' }}>Hemen Başlayın</Link>
+  return (
+    <div className="m-container">
+      {/* Global Navigation & Banner Logic */}
+      {sections.some((s: any) => s.type === 'BANNER')
+        ? sections.filter((s: any) => s.type === 'BANNER').map((s: any) => renderSection(s))
+        : (bannerVisible && !sections.length) && (
+          <div className="m-top-banner">
+            Use AI to <strong>talk to your data</strong> and move from insights to action faster. 👆
+            <a href="#">Read the blog.</a>
+            <button onClick={() => setBannerVisible(false)} style={{ position: 'absolute', right: '20px', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '18px' }}>×</button>
           </div>
+        )
+      }
 
-          <div className="pricing-card popular">
-            <h3>Business</h3>
-            <div className="pricing-price">₺999<span>/ay</span></div>
-            <p style={{ color: 'var(--m-text-muted)', fontSize: '14px' }}>Büyümekte olan, profesyonel ekipler için.</p>
-            <ul className="pricing-features">
-              <li>Ayda 1000 Fatura</li>
-              <li>5 Kullanıcı</li>
-              <li>Sınırsız Şube</li>
-              <li>Gelişmiş Stok Yönetimi</li>
-              <li>WhatsApp Bildirimleri</li>
-              <li>Banka Entegrasyonları</li>
-            </ul>
-            <Link href="/register" className="m-btn m-btn-primary">Ücretsiz Deneyin</Link>
+      {/* Navigation */}
+      {sections.some((s: any) => s.type === 'NAV')
+        ? sections.filter((s: any) => s.type === 'NAV').map((s: any) => renderSection(s))
+        : renderNav()
+      }
+
+      {/* Main Content Sections */}
+      {sections.length > 0 ? (
+        sections
+          .filter((s: any) => s.type !== 'NAV' && s.type !== 'BANNER')
+          .map((section: any) => renderSection(section))
+      ) : (
+        <header className="m-hero">
+          <div className="m-hero-bg"></div>
+          <div className="m-pill-row">
+            <div className="m-pill">⭐ 4.4 | G2</div>
+            <div className="m-pill">✨ 4.6 | CAPTERRA</div>
+            <span className="text-[13px] text-slate-400 font-medium self-center ml-2">based on 1,000+ reviews</span>
           </div>
-
-          <div className="pricing-card">
-            <h3>Enterprise</h3>
-            <div className="pricing-price">₺2499<span>/ay</span></div>
-            <p style={{ color: 'var(--m-text-muted)', fontSize: '14px' }}>Büyük ölçekli operasyonlar ve holdingler için.</p>
-            <ul className="pricing-features">
-              <li>Sınırsız Fatura</li>
-              <li>Sınırsız Kullanıcı</li>
-              <li>Proaktif Upsell Radarı</li>
-              <li>Özel Hesap Yöneticisi</li>
-              <li>API Erişimi</li>
-              <li>Özel SLA Desteği</li>
-            </ul>
-            <Link href="/register" className="m-btn m-btn-outline">İletişime Geçin</Link>
+          <h1>Modern BI software for agencies <br />that need answers now</h1>
+          <p>Empower your entire team to easily see, share and act on data — without the cost or complexity of legacy BI software.</p>
+          <div className="m-hero-btns">
+            <Link href="/register" className="m-btn m-btn-primary" style={{ padding: '14px 36px', fontSize: '15px' }}>Try It Free</Link>
+            <button onClick={handleDemo} className="m-btn m-btn-outline" style={{ padding: '14px 36px', fontSize: '15px' }}>Book a Demo</button>
           </div>
-        </div>
+          <div className="m-hero-note" style={{ color: '#667085', fontWeight: 700 }}>No card required</div>
+          <div style={{ marginTop: '40px', position: 'relative', maxWidth: '1000px', margin: '40px auto 0' }}>
+            <div className="m-card-white" style={{ padding: '20px', borderRadius: '24px' }}>
+              <img src="https://databox.com/wp-content/uploads/2023/04/databox-dashboards.png" alt="Mockup" style={{ width: '100%', height: '320px', objectFit: 'cover', borderRadius: '16px' }} />
+            </div>
+          </div>
+        </header>
+      )}
 
-        <div style={{ marginTop: '40px' }}>
-          <img src="/landing_pricing.png" alt="Pricing Calculator" style={{ maxWidth: '600px', width: '100%', borderRadius: '12px' }} />
-        </div>
-      </section >
-
-      {/* Security & Trust (NEW) */}
-      < section id="security" className="m-feature" >
-        <div className="m-feature-text">
-          <div style={{ color: 'var(--m-green)', fontWeight: '700', marginBottom: '10px' }}>GÜVENLİK & UYUM</div>
-          <h2>Verileriniz banka düzeyinde güvenlikte</h2>
-          <p>Periodya, verilerinizi 256-bit AES şifreleme ile korur. Tüm süreçlerimiz GİB ve KVKK mevzuatlarına %100 uyumludur.</p>
-          <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px' }}>
-            <li style={{ marginBottom: '10px' }}>🔒 Günlük Bulut Yedekleme</li>
-            <li style={{ marginBottom: '10px' }}>🛡️ İki Faktörlü Doğrulama (2FA)</li>
-            <li style={{ marginBottom: '10px' }}>📜 KVKK ve GDPR Uyumluluğu</li>
-          </ul>
-        </div>
-        <div className="m-feature-visual">
-          <img src="/landing_security.png" alt="Security" />
-        </div>
-      </section >
-
-      {/* FAQ (NEW) */}
-      < section className="faq-section" >
-        <h2 style={{ textAlign: 'center', fontSize: '36px', marginBottom: '40px' }}>Sıkça Sorulan Sorular</h2>
-        <div className="faq-item">
-          <h4>Periodya'yı denemek ücretli mi?</h4>
-          <p>Hayır, Periodya'yı kredi kartı gerekmeden sınırsız tüm özellikleri ile test edebilirsiniz. Memnun kaldığınızda planınızı güncelleyebilirsiniz.</p>
-        </div>
-        <div className="faq-item">
-          <h4>Mevcut verilerimi aktarabilir miyim?</h4>
-          <p>Kesinlikle. Excel veya diğer muhasebe yazılımlarından dışa aktardığınız stok ve cari listelerinizi saniyeler içinde Periodya'ya içe aktarabilirsiniz.</p>
-        </div>
-        <div className="faq-item">
-          <h4>E-Fatura geçiş süreci ne kadar sürer?</h4>
-          <p>Aktivasyon işlemleriniz tamamlandıktan sonra aynı gün içinde ilk e-faturanızı kesmeye başlayabilirsiniz. Uzman ekibimiz size ücretsiz destek verecektir.</p>
-        </div>
-      </section >
-
-      {/* Final CTA */}
-      < section style={{ background: 'var(--m-blue)', color: '#fff', padding: '100px 20px', textAlign: 'center' }}>
-        <h2 style={{ fontSize: '48px', fontWeight: '800', marginBottom: '24px' }}>Hazırsanız, işinizi birlikte büyütelim</h2>
-        <p style={{ fontSize: '20px', opacity: 0.9, marginBottom: '40px' }}>14 günlük ücretsiz deneme sürenizi başlatın, farkı bugün hissedin.</p>
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-          <Link href="/register" className="m-btn" style={{ background: '#fff', color: 'var(--m-blue)', padding: '16px 48px' }}>Ücretsiz Başlayın</Link>
-          <Link href="/login" className="m-btn" style={{ border: '1px solid #fff', color: '#fff', padding: '16px 48px' }}>Giriş Yap</Link>
-        </div>
-      </section >
-
+      {/* Global Footer (Dynamic Settings) */}
       {/* Footer */}
-      < footer className="m-footer" >
-        <div className="m-footer-grid">
-          <div>
-            <div className="m-logo" style={{ color: '#fff', marginBottom: '20px' }}>Periodya<span>.</span></div>
-            <p>Küçük ve orta ölçekli işletmeler için dünyanın en verimli finansal yönetim platformu.</p>
-          </div>
-          <div>
-            <h4>Ürün</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <span>E-Fatura</span>
-              <span>Stok Takibi</span>
-              <span>CRM</span>
-              <span>Raporlama</span>
+      {sections.some((s: any) => s.type === 'FOOTER')
+        ? sections.filter((s: any) => s.type === 'FOOTER').map((s: any) => renderSection(s))
+        : (
+          <footer className="m-footer-dark">
+            <div className="m-footer-grid">
+              <div>
+                <div className="m-logo" style={{ color: '#fff', marginBottom: '20px' }}>
+                  <div className="m-logo-icon"><span></span><span></span><span></span></div>
+                  databox
+                </div>
+                <div className="m-footer-info">Databox Inc.</div>
+                <div className="m-footer-info">HQ: Boston, MA, USA</div>
+
+                <div className="m-footer-tagline mt-8">
+                  Modern BI for teams that needs answers now
+                </div>
+
+                <div className="flex gap-4 mb-12 opacity-60">
+                  {[1, 2, 3, 4, 5, 6].map(i => (
+                    <div key={i} className="w-5 h-5 bg-white/20 rounded-full"></div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="m-footer-col">
+                <h5>Product</h5>
+                <ul>
+                  <li>Overview</li>
+                  <li>Integrations</li>
+                  <li>Datasets</li>
+                  <li>Metrics & KPIs</li>
+                  <li>Dashboards</li>
+                  <li>Reports</li>
+                  <li>Benchmarks</li>
+                  <li>Goals</li>
+                  <li>Performance Management</li>
+                </ul>
+              </div>
+
+              <div className="m-footer-col">
+                <h5>Compare</h5>
+                <ul>
+                  <li>vs. Tableau</li>
+                  <li>vs. Power BI</li>
+                  <li>vs. Looker Studio</li>
+                  <li>vs. AgencyAnalytics</li>
+                  <li>vs. Klipfolio</li>
+                  <li>vs. Supermetrics</li>
+                  <li>vs. Geckoboard</li>
+                  <li>vs. Whatagraph</li>
+                  <li>vs. Qlik</li>
+                  <li>vs. DashThis</li>
+                </ul>
+              </div>
+
+              <div className="m-footer-col">
+                <h5>Company</h5>
+                <ul>
+                  <li>About us</li>
+                  <li>Why Databox</li>
+                  <li>Careers</li>
+                  <li>Product & Engineering</li>
+                  <li>Talent Resources</li>
+                  <li className="text-blue-400 font-bold">We're Hiring!</li>
+                </ul>
+              </div>
+
+              <div className="m-footer-col">
+                <h5>Support & Resources</h5>
+                <ul>
+                  <li>Start Chat</li>
+                  <li>Help Center</li>
+                  <li>Databox Community</li>
+                  <li>API Documentation</li>
+                  <li>System Status</li>
+                  <li>Blog</li>
+                  <li>Become a Solutions Partner</li>
+                  <li>Courses & Certifications</li>
+                  <li>Product Updates</li>
+                  <li>Affiliate Program</li>
+                </ul>
+              </div>
             </div>
-          </div>
-          <div>
-            <h4>Kurumsal</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <span>Hakkımızda</span>
-              <span>Gizlilik Politikası</span>
-              <span>Mevzuat Uyumu</span>
-              <span>İletişim</span>
+            <div style={{ marginTop: '100px', borderTop: '1px solid #1e293b', paddingTop: '40px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
+              © {new Date().getFullYear()} Databox Inc.
             </div>
-          </div>
-          <div>
-            <h4>Destek</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <span>Yardım Merkezi</span>
-              <span>Eğitim Videoları</span>
-              <span>API Dökümantasyonu</span>
-              <span>Canlı Destek</span>
-            </div>
-          </div>
-        </div>
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '80px', paddingTop: '40px', fontSize: '13px', textAlign: 'center', opacity: 0.6 }}>
-          © 2026 Periodya Teknolojileri A.Ş. Tüm hakları saklıdır.
-        </div>
-      </footer >
-    </div >
+          </footer>
+        )
+      }
+    </div>
   );
 }

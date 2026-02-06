@@ -1,10 +1,11 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function TenantDetailPage({ params }: { params: { id: string } }) {
+export default function TenantDetailPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
+    const params = use(paramsPromise);
     const router = useRouter();
     const [tenant, setTenant] = useState<any>(null);
     const [usage, setUsage] = useState<any>(null);
@@ -89,8 +90,8 @@ export default function TenantDetailPage({ params }: { params: { id: string } })
                     <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
                         {tenant.name}
                         <span className={`px-3 py-1 text-xs font-bold rounded-full ${sub?.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' :
-                                sub?.status === 'PAST_DUE' ? 'bg-amber-100 text-amber-700' :
-                                    'bg-slate-100 text-slate-700'
+                            sub?.status === 'PAST_DUE' ? 'bg-amber-100 text-amber-700' :
+                                'bg-slate-100 text-slate-700'
                             }`}>
                             {sub?.status}
                         </span>

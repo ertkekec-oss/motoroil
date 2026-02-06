@@ -36,8 +36,8 @@ export async function middleware(request: NextRequest) {
     }
 
     // 2. Auth Related Paths - Allowed
-    const publicPaths = ['/login', '/reset-password', '/api/auth/login'];
-    if (pathname === '/' || publicPaths.some(path => pathname.startsWith(path))) {
+    const publicPaths = ['/login', '/register', '/reset-password', '/api/auth/login', '/api/auth/register', '/api/auth/demo', '/api/public'];
+    if (pathname === '/' || publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
         return NextResponse.next();
     }
 

@@ -76,15 +76,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     const userData = JSON.parse(storedUser);
                     setUser(userData);
                 } else {
-                    // Login sayfasında veya ana sayfada değilse, login'e yönlendir
-                    if (pathname !== '/login' && !pathname.startsWith('/reset-password') && pathname !== '/') {
+                    // Public paths allowed without login
+                    const publicPaths = ['/login', '/register', '/', '/reset-password'];
+                    const isPublicPath = publicPaths.some(p => pathname === p || pathname.startsWith(p + '/'));
+
+                    if (!isPublicPath) {
                         router.push('/login');
                     }
                 }
             } catch (error) {
                 console.error('Auth check error:', error);
                 localStorage.clear();
-                if (pathname !== '/login' && !pathname.startsWith('/reset-password') && pathname !== '/') {
+
+                const publicPaths = ['/login', '/register', '/', '/reset-password'];
+                const isPublicPath = publicPaths.some(p => pathname === p || pathname.startsWith(p + '/'));
+
+                if (!isPublicPath) {
                     router.push('/login');
                 }
             } finally {

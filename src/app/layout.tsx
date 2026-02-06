@@ -1,3 +1,4 @@
+
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -69,8 +70,12 @@ function MobileHeader() {
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const pathname = usePathname();
+
   const isLoginPage = pathname === '/login';
+  const isRegisterPage = pathname === '/register';
   const isResetPage = pathname.startsWith('/reset-password');
+  const isAdminPage = pathname.startsWith('/admin');
+  const isPublicPage = isLoginPage || isRegisterPage || isResetPage || isAdminPage || (!isAuthenticated && pathname === '/');
 
   if (isLoading && !isResetPage) {
     return (
@@ -80,12 +85,12 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthenticated && !isLoginPage && !isResetPage && pathname !== '/') {
+  if (!isAuthenticated && !isPublicPage) {
     // Redirection is handled in AuthContext
     return null;
   }
 
-  if (isLoginPage || isResetPage || (!isAuthenticated && pathname === '/')) {
+  if (isPublicPage) {
     return <>{children}</>;
   }
 
