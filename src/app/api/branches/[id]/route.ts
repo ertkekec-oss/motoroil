@@ -17,6 +17,7 @@ export async function PUT(
                 name: body.name,
                 type: body.type,
                 city: body.city,
+                district: body.district,
                 address: body.address,
                 phone: body.phone,
                 manager: body.manager,

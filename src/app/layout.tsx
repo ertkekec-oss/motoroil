@@ -68,7 +68,11 @@ function MobileHeader() {
 
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const app = useApp();
+  const crm = useCRM();
+  const inventory = useInventory();
+  const financials = useFinancials(); // Financials might be null if no branch selected
   const pathname = usePathname();
 
   const isLoginPage = pathname === '/login';
@@ -77,7 +81,10 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const isAdminPage = pathname.startsWith('/admin');
   const isPublicPage = isLoginPage || isRegisterPage || isResetPage || isAdminPage || (!isAuthenticated && pathname === '/');
 
-  if (isLoading && !isResetPage) {
+  // Unified loading state
+  const isInitialLoading = app.isInitialLoading || crm.isInitialLoading || inventory.isInitialLoading || (isAuthenticated && !isAdminPage && !app.activeBranchName) || (app.activeBranchName && (financials as any)?.isInitialLoading);
+
+  if (authLoading && !isResetPage) {
     return (
       <div style={{ background: 'var(--bg-deep)', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)' }}>
         Yükleniyor...
@@ -94,17 +101,57 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  const { isSidebarOpen, setIsSidebarOpen } = useApp();
+  // GLOBAL LOADING GATE for operational pages
+  if (isInitialLoading && !isAdminPage) {
+    return (
+      <div style={{
+        background: 'var(--bg-deep)',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        fontFamily: "'Outfit', sans-serif"
+      }}>
+        <div style={{ fontSize: '40px', marginBottom: '20px' }}>⏳</div>
+        <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>Verileriniz Hazırlanıyor</div>
+        <div style={{ fontSize: '14px', opacity: 0.6 }}>Lütfen bekleyin, şube ve personel ayarları senkronize ediliyor...</div>
+        <div style={{
+          marginTop: '30px',
+          width: '200px',
+          height: '4px',
+          background: 'rgba(255,255,255,0.1)',
+          borderRadius: '2px',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            width: '40%',
+            height: '100%',
+            background: 'var(--primary)',
+            animation: 'loading-bar 2s infinite ease-in-out'
+          }}></div>
+        </div>
+        <style jsx>{`
+          @keyframes loading-bar {
+            0% { transform: translateX(-100%); width: 30%; }
+            50% { width: 60%; }
+            100% { transform: translateX(330%); width: 30%; }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
-    <div className={isSidebarOpen ? 'sidebar-open' : ''} style={{ display: 'flex', height: '100vh', width: '100%', background: 'var(--bg-deep)', overflow: 'hidden' }}>
+    <div className={app.isSidebarOpen ? 'sidebar-open' : ''} style={{ display: 'flex', height: '100vh', width: '100%', background: 'var(--bg-deep)', overflow: 'hidden' }}>
       <Sidebar />
       <MobileHeader />
 
       {/* Mobile Backdrop */}
-      {isSidebarOpen && (
+      {app.isSidebarOpen && (
         <div
-          onClick={() => setIsSidebarOpen(false)}
+          onClick={() => app.setIsSidebarOpen(false)}
           style={{
             position: 'fixed',
             inset: 0,
@@ -119,7 +166,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       <main
         className="main-content"
         onClick={() => {
-          if (isSidebarOpen && window.innerWidth < 1024) setIsSidebarOpen(false);
+          if (app.isSidebarOpen && window.innerWidth < 1024) app.setIsSidebarOpen(false);
         }}
       >
         <GrowthBanner />

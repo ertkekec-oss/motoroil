@@ -69,6 +69,7 @@ interface InventoryContextType {
     requestProductCreation: (productData: Omit<Product, 'id'>) => Promise<void>;
     approveProduct: (pendingId: string) => Promise<void>;
     rejectProduct: (pendingId: string) => Promise<void>;
+    isInitialLoading: boolean;
 }
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
@@ -77,6 +78,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     const [products, setProducts] = useState<Product[]>([]);
     const [stockTransfers, setStockTransfers] = useState<StockTransfer[]>([]);
     const [pendingProducts, setPendingProducts] = useState<PendingProduct[]>([]);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
     const { user } = useAuth();
 
     const refreshProducts = async () => {
@@ -175,9 +177,14 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     const { isAuthenticated } = useAuth();
     useEffect(() => {
         if (isAuthenticated) {
-            refreshProducts();
-            refreshStockTransfers();
-            refreshPending();
+            setIsInitialLoading(true);
+            Promise.all([
+                refreshProducts(),
+                refreshStockTransfers(),
+                refreshPending()
+            ]).finally(() => setIsInitialLoading(false));
+        } else {
+            setIsInitialLoading(false);
         }
     }, [isAuthenticated]);
 
@@ -190,7 +197,8 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
             refreshPending,
             requestProductCreation,
             approveProduct,
-            rejectProduct
+            rejectProduct,
+            isInitialLoading
         }}>
             {children}
         </InventoryContext.Provider>

@@ -1,13 +1,17 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '@/lib/auth';
 import { sendMail } from '@/lib/mail';
 
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { name, email, phone, companyName, password } = body;
+        const { name, phone, companyName, password } = body;
+        const email = body.email?.toLowerCase().trim();
+
+        const host = req.headers.get('host');
+        const protocol = host?.includes('localhost') ? 'http' : 'https';
+        const siteUrl = `${protocol}://${host}`;
 
         if (!email || !password || !name || !companyName) {
             return NextResponse.json({ error: 'Eksik bilgiler var' }, { status: 400 });
@@ -65,7 +69,7 @@ export async function POST(req: NextRequest) {
         });
 
         // 4. Create User (Admin of Tenant)
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await hashPassword(password);
         const user = await (prisma as any).user.create({
             data: {
                 email,
@@ -87,7 +91,6 @@ export async function POST(req: NextRequest) {
 
         // 6. Send Welcome Email
         try {
-            const origin = req.headers.get('origin') || 'https://kech.tr';
             await sendMail({
                 to: email,
                 subject: '🌸 Periodya\'ya Hoş Geldiniz!',
@@ -100,7 +103,7 @@ export async function POST(req: NextRequest) {
                         <p><b>${companyName}</b> firması için Periodya hesabınız başarıyla oluşturuldu!</p>
                         <p>14 günlük ücretsiz deneme süreniz şimdi başladı. Bu süreçte tüm özellikleri sınırsızca deneyimleyebilirsiniz.</p>
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="${origin}/login" style="background: #446ee7; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Hemen Giriş Yap</a>
+                            <a href="${siteUrl}/login" style="background: #446ee7; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Hemen Giriş Yap</a>
                         </div>
                         <p style="font-size: 14px; color: #666;">Herhangi bir sorunuz olursa bu e-postayı yanıtlayarak bize ulaşabilirsiniz.</p>
                         <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />

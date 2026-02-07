@@ -545,6 +545,11 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 <span>
                                     {(() => {
                                         let addr = customer.address;
+                                        // Priority 1: New fields (city/district)
+                                        if (customer.city || customer.district) {
+                                            return `${addr ? addr + ' ' : ''}${customer.district ? customer.district + ' / ' : ''}${customer.city || ''}`;
+                                        }
+                                        // Priority 2: Legacy JSON parsing
                                         try {
                                             if (addr && typeof addr === 'string' && addr.trim().startsWith('{')) {
                                                 const parsed = JSON.parse(addr);

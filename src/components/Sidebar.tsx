@@ -13,13 +13,13 @@ export default function Sidebar() {
     const {
         currentUser, hasPermission, hasFeature, subscription,
         branches, activeBranchName, setActiveBranchName,
-        suspiciousEvents, isSidebarOpen, setIsSidebarOpen
+        suspiciousEvents, isSidebarOpen, setIsSidebarOpen,
+        isInitialLoading
     } = useApp();
 
     const isSystemAdmin = currentUser === null || currentUser?.role === 'SUPER_ADMIN' || (currentUser?.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
+    const isAuditor = currentUser?.role === 'AUDITOR';
     const displayUser = currentUser || authUser;
-
-    // ... menuItems and logic ...
 
     // UI mapping for permissions
     const permMap: Record<string, { perm?: string, feature?: string }> = {
@@ -38,6 +38,7 @@ export default function Sidebar() {
         '/settings': { perm: 'settings_manage' },
         '/staff': { perm: 'staff_manage' },
         '/advisor': { perm: 'finance_view', feature: 'accounting' },
+        '/admin/audit-logs': { perm: 'audit_view' },
     };
 
     const menuItems = [
@@ -50,6 +51,7 @@ export default function Sidebar() {
         { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
         { name: 'Servis Masası', href: '/service', icon: '🛠️' },
         { name: 'Veri Analizi', href: '/reports', icon: '📊' },
+        { name: 'Denetim Kayıtları', href: '/admin/audit-logs', icon: '🔍' },
         { name: 'Kaçak Satış Tespit', href: '/security/suspicious', icon: '🚨' },
         { name: 'Mali Müşavir', href: '/advisor', icon: '💼' },
         { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
@@ -59,6 +61,11 @@ export default function Sidebar() {
     ].filter(item => {
         const config = permMap[item.href];
         if (!config) return true; // default public items
+
+        // Auditor specific logic
+        if (isAuditor) {
+            return ['/admin/audit-logs', '/reports', '/advisor'].includes(item.href);
+        }
 
         // 1. Feature Check (Subscription Plan)
         if (config.feature && !hasFeature(config.feature)) {
@@ -80,7 +87,7 @@ export default function Sidebar() {
         setActiveBranchName(e.target.value);
     };
 
-    if (!displayUser) return null;
+    if (!displayUser || isInitialLoading) return null;
 
     return (
         <aside

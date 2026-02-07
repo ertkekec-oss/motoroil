@@ -1,13 +1,31 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { authorize, verifyWriteAccess } from '@/lib/auth';
+import { logActivity } from '@/lib/audit';
 import { createJournalFromSale, createJournalFromTransaction } from '@/lib/accounting';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const { user } = auth;
+
+    const writeCheck = verifyWriteAccess(user);
+    if (!writeCheck.authorized) return writeCheck.response;
+
     try {
         const body = await request.json();
         const { items, total, kasaId, description, paymentMode, customerName, customerId, earnedPoints, pointsUsed, couponCode, referenceCode, branch } = body;
+
+        // Get the default company for this tenant
+        const company = await prisma.company.findFirst({
+            where: { tenantId: (user as any).tenantId || 'PLATFORM_ADMIN' }
+        });
+
+        if (!company && (user as any).tenantId !== 'PLATFORM_ADMIN') {
+            return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 404 });
+        }
 
         console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode });
 
@@ -48,11 +66,12 @@ export async function POST(request: Request) {
         const finalTotal = parseFloat(total);
 
         const result = await prisma.$transaction(async (tx) => {
-            const order = await tx.order.create({
+            const order = await (tx as any).order.create({
                 data: {
                     marketplace: 'POS',
                     marketplaceId: 'LOCAL',
                     orderNumber: orderNumber,
+                    companyId: company?.id,
                     customerName: customerName || 'Perakende Müşteri',
                     totalAmount: finalTotal,
                     currency: 'TRY',
@@ -95,8 +114,9 @@ export async function POST(request: Request) {
 
             transactionDesc += ` | REF:${order.id}`;
 
-            await tx.transaction.create({
+            await (tx as any).transaction.create({
                 data: {
+                    companyId: company?.id,
                     type: 'Sales',
                     amount: finalTotal,
                     description: transactionDesc,
@@ -127,7 +147,7 @@ export async function POST(request: Request) {
                 if (coupon) {
                     await tx.coupon.update({
                         where: { code: couponCode },
-                        data: { usedCount: (coupon.usedCount || 0) + 1, lastUsedAt: new Date() }
+                        data: { usedCount: (coupon.usedCount || 0) + 1, usedAt: new Date(), isUsed: true }
                     });
                 }
             }
@@ -153,8 +173,9 @@ export async function POST(request: Request) {
                             const rate = Number(commissionConfig.rate);
                             const commissionAmount = (finalTotal * rate) / 100;
 
-                            const commTrx = await tx.transaction.create({
+                            const commTrx = await (tx as any).transaction.create({
                                 data: {
+                                    companyId: company?.id,
                                     type: 'Expense',
                                     amount: commissionAmount,
                                     description: `Banka POS Komisyon Gideri (${commissionConfig.installment})`,
@@ -198,6 +219,20 @@ export async function POST(request: Request) {
             }
 
             return order;
+        });
+
+        // AUDIT LOG
+        await logActivity({
+            tenantId: (user as any).tenantId || 'PLATFORM_ADMIN',
+            userId: (user as any).id,
+            userName: (user as any).username,
+            action: 'CREATE_SALE',
+            entity: 'Order',
+            entityId: result.id,
+            after: result,
+            details: `${result.orderNumber} nolu satış gerçekleştirildi.`,
+            userAgent: request.headers.get('user-agent') || undefined,
+            ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
         });
 
         return NextResponse.json({

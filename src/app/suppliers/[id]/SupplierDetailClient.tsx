@@ -232,7 +232,11 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                 <span style={{ color: '#888' }}>Adres:</span>
-                                <span style={{ fontSize: '12px', color: 'white' }}>{supplier.address || 'Girilmemiş'}</span>
+                                <span style={{ fontSize: '12px', color: 'white' }}>
+                                    {supplier.address || 'Girilmemiş'}
+                                    {supplier.district && ` ${supplier.district}`}
+                                    {supplier.city && ` / ${supplier.city}`}
+                                </span>
                             </div>
                         </div>
                     </div>

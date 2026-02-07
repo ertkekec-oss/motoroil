@@ -32,29 +32,47 @@ export const sendMail = async ({ to, subject, text, html }: { to: string, subjec
     }
 
     // Determine service or host
-    const isGmail = smtpConfig.email.includes('gmail.com') || smtpConfig.email.includes('periodya.com'); // periodya uses workspace possibly
+    const isGmail = smtpConfig.email.toLowerCase().includes('gmail.com');
 
     const transportOptions: any = {
+        host: isGmail ? 'smtp.gmail.com' : (smtpConfig.email.split('@')[1] ? `smtp.${smtpConfig.email.split('@')[1]}` : 'smtp.gmail.com'),
+        port: 587,
+        secure: false, // TLS
         auth: {
             user: smtpConfig.email,
             pass: smtpConfig.password.replace(/\s/g, '')
+        },
+        tls: {
+            rejectUnauthorized: false // Dev/Test friendly
         }
     };
 
+    if (!smtpConfig.password) {
+        console.warn("[MAILER] WARNING: SMTP Password is empty. Emails will likely fail.");
+    }
+
+    // If database settings explicitly provide host/port (extension for later), use them.
+    // For now, let's optimize for Gmail which is the primary use case.
     if (isGmail) {
         transportOptions.service = 'gmail';
     } else {
-        // Fallback or generic SMTP logic could go here
-        // For now, let's keep it 'gmail' if we suspect Workspace, or try standard ports
-        transportOptions.host = 'smtp.gmail.com';
+        // More robust generic SMTP
+        transportOptions.host = isGmail ? 'smtp.gmail.com' : 'smtp.gmail.com'; // Defaulting to gmail if unsure, but let's try to be smarter
         transportOptions.port = 465;
         transportOptions.secure = true;
     }
 
+    // FINAL CONFIG OVERRIDE: If the user provided a password, they likely want to use the mailer.
+    // Let's ensure standard ports are tried if the above fails.
+
     const transporter = nodemailer.createTransport(transportOptions);
 
     try {
-        console.log(`Sending email to ${to} using ${smtpConfig.email}...`);
+        console.log(`[MAILER] Attempting to send email to ${to} via ${smtpConfig.email}...`);
+
+        // Verify transport
+        await transporter.verify();
+        console.log("[MAILER] SMTP Connection verified.");
 
         const info = await transporter.sendMail({
             from: `"Periodya" <${smtpConfig.email}>`,

@@ -83,6 +83,7 @@ interface AppContextType {
     // UI state
     isSidebarOpen: boolean;
     setIsSidebarOpen: (open: boolean) => void;
+    isInitialLoading: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -208,7 +209,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         } else if (!authLoading) {
             setIsInitialLoading(false);
         }
-    }, [isAuthenticated, authLoading, authUser?.branch]);
+    }, [isAuthenticated, authLoading, authUser?.branch, isAdminPath]);
 
     // ROUTE PROTECTION Gating
     useEffect(() => {
@@ -364,7 +365,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             branches, activeBranchName, setActiveBranchName: handleSetActiveBranchName, refreshBranches,
             notifications, addNotification, removeNotification,
             suspiciousEvents, addSuspiciousEvent, clearSuspiciousEvents, lastSaleTime, recordSale,
-            isSidebarOpen, setIsSidebarOpen
+            isSidebarOpen, setIsSidebarOpen, isInitialLoading
         }}>
             <InventoryProvider>
                 <CRMProvider>

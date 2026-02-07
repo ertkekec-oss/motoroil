@@ -7,11 +7,13 @@ interface CustomModalProps {
     isOpen: boolean;
     onClose: () => void;
     title: string;
-    message: string;
+    message?: string;
+    content?: React.ReactNode;
     type?: 'success' | 'error' | 'warning' | 'info' | 'confirm';
     onConfirm?: () => void;
     confirmText?: string;
     cancelText?: string;
+    size?: 'small' | 'medium' | 'large' | 'wide';
 }
 
 export default function CustomModal({
@@ -19,10 +21,12 @@ export default function CustomModal({
     onClose,
     title,
     message,
+    content,
     type = 'info',
     onConfirm,
     confirmText = 'Tamam',
-    cancelText = 'İptal'
+    cancelText = 'İptal',
+    size = 'medium'
 }: CustomModalProps) {
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -50,10 +54,17 @@ export default function CustomModal({
 
     const current = config[type];
 
+    const sizeClasses = {
+        small: 'max-w-[400px]',
+        medium: 'max-w-[500px]',
+        large: 'max-w-[800px]',
+        wide: 'max-w-[1200px]'
+    };
+
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-black/85 backdrop-blur-xl animate-fade-in" onClick={onClose}>
             <div
-                className="w-full max-w-[500px] glass-plus rounded-[40px] p-12 border shadow-[0_50px_100px_rgba(0,0,0,0.9)] animate-in relative overflow-hidden text-center"
+                className={`w-full ${sizeClasses[size]} glass-plus rounded-[40px] p-12 border shadow-[0_50px_100px_rgba(0,0,0,0.9)] animate-in relative overflow-hidden text-center`}
                 style={{ borderColor: `${current.color}40` }}
                 onClick={(e) => e.stopPropagation()}
             >
@@ -79,9 +90,16 @@ export default function CustomModal({
                 <h3 className="text-3xl font-black mb-4 tracking-tight" style={{ color: current.color }}>
                     {title}
                 </h3>
-                <p className="text-white/60 text-[15px] leading-relaxed mb-12 font-medium px-6">
-                    {message}
-                </p>
+
+                {content ? (
+                    <div className="text-left mb-12">
+                        {content}
+                    </div>
+                ) : (
+                    <p className="text-white/60 text-[15px] leading-relaxed mb-12 font-medium px-6">
+                        {message}
+                    </p>
+                )}
 
                 {/* Dynamic Actions */}
                 <div className="flex gap-4">

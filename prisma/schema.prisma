@@ -18,6 +18,7 @@ model Tenant {
   ownerEmail String // Ana Hesap Sahibi
   phone      String? // İletişim Telefonu (WhatsApp için)
   status     String @default("ACTIVE") // ACTIVE, SUSPENDED, TRIAL
+  setupState String @default("PENDING") // PENDING, COMPLETED
 
   subscription Subscription?
   companies    Company[]
@@ -60,6 +61,7 @@ model Company {
   paymentPlans     PaymentPlan[]
   orders           Order[]
   stockTransfers   StockTransfer[]
+  branches         Branch[]
 
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -365,6 +367,8 @@ model Supplier {
   phone         String?
   email         String?
   address       String?
+  district      String?
+  city          String?
   category      String?
   taxNumber     String?
   taxOffice     String?
@@ -538,7 +542,7 @@ model CustomerCategory {
 
 model Kasa {
   id           String        @id @default(cuid())
-  companyId    String?
+  companyId    String
   name         String
   type         String        @default("Nakit")
   balance      Decimal       @default(0) @db.Decimal(12, 2)
@@ -550,7 +554,7 @@ model Kasa {
   branch       String?       @default("Merkez")
   transactions Transaction[]
 
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([name, branch, companyId])
   @@index([companyId])
@@ -558,7 +562,7 @@ model Kasa {
 
 model Transaction {
   id           String    @id @default(cuid())
-  companyId    String?
+  companyId    String
   type         String
   amount       Decimal   @db.Decimal(12, 2)
   description  String?
@@ -574,7 +578,7 @@ model Transaction {
   customer     Customer? @relation(fields: [customerId], references: [id])
   kasa         Kasa?     @relation(fields: [kasaId], references: [id])
   supplier     Supplier? @relation(fields: [supplierId], references: [id])
-  company      Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([supplierId])
@@ -588,7 +592,7 @@ model Transaction {
 
 model Check {
   id          String    @id @default(cuid())
-  companyId   String?
+  companyId   String
   type        String
   number      String
   bank        String?
@@ -613,24 +617,25 @@ model Check {
 }
 
 model AuditLog {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid()) // Keeping cuid as used throughout the project
+  tenantId  String?
   userId    String?
   userName  String?
-  action    String // 'CREATE', 'UPDATE', 'DELETE'
-  entity    String // 'Customer', 'Product', 'Transaction', etc.
+  action    String   // 'CREATE', 'UPDATE', 'DELETE', etc.
+  entity    String   // 'Customer', 'Product', 'Transaction', etc.
   entityId  String?
-  oldData   Json?
-  newData   Json?
+  before    Json?    // RENAMED from oldData for alignment
+  after     Json?    // RENAMED from newData for alignment
   details   String?
   ipAddress String?
+  userAgent String?  // ADDED
   branch    String?
   createdAt DateTime @default(now())
-  tenantId  String? // Audit logs are usually at Tenant level for security oversight
 
   @@index([action, entity])
   @@index([entityId])
+  @@index([tenantId])
   @@index([userId])
-  @@index([userName])
   @@index([createdAt])
 }
 
@@ -647,10 +652,11 @@ model LoginAttempt {
 
 model Branch {
   id        Int              @id @default(autoincrement())
-  // companyId   String?  // Branch connects to Company if we want strict relation
+  companyId String
   name      String           @unique
   type      String           @default("Şube")
   city      String?
+  district  String?
   address   String?
   phone     String?
   manager   String?
@@ -659,6 +665,7 @@ model Branch {
   updatedAt DateTime         @updatedAt
   deletedAt DateTime? // Soft delete
   documents BranchDocument[]
+  company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model BranchDocument {

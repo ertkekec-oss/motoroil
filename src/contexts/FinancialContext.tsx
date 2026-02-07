@@ -69,6 +69,7 @@ interface FinancialContextType {
     setKasaTypes: React.Dispatch<React.SetStateAction<string[]>>;
     salesExpenses: any;
     updateSalesExpenses: (settings: any) => Promise<void>;
+    isInitialLoading: boolean;
 }
 
 const FinancialContext = createContext<FinancialContextType | undefined>(undefined);
@@ -80,6 +81,7 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
     const [kasalar, setKasalar] = useState<Kasa[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [checks, setChecks] = useState<Check[]>([]);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
 
     const addTransaction = (t: Omit<Transaction, 'id' | 'date'>) => {
         const newT: Transaction = {
@@ -216,9 +218,14 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
 
     useEffect(() => {
         if (isAuthenticated) {
-            refreshKasalar();
-            refreshTransactions();
-            refreshChecks();
+            setIsInitialLoading(true);
+            Promise.all([
+                refreshKasalar(),
+                refreshTransactions(),
+                refreshChecks()
+            ]).finally(() => setIsInitialLoading(false));
+        } else {
+            setIsInitialLoading(false);
         }
     }, [isAuthenticated]);
 
@@ -227,7 +234,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
             kasalar, setKasalar, refreshKasalar, transactions, setTransactions, refreshTransactions,
             addTransaction, checks, refreshChecks,
             addFinancialTransaction, addCheck, collectCheck, paymentMethods, updatePaymentMethods,
-            kasaTypes, setKasaTypes, salesExpenses, updateSalesExpenses
+            kasaTypes, setKasaTypes, salesExpenses, updateSalesExpenses,
+            isInitialLoading
         }}>
             {children}
         </FinancialContext.Provider>

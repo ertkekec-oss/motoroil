@@ -14,6 +14,7 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import IntegrationsContent from '@/components/IntegrationsContent';
+import { TURKISH_CITIES, TURKISH_DISTRICTS } from '@/lib/constants';
 
 export default function SettingsPage() {
     const searchParams = useSearchParams();
@@ -86,6 +87,8 @@ export default function SettingsPage() {
                 company_email: appSettings.company_email || '',
                 company_website: appSettings.company_website || '',
                 company_address: appSettings.company_address || '',
+                company_city: appSettings.company_city || '',
+                company_district: appSettings.company_district || '',
                 company_phone: appSettings.company_phone || ''
             });
         }
@@ -684,7 +687,7 @@ export default function SettingsPage() {
     // --- 4. ŞUBELER & EVRAK DEPOSU ---
     // --- 4. ŞUBELER & EVRAK DEPOSU ---
     const branches = contextBranches?.map(b => ({ ...b, docs: 0 })) || [];
-    const [newBranch, setNewBranch] = useState({ name: '', type: 'Şube', city: '', address: '', phone: '', manager: '', status: 'Aktif' });
+    const [newBranch, setNewBranch] = useState({ name: '', type: 'Şube', city: 'İstanbul', address: '', phone: '', manager: '', status: 'Aktif' });
     const [editingBranchId, setEditingBranchId] = useState<number | null>(null);
     const [selectedBranchDocs, setSelectedBranchDocs] = useState<number | null>(null); // Branch ID
 
@@ -743,7 +746,7 @@ export default function SettingsPage() {
                 showSuccess(editingBranchId ? 'Güncellendi' : 'Eklendi', 'Şube işlemi başarılı.');
                 await refreshBranches();
                 setEditingBranchId(null);
-                setNewBranch({ name: '', type: 'Şube', city: '', address: '', phone: '', manager: '', status: 'Aktif' });
+                setNewBranch({ name: '', type: 'Şube', city: 'İstanbul', district: '', address: '', phone: '', manager: '', status: 'Aktif' });
             } else {
                 showError('Hata', data.error);
             }
@@ -1091,6 +1094,36 @@ export default function SettingsPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex-col gap-2">
+                                    <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>ŞEHİR</label>
+                                    <select
+                                        value={tempCompanyInfo?.company_city || ""}
+                                        onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_city: e.target.value, company_district: '' })}
+                                        style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                    >
+                                        <option value="">Şehir Seçin...</option>
+                                        {TURKISH_CITIES.map(city => (
+                                            <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex-col gap-2">
+                                    <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>İLÇE</label>
+                                    <select
+                                        value={tempCompanyInfo?.company_district || ""}
+                                        onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_district: e.target.value })}
+                                        disabled={!tempCompanyInfo?.company_city}
+                                        style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                    >
+                                        <option value="">İlçe Seçin...</option>
+                                        {(TURKISH_DISTRICTS[tempCompanyInfo?.company_city] || []).map(district => (
+                                            <option key={district} value={district}>{district}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="flex-col gap-2">
                                     <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>GENEL E-POSTA</label>
                                     <input
                                         type="email"
@@ -1176,11 +1209,11 @@ export default function SettingsPage() {
                                     {editingBranchId ? '✏️ Şube Düzenleme Modu' : '➕ Yeni Şube / Depo Ekle'}
                                 </h3>
                                 {editingBranchId && (
-                                    <button onClick={() => { setEditingBranchId(null); setNewBranch({ name: '', type: 'Şube', city: '', address: '', phone: '', manager: '', status: 'Aktif' }); }} className="btn btn-ghost" style={{ fontSize: '12px' }}>Vazgeç</button>
+                                    <button onClick={() => { setEditingBranchId(null); setNewBranch({ name: '', type: 'Şube', city: '', district: '', address: '', phone: '', manager: '', status: 'Aktif' }); }} className="btn btn-ghost" style={{ fontSize: '12px' }}>Vazgeç</button>
                                 )}
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                                 <div className="flex-col gap-2">
                                     <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>TÜR</label>
                                     <select value={newBranch.type} onChange={e => setNewBranch({ ...newBranch, type: e.target.value })} style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }}>
@@ -1196,7 +1229,30 @@ export default function SettingsPage() {
                                 </div>
                                 <div className="flex-col gap-2">
                                     <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ŞEHİR</label>
-                                    <input type="text" value={newBranch.city} onChange={e => setNewBranch({ ...newBranch, city: e.target.value })} style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }} placeholder="İzmir" />
+                                    <select
+                                        value={newBranch.city}
+                                        onChange={e => setNewBranch({ ...newBranch, city: e.target.value, district: '' })}
+                                        style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }}
+                                    >
+                                        <option value="">Şehir Seçin...</option>
+                                        {TURKISH_CITIES.map(city => (
+                                            <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex-col gap-2">
+                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>İLÇE</label>
+                                    <select
+                                        value={newBranch.district}
+                                        onChange={e => setNewBranch({ ...newBranch, district: e.target.value })}
+                                        disabled={!newBranch.city}
+                                        style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }}
+                                    >
+                                        <option value="">İlçe Seçin...</option>
+                                        {(TURKISH_DISTRICTS[newBranch.city] || []).map(district => (
+                                            <option key={district} value={district}>{district}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="flex-col gap-2">
                                     <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>DURUM</label>
@@ -1242,7 +1298,7 @@ export default function SettingsPage() {
                                                 {branch.status !== 'Aktif' && <span style={{ background: 'rgba(255,255,255,0.1)', fontSize: '10px', padding: '2px 6px', borderRadius: '4px' }}>{branch.status}</span>}
                                             </div>
                                             <div className="text-muted" style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '15px', marginTop: '5px' }}>
-                                                <span>📍 {branch.city}</span>
+                                                <span>📍 {branch.city}{branch.district ? ` / ${branch.district}` : ''}</span>
                                                 <span>📞 {branch.phone}</span>
                                                 <span>👤 Yon: {branch.manager || '-'}</span>
                                             </div>

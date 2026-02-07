@@ -46,6 +46,7 @@ export async function createSession(user: any) {
         username: user.username,
         role: user.role,
         tenantId: user.tenantId, // Add tenantId to session
+        setupState: user.setupState || 'COMPLETED',
         branch: user.branch,
         permissions: user.permissions
     })
@@ -122,4 +123,14 @@ export async function authorize() {
         };
     }
     return { authorized: true, user: session };
+}
+
+export function verifyWriteAccess(session: any) {
+    if (session?.role?.toUpperCase() === 'AUDITOR') {
+        return {
+            authorized: false,
+            response: Response.json({ success: false, error: 'Denetçi hesabı veri girişi yapamaz (Read-only).' }, { status: 403 })
+        };
+    }
+    return { authorized: true };
 }

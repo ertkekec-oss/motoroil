@@ -88,7 +88,12 @@ const prismaClientSingleton = () => {
 
                     if (session) {
                         const role = session.role?.toUpperCase() || '';
+
+                        // --- 2. Logging for SUPER_ADMIN / PLATFORM_ADMIN Bypass ---
                         if (role === 'SUPER_ADMIN' || session.tenantId === 'PLATFORM_ADMIN') {
+                            if (operation !== 'findUnique' && operation !== 'findFirst') { // Avoid spamming common lookups
+                                console.log(`[SECURITY] ${role} (${session.username}) bypassed tenant isolation for ${model}.${operation}`);
+                            }
                             return query(args);
                         }
 
@@ -98,6 +103,29 @@ const prismaClientSingleton = () => {
                         }
 
                         const a = args as any;
+
+                        // --- 1. Create-time Assertion (Write-time Tenant Assertion) ---
+                        if (['create', 'createMany'].includes(operation)) {
+                            // If it's not a special model like 'company' or 'user' themselves
+                            if (!['company', 'user', 'tenant', 'subscription'].includes(modelName)) {
+                                const data = a.data;
+                                if (data) {
+                                    // Multiple records (createMany)
+                                    if (Array.isArray(data)) {
+                                        for (const item of data) {
+                                            if (!item.companyId) {
+                                                throw new Error(`SECURITY_ERROR: companyId is mandatory for ${model} creation.`);
+                                            }
+                                        }
+                                    } else {
+                                        // Single record (create)
+                                        if (!data.companyId && !data.company?.connect?.id) {
+                                            throw new Error(`SECURITY_ERROR: companyId is mandatory for ${model} creation.`);
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
                         // READ FILTERING
                         if (['findMany', 'findFirst', 'findUnique', 'count', 'aggregate', 'groupBy'].includes(operation)) {

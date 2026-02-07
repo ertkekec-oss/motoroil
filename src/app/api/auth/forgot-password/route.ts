@@ -5,14 +5,15 @@ import { sendMail } from '@/lib/mail';
 export async function POST(request: Request) {
     try {
         const { email } = await request.json();
+        const normalizedEmail = email?.toLowerCase().trim();
 
-        if (!email) {
+        if (!normalizedEmail) {
             return NextResponse.json({ error: 'E-Posta adresi gereklidir.' }, { status: 400 });
         }
 
         // 1. Search in Staff
         let targetUser = await (prisma as any).staff.findFirst({
-            where: { email, deletedAt: null }
+            where: { email: normalizedEmail, deletedAt: null }
         });
 
         let type = 'STAFF';
@@ -20,16 +21,19 @@ export async function POST(request: Request) {
         // 2. Search in User if not found in Staff
         if (!targetUser) {
             targetUser = await (prisma as any).user.findFirst({
-                where: { email }
+                where: { email: normalizedEmail }
             });
             type = 'USER';
         }
 
         if (targetUser) {
             // Real Email Sending
-            const origin = request.headers.get('origin') || 'https://kech.tr';
+            const host = request.headers.get('host');
+            const protocol = host?.includes('localhost') ? 'http' : 'https';
+            const siteUrl = `${protocol}://${host}`;
+
             // Simple token: In a production app, use a real signed/stored token!
-            const resetLink = `${origin}/reset-password?id=${targetUser.id}&token=${targetUser.id}&type=${type}`;
+            const resetLink = `${siteUrl}/reset-password?id=${targetUser.id}&token=${targetUser.id}&type=${type}`;
 
             const htmlBody = `
                 <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 10px;">

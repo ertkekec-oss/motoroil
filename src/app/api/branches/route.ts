@@ -27,6 +27,7 @@ export async function POST(request: Request) {
                 name: body.name,
                 type: body.type || 'Şube',
                 city: body.city,
+                district: body.district,
                 address: body.address,
                 phone: body.phone,
                 manager: body.manager,

@@ -11,16 +11,18 @@ type ModalType = 'success' | 'error' | 'warning' | 'info' | 'confirm';
 interface ModalState {
     isOpen: boolean;
     title: string;
-    message: string;
-    type: ModalType;
+    message?: string;
+    content?: ReactNode; // Added for custom components like diff view
+    type?: ModalType;
     onConfirm?: () => void;
     onCancel?: () => void;
     confirmText?: string;
     cancelText?: string;
+    size?: 'small' | 'medium' | 'large' | 'wide'; // Added for layout control
 }
 
 interface ModalContextType {
-    showModal: (config: ModalState) => void;
+    showModal: (config: Omit<ModalState, 'isOpen'>) => void;
     showSuccess: (title: string, message: string, onConfirm?: () => void, confirmText?: string) => void;
     showError: (title: string, message: string, onConfirm?: () => void, confirmText?: string) => void;
     showWarning: (title: string, message: string, onConfirm?: () => void, confirmText?: string) => void;
@@ -93,6 +95,8 @@ export function ModalProvider({ children }: { children: ReactNode }) {
                 onClose={handleCancel}
                 title={modal.title}
                 message={modal.message}
+                content={modal.content}
+                size={modal.size}
                 type={modal.type}
                 onConfirm={handleConfirm}
                 confirmText={modal.confirmText}

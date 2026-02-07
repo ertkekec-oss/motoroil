@@ -80,8 +80,11 @@ export async function DELETE(
                     }
                 }
 
-                // Delete Transaction
-                await tx.transaction.delete({ where: { id: t.id } });
+                // SOFT DELETE Transaction
+                await tx.transaction.update({
+                    where: { id: t.id },
+                    data: { deletedAt: new Date() }
+                });
             }
 
             // 4. Handle Accounting Reversal (Storno)
@@ -96,8 +99,31 @@ export async function DELETE(
                 console.error('[Accounting Reversal Error]:', err);
             }
 
-            // 3. Delete Order
-            await tx.order.delete({ where: { id } });
+            // 3. SOFT DELETE Order
+            await tx.order.update({
+                where: { id },
+                data: {
+                    deletedAt: new Date(),
+                    status: 'İptal Edildi'
+                }
+            });
+
+            // AUDIT LOG
+            const session = await getSession();
+            if (session) {
+                await logActivity({
+                    tenantId: session.tenantId as string,
+                    userId: session.id as string,
+                    userName: session.username as string,
+                    action: 'CANCEL_ORDER',
+                    entity: 'Order',
+                    entityId: id,
+                    before: order,
+                    details: `${order.orderNumber} nolu satış iptal edildi (Soft Delete).`,
+                    userAgent: request.headers.get('user-agent') || undefined,
+                    ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
+                });
+            }
         });
 
         return NextResponse.json({ success: true });

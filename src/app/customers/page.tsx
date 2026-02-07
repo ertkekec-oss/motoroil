@@ -9,6 +9,7 @@ import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
 import Pagination from '@/components/Pagination';
 import { useSearchParams } from 'next/navigation';
+import { TURKISH_CITIES, TURKISH_DISTRICTS } from '@/lib/constants';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -53,6 +54,7 @@ export default function CustomersPage() {
                 (cust.name || '').toLowerCase().includes(lowerTerm) ||
                 (cust.phone || '').includes(searchTerm) ||
                 (cust.email || '').toLowerCase().includes(lowerTerm) ||
+                (cust.city || '').toLowerCase().includes(lowerTerm) ||
                 ((cust as any).taxNumber || '').includes(searchTerm);
             if (!searchMatch) return false;
         }
@@ -90,6 +92,8 @@ export default function CustomersPage() {
         phone: '',
         email: '',
         address: '',
+        city: 'İstanbul',
+        district: '',
         taxNumber: '',
         taxOffice: '',
         contactPerson: '',
@@ -104,6 +108,8 @@ export default function CustomersPage() {
         phone: '',
         email: '',
         address: '',
+        city: '',
+        district: '',
         taxNumber: '',
         taxOffice: '',
         contactPerson: '',
@@ -133,7 +139,7 @@ export default function CustomersPage() {
                 showSuccess("Başarılı", "Müşteri başarıyla oluşturuldu.");
                 setIsModalOpen(false);
 
-                setNewCustomer({ name: '', phone: '', email: '', address: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '', branch: activeBranchName || currentUser?.branch || 'Merkez' });
+                setNewCustomer({ name: '', phone: '', email: '', address: '', city: 'İstanbul', district: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '', branch: activeBranchName || currentUser?.branch || 'Merkez' });
                 window.location.reload();
             } else {
                 showError("Hata", data.error || "Beklenmedik bir hata oluştu.");
@@ -167,7 +173,7 @@ export default function CustomersPage() {
             if (data.success) {
                 showSuccess("Başarılı", "Müşteri başarıyla güncellendi.");
                 setIsEditModalOpen(false);
-                setEditCustomer({ id: '', name: '', phone: '', email: '', address: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '' });
+                setEditCustomer({ id: '', name: '', phone: '', email: '', address: '', city: '', district: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', customerClass: '', referredByCode: '' });
                 window.location.reload();
             } else {
                 showError("Hata", data.error || "Beklenmedik bir hata oluştu.");
@@ -193,6 +199,8 @@ export default function CustomersPage() {
                     phone: customerToEdit.phone || '',
                     email: customerToEdit.email || '',
                     address: customerToEdit.address || '',
+                    city: (customerToEdit as any).city || '',
+                    district: (customerToEdit as any).district || '',
                     taxNumber: (customerToEdit as any).taxNumber || '',
                     taxOffice: (customerToEdit as any).taxOffice || '',
                     contactPerson: (customerToEdit as any).contactPerson || '',
@@ -729,6 +737,36 @@ export default function CustomersPage() {
                                 </div>
                             </div>
 
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ŞEHİR</label>
+                                    <select
+                                        value={newCustomer.city}
+                                        onChange={e => setNewCustomer({ ...newCustomer, city: e.target.value, district: '' })}
+                                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
+                                    >
+                                        <option value="">Şehir Seçin...</option>
+                                        {TURKISH_CITIES.map(city => (
+                                            <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>İLÇE</label>
+                                    <select
+                                        value={newCustomer.district}
+                                        onChange={e => setNewCustomer({ ...newCustomer, district: e.target.value })}
+                                        disabled={!newCustomer.city}
+                                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
+                                    >
+                                        <option value="">İlçe Seçin...</option>
+                                        {(TURKISH_DISTRICTS[newCustomer.city] || []).map(district => (
+                                            <option key={district} value={district}>{district}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
                             <div>
                                 <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ADRES</label>
                                 <textarea value={newCustomer.address} onChange={e => setNewCustomer({ ...newCustomer, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)', minHeight: '80px', resize: 'vertical' }} />
@@ -796,6 +834,36 @@ export default function CustomersPage() {
                             <div>
                                 <label className="text-muted" style={{ fontSize: '12px' }}>IBAN</label>
                                 <input type="text" placeholder="TR..." value={editCustomer.iban} onChange={e => setEditCustomer({ ...editCustomer, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                            </div>
+
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>ŞEHİR</label>
+                                    <select
+                                        value={editCustomer.city}
+                                        onChange={e => setEditCustomer({ ...editCustomer, city: e.target.value, district: '' })}
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                    >
+                                        <option value="">Şehir Seçin...</option>
+                                        {TURKISH_CITIES.map(city => (
+                                            <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>İLÇE</label>
+                                    <select
+                                        value={editCustomer.district}
+                                        onChange={e => setEditCustomer({ ...editCustomer, district: e.target.value })}
+                                        disabled={!editCustomer.city}
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                    >
+                                        <option value="">İlçe Seçin...</option>
+                                        {(TURKISH_DISTRICTS[editCustomer.city] || []).map(district => (
+                                            <option key={district} value={district}>{district}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div>

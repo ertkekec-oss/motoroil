@@ -1,31 +1,35 @@
 import prisma from './prisma';
 
 interface LogParams {
+    tenantId?: string;
     userId?: string;
     userName?: string;
-    action: 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'EXPORT';
+    action: string;
     entity: string;
     entityId?: string;
-    oldData?: any;
-    newData?: any;
+    before?: any;
+    after?: any;
     details?: string;
     ipAddress?: string;
+    userAgent?: string;
     branch?: string;
 }
 
 export async function logActivity(params: LogParams) {
     try {
-        await prisma.auditLog.create({
+        await (prisma as any).auditLog.create({
             data: {
+                tenantId: params.tenantId,
                 userId: params.userId,
                 userName: params.userName,
                 action: params.action,
                 entity: params.entity,
                 entityId: params.entityId,
-                oldData: params.oldData ? JSON.parse(JSON.stringify(params.oldData)) : undefined,
-                newData: params.newData ? JSON.parse(JSON.stringify(params.newData)) : undefined,
+                before: params.before ? JSON.parse(JSON.stringify(params.before)) : undefined,
+                after: params.after ? JSON.parse(JSON.stringify(params.after)) : undefined,
                 details: params.details,
                 ipAddress: params.ipAddress,
+                userAgent: params.userAgent,
                 branch: params.branch,
             }
         });

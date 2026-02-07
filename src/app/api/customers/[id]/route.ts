@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession, hasPermission } from '@/lib/auth';
+import { getSession, hasPermission, verifyWriteAccess } from '@/lib/auth';
 import { logActivity } from '@/lib/audit';
 
 export const dynamic = 'force-dynamic';
@@ -40,13 +40,16 @@ export async function GET(
 
         // Log the view action
         await logActivity({
+            tenantId: session.tenantId as string,
             userId: session.id as string,
             userName: session.username as string,
-            action: 'EXPORT', // Or create a 'VIEW' action
+            action: 'VIEW_CUSTOMER',
             entity: 'Customer',
             entityId: customerId,
             details: `${customer.name} detayı görüntülendi.`,
-            branch: session.branch as string
+            branch: session.branch as string,
+            userAgent: request.headers.get('user-agent') || undefined,
+            ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
         });
 
         return NextResponse.json({ success: true, customer });
@@ -62,8 +65,11 @@ export async function PUT(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const session: any = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
+        const writeCheck = verifyWriteAccess(session);
+        if (!writeCheck.authorized) return writeCheck.response;
 
         const { id } = await params;
         const body = await request.json();
@@ -78,6 +84,8 @@ export async function PUT(
                 email: body.email,
                 phone: body.phone,
                 address: body.address,
+                city: body.city,
+                district: body.district,
                 taxNumber: body.taxNumber,
                 taxOffice: body.taxOffice,
                 contactPerson: body.contactPerson,
@@ -91,15 +99,18 @@ export async function PUT(
 
         // Log the update action
         await logActivity({
+            tenantId: session.tenantId as string,
             userId: session.id as string,
             userName: session.username as string,
-            action: 'UPDATE',
+            action: 'UPDATE_CUSTOMER',
             entity: 'Customer',
             entityId: id,
-            oldData: oldCustomer,
-            newData: updatedCustomer,
+            before: oldCustomer,
+            after: updatedCustomer,
             details: `${updatedCustomer.name} bilgileri güncellendi.`,
-            branch: session.branch as string
+            branch: session.branch as string,
+            userAgent: request.headers.get('user-agent') || undefined,
+            ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
         });
 
         return NextResponse.json({ success: true, customer: updatedCustomer });
@@ -114,8 +125,11 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const session: any = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+
+        const writeCheck = verifyWriteAccess(session);
+        if (!writeCheck.authorized) return writeCheck.response;
 
         // CRITICAL: Check server-side permission
         if (!hasPermission(session, 'delete_records')) {
@@ -135,14 +149,17 @@ export async function DELETE(
 
         // Log the delete action
         await logActivity({
+            tenantId: session.tenantId as string,
             userId: session.id as string,
             userName: session.username as string,
-            action: 'DELETE',
+            action: 'DELETE_CUSTOMER',
             entity: 'Customer',
             entityId: id,
-            oldData: oldCustomer,
+            before: oldCustomer,
             details: `${oldCustomer?.name} silindi (Soft Delete).`,
-            branch: session.branch as string
+            branch: session.branch as string,
+            userAgent: request.headers.get('user-agent') || undefined,
+            ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
         });
 
         return NextResponse.json({ success: true });

@@ -9,6 +9,7 @@ interface User {
     branch: string;
     name: string;
     permissions: string[];
+    setupState?: 'PENDING' | 'COMPLETED';
 }
 
 interface AuthContextType {
@@ -18,6 +19,7 @@ interface AuthContextType {
     login: (username: string, password: string) => Promise<boolean>;
     logout: () => void;
     hasPermission: (permission: string) => boolean;
+    updateUser: (data: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,34 +41,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
 
             try {
-                // Eski localStorage key'lerini temizle (migration)
-                const oldIsLoggedIn = localStorage.getItem('isLoggedIn');
-                const oldUser = localStorage.getItem('user');
-
-                if (oldIsLoggedIn || oldUser) {
-                    // Eski verileri yeni formata taşı
-                    if (oldIsLoggedIn === 'true' && oldUser) {
-                        try {
-                            const userData = JSON.parse(oldUser);
-                            localStorage.setItem('motoroil_user', oldUser);
-                            localStorage.setItem('motoroil_isLoggedIn', 'true');
-                        } catch (e) {
-                            console.error('Migration error:', e);
-                        }
-                    }
-                    // Eski key'leri sil
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('user');
-                }
-
                 // Migration: motoroil_ -> periodya_
-                const moUser = localStorage.getItem('motoroil_user');
-                const moIsLoggedIn = localStorage.getItem('motoroil_isLoggedIn');
+                const moUser = localStorage.getItem('motoroil_user') || localStorage.getItem('user');
+                const moIsLoggedIn = localStorage.getItem('motoroil_isLoggedIn') || localStorage.getItem('isLoggedIn');
+
                 if (moUser || moIsLoggedIn) {
                     if (moUser) localStorage.setItem('periodya_user', moUser);
                     if (moIsLoggedIn) localStorage.setItem('periodya_isLoggedIn', moIsLoggedIn);
-                    localStorage.removeItem('motoroil_user');
-                    localStorage.removeItem('motoroil_isLoggedIn');
+                    ['motoroil_user', 'user', 'motoroil_isLoggedIn', 'isLoggedIn'].forEach(k => localStorage.removeItem(k));
                 }
 
                 const storedUser = localStorage.getItem('periodya_user');
@@ -75,6 +57,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if (isLoggedIn === 'true' && storedUser) {
                     const userData = JSON.parse(storedUser);
                     setUser(userData);
+
+                    // ONBOARDING REDIRECTION
+                    if (userData.setupState === 'PENDING' && pathname !== '/onboarding' && !pathname.startsWith('/api')) {
+                        router.push('/onboarding');
+                    }
                 } else {
                     // Public paths allowed without login
                     const publicPaths = ['/login', '/register', '/', '/reset-password'];
@@ -86,11 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 }
             } catch (error) {
                 console.error('Auth check error:', error);
-                localStorage.clear();
-
                 const publicPaths = ['/login', '/register', '/', '/reset-password'];
                 const isPublicPath = publicPaths.some(p => pathname === p || pathname.startsWith(p + '/'));
-
                 if (!isPublicPath) {
                     router.push('/login');
                 }
@@ -115,6 +99,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setUser(userData);
                 localStorage.setItem('periodya_user', JSON.stringify(userData));
                 localStorage.setItem('periodya_isLoggedIn', 'true');
+
+                // Redirect based on setupState
+                if (userData.setupState === 'PENDING') {
+                    router.push('/onboarding');
+                } else {
+                    router.push('/');
+                }
                 return true;
             }
             return false;
@@ -142,6 +133,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return user.permissions.includes(permission);
     };
 
+    const updateUser = (data: Partial<User>) => {
+        if (!user) return;
+        const updatedUser = { ...user, ...data };
+        setUser(updatedUser);
+        localStorage.setItem('periodya_user', JSON.stringify(updatedUser));
+    };
+
     return (
         <AuthContext.Provider
             value={{
@@ -150,7 +148,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isLoading,
                 login,
                 logout,
-                hasPermission
+                hasPermission,
+                updateUser
             }}
         >
             {children}

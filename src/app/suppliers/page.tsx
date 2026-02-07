@@ -10,6 +10,7 @@ import { useModal } from '@/contexts/ModalContext';
 import SupplierPurchaseModal from '@/components/modals/SupplierPurchaseModal';
 import { formatCurrency } from '@/lib/utils';
 import Pagination from '@/components/Pagination';
+import { TURKISH_CITIES, TURKISH_DISTRICTS } from '@/lib/constants';
 
 export default function SuppliersPage() {
     const router = useRouter();
@@ -40,12 +41,12 @@ export default function SuppliersPage() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [newSupplier, setNewSupplier] = useState({
-        name: '', phone: '', email: '', address: '', category: '',
+        name: '', phone: '', email: '', address: '', city: 'İstanbul', district: '', category: '',
         taxNumber: '', taxOffice: '', contactPerson: '', iban: '',
         branch: activeBranchName || currentUser?.branch || 'Merkez'
     });
     const [editSupplier, setEditSupplier] = useState<any>({
-        id: '', name: '', phone: '', email: '', address: '', category: '',
+        id: '', name: '', phone: '', email: '', address: '', city: '', district: '', category: '',
         taxNumber: '', taxOffice: '', contactPerson: '', iban: '',
         branch: ''
     });
@@ -63,6 +64,7 @@ export default function SuppliersPage() {
             const match =
                 (sup.name || '').toLowerCase().includes(low) ||
                 (sup.phone || '').includes(searchTerm) ||
+                (sup.city || '').toLowerCase().includes(low) ||
                 (sup.category || '').toLowerCase().includes(low);
             if (!match) return false;
         }
@@ -111,7 +113,7 @@ export default function SuppliersPage() {
             if (data.success) {
                 showSuccess('Başarılı', 'Tedarikçi başarıyla oluşturuldu.');
                 setIsModalOpen(false);
-                setNewSupplier({ name: '', phone: '', email: '', address: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', branch: activeBranchName || currentUser?.branch || 'Merkez' });
+                setNewSupplier({ name: '', phone: '', email: '', address: '', city: 'İstanbul', district: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', branch: activeBranchName || currentUser?.branch || 'Merkez' });
                 window.location.reload();
             } else {
                 showError('Hata', data.error);
@@ -142,7 +144,7 @@ export default function SuppliersPage() {
             if (data.success) {
                 showSuccess('Başarılı', 'Tedarikçi başarıyla güncellendi.');
                 setIsEditModalOpen(false);
-                setEditSupplier({ id: '', name: '', phone: '', email: '', address: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '' });
+                setEditSupplier({ id: '', name: '', phone: '', email: '', address: '', city: '', district: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '' });
                 window.location.reload();
             } else {
                 showError('Hata', data.error);
@@ -539,6 +541,36 @@ export default function SuppliersPage() {
                                 <input type="text" placeholder="TR..." value={newSupplier.iban} onChange={e => setNewSupplier({ ...newSupplier, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
                             </div>
 
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>ŞEHİR</label>
+                                    <select
+                                        value={newSupplier.city}
+                                        onChange={e => setNewSupplier({ ...newSupplier, city: e.target.value, district: '' })}
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                    >
+                                        <option value="">Şehir Seçin...</option>
+                                        {TURKISH_CITIES.map(city => (
+                                            <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>İLÇE</label>
+                                    <select
+                                        value={newSupplier.district}
+                                        onChange={e => setNewSupplier({ ...newSupplier, district: e.target.value })}
+                                        disabled={!newSupplier.city}
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                    >
+                                        <option value="">İlçe Seçin...</option>
+                                        {(TURKISH_DISTRICTS[newSupplier.city] || []).map(district => (
+                                            <option key={district} value={district}>{district}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
                             <div>
                                 <label className="text-muted" style={{ fontSize: '12px' }}>ADRES</label>
                                 <textarea value={newSupplier.address} onChange={e => setNewSupplier({ ...newSupplier, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', minHeight: '80px' }} />
@@ -610,6 +642,36 @@ export default function SuppliersPage() {
                             <div>
                                 <label className="text-muted" style={{ fontSize: '12px' }}>IBAN</label>
                                 <input type="text" placeholder="TR..." value={editSupplier.iban} onChange={e => setEditSupplier({ ...editSupplier, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                            </div>
+
+                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>ŞEHİR</label>
+                                    <select
+                                        value={editSupplier.city}
+                                        onChange={e => setEditSupplier({ ...editSupplier, city: e.target.value, district: '' })}
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                    >
+                                        <option value="">Şehir Seçin...</option>
+                                        {TURKISH_CITIES.map(city => (
+                                            <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>İLÇE</label>
+                                    <select
+                                        value={editSupplier.district}
+                                        onChange={e => setEditSupplier({ ...editSupplier, district: e.target.value })}
+                                        disabled={!editSupplier.city}
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                    >
+                                        <option value="">İlçe Seçin...</option>
+                                        {(TURKISH_DISTRICTS[editSupplier.city] || []).map(district => (
+                                            <option key={district} value={district}>{district}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div>

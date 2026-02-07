@@ -1275,6 +1275,7 @@ export default function StaffManagementContent() {
                                         <option value="Yönetici" className="bg-[#0f111a]">👑 Yönetici</option>
                                         <option value="Şube Müdürü" className="bg-[#0f111a]">🏢 Şube Müdürü</option>
                                         <option value="Muhasebe" className="bg-[#0f111a]">💰 Muhasebe</option>
+                                        <option value="Denetçi" className="bg-[#0f111a]">🔍 Denetçi (Auditor)</option>
                                         <option value="Servis Personeli" className="bg-[#0f111a]">🔧 Servis Personeli</option>
                                         <option value="Satış Temsilcisi" className="bg-[#0f111a]">🤝 Satış Temsilcisi</option>
                                     </select>
@@ -1375,6 +1376,7 @@ export default function StaffManagementContent() {
                                         <option value="Yönetici" className="bg-[#0f111a]">👑 Yönetici</option>
                                         <option value="Şube Müdürü" className="bg-[#0f111a]">🏢 Şube Müdürü</option>
                                         <option value="Muhasebe" className="bg-[#0f111a]">💰 Muhasebe</option>
+                                        <option value="Denetçi" className="bg-[#0f111a]">🔍 Denetçi (Auditor)</option>
                                         <option value="Servis Personeli" className="bg-[#0f111a]">🔧 Servis Personeli</option>
                                         <option value="Satış Temsilcisi" className="bg-[#0f111a]">🤝 Satış Temsilcisi</option>
                                     </select>

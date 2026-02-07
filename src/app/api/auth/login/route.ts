@@ -5,7 +5,9 @@ import { logActivity } from '@/lib/audit';
 
 export async function POST(request: Request) {
     try {
-        const { username, password } = await request.json();
+        const body = await request.json();
+        const username = body.username?.toLowerCase().trim();
+        const password = body.password;
         const ip = request.headers.get('x-forwarded-for') || '0.0.0.0';
 
         // 1. Brute Force Protection: Check failed attempts in last 15 mins
@@ -50,11 +52,19 @@ export async function POST(request: Request) {
                     OR: [
                         { email: username }
                     ]
+                },
+                include: {
+                    tenant: {
+                        select: {
+                            setupState: true
+                        }
+                    }
                 }
             });
             // Adapt User object to look like Staff for the rest of logic if needed
-            if (targetUser && !targetUser.username) {
-                targetUser.username = targetUser.email;
+            if (targetUser) {
+                if (!targetUser.username) targetUser.username = targetUser.email;
+                targetUser.setupState = targetUser.tenant?.setupState || 'PENDING';
             }
         }
 
@@ -96,12 +106,15 @@ export async function POST(request: Request) {
 
         // Log login activity
         await logActivity({
+            tenantId: targetUser.tenantId || 'PLATFORM_ADMIN',
             userId: targetUser.id,
             userName: targetUser.username,
             action: 'LOGIN',
             entity: 'User',
             entityId: targetUser.id,
             details: 'Sisteme giriş yapıldı.',
+            ipAddress: ip,
+            userAgent: request.headers.get('user-agent') || undefined,
             branch: (targetUser as any).branch || 'Merkez'
         });
 
@@ -112,7 +125,8 @@ export async function POST(request: Request) {
             role: targetUser.role || 'Personel',
             branch: (targetUser as any).branch || 'Merkez',
             name: targetUser.name,
-            permissions: (targetUser as any).permissions || []
+            permissions: (targetUser as any).permissions || [],
+            setupState: (targetUser as any).setupState || 'COMPLETED'
         });
     } catch (error: any) {
         console.error('Login error:', error);

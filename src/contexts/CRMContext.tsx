@@ -16,6 +16,8 @@ export interface Customer {
     contactPerson?: string;
     iban?: string;
     customerClass?: string;
+    city?: string;
+    district?: string;
     referredByCode?: string;
     category?: string;
     points?: number;
@@ -35,6 +37,8 @@ export interface Supplier {
     taxOffice?: string;
     contactPerson?: string;
     iban?: string;
+    city?: string;
+    district?: string;
     branch?: string;
     isActive?: boolean;
 }
@@ -51,6 +55,7 @@ interface CRMContextType {
     suppClasses: string[];
     setSuppClasses: React.Dispatch<React.SetStateAction<string[]>>;
     refreshClasses: () => Promise<void>;
+    isInitialLoading: boolean;
 }
 
 const CRMContext = createContext<CRMContextType | undefined>(undefined);
@@ -60,6 +65,7 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [custClasses, setCustClasses] = useState<string[]>([]);
     const [suppClasses, setSuppClasses] = useState<string[]>([]);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
 
     const refreshCustomers = async () => {
         try {
@@ -92,12 +98,15 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (isAuthenticated) {
+            setIsInitialLoading(true);
             // Parallel fetch for better performance
             Promise.all([
                 refreshCustomers(),
                 refreshSuppliers(),
                 refreshClasses()
-            ]);
+            ]).finally(() => setIsInitialLoading(false));
+        } else {
+            setIsInitialLoading(false);
         }
     }, [isAuthenticated]);
 
@@ -107,7 +116,8 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
             suppliers, setSuppliers, refreshSuppliers,
             custClasses, setCustClasses,
             suppClasses, setSuppClasses,
-            refreshClasses
+            refreshClasses,
+            isInitialLoading
         }}>
             {children}
         </CRMContext.Provider>

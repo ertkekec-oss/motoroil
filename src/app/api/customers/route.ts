@@ -5,7 +5,8 @@ import prisma from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 
-import { authorize } from '@/lib/auth';
+import { authorize, verifyWriteAccess } from '@/lib/auth';
+import { logActivity } from '@/lib/audit';
 
 export async function GET() {
     const auth = await authorize();
@@ -23,6 +24,8 @@ export async function GET() {
                 balance: true,
                 email: true,
                 address: true,
+                city: true,
+                district: true,
                 supplierClass: true,
                 customerClass: true,
                 points: true,
@@ -52,6 +55,8 @@ export async function GET() {
             category: c.category?.name || 'Genel',
             email: c.email || '',
             address: c.address || '',
+            city: c.city || '',
+            district: (c as any).district || '',
             supplierClass: c.supplierClass || '',
             customerClass: c.customerClass || '',
             points: Number(c.points || 0),
@@ -68,12 +73,28 @@ export async function GET() {
 
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const { user } = auth;
+
+    const writeCheck = verifyWriteAccess(user);
+    if (!writeCheck.authorized) return writeCheck.response;
+
     try {
         const body = await request.json();
-        const { name, phone, email, address, taxNumber, taxOffice, categoryId, contactPerson, iban, branch, supplierClass, customerClass, referredByCode } = body;
+        const { name, phone, email, address, city, district, taxNumber, taxOffice, categoryId, contactPerson, iban, branch, supplierClass, customerClass, referredByCode } = body;
 
         if (!name) {
             return NextResponse.json({ success: false, error: 'Müşteri adı zorunludur.' }, { status: 400 });
+        }
+
+        // Get the default company for this tenant
+        const company = await prisma.company.findFirst({
+            where: { tenantId: user.tenantId }
+        });
+
+        if (!company && user.tenantId !== 'PLATFORM_ADMIN') {
+            return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 404 });
         }
 
         // Genel kategori otomatik seçilsin mi? Eğer categoryId gönderilmezse:
@@ -87,11 +108,12 @@ export async function POST(request: Request) {
         const myReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
 
         const result = await prisma.$transaction(async (tx) => {
-            const newCustomer = await tx.customer.create({
+            const newCustomer = await (tx as any).customer.create({
                 data: {
-                    name, phone, email, address, taxNumber, taxOffice, contactPerson, iban,
+                    name, phone, email, address, city, district, taxNumber, taxOffice, contactPerson, iban,
                     branch: branch || 'Merkez',
                     categoryId: targetCategoryId,
+                    companyId: company?.id, // Added companyId
                     supplierClass,
                     customerClass,
                     referralCode: myReferralCode
@@ -102,11 +124,9 @@ export async function POST(request: Request) {
                 const searchCode = referredByCode.trim().toUpperCase();
                 const referrer = await tx.customer.findUnique({ where: { referralCode: searchCode } });
                 if (referrer) {
-                    // Fetch referral settings from AppSettings
                     const settings = await tx.appSettings.findUnique({ where: { key: 'referralSettings' } });
                     const s = (settings?.value as any) || { referrerDiscount: 10, refereeGift: 50 };
 
-                    // Award coupon to Referrer
                     await tx.coupon.create({
                         data: {
                             code: `REF-FOR-${referrer.id.substring(0, 4)}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`,
@@ -116,7 +136,6 @@ export async function POST(request: Request) {
                             isUsed: false
                         }
                     });
-                    // Award coupon to New Customer
                     await tx.coupon.create({
                         data: {
                             code: `WELCOME-${newCustomer.id.substring(0, 4)}`,
@@ -129,6 +148,20 @@ export async function POST(request: Request) {
                 }
             }
             return newCustomer;
+        });
+
+        // AUDIT LOG
+        await logActivity({
+            tenantId: (user as any).tenantId,
+            userId: (user as any).id,
+            userName: (user as any).username,
+            action: 'CREATE_CUSTOMER',
+            entity: 'Customer',
+            entityId: result.id,
+            after: result,
+            details: `${result.name} isimli müşteri oluşturuldu.`,
+            userAgent: request.headers.get('user-agent') || undefined,
+            ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
         });
 
         return NextResponse.json({ success: true, customer: result });
