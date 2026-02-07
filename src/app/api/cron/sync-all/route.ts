@@ -27,7 +27,10 @@ export async function GET(request: Request) {
             // VEYA daha doğrusu şudur: Servis mantığını buraya taşıyalım.
 
             // Kolaylık için URL üzerinden tetikleyelim (Self-request)
-            const ecommerceRes = await fetch(`${baseUrl}/api/integrations/ecommerce/sync`, { method: 'POST' });
+            const ecommerceRes = await fetch(`${baseUrl}/api/integrations/ecommerce/sync`, {
+                method: 'POST',
+                headers: { 'x-cron-secret': process.env.CRON_SECRET || '' }
+            });
             results.ecommerce = await ecommerceRes.json();
             console.log('✅ E-Ticaret Sync Bitti:', results.ecommerce.message);
         } catch (e: any) {
@@ -79,7 +82,10 @@ export async function GET(request: Request) {
                 // Servisi doğrudan çağırabiliriz veya API'ye istek atabiliriz
                 const syncRes = await fetch(`${baseUrl}/api/integrations/marketplace/sync`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-cron-secret': process.env.CRON_SECRET || ''
+                    },
                     body: JSON.stringify({
                         type: config.type,
                         config: config.settings

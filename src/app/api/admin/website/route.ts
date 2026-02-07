@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 // Get CMS data (Settings + Pages + Menus)
 export async function GET() {
     const session: any = await getSession();
@@ -16,6 +18,30 @@ export async function GET() {
             (prisma as any).cmsPage.findMany({ include: { sections: { orderBy: { order: 'asc' } } } }),
             (prisma as any).cmsMenu.findMany()
         ]);
+
+        // Varsayılan menüleri oluştur
+        if (menus.length === 0) {
+            await (prisma as any).cmsMenu.create({
+                data: {
+                    name: 'Header',
+                    items: [
+                        { label: 'Özellikler', link: '/#features' },
+                        { label: 'Fiyatlandırma', link: '/#pricing' },
+                        { label: 'S.S.S', link: '/#faq' }
+                    ]
+                }
+            });
+            await (prisma as any).cmsMenu.create({
+                data: {
+                    name: 'Footer',
+                    items: [
+                        { label: 'Gizlilik', link: '/privacy' },
+                        { label: 'Kullanım Koşulları', link: '/terms' }
+                    ]
+                }
+            });
+            menus = await (prisma as any).cmsMenu.findMany();
+        }
 
         // Eğer hiç sayfa yoksa varsayılan bir index sayfası oluştur (Profesyonel Databox Yapısı)
         if (pages.length === 0) {

@@ -4,27 +4,52 @@ import prisma from '@/lib/prisma';
 import { getRequestContext } from '@/lib/api-context';
 import { iyzico } from '@/lib/iyzico';
 
+export const dynamic = 'force-dynamic';
+
+export async function GET() {
+    return NextResponse.json({ message: 'Upgrade API is alive' });
+}
+
 export async function POST(req: NextRequest) {
     try {
         const ctx = await getRequestContext(req);
-        const { planId } = await req.json();
+
+        // PLATFORM_ADMIN check
+        if (ctx.tenantId === 'PLATFORM_ADMIN') {
+            return NextResponse.json({
+                error: 'Sistem yöneticileri plan yükseltmesi yapamaz. Lütfen bir müşteri hesabı ile test edin.'
+            }, { status: 403 });
+        }
+
+        const body = await req.json().catch(() => ({}));
+        const { planId } = body;
+
+        if (!planId) {
+            return NextResponse.json({ error: 'Plan ID zorunludur.' }, { status: 400 });
+        }
 
         // 1. Planı ve Detayları Getir
         const [plan, tenant, user] = await Promise.all([
             prisma.plan.findUnique({ where: { id: planId } }),
             prisma.tenant.findUnique({
                 where: { id: ctx.tenantId },
-                include: { companies: { take: 1 } } // Fatura bilgisi için ilk şirketi alıyoruz
+                include: { companies: { take: 1 } }
             }),
             prisma.user.findUnique({ where: { id: ctx.userId } })
         ]);
 
-        if (!plan || !plan.iyzicoPlanCode) {
-            return NextResponse.json({ error: 'Seçilen paket ödeme için hazır değil (iyzicoPlanCode eksik).' }, { status: 400 });
+        if (!plan) {
+            return NextResponse.json({ error: 'Seçilen paket bulunamadı.' }, { status: 404 });
+        }
+
+        if (!plan.iyzicoPlanCode) {
+            return NextResponse.json({
+                error: 'Bu paket şu anda ödemeye açık değil (Iyzico yapılandırması eksik).'
+            }, { status: 400 });
         }
 
         if (!tenant || !user) {
-            return NextResponse.json({ error: 'Kullanıcı veya hesap bilgileri bulunamadı.' }, { status: 404 });
+            return NextResponse.json({ error: 'Hesap veya kullanıcı bilgileri bulunamadı.' }, { status: 404 });
         }
 
         const company = tenant.companies[0] || { name: tenant.name, address: 'Merkez', city: 'Istanbul' };
@@ -35,7 +60,8 @@ export async function POST(req: NextRequest) {
         const surname = nameParts.length > 1 ? nameParts.slice(1).join(' ') : name;
 
         // 2. Iyzico Checkout Formunu Başlat
-        const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/webhooks/iyzico/callback`;
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.kech.tr';
+        const callbackUrl = `${baseUrl}/api/webhooks/iyzico/callback`;
 
         const checkoutData = {
             locale: 'tr',
@@ -52,7 +78,7 @@ export async function POST(req: NextRequest) {
                 name: name,
                 surname: surname,
                 email: user.email,
-                gsmNumber: '+905000000000', // Gerçek veride phone alanı olmalı
+                gsmNumber: '+905000000000',
                 identityNumber: '11111111111',
                 billingAddress: {
                     contactName: user.name || 'Müşteri',
@@ -66,10 +92,11 @@ export async function POST(req: NextRequest) {
         const result = await iyzico.initializeSubscriptionCheckout(checkoutData as any);
 
         if (result.status !== 'success') {
-            return NextResponse.json({ error: result.errorMessage || 'Iyzico başlatılamadı.' }, { status: 500 });
+            return NextResponse.json({
+                error: result.errorMessage || 'Iyzico başlatılamadı.'
+            }, { status: 500 });
         }
 
-        // 3. Sonucu Dön (Frontend'de HTML content render edilecek)
         return NextResponse.json({
             success: true,
             checkoutFormContent: result.checkoutFormContent,

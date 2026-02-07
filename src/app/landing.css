@@ -30,11 +30,11 @@ body {
     position: relative;
     background-color: #ffffff;
     background-image:
-        linear-gradient(to bottom, transparent 20%, #ffffff 60%),
-        radial-gradient(at 0% 0%, rgba(200, 210, 255, 0.9) 0px, transparent 60%),
-        radial-gradient(at 100% 0%, rgba(255, 230, 240, 0.8) 0px, transparent 60%),
-        radial-gradient(at 15% 45%, rgba(210, 225, 255, 0.5) 0px, transparent 50%),
-        radial-gradient(at 85% 45%, rgba(255, 235, 245, 0.5) 0px, transparent 50%);
+        linear-gradient(to bottom, transparent 0%, #ffffff 35%),
+        radial-gradient(at 0% 0%, rgba(200, 210, 255, 0.8) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(255, 230, 240, 0.7) 0px, transparent 50%),
+        radial-gradient(at 20% 40%, rgba(210, 225, 255, 0.3) 0px, transparent 40%),
+        radial-gradient(at 80% 40%, rgba(255, 235, 245, 0.3) 0px, transparent 40%);
 }
 
 .m-hero-bg {
@@ -96,12 +96,15 @@ body {
 .m-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 26px;
+    gap: 12px;
+    font-size: 24px;
     font-weight: 900;
-    letter-spacing: -1px;
+    letter-spacing: -1.5px;
     color: #0d0e12;
     transition: 0.3s;
+    position: relative;
+    top: 2px;
+    /* Slight push down to center with menu text */
 }
 
 .m-logo:hover {
@@ -139,13 +142,34 @@ body {
 
 /* Buttons */
 .m-btn {
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 800;
     font-size: 14px;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 1px solid transparent;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 2px solid transparent;
     white-space: nowrap;
+    line-height: 1;
+}
+
+.m-nav-login {
+    font-size: 14px;
+    font-weight: 800;
+    color: #475467;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.m-nav-login:hover {
+    background: rgba(0, 0, 0, 0.03);
+    color: #000;
 }
 
 .m-btn-primary {

@@ -28,7 +28,7 @@ export async function GET(req: NextRequest, { params: paramsPromise }: { params:
                     }
                 },
                 users: {
-                    select: { id: true, username: true, role: true, email: true, createdAt: true }
+                    select: { id: true, role: true, email: true, createdAt: true }
                 }
             }
         });
@@ -91,6 +91,30 @@ export async function GET(req: NextRequest, { params: paramsPromise }: { params:
         });
 
     } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+
+export async function DELETE(req: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+    try {
+        const session: any = await getSession();
+        if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
+        const { id: tenantId } = await paramsPromise;
+
+        // Cascade delete is handled by Prisma/DB if configured, 
+        // but let's do a safe transaction if needed or just delete the tenant.
+        // In this project, most relations are defined with onDelete: Cascade in schema or handled manually.
+
+        await (prisma as any).tenant.delete({
+            where: { id: tenantId }
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error: any) {
+        console.error("Tenant Delete Error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

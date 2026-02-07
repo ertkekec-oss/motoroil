@@ -1,0 +1,12 @@
+﻿--- ISOLATION AUDIT ---
+customer: 7 records without companyId
+product: 5 records without companyId
+transaction: 16 records without companyId
+kasa: 2 records without companyId
+salesInvoice: 20 records without companyId
+purchaseInvoice: 0 records without companyId
+supplier: 0 records without companyId
+order: 15 records without companyId
+serviceRecord: 1 records without companyId
+quote: 2 records without companyId
+paymentPlan: 0 records without companyId

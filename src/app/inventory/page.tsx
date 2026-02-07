@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useMemo, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import * as XLSX from 'xlsx';
 import { useApp } from '@/contexts/AppContext';
 import { useInventory, Product as ContextProduct } from '@/contexts/InventoryContext';
@@ -35,7 +35,15 @@ function InventoryContent() {
     const initialFilter = searchParams.get('filter') as any || 'none';
 
     const [activeTab, setActiveTab] = useState(initialTab);
-    const { currentUser, hasPermission, branches: contextBranches, activeBranchName } = useApp();
+    const { currentUser, hasPermission, hasFeature, branches: contextBranches, activeBranchName } = useApp();
+    const router = useRouter(); // Wait, need to check if router is available. Yes, it's used in AppContext.
+
+    useEffect(() => {
+        if (!hasFeature('inventory') && currentUser !== null) {
+            router.push('/billing?upsell=inventory');
+        }
+    }, [hasFeature, currentUser, router]);
+
     const {
         products, setProducts, requestProductCreation
     } = useInventory();

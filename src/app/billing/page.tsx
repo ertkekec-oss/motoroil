@@ -38,7 +38,7 @@ function BillingContent() {
                 if (ovData.error) throw new Error(ovData.error);
 
                 setOverview(ovData);
-                setPlans(plansData.plans || []);
+                setPlans(Array.isArray(plansData) ? plansData : (plansData.plans || []));
             } catch (err: any) {
                 showError('Hata', 'Bilgiler yüklenemedi: ' + err.message);
             } finally {
@@ -53,7 +53,7 @@ function BillingContent() {
         setIsProcessing(true);
         setCheckoutHtml(null);
         try {
-            const res = await fetch('/api/billing/upgrade', {
+            const res = await fetch('/api/billing/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ planId })
@@ -69,6 +69,7 @@ function BillingContent() {
                 showError('Ödeme Hatası', data.error || 'Ödeme formu başlatılamadı.');
             }
         } catch (err: any) {
+            console.error('Plan selection error:', err);
             showError('Hata', 'Sistem hatası: ' + err.message);
         } finally {
             setIsProcessing(false);
@@ -89,6 +90,7 @@ function BillingContent() {
     }, [checkoutHtml]);
 
     if (loading) return <div className="p-8 text-center">Yükleniyor...</div>;
+    if (!overview) return <div className="p-8 text-center text-red-500 font-bold">Abonelik bilgileri yüklenemedi. Lütfen yönetici ile iletişime geçin.</div>;
 
     const currentPlanId = plans.find(p => p.name === overview?.planName)?.id;
 
@@ -202,14 +204,14 @@ function BillingContent() {
 
                             <button
                                 onClick={() => handlePlanSelect(plan.id)}
-                                disabled={isCurrent || isProcessing}
-                                className={`w-full py-4 rounded-2xl font-black text-lg transition-all ${isCurrent
+                                disabled={isCurrent || isProcessing || overview?.planName === 'PLATFORM ADMIN'}
+                                className={`w-full py-4 rounded-2xl font-black text-lg transition-all ${isCurrent || overview?.planName === 'PLATFORM ADMIN'
                                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                     : isRecommended ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-xl active:scale-95'
                                         : 'bg-slate-900 text-white hover:bg-black hover:shadow-xl active:scale-95'
                                     }`}
                             >
-                                {isCurrent ? 'Mevcut Paketiniz' : (isProcessing ? 'Hazırlanıyor...' : (isRecommended ? 'Hemen Yükselt' : 'Seç'))}
+                                {overview?.planName === 'PLATFORM ADMIN' ? 'Sınırsız Erişim' : (isCurrent ? 'Mevcut Paketiniz' : (isProcessing ? 'Hazırlanıyor...' : (isRecommended ? 'Hemen Yükselt' : 'Seç')))}
                             </button>
                         </div>
                     );

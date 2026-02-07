@@ -1,0 +1,46 @@
+Toplam Kasa Sayısı: 2
+İlk 5 Kasa: [
+  {
+    "id": "cml5p3bsk0002tq3wt2rnnv4a",
+    "companyId": null,
+    "name": "NKT",
+    "type": "Nakit",
+    "balance": "82384",
+    "currency": "TRY",
+    "isActive": true,
+    "deletedAt": null,
+    "createdAt": "2026-02-02T21:41:55.700Z",
+    "updatedAt": "2026-02-05T15:28:37.437Z",
+    "branch": "Merkez"
+  },
+  {
+    "id": "cml9m9fcu0005fdtlj21qqx8k",
+    "companyId": null,
+    "name": "Merkez Nakit Kasa",
+    "type": "Nakit",
+    "balance": "25000",
+    "currency": "TRY",
+    "isActive": true,
+    "deletedAt": null,
+    "createdAt": "2026-02-05T15:33:46.110Z",
+    "updatedAt": "2026-02-05T15:33:46.110Z",
+    "branch": "Merkez"
+  }
+]
+Bulunan Kasalar: []
+Mevcut Kasa Şubeleri: [ 'Merkez' ]
+Branch Tablosundaki Şubeler: [
+  {
+    "id": 1,
+    "name": "Merkez",
+    "type": "Merkez",
+    "city": "İstanbul",
+    "address": null,
+    "phone": null,
+    "manager": null,
+    "status": "Aktif",
+    "createdAt": "2026-02-01T18:41:01.578Z",
+    "updatedAt": "2026-02-01T18:41:01.578Z",
+    "deletedAt": null
+  }
+]

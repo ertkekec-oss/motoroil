@@ -2,11 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Pagination from '@/components/Pagination';
 
 export default function ServiceDashboard() {
-    const { user: currentUser, hasPermission } = useAuth(); // AuthContext provides user and hasPermission
+    const { currentUser, hasPermission, hasFeature } = useApp();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!hasFeature('service') && currentUser !== null) {
+            router.push('/billing?upsell=service');
+        }
+    }, [hasFeature, currentUser, router]);
+
     const isSystemAdmin = currentUser?.role === 'Admin';
 
     const [activeServiceTab, setActiveServiceTab] = useState<'jobs' | 'calendar'>('jobs');

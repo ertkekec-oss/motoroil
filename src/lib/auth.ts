@@ -45,6 +45,7 @@ export async function createSession(user: any) {
         id: user.id,
         username: user.username,
         role: user.role,
+        tenantId: user.tenantId, // Add tenantId to session
         branch: user.branch,
         permissions: user.permissions
     })
@@ -68,6 +69,21 @@ export async function createSession(user: any) {
 export async function getSession() {
     const cookieStore = await cookies();
     const token = cookieStore.get('session')?.value;
+
+    // Support for Cron/Internal Service Headers
+    const headersList = await (await import('next/headers')).headers();
+    const cronSecret = headersList.get('x-cron-secret');
+
+    if (cronSecret && cronSecret === process.env.CRON_SECRET) {
+        return {
+            id: 'SYSTEM',
+            username: 'SYSTEM_CRON',
+            role: 'PLATFORM_ADMIN',
+            tenantId: 'PLATFORM_ADMIN',
+            isSystem: true
+        };
+    }
+
     if (!token) return null;
 
     try {

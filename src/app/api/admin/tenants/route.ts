@@ -48,7 +48,11 @@ export async function GET(req: NextRequest) {
                 orderBy: { createdAt: 'desc' },
                 include: {
                     subscription: {
-                        include: { plan: true }
+                        include: {
+                            plan: {
+                                include: { limits: true }
+                            }
+                        }
                     },
                     companies: { select: { id: true, name: true } }, // Hafif veri
                     users: { select: { id: true } } // Sadece sayı için
@@ -56,32 +60,52 @@ export async function GET(req: NextRequest) {
             })
         ]);
 
-        // 4. İstatistik Ekleme (Advanced: Performans için ayrı query veya cache lazım olabilir)
-        // Şimdilik N+1 problemine dikkat ederek veya basitçe her biri için count alarak ilerliyoruz.
-        // Prisma transaction veya aggregate ile çözülebilir.
-        // Hız için şimdilik sadece özet dönüyoruz.
+        // 4. Optimized Data Fetching (Fixing N+1 Problem)
+        const tenantIds = tenants.map((t: any) => t.id);
+        const allCompanyIds = tenants.flatMap((t: any) => t.companies.map((c: any) => c.id));
+        const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
-        const data = await Promise.all(tenants.map(async (t: any) => {
-            // Aylık fatura kullanımı
-            const invoiceCount = await (prisma as any).salesInvoice.count({
-                where: {
-                    companyId: { in: t.companies.map((c: any) => c.id) },
-                    isFormal: true,
-                    createdAt: {
-                        gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-                    }
-                }
-            });
+        // Bulk Fetch Invoices
+        const invoiceCounts = await (prisma as any).salesInvoice.groupBy({
+            by: ['companyId'],
+            _count: { _all: true },
+            where: {
+                companyId: { in: allCompanyIds },
+                isFormal: true,
+                createdAt: { gte: firstDayOfMonth }
+            }
+        });
 
-            // Son aktiflik (Churn Risk Analizi)
-            const tenantUsers = await (prisma as any).user.findMany({
-                where: { tenantId: t.id },
-                orderBy: { lastActiveAt: 'desc' },
-                take: 1,
-                select: { lastActiveAt: true }
-            });
+        // Bulk Fetch Growth Events
+        const growthEventCounts = await (prisma as any).growthEvent.groupBy({
+            by: ['tenantId'],
+            _count: { _all: true },
+            where: {
+                tenantId: { in: tenantIds },
+                status: 'PENDING'
+            }
+        });
 
-            const lastActive = tenantUsers[0]?.lastActiveAt;
+        // Bulk Fetch Last Active Users
+        const lastActiveUsers = await (prisma as any).user.groupBy({
+            by: ['tenantId'],
+            _max: { lastActiveAt: true },
+            where: {
+                tenantId: { in: tenantIds }
+            }
+        });
+
+        // Map Results
+        const invoiceCountMap = new Map(invoiceCounts.map((ic: any) => [ic.companyId, ic._count._all]));
+        const growthEventMap = new Map(growthEventCounts.map((ge: any) => [ge.tenantId, ge._count._all]));
+        const lastActiveMap = new Map(lastActiveUsers.map((lau: any) => [lau.tenantId, lau._max.lastActiveAt]));
+
+        const data = tenants.map((t: any) => {
+            // Aggregate invoice counts for all companies of this tenant
+            const tenantInvoiceCount = t.companies.reduce((sum: number, c: any) => sum + (Number(invoiceCountMap.get(c.id)) || 0), 0);
+
+            // Last active status
+            const lastActive = lastActiveMap.get(t.id) as any;
             let risk = 'HEALTHY';
             if (!lastActive) risk = 'NEW';
             else {
@@ -90,14 +114,12 @@ export async function GET(req: NextRequest) {
                 else if (daysDiff > 7) risk = 'RISK';
             }
 
-            // Olay Sinyalleri (Growth Events)
-            const growthEventsCount = await (prisma as any).growthEvent.count({
-                where: { tenantId: t.id, status: 'PENDING' }
-            });
+            // Olay Sinyalleri
+            const growthEventsCount = growthEventMap.get(t.id) || 0;
 
             // Limit
             const invoiceLimit = t.subscription?.plan?.limits?.find((l: any) => l.resource === 'monthly_documents')?.limit || 0;
-            const highValue = invoiceLimit !== -1 && invoiceLimit > 0 && (invoiceCount / invoiceLimit) >= 0.9;
+            const highValue = invoiceLimit !== -1 && invoiceLimit > 0 && (tenantInvoiceCount / invoiceLimit) >= 0.9;
 
             return {
                 id: t.id,
@@ -112,12 +134,12 @@ export async function GET(req: NextRequest) {
                 stats: {
                     companies: t.companies.length,
                     users: t.users.length,
-                    invoices: invoiceCount,
+                    invoices: tenantInvoiceCount,
                     invoiceLimit: invoiceLimit === -1 ? '∞' : invoiceLimit
                 },
                 createdAt: t.createdAt
             };
-        }));
+        });
 
         return NextResponse.json({
             data,

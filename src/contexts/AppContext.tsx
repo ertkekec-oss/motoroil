@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { useModal } from './ModalContext';
 import { useAuth } from './AuthContext';
 import { FinancialProvider } from './FinancialContext';
@@ -8,11 +9,6 @@ import { InventoryProvider } from './InventoryContext';
 import { CRMProvider } from './CRMContext';
 import { SalesProvider } from './SalesContext';
 import { SettingsProvider } from './SettingsContext';
-
-import { Product, PendingProduct } from './InventoryContext';
-import { Kasa } from './FinancialContext';
-import { Customer } from './CRMContext';
-import { SuspendedSale } from './SalesContext';
 
 export interface Branch {
     id: number;
@@ -61,6 +57,8 @@ interface AppContextType {
     currentUser: Staff | null;
     setCurrentUser: (user: Staff | null) => void;
     hasPermission: (permId: string) => boolean;
+    hasFeature: (featureKey: string) => boolean;
+    subscription: any;
     staff: Staff[];
     refreshStaff: () => Promise<void>;
 
@@ -93,6 +91,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const { showError } = useModal();
     const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const pathname = usePathname();
+    const router = useRouter();
+    const isAdminPath = pathname?.startsWith('/admin');
+
+    // Feature to Path Mapping for redirection
+    const featurePathMap: Record<string, string> = {
+        '/': 'pos',
+        '/accounting': 'accounting',
+        '/inventory': 'inventory',
+        '/service': 'service',
+        '/sales': 'sales',
+        '/reports': 'reporting',
+        '/customers': 'crm',
+        '/suppliers': 'crm',
+        '/advisor': 'accounting',
+        '/quotes': 'quotes'
+    };
 
     // 1. BRANCH STATE
     const [branches, setBranches] = useState<Branch[]>([]);
@@ -106,6 +121,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
 
     const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [subscription, setSubscription] = useState<any>(null);
+
+    const refreshSubscription = async () => {
+        try {
+            const res = await fetch('/api/billing/subscription');
+            const data = await res.json();
+            if (data && !data.error) {
+                setSubscription(data);
+            }
+        } catch (err) {
+            console.error('Subscription fetch failed', err);
+        }
+    };
 
     const refreshBranches = async () => {
         try {
@@ -139,21 +167,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return currentUser.permissions.includes('*') || currentUser.permissions.includes(permId);
     };
 
+    const hasFeature = (featureKey: string) => {
+        if (!subscription) return true; // Default to true while loading
+        if (subscription.plan?.name === 'Super Admin') return true;
+        return subscription.features?.includes(featureKey);
+    };
+
     useEffect(() => {
         if (isAuthenticated) {
+            // CRM/POS data fetching - Skip blocking for admin paths
+            if (isAdminPath) {
+                setIsInitialLoading(false);
+                return;
+            }
+
             // CRITICAL: Ensure loading screen is visible during transition
             setIsInitialLoading(true);
 
-            // Parallel start: don't wait for branches if we already know which one to use
+            // Parallel start
             if (!activeBranchName && authUser?.branch) {
                 setActiveBranchName(authUser.branch);
             }
 
-            // Load both core requirements in parallel
-            Promise.all([refreshBranches(), refreshStaff()]).finally(() => {
+            // Load all core requirements in parallel
+            Promise.all([refreshBranches(), refreshStaff(), refreshSubscription()]).finally(() => {
                 const savedBranch = localStorage.getItem('periodya_activeBranch') || localStorage.getItem('motoroil_activeBranch');
 
-                // Determine initial branch preference if still empty
                 if (!activeBranchName) {
                     if (savedBranch) {
                         setActiveBranchName(savedBranch);
@@ -170,6 +209,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             setIsInitialLoading(false);
         }
     }, [isAuthenticated, authLoading, authUser?.branch]);
+
+    // ROUTE PROTECTION Gating
+    useEffect(() => {
+        if (!isInitialLoading && isAuthenticated && subscription && !isAdminPath) {
+            const requiredFeature = featurePathMap[pathname];
+            if (requiredFeature && !hasFeature(requiredFeature)) {
+                console.warn(`[Plan Gate] Access to ${pathname} restricted by plan. Required: ${requiredFeature}`);
+                router.push('/billing?upsell=' + requiredFeature);
+            }
+        }
+    }, [pathname, isInitialLoading, isAuthenticated, subscription, isAdminPath]);
 
     useEffect(() => {
         if (authUser) {
@@ -267,8 +317,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const recordSale = () => setLastSaleTime(new Date());
 
-    // --- RENDER CLOCK / LOADING GATE ---
-    if ((isInitialLoading || authLoading) && isAuthenticated) {
+    if (!isAdminPath && (isInitialLoading || authLoading) && isAuthenticated) {
         return (
             <div style={{
                 background: 'var(--bg-deep)',
@@ -283,8 +332,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 <div style={{ fontSize: '40px', marginBottom: '20px' }}>⏳</div>
                 <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>Verileriniz Hazırlanıyor</div>
                 <div style={{ fontSize: '14px', opacity: 0.6 }}>Lütfen bekleyin, şube ve personel ayarları senkronize ediliyor...</div>
-
-                {/* Subtle loading bar animation could be added here */}
                 <div style={{
                     marginTop: '30px',
                     width: '200px',
@@ -313,16 +360,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <AppContext.Provider value={{
-            currentUser, setCurrentUser, hasPermission, staff, refreshStaff,
+            currentUser, setCurrentUser, hasPermission, hasFeature, subscription, staff, refreshStaff,
             branches, activeBranchName, setActiveBranchName: handleSetActiveBranchName, refreshBranches,
             notifications, addNotification, removeNotification,
             suspiciousEvents, addSuspiciousEvent, clearSuspiciousEvents, lastSaleTime, recordSale,
             isSidebarOpen, setIsSidebarOpen
         }}>
-            {/* 
-                Performance Optimization: Mount non-branch-dependent providers higher 
-                so they can start fetching data in parallel while AppProvider resolves branches.
-            */}
             <InventoryProvider>
                 <CRMProvider>
                     <SettingsProvider>
@@ -333,10 +376,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                                 </SalesProvider>
                             </FinancialProvider>
                         ) : (
-                            /* Fallback to render children even without branch if we're not authenticated 
-                               (though AppProvider usually gated by LayoutContent)
-                            */
-                            !isAuthenticated ? children : null
+                            (!isAuthenticated || isAdminPath) ? children : null
                         )}
                     </SettingsProvider>
                 </CRMProvider>

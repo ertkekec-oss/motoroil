@@ -13,7 +13,6 @@ import { useSettings } from '@/contexts/SettingsContext';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import StaffManagementContent from '@/components/StaffManagementContent';
 import IntegrationsContent from '@/components/IntegrationsContent';
 
 export default function SettingsPage() {
@@ -1008,7 +1007,6 @@ export default function SettingsPage() {
 
                 {[
                     { id: 'company', label: 'Firma Profili', icon: '🏢' },
-                    { id: 'staff', label: 'Ekip Yönetimi', icon: '👥' },
                     { id: 'integrations', label: 'Entegrasyonlar', icon: '🔌' },
                     { id: 'branches', label: 'Şubeler & Depo', icon: '🏢' },
                     { id: 'profile', label: 'Hesabım', icon: '👤' },
@@ -1162,8 +1160,6 @@ export default function SettingsPage() {
                     </div>
                 )}
 
-                {/* 1. EKİP YÖNETİMİ */}
-                {activeTab === 'staff' && <StaffManagementContent />}
 
                 {/* 0. ENTEGRASYONLAR */}
                 {activeTab === 'integrations' && <IntegrationsContent />}

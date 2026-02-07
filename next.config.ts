@@ -19,10 +19,10 @@ const nextConfig: NextConfig = {
             // SECURITY FIX: Tightened CSP - removed unsafe-eval and unsafe-inline
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'", // unsafe-inline needed for Next.js
-              "style-src 'self' 'unsafe-inline'", // unsafe-inline needed for styled components
-              "img-src 'self' data: https:",
-              "font-src 'self' data:",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Relaxed for compatibility
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Allow Google Fonts
+              "img-src 'self' data: https: blob:", // Allow images from any https source (e.g. Databox, user uploads)
+              "font-src 'self' data: https://fonts.gstatic.com", // Allow Google Fonts files
               "connect-src 'self' https://api.nilvera.com https://apitest.nilvera.com https://elogo.com.tr https://*.vercel-insights.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",

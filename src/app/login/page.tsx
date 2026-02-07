@@ -300,49 +300,95 @@ export default function LoginPage() {
             {/* Forgot Password Modal */}
             {showForgotModal && (
                 <div style={{
-                    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }}>
-                    <div className="card glass" style={{ width: '400px', padding: '30px' }}>
-                        <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>🔑 Şifre Sıfırlama</h3>
-                        <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px' }}>
-                            Sisteme kayıtlı e-posta adresinizi giriniz. Size şifre sıfırlama bağlantısı göndereceğiz.
-                        </p>
+                    position: 'fixed', inset: 0,
+                    background: 'rgba(5, 5, 16, 0.7)',
+                    backdropFilter: 'blur(12px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+                    padding: '20px'
+                }} className="animate-fade-in">
+                    <div className="card glass-plus animate-zoom-in" style={{
+                        width: '100%', maxWidth: '440px',
+                        padding: '40px',
+                        borderRadius: '24px',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                    }}>
+                        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <div style={{ fontSize: '40px', marginBottom: '16px' }}>🔑</div>
+                            <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', marginBottom: '8px' }}>Şifre Sıfırlama</h3>
+                            <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                                Sisteme kayıtlı e-posta adresinizi giriniz. Size şifre sıfırlama bağlantısı göndereceğiz.
+                            </p>
+                        </div>
 
                         {forgotMessage ? (
-                            <div className="bg-emerald-500/10 text-emerald-500 p-4 rounded-lg text-center font-bold mb-4">
+                            <div style={{
+                                padding: '20px',
+                                background: 'rgba(16, 185, 129, 0.1)',
+                                border: '1px solid rgba(16, 185, 129, 0.2)',
+                                borderRadius: '14px',
+                                color: '#10b981',
+                                textAlign: 'center',
+                                fontWeight: 'bold'
+                            }} className="animate-bounce-in">
                                 ✅ {forgotMessage}
                             </div>
                         ) : (
-                            <form onSubmit={handleForgotPassword}>
-                                <div style={{ marginBottom: '20px' }}>
-                                    <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold' }}>E-Posta Adresi</label>
+                            <form onSubmit={handleForgotPassword} className="flex flex-col gap-5">
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '13px', marginBottom: '8px', color: 'var(--text-muted)', fontWeight: '500' }}>E-Posta Adresi</label>
                                     <input
                                         type="email"
                                         required
+                                        autoFocus
                                         className="input-field"
-                                        style={{ width: '100%', padding: '12px' }}
+                                        style={{
+                                            width: '100%',
+                                            padding: '14px 16px',
+                                            background: 'rgba(255,255,255,0.05)',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            borderRadius: '12px',
+                                            color: 'white',
+                                            boxSizing: 'border-box'
+                                        }}
                                         value={forgotEmail}
                                         onChange={e => setForgotEmail(e.target.value)}
-                                        placeholder="E-posta adresiniz..."
+                                        placeholder="ornek@sirket.com"
                                     />
                                 </div>
-                                <div style={{ display: 'flex', gap: '10px' }}>
+                                <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
                                     <button
                                         type="button"
                                         onClick={() => setShowForgotModal(false)}
-                                        className="btn"
-                                        style={{ flex: 1, background: 'rgba(255,255,255,0.1)' }}
+                                        style={{
+                                            flex: 1,
+                                            padding: '14px',
+                                            background: 'rgba(255,255,255,0.05)',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            borderRadius: '12px',
+                                            color: 'white',
+                                            fontWeight: '600',
+                                            cursor: 'pointer'
+                                        }}
                                     >
                                         İptal
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={forgotLoading}
-                                        className="btn btn-primary"
-                                        style={{ flex: 1 }}
+                                        style={{
+                                            flex: 1.5,
+                                            padding: '14px',
+                                            background: 'linear-gradient(135deg, var(--primary) 0%, #E64A00 100%)',
+                                            border: 'none',
+                                            borderRadius: '12px',
+                                            color: 'white',
+                                            fontWeight: 'bold',
+                                            cursor: forgotLoading ? 'not-allowed' : 'pointer',
+                                            boxShadow: '0 4px 15px rgba(255, 87, 34, 0.3)'
+                                        }}
                                     >
-                                        {forgotLoading ? 'Gönderiliyor...' : 'Bağlantı Gönder'}
+                                        {forgotLoading ? '⌛ Gönderiliyor...' : 'Bağlantı Gönder'}
                                     </button>
                                 </div>
                             </form>

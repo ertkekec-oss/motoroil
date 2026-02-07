@@ -10,42 +10,57 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'E-Posta adresi gereklidir.' }, { status: 400 });
         }
 
-        const staff = await prisma.staff.findFirst({
-            where: { email }
+        // 1. Search in Staff
+        let targetUser = await (prisma as any).staff.findFirst({
+            where: { email, deletedAt: null }
         });
 
-        if (!staff) {
-            // Security: Don't reveal if user exists or not, but for UX we might say "If registered..."
-            // But here for simplicity we can just return success to avoid enumeration, or error if specifically internal tool.
-            // Let's return success with a generic message.
-            console.log(`Password reset requested for non-existent email: ${email}`);
-        } else {
+        let type = 'STAFF';
+
+        // 2. Search in User if not found in Staff
+        if (!targetUser) {
+            targetUser = await (prisma as any).user.findFirst({
+                where: { email }
+            });
+            type = 'USER';
+        }
+
+        if (targetUser) {
             // Real Email Sending
             const origin = request.headers.get('origin') || 'https://kech.tr';
-            const resetLink = `${origin}/reset-password?id=${staff.id}&token=${staff.id}`; // Simple token for now
+            // Simple token: In a production app, use a real signed/stored token!
+            const resetLink = `${origin}/reset-password?id=${targetUser.id}&token=${targetUser.id}&type=${type}`;
 
             const htmlBody = `
-                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-                    <h2 style="color: #2563eb;">Şifre Sıfırlama Talebi</h2>
-                    <p>Sayın <b>${staff.name}</b>,</p>
-                    <p>Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:</p>
-                    <p>
-                        <a href="${resetLink}" style="background: #2563eb; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Şifremi Sıfırla</a>
-                    </p>
-                    <p style="font-size: 12px; color: #666; margin-top:20px;">Eğer bu talebi siz yapmadıysanız, dikkate almayınız.</p>
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h1 style="color: #446ee7; margin: 0;">PERIOD<span style="color: #E64A00;">YA</span></h1>
+                    </div>
+                    <h2 style="color: #333; text-align: center;">Şifre Sıfırlama Talebi</h2>
+                    <p>Sayın <b>${targetUser.name || 'Kullanıcı'}</b>,</p>
+                    <p>Sistemiz üzerinden bir şifre sıfırlama talebinde bulundunuz. Devam etmek için aşağıdaki butona tıklayabilirsiniz:</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${resetLink}" style="background: #446ee7; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Şifremi Sıfırla</a>
+                    </div>
+                    <p style="font-size: 13px; color: #666;">Eğer bu butona tıklayamıyorsanız, aşağıdaki bağlantıyı tarayıcınıza yapıştırabilirsiniz:</p>
+                    <p style="font-size: 12px; color: #446ee7; word-break: break-all;">${resetLink}</p>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+                    <p style="font-size: 11px; color: #999; text-align: center;">Eğer bu talebi siz yapmadıysanız, bu e-postayı güvenle silebilirsiniz.</p>
                 </div>
              `;
 
             await sendMail({
                 to: email,
-                subject: 'Şifre Sıfırlama Talebi',
+                subject: '🔑 Periodya Şifre Sıfırlama Talebi',
                 html: htmlBody,
                 text: `Şifrenizi sıfırlamak için şu bağlantıyı kullanın: ${resetLink}`
             });
         }
 
+        // Return success always (for security)
         return NextResponse.json({ success: true, message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.' });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("Forgot Password Error:", error);
+        return NextResponse.json({ error: 'İşlem sırasında bir hata oluştu.' }, { status: 500 });
     }
 }

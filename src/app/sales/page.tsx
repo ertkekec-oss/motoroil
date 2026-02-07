@@ -3,6 +3,7 @@
 
 import { useState, Fragment } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
 import { useInventory } from '@/contexts/InventoryContext';
@@ -13,6 +14,15 @@ import Pagination from '@/components/Pagination';
 
 export default function SalesPage() {
     const { showSuccess, showError, showConfirm, showWarning, showQuotaExceeded, closeModal } = useModal();
+    const { currentUser, hasFeature } = useApp();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!hasFeature('sales') && currentUser !== null) {
+            router.push('/billing?upsell=sales');
+        }
+    }, [hasFeature, currentUser, router]);
+
     const [activeTab, setActiveTab] = useState('online');
     const [view, setView] = useState<'list' | 'new_wayslip'>('list');
 

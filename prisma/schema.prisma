@@ -41,7 +41,7 @@ model Company {
 
   integratorSettings IntegratorSettings?
 
-  tenant Tenant              @relation(fields: [tenantId], references: [id])
+  tenant Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   users  UserCompanyAccess[]
 
   // Operational Relationships - Modified to include relations
@@ -59,6 +59,7 @@ model Company {
   quotes           Quote[]
   paymentPlans     PaymentPlan[]
   orders           Order[]
+  stockTransfers   StockTransfer[]
 
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -81,7 +82,7 @@ model IntegratorSettings {
   isActive    Boolean @default(true)
   environment String  @default("PRODUCTION")
 
-  company Company @relation(fields: [companyId], references: [id])
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 // ------------------------------------------
@@ -116,8 +117,8 @@ model PlanFeature {
   planId    String
   featureId String
 
-  plan    Plan    @relation(fields: [planId], references: [id])
-  feature Feature @relation(fields: [featureId], references: [id])
+  plan    Plan    @relation(fields: [planId], references: [id], onDelete: Cascade)
+  feature Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
 
   @@id([planId, featureId])
 }
@@ -128,7 +129,7 @@ model PlanLimit {
   resource String
   limit    Int // -1 = Unlimited
 
-  plan Plan @relation(fields: [planId], references: [id])
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   @@unique([planId, resource])
 }
@@ -145,7 +146,7 @@ model Subscription {
   startDate DateTime
   endDate   DateTime
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   plan   Plan   @relation(fields: [planId], references: [id])
 
   history SubscriptionHistory[]
@@ -159,7 +160,7 @@ model SubscriptionHistory {
   newPlanId      String
   createdAt      DateTime @default(now())
 
-  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 }
 
 // ------------------------------------------
@@ -168,7 +169,7 @@ model SubscriptionHistory {
 
 model User {
   id        String   @id @default(cuid())
-  tenantId  String?
+  tenantId  String
   email     String   @unique
   name      String?
   password  String
@@ -177,7 +178,7 @@ model User {
   updatedAt DateTime @updatedAt
   lastActiveAt DateTime? 
 
-  tenant              Tenant?             @relation(fields: [tenantId], references: [id])
+  tenant              Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   accessibleCompanies UserCompanyAccess[]
   notifications       Notification[]
 }
@@ -197,7 +198,7 @@ model UserCompanyAccess {
 
 model Order {
   id              String    @id @default(cuid())
-  companyId       String?
+  companyId       String
   marketplaceId   String
   orderNumber     String    @unique
   marketplace     String
@@ -218,7 +219,7 @@ model Order {
   updatedAt       DateTime  @updatedAt
   branch          String?   @default("Merkez")
 
-  company Company? @relation(fields: [companyId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([marketplace, orderNumber])
   @@index([customerName])
@@ -229,7 +230,7 @@ model Order {
 
 model Product {
   id                  String    @id @default(cuid())
-  companyId           String?
+  companyId           String
   name                String
   code                String
   barcode             String?
@@ -272,7 +273,7 @@ model Product {
   stocks          Stock[]
   movements       StockMovement[]
 
-  company Company? @relation(fields: [companyId], references: [id])
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([code, branch, companyId]) // Updated unique constraint for multi-company
   @@index([name])
@@ -323,7 +324,7 @@ model StockMovement {
   referenceId String? // ID of PurchaseInvoice, SalesInvoice, etc.
   createdAt   DateTime @default(now())
   product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  company     Company? @relation(fields: [companyId], references: [id])
+  company     Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([productId])
   @@index([branch])
@@ -359,7 +360,7 @@ model MarketplaceProductMap {
 
 model Supplier {
   id            String            @id @default(cuid())
-  companyId     String?
+  companyId     String
   name          String
   phone         String?
   email         String?
@@ -379,7 +380,7 @@ model Supplier {
   invoices      PurchaseInvoice[]
   transactions  Transaction[]
 
-  company Company? @relation(fields: [companyId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([name])
   @@index([taxNumber])
@@ -389,7 +390,7 @@ model Supplier {
 
 model PurchaseInvoice {
   id          String    @id @default(cuid())
-  companyId   String?
+  companyId   String
   invoiceNo   String
   invoiceDate DateTime
   dueDate     DateTime?
@@ -404,7 +405,7 @@ model PurchaseInvoice {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   supplier    Supplier  @relation(fields: [supplierId], references: [id])
-  company     Company?  @relation(fields: [companyId], references: [id])
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([invoiceNo])
   @@index([invoiceDate])
@@ -415,7 +416,7 @@ model PurchaseInvoice {
 
 model SalesInvoice {
   id           String    @id @default(cuid())
-  companyId    String?
+  companyId    String
   invoiceNo    String    @unique
   invoiceDate  DateTime  @default(now())
   amount       Decimal   @db.Decimal(10, 2)
@@ -435,7 +436,7 @@ model SalesInvoice {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   customer     Customer  @relation(fields: [customerId], references: [id])
-  company      Company?  @relation(fields: [companyId], references: [id])
+  company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([invoiceDate])
@@ -446,7 +447,7 @@ model SalesInvoice {
 
 model Customer {
   id            String             @id @default(cuid())
-  companyId     String?
+  companyId     String
   name          String
   email         String?
   phone         String?
@@ -477,7 +478,7 @@ model Customer {
   warranties    Warranty[]
   quotes        Quote[]
 
-  company Company? @relation(fields: [companyId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([name])
   @@index([phone])
@@ -504,7 +505,7 @@ model ServiceRecord {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   customer      Customer  @relation(fields: [customerId], references: [id])
-  company       Company?  @relation(fields: [companyId], references: [id])
+  company       Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([plate])
@@ -549,7 +550,7 @@ model Kasa {
   branch       String?       @default("Merkez")
   transactions Transaction[]
 
-  company Company? @relation(fields: [companyId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([name, branch, companyId])
   @@index([companyId])
@@ -573,7 +574,7 @@ model Transaction {
   customer     Customer? @relation(fields: [customerId], references: [id])
   kasa         Kasa?     @relation(fields: [kasaId], references: [id])
   supplier     Supplier? @relation(fields: [supplierId], references: [id])
-  company      Company?  @relation(fields: [companyId], references: [id])
+  company      Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([supplierId])
@@ -582,6 +583,7 @@ model Transaction {
   @@index([kasaId])
   @@index([branch])
   @@index([companyId])
+  @@index([createdAt])
 }
 
 model Check {
@@ -601,7 +603,7 @@ model Check {
   branch      String?   @default("Merkez")
   customer    Customer? @relation(fields: [customerId], references: [id])
   supplier    Supplier? @relation(fields: [supplierId], references: [id])
-  company     Company?  @relation(fields: [companyId], references: [id])
+  company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([dueDate])
   @@index([status])
@@ -830,6 +832,7 @@ model PendingTransfer {
 
 model StockTransfer {
   id          String    @id @default(cuid())
+  companyId   String?
   productId   String
   productName String
   productCode String
@@ -843,10 +846,13 @@ model StockTransfer {
   receivedBy  String?
   trackingNo  String?
   notes       String?
+  
+  company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([status])
+  @@index([companyId])
   @@index([fromBranch])
   @@index([toBranch])
 }
@@ -965,7 +971,7 @@ model PaymentPlan {
   supplierId       String?
   installments     Installment[]
 
-  company Company? @relation(fields: [companyId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
 }
@@ -1020,7 +1026,7 @@ model Account {
   branch String? @default("Merkez")
 
   journalItems JournalItem[]
-  company      Company?      @relation(fields: [companyId], references: [id])
+  company      Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([code, branch, companyId])
   @@index([code])
@@ -1052,7 +1058,7 @@ model Journal {
   updatedAt DateTime @updatedAt
 
   items   JournalItem[]
-  company Company?      @relation(fields: [companyId], references: [id])
+  company Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([fisNo, companyId, branch])
   @@index([date])
@@ -1102,7 +1108,7 @@ model Quote {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   customer    Customer  @relation(fields: [customerId], references: [id])
-  company     Company?  @relation(fields: [companyId], references: [id])
+  company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([quoteNo])
@@ -1120,7 +1126,7 @@ model MarketplaceConfig {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  company Company? @relation(fields: [companyId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
 }
@@ -1154,7 +1160,7 @@ model GrowthEvent {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@index([type])
@@ -1172,7 +1178,7 @@ model UpsellEvent {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@index([type])
@@ -1204,6 +1210,8 @@ model CmsSection {
   isActive    Boolean  @default(true)
   
   page        CmsPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
 }
 
 model CmsMenu {

@@ -11,6 +11,22 @@ export async function GET(req: NextRequest) {
         // Sadece Admin veya yetkili kullanıcı görebilmeli, assertCompanyAccess gerekebilir ama bu tenant-level bir sorgu.
         // Billing tenant'a aittir, company'ye değil. O yüzden ctx.tenantId yeterli.
 
+        if (ctx.tenantId === 'PLATFORM_ADMIN') {
+            return NextResponse.json({
+                planName: 'PLATFORM ADMIN',
+                status: 'ACTIVE',
+                period: 'LIFETIME',
+                endDate: new Date(2099, 11, 31),
+                limits: {
+                    monthly_documents: { used: 0, limit: -1, percent: 0 },
+                    companies: { used: 0, limit: -1, percent: 0 },
+                    users: { used: 0, limit: -1, percent: 0 }
+                },
+                features: ['*'],
+                recommendedPlanId: null
+            });
+        }
+
         const subscription = await (prisma as any).subscription.findUnique({
             where: { tenantId: ctx.tenantId },
             include: {

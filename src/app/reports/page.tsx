@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useApp } from '@/contexts/AppContext';
 import { useFinancials } from '@/contexts/FinancialContext';
 import { useInventory } from '@/contexts/InventoryContext';
@@ -27,7 +28,15 @@ const COLORS = {
 };
 
 export default function ReportsPage() {
-    const { branches, currentUser, hasPermission } = useApp();
+    const { branches, currentUser, hasPermission, hasFeature } = useApp();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!hasFeature('reporting') && currentUser !== null) {
+            router.push('/billing?upsell=reporting');
+        }
+    }, [hasFeature, currentUser, router]);
+
     const { transactions, kasalar } = useFinancials();
     const { products } = useInventory();
     const { customers, suppliers } = useCRM();

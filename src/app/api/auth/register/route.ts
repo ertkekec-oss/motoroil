@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { sendMail } from '@/lib/mail';
 
 export async function POST(req: NextRequest) {
     try {
@@ -68,7 +69,6 @@ export async function POST(req: NextRequest) {
         const user = await (prisma as any).user.create({
             data: {
                 email,
-                username: email.split('@')[0],
                 password: hashedPassword,
                 role: 'ADMIN',
                 name: name,
@@ -84,6 +84,34 @@ export async function POST(req: NextRequest) {
                 vkn: '9999999999' // Placeholder
             }
         });
+
+        // 6. Send Welcome Email
+        try {
+            const origin = req.headers.get('origin') || 'https://kech.tr';
+            await sendMail({
+                to: email,
+                subject: '🌸 Periodya\'ya Hoş Geldiniz!',
+                html: `
+                    <div style="font-family: Arial, sans-serif; padding: 30px; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 15px; background: #fff;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <h1 style="color: #446ee7; margin: 0;">PERIOD<span style="color: #E64A00;">YA</span></h1>
+                        </div>
+                        <h2 style="color: #333;">Merhaba ${name},</h2>
+                        <p><b>${companyName}</b> firması için Periodya hesabınız başarıyla oluşturuldu!</p>
+                        <p>14 günlük ücretsiz deneme süreniz şimdi başladı. Bu süreçte tüm özellikleri sınırsızca deneyimleyebilirsiniz.</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${origin}/login" style="background: #446ee7; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Hemen Giriş Yap</a>
+                        </div>
+                        <p style="font-size: 14px; color: #666;">Herhangi bir sorunuz olursa bu e-postayı yanıtlayarak bize ulaşabilirsiniz.</p>
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+                        <p style="font-size: 11px; color: #999; text-align: center;">© 2026 Periodya Teknolojileri</p>
+                    </div>
+                `
+            });
+        } catch (mailErr) {
+            console.error("Welcome email failed:", mailErr);
+            // Don't fail registration if email fails
+        }
 
         return NextResponse.json({ success: true, userId: user.id });
 

@@ -15,9 +15,15 @@ export default function AccountingPage() {
     const [customRange, setCustomRange] = useState({ start: '', end: '' });
 
     const {
-        currentUser, hasPermission,
+        currentUser, hasPermission, hasFeature,
         activeBranchName
     } = useApp();
+
+    useEffect(() => {
+        if (!hasFeature('accounting') && currentUser !== null) {
+            router.push('/billing?upsell=accounting');
+        }
+    }, [hasFeature, currentUser, router]);
 
     const {
         customers, suppliers,

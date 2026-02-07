@@ -56,6 +56,23 @@ export default function TenantsPage() {
         }
     };
 
+    const deleteTenant = async (id: string) => {
+        if (!window.confirm('BU MÜŞTERİYİ VE TÜM VERİLERİNİ SİLMEK İSTEDİĞİNİZE EMİN MİSİNİZ?\nBu işlem geri alınamaz!')) return;
+
+        try {
+            const res = await fetch(`/api/admin/tenants/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                fetchTenants(pagination.page);
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Silme işlemi başarısız.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Bağlantı hatası.');
+        }
+    };
+
     useEffect(() => {
         // Debounce search
         const timer = setTimeout(() => {
@@ -197,7 +214,7 @@ export default function TenantsPage() {
                     />
                 </div>
                 <select
-                    className="px-4 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500"
+                    className="px-4 py-2 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 font-medium focus:outline-none focus:border-blue-500"
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                 >
@@ -281,6 +298,13 @@ export default function TenantsPage() {
                                                 title="Sadece bu müşteri için otomasyonu tetikle"
                                             >
                                                 🤖 TETİKLE
+                                            </button>
+                                            <button
+                                                onClick={() => deleteTenant(t.id)}
+                                                className="text-red-400 hover:text-red-600 p-1 hover:bg-red-50 rounded transition"
+                                                title="Müşteriyi Sil"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                             </button>
                                             <Link href={`/admin/tenants/${t.id}`} className="text-blue-600 hover:text-blue-700 font-medium text-xs">
                                                 Yönet &rarr;

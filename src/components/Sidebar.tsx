@@ -10,7 +10,11 @@ import NotificationCenter from "./NotificationCenter";
 export default function Sidebar() {
     const pathname = usePathname();
     const { user: authUser, logout } = useAuth();
-    const { currentUser, hasPermission, branches, activeBranchName, setActiveBranchName, suspiciousEvents, isSidebarOpen, setIsSidebarOpen } = useApp();
+    const {
+        currentUser, hasPermission, hasFeature, subscription,
+        branches, activeBranchName, setActiveBranchName,
+        suspiciousEvents, isSidebarOpen, setIsSidebarOpen
+    } = useApp();
 
     const isSystemAdmin = currentUser === null || currentUser?.role === 'SUPER_ADMIN' || (currentUser?.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
     const displayUser = currentUser || authUser;
@@ -18,22 +22,22 @@ export default function Sidebar() {
     // ... menuItems and logic ...
 
     // UI mapping for permissions
-    const permMap: Record<string, string> = {
-        '/': 'pos_access', // POS requires specific access
-        '/accounting': 'finance_view',
-        '/customers': 'customer_view',
-        '/suppliers': 'supplier_view',
-        '/inventory': 'inventory_view',
-        '/service': 'service_view',
-        '/sales': 'sales_archive',
-        '/reports': 'reports_view',
-        '/reports/daily': 'reports_view',
-        '/reports/suppliers': 'reports_view',
-        // '/security/suspicious': 'security_access',
-        '/integrations': 'settings_manage',
-        '/settings/branch': 'settings_manage',
-        '/settings': 'settings_manage',
-        '/advisor': 'finance_view',
+    const permMap: Record<string, { perm?: string, feature?: string }> = {
+        '/': { perm: 'pos_access', feature: 'pos' },
+        '/accounting': { perm: 'finance_view', feature: 'accounting' },
+        '/customers': { perm: 'customer_view', feature: 'crm' },
+        '/suppliers': { perm: 'supplier_view', feature: 'crm' },
+        '/inventory': { perm: 'inventory_view', feature: 'inventory' },
+        '/service': { perm: 'service_view', feature: 'service' },
+        '/sales': { perm: 'sales_archive', feature: 'sales' },
+        '/reports': { perm: 'reports_view', feature: 'reporting' },
+        '/reports/daily': { perm: 'reports_view', feature: 'reporting' },
+        '/reports/suppliers': { perm: 'reports_view', feature: 'reporting' },
+        '/integrations': { perm: 'settings_manage', feature: 'e_invoice' }, // E-invoice is an integration
+        '/settings/branch': { perm: 'settings_manage' },
+        '/settings': { perm: 'settings_manage' },
+        '/staff': { perm: 'staff_manage' },
+        '/advisor': { perm: 'finance_view', feature: 'accounting' },
     };
 
     const menuItems = [
@@ -49,16 +53,27 @@ export default function Sidebar() {
         { name: 'Kaçak Satış Tespit', href: '/security/suspicious', icon: '🚨' },
         { name: 'Mali Müşavir', href: '/advisor', icon: '💼' },
         { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
+        { name: 'Ekip & Yetki', href: '/staff', icon: '👥' },
         { name: 'Abonelik & Planlar', href: '/billing', icon: '💎' },
         { name: 'Yardım & Kılavuz', href: '/help', icon: '❓' },
     ].filter(item => {
-        // Admin users see everything
+        const config = permMap[item.href];
+        if (!config) return true; // default public items
+
+        // 1. Feature Check (Subscription Plan)
+        if (config.feature && !hasFeature(config.feature)) {
+            return false;
+        }
+
+        // 2. Admin users bypass permissions (but NOT features)
         if (isSystemAdmin) return true;
 
-        // For non-admin users, check permissions
-        const requiredPerm = permMap[item.href];
-        if (!requiredPerm) return true; // default public items
-        return hasPermission(requiredPerm);
+        // 3. Permission Check (User Role)
+        if (config.perm) {
+            return hasPermission(config.perm);
+        }
+
+        return true;
     });
 
     const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -208,7 +223,7 @@ export default function Sidebar() {
                     <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             {displayUser.name}
-                            {hasPermission('staff_manage') && (
+                            {hasPermission('settings_manage') && (
                                 <Link href="/settings" title="Ayarlar" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '14px', marginLeft: '5px' }}>
                                     ⚙️
                                 </Link>
