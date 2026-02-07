@@ -14,7 +14,7 @@ import Pagination from '@/components/Pagination';
 
 export default function SalesPage() {
     const { showSuccess, showError, showConfirm, showWarning, showQuotaExceeded, closeModal } = useModal();
-    const { currentUser, hasFeature } = useApp();
+    const { currentUser, hasFeature, hasPermission } = useApp();
     const router = useRouter();
 
     useEffect(() => {
@@ -481,7 +481,7 @@ export default function SalesPage() {
     const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
     const [isCollecting, setIsCollecting] = useState(false);
 
-    const { currentUser, hasPermission } = useApp();
+    // const { currentUser, hasPermission } = useApp(); // Removed duplicate declaration
     const { products: mockInventory } = useInventory();
     const { processSale } = useSales();
     const { transactions } = useFinancials(); // transactions used in calculateTurnover? Let's check.
