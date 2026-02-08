@@ -35,7 +35,8 @@ export default async function AdminLayout({
                     <NavLink href="/admin/sales-radar" icon="radar">Satış Radarı (Upsell)</NavLink>
                     <NavLink href="/admin/plans" icon="tag">Paketler & Fiyatlar</NavLink>
                     <NavLink href="/admin/transactions" icon="credit-card">Ödemeler</NavLink>
-                    <NavLink href="/admin/logs" icon="activity">Sistem Logları</NavLink>
+                    <NavLink href="/admin/audit-logs" icon="activity">Denetim Kayıtları</NavLink>
+                    <NavLink href="/admin/logs" icon="terminal">Sistem Logları</NavLink>
 
                     <div className="pt-4 mt-4 border-t border-slate-700">
                         <NavLink href="/" icon="terminal">POS Terminaline Dön</NavLink>
