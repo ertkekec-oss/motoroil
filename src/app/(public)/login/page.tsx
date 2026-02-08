@@ -19,7 +19,7 @@ export default function LoginPage() {
     // Eğer zaten giriş yapılmışsa ana sayfaya yönlendir
     useEffect(() => {
         if (isAuthenticated) {
-            window.location.href = '/';
+            // Let the AuthContext middleware handle the redirection
         }
     }, [isAuthenticated]);
 
@@ -32,7 +32,7 @@ export default function LoginPage() {
             const success = await login(username, password);
 
             if (success) {
-                window.location.href = '/';
+                // Success - AuthContext handles the redirect
             } else {
                 setError('E-Posta, kullanıcı adı veya şifre hatalı!');
             }

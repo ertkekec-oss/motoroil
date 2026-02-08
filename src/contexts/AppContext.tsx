@@ -31,6 +31,10 @@ export interface Staff {
     currentJob: string;
     username?: string;
     email?: string;
+    phone?: string;
+    salary?: number | string;
+    earnings?: number;
+    performance?: number;
 }
 
 export interface SuspiciousEvent {

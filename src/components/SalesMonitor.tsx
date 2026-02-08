@@ -15,7 +15,7 @@ interface SuspiciousEvent {
 }
 
 interface SalesMonitorProps {
-    userRole: 'Admin' | 'Personel';
+    userRole: string;
     currentBranch: string;
     currentStaff: string;
     onSuspiciousActivity?: (event: SuspiciousEvent) => void;

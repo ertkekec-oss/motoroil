@@ -10,8 +10,10 @@ export default async function AdminLayout({
 }) {
     const session: any = await getSession();
 
-    // 1. Role Gate
-    if (!session || session.role !== 'SUPER_ADMIN') {
+    // 1. Role Gate - Allow platform owner OR super admins
+    const isPlatformAdmin = session.role === 'SUPER_ADMIN' || session.tenantId === 'PLATFORM_ADMIN';
+
+    if (!session || !isPlatformAdmin) {
         redirect('/login?error=unauthorized_admin');
     }
 

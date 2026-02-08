@@ -708,6 +708,7 @@ model Staff {
   username         String          @unique
   password         String?
   email            String?
+  phone            String?
   name             String
   role             String?
   branch           String?         @default("Merkez")

@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 
 interface User {
     username: string;
-    role: 'Admin' | 'Personel';
+    role: string;
     branch: string;
     name: string;
     permissions: string[];
@@ -100,11 +100,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 localStorage.setItem('periodya_user', JSON.stringify(userData));
                 localStorage.setItem('periodya_isLoggedIn', 'true');
 
-                // Redirect based on setupState
+                // Redirect based on setupState and permissions
                 if (userData.setupState === 'PENDING') {
                     router.push('/onboarding');
                 } else {
-                    router.push('/');
+                    const isAdmin = userData.role?.includes('Admin') || userData.role?.includes('Müdür') || userData.permissions?.includes('*');
+                    const hasPOS = userData.permissions?.includes('pos_access');
+                    const hasFieldSales = userData.permissions?.includes('field_sales_access');
+
+                    if (isAdmin || hasPOS) {
+                        router.push('/');
+                    } else if (hasFieldSales) {
+                        router.push('/field-mobile/routes');
+                    } else {
+                        router.push('/');
+                    }
                 }
                 return true;
             }

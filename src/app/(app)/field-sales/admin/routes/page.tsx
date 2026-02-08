@@ -49,6 +49,19 @@ export default function AdminRoutesPage() {
         }
     };
 
+    const sendWhatsApp = (staff: any) => {
+        if (!staff?.phone) {
+            alert('Bu personelin telefon numarası sistemde kayıtlı değil. Lütfen personel yönetiminden ekleyin.');
+            return;
+        }
+
+        const origin = window.location.origin;
+        const message = `Merhaba ${staff.name}, saha satış sistemine şu adresten giriş yapabilirsin: ${origin}/field-mobile/routes`;
+        const encodedMessage = encodeURIComponent(message);
+        const url = `https://wa.me/${staff.phone}?text=${encodedMessage}`;
+        window.open(url, '_blank');
+    };
+
     const handleCreateRoute = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -129,6 +142,13 @@ export default function AdminRoutesPage() {
                                     className="flex-1 md:flex-none bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg font-bold text-sm transition-colors"
                                 >
                                     DURAKLARI YÖNET
+                                </button>
+                                <button
+                                    onClick={() => sendWhatsApp(route.staff)}
+                                    className="bg-green-600/10 hover:bg-green-600/20 text-green-500 p-2 rounded-lg transition-colors"
+                                    title="WhatsApp ile Giriş Bilgisi Gönder"
+                                >
+                                    <span className="text-xl">💬</span>
                                 </button>
                                 <button className="bg-red-500/10 hover:bg-red-500/20 text-red-500 p-2 rounded-lg transition-colors" title="Sil">
                                     🗑️

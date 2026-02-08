@@ -34,25 +34,50 @@ export async function POST(req: Request) {
     try {
         const body = await req.json();
 
-        const { name, role, salary, branch, phone, email, type } = body;
+        const { name, role, salary, branch, phone, email, type, username } = body;
 
         // Basic validation
         if (!name) return NextResponse.json({ success: false, error: 'İsim zorunludur' }, { status: 400 });
 
         const newStaff = await prisma.staff.create({
             data: {
-                username: email || `user${Date.now()}`, // Temporary username generation
+                username: username || email || `user${Date.now()}`,
                 name,
+                phone,
                 role: role || 'Personel',
                 salary: parseFloat(salary) || 17002,
                 branch: branch || 'Merkez',
                 email,
                 type: type || 'service',
-                // other fields default
             }
         });
 
         return NextResponse.json({ success: true, staff: newStaff });
+    } catch (error: any) {
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+}
+
+export async function PUT(req: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+
+    try {
+        const body = await req.json();
+        const { id, ...data } = body;
+
+        if (!id) return NextResponse.json({ success: false, error: 'ID zorunludur' }, { status: 400 });
+
+        // Convert numeric fields if they exist
+        if (data.salary) data.salary = parseFloat(data.salary);
+        if (data.age) data.age = parseInt(data.age);
+
+        const updatedStaff = await prisma.staff.update({
+            where: { id },
+            data
+        });
+
+        return NextResponse.json({ success: true, staff: updatedStaff });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }

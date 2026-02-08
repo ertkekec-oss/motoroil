@@ -16,6 +16,38 @@ import { GrowthBanner } from "../components/GrowthBanner";
 import GlobalErrorScreen from "../components/GlobalErrorScreen";
 import AppSkeleton from "../components/AppSkeleton";
 
+const permMap: Record<string, { perm?: string, feature?: string }> = {
+    '/': { perm: 'pos_access', feature: 'pos' },
+    '/accounting': { perm: 'finance_view', feature: 'accounting' },
+    '/customers': { perm: 'customer_view', feature: 'crm' },
+    '/suppliers': { perm: 'supplier_view', feature: 'crm' },
+    '/inventory': { perm: 'inventory_view', feature: 'inventory' },
+    '/service': { perm: 'service_view', feature: 'service' },
+    '/sales': { perm: 'sales_archive', feature: 'sales' },
+    '/field-sales/admin/routes': { perm: 'field_sales_admin', feature: 'sales' },
+    '/field-mobile/routes': { perm: 'field_sales_access' },
+    '/quotes': { perm: 'offer_create', feature: 'sales' },
+    '/reports': { perm: 'reports_view', feature: 'reporting' },
+    '/reports/ceo': { perm: 'reports_view', feature: 'reporting' },
+    '/reports/daily': { perm: 'reports_view', feature: 'reporting' },
+    '/reports/suppliers': { perm: 'reports_view', feature: 'reporting' },
+    '/integrations': { perm: 'settings_manage', feature: 'e_invoice' },
+    '/settings/branch': { perm: 'settings_manage' },
+    '/settings': { perm: 'settings_manage' },
+    '/staff': { perm: 'staff_manage' },
+    '/advisor': { perm: 'finance_view', feature: 'accounting' },
+    '/admin/dashboard': { perm: 'admin_view' },
+    '/admin/tenants': { perm: 'admin_view' },
+    '/admin/website': { perm: 'admin_view' },
+    '/admin/sales-radar': { perm: 'admin_view' },
+    '/admin/plans': { perm: 'admin_view' },
+    '/admin/transactions': { perm: 'admin_view' },
+    '/admin/logs': { perm: 'admin_view' },
+    '/admin/audit-logs': { perm: 'audit_view' },
+    '/security/suspicious': { perm: 'security_access' },
+    '/billing': { perm: 'settings_manage' },
+};
+
 function MobileHeader() {
     const { isSidebarOpen, setIsSidebarOpen } = useApp();
     const pathname = usePathname();
@@ -95,13 +127,38 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         return () => clearTimeout(t);
     }, []);
 
-    // Route Change Cleanup
+    // Route Change Cleanup & Protection
+    const router = useRouter();
     useEffect(() => {
         if (typeof window !== 'undefined') {
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
         }
-    }, [pathname]);
+
+        // Global Permission Check
+        if (!app.isInitialLoading && auth.isAuthenticated && pathname) {
+            // Absolute system admin bypasses all UI gates
+            const isSuperAdmin = auth.user?.role === 'SUPER_ADMIN';
+
+            const config = permMap[pathname];
+            if (config) {
+                // 1. Feature Check
+                if (config.feature && !app.hasFeature(config.feature)) {
+                    router.push('/');
+                    return;
+                }
+
+                // 2. Super Admin Bypass
+                if (isSuperAdmin) return;
+
+                // 3. Permission Check
+                if (config.perm && !app.hasPermission(config.perm)) {
+                    const targetFallback = app.hasPermission('pos_access') ? '/' : '/field-mobile/routes';
+                    router.push(targetFallback);
+                }
+            }
+        }
+    }, [pathname, app.isInitialLoading, auth.isAuthenticated]);
 
     useEffect(() => {
         if (!isInitialLoading) {

@@ -24,7 +24,7 @@ export default function StaffManagementContent() {
     const [isProcessing, setIsProcessing] = useState(false);
 
     const [newStaff, setNewStaff] = useState({
-        name: '', email: '', role: '', branch: '', type: 'service', age: '', address: '', salary: ''
+        name: '', email: '', username: '', phone: '', password: '', role: '', branch: '', type: 'service', age: '', address: '', salary: ''
     });
 
     // --- NEW STATES FOR HR MODULES ---
@@ -135,6 +135,8 @@ export default function StaffManagementContent() {
         { id: 'price_override', label: '💸 Fiyat Değiştirme / Manuel Fiyat', category: 'Satış' },
         { id: 'return_create', label: '↩️ İade Alma', category: 'Satış' },
         { id: 'credit_sales', label: 'Veresiye (Açık Hesap) Satış', category: 'Satış' },
+        { id: 'field_sales_access', label: '📍 Saha Satış Modülü Erişimi (Mobil)', category: 'Satış' },
+        { id: 'field_sales_admin', label: '🗺️ Saha Satış Yönetimi (Rota Planlama)', category: 'Satış' },
 
         // --- SERVİS & İŞ EMRİ ---
         { id: 'service_view', label: 'Servis / İş Emirlerini Görme', category: 'Servis' },
@@ -173,6 +175,7 @@ export default function StaffManagementContent() {
         // --- YÖNETİM & GÜVENLİK ---
         { id: 'staff_manage', label: 'Personel Yönetimi', category: 'Yönetim' },
         { id: 'settings_manage', label: 'Sistem Ayarları', category: 'Yönetim' },
+        { id: 'admin_view', label: '⚙️ Platform Yönetim Paneli', category: 'Yönetim' },
         { id: 'security_access', label: 'Güvenlik Masası / Loglar', category: 'Yönetim' },
 
         // --- KRİTİK İŞLEMLER ---
@@ -264,7 +267,7 @@ export default function StaffManagementContent() {
             if (res.ok) {
                 await refreshStaff();
                 setShowAddStaffModal(false);
-                setNewStaff({ name: '', email: '', role: '', branch: '', type: 'service', age: '', address: '', salary: '' });
+                setNewStaff({ name: '', email: '', username: '', phone: '', password: '', role: '', branch: '', type: 'service', age: '', address: '', salary: '' });
                 showSuccess("Personel Eklendi", "Sisteme giriş yetkileri varsayılan olarak tanımlandı. Şifre mail olarak gönderildi.");
             }
         } catch (e) {
@@ -289,6 +292,7 @@ export default function StaffManagementContent() {
                     id: editStaff.id,
                     name: editStaff.name,
                     email: editStaff.email,
+                    phone: editStaff.phone,
                     role: editStaff.role,
                     branch: editStaff.branch,
                     type: editStaff.type,
@@ -301,8 +305,7 @@ export default function StaffManagementContent() {
             if (res.ok) {
                 await refreshStaff();
                 setShowEditStaffModal(false);
-                setEditStaff({ name: '', email: '', role: '', branch: '', type: 'service', age: '', address: '', salary: '' });
-                showSuccess("Personel Güncellendi", "Personel bilgileri başarıyla güncellendi.");
+                showSuccess("Güncellendi", "Personel bilgileri başarıyla güncellendi.");
             }
         } catch (e) {
             console.error('Edit staff failed', e);
@@ -1340,6 +1343,16 @@ export default function StaffManagementContent() {
                                     />
                                 </div>
                                 <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Telefon</label>
+                                    <input
+                                        type="tel"
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                        placeholder="05xxxxxxxxx"
+                                        value={newStaff.phone}
+                                        onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
                                     <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Rol / Pozisyon</label>
                                     <select
                                         className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none appearance-none"
@@ -1353,6 +1366,7 @@ export default function StaffManagementContent() {
                                         <option value="Denetçi" className="bg-[#0f111a]">🔍 Denetçi (Auditor)</option>
                                         <option value="Servis Personeli" className="bg-[#0f111a]">🔧 Servis Personeli</option>
                                         <option value="Satış Temsilcisi" className="bg-[#0f111a]">🤝 Satış Temsilcisi</option>
+                                        <option value="Saha Satış Personeli" className="bg-[#0f111a]">📍 Saha Satış Personeli</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
@@ -1442,6 +1456,15 @@ export default function StaffManagementContent() {
                                     />
                                 </div>
                                 <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Telefon</label>
+                                    <input
+                                        type="tel"
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                        value={editStaff.phone || ''}
+                                        onChange={(e) => setEditStaff({ ...editStaff, phone: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
                                     <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Rol / Pozisyon</label>
                                     <select
                                         className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none appearance-none"
@@ -1454,6 +1477,7 @@ export default function StaffManagementContent() {
                                         <option value="Denetçi" className="bg-[#0f111a]">🔍 Denetçi (Auditor)</option>
                                         <option value="Servis Personeli" className="bg-[#0f111a]">🔧 Servis Personeli</option>
                                         <option value="Satış Temsilcisi" className="bg-[#0f111a]">🤝 Satış Temsilcisi</option>
+                                        <option value="Saha Satış Personeli" className="bg-[#0f111a]">📍 Saha Satış Personeli</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
