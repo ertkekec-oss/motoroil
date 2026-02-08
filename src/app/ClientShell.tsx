@@ -181,6 +181,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         }
     }, [showContent]);
 
+    const showSidebar = auth.isAuthenticated && !isAdminPage;
+
     // Handle Global Errors
     if (hasCriticalError && !isAdminPage) {
         return <GlobalErrorScreen error={hasCriticalError} />;
@@ -206,10 +208,10 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     return (
         <>
             <div className={app.isSidebarOpen ? 'sidebar-open' : ''} style={{ display: 'flex', height: '100dvh', width: '100%', background: 'var(--bg-deep)', overflow: 'hidden' }}>
-                <Sidebar />
-                <MobileHeader />
+                {showSidebar && <Sidebar />}
+                {showSidebar && <MobileHeader />}
 
-                {app.isSidebarOpen && (
+                {showSidebar && app.isSidebarOpen && (
                     <div
                         onClick={() => app.setIsSidebarOpen(false)}
                         style={{
@@ -224,17 +226,18 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 )}
 
                 <main
-                    className="main-content"
+                    className={showSidebar ? "main-content" : ""}
+                    style={!showSidebar ? { flex: 1, height: '100vh', overflowY: 'auto', position: 'relative' } : {}}
                     onClick={() => {
                         if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 1024) {
                             app.setIsSidebarOpen(false);
                         }
                     }}
                 >
-                    <GrowthBanner />
+                    {showSidebar && <GrowthBanner />}
                     {children}
 
-                    {auth.user && (
+                    {auth.user && !isAdminPage && (
                         <>
                             {widgetsReady && (
                                 <>
@@ -249,7 +252,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                         </>
                     )}
                 </main>
-                <MobileNav />
+                {showSidebar && <MobileNav />}
             </div>
         </>
     );
