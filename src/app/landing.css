@@ -10,17 +10,18 @@
     --db-bg-section: #fcfcfd;
 }
 
-* {
+.landing-page-root * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-body {
+.landing-page-root {
     background: #fff;
     color: var(--db-text-main);
     font-family: 'Inter', -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
 }
 
 /* Page Components */

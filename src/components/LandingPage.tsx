@@ -779,7 +779,7 @@ export default function LandingPage() {
   const sections = cms?.sections || [];
 
   return (
-    <div className="m-container">
+    <div className="m-container landing-page-root">
       {/* Global Navigation & Banner Logic */}
       {sections.some((s: any) => s.type === 'BANNER')
         ? sections.filter((s: any) => s.type === 'BANNER').map((s: any) => renderSection(s))
