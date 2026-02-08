@@ -7,8 +7,8 @@ export async function GET(req: NextRequest) {
     try {
         // 1. Yetki Kontrolü
         const session: any = await getSession();
-        if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        if (!session || session.role !== 'SUPER_ADMIN') {
+            return NextResponse.json({ error: 'Forbidden: SUPER_ADMIN ONLY' }, { status: 403 });
         }
 
         const { searchParams } = new URL(req.url);

@@ -7,8 +7,8 @@ import { calculateUpsellSignal } from '@/lib/upsell-engine';
 export async function GET(req: NextRequest) {
     try {
         const ctx = await getRequestContext(req);
-        if (ctx.role !== 'SUPER_ADMIN' && ctx.role !== 'ADMIN') {
-            return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 });
+        if (ctx.role !== 'SUPER_ADMIN') {
+            return NextResponse.json({ error: 'Yetkisiz erişim: SUPER_ADMIN ONLY' }, { status: 403 });
         }
 
         const tenants = await (prisma as any).tenant.findMany({

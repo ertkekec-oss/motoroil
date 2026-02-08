@@ -15,6 +15,8 @@ import {
 } from 'recharts';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUpsell } from '@/hooks/useUpsell';
+import CashflowForecastChart from '@/components/CashflowForecastChart';
+import AnomalyAlert from '@/components/AnomalyAlert';
 // End of imports
 
 export default function DashboardPage() {
@@ -454,6 +456,9 @@ export default function DashboardPage() {
       {/* SOL PANEL (Satış ve Liste) */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
 
+        {/* SECURITY ALERTS */}
+        <AnomalyAlert />
+
         {/* INSIGHTS SECTION */}
         <div style={{ marginBottom: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
@@ -557,6 +562,11 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* AI CASHFLOW FORECAST (NEW) */}
+        <div className="mb-4">
+          <CashflowForecastChart />
+        </div>
 
         {/* POS MAIN AREA */}
         <div className="flex flex-mobile-col" style={{ flex: 1, gap: '16px', minHeight: 0 }}>

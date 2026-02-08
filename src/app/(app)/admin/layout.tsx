@@ -11,7 +11,7 @@ export default async function AdminLayout({
     const session: any = await getSession();
 
     // 1. Role Gate
-    if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
+    if (!session || session.role !== 'SUPER_ADMIN') {
         redirect('/login?error=unauthorized_admin');
     }
 

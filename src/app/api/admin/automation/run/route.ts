@@ -11,10 +11,10 @@ import { getRequestContext } from '@/lib/api-context';
 
 export async function POST(req: NextRequest) {
     try {
-        // Güvenlik: Sadece ADMIN rolü tetikleyebilir
+        // Güvenlik: Sadece SUPER_ADMIN rolü tetikleyebilir
         const ctx = await getRequestContext(req);
-        if (ctx.role !== 'ADMIN' && ctx.role !== 'SUPER_ADMIN') {
-            return NextResponse.json({ error: 'FORBIDDEN: Yetkiniz yok.' }, { status: 403 });
+        if (ctx.role !== 'SUPER_ADMIN') {
+            return NextResponse.json({ error: 'FORBIDDEN: Sadece SUPER_ADMIN yetkisi var.' }, { status: 403 });
         }
 
         const body = await req.json();

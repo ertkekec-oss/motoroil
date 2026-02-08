@@ -32,6 +32,11 @@ export default function StaffManagementContent() {
     const [leaves, setLeaves] = useState<any[]>([]);
     const [payrolls, setPayrolls] = useState<any[]>([]);
     const [currentWeekStart, setCurrentWeekStart] = useState(getMonday(new Date()));
+    const [targets, setTargets] = useState<any[]>([]);
+    const [showTargetModal, setShowTargetModal] = useState(false);
+    const [newTarget, setNewTarget] = useState({
+        staffId: '', type: 'TURNOVER', targetValue: '', period: 'MONTHLY', startDate: '', endDate: ''
+    });
 
     // --- STAFF DOCUMENTS STATE ---
     const [staffDocuments, setStaffDocuments] = useState<any[]>([]);
@@ -92,6 +97,13 @@ export default function StaffManagementContent() {
         } catch (e) { console.error(e); }
     };
 
+    const fetchTargets = async () => {
+        try {
+            const res = await fetch('/api/staff/targets');
+            if (res.ok) setTargets(await res.json());
+        } catch (e) { console.error(e); }
+    };
+
     useEffect(() => {
         if (showEditStaffModal && editStaff.id) {
             fetchStaffDocuments(editStaff.id);
@@ -103,6 +115,7 @@ export default function StaffManagementContent() {
         if (activeTab === 'shifts') fetchShifts();
         if (activeTab === 'leaves') fetchLeaves();
         if (activeTab === 'payroll') fetchPayrolls();
+        if (activeTab === 'performance') fetchTargets();
     }, [activeTab, currentWeekStart]);
 
     // Set default branch when branches load
@@ -585,7 +598,36 @@ export default function StaffManagementContent() {
             } catch (err) {
                 console.error("Staff delete error", err);
             }
+            finally { setIsProcessing(false); }
         });
+    };
+
+    const handleSaveTarget = async () => {
+        if (!newTarget.staffId || !newTarget.targetValue || !newTarget.startDate || !newTarget.endDate) {
+            showSuccess('Hata', 'Lütfen tüm alanları doldurun.');
+            return;
+        }
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/staff/targets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...newTarget,
+                    targetValue: parseFloat(newTarget.targetValue)
+                })
+            });
+            if (res.ok) {
+                await fetchTargets();
+                setShowTargetModal(false);
+                setNewTarget({ staffId: '', type: 'TURNOVER', targetValue: '', period: 'MONTHLY', startDate: '', endDate: '' });
+                showSuccess("Hedef Tanımlandı", "Personel hedefleri güncellendi.");
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     return (
@@ -777,63 +819,96 @@ export default function StaffManagementContent() {
             )}
 
             {/* --- PERFORMANCE TAB --- */}
-            {activeTab === 'performance' && (
-                <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="card glass p-8 border-t-4 border-emerald-500">
-                            <h4 className="text-muted text-xs font-black uppercase mb-4">CİRO HEDEFİ (%)</h4>
-                            <div className="text-5xl font-black text-white mb-4">%82</div>
-                            <div className="w-full h-2 bg-white/5 rounded-full">
-                                <div className="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" style={{ width: '82%' }}></div>
+            {activeTab === 'performance' && (() => {
+                const totalTarget = targets.reduce((sum, t) => sum + Number(t.targetValue), 0);
+                const totalActual = targets.reduce((sum, t) => sum + Number(t.currentValue), 0);
+                const overallProgress = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+
+                return (
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="card glass p-8 border-t-4 border-emerald-500">
+                                <h4 className="text-muted text-xs font-black uppercase mb-4">GENEL CİRO HEDEFİ (%)</h4>
+                                <div className="text-5xl font-black text-white mb-4">%{overallProgress}</div>
+                                <div className="w-full h-2 bg-white/5 rounded-full">
+                                    <div className="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" style={{ width: `${Math.min(overallProgress, 100)}%` }}></div>
+                                </div>
+                            </div>
+                            <div className="card glass p-8 border-t-4 border-primary">
+                                <h4 className="text-muted text-xs font-black uppercase mb-4">TOPLAM HEDEF CİRO</h4>
+                                <div className="text-5xl font-black text-white mb-4">₺ {(totalTarget / 1000).toFixed(1)}K</div>
+                                <p className="text-xs text-white/30">Belirlenen toplam satış hedefi.</p>
+                            </div>
+                            <button
+                                onClick={() => setShowTargetModal(true)}
+                                className="card glass p-8 border-2 border-dashed border-white/10 hover:border-primary/50 hover:bg-primary/5 transition-all text-center flex flex-col items-center justify-center gap-3"
+                            >
+                                <span className="text-3xl">🎯</span>
+                                <span className="font-black text-sm text-primary">YENİ HEDEF TANIMLA</span>
+                            </button>
+                        </div>
+
+                        <div className="card glass p-0 overflow-hidden">
+                            <div className="p-6 border-b border-white/5">
+                                <h3 className="text-xl font-black">Personel Bazlı Hedef Takibi</h3>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
+                                        <tr>
+                                            <th className="p-6">PERSONEL</th>
+                                            <th className="p-6">HEDEF TÜRÜ</th>
+                                            <th className="p-6">HEDEF</th>
+                                            <th className="p-6">GERÇEKLEŞEN</th>
+                                            <th className="p-6">İLERLEME</th>
+                                            <th className="p-6">TARİH ARALIĞI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {targets.length > 0 ? (
+                                            targets.map((t, idx) => {
+                                                const progress = t.targetValue > 0 ? Math.round((t.currentValue / t.targetValue) * 100) : 0;
+                                                return (
+                                                    <tr key={t.id} className="hover:bg-white/[0.02]">
+                                                        <td className="p-6 font-bold text-white">{t.staff?.name}</td>
+                                                        <td className="p-6">
+                                                            <span className="text-xs font-bold bg-white/5 px-2 py-1 rounded">
+                                                                {t.type === 'TURNOVER' ? '💰 CİRO' : '📍 ZİYARET'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-6 text-white/40">
+                                                            {t.type === 'TURNOVER' ? `₺ ${Number(t.targetValue).toLocaleString()}` : `${t.targetValue} Adet`}
+                                                        </td>
+                                                        <td className="p-6 font-black text-emerald-400">
+                                                            {t.type === 'TURNOVER' ? `₺ ${Number(t.currentValue).toLocaleString()}` : `${t.currentValue} Adet`}
+                                                        </td>
+                                                        <td className="p-6">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="flex-1 h-1.5 w-24 bg-white/5 rounded-full overflow-hidden">
+                                                                    <div
+                                                                        className={`h-full rounded-full ${progress >= 100 ? 'bg-emerald-500' : 'bg-primary'}`}
+                                                                        style={{ width: `${Math.min(progress, 100)}%` }}
+                                                                    ></div>
+                                                                </div>
+                                                                <span className="text-xs font-black text-white">%{progress}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="p-6 text-xs text-white/40 font-mono">
+                                                            {new Date(t.startDate).toLocaleDateString('tr-TR')} - {new Date(t.endDate).toLocaleDateString('tr-TR')}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
+                                        ) : (
+                                            <tr><td colSpan={6} className="p-8 text-center text-white/40">Henüz bir hedef tanımlanmamış.</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <div className="card glass p-8 border-t-4 border-primary">
-                            <h4 className="text-muted text-xs font-black uppercase mb-4">TOPLAM PRİM</h4>
-                            <div className="text-5xl font-black text-white mb-4">₺ 32,4K</div>
-                            <p className="text-xs text-white/30">Bu ayki toplam hakediş.</p>
-                        </div>
-                        <div className="card glass p-8 border-t-4 border-purple-500">
-                            <h4 className="text-muted text-xs font-black uppercase mb-4">MÜŞTERİ MEMNUNİYETİ</h4>
-                            <div className="text-5xl font-black text-white mb-4">4.9</div>
-                            <p className="text-xs text-white/30">Anket ortalaması (5 üzerinden).</p>
-                        </div>
                     </div>
-
-                    <div className="card glass p-0 overflow-hidden">
-                        <div className="p-6 border-b border-white/5">
-                            <h3 className="text-xl font-black">Personel Bazlı Analiz</h3>
-                        </div>
-                        <table className="w-full text-left">
-                            <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
-                                <tr>
-                                    <th className="p-6">PERSONEL</th>
-                                    <th className="p-6">HEDEF</th>
-                                    <th className="p-6">GERÇEKLEŞEN</th>
-                                    <th className="p-6">SKOR</th>
-                                    <th className="p-6 text-right">HAKEDİLEN PRİM</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/5">
-                                {[
-                                    { name: 'Kemal Yıldız', target: 50000, actual: 45000, score: '90%', bonus: 2250 },
-                                    { name: 'Ayşe Bilge', target: 120000, actual: 154000, score: '128%', bonus: 4620 },
-                                    { name: 'Serkan Demir', target: 15000, actual: 12500, score: '83%', bonus: 625 }
-                                ].map((p, idx) => (
-                                    <tr key={idx} className="hover:bg-white/[0.02]">
-                                        <td className="p-6 font-bold">{p.name}</td>
-                                        <td className="p-6 text-white/40">₺ {p.target.toLocaleString()}</td>
-                                        <td className="p-6 font-black">₺ {p.actual.toLocaleString()}</td>
-                                        <td className="p-6">
-                                            <span className={`font-black ${parseInt(p.score) >= 100 ? 'text-emerald-400' : 'text-amber-400'}`}>{p.score}</span>
-                                        </td>
-                                        <td className="p-6 text-right font-black text-primary">₺ {p.bonus.toLocaleString()}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            )}
+                );
+            })()}
 
             {/* --- SHIFT MANAGEMENT TAB --- */}
             {activeTab === 'shifts' && (
@@ -1731,6 +1806,100 @@ export default function StaffManagementContent() {
                     </div>
                 )
             }
+            {/* 6. TARGET MODAL */}
+            {showTargetModal && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-primary/20">
+                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                            <h2 className="text-xl font-black text-white flex items-center gap-3">
+                                🎯 <span className="text-white/80">Yeni Hedef Tanımla</span>
+                            </h2>
+                            <button onClick={() => setShowTargetModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Personel</label>
+                                <select
+                                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none appearance-none"
+                                    value={newTarget.staffId}
+                                    onChange={(e) => setNewTarget({ ...newTarget, staffId: e.target.value })}
+                                >
+                                    <option value="" className="bg-[#0f111a]">Personel Seçiniz</option>
+                                    {staff.map(p => (
+                                        <option key={p.id} value={p.id} className="bg-[#0f111a]">{p.name} ({p.role})</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Hedef Türü</label>
+                                    <select
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none appearance-none"
+                                        value={newTarget.type}
+                                        onChange={(e) => setNewTarget({ ...newTarget, type: e.target.value })}
+                                    >
+                                        <option value="TURNOVER" className="bg-[#0f111a]">💰 Ciro Hedefi</option>
+                                        <option value="VISIT" className="bg-[#0f111a]">📍 Ziyaret Hedefi</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Periyot</label>
+                                    <input
+                                        type="text"
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white/50 outline-none"
+                                        value="Aylık (Varsayılan)"
+                                        disabled
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Hedef Değeri ({newTarget.type === 'TURNOVER' ? 'TL' : 'Adet'})</label>
+                                <input
+                                    type="number"
+                                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                    placeholder={newTarget.type === 'TURNOVER' ? "50000" : "100"}
+                                    value={newTarget.targetValue}
+                                    onChange={(e) => setNewTarget({ ...newTarget, targetValue: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Başlangıç</label>
+                                    <input
+                                        type="date"
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                        value={newTarget.startDate}
+                                        onChange={(e) => setNewTarget({ ...newTarget, startDate: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Bitiş</label>
+                                    <input
+                                        type="date"
+                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
+                                        value={newTarget.endDate}
+                                        onChange={(e) => setNewTarget({ ...newTarget, endDate: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={handleSaveTarget}
+                                disabled={isProcessing}
+                                className="w-full h-14 bg-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                            >
+                                {isProcessing ? (
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                ) : '🎯 HEDEFİ KAYDET'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 }

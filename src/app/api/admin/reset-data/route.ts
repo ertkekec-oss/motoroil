@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+import { getSession } from '@/lib/auth';
+
 export async function POST(request: Request) {
+    const session: any = await getSession();
+    if (!session || session.role !== 'SUPER_ADMIN') {
+        return NextResponse.json({ success: false, error: 'FORBIDDEN: Sadece SUPER_ADMIN bu işlemi yapabilir.' }, { status: 403 });
+    }
     try {
         const { confirmation, options, currentUsername } = await request.json();
 

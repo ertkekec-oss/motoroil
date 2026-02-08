@@ -29,8 +29,8 @@ export async function GET(request: Request) {
 
         let where: any = {};
 
-        // Isolation: If not Platform Admin, only show current tenant logs
-        if (roll !== 'PLATFORM_ADMIN') {
+        // Isolation: If not Platform/Super Admin, only show current tenant logs
+        if (roll !== 'PLATFORM_ADMIN' && roll !== 'SUPER_ADMIN') {
             where.tenantId = (user as any).tenantId;
         } else if (tenantId) {
             where.tenantId = tenantId;
