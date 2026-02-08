@@ -1,9 +1,13 @@
 
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import { AppProvider, useApp } from "../contexts/AppContext";
+import { useCRM } from "../contexts/CRMContext";
+import { useInventory } from "../contexts/InventoryContext";
+import { useFinancials } from "../contexts/FinancialContext";
 import Sidebar from "../components/Sidebar";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import { ModalProvider } from "../contexts/ModalContext";
@@ -13,6 +17,8 @@ import SalesMonitor from "../components/SalesMonitor";
 import ChatWidget from "../components/ChatWidget";
 import { MobileNav } from "../components/MobileNav";
 import { GrowthBanner } from "../components/GrowthBanner";
+import GlobalErrorScreen from "../components/GlobalErrorScreen";
+import AppSkeleton from "../components/AppSkeleton";
 
 function MobileHeader() {
   const { isSidebarOpen, setIsSidebarOpen } = useApp();
@@ -68,32 +74,93 @@ function MobileHeader() {
 
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const auth = useAuth();
   const app = useApp();
   const crm = useCRM();
   const inventory = useInventory();
-  const financials = useFinancials(); // Financials might be null if no branch selected
   const pathname = usePathname();
 
   const isLoginPage = pathname === '/login';
   const isRegisterPage = pathname === '/register';
   const isResetPage = pathname.startsWith('/reset-password');
   const isAdminPage = pathname.startsWith('/admin');
-  const isPublicPage = isLoginPage || isRegisterPage || isResetPage || isAdminPage || (!isAuthenticated && pathname === '/');
+  const isPublicPage = isLoginPage || isRegisterPage || isResetPage || isAdminPage || (!auth.isAuthenticated && pathname === '/');
 
-  // Unified loading state
-  const isInitialLoading = app.isInitialLoading || crm.isInitialLoading || inventory.isInitialLoading || (isAuthenticated && !isAdminPage && !app.activeBranchName) || (app.activeBranchName && (financials as any)?.isInitialLoading);
+  // Financial Context is now safely provided by AppContext even without active branch
+  const financial = useFinancials();
 
-  if (authLoading && !isResetPage) {
+  // Unified loading state - Global Ready Gate
+  const isInitialLoading =
+    app.isInitialLoading ||
+    crm.isInitialLoading ||
+    inventory.isInitialLoading ||
+    (auth.isAuthenticated && !isAdminPage && financial.isInitialLoading);
+
+  // Global Error Gate
+  const hasCriticalError = crm.error || inventory.error || (auth.isAuthenticated && !isAdminPage && financial.error);
+
+  // Graceful Reveal State
+  const [showContent, setShowContent] = useState(false);
+
+  // Route Change Cleanup & Reflow
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Reset scroll
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+
+      // Force Reflow / Layout Recalculation
+      window.dispatchEvent(new Event('resize'));
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isInitialLoading) {
+      // Wait 800ms for the DOM to settle and CSS to apply fully
+      const timer = setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('resize'));
+        }
+        setShowContent(true);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isInitialLoading]);
+
+  // Performance Metrics
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      performance.mark("app_start");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showContent) {
+      if (typeof window !== 'undefined') {
+        performance.mark("app_ready");
+        try {
+          performance.measure("cold_start", "app_start", "app_ready");
+          const measure = performance.getEntriesByName("cold_start")[0];
+          console.log(`🚀 App Ready in ${measure.duration.toFixed(2)}ms`);
+        } catch (e) { }
+      }
+    }
+  }, [showContent]);
+
+  // Handle Global Errors
+  if (hasCriticalError && !isAdminPage) {
+    return <GlobalErrorScreen error={hasCriticalError} />;
+  }
+
+  if (auth.isLoading && !isResetPage) {
     return (
       <div style={{ background: 'var(--bg-deep)', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)' }}>
-        Yükleniyor...
+        <div style={{ fontSize: '24px', animation: 'spin 1s infinite' }}>⏳</div>
       </div>
     );
   }
 
-  if (!isAuthenticated && !isPublicPage) {
-    // Redirection is handled in AuthContext
+  if (!auth.isAuthenticated && !isPublicPage) {
     return null;
   }
 
@@ -101,91 +168,56 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  // GLOBAL LOADING GATE for operational pages
-  if (isInitialLoading && !isAdminPage) {
-    return (
-      <div style={{
-        background: 'var(--bg-deep)',
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        fontFamily: "'Outfit', sans-serif"
-      }}>
-        <div style={{ fontSize: '40px', marginBottom: '20px' }}>⏳</div>
-        <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>Verileriniz Hazırlanıyor</div>
-        <div style={{ fontSize: '14px', opacity: 0.6 }}>Lütfen bekleyin, şube ve personel ayarları senkronize ediliyor...</div>
-        <div style={{
-          marginTop: '30px',
-          width: '200px',
-          height: '4px',
-          background: 'rgba(255,255,255,0.1)',
-          borderRadius: '2px',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            width: '40%',
-            height: '100%',
-            background: 'var(--primary)',
-            animation: 'loading-bar 2s infinite ease-in-out'
-          }}></div>
-        </div>
-        <style jsx>{`
-          @keyframes loading-bar {
-            0% { transform: translateX(-100%); width: 30%; }
-            50% { width: 60%; }
-            100% { transform: translateX(330%); width: 30%; }
-          }
-        `}</style>
-      </div>
-    );
-  }
-
+  // APP LAYOUT WITH LOADING OVERLAY
   return (
-    <div className={app.isSidebarOpen ? 'sidebar-open' : ''} style={{ display: 'flex', height: '100vh', width: '100%', background: 'var(--bg-deep)', overflow: 'hidden' }}>
-      <Sidebar />
-      <MobileHeader />
+    <>
+      {/* GLOBAL LOADING OVERLAY - Keeps layout mounted underneath */}
+      {(!showContent && !isAdminPage) && <AppSkeleton />}
 
-      {/* Mobile Backdrop */}
-      {app.isSidebarOpen && (
-        <div
-          onClick={() => app.setIsSidebarOpen(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.5)',
-            backdropFilter: 'blur(4px)',
-            zIndex: 1900
-          }}
-          className="show-mobile"
-        />
-      )}
+      {/* MAIN APP STRUCTURE - Always rendered for auth pages */}
+      <div className={app.isSidebarOpen ? 'sidebar-open' : ''} style={{ display: 'flex', height: '100vh', width: '100%', background: 'var(--bg-deep)', overflow: 'hidden' }}>
+        <Sidebar />
+        <MobileHeader />
 
-      <main
-        className="main-content"
-        onClick={() => {
-          if (app.isSidebarOpen && window.innerWidth < 1024) app.setIsSidebarOpen(false);
-        }}
-      >
-        <GrowthBanner />
-        {children}
-
-        {/* Global Security Monitor */}
-        {user && (
-          <>
-            <SalesMonitor
-              userRole={user.role}
-              currentBranch={user.branch}
-              currentStaff={user.name}
-            />
-            <ChatWidget />
-          </>
+        {/* Mobile Backdrop */}
+        {app.isSidebarOpen && (
+          <div
+            onClick={() => app.setIsSidebarOpen(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.5)',
+              backdropFilter: 'blur(4px)',
+              zIndex: 1900
+            }}
+            className="show-mobile"
+          />
         )}
-      </main>
-      <MobileNav />
-    </div>
+
+        <main
+          className="main-content"
+          onClick={() => {
+            if (app.isSidebarOpen && window.innerWidth < 1024) app.setIsSidebarOpen(false);
+          }}
+        >
+          <GrowthBanner />
+          {children}
+
+          {/* Global Security Monitor */}
+          {auth.user && (
+            <>
+              <SalesMonitor
+                userRole={auth.user.role}
+                currentBranch={auth.user.branch}
+                currentStaff={auth.user.name}
+              />
+              <ChatWidget />
+            </>
+          )}
+        </main>
+        <MobileNav />
+      </div>
+    </>
   );
 }
 

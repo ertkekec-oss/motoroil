@@ -370,15 +370,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             <InventoryProvider>
                 <CRMProvider>
                     <SettingsProvider>
-                        {activeBranchName ? (
-                            <FinancialProvider activeBranchName={activeBranchName}>
-                                <SalesProvider activeBranchName={activeBranchName}>
-                                    {children}
-                                </SalesProvider>
-                            </FinancialProvider>
-                        ) : (
-                            (!isAuthenticated || isAdminPath) ? children : null
-                        )}
+                        <FinancialProvider activeBranchName={activeBranchName || ''}>
+                            <SalesProvider activeBranchName={activeBranchName || ''}>
+                                {(activeBranchName || !isAuthenticated || isAdminPath) ? children : null}
+                            </SalesProvider>
+                        </FinancialProvider>
                     </SettingsProvider>
                 </CRMProvider>
             </InventoryProvider>

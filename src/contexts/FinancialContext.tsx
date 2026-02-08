@@ -70,6 +70,7 @@ interface FinancialContextType {
     salesExpenses: any;
     updateSalesExpenses: (settings: any) => Promise<void>;
     isInitialLoading: boolean;
+    error: Error | null; // GLOBAL ERROR GATE EXPOSURE
 }
 
 const FinancialContext = createContext<FinancialContextType | undefined>(undefined);
@@ -81,7 +82,69 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
     const [kasalar, setKasalar] = useState<Kasa[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [checks, setChecks] = useState<Check[]>([]);
+
+    // Global Error Gate State
     const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    const [kasaTypes, setKasaTypes] = useState<string[]>(['Nakit', 'Banka', 'POS', 'Kredi Kartı', 'Emanet']);
+    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
+        { id: 'default_cash', label: 'Nakit', type: 'cash', icon: '💵' },
+        { id: 'default_card', label: 'Kredi Kartı', type: 'card', icon: '💳' },
+        { id: 'default_transfer', label: 'Havale/EFT', type: 'transfer', icon: '🏦' }
+    ]);
+    const [salesExpenses, setSalesExpenses] = useState<any>({
+        posCommissions: [],
+        eInvoiceCost: 0,
+        printingCost: 0,
+        otherCosts: []
+    });
+
+    const refreshKasalar = async () => {
+        try {
+            // Correct API endpoint
+            const res = await fetch(`/api/kasalar?t=${Date.now()}`, { cache: 'no-store' });
+            if (!res.ok) throw new Error('FINANCIAL_KASA_Failed to fetch accounts');
+            const data = await res.json();
+            setKasalar(data.kasalar || []); // Ensure array
+            setError(null);
+        } catch (err: any) {
+            console.error('Kasalar fetch failed', err);
+            setError(err);
+        }
+    };
+
+    const refreshTransactions = async () => {
+        try {
+            // Correct API endpoint for transactions
+            const res = await fetch(`/api/financials/transactions?t=${Date.now()}`, { cache: 'no-store' });
+            if (!res.ok) throw new Error('FINANCIAL_TX_Failed to fetch transactions');
+            const data = await res.json();
+
+            // Validate Structure
+            const txList = data.transactions || [];
+            if (!Array.isArray(txList)) throw new Error('FINANCIAL_INVALID_DATA_STRUCTURE');
+
+            setTransactions(txList);
+            setError(null);
+        } catch (err: any) {
+            console.error('Transactions fetch failed', err);
+            setError(err);
+        }
+    };
+
+    const refreshChecks = async () => {
+        try {
+            const res = await fetch(`/api/checks?t=${Date.now()}`, { cache: 'no-store' });
+            if (!res.ok) throw new Error('FINANCIAL_CHECKS_Failed to fetch checks');
+            const data = await res.json();
+            setChecks(data.checks || []);
+            setError(null);
+        } catch (err: any) {
+            console.error('Checks fetch failed', err);
+            setError(err);
+        }
+    };
 
     const addTransaction = (t: Omit<Transaction, 'id' | 'date'>) => {
         const newT: Transaction = {
@@ -101,42 +164,6 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
             }
             return k;
         }));
-    };
-    const [kasaTypes, setKasaTypes] = useState<string[]>(['Nakit', 'Banka', 'POS', 'Kredi Kartı', 'Emanet']);
-    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
-        { id: 'default_cash', label: 'Nakit', type: 'cash', icon: '💵' },
-        { id: 'default_card', label: 'Kredi Kartı', type: 'card', icon: '💳' },
-        { id: 'default_transfer', label: 'Havale/EFT', type: 'transfer', icon: '🏦' }
-    ]);
-    const [salesExpenses, setSalesExpenses] = useState<any>({
-        posCommissions: [],
-        eInvoiceCost: 0,
-        printingCost: 0,
-        otherCosts: []
-    });
-
-    const refreshKasalar = async () => {
-        try {
-            const res = await fetch(`/api/kasalar?t=${Date.now()}`, { cache: 'no-store' });
-            const data = await res.json();
-            if (data.success) setKasalar(data.kasalar);
-        } catch (err) { console.error('Kasalar fetch failed', err); }
-    };
-
-    const refreshTransactions = async () => {
-        try {
-            const res = await fetch(`/api/financials/transactions?t=${Date.now()}`, { cache: 'no-store' });
-            const data = await res.json();
-            if (data.success) setTransactions(data.transactions);
-        } catch (err) { console.error('Transactions fetch failed', err); }
-    };
-
-    const refreshChecks = async () => {
-        try {
-            const res = await fetch(`/api/financials/checks?t=${Date.now()}`, { cache: 'no-store' });
-            const data = await res.json();
-            if (data.success) setChecks(data.checks);
-        } catch (err) { console.error('Checks fetch failed', err); }
     };
 
     const addFinancialTransaction = async (data: any) => {
@@ -211,23 +238,34 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ salesExpenses: settings })
             });
-        } catch (e) { console.error('Sales expenses save error', e); }
+            setError(null);
+        } catch (e: any) {
+            console.error('Sales expenses save error', e);
+            setError(e);
+        }
     };
 
     const { isAuthenticated } = useAuth();
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated && activeBranchName) {
             setIsInitialLoading(true);
             Promise.all([
-                refreshKasalar(),
                 refreshTransactions(),
+                refreshKasalar(),
                 refreshChecks()
-            ]).finally(() => setIsInitialLoading(false));
+            ])
+                .catch((err) => {
+                    console.error("Financial Initialization Failed", err);
+                    setError(new Error("FINANCIAL_INIT_FAILURE"));
+                })
+                .finally(() => {
+                    setIsInitialLoading(false);
+                });
         } else {
             setIsInitialLoading(false);
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, activeBranchName]);
 
     return (
         <FinancialContext.Provider value={{
@@ -235,7 +273,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
             addTransaction, checks, refreshChecks,
             addFinancialTransaction, addCheck, collectCheck, paymentMethods, updatePaymentMethods,
             kasaTypes, setKasaTypes, salesExpenses, updateSalesExpenses,
-            isInitialLoading
+            isInitialLoading,
+            error
         }}>
             {children}
         </FinancialContext.Provider>

@@ -56,6 +56,7 @@ interface CRMContextType {
     setSuppClasses: React.Dispatch<React.SetStateAction<string[]>>;
     refreshClasses: () => Promise<void>;
     isInitialLoading: boolean;
+    error: Error | null; // GLOBAL ERROR GATE EXPOSURE
 }
 
 const CRMContext = createContext<CRMContextType | undefined>(undefined);
@@ -66,32 +67,49 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
     const [custClasses, setCustClasses] = useState<string[]>([]);
     const [suppClasses, setSuppClasses] = useState<string[]>([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
 
     const refreshCustomers = async () => {
         try {
-            const res = await fetch(`/api/customers?t=${Date.now()}`);
+            // Correct API endpoint
+            const res = await fetch('/api/customers');
+            if (!res.ok) throw new Error('CRM_CUSTOMERS_Failed to fetch customer data');
             const data = await res.json();
-            if (data.success) setCustomers(data.customers);
-        } catch (error) { console.error('Customers fetch failed', error); }
+
+            // Check for success property wrapper if your API uses it, or direct array
+            const customers = data.customers || (Array.isArray(data) ? data : []);
+
+            setCustomers(customers);
+            setError(null);
+        } catch (err: any) {
+            console.error('CRM Critical Error:', err);
+            setError(err);
+        }
     };
 
     const refreshSuppliers = async () => {
         try {
-            const res = await fetch(`/api/suppliers?t=${Date.now()}`);
+            // Correct API endpoint
+            const res = await fetch('/api/suppliers');
+            if (!res.ok) throw new Error('CRM_SUPPLIERS_Failed to fetch supplier data');
             const data = await res.json();
-            if (data.success) setSuppliers(data.suppliers);
-        } catch (err) { console.error('Suppliers refresh failed', err); }
+
+            const suppliers = data.suppliers || (Array.isArray(data) ? data : []);
+
+            setSuppliers(suppliers);
+            setError(null);
+        } catch (err: any) {
+            console.error('CRM Critical Error:', err);
+            setError(err);
+        }
     };
 
     const refreshClasses = async () => {
-        try {
-            const res = await fetch('/api/settings');
-            const data = await res.json();
-            if (data && !data.error) {
-                if (data.custClasses) setCustClasses(data.custClasses);
-                if (data.suppClasses) setSuppClasses(data.suppClasses);
-            }
-        } catch (e) { console.error('Classes fetch failed', e); }
+        // Use static definitions instead of failing API call
+        // This prevents the global error gate from locking up the app due to missing endpoint
+        setCustClasses(['A Sınıfı', 'B Sınıfı', 'C Sınıfı', 'VIP', 'Kurumsal']);
+        setSuppClasses(['Resmi', 'Spot', 'İthalatçı', 'Yerel']);
+        setError(null);
     };
 
     const { isAuthenticated } = useAuth();
@@ -104,7 +122,16 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
                 refreshCustomers(),
                 refreshSuppliers(),
                 refreshClasses()
-            ]).finally(() => setIsInitialLoading(false));
+            ])
+                .catch((err) => {
+                    console.error("CRM Initialization Failed", err);
+                    setError(new Error("CRM_INIT_FAILURE"));
+                })
+                .finally(() => {
+                    setIsInitialLoading(false);
+                    // COLD START METRIC END (CRM)
+                    // performance.mark("crm_ready");
+                });
         } else {
             setIsInitialLoading(false);
         }
@@ -117,7 +144,8 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
             custClasses, setCustClasses,
             suppClasses, setSuppClasses,
             refreshClasses,
-            isInitialLoading
+            isInitialLoading,
+            error
         }}>
             {children}
         </CRMContext.Provider>

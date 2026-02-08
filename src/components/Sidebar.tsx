@@ -87,7 +87,7 @@ export default function Sidebar() {
         setActiveBranchName(e.target.value);
     };
 
-    if (!displayUser || isInitialLoading) return null;
+    if (!displayUser) return null;
 
     return (
         <aside
