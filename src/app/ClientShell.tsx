@@ -1,0 +1,232 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "../contexts/AuthContext";
+import { AppProvider, useApp } from "../contexts/AppContext";
+import { useCRM } from "../contexts/CRMContext";
+import { useInventory } from "../contexts/InventoryContext";
+import { useFinancials } from "../contexts/FinancialContext";
+import Sidebar from "../components/Sidebar";
+
+import SalesMonitor from "../components/SalesMonitor";
+import ChatWidget from "../components/ChatWidget";
+import { MobileNav } from "../components/MobileNav";
+import { GrowthBanner } from "../components/GrowthBanner";
+import GlobalErrorScreen from "../components/GlobalErrorScreen";
+import AppSkeleton from "../components/AppSkeleton";
+
+function MobileHeader() {
+    const { isSidebarOpen, setIsSidebarOpen } = useApp();
+    const pathname = usePathname();
+
+    const getTitle = (path: string) => {
+        if (path === '/') return 'POS Terminal';
+        if (path === '/dashboard') return 'POS Terminal';
+        if (path === '/accounting') return 'Finans';
+        if (path === '/inventory') return 'Envanter';
+        if (path === '/customers') return 'Cariler';
+        if (path === '/suppliers') return 'Tedarikçiler';
+        if (path === '/sales') return 'Satışlar';
+        if (path === '/service') return 'Servis';
+        if (path === '/reports') return 'Raporlar';
+        if (path === '/settings') return 'Ayarlar';
+        return 'Periodya';
+    };
+
+    return (
+        <header className="show-mobile" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '64px',
+            background: 'var(--bg-card)',
+            backdropFilter: 'blur(20px)',
+            borderBottom: '1px solid var(--border-light)',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0 20px',
+            zIndex: 1500,
+            gap: '15px'
+        }}>
+            <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '24px',
+                    color: 'var(--text-main)',
+                    cursor: 'pointer'
+                }}
+            >
+                {isSidebarOpen ? '✕' : '☰'}
+            </button>
+            <div style={{ fontWeight: '800', fontSize: '18px', flex: 1 }}>{getTitle(pathname || '')}</div>
+            <div style={{ fontSize: '20px' }}>⚡</div>
+        </header>
+    );
+}
+
+function LayoutContent({ children }: { children: React.ReactNode }) {
+    const auth = useAuth();
+    const app = useApp();
+    const crm = useCRM();
+    const inventory = useInventory();
+    const pathname = usePathname();
+
+    const isAdminPage = pathname?.startsWith('/admin');
+
+    // Financial Context is now safely provided by AppContext
+    const financial = useFinancials();
+
+    const isInitialLoading = app.isInitialLoading;
+
+    // Global Error Gate
+    const hasCriticalError = crm.error || inventory.error || (auth.isAuthenticated && !isAdminPage && financial.error);
+
+    // Graceful Reveal State
+    const [showContent, setShowContent] = useState(false);
+    const [widgetsReady, setWidgetsReady] = useState(false);
+
+    useEffect(() => {
+        // Delay widgets to ensure main DOM and CSS are perfectly stable first
+        const t = setTimeout(() => setWidgetsReady(true), 2500);
+        return () => clearTimeout(t);
+    }, []);
+
+    // Route Change Cleanup
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+    }, [pathname]);
+
+    useEffect(() => {
+        if (!isInitialLoading) {
+            // Wait 200ms for the DOM to settle and CSS to apply fully
+            const timer = setTimeout(() => {
+                setShowContent(true);
+            }, 200);
+            return () => clearTimeout(timer);
+        }
+    }, [isInitialLoading]);
+
+
+    useEffect(() => {
+        if (showContent) {
+            if (typeof window !== 'undefined') {
+                try {
+                    // performance marks if needed
+                } catch (e) { }
+            }
+        }
+    }, [showContent]);
+
+    // Handle Global Errors
+    if (hasCriticalError && !isAdminPage) {
+        return <GlobalErrorScreen error={hasCriticalError} />;
+    }
+
+    if (auth.isLoading) {
+        return (
+            <div style={{ background: 'var(--bg-deep)', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)' }}>
+                <div style={{ fontSize: '24px', animation: 'spin 1s infinite' }}>⏳</div>
+            </div>
+        );
+    }
+
+    // APP LAYOUT WITH LOADING OVERLAY
+    if (!showContent && !isAdminPage) {
+        return (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
+                <AppSkeleton />
+            </div>
+        );
+    }
+
+    return (
+        <>
+            <div className={app.isSidebarOpen ? 'sidebar-open' : ''} style={{ display: 'flex', height: '100dvh', width: '100%', background: 'var(--bg-deep)', overflow: 'hidden' }}>
+                <Sidebar />
+                <MobileHeader />
+
+                {app.isSidebarOpen && (
+                    <div
+                        onClick={() => app.setIsSidebarOpen(false)}
+                        style={{
+                            position: 'fixed',
+                            inset: 0,
+                            background: 'rgba(0,0,0,0.5)',
+                            backdropFilter: 'blur(4px)',
+                            zIndex: 1900
+                        }}
+                        className="show-mobile"
+                    />
+                )}
+
+                <main
+                    className="main-content"
+                    onClick={() => {
+                        if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 1024) {
+                            app.setIsSidebarOpen(false);
+                        }
+                    }}
+                >
+                    <GrowthBanner />
+                    {children}
+
+                    {auth.user && (
+                        <>
+                            {widgetsReady && (
+                                <>
+                                    <SalesMonitor
+                                        userRole={auth.user.role}
+                                        currentBranch={auth.user.branch}
+                                        currentStaff={auth.user.name}
+                                    />
+                                    <ChatWidget />
+                                </>
+                            )}
+                        </>
+                    )}
+                </main>
+                <MobileNav />
+            </div>
+        </>
+    );
+}
+
+export default function ClientShell({ children }: { children: React.ReactNode }) {
+    const [ready, setReady] = useState(false);
+    const [cssReady, setCssReady] = useState(false);
+
+    useEffect(() => {
+        setReady(true);
+        const checkStyles = () => {
+            const styles = Array.from(document.styleSheets);
+            if (styles.length > 0) {
+                try {
+                    const _ = styles[0].cssRules;
+                    setCssReady(true);
+                } catch (e) {
+                    setCssReady(true);
+                }
+            }
+        };
+        const interval = setInterval(checkStyles, 50);
+        const timeout = setTimeout(() => setCssReady(true), 1500);
+        return () => { clearInterval(interval); clearTimeout(timeout); };
+    }, []);
+
+    if (!ready || !cssReady) {
+        return <div style={{ height: "100dvh", background: "var(--bg-deep)" }} />;
+    }
+
+    return (
+        <AppProvider>
+            <LayoutContent>{children}</LayoutContent>
+        </AppProvider>
+    );
+}

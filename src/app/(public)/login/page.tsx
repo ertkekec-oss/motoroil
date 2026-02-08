@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -19,9 +19,9 @@ export default function LoginPage() {
     // Eğer zaten giriş yapılmışsa ana sayfaya yönlendir
     useEffect(() => {
         if (isAuthenticated) {
-            router.push('/');
+            window.location.href = '/';
         }
-    }, [isAuthenticated, router]);
+    }, [isAuthenticated]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -32,7 +32,7 @@ export default function LoginPage() {
             const success = await login(username, password);
 
             if (success) {
-                router.push('/');
+                window.location.href = '/';
             } else {
                 setError('E-Posta, kullanıcı adı veya şifre hatalı!');
             }
