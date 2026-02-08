@@ -136,6 +136,7 @@ body::before {
 /* Desktop Content: Takes the remaining space */
 .main-content {
   flex: 1;
+  width: 100%;
   min-width: 0;
   /* Critical for chart responsiveness */
   height: 100%;

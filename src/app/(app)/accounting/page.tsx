@@ -8,19 +8,40 @@ import { formatCurrency } from "@/lib/utils";
 export default function AccountingPage() {
     const { user } = useAuth();
     const {
-        stats,
         transactions,
-        refreshData,
-        isLoading
+        checks,
+        kasalar,
+        refreshTransactions,
+        refreshKasalar,
+        refreshChecks,
+        isInitialLoading
     } = useFinancials();
 
     const [activeTab, setActiveTab] = useState("receivables");
 
-    // Vercel'deki tasarıma uygun renkler ve ikonlar
+    // Calculate Stats
+    const stats = React.useMemo(() => {
+        const totalReceivables = checks.filter(c => c.type === 'In' && c.status !== 'Tahsil Edildi').reduce((sum, c) => sum + c.amount, 0);
+        const totalPayables = checks.filter(c => c.type === 'Out' && c.status !== 'Ödendi').reduce((sum, c) => sum + c.amount, 0);
+        const totalExpenses = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
+        const netCash = kasalar.reduce((sum, k) => sum + k.balance, 0);
+
+        return {
+            totalReceivables,
+            totalPayables,
+            totalExpenses,
+            netCash
+        };
+    }, [transactions, checks, kasalar]);
+
+    const refreshData = async () => {
+        await Promise.all([refreshTransactions(), refreshKasalar(), refreshChecks()]);
+    };
+
     const cards = [
         {
             title: "TOPLAM ALACAKLAR",
-            value: stats?.totalReceivables || 0,
+            value: stats.totalReceivables,
             desc: "Seçili dönemdeki taksit ve çekler",
             icon: "🗓️",
             color: "text-blue-400",
@@ -29,7 +50,7 @@ export default function AccountingPage() {
         },
         {
             title: "TOPLAM ÖDEMELER",
-            value: stats?.totalPayables || 0,
+            value: stats.totalPayables,
             desc: "Seçili dönemdeki borç ve çekler",
             icon: "💸",
             color: "text-emerald-400",
@@ -38,7 +59,7 @@ export default function AccountingPage() {
         },
         {
             title: "TOPLAM GİDERLER",
-            value: stats?.totalExpenses || 0,
+            value: stats.totalExpenses,
             desc: "Kasa ve bankadan çıkan giderler",
             icon: "📉",
             color: "text-rose-400",
@@ -47,7 +68,7 @@ export default function AccountingPage() {
         },
         {
             title: "NET KASA DURUMU",
-            value: stats?.netCash || 0,
+            value: stats.netCash,
             desc: "Anlık kasa ve banka toplamları",
             icon: "💰",
             color: "text-amber-400",
@@ -57,7 +78,7 @@ export default function AccountingPage() {
     ];
 
     return (
-        <div className="p-6 md:p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -68,7 +89,7 @@ export default function AccountingPage() {
                     onClick={() => refreshData()}
                     className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-white transition-all active:scale-95"
                 >
-                    {isLoading ? "🔄 Yenileniyor..." : "🔄 Verileri Yenile"}
+                    {isInitialLoading ? "🔄 Yenileniyor..." : "🔄 Verileri Yenile"}
                 </button>
             </div>
 
@@ -117,8 +138,8 @@ export default function AccountingPage() {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === tab.id
-                                ? 'bg-orange-600 text-white shadow-lg shadow-orange-900/20 scale-105'
-                                : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                            ? 'bg-orange-600 text-white shadow-lg shadow-orange-900/20 scale-105'
+                            : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
                             }`}
                     >
                         {tab.label}

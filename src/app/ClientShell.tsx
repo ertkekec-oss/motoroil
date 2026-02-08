@@ -218,7 +218,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 )}
 
                 <main
-                    className="main-content"
+                    className="main-content w-full"
                     onClick={() => {
                         if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 1024) {
                             app.setIsSidebarOpen(false);
@@ -276,8 +276,6 @@ export default function ClientShell({ children }: { children: React.ReactNode })
     }
 
     return (
-        <AppProvider>
-            <LayoutContent>{children}</LayoutContent>
-        </AppProvider>
+        <LayoutContent>{children}</LayoutContent>
     );
 }

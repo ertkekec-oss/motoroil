@@ -219,20 +219,37 @@ import { formatCurrency } from '@/lib/utils';
 
 ---
 
-## Troubleshooting
+## CSS Safety & Layout Stability (CRITICAL)
 
-### If Tailwind classes don't work:
-1. Make sure you added `@tailwind` directives to globals.css
-2. Restart the dev server: `npm run dev`
-3. Check tailwind.config.js has correct content paths
+To prevent the "broken layout on load" and "squashed dashboard" issues from recurring, follow these rules:
 
-### If formatCurrency shows errors:
-1. Make sure you imported it: `import { formatCurrency } from '@/lib/utils';`
-2. Ensure you're passing a number: `formatCurrency(Number(value))`
+### 1. Style Scoping (Prevent Pollution)
+- **NEVER** use global tags like `body`, `html`, or `*` in standard CSS files (except `globals.css`).
+- **ALWAYS** wrap your component styles in a unique root class.
+    - *Incorrect:* `body { background: #fff; }`
+    - *Correct:* `.my-page-root { background: #fff; }`
+- **GIRİŞ/LANDING PAGE:** Public sayfaların CSS'lerini mutlaka ayrı tutun. Landing sayfasında kullanılan bir stil Dashboard'un stilini ezmemelidir.
 
-### If React Query doesn't work:
-1. Make sure ReactQueryProvider wraps your app in layout.tsx
-2. Check that @tanstack/react-query is installed
+### 2. Flexbox Layout Shell
+- Dashboard iskeletini kurarken `fixed` pozisyonlardan ve manuel `margin/padding` hesaplarından kaçının.
+- **Root Shell Yapısı:**
+    ```tsx
+    <div className="main-shell">
+        <Sidebar className="sidebar-fixed" />
+        <main className="main-content">
+            {children}
+        </main>
+    </div>
+    ```
+- CSS'de `main-content` için `flex: 1` ve `min-width: 0` kullanın. Bu, grafiklerin ve tabloların kenarlardan taşmasını veya sıkışmasını engeller.
+
+### 3. Hydration & Content Reveal
+- Sayfa yüklenirken veri bekliyorsa `AppSkeleton` kullanın.
+- Skeleton yapısı, gerçek sayfa yapısı (`main-shell`) ile birebir aynı flex yapısına sahip olmalıdır.
+- Kullanıcı giriş yaptıktan sonra "tanıtım sayfası" (Landing Page) kodlarının ve CSS'lerinin yüklenmesini engellemek için `dynamic import` (`ssr: false`) kullanın.
+
+### 4. Tailwind First
+- Şüpheli durumlarda satır içi (inline) `style={{...}}` yerine Tailwind sınıflarını tercih edin. Tailwind sınıfları çakışmalara karşı daha dirençlidir.
 
 ---
 

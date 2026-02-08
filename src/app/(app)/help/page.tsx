@@ -32,10 +32,10 @@ export default function HelpPage() {
 
                 {/* Content Area */}
                 <div className="lg:col-span-3">
-                    <div className="card glass-plus p-8 min-h-[600px]">
+                    <div className="card glass-plus p-8 min-h-[600px] relative">
 
                         {activeSection === 'getting-started' && (
-                            <div className="space-y-8 animate-in slide-in-from-right-4 fade-in duration-300">
+                            <div className="space-y-8">
                                 <SectionTitle title="Periodya Sistemine Giriş" icon="🚀" />
                                 <div className="space-y-6 text-gray-300">
                                     <Block title="Giriş Yapma">
@@ -56,7 +56,7 @@ export default function HelpPage() {
                         )}
 
                         {activeSection === 'pos' && (
-                            <div className="space-y-8 animate-in slide-in-from-right-4 fade-in duration-300">
+                            <div className="space-y-8">
                                 <SectionTitle title="Satış ve Kasa İşlemleri" icon="💳" />
                                 <div className="space-y-6 text-gray-300">
                                     <Block title="Hızlı Satış Yapma">
@@ -79,7 +79,7 @@ export default function HelpPage() {
                         )}
 
                         {activeSection === 'customers' && (
-                            <div className="space-y-8 animate-in slide-in-from-right-4 fade-in duration-300">
+                            <div className="space-y-8">
                                 <SectionTitle title="Müşteri ve Cari Yönetimi" icon="👥" />
                                 <div className="space-y-6 text-gray-300">
                                     <Block title="Müşteri Ekleme">
@@ -100,7 +100,7 @@ export default function HelpPage() {
                         )}
 
                         {activeSection === 'inventory' && (
-                            <div className="space-y-8 animate-in slide-in-from-right-4 fade-in duration-300">
+                            <div className="space-y-8">
                                 <SectionTitle title="Stok ve Ürün Yönetimi" icon="📦" />
                                 <div className="space-y-6 text-gray-300">
                                     <Block title="Ürün Arama">
@@ -117,7 +117,7 @@ export default function HelpPage() {
                         )}
 
                         {activeSection === 'service' && (
-                            <div className="space-y-8 animate-in slide-in-from-right-4 fade-in duration-300">
+                            <div className="space-y-8">
                                 <SectionTitle title="Servis ve Araç İşlemleri" icon="🛠️" />
                                 <div className="space-y-6 text-gray-300">
                                     <Block title="Servis Kaydı Açma">
@@ -135,7 +135,7 @@ export default function HelpPage() {
                         )}
 
                         {activeSection === 'quotes' && (
-                            <div className="space-y-8 animate-in slide-in-from-right-4 fade-in duration-300">
+                            <div className="space-y-8">
                                 <SectionTitle title="Teklif Hazırlama" icon="📋" />
                                 <div className="space-y-6 text-gray-300">
                                     <Block title="Teklif Oluşturma">
@@ -152,7 +152,7 @@ export default function HelpPage() {
                         )}
 
                         {activeSection === 'faq' && (
-                            <div className="space-y-8 animate-in slide-in-from-right-4 fade-in duration-300">
+                            <div className="space-y-8">
                                 <SectionTitle title="Sıkça Sorulan Sorular" icon="🙋" />
                                 <div className="space-y-4">
                                     <FAQ
