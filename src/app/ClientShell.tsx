@@ -227,7 +227,16 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
                 <main
                     className={showSidebar ? "main-content" : ""}
-                    style={!showSidebar ? { flex: 1, height: '100vh', overflowY: 'auto', position: 'relative' } : {}}
+                    style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100vh',
+                        overflowY: 'auto',
+                        position: 'relative',
+                        minWidth: 0, // Critical for preventing flex items from exceeding parent
+                        width: '100%'
+                    }}
                     onClick={() => {
                         if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 1024) {
                             app.setIsSidebarOpen(false);

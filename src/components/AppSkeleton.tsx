@@ -13,16 +13,20 @@ export default function AppSkeleton() {
             overflow: 'hidden',
             fontFamily: "'Outfit', sans-serif"
         }}>
-            {/* Sidebar Skeleton */}
+            {/* Sidebar Skeleton (Fixed) */}
             <div style={{
                 width: '240px',
-                height: '100%',
+                height: '100dvh',
                 borderRight: '1px solid var(--border-light)',
                 background: 'var(--bg-card)',
                 padding: '24px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '24px'
+                gap: '24px',
+                position: 'fixed',
+                left: 0,
+                top: 0,
+                zIndex: 10000
             }} className="sidebar-skeleton show-desktop">
 
                 {/* Logo Placeholder */}
@@ -45,11 +49,18 @@ export default function AppSkeleton() {
                 <div className="skeleton-pulse" style={{ width: '100%', height: '80px', borderRadius: '16px', marginTop: 'auto' }} />
             </div>
 
-            {/* Main Content Skeleton */}
-            <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', overflow: 'hidden' }}>
-
-                {/* Top Banner / Header (Mobile Header simulation) */}
-                <div className="skeleton-pulse show-mobile" style={{ width: '100%', height: '64px', borderRadius: '0', position: 'fixed', top: 0, left: 0, zIndex: 100 }} />
+            {/* Main Content Skeleton (Shifted) */}
+            <div style={{
+                flex: 1,
+                padding: '24px',
+                paddingLeft: '264px', // 240px sidebar + 24px padding
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px',
+                overflow: 'hidden',
+                width: '100%',
+                boxSizing: 'border-box'
+            }} className="main-content-skeleton">
 
                 {/* Greeting / Dashboard Header */}
                 <div className="skeleton-pulse" style={{ width: '40%', height: '40px', borderRadius: '12px', marginTop: '20px' }} />
@@ -101,6 +112,9 @@ export default function AppSkeleton() {
             }
             .sidebar-skeleton {
                 display: none !important;
+            }
+            .main-content-skeleton {
+                padding-left: 24px !important;
             }
         }
         

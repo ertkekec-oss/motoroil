@@ -111,18 +111,20 @@ body::before {
 /* Layout System */
 .main-content {
   flex: 1;
-  margin-left: 240px;
-  /* Offset for fixed sidebar */
+  padding-left: 240px;
+  /* Use padding instead of margin to keep content in viewport */
   height: 100vh;
   overflow-y: auto;
   position: relative;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: var(--bg-deep);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 1024px) {
   .main-content {
-    margin-left: 0 !important;
+    padding-left: 0 !important;
     padding-top: 64px;
     padding-bottom: 80px;
     /* Space for MobileNav if present */
