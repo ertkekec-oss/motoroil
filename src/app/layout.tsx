@@ -89,12 +89,12 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   // Financial Context is now safely provided by AppContext even without active branch
   const financial = useFinancials();
 
-  // Unified loading state - Global Ready Gate
+  // SEMANTIC READINESS: Data must be valid for current context, not just "loaded"
   const isInitialLoading =
     app.isInitialLoading ||
     crm.isInitialLoading ||
     inventory.isInitialLoading ||
-    (auth.isAuthenticated && !isAdminPage && financial.isInitialLoading);
+    (auth.isAuthenticated && !isAdminPage && (financial.isInitialLoading || !financial.isDataValid));
 
   // Global Error Gate
   const hasCriticalError = crm.error || inventory.error || (auth.isAuthenticated && !isAdminPage && financial.error);

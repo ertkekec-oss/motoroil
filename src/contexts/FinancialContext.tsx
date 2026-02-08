@@ -70,7 +70,8 @@ interface FinancialContextType {
     salesExpenses: any;
     updateSalesExpenses: (settings: any) => Promise<void>;
     isInitialLoading: boolean;
-    error: Error | null; // GLOBAL ERROR GATE EXPOSURE
+    error: Error | null;
+    isDataValid: boolean; // SEMANTIC READINESS
 }
 
 const FinancialContext = createContext<FinancialContextType | undefined>(undefined);
@@ -78,6 +79,9 @@ const FinancialContext = createContext<FinancialContextType | undefined>(undefin
 
 export function FinancialProvider({ children, activeBranchName }: { children: React.ReactNode, activeBranchName: string }) {
     const { showError } = useModal();
+
+    // SEMANTIC READINESS: Track which branch this data belongs to
+    const [dataVersion, setDataVersion] = useState<string>('');
 
     const [kasalar, setKasalar] = useState<Kasa[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -247,6 +251,18 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
 
     const { isAuthenticated } = useAuth();
 
+    // SEMANTIC READINESS: Invalidate stale data immediately on branch change
+    useEffect(() => {
+        // Branch changed → old data is now INVALID
+        if (activeBranchName && dataVersion !== activeBranchName) {
+            // CRITICAL: Clear stale data IMMEDIATELY to prevent showing wrong branch data
+            setKasalar([]);
+            setTransactions([]);
+            setChecks([]);
+            setIsInitialLoading(true);
+        }
+    }, [activeBranchName]);
+
     useEffect(() => {
         if (isAuthenticated && activeBranchName) {
             setIsInitialLoading(true);
@@ -255,6 +271,11 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
                 refreshKasalar(),
                 refreshChecks()
             ])
+                .then(() => {
+                    // Mark data as belonging to this branch
+                    setDataVersion(activeBranchName);
+                    setError(null);
+                })
                 .catch((err) => {
                     console.error("Financial Initialization Failed", err);
                     setError(new Error("FINANCIAL_INIT_FAILURE"));
@@ -267,6 +288,9 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
         }
     }, [isAuthenticated, activeBranchName]);
 
+    // SEMANTIC READINESS CHECK: Is the data valid for current context?
+    const isDataValid = dataVersion === activeBranchName && activeBranchName !== '';
+
     return (
         <FinancialContext.Provider value={{
             kasalar, setKasalar, refreshKasalar, transactions, setTransactions, refreshTransactions,
@@ -274,7 +298,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
             addFinancialTransaction, addCheck, collectCheck, paymentMethods, updatePaymentMethods,
             kasaTypes, setKasaTypes, salesExpenses, updateSalesExpenses,
             isInitialLoading,
-            error
+            error,
+            isDataValid // EXPOSE SEMANTIC READINESS
         }}>
             {children}
         </FinancialContext.Provider>
