@@ -102,13 +102,9 @@ export default function Sidebar() {
         <aside
             className={`sidebar-fixed ${isSidebarOpen ? 'active' : ''}`}
             style={{
-                width: '240px',
                 background: 'var(--bg-card)',
                 backdropFilter: 'blur(30px) saturate(150%)',
                 borderRight: '1px solid var(--border-light)',
-                position: 'fixed',
-                top: 0,
-                bottom: 0,
                 display: 'flex',
                 flexDirection: 'column',
                 zIndex: 2000,

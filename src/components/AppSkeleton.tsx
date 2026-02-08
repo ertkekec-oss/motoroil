@@ -4,29 +4,14 @@ import React from 'react';
 
 export default function AppSkeleton() {
     return (
-        <div className="main-shell has-sidebar" style={{
+        <div className="main-shell" style={{
             position: 'fixed',
             inset: 0,
             zIndex: 9999,
             overflow: 'hidden',
-            fontFamily: "'Outfit', sans-serif"
         }}>
-            {/* Sidebar Skeleton (Fixed) */}
-            <div style={{
-                width: '240px',
-                height: '100dvh',
-                borderRight: '1px solid var(--border-light)',
-                background: 'var(--bg-card)',
-                padding: '24px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-                position: 'fixed',
-                left: 0,
-                top: 0,
-                zIndex: 10000
-            }} className="sidebar-skeleton show-desktop">
-
+            {/* Sidebar Skeleton (Fixed-width flex child) */}
+            <div className="sidebar-fixed show-desktop" style={{ height: '100%', padding: '24px', gap: '24px' }}>
                 {/* Logo Placeholder */}
                 <div className="skeleton-pulse" style={{ width: '70%', height: '32px', marginBottom: '12px' }} />
 
@@ -47,27 +32,22 @@ export default function AppSkeleton() {
                 <div className="skeleton-pulse" style={{ width: '100%', height: '80px', borderRadius: '16px', marginTop: 'auto' }} />
             </div>
 
-            {/* Main Content Skeleton (Shifted) */}
-            <div
-                className="main-content"
-                style={{
-                    padding: '24px',
-                    gap: '24px'
-                }}
-            >
+            {/* Main Content Wrapper (Matches ClientShell structure) */}
+            <div className="flex-1 flex flex-col min-w-0 h-full relative">
+                <div className="main-content" style={{ padding: '24px', gap: '24px' }}>
+                    {/* Greeting / Dashboard Header */}
+                    <div className="skeleton-pulse" style={{ width: '40%', height: '40px', borderRadius: '12px', marginTop: '20px' }} />
 
-                {/* Greeting / Dashboard Header */}
-                <div className="skeleton-pulse" style={{ width: '40%', height: '40px', borderRadius: '12px', marginTop: '20px' }} />
+                    {/* Stats Grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="skeleton-pulse" style={{ height: '140px', borderRadius: '20px' }} />
+                        ))}
+                    </div>
 
-                {/* Stats Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
-                    {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="skeleton-pulse" style={{ height: '140px', borderRadius: '20px' }} />
-                    ))}
+                    {/* Big Table / Content Placeholder */}
+                    <div className="skeleton-pulse" style={{ flex: 1, width: '100%', borderRadius: '20px', minHeight: '300px' }} />
                 </div>
-
-                {/* Big Table / Content Placeholder */}
-                <div className="skeleton-pulse" style={{ flex: 1, width: '100%', borderRadius: '20px', minHeight: '300px' }} />
             </div>
 
             <style jsx global>{`

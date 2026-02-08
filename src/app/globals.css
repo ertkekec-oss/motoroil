@@ -108,46 +108,68 @@ body::before {
   z-index: 9999;
 }
 
-/* Layout System */
+/* Layout System - Rock Solid Flexbox Structure */
 .main-shell {
   display: flex;
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
   height: 100dvh;
   background: var(--bg-deep);
   overflow: hidden;
+  position: relative;
 }
 
+/* Desktop Sidebar: Takes physical space in the flex row */
+.sidebar-fixed {
+  width: 240px;
+  min-width: 240px;
+  height: 100%;
+  position: relative;
+  /* Not fixed on desktop to prevent overlap issues */
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-light);
+  z-index: 100;
+}
+
+/* Desktop Content: Takes the remaining space */
 .main-content {
   flex: 1;
   min-width: 0;
-  height: 100vh;
+  /* Critical for chart responsiveness */
+  height: 100%;
   overflow-y: auto;
-  position: relative;
-  background: var(--bg-deep);
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
-}
-
-/* Sidebar Offset - Only applied when sidebar is present and on desktop */
-.has-sidebar .main-content {
-  margin-left: 240px;
+  position: relative;
 }
 
 @media (max-width: 1024px) {
-  .has-sidebar .main-content {
-    margin-left: 0 !important;
-    padding-top: 64px;
-    padding-bottom: 80px;
-  }
 
+  /* Mobile: Sidebar becomes the classic absolute drawer */
   .sidebar-fixed {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
     transform: translateX(-100%);
-    width: 280px !important;
+    z-index: 9999 !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .sidebar-open .sidebar-fixed {
     transform: translateX(0);
     box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+  }
+
+  .main-content {
+    width: 100vw;
+    padding-top: 64px;
+    /* Mobile header space */
+    padding-bottom: 80px;
+    /* Mobile nav space */
   }
 }
 

@@ -162,11 +162,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (!isInitialLoading) {
-            // Wait 200ms for the DOM to settle and CSS to apply fully
-            const timer = setTimeout(() => {
-                setShowContent(true);
-            }, 200);
-            return () => clearTimeout(timer);
+            setShowContent(true);
         }
     }, [isInitialLoading]);
 
@@ -180,9 +176,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
             }
         }
     }, [showContent]);
-
     const showSidebar = auth.isAuthenticated && !isAdminPage;
-    const layoutClass = showSidebar ? "main-shell has-sidebar" : "main-shell";
 
     // Handle Global Errors
     if (hasCriticalError && !isAdminPage) {
@@ -199,59 +193,58 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
     // APP LAYOUT WITH LOADING OVERLAY
     if (!showContent && !isAdminPage) {
-        return (
-            <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
-                <AppSkeleton />
-            </div>
-        );
+        return <AppSkeleton />;
     }
 
     return (
-        <div className={`${layoutClass} ${app.isSidebarOpen ? 'sidebar-open' : ''}`}>
+        <div className={`main-shell ${app.isSidebarOpen ? 'sidebar-open' : ''}`}>
             {showSidebar && <Sidebar />}
-            {showSidebar && <MobileHeader />}
 
-            {showSidebar && app.isSidebarOpen && (
-                <div
-                    onClick={() => app.setIsSidebarOpen(false)}
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(0,0,0,0.5)',
-                        backdropFilter: 'blur(4px)',
-                        zIndex: 1900
-                    }}
-                    className="show-mobile"
-                />
-            )}
+            <div className="flex-1 flex flex-col min-w-0 h-full relative">
+                {showSidebar && <MobileHeader />}
 
-            <main
-                className="main-content"
-                onClick={() => {
-                    if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 1024) {
-                        app.setIsSidebarOpen(false);
-                    }
-                }}
-            >
-                {showSidebar && <GrowthBanner />}
-                {children}
-
-                {auth.user && !isAdminPage && (
-                    <>
-                        {widgetsReady && (
-                            <>
-                                <SalesMonitor
-                                    userRole={auth.user.role}
-                                    currentBranch={auth.user.branch}
-                                    currentStaff={auth.user.name}
-                                />
-                                <ChatWidget />
-                            </>
-                        )}
-                    </>
+                {showSidebar && app.isSidebarOpen && (
+                    <div
+                        onClick={() => app.setIsSidebarOpen(false)}
+                        style={{
+                            position: 'fixed',
+                            inset: 0,
+                            background: 'rgba(0,0,0,0.5)',
+                            backdropFilter: 'blur(4px)',
+                            zIndex: 1900
+                        }}
+                        className="show-mobile"
+                    />
                 )}
-            </main>
-            {showSidebar && <MobileNav />}
+
+                <main
+                    className="main-content"
+                    onClick={() => {
+                        if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 1024) {
+                            app.setIsSidebarOpen(false);
+                        }
+                    }}
+                >
+                    {showSidebar && <GrowthBanner />}
+                    {children}
+
+                    {auth.user && !isAdminPage && (
+                        <>
+                            {widgetsReady && (
+                                <>
+                                    <SalesMonitor
+                                        userRole={auth.user.role}
+                                        currentBranch={auth.user.branch}
+                                        currentStaff={auth.user.name}
+                                    />
+                                    <ChatWidget />
+                                </>
+                            )}
+                        </>
+                    )}
+                </main>
+                {showSidebar && <MobileNav />}
+            </div>
         </div>
     );
 }
