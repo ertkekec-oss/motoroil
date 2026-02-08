@@ -182,6 +182,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     }, [showContent]);
 
     const showSidebar = auth.isAuthenticated && !isAdminPage;
+    const layoutClass = showSidebar ? "main-shell has-sidebar" : "main-shell";
 
     // Handle Global Errors
     if (hasCriticalError && !isAdminPage) {
@@ -206,64 +207,52 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <>
-            <div className={app.isSidebarOpen ? 'sidebar-open' : ''} style={{ display: 'flex', height: '100dvh', width: '100%', background: 'var(--bg-deep)', overflow: 'hidden' }}>
-                {showSidebar && <Sidebar />}
-                {showSidebar && <MobileHeader />}
+        <div className={`${layoutClass} ${app.isSidebarOpen ? 'sidebar-open' : ''}`}>
+            {showSidebar && <Sidebar />}
+            {showSidebar && <MobileHeader />}
 
-                {showSidebar && app.isSidebarOpen && (
-                    <div
-                        onClick={() => app.setIsSidebarOpen(false)}
-                        style={{
-                            position: 'fixed',
-                            inset: 0,
-                            background: 'rgba(0,0,0,0.5)',
-                            backdropFilter: 'blur(4px)',
-                            zIndex: 1900
-                        }}
-                        className="show-mobile"
-                    />
-                )}
-
-                <main
-                    className={showSidebar ? "main-content" : ""}
+            {showSidebar && app.isSidebarOpen && (
+                <div
+                    onClick={() => app.setIsSidebarOpen(false)}
                     style={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        height: '100vh',
-                        overflowY: 'auto',
-                        position: 'relative',
-                        minWidth: 0, // Critical for preventing flex items from exceeding parent
-                        width: '100%'
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0,0,0,0.5)',
+                        backdropFilter: 'blur(4px)',
+                        zIndex: 1900
                     }}
-                    onClick={() => {
-                        if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 1024) {
-                            app.setIsSidebarOpen(false);
-                        }
-                    }}
-                >
-                    {showSidebar && <GrowthBanner />}
-                    {children}
+                    className="show-mobile"
+                />
+            )}
 
-                    {auth.user && !isAdminPage && (
-                        <>
-                            {widgetsReady && (
-                                <>
-                                    <SalesMonitor
-                                        userRole={auth.user.role}
-                                        currentBranch={auth.user.branch}
-                                        currentStaff={auth.user.name}
-                                    />
-                                    <ChatWidget />
-                                </>
-                            )}
-                        </>
-                    )}
-                </main>
-                {showSidebar && <MobileNav />}
-            </div>
-        </>
+            <main
+                className="main-content"
+                onClick={() => {
+                    if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 1024) {
+                        app.setIsSidebarOpen(false);
+                    }
+                }}
+            >
+                {showSidebar && <GrowthBanner />}
+                {children}
+
+                {auth.user && !isAdminPage && (
+                    <>
+                        {widgetsReady && (
+                            <>
+                                <SalesMonitor
+                                    userRole={auth.user.role}
+                                    currentBranch={auth.user.branch}
+                                    currentStaff={auth.user.name}
+                                />
+                                <ChatWidget />
+                            </>
+                        )}
+                    </>
+                )}
+            </main>
+            {showSidebar && <MobileNav />}
+        </div>
     );
 }
 

@@ -4,11 +4,9 @@ import React from 'react';
 
 export default function AppSkeleton() {
     return (
-        <div style={{
+        <div className="main-shell has-sidebar" style={{
             position: 'fixed',
             inset: 0,
-            background: 'var(--bg-deep)',
-            display: 'flex',
             zIndex: 9999,
             overflow: 'hidden',
             fontFamily: "'Outfit', sans-serif"
@@ -50,17 +48,13 @@ export default function AppSkeleton() {
             </div>
 
             {/* Main Content Skeleton (Shifted) */}
-            <div style={{
-                flex: 1,
-                padding: '24px',
-                paddingLeft: '264px', // 240px sidebar + 24px padding
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-                overflow: 'hidden',
-                width: '100%',
-                boxSizing: 'border-box'
-            }} className="main-content-skeleton">
+            <div
+                className="main-content"
+                style={{
+                    padding: '24px',
+                    gap: '24px'
+                }}
+            >
 
                 {/* Greeting / Dashboard Header */}
                 <div className="skeleton-pulse" style={{ width: '40%', height: '40px', borderRadius: '12px', marginTop: '20px' }} />
@@ -112,9 +106,6 @@ export default function AppSkeleton() {
             }
             .sidebar-skeleton {
                 display: none !important;
-            }
-            .main-content-skeleton {
-                padding-left: 24px !important;
             }
         }
         
