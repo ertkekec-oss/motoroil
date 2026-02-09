@@ -104,16 +104,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if (userData.setupState === 'PENDING') {
                     router.push('/onboarding');
                 } else {
-                    const isAdmin = userData.role?.includes('Admin') || userData.role?.includes('Müdür') || userData.permissions?.includes('*');
-                    const hasPOS = userData.permissions?.includes('pos_access');
-                    const hasFieldSales = userData.permissions?.includes('field_sales_access');
-
-                    if (isAdmin || hasPOS) {
+                    // ADMIN role always goes to main dashboard
+                    if (userData.role === 'ADMIN') {
                         router.push('/');
-                    } else if (hasFieldSales) {
-                        router.push('/field-mobile/routes');
                     } else {
-                        router.push('/');
+                        // For non-admin users, check permissions
+                        const hasPOS = userData.permissions?.includes('pos_access');
+                        const hasFieldSales = userData.permissions?.includes('field_sales_access');
+
+                        if (hasPOS) {
+                            router.push('/');
+                        } else if (hasFieldSales) {
+                            router.push('/field-mobile/routes');
+                        } else {
+                            // Default fallback
+                            router.push('/');
+                        }
                     }
                 }
                 return true;

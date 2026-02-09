@@ -68,15 +68,27 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        // 4. Create User (Admin of Tenant)
+        // 4. Create User (Admin of Tenant) with default permissions
         const hashedPassword = await hashPassword(password);
+        const defaultPermissions = [
+            'pos_access',
+            'customer_view',
+            'customer_create',
+            'customer_edit',
+            'inventory_view',
+            'sales_archive',
+            'finance_view',
+            'settings_manage'
+        ];
+
         const user = await (prisma as any).user.create({
             data: {
                 email,
                 password: hashedPassword,
                 role: 'ADMIN',
                 name: name,
-                tenantId: tenant.id
+                tenantId: tenant.id,
+                permissions: defaultPermissions
             }
         });
 
