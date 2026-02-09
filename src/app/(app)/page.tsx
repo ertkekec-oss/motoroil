@@ -196,6 +196,14 @@ function POSContent() {
       if (success) {
         showSuccess("Başarılı", "Satış tamamlandı");
         setCart([]); setPaymentMode(null); setPointsToUse(0); setValidCoupon(null); setDiscountValue(0); setReferenceCode('');
+
+        // Redirect to Customer Detail Page if not retail
+        if (selectedCustomer !== 'Perakende Müşteri' && customer?.id) {
+          router.push(`/customers/${customer.id}`);
+        } else {
+          // Reset to Retail if anonymous
+          setSelectedCustomer('Perakende Müşteri');
+        }
       } else {
         showError("Hata", "Satış kaydedilemedi.");
       }
