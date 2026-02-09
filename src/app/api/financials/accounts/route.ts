@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAccountForKasa } from '@/lib/accounting';
+import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,17 +24,33 @@ const DEFAULT_CHART_OF_ACCOUNTS = [
 ];
 
 export async function GET() {
-    try {
-        // 1. Check if any accounts exist
-        const count = await prisma.account.count();
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user;
 
-        // 2. If empty or missing new fields, SEED/UPDATE the default chart of accounts
+    try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
+        // 1. Check if any accounts exist for THIS company
+        const count = await prisma.account.count({
+            where: { companyId: company.id }
+        });
+
+        // 2. If empty, SEED the default chart of accounts for THIS company
         if (count === 0) {
-            console.log("Seeding Default Chart of Accounts...");
+            console.log(`Seeding Default Chart of Accounts for Company: ${company.name}`);
             try {
                 for (const acc of DEFAULT_CHART_OF_ACCOUNTS) {
                     await prisma.account.create({
                         data: {
+                            companyId: company.id, // Bind to company
                             code: acc.code,
                             name: acc.name,
                             type: acc.type,
@@ -54,16 +71,12 @@ export async function GET() {
             }
         }
 
-        // 3. (REMOVED REDUNDANT SYNC)
-        // Kasa sync is now handled via manual /api/financials/accounts/sync or background tasks
-
-        // 4. Fetch all accounts sorted by code
-        console.log('[Accounts API] Fetching all accounts...');
+        // 4. Fetch all accounts sorted by code (Filtered by Company)
         const accountsRaw = await prisma.account.findMany({
+            where: { companyId: company.id },
             orderBy: { code: 'asc' }
         });
 
-        // 5. Calculate Correct Balances (TDHP Logic)
         // 5. Calculate Correct Balances (TDHP Logic)
         const accounts = accountsRaw.map(acc => {
             const rawBalance = Number(acc.balance);
@@ -72,7 +85,6 @@ export async function GET() {
             const warnings: string[] = [];
 
             // Determine orientation
-            const accountClass = acc.accountClass || 'DIĞER';
             // Explicit check for known classes or type fallback
             const isDebitOriented =
                 acc.accountClass === 'AKTIF' ||
@@ -124,9 +136,6 @@ export async function GET() {
             }
 
             // 4. GENERIC REVERSE BALANCE CHECK (Applicable to all other meaningful accounts)
-            // Skip 391, 191 etc if they have specific behaviors, but generally:
-            // Asset/Expense shouldn't likely have Credit Balance (unless returns/adjustments)
-            // Liability/Income shouldn't likely have Debit Balance (unless returns/adjustments)
             else {
                 if (isDebitOriented && creditBalance > 0) {
                     // e.g. 120 Alicilar having Credit Balance (Customer overpaid) which is valid but noteworthy
@@ -150,8 +159,6 @@ export async function GET() {
             };
         });
 
-        console.log(`[Accounts API] Found ${accounts.length} accounts.`);
-
         return NextResponse.json({ success: true, accounts });
 
     } catch (error: any) {
@@ -161,7 +168,20 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user;
+
     try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const body = await req.json();
         const { code, name, type, parentCode } = body;
 
@@ -170,21 +190,28 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: 'Hesap kodu, adı ve tipi zorunludur.' }, { status: 400 });
         }
 
-        // Check uniqueness (code + branch compound unique)
+        // Check uniqueness (code + branch + companyId compound unique)
         const existing = await prisma.account.findFirst({
-            where: { code, branch: 'Merkez' }
+            where: {
+                code,
+                companyId: company.id,
+                branch: 'Merkez' // TODO: Dynamic branch
+            }
         });
+
         if (existing) {
             return NextResponse.json({ success: false, error: 'Bu hesap kodu zaten kullanılıyor.' }, { status: 400 });
         }
 
         const newAccount = await prisma.account.create({
             data: {
+                companyId: company.id,
                 code,
                 name,
                 type,
                 parentCode: parentCode || null,
-                balance: 0
+                balance: 0,
+                branch: 'Merkez' // TODO: Dynamic branch
             }
         });
 

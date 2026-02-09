@@ -115,14 +115,14 @@ export default function SettingsPage() {
 
         let updatedMethods;
         if (editingPaymentMethodId) {
-            updatedMethods = paymentMethods.map((pm: any) =>
+            updatedMethods = (paymentMethods || []).map((pm: any) =>
                 pm.id === editingPaymentMethodId ? { ...newPaymentMethod, id: pm.id } : pm
             );
             setEditingPaymentMethodId(null);
         } else {
             const id = Math.random().toString(36).substr(2, 9);
             const icon = newPaymentMethod.type === 'cash' ? '💵' : (newPaymentMethod.type === 'card' ? '💳' : '🏦');
-            updatedMethods = [...paymentMethods, { ...newPaymentMethod, id, icon }];
+            updatedMethods = [...(paymentMethods || []), { ...newPaymentMethod, id, icon }];
         }
 
         try {
@@ -136,7 +136,7 @@ export default function SettingsPage() {
 
     const removePaymentMethodDefinition = (id: string) => {
         showConfirm('Emin misiniz?', 'Bu ödeme tanımı silinecek. Şubelerdeki aktif hesapları etkilemez ancak yeni şubelerde seçilemez.', async () => {
-            const updatedMethods = paymentMethods.filter((pm: any) => pm.id !== id);
+            const updatedMethods = (paymentMethods || []).filter((pm: any) => pm.id !== id);
             await updatePaymentMethods(updatedMethods);
             showSuccess('Başarılı', 'Tanım silindi.');
         });
@@ -508,7 +508,8 @@ export default function SettingsPage() {
 
     const addKdv = () => {
         if (newKdv) {
-            updateInvoiceSettings({ ...invoiceSettings, kdvRates: [...invoiceSettings.kdvRates, parseInt(newKdv)] });
+            const currentRates = (invoiceSettings as any)?.kdvRates || [];
+            updateInvoiceSettings({ ...invoiceSettings, kdvRates: [...currentRates, parseInt(newKdv)] });
             setNewKdv('');
         }
     };
@@ -537,7 +538,8 @@ export default function SettingsPage() {
 
     const addDefinition = async (key: string, list: string[], setList: any) => {
         if (!newItemInput) return;
-        const newList = [...list, newItemInput];
+        const currentList = list || [];
+        const newList = [...currentList, newItemInput];
         setList(newList);
         setNewItemInput('');
 
@@ -557,7 +559,8 @@ export default function SettingsPage() {
     };
 
     const removeDefinition = async (key: string, item: string, list: string[], setList: any) => {
-        const newList = list.filter(i => i !== item);
+        const currentList = list || [];
+        const newList = currentList.filter(i => i !== item);
         setList(newList);
 
         // Veritabanına kaydet
@@ -590,7 +593,7 @@ export default function SettingsPage() {
                     icon,
                     linkedKasaId: ''
                 };
-                updatePaymentMethods([...paymentMethods, newVal]).then(() => {
+                updatePaymentMethods([...(paymentMethods || []), newVal]).then(() => {
                     setNewItemInput('');
                     if (showSuccess) showSuccess('Başarılı', 'Ödeme yöntemi eklendi.');
                 }).catch(err => {
@@ -1409,7 +1412,7 @@ export default function SettingsPage() {
 
                                 <div className="p-4">
                                     <div className="grid grid-cols-1 gap-2">
-                                        {paymentMethods.map(pm => (
+                                        {(paymentMethods || []).map(pm => (
                                             <div key={pm.id} className="flex-between p-3 bg-white/5 border border-white/5 rounded-xl group hover:bg-white/10 transition-all">
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-xl p-2 bg-white/5 rounded-lg">{pm.icon}</span>
@@ -1459,14 +1462,14 @@ export default function SettingsPage() {
                                             <div className="form-group">
                                                 <label className="text-[9px] font-black opacity-50 mb-1 block uppercase">Tipi</label>
                                                 <select value={newKasa.type} onChange={e => setNewKasa({ ...newKasa, type: e.target.value })} className="w-full bg-black/50 border border-white/10 rounded p-2 text-xs">
-                                                    {kasaTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                                                    {(kasaTypes || []).map(t => <option key={t} value={t}>{t}</option>)}
                                                 </select>
                                             </div>
                                             <div className="form-group">
                                                 <label className="text-[9px] font-black opacity-50 mb-1 block uppercase">Şube</label>
                                                 <select value={newKasa.branch} onChange={e => setNewKasa({ ...newKasa, branch: e.target.value })} className="w-full bg-black/50 border border-white/10 rounded p-2 text-xs">
                                                     <option value="Global">Küresel (Tüm Şubeler)</option>
-                                                    {contextBranches.map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>)}
+                                                    {(contextBranches || []).map((b: any) => <option key={b.id} value={b.name}>{b.name}</option>)}
                                                 </select>
                                             </div>
                                             {!editingKasa && (
@@ -1484,7 +1487,7 @@ export default function SettingsPage() {
 
                                 <div className="p-4">
                                     <div className="flex flex-col gap-2">
-                                        {kasalar.map(k => (
+                                        {(kasalar || []).map(k => (
                                             <div key={k.id} className="p-3 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-all group">
                                                 <div className="flex-between">
                                                     <div className="flex items-center gap-3">
@@ -1675,7 +1678,7 @@ export default function SettingsPage() {
                                 <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>FATURA NOTU (VARSAYILAN)</label>
                                 <textarea
                                     rows={2}
-                                    value={invoiceSettings.defaultNote}
+                                    value={invoiceSettings?.defaultNote || ''}
                                     onChange={(e) => updateInvoiceSettings({ ...invoiceSettings, defaultNote: e.target.value })}
                                     style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '10px', borderRadius: '8px', color: 'white', fontSize: '12px' }}
                                 />
@@ -1684,11 +1687,11 @@ export default function SettingsPage() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex-col gap-1">
                                     <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>SERİ ÖN EKİ</label>
-                                    <input type="text" value={invoiceSettings.prefix} onChange={e => updateInvoiceSettings({ ...invoiceSettings, prefix: e.target.value })} style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', color: 'var(--text-main)', fontSize: '12px' }} />
+                                    <input type="text" value={invoiceSettings?.prefix || ''} onChange={e => updateInvoiceSettings({ ...invoiceSettings, prefix: e.target.value })} style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', color: 'var(--text-main)', fontSize: '12px' }} />
                                 </div>
                                 <div className="flex-col gap-1">
                                     <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>SIRADAKİ NO</label>
-                                    <input type="number" value={invoiceSettings.nextNumber} readOnly style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', color: 'var(--text-muted)', fontSize: '12px', cursor: 'not-allowed' }} />
+                                    <input type="number" value={invoiceSettings?.nextNumber || 0} readOnly style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', color: 'var(--text-muted)', fontSize: '12px', cursor: 'not-allowed' }} />
                                 </div>
                             </div>
 
@@ -1743,15 +1746,16 @@ export default function SettingsPage() {
 
                         <div className="card glass" style={{ padding: '20px' }}>
                             <div className="flex-col gap-2">
-                                {invoiceSettings.kdvRates.map((rate, idx) => (
-                                    <div key={rate} className="flex-between" style={{ padding: '10px 16px', background: 'var(--bg-deep)', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
+                                {((invoiceSettings as any)?.kdvRates || []).map((rate: any, idx: number) => (
+                                    <div key={idx} className="flex-between" style={{ padding: '10px 16px', background: 'var(--bg-deep)', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
                                         <div className="flex-center gap-3">
                                             <span style={{ fontSize: '14px', fontWeight: '900', color: 'var(--primary)' }}>%{rate}</span>
                                             <span style={{ fontSize: '10px', opacity: 0.5, fontWeight: '700' }}>KDV ORANI</span>
                                         </div>
                                         <button
                                             onClick={() => {
-                                                const newRates = invoiceSettings.kdvRates.filter((_, i) => i !== idx);
+                                                const currentRates = (invoiceSettings as any)?.kdvRates || [];
+                                                const newRates = currentRates.filter((_: any, i: number) => i !== idx);
                                                 updateInvoiceSettings({ ...invoiceSettings, kdvRates: newRates });
                                             }}
                                             style={{ background: 'rgba(239, 68, 68, 0.1)', border: 'none', color: 'var(--danger)', padding: '6px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer' }}
@@ -1761,18 +1765,30 @@ export default function SettingsPage() {
                             </div>
 
                             <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '10px', border: '1px dashed var(--success)' }}>
-                                <div className="flex-center gap-2">
-                                    <div style={{ position: 'relative' }}>
-                                        <input
-                                            type="number"
-                                            placeholder="0"
-                                            value={newKdv}
-                                            onChange={e => setNewKdv(e.target.value)}
-                                            style={{ width: '80px', padding: '8px 20px 8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)', background: 'var(--bg-card)', color: 'white', fontSize: '13px', fontWeight: '900', textAlign: 'center' }}
-                                        />
-                                        <span style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', fontWeight: '900', fontSize: '11px', opacity: 0.5 }}>%</span>
+                                <div className="flex-col gap-3">
+                                    <p style={{ fontSize: '11px', fontWeight: 'bold', opacity: 0.7 }}>Yeni Vergi Oranı Ekle</p>
+                                    <div className="flex items-center gap-2">
+                                        <div style={{ position: 'relative', flex: 1 }}>
+                                            <input
+                                                type="number"
+                                                placeholder="0"
+                                                value={newKdv}
+                                                onChange={e => setNewKdv(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') addKdv();
+                                                }}
+                                                style={{ width: '100%', padding: '10px 30px 10px 12px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-card)', color: 'white', fontSize: '14px', fontWeight: '800' }}
+                                            />
+                                            <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', fontWeight: '900', fontSize: '12px', opacity: 0.5 }}>%</span>
+                                        </div>
+                                        <button
+                                            onClick={addKdv}
+                                            className="btn btn-success"
+                                            style={{ padding: '10px 20px', fontSize: '12px', fontWeight: '900', minWidth: '100px', borderRadius: '8px' }}
+                                        >
+                                            + EKLE
+                                        </button>
                                     </div>
-                                    <button onClick={addKdv} className="btn btn-success" style={{ marginLeft: 'auto', fontSize: '11px', fontWeight: '900' }}>+ ORAN EKLE</button>
                                 </div>
                             </div>
                         </div>
@@ -1822,7 +1838,7 @@ export default function SettingsPage() {
                                     <tr><th style={{ padding: '10px' }}>TAKSİT TİPİ</th><th>KOMİSYON ORANI</th><th style={{ textAlign: 'right' }}>İŞLEM</th></tr>
                                 </thead>
                                 <tbody>
-                                    {salesExpenses.posCommissions.map((comm, idx) => (
+                                    {(salesExpenses?.posCommissions || []).map((comm: any, idx: number) => (
                                         <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                                             {editingCommissionIdx === idx ? (
                                                 // EDIT MODE
@@ -1937,7 +1953,7 @@ export default function SettingsPage() {
 
                             {/* Other Costs List */}
                             <div className="flex-col gap-2">
-                                {salesExpenses.otherCosts.map((cost, idx) => (
+                                {(salesExpenses?.otherCosts || []).map((cost: any, idx: number) => (
                                     <div key={idx} className="flex-between" style={{ padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
                                         <span style={{ fontWeight: 'bold' }}>{cost.name}</span>
                                         <div className="flex-center gap-4">
@@ -2128,7 +2144,7 @@ export default function SettingsPage() {
                                 {/* LIST AREA */}
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
                                     {definitionTab === 'payment_methods' ?
-                                        paymentMethods.map((pm: any, i: number) => (
+                                        (paymentMethods || []).map((pm: any, i: number) => (
                                             <div key={pm.id || i} className="card glass-hover animate-scale-in" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
                                                 <div className="flex items-center gap-3">
                                                     <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
@@ -2150,11 +2166,11 @@ export default function SettingsPage() {
                                             </div>
                                         ))
                                         : (
-                                            (definitionTab === 'brands' ? brands :
-                                                definitionTab === 'prod_cat' ? prodCats :
-                                                    definitionTab === 'cust_class' ? custClasses :
-                                                        definitionTab === 'supp_class' ? suppClasses :
-                                                            definitionTab === 'vehicle_types' ? vehicleTypes : warranties
+                                            (definitionTab === 'brands' ? (brands || []) :
+                                                definitionTab === 'prod_cat' ? (prodCats || []) :
+                                                    definitionTab === 'cust_class' ? (custClasses || []) :
+                                                        definitionTab === 'supp_class' ? (suppClasses || []) :
+                                                            definitionTab === 'vehicle_types' ? (vehicleTypes || []) : (warranties || [])
                                             ).map((item: string, i: number) => (
                                                 <div key={i} className="card glass-hover animate-scale-in" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <span style={{ fontWeight: '600' }}>{item}</span>
@@ -2395,7 +2411,7 @@ export default function SettingsPage() {
                                                 <div className="flex-col gap-2">
                                                     <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>GEÇERLİ OLDUĞU MARKALAR (Boşsa Tümü)</label>
                                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '10px', background: 'var(--bg-deep)', borderRadius: '10px', border: '1px solid var(--border-light)', minHeight: '60px' }}>
-                                                        {allBrands.map(b => (
+                                                        {(allBrands || []).map(b => (
                                                             <button
                                                                 key={b}
                                                                 onClick={() => {
@@ -2421,7 +2437,7 @@ export default function SettingsPage() {
                                                 <div className="flex-col gap-2">
                                                     <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>GEÇERLİ OLDUĞU KATEGORİLER (Boşsa Tümü)</label>
                                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '10px', background: 'var(--bg-deep)', borderRadius: '10px', border: '1px solid var(--border-light)', minHeight: '60px' }}>
-                                                        {allCats.map(c => (
+                                                        {(allCats || []).map(c => (
                                                             <button
                                                                 key={c}
                                                                 onClick={() => {
@@ -2634,7 +2650,7 @@ export default function SettingsPage() {
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>MARKA KISITI</label>
                                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '8px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)', minHeight: '50px' }}>
-                                                            {allBrands.map(b => (
+                                                            {(allBrands || []).map(b => (
                                                                 <button
                                                                     type="button"
                                                                     key={b}
@@ -2653,7 +2669,7 @@ export default function SettingsPage() {
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>KAT. KISITI</label>
                                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '8px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)', minHeight: '50px' }}>
-                                                            {allCats.map(c => (
+                                                            {(allCats || []).map(c => (
                                                                 <button
                                                                     type="button"
                                                                     key={c}

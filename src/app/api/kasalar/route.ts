@@ -2,20 +2,31 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAccountForKasa, syncKasaBalancesToLedger } from '@/lib/accounting';
+import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-
-import { authorize } from '@/lib/auth';
-
 export async function GET() {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
+    const session = auth.user;
 
     try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const kasalar = await prisma.kasa.findMany({
-            where: { isActive: true },
+            where: {
+                isActive: true,
+                companyId: company.id // Strict Isolation
+            },
             orderBy: { name: 'asc' }
         });
 
@@ -35,17 +46,28 @@ export async function GET() {
 export async function POST(request: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
+    const session = auth.user;
 
     try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const body = await request.json();
         const { name, type, balance, branch } = body;
         const branchName = branch || 'Merkez';
 
         console.log(`[KASA_POST] Adding kasa: ${name}, Type: ${type}, Branch: ${branchName}`);
 
-        // 1. Check if an match (Name + Branch) exists (case-insensitive)
+        // 1. Check if an match (Name + Branch + Company) exists (case-insensitive)
         const existing = await prisma.kasa.findFirst({
             where: {
+                companyId: company.id,
                 name: { equals: name, mode: 'insensitive' },
                 branch: { equals: branchName, mode: 'insensitive' }
             }
@@ -81,6 +103,7 @@ export async function POST(request: Request) {
 
         const kasa = await prisma.kasa.create({
             data: {
+                companyId: company.id, // Set Company ID
                 name,
                 type,
                 balance: balance || 0,
@@ -94,7 +117,8 @@ export async function POST(request: Request) {
 
             // If there's an opening balance, create opening slip
             if (Number(balance) !== 0) {
-                await syncKasaBalancesToLedger(branchName);
+                // TODO: Verify if syncKasaBalancesToLedger respects company isolation
+                await syncKasaBalancesToLedger(branchName, company.id);
             }
         } catch (e) {
             console.error('Accounting Sync Error (Create):', e);

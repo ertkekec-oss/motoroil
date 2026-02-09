@@ -10,29 +10,53 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
+        // Migration: Fix keys to match frontend expectations
+        try {
+            const oldFinance = await prisma.feature.findUnique({ where: { key: 'finance' } });
+            const newAccounting = await prisma.feature.findUnique({ where: { key: 'accounting' } });
+            if (oldFinance && !newAccounting) {
+                await prisma.feature.update({ where: { key: 'finance' }, data: { key: 'accounting' } });
+            }
+
+            const oldEinvoice = await prisma.feature.findUnique({ where: { key: 'einvoice' } });
+            const newEInvoice = await prisma.feature.findUnique({ where: { key: 'e_invoice' } });
+            if (oldEinvoice && !newEInvoice) {
+                await prisma.feature.update({ where: { key: 'einvoice' }, data: { key: 'e_invoice' } });
+            }
+        } catch (e) {
+            console.log('Feature key migration skipped or failed:', e);
+        }
+
+        const currentFeatures = [
+            { key: 'dashboard', name: 'Gelişmiş Gösterge Paneli', description: 'Tüm finansal ve operasyonel metriklerin anlık özeti.' },
+            { key: 'pos', name: 'Hızlı Satış (POS)', description: 'Barkodlu perakende satış, hızlı tahsilat ve bilgi fişi.' },
+            { key: 'sales', name: 'Satış Yönetimi', description: 'Satış geçmişi, faturalar ve sipariş yönetimi.' },
+            { key: 'inventory', name: 'Stok & Varyant Yönetimi', description: 'Ürün, varyant, kritik stok, barkod ve depo takibi.' },
+            { key: 'crm', name: 'Cari & Müşteri Takibi', description: 'Müşteri/Tedarikçi borç-alacak, ekstre ve iletişim yönetimi.' },
+            { key: 'accounting', name: 'Finans & Kasa Yönetimi', description: 'Kasa, banka, gelir-gider takibi ve nakit akışı yönetimi.' },
+            { key: 'service', name: 'Servis & İş Emirleri', description: 'Araç kabul, iş emri, plaka takibi, parça ve işçilik yönetimi.' },
+            { key: 'e_invoice', name: 'E-Dönüşüm (E-Fatura)', description: 'GİB uyumlu E-Fatura ve E-Arşiv fatura entegrasyonu.' },
+            { key: 'reporting', name: 'Gelişmiş Raporlama', description: 'Satış, stok, servis, personel ve finansal detay raporları.' },
+            { key: 'branch', name: 'Çoklu Şube Yönetimi', description: 'Merkez ve şubeler arası stok transferi ve ortak yönetim.' },
+            { key: 'campaign', name: 'Kampanya & Sadakat', description: 'Müşteri puan sistemi, indirim kuponları ve SMS bildirimleri.' }
+        ];
+
+        // Sync features (Upsert all)
+        for (const feat of currentFeatures) {
+            await prisma.feature.upsert({
+                where: { key: feat.key },
+                update: { name: feat.name, description: feat.description },
+                create: feat
+            });
+        }
+
+        // Return the fresh list
         const features = await prisma.feature.findMany({
+            where: {
+                key: { in: currentFeatures.map(f => f.key) }
+            },
             orderBy: { name: 'asc' }
         });
-
-        // Initialize features if empty (seed)
-        if (features.length === 0) {
-            const defaultFeatures = [
-                { key: 'einvoice', name: 'E-Fatura & E-Arşiv Entegrasyonu', description: 'Nilvera ve diğer entegratörler üzerinden fatura gönderimi.' },
-                { key: 'pos', name: 'Hızlı Satış (POS) Ekranı', description: 'Perakende satış ve fiş kesme ekranı.' },
-                { key: 'crm', name: 'CRM & Müşteri Yönetimi', description: 'Müşteri takibi, borç/alacak ve randevu sistemi.' },
-                { key: 'inventory', name: 'Stok & Depo Yönetimi', description: 'Ürün takibi, kritik stok uyarıları ve transferler.' },
-                { key: 'accounting', name: 'Resmi Muhasebe', description: 'Yevmiye fişleri, mizan ve mali tablolar.' },
-                { key: 'reporting', name: 'Gelişmiş Raporlama', description: 'Kâr/zarar, satış analizleri ve personel performansı.' },
-                { key: 'sms', name: 'SMS & WhatsApp Bildirimleri', description: 'Bakım ve kampanya bildirimleri.' },
-                { key: 'mobile', name: 'Mobil Uygulama Erişimi', description: 'Sistemi mobil cihazlardan tam yetkiyle kullanma.' }
-            ];
-
-            await prisma.feature.createMany({
-                data: defaultFeatures
-            });
-
-            return NextResponse.json(defaultFeatures);
-        }
 
         return NextResponse.json(features);
 

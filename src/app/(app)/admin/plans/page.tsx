@@ -109,7 +109,9 @@ export default function AdminPlans() {
             isActive: plan.isActive ?? true,
             limits: limitObj,
             selectedFeatures: Array.isArray(plan.features)
-                ? plan.features.map((f: any) => typeof f === 'string' ? f : (f.id || f.key))
+                ? plan.features
+                    .map((f: any) => typeof f === 'string' ? f : (f.id || f.key))
+                    .filter((id: string) => availableFeatures.some(af => af.id === id))
                 : []
         });
         setShowModal(true);
@@ -207,11 +209,16 @@ export default function AdminPlans() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-wrap gap-1 max-w-[200px]">
-                                            {plan.features?.length > 0 ? plan.features.map((f: any, i: number) => (
-                                                <span key={i} className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-blue-100 whitespace-nowrap">
-                                                    {typeof f === 'string' ? f : (f.name || f.key || 'Limit')}
-                                                </span>
-                                            )) : (
+                                            {plan.features?.length > 0 ? plan.features
+                                                .filter((f: any) => {
+                                                    const fId = typeof f === 'string' ? f : (f.id || f.key);
+                                                    return availableFeatures.some(af => af.id === fId || af.key === fId);
+                                                })
+                                                .map((f: any, i: number) => (
+                                                    <span key={i} className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-blue-100 whitespace-nowrap">
+                                                        {typeof f === 'string' ? f : (f.name || f.key || 'Limit')}
+                                                    </span>
+                                                )) : (
                                                 <span className="text-[9px] text-slate-300 italic">Standart Özellikler</span>
                                             )}
                                         </div>

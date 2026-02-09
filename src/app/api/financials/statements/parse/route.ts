@@ -1,11 +1,15 @@
 
 import { NextResponse } from 'next/server';
 import { parseStatementPdf } from '@/lib/statement-parser';
+import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+
     try {
         const formData = await request.formData();
         const file = formData.get('file') as File;

@@ -1,10 +1,24 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user;
+
     try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const { orderIds } = await request.json();
 
         if (!orderIds || !Array.isArray(orderIds) || orderIds.length === 0) {
@@ -16,15 +30,19 @@ export async function POST(request: Request) {
 
         console.log('💰 Tahsilat işlemi başlatıldı:', { orderIds });
 
-        // 1. E-ticaret kasasını bul veya oluştur
+        // 1. E-ticaret kasasını bul veya oluştur (Tenant Scoped)
         let ecommerceKasa = await prisma.kasa.findFirst({
-            where: { name: 'E-ticaret' }
+            where: {
+                name: 'E-ticaret',
+                companyId: company.id // Strict Isolation
+            }
         });
 
         if (!ecommerceKasa) {
             console.log('📦 E-ticaret kasası bulunamadı, oluşturuluyor...');
             ecommerceKasa = await prisma.kasa.create({
                 data: {
+                    companyId: company.id, // Set Company ID
                     name: 'E-ticaret',
                     type: 'Nakit',
                     balance: 0,
@@ -35,20 +53,31 @@ export async function POST(request: Request) {
             console.log('✅ E-ticaret kasası oluşturuldu:', ecommerceKasa.id);
         }
 
-        // 2. E-ticaret kategorisini bul veya oluştur
+        // 2. E-ticaret kategorisini bul veya oluştur (Global or Tenant? Assuming Global Name for now, or just reuse)
+        // If CustomerCategory doesn't have companyId, we just find by name.
         let ecommerceCategory = await prisma.customerCategory.findFirst({
             where: { name: 'E-ticaret' }
         });
 
         if (!ecommerceCategory) {
-            console.log('📦 E-ticaret kategorisi bulunamadı, oluşturuluyor...');
-            ecommerceCategory = await prisma.customerCategory.create({
-                data: {
-                    name: 'E-ticaret',
-                    description: 'E-ticaret platformlarından sipariş veren müşteriler'
-                }
-            });
-            console.log('✅ E-ticaret kategorisi oluşturuldu:', ecommerceCategory.id);
+            // Check if we can create it (might be global)
+            try {
+                console.log('📦 E-ticaret kategorisi bulunamadı, oluşturuluyor...');
+                ecommerceCategory = await prisma.customerCategory.create({
+                    data: {
+                        name: 'E-ticaret',
+                        description: 'E-ticaret platformlarından sipariş veren müşteriler'
+                    }
+                });
+                console.log('✅ E-ticaret kategorisi oluşturuldu:', ecommerceCategory.id);
+            } catch (catErr) {
+                // concurrency or permission issue, try fetching again
+                ecommerceCategory = await prisma.customerCategory.findFirst({ where: { name: 'E-ticaret' } });
+            }
+        }
+
+        if (!ecommerceCategory) {
+            return NextResponse.json({ success: false, error: 'E-ticaret kategorisi hatası.' }, { status: 500 });
         }
 
         const results = [];
@@ -66,9 +95,16 @@ export async function POST(request: Request) {
                     continue;
                 }
 
-                // Müşteriyi bul veya oluştur
+                // SECURITY: Verify Order Ownership
+                if (order.companyId !== company.id) {
+                    results.push({ orderId, success: false, error: 'Yetkisiz sipariş erişimi' });
+                    continue;
+                }
+
+                // Müşteriyi bul veya oluştur (Tenant Scoped)
                 let customer = await prisma.customer.findFirst({
                     where: {
+                        companyId: company.id, // Strict Isolation
                         OR: [
                             { name: order.customerName },
                             { email: order.customerEmail }
@@ -80,6 +116,7 @@ export async function POST(request: Request) {
                     console.log('👤 Müşteri bulunamadı, oluşturuluyor:', order.customerName);
                     customer = await prisma.customer.create({
                         data: {
+                            companyId: company.id, // Set Company ID
                             name: order.customerName,
                             email: order.customerEmail || '',
                             phone: '',
@@ -99,7 +136,7 @@ export async function POST(request: Request) {
                 // Tahsilat işlemi
                 const amount = parseFloat(order.totalAmount.toString());
 
-                // Kasaya para ekle
+                // Kasaya para ekle (Kasa already verified/created for company)
                 await prisma.kasa.update({
                     where: { id: ecommerceKasa.id },
                     data: { balance: { increment: amount } }
@@ -114,6 +151,7 @@ export async function POST(request: Request) {
                 // Transaction kaydı oluştur
                 await prisma.transaction.create({
                     data: {
+                        companyId: company.id, // Set Company ID
                         type: 'Tahsilat',
                         amount: amount,
                         description: `E-ticaret sipariş tahsilatı: ${order.orderNumber || order.id}`,

@@ -35,23 +35,44 @@ export async function POST(request: Request) {
         // Normalize payment mode
         const effectivePaymentMode = (paymentMode === 'card' || paymentMode === 'credit_card') ? 'credit_card' : paymentMode;
 
-        if (!targetKasaId) {
-            if (effectivePaymentMode === 'credit_card') {
-                const posKasa = await prisma.kasa.findFirst({ where: { isActive: true, type: { contains: 'POS' } } });
-                targetKasaId = posKasa?.id;
-                if (!targetKasaId) {
-                    const bankKasa = await prisma.kasa.findFirst({ where: { isActive: true, type: 'Banka' } });
-                    targetKasaId = bankKasa?.id;
+        if (effectivePaymentMode === 'credit_card') {
+            const posKasa = await prisma.kasa.findFirst({
+                where: {
+                    isActive: true,
+                    type: { contains: 'POS' },
+                    companyId: company.id // Strict Tenant Isolation
                 }
-            } else if (effectivePaymentMode === 'transfer') {
-                const bankKasa = await prisma.kasa.findFirst({ where: { isActive: true, type: 'Banka' } });
+            });
+            targetKasaId = posKasa?.id;
+            if (!targetKasaId) {
+                const bankKasa = await prisma.kasa.findFirst({
+                    where: {
+                        isActive: true,
+                        type: 'Banka',
+                        companyId: company.id // Strict Tenant Isolation
+                    }
+                });
                 targetKasaId = bankKasa?.id;
             }
+        } else if (effectivePaymentMode === 'transfer') {
+            const bankKasa = await prisma.kasa.findFirst({
+                where: {
+                    isActive: true,
+                    type: 'Banka',
+                    companyId: company.id // Strict Tenant Isolation
+                }
+            });
+            targetKasaId = bankKasa?.id;
+        }
 
-            if (!targetKasaId) {
-                const anyKasa = await prisma.kasa.findFirst({ where: { isActive: true } });
-                targetKasaId = anyKasa?.id;
-            }
+        if (!targetKasaId) {
+            const anyKasa = await prisma.kasa.findFirst({
+                where: {
+                    isActive: true,
+                    companyId: company.id // Strict Tenant Isolation
+                }
+            });
+            targetKasaId = anyKasa?.id;
         }
 
         if (!targetKasaId) {

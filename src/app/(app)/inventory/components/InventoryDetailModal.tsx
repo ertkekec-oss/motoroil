@@ -12,6 +12,7 @@ interface InventoryDetailModalProps {
     onDelete?: () => void;
     selectedProductState: [any, any]; // [selectedProduct, setSelectedProduct] to allow local mutation
     categories?: string[];
+    allProducts?: any[];
 }
 
 export default function InventoryDetailModal({
@@ -22,7 +23,8 @@ export default function InventoryDetailModal({
     canDelete,
     onDelete,
     selectedProductState,
-    categories = []
+    categories = [],
+    allProducts = []
 }: InventoryDetailModalProps) {
     const [selectedProduct, setSelectedProduct] = selectedProductState;
     const [detailTab, setDetailTab] = useState('general');
@@ -36,8 +38,19 @@ export default function InventoryDetailModal({
                 {/* Header */}
                 <div className="flex justify-between items-center p-6 border-b border-white/5 bg-white/5">
                     <div>
-                        <h2 className="text-xl font-black text-white flex items-center gap-2">
-                            ✏️ Ürün Düzenle <span className="text-muted font-normal text-sm">#{selectedProduct.code}</span>
+                        <h2 className="text-xl font-black text-white flex flex-col gap-0.5">
+                            <span className="flex items-center gap-2">✏️ Ürün Düzenle <span className="text-muted font-normal text-sm">#{selectedProduct.code}</span></span>
+                            {selectedProduct.parentId && allProducts && (
+                                <button
+                                    onClick={() => {
+                                        const parent = allProducts.find(p => p.id === selectedProduct.parentId);
+                                        if (parent) setSelectedProduct(parent);
+                                    }}
+                                    className="text-[10px] text-primary hover:underline text-left"
+                                >
+                                    ← Ana Ürüne Dön ({allProducts.find(p => p.id === selectedProduct.parentId)?.name || 'Parent'})
+                                </button>
+                            )}
                         </h2>
                     </div>
                     <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
@@ -61,9 +74,75 @@ export default function InventoryDetailModal({
                         >
                             Fiyat & Vergi
                         </button>
+                        {selectedProduct && selectedProduct.isParent && (
+                            <button
+                                type="button"
+                                onClick={() => setDetailTab('variants')}
+                                className={`px-4 py-2 text-sm font-bold rounded-t-lg transition-colors ${detailTab === 'variants' ? 'bg-primary text-white' : 'text-muted hover:text-white'}`}
+                            >
+                                Varyantlar
+                            </button>
+                        )}
                     </div>
 
                     <form id="product-edit-form" onSubmit={onSave} className="space-y-6">
+                        {detailTab === 'variants' && selectedProduct.isParent && (
+                            <div className="space-y-4 animate-fade-in">
+                                <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                    <h3 className="text-sm font-bold text-white mb-4 border-b border-white/10 pb-2 flex justify-between items-center">
+                                        <span>Ürün Varyantları</span>
+                                        <span className="text-xs font-normal text-muted bg-white/5 px-2 py-1 rounded-lg">Ana Ürün: {selectedProduct.code}</span>
+                                    </h3>
+
+                                    <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scroll pr-2">
+                                        {(allProducts || []).filter(p => p.parentId === selectedProduct.id).length > 0 ? (
+                                            (allProducts || []).filter(p => p.parentId === selectedProduct.id).map(variant => (
+                                                <div key={variant.id}
+                                                    className="flex justify-between items-center p-3 bg-black/40 border border-white/10 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group"
+                                                    onClick={() => {
+                                                        // Switch context to this variant? 
+                                                        // Ideally we should select this variant for editing, but that might close this modal or change context abruptly.
+                                                        // For now, let's just create a quick view or allow 'select'
+                                                        setSelectedProduct(variant);
+                                                        setDetailTab('general');
+                                                    }}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-lg shadow-inner">
+                                                            👕
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-sm font-bold text-white group-hover:text-primary transition-colors flex items-center gap-2">
+                                                                {variant.name.replace(selectedProduct.name, '').trim() || variant.name}
+                                                                <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-white/10 text-white/50 border border-white/5">{variant.code}</span>
+                                                            </div>
+                                                            <div className="text-[10px] text-muted flex items-center gap-2">
+                                                                <span>Stok: <b className={variant.stock <= 0 ? 'text-red-500' : 'text-emerald-500'}>{variant.stock}</b></span>
+                                                                <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                                                                <span>Fiyat: <b>{Number(variant.price).toLocaleString('tr-TR')} ₺</b></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <span className="text-xs font-bold text-primary">DÜZENLE →</span>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-center py-12 flex flex-col items-center justify-center text-muted">
+                                                <span className="text-2xl opacity-50 mb-2">📦</span>
+                                                <span className="text-sm font-bold">Varyant Bulunamadı</span>
+                                                <p className="text-xs opacity-50 mt-1 max-w-[200px]">Bu ana ürüne bağlı alt varyantlar henüz oluşturulmamış.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="mt-4 pt-4 border-t border-white/10 text-center">
+                                        <p className="text-xs text-muted">Yeni varyant eklemek için "Envanter → Yeni Ürün" menüsünü kullanın ve "Varyant Kullan" seçeneğini işaretleyin.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {detailTab === 'general' && (
                             <div className="grid grid-cols-2 gap-6 animate-fade-in">
                                 <div className="space-y-4">

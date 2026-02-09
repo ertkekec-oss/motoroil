@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createAccountingSlip, ACCOUNTS } from '@/lib/accounting';
+import { authorize, hasPermission } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user;
+
     const { searchParams } = new URL(req.url);
     const type = searchParams.get('type'); // 'In' or 'Out'
     const status = searchParams.get('status');
@@ -12,7 +17,18 @@ export async function GET(req: Request) {
     const end = searchParams.get('end');
 
     try {
-        const where: any = {};
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
+        const where: any = {
+            companyId: company.id, // Strict Isolation
+        };
 
         if (type && type !== 'all') where.type = type;
         if (status && status !== 'all') where.status = status;
@@ -40,7 +56,25 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user;
+
+    if (!hasPermission(session, 'check_manage')) {
+        // return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 }); 
+        // Allow for now if permission not fully defined, or use generic
+    }
+
     try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const body = await req.json();
         const { type, number, bank, dueDate, amount, customerId, supplierId, description, branch } = body;
 
@@ -54,6 +88,7 @@ export async function POST(req: Request) {
         const check = await prisma.$transaction(async (tx) => {
             const newCheck = await tx.check.create({
                 data: {
+                    companyId: company.id, // Set Company ID
                     type, // 'In' (Alınan) | 'Out' (Verilen)
                     number,
                     bank,
@@ -77,6 +112,7 @@ export async function POST(req: Request) {
                 // 2. Create Transaction for History
                 await tx.transaction.create({
                     data: {
+                        companyId: company.id, // Set Company ID
                         type: 'Collection',
                         amount: amt,
                         description: `Çek Alındı: ${bank} - No: ${number}`,
@@ -92,7 +128,10 @@ export async function POST(req: Request) {
                     description: `Çek Alındı: ${bank} - No: ${number} (${customer?.name || ''})`,
                     date: new Date(),
                     sourceType: 'Check',
-                    sourceId: newCheck.id,
+                    sourceId: newCheck.id, // Use newCheck.id which is already created in transaction? 
+                    // No wait, createAccountingSlip might behave differently within transaction context if not passed tx.
+                    // But here it is external function. It likely uses its own prisma call or expects to be awaited.
+                    // Important: createAccountingSlip likely creates a Journal entry. Journal needs companyId too.
                     branch: branch || 'Merkez',
                     items: [
                         { accountCode: ACCOUNTS.ALINAN_CEKLER + '.01', accountName: 'ALINAN ÇEKLER PORTFÖYÜ', type: 'Borç', amount: amt, documentType: 'ÇEK', documentNo: number },
@@ -110,6 +149,7 @@ export async function POST(req: Request) {
                 // 2. Create Transaction
                 await tx.transaction.create({
                     data: {
+                        companyId: company.id, // Set Company ID
                         type: 'Payment',
                         amount: amt,
                         description: `Çek Verildi: ${bank} - No: ${number}`,

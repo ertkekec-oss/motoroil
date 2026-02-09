@@ -37,11 +37,17 @@ export const ACCOUNTS = {
  * Kasa ID'sine karşılık gelen Muhasebe Hesabını bulur veya oluşturur.
  */
 export async function getAccountForKasa(kasaId: string, branch: string = 'Merkez', prismaClient: any = globalPrisma) {
-    const existing = await prismaClient.account.findFirst({ where: { kasaId, branch } as any });
-    if (existing) return existing;
-
+    // 1. Fetch Kasa to get Company ID
     const kasa = await prismaClient.kasa.findUnique({ where: { id: kasaId } });
     if (!kasa) throw new Error(`Kasa bulunamadı: ${kasaId}`);
+
+    // STRICT TENANT ISOLATION
+    const companyId = kasa.companyId;
+
+    const existing = await prismaClient.account.findFirst({
+        where: { kasaId, branch, companyId } as any
+    });
+    if (existing) return existing;
 
     // TDHP'ye göre Ana Grubu belirle
     let parentRoot = ACCOUNTS.KASA;
@@ -60,12 +66,15 @@ export async function getAccountForKasa(kasaId: string, branch: string = 'Merkez
     }
 
     const groupCode = `${parentRoot}.01`;
-    let groupAccount = await prismaClient.account.findFirst({ where: { code: groupCode, branch } as any });
+    let groupAccount = await prismaClient.account.findFirst({
+        where: { code: groupCode, branch, companyId } as any
+    });
 
     if (!groupAccount) {
         try {
             groupAccount = await prismaClient.account.create({
                 data: {
+                    companyId,
                     code: groupCode,
                     name: `${namePrefix} HESAPLARI`,
                     parentCode: parentRoot,
@@ -78,7 +87,9 @@ export async function getAccountForKasa(kasaId: string, branch: string = 'Merkez
                 }
             });
         } catch (e) {
-            groupAccount = await prismaClient.account.findFirst({ where: { code: groupCode, branch } as any });
+            groupAccount = await prismaClient.account.findFirst({
+                where: { code: groupCode, branch, companyId } as any
+            });
         }
     }
 
@@ -88,7 +99,7 @@ export async function getAccountForKasa(kasaId: string, branch: string = 'Merkez
 
     while (!accountToReturn) {
         const lastChild = await prismaClient.account.findFirst({
-            where: { parentCode: groupCode, branch } as any,
+            where: { parentCode: groupCode, branch, companyId } as any,
             orderBy: { code: 'desc' }
         });
 
@@ -101,7 +112,10 @@ export async function getAccountForKasa(kasaId: string, branch: string = 'Merkez
         newCode = `${groupCode}.${nextSeq.toString().padStart(3, '0')}`;
 
         // Check for collision
-        const duplicate = await prismaClient.account.findFirst({ where: { code: newCode, branch } as any });
+        const duplicate = await prismaClient.account.findFirst({
+            where: { code: newCode, branch, companyId } as any
+        });
+
         if (duplicate) {
             if (duplicate.kasaId === kasaId) {
                 accountToReturn = duplicate;
@@ -118,6 +132,7 @@ export async function getAccountForKasa(kasaId: string, branch: string = 'Merkez
             try {
                 accountToReturn = await prismaClient.account.create({
                     data: {
+                        companyId,
                         code: newCode,
                         name: `${kasa.name.toUpperCase()}`,
                         parentCode: groupCode,
@@ -153,8 +168,11 @@ export async function createAccountingSlip(params: {
     sourceType?: string;
     sourceId?: string;
     branch?: string;
+    companyId: string; // REQUIRED: Tenant Isolation
 }, prismaClient: any = globalPrisma) {
-    const { description, date = new Date(), items, sourceType, sourceId, branch = 'Merkez' } = params;
+    const { description, date = new Date(), items, sourceType, sourceId, branch = 'Merkez', companyId } = params;
+
+    if (!companyId) throw new Error('Accounting Slip requires companyId for safety.');
 
     const totalDebt = items.filter(i => i.type === 'Borç').reduce((sum, item) => sum + Number(item.amount), 0);
     const totalCredit = items.filter(i => i.type === 'Alacak').reduce((sum, item) => sum + Number(item.amount), 0);
@@ -168,7 +186,7 @@ export async function createAccountingSlip(params: {
 
     // Transactional Lock/Retry for No generation in real scenarios, here simple max+1
     const lastJournal = await prismaClient.journal.findFirst({
-        where: { fisNo: { startsWith: prefix } },
+        where: { fisNo: { startsWith: prefix }, companyId },
         orderBy: { fisNo: 'desc' }
     });
 
@@ -182,7 +200,7 @@ export async function createAccountingSlip(params: {
     const preparedItems = [];
     for (const item of items) {
         let account = await prismaClient.account.findFirst({
-            where: { code: item.accountCode, branch } as any
+            where: { code: item.accountCode, branch, companyId } as any
         });
 
         if (!account) {
@@ -194,7 +212,7 @@ export async function createAccountingSlip(params: {
             let accClass, normBal, repGrp, repType, oldType;
 
             if (parentCode) {
-                const parent = await prismaClient.account.findFirst({ where: { code: parentCode, branch } as any }) as any;
+                const parent = await prismaClient.account.findFirst({ where: { code: parentCode, branch, companyId } as any }) as any;
                 if (parent) {
                     accClass = parent.accountClass;
                     normBal = parent.normalBalance;
@@ -223,6 +241,7 @@ export async function createAccountingSlip(params: {
 
             account = await prismaClient.account.create({
                 data: {
+                    companyId,
                     code: item.accountCode,
                     name: item.accountName || `Hesap ${item.accountCode}`,
                     type: oldType || (normBal === 'BORC' ? 'Borç' : 'Alacak'),
@@ -262,6 +281,7 @@ export async function createAccountingSlip(params: {
 
     return await prismaClient.journal.create({
         data: {
+            companyId,
             fisNo,
             description,
             date,
@@ -284,8 +304,15 @@ export async function createJournalFromTransaction(trx: any, prismaClient: any =
     const items: EntryLine[] = [];
     const amount = Number(trx.amount);
     const branch = trx.branch || 'Merkez';
+    const companyId = trx.companyId;
+
+    if (!companyId) {
+        console.error('[createJournalFromTransaction] Missing companyId in transaction', trx.id);
+        return; // Cannot proceed securely
+    }
 
     // 1. Kasa/Banka Hesabı
+    // getAccountForKasa calls findUnique on kasaId, which is safe.
     const mainAcc = trx.kasaId ? await getAccountForKasa(trx.kasaId, branch, prismaClient) : null;
     const mainCode = (mainAcc as any)?.code || ACCOUNTS.KASA + '.01.001';
     const mainName = (mainAcc as any)?.name || 'MERKEZ KASA';
@@ -341,7 +368,8 @@ export async function createJournalFromTransaction(trx: any, prismaClient: any =
             sourceType: 'Transaction',
             sourceId: trx.id,
             branch,
-            items
+            items,
+            companyId
         }, prismaClient) as any;
     }
 }
@@ -352,6 +380,9 @@ export async function createJournalFromTransaction(trx: any, prismaClient: any =
 export async function createJournalFromSale(order: any, items: any[], kasaId: string, prismaClient: any = globalPrisma) {
     const amount = Number(order.totalAmount);
     const branch = order.branch || 'Merkez';
+    const companyId = order.companyId;
+    // Assuming order has companyId. If not, this will crash (as desired for safety).
+
     const acc = await getAccountForKasa(kasaId, branch, prismaClient);
 
     const entryLines: EntryLine[] = [];
@@ -411,7 +442,8 @@ export async function createJournalFromSale(order: any, items: any[], kasaId: st
         sourceType: 'Order',
         sourceId: order.id,
         branch,
-        items: entryLines
+        items: entryLines,
+        companyId
     }, prismaClient);
 }
 
@@ -426,6 +458,8 @@ export async function stornoJournalEntry(journalId: string, reason: string = 'İ
 
     if (!original) return;
     if ((original as any).isReversal) throw new Error('Bu fiş zaten bir ters kayıttır.');
+
+    const companyId = original.companyId;
 
     const reversalItems: EntryLine[] = original.items.map((item: any) => ({
         accountCode: (item as any).account.code,
@@ -445,7 +479,8 @@ export async function stornoJournalEntry(journalId: string, reason: string = 'İ
         sourceType: 'JournalReversal',
         sourceId: original.id,
         branch: original.branch || 'Merkez',
-        items: reversalItems
+        items: reversalItems,
+        companyId: companyId!
     }, prismaClient);
 }
 
@@ -453,8 +488,12 @@ export async function stornoJournalEntry(journalId: string, reason: string = 'İ
  * Mevcut kasa bakiyelerini muhasebe hesaplarıyla senkronize eder.
  * (Bakiyesi olan ama yevmiye kaydı olmayan kasalar için 'Açılış Fişi' oluşturur)
  */
-export async function syncKasaBalancesToLedger(branch: string = 'Merkez', prismaClient: any = globalPrisma) {
-    const kasalar = await prismaClient.kasa.findMany({ where: { branch } as any });
+export async function syncKasaBalancesToLedger(branch: string = 'Merkez', companyId: string, prismaClient: any = globalPrisma) {
+    if (!companyId) return;
+
+    const kasalar = await prismaClient.kasa.findMany({
+        where: { branch, companyId } as any
+    });
 
     for (const kasa of kasalar) {
         const account = await getAccountForKasa(kasa.id, branch, prismaClient);
@@ -482,7 +521,8 @@ export async function syncKasaBalancesToLedger(branch: string = 'Merkez', prisma
                 sourceType: 'System',
                 sourceId: kasa.id,
                 branch,
-                items
+                items,
+                companyId
             }, prismaClient);
         }
     }
@@ -494,9 +534,9 @@ export async function syncKasaBalancesToLedger(branch: string = 'Merkez', prisma
  * 2. Eksik komisyon fişlerini tamamlar.
  * 3. Hatalı bakiye yönlerini düzeltir.
  */
-export async function repairAccounting(branch: string = 'Merkez', prismaClient: any = globalPrisma) {
+export async function repairAccounting(branch: string = 'Merkez', companyId: string, prismaClient: any = globalPrisma) {
     // 1. Kasa Bakiyelerini Eşitle (Açılış Fişi)
-    await syncKasaBalancesToLedger(branch, prismaClient);
+    await syncKasaBalancesToLedger(branch, companyId, prismaClient);
 
     // 2. Eksik Komisyon Fişlerini Bul ve Tamamla
     const transactions = await prismaClient.transaction.findMany({
@@ -504,13 +544,14 @@ export async function repairAccounting(branch: string = 'Merkez', prismaClient: 
             type: 'Expense',
             description: { contains: 'Komisyon', mode: 'insensitive' },
             deletedAt: null,
-            branch
+            branch,
+            companyId // Safety
         } as any
     });
 
     for (const trx of transactions) {
         const journal = await prismaClient.journal.findFirst({
-            where: { sourceId: trx.id, sourceType: 'Transaction' }
+            where: { sourceId: trx.id, sourceType: 'Transaction', companyId }
         });
 
         if (!journal) {

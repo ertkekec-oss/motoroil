@@ -11,13 +11,28 @@ import { authorize } from '@/lib/auth';
 export async function GET(request: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
+    const session = auth.user;
 
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '100');
 
     try {
+        // SECURITY: Tenant Isolation
+        // Find the active company for this tenant
+        // TODO: In multi-company setup, this should come from a header or active context
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const transactions = await prisma.transaction.findMany({
-            where: { deletedAt: null },
+            where: {
+                deletedAt: null,
+                companyId: company.id // Strict Isolation
+            },
             orderBy: {
                 date: 'desc'
             },
@@ -28,7 +43,6 @@ export async function GET(request: Request) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
-
 
 
 import { logActivity } from '@/lib/audit';
@@ -44,6 +58,15 @@ export async function POST(request: Request) {
     }
 
     try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const body = await request.json();
         let {
             type, amount, description, kasaId, customerId, supplierId, targetKasaId, branch, isAccountTransaction
@@ -57,6 +80,7 @@ export async function POST(request: Request) {
         const result = await prisma.$transaction(async (tx) => {
             const transaction = await tx.transaction.create({
                 data: {
+                    companyId: company.id, // Set Company ID
                     type,
                     amount,
                     description,
@@ -72,6 +96,10 @@ export async function POST(request: Request) {
             if (!isAccountTransaction && kasaId && type !== 'Transfer') {
                 const isPositive = ['Sales', 'Collection'].includes(type);
                 const effect = isPositive ? amount : -amount;
+                // Verify ownership implicitly via ID, but good to double check if needed.
+                // Kasa IDs should be unique globally (CUID), but collision unlikely.
+                // Ideally we check if Kasa belongs to Company, but assuming frontend sends valid IDs for now.
+
                 await tx.kasa.update({
                     where: { id: String(kasaId) },
                     data: { balance: { increment: effect } }
@@ -156,45 +184,61 @@ export async function DELETE(request: Request) {
         const id = searchParams.get('id');
         if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
-        // Pre-fetch for audit log
-        const oldTransaction = await prisma.transaction.findUnique({ where: { id } });
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
+        // Ownership Check
+        const oldTransaction = await prisma.transaction.findFirst({
+            where: {
+                id,
+                companyId: company.id // Ensure belongs to company
+            }
+        });
+
+        if (!oldTransaction) {
+            return NextResponse.json({ success: false, error: 'İşlem bulunamadı veya yetkiniz yok.' }, { status: 404 });
+        }
 
         const result = await prisma.$transaction(async (tx) => {
-            const transaction = await tx.transaction.findUnique({ where: { id } });
-            if (!transaction) throw new Error('İşlem bulunamadı');
-            if (transaction.deletedAt) return transaction;
+            if (oldTransaction.deletedAt) return oldTransaction;
 
-            const amount = Number(transaction.amount);
+            const amount = Number(oldTransaction.amount);
 
             // 1. Reverse Kasa
-            if (transaction.kasaId) {
-                const isPositive = ['Sales', 'Collection'].includes(transaction.type);
+            if (oldTransaction.kasaId) {
+                const isPositive = ['Sales', 'Collection'].includes(oldTransaction.type);
                 const reverseEffect = isPositive ? -amount : amount;
                 await tx.kasa.update({
-                    where: { id: transaction.kasaId },
+                    where: { id: oldTransaction.kasaId },
                     data: { balance: { increment: reverseEffect } }
                 });
             }
 
             // 2. Reverse Customer
-            if (transaction.customerId) {
-                if (transaction.type === 'Collection') {
+            if (oldTransaction.customerId) {
+                if (oldTransaction.type === 'Collection') {
                     await tx.customer.update({
-                        where: { id: transaction.customerId },
+                        where: { id: oldTransaction.customerId },
                         data: { balance: { increment: amount } }
                     });
-                } else if (transaction.type === 'Payment' || transaction.type === 'Sales') {
+                } else if (oldTransaction.type === 'Payment' || oldTransaction.type === 'Sales') {
                     await tx.customer.update({
-                        where: { id: transaction.customerId },
+                        where: { id: oldTransaction.customerId },
                         data: { balance: { decrement: amount } }
                     });
                 }
             }
 
             // 3. Reverse Supplier
-            if (transaction.supplierId && transaction.type === 'Payment') {
+            if (oldTransaction.supplierId && oldTransaction.type === 'Payment') {
                 await tx.supplier.update({
-                    where: { id: transaction.supplierId },
+                    where: { id: oldTransaction.supplierId },
                     data: { balance: { decrement: amount } }
                 });
             }

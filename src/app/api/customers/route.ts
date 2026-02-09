@@ -82,7 +82,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { name, phone, email, address, city, district, taxNumber, taxOffice, categoryId, contactPerson, iban, branch, supplierClass, customerClass, referredByCode } = body;
+        const { name, phone, email, address, city, district, taxNumber, taxOffice, categoryId, contactPerson, iban, branch, supplierClass, customerClass, referredByCode, companyId: explicitCompanyId } = body;
 
         if (!name) {
             return NextResponse.json({ success: false, error: 'Müşteri adı zorunludur.' }, { status: 400 });
@@ -93,8 +93,32 @@ export async function POST(request: Request) {
             where: { tenantId: user.tenantId }
         });
 
-        if (!company && user.tenantId !== 'PLATFORM_ADMIN') {
-            return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 404 });
+        // Determine effective company ID
+        let targetCompanyId = company?.id;
+
+        // If no company found automatically, check if explicit ID is allowed and provided
+        if (!targetCompanyId) {
+            const isPlatformAdmin = user.tenantId === 'PLATFORM_ADMIN' || user.role === 'SUPER_ADMIN';
+
+            if (isPlatformAdmin && explicitCompanyId) {
+                targetCompanyId = explicitCompanyId;
+            } else if (!isPlatformAdmin) {
+                return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı. Lütfen önce Firma Profilini oluşturun.' }, { status: 404 });
+            } else {
+                // Platform admin but no ID provided
+                // Try to find ANY company to attach to (fallback) or fail
+                const firstCompany = await prisma.company.findFirst();
+                if (firstCompany) {
+                    targetCompanyId = firstCompany.id;
+                } else {
+                    return NextResponse.json({ success: false, error: 'Sistemde kayıtlı firma bulunamadı.' }, { status: 400 });
+                }
+            }
+        }
+
+        // Final safety check
+        if (!targetCompanyId) {
+            return NextResponse.json({ success: false, error: 'İşlem için geçerli bir Firma ID (Company ID) bulunamadı.' }, { status: 400 });
         }
 
         // Genel kategori otomatik seçilsin mi? Eğer categoryId gönderilmezse:
@@ -113,7 +137,7 @@ export async function POST(request: Request) {
                     name, phone, email, address, city, district, taxNumber, taxOffice, contactPerson, iban,
                     branch: branch || 'Merkez',
                     categoryId: targetCategoryId,
-                    companyId: company?.id, // Added companyId
+                    companyId: targetCompanyId, // Use valid ID
                     supplierClass,
                     customerClass,
                     referralCode: myReferralCode

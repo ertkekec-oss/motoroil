@@ -1,9 +1,23 @@
 
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user;
+
     try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const body = await request.json();
         const { supplierId, type, amount, description, invoiceNo, invoiceDate, items } = body;
 
@@ -20,16 +34,22 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: 'Tedarikçi bulunamadı.' }, { status: 404 });
         }
 
+        // SECURITY: Verify Supplier Ownership
+        if (supplier.companyId !== company.id) {
+            return NextResponse.json({ success: false, error: 'Yetkisiz işlem.' }, { status: 403 });
+        }
+
         let newBalance = supplier.balance;
 
         if (type === 'PURCHASE') {
             // Purchase increases debt (decreases balance)
-            newBalance -= parseFloat(amount);
+            newBalance = Number(newBalance) - parseFloat(amount); // Type safe math
 
             // Using prisma bits for better consistency
             const operations: any[] = [
                 prisma.purchaseInvoice.create({
                     data: {
+                        companyId: company.id, // Set Company ID
                         supplierId,
                         invoiceNo: invoiceNo || `M-${Date.now()}`,
                         invoiceDate: invoiceDate ? new Date(invoiceDate) : new Date(),
@@ -81,10 +101,16 @@ export async function POST(request: Request) {
         } else if (type === 'ADJUSTMENT') {
             // Manual adjustment
             const numAmount = parseFloat(amount);
-            newBalance += numAmount;
+            newBalance = Number(newBalance) + numAmount;
 
-            // Find a valid Kasa ID to satisfy relation
-            const defaultKasa = await prisma.kasa.findFirst();
+            // Find a valid Kasa ID to satisfy relation (Tenant Scoped)
+            const defaultKasa = await prisma.kasa.findFirst({
+                where: {
+                    isActive: true, // Prefer active
+                    companyId: company.id // Strict Tenant Isolation
+                }
+            });
+
             if (!defaultKasa) {
                 return NextResponse.json({ success: false, error: 'Sistemde kayıtlı kasa bulunamadı.' }, { status: 400 });
             }
@@ -96,6 +122,7 @@ export async function POST(request: Request) {
                 }),
                 prisma.transaction.create({
                     data: {
+                        companyId: company.id, // Set Company ID
                         type: 'Adjustment',
                         amount: numAmount,
                         description: description || 'Manuel Bakiye Düzeltmesi',

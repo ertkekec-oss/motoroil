@@ -1,15 +1,34 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createAccountingSlip, ACCOUNTS, getAccountForKasa } from '@/lib/accounting';
+import { authorize } from '@/lib/auth';
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user;
+
     try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const { id } = await params;
         const body = await req.json();
         const { status, kasaId } = body; // status: 'Tahsil Edildi', 'Ödendi', 'Karşılıksız', 'Ciro Edildi'
 
         const check = await prisma.check.findUnique({ where: { id } });
         if (!check) return NextResponse.json({ success: false, error: 'Çek bulunamadı' }, { status: 404 });
+
+        // SECURITY: Verify Check Ownership
+        if (check.companyId !== company.id) {
+            return NextResponse.json({ success: false, error: 'Yetkisiz işlem.' }, { status: 403 });
+        }
 
         if (check.status === status) return NextResponse.json({ success: true, check });
 
@@ -18,6 +37,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             // ALINAN ÇEKLER
             if (status === 'Tahsil Edildi') {
                 if (!kasaId) return NextResponse.json({ success: false, error: 'Tahsilat için kasa/banka seçilmelidir' }, { status: 400 });
+
+                // SECURITY: Verify Kasa Ownership
+                const validKasa = await prisma.kasa.findFirst({
+                    where: { id: kasaId, companyId: company.id }
+                });
+
+                if (!validKasa) {
+                    return NextResponse.json({ success: false, error: 'Geçersiz Kasa/Banka seçimi.' }, { status: 400 });
+                }
 
                 const branch = check.branch || 'Merkez';
                 let bankAcc;
@@ -40,6 +68,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
                 await prisma.transaction.create({
                     data: {
+                        companyId: company.id, // Set Company ID
                         type: 'Collection',
                         amount: check.amount,
                         description: `Çek Tahsilatı (${check.number}) - ${check.bank}`,
@@ -53,6 +82,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
                 // 2. Create Journal Entry (102 Banka Borç / 101 Alınan Çek Alacak)
                 try {
                     await createAccountingSlip({
+                        companyId: company.id, // Set Company ID
                         description: `Çek Tahsilatı: ${check.number} - ${check.bank}`,
                         date: new Date(),
                         sourceType: 'CheckTransition',
@@ -80,6 +110,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
                 // 120 (Borç) / 101 (Alacak)
                 try {
                     await createAccountingSlip({
+                        companyId: company.id, // Set Company ID
                         description: `ÇEK KARŞILIKSIZ: ${check.number}`,
                         date: new Date(),
                         sourceType: 'CheckTransition',
@@ -100,6 +131,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             if (status === 'Ödendi') {
                 if (!kasaId) return NextResponse.json({ success: false, error: 'Ödeme için banka hesabı seçilmelidir' }, { status: 400 });
 
+                // SECURITY: Verify Kasa Ownership
+                const validKasa = await prisma.kasa.findFirst({
+                    where: { id: kasaId, companyId: company.id }
+                });
+
+                if (!validKasa) {
+                    return NextResponse.json({ success: false, error: 'Geçersiz Kasa/Banka seçimi.' }, { status: 400 });
+                }
+
                 const branch = check.branch || 'Merkez';
                 let bankAcc;
                 try {
@@ -115,6 +155,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
                 await prisma.transaction.create({
                     data: {
+                        companyId: company.id, // Set Company ID
                         type: 'Payment',
                         amount: check.amount,
                         description: `Çek Ödemesi (${check.number}) - ${check.bank}`,
@@ -128,6 +169,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
                 // 2. Journal: 103 (Borç) / 102 (Alacak)
                 try {
                     await createAccountingSlip({
+                        companyId: company.id, // Set Company ID
                         description: `Çek Ödemesi: ${check.number} - ${check.bank}`,
                         date: new Date(),
                         sourceType: 'CheckTransition',

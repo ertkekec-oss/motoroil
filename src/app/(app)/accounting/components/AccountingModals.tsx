@@ -1,0 +1,333 @@
+"use client";
+
+import React, { useState } from 'react';
+import { useFinancials } from '@/contexts/FinancialContext';
+import { useModal } from '@/contexts/ModalContext';
+
+export default function AccountingModals({
+    isOpen,
+    onClose,
+    type // 'transaction', 'debt', 'collection', 'check', 'account', 'statement'
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    type: string;
+}) {
+    const { addFinancialTransaction, addCheck, refreshKasalar, kasalar } = useFinancials();
+    const { showSuccess, showError } = useModal();
+    const [loading, setLoading] = useState(false);
+
+    // Form States
+    const [formData, setFormData] = useState<any>({
+        type: type === 'debt' ? 'Expense' : type === 'collection' ? 'Income' : 'Expense', // Default
+        description: '',
+        amount: '',
+        date: new Date().toISOString().split('T')[0],
+        kasaId: '',
+        category: '',
+        // Check specific
+        dueDate: '',
+        bankName: '',
+        checkNo: '',
+        // Account specific
+        accountName: '',
+        accountType: 'cash', // cash, bank
+        currency: 'TRY'
+    });
+
+    // Statement Import State
+    const [file, setFile] = useState<File | null>(null);
+    const [parsedTransactions, setParsedTransactions] = useState<any[]>([]);
+
+    if (!isOpen) return null;
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            let res;
+            if (type === 'transaction' || type === 'debt' || type === 'collection' || type === 'expense') {
+                // Adjust type based on modal context
+                const txType = type === 'debt' ? 'Expense' : type === 'collection' ? 'Income' : formData.type;
+
+                res = await addFinancialTransaction({
+                    ...formData,
+                    type: txType,
+                    amount: Number(formData.amount)
+                });
+            } else if (type === 'check') {
+                res = await addCheck({
+                    ...formData,
+                    type: formData.type === 'In' ? 'In' : 'Out', // In = Alacak Çeki, Out = Borç Çeki
+                    amount: Number(formData.amount)
+                });
+            } else if (type === 'account') {
+                // Manually call API since context doesn't have addAccount
+                const response = await fetch('/api/kasalar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: formData.accountName,
+                        type: formData.accountType,
+                        currency: formData.currency,
+                        balance: Number(formData.amount || 0) // Opening balance
+                    })
+                });
+                res = await response.json();
+                if (res.success) await refreshKasalar();
+            }
+
+            if (res?.success) {
+                showSuccess('İşlem Başarılı', 'Kayıt başarıyla oluşturuldu.');
+                onClose();
+            } else {
+                showError('Hata', res?.error || 'Bir hata oluştu.');
+            }
+        } catch (error) {
+            showError('Hata', 'İşlem sırasında bir sorun oluştu.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const f = e.target.files?.[0];
+        if (f) {
+            setFile(f);
+            const data = new FormData();
+            data.append('file', f);
+
+            setLoading(true);
+            try {
+                const res = await fetch('/api/financials/statements/parse', { // Use verified endpoint
+                    method: 'POST',
+                    body: data
+                });
+                const result = await res.json();
+                if (result.success) {
+                    setParsedTransactions(result.transactions);
+                } else {
+                    showError('Hata', result.error);
+                }
+            } catch (err) {
+                showError('Hata', 'Dosya okunamadı.');
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const handleImportTransaction = async (tx: any) => {
+        // Import single transaction from parsed list
+        setLoading(true);
+        const res = await addFinancialTransaction({
+            date: tx.date,
+            description: tx.description,
+            amount: Math.abs(tx.amount), // Ensure positive
+            type: tx.amount > 0 ? 'Income' : 'Expense', // Check sign logic
+            kasaId: kasalar[0]?.id // Default to first account or let user choose
+        });
+        setLoading(false);
+        if (res.success) {
+            // Remove from list
+            setParsedTransactions(prev => prev.filter(t => t !== tx));
+            showSuccess('Aktarıldı', 'Kayıt eklendi.');
+        }
+    };
+
+    // Render based on type
+    return (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
+            <div className="bg-[#1a1a1a] border border-white/10 p-6 rounded-2xl w-full max-w-lg relative animate-in zoom-in-95 transaction-modal">
+                <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white">✕</button>
+
+                <h2 className="text-xl font-bold text-white mb-6">
+                    {type === 'debt' && 'Borç Ekle'}
+                    {type === 'collection' && 'Tahsilat Ekle'}
+                    {type === 'check' && 'Çek / Senet Ekle'}
+                    {type === 'account' && 'Yeni Hesap Ekle'}
+                    {type === 'statement' && 'Ekstre Yükle'}
+                    {type === 'expense' && 'Gider Ekle'}
+                </h2>
+
+                {type === 'statement' ? (
+                    <div className="space-y-4">
+                        <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-blue-500/50 transition-colors">
+                            <input type="file" onChange={handleFileUpload} accept=".pdf" className="hidden" id="file-upload" />
+                            <label htmlFor="file-upload" className="cursor-pointer block">
+                                <div className="text-4xl mb-2">📄</div>
+                                <div className="text-sm font-bold text-white">PDF Ekstre Yükle</div>
+                                <div className="text-xs text-white/40 mt-1">Bankanızdan aldığınız PDF ekstresini buraya sürükleyin.</div>
+                            </label>
+                        </div>
+
+                        {loading && <div className="text-center text-white/50 text-sm">İşleniyor...</div>}
+
+                        {parsedTransactions.length > 0 && (
+                            <div className="max-h-60 overflow-y-auto space-y-2 mt-4">
+                                <h3 className="text-xs font-bold text-white/50 uppercase">Bulunan İşlemler ({parsedTransactions.length})</h3>
+                                {parsedTransactions.map((tx, i) => (
+                                    <div key={i} className="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
+                                        <div>
+                                            <div className="text-sm font-bold text-white">{tx.description}</div>
+                                            <div className="text-xs text-white/50">{tx.date}</div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`font-bold ${tx.amount > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                                {tx.amount} TL
+                                            </div>
+                                            <button onClick={() => handleImportTransaction(tx)} className="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-white">
+                                                Ekle
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {type === 'check' && (
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-white/50 mb-1">Çek Türü</label>
+                                    <select
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                        value={formData.type}
+                                        onChange={e => setFormData({ ...formData, type: e.target.value })}
+                                    >
+                                        <option value="In">Müşteri Çeki (Alacak)</option>
+                                        <option value="Out">Firma Çeki (Borç)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-white/50 mb-1">Vade Tarihi</label>
+                                    <input
+                                        type="date"
+                                        required
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                        value={formData.dueDate}
+                                        onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {type === 'account' ? (
+                            <>
+                                <div>
+                                    <label className="block text-xs font-bold text-white/50 mb-1">Hesap İsmi</label>
+                                    <input
+                                        type="text" required
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                        placeholder="Örn: Garanti Bankası, Ana Kasa..."
+                                        value={formData.accountName}
+                                        onChange={e => setFormData({ ...formData, accountName: e.target.value })}
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-white/50 mb-1">Hesap Türü</label>
+                                        <select
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            value={formData.accountType}
+                                            onChange={e => setFormData({ ...formData, accountType: e.target.value })}
+                                        >
+                                            <option value="cash">Nakit Kasa</option>
+                                            <option value="bank">Banka Hesabı</option>
+                                            <option value="pos">POS Hesabı</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-white/50 mb-1">Para Birimi</label>
+                                        <select
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            value={formData.currency}
+                                            onChange={e => setFormData({ ...formData, currency: e.target.value })}
+                                        >
+                                            <option value="TRY">Türk Lirası (₺)</option>
+                                            <option value="USD">Dolar ($)</option>
+                                            <option value="EUR">Euro (€)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-white/50 mb-1">Açılış Bakiyesi</label>
+                                    <input
+                                        type="number"
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50 font-bold text-lg"
+                                        placeholder="0.00"
+                                        value={formData.amount}
+                                        onChange={e => setFormData({ ...formData, amount: e.target.value })}
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                {type !== 'check' && (
+                                    <div>
+                                        <label className="block text-xs font-bold text-white/50 mb-1">İşlem Tarihi</label>
+                                        <input
+                                            type="date" required
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            value={formData.date}
+                                            onChange={e => setFormData({ ...formData, date: e.target.value })}
+                                        />
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="block text-xs font-bold text-white/50 mb-1">Açıklama</label>
+                                    <input
+                                        type="text" required
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                        placeholder="İşlem açıklaması giriniz..."
+                                        value={formData.description}
+                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-bold text-white/50 mb-1">Tutar (₺)</label>
+                                    <input
+                                        type="number" required
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50 font-bold text-2xl"
+                                        placeholder="0.00"
+                                        value={formData.amount}
+                                        onChange={e => setFormData({ ...formData, amount: e.target.value })}
+                                    />
+                                </div>
+
+                                {type !== 'check' && (
+                                    <div>
+                                        <label className="block text-xs font-bold text-white/50 mb-1">İlgili Kasa / Hesap</label>
+                                        <select
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            value={formData.kasaId}
+                                            onChange={e => setFormData({ ...formData, kasaId: e.target.value })}
+                                            required
+                                        >
+                                            <option value="">Seçiniz</option>
+                                            {kasalar.map(k => (
+                                                <option key={k.id} value={k.id}>{k.name} ({k.balance} ₺)</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all active:scale-95 disabled:opacity-50 mt-4"
+                        >
+                            {loading ? 'Kaydediliyor...' : 'Kaydet'}
+                        </button>
+                    </form>
+                )}
+            </div>
+        </div>
+    );
+}

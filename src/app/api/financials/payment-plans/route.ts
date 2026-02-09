@@ -1,8 +1,22 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user;
+
     try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const body = await request.json();
         const { title, totalAmount, installmentCount, startDate, description, branch, type, direction, customerId, supplierId, isExisting } = body;
 
@@ -22,8 +36,9 @@ export async function POST(request: Request) {
 
         // Create Plan and Installments Transactionally
         const plan = await prisma.$transaction(async (tx: any) => {
-            const plan = await tx.paymentPlan.create({
+            const newPlan = await tx.paymentPlan.create({
                 data: {
+                    companyId: company.id, // Set Company ID
                     title,
                     totalAmount: total,
                     installmentCount: count,
@@ -66,6 +81,7 @@ export async function POST(request: Request) {
                     // Create Sales Transaction (Without Kasa - Veresiye)
                     await tx.transaction.create({
                         data: {
+                            companyId: company.id, // Set Company ID
                             type: 'Sales',
                             amount: total,
                             description: `Vadeli Satış Planı: ${title}`,
@@ -88,6 +104,7 @@ export async function POST(request: Request) {
                     // Create Purchase Transaction
                     await tx.transaction.create({
                         data: {
+                            companyId: company.id, // Set Company ID
                             type: 'Purchase',
                             amount: total,
                             description: `Vadeli Borç Planı: ${title}`,
@@ -107,7 +124,7 @@ export async function POST(request: Request) {
                 }
             }
 
-            return plan;
+            return newPlan;
         });
 
         return NextResponse.json({ success: true, plan });
@@ -119,11 +136,27 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user;
+
     try {
+        // SECURITY: Tenant Isolation
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+        }
+
         const { searchParams } = new URL(request.url);
         const branch = searchParams.get('branch');
 
-        const whereClause: any = {};
+        const whereClause: any = {
+            companyId: company.id // Strict Tenant Isolation
+        };
+
         if (branch && branch !== 'Tümü' && branch !== 'Merkez') {
             /* whereClause.branch = branch; */
         }

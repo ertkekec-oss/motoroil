@@ -1194,6 +1194,7 @@ function InventoryContent() {
                 }}
                 selectedProductState={[selectedProduct, setSelectedProduct]}
                 categories={dbCategories}
+                allProducts={products || []}
             />
 
             {showAddModal && (
