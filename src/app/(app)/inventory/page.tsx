@@ -348,8 +348,7 @@ function InventoryContent() {
                 });
             }
 
-            // Use local user branch or default
-            const branch = currentUser?.branch || 'Merkez';
+
 
             // Finalize audit record status
             await fetch('/api/inventory/audit', {

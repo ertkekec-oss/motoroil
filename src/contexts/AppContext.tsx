@@ -5,10 +5,13 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useModal } from './ModalContext';
 import { useAuth } from './AuthContext';
 import { FinancialProvider } from './FinancialContext';
-import { InventoryProvider } from './InventoryContext';
-import { CRMProvider } from './CRMContext';
+import { InventoryProvider, Product } from './InventoryContext';
+import { CRMProvider, Customer, Supplier } from './CRMContext';
 import { SalesProvider } from './SalesContext';
 import { SettingsProvider } from './SettingsContext';
+
+// Re-export core types for backward compatibility
+export type { Product, Customer, Supplier };
 
 export interface Branch {
     id: number;
