@@ -124,7 +124,7 @@ export async function POST(request: Request) {
             if (!isAccountTransaction && supplierId && type === 'Payment') {
                 await tx.supplier.update({
                     where: { id: String(supplierId) },
-                    data: { balance: { increment: amount } }
+                    data: { balance: { decrement: amount } }
                 });
             }
 
@@ -148,11 +148,11 @@ export async function POST(request: Request) {
 
                     // AUDIT LOG
                     await logActivity({
-                        userId: session.id,
-                        userName: session.username,
+                        userId: String(session.id),
+                        userName: String(session.username || 'Sistem'),
                         action: 'CREATE',
                         entity: 'Transaction',
-                        entityId: result.id,
+                        entityId: String(result.id),
                         newData: result,
                         branch: result.branch || 'Merkez',
                         details: `${result.type} işlemi: ${result.amount}`
@@ -239,7 +239,7 @@ export async function DELETE(request: Request) {
             if (oldTransaction.supplierId && oldTransaction.type === 'Payment') {
                 await tx.supplier.update({
                     where: { id: oldTransaction.supplierId },
-                    data: { balance: { decrement: amount } }
+                    data: { balance: { increment: amount } }
                 });
             }
 
@@ -263,11 +263,11 @@ export async function DELETE(request: Request) {
         // Audit Log
         if (oldTransaction) {
             logActivity({
-                userId: session.id,
-                userName: session.username,
+                userId: String(session.id),
+                userName: String(session.username || 'Sistem'),
                 action: 'DELETE',
                 entity: 'Transaction',
-                entityId: id,
+                entityId: String(id),
                 oldData: oldTransaction,
                 branch: oldTransaction.branch || 'Merkez',
                 details: `İşlem silindi: ${oldTransaction.description} - ${oldTransaction.amount}`

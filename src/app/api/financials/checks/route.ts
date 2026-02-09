@@ -128,11 +128,9 @@ export async function POST(req: Request) {
                     description: `Çek Alındı: ${bank} - No: ${number} (${customer?.name || ''})`,
                     date: new Date(),
                     sourceType: 'Check',
-                    sourceId: newCheck.id, // Use newCheck.id which is already created in transaction? 
-                    // No wait, createAccountingSlip might behave differently within transaction context if not passed tx.
-                    // But here it is external function. It likely uses its own prisma call or expects to be awaited.
-                    // Important: createAccountingSlip likely creates a Journal entry. Journal needs companyId too.
+                    sourceId: newCheck.id,
                     branch: branch || 'Merkez',
+                    companyId: company.id, // Add companyId
                     items: [
                         { accountCode: ACCOUNTS.ALINAN_CEKLER + '.01', accountName: 'ALINAN ÇEKLER PORTFÖYÜ', type: 'Borç', amount: amt, documentType: 'ÇEK', documentNo: number },
                         { accountCode: ACCOUNTS.ALICILAR + '.01', accountName: 'ALICILAR', type: 'Alacak', amount: amt, documentType: 'ÇEK', documentNo: number }
@@ -143,7 +141,7 @@ export async function POST(req: Request) {
             if (type === 'Out' && supplierId) {
                 await tx.supplier.update({
                     where: { id: supplierId },
-                    data: { balance: { increment: amt } }
+                    data: { balance: { decrement: amt } }
                 });
 
                 // 2. Create Transaction
@@ -166,6 +164,7 @@ export async function POST(req: Request) {
                     sourceType: 'Check',
                     sourceId: newCheck.id,
                     branch: branch || 'Merkez',
+                    companyId: company.id, // Add companyId
                     items: [
                         { accountCode: ACCOUNTS.SATICILAR + '.01', accountName: 'SATICILAR', type: 'Borç', amount: amt, documentType: 'ÇEK', documentNo: number },
                         { accountCode: ACCOUNTS.VERILEN_CEKLER + '.01', accountName: 'VERİLEN ÇEKLER VE ÖDEME EMİRLERİ', type: 'Alacak', amount: amt, documentType: 'ÇEK', documentNo: number }

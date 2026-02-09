@@ -1,8 +1,7 @@
-"use client";
-
 import React, { useState } from 'react';
 import { useFinancials } from '@/contexts/FinancialContext';
 import { useModal } from '@/contexts/ModalContext';
+import { useCRM } from '@/contexts/CRMContext'; // Added useCRM
 
 export default function AccountingModals({
     isOpen,
@@ -14,6 +13,7 @@ export default function AccountingModals({
     type: string;
 }) {
     const { addFinancialTransaction, addCheck, refreshKasalar, kasalar } = useFinancials();
+    const { customers, suppliers } = useCRM(); // Get CRM data
     const { showSuccess, showError } = useModal();
     const [loading, setLoading] = useState(false);
 
@@ -32,7 +32,10 @@ export default function AccountingModals({
         // Account specific
         accountName: '',
         accountType: 'cash', // cash, bank
-        currency: 'TRY'
+        currency: 'TRY',
+        // CRM Relations
+        customerId: '',
+        supplierId: ''
     });
 
     // Statement Import State
@@ -51,17 +54,32 @@ export default function AccountingModals({
                 // Adjust type based on modal context
                 const txType = type === 'debt' ? 'Expense' : type === 'collection' ? 'Income' : formData.type;
 
-                res = await addFinancialTransaction({
+                // Prepare Data
+                const payload = {
                     ...formData,
                     type: txType,
                     amount: Number(formData.amount)
-                });
+                };
+
+                // Clear unused relations based on type
+                if (type === 'collection') payload.supplierId = undefined; // Income usually from customer
+                if (type === 'debt') payload.customerId = undefined; // Expense usually to supplier (or general)
+
+                res = await addFinancialTransaction(payload);
             } else if (type === 'check') {
-                res = await addCheck({
+                const checkType = formData.type === 'In' ? 'In' : 'Out';
+
+                const payload = {
                     ...formData,
-                    type: formData.type === 'In' ? 'In' : 'Out', // In = Alacak Çeki, Out = Borç Çeki
+                    type: checkType, // In = Alacak Çeki, Out = Borç Çeki
                     amount: Number(formData.amount)
-                });
+                };
+
+                // Relation Cleanup
+                if (checkType === 'In') payload.supplierId = undefined;
+                if (checkType === 'Out') payload.customerId = undefined;
+
+                res = await addCheck(payload);
             } else if (type === 'account') {
                 // Manually call API since context doesn't have addAccount
                 const response = await fetch('/api/kasalar', {
@@ -139,11 +157,11 @@ export default function AccountingModals({
     // Render based on type
     return (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
-            <div className="bg-[#1a1a1a] border border-white/10 p-6 rounded-2xl w-full max-w-lg relative animate-in zoom-in-95 transaction-modal">
+            <div className="bg-[#1a1a1a] border border-white/10 p-6 rounded-2xl w-full max-w-lg relative animate-in zoom-in-95 transaction-modal max-h-[90vh] overflow-y-auto">
                 <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white">✕</button>
 
                 <h2 className="text-xl font-bold text-white mb-6">
-                    {type === 'debt' && 'Borç Ekle'}
+                    {type === 'debt' && 'Ödeme Yap (Borç)'}
                     {type === 'collection' && 'Tahsilat Ekle'}
                     {type === 'check' && 'Çek / Senet Ekle'}
                     {type === 'account' && 'Yeni Hesap Ekle'}
@@ -188,29 +206,93 @@ export default function AccountingModals({
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
+                        {/* CUSTOMER / SUPPLIER SELECTION LOGIC */}
+                        {type === 'collection' && (
+                            <div>
+                                <label className="block text-xs font-bold text-white/50 mb-1">Kimden Tahsilat Yapılacak?</label>
+                                <select
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                    value={formData.customerId}
+                                    onChange={e => setFormData({ ...formData, customerId: e.target.value })}
+                                >
+                                    <option value="">Seçiniz (Cari Yok)</option>
+                                    {customers.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {type === 'debt' && (
+                            <div>
+                                <label className="block text-xs font-bold text-white/50 mb-1">Kime Ödeme Yapılacak?</label>
+                                <select
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                    value={formData.supplierId}
+                                    onChange={e => setFormData({ ...formData, supplierId: e.target.value })}
+                                >
+                                    <option value="">Seçiniz (Cari Yok / Genel Gider)</option>
+                                    {suppliers.map(s => (
+                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
                         {type === 'check' && (
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-xs font-bold text-white/50 mb-1">Çek Türü</label>
-                                    <select
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
-                                        value={formData.type}
-                                        onChange={e => setFormData({ ...formData, type: e.target.value })}
-                                    >
-                                        <option value="In">Müşteri Çeki (Alacak)</option>
-                                        <option value="Out">Firma Çeki (Borç)</option>
-                                    </select>
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-white/50 mb-1">Çek Türü</label>
+                                        <select
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            value={formData.type}
+                                            onChange={e => setFormData({ ...formData, type: e.target.value, customerId: '', supplierId: '' })}
+                                        >
+                                            <option value="In">Müşteri Çeki (Alacak)</option>
+                                            <option value="Out">Firma Çeki (Borç)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-white/50 mb-1">Vade Tarihi</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            value={formData.dueDate}
+                                            onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-white/50 mb-1">Vade Tarihi</label>
-                                    <input
-                                        type="date"
-                                        required
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
-                                        value={formData.dueDate}
-                                        onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
-                                    />
-                                </div>
+                                {formData.type === 'In' ? (
+                                    <div>
+                                        <label className="block text-xs font-bold text-white/50 mb-1">Kimden Alındı (Müşteri)</label>
+                                        <select
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            value={formData.customerId}
+                                            onChange={e => setFormData({ ...formData, customerId: e.target.value })}
+                                        >
+                                            <option value="">Seçiniz</option>
+                                            {customers.map(c => (
+                                                <option key={c.id} value={c.id}>{c.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <label className="block text-xs font-bold text-white/50 mb-1">Kime Verildi (Tedarikçi)</label>
+                                        <select
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            value={formData.supplierId}
+                                            onChange={e => setFormData({ ...formData, supplierId: e.target.value })}
+                                        >
+                                            <option value="">Seçiniz</option>
+                                            {suppliers.map(s => (
+                                                <option key={s.id} value={s.id}>{s.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
                             </div>
                         )}
 
