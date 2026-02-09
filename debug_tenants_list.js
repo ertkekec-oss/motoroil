@@ -3,8 +3,8 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-    const branches = await prisma.branch.findMany();
-    console.log('Branches:', JSON.stringify(branches, null, 2));
+    const tenants = await prisma.tenant.findMany();
+    console.log('Tenants:', JSON.stringify(tenants.map(t => ({ id: t.id, name: t.name })), null, 2));
 }
 
 main()

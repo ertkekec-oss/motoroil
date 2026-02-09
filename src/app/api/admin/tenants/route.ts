@@ -7,8 +7,10 @@ export async function GET(req: NextRequest) {
     try {
         // 1. Yetki Kontrolü
         const session: any = await getSession();
-        if (!session || session.role !== 'SUPER_ADMIN') {
-            return NextResponse.json({ error: 'Forbidden: SUPER_ADMIN ONLY' }, { status: 403 });
+        const isPlatformAdmin = session?.role === 'SUPER_ADMIN' || session?.tenantId === 'PLATFORM_ADMIN' || session?.role === 'ADMIN';
+
+        if (!session || !isPlatformAdmin) {
+            return NextResponse.json({ error: 'Forbidden: Admin Access Required' }, { status: 403 });
         }
 
         const { searchParams } = new URL(req.url);

@@ -8,8 +8,10 @@ export const dynamic = 'force-dynamic';
 // Get CMS data (Settings + Pages + Menus)
 export async function GET() {
     const session: any = await getSession();
-    if (!session || session.role !== 'SUPER_ADMIN') {
-        return NextResponse.json({ error: 'Unauthorized: SUPER_ADMIN ONLY' }, { status: 401 });
+    const isPlatformAdmin = session?.role === 'SUPER_ADMIN' || session?.tenantId === 'PLATFORM_ADMIN' || session?.role === 'ADMIN';
+
+    if (!session || !isPlatformAdmin) {
+        return NextResponse.json({ error: 'Unauthorized: Admin Access Required' }, { status: 401 });
     }
 
     try {

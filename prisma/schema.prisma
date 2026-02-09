@@ -666,7 +666,7 @@ model LoginAttempt {
 model Branch {
   id        Int              @id @default(autoincrement())
   companyId String
-  name      String           @unique
+  name      String
   type      String           @default("Şube")
   city      String?
   district  String?
@@ -679,6 +679,8 @@ model Branch {
   deletedAt DateTime? // Soft delete
   documents BranchDocument[]
   company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, name])
 }
 
 model BranchDocument {

@@ -577,43 +577,9 @@ export default function SettingsPage() {
         }
     };
 
-    // ... existing render code ...
 
-    <button
-        onClick={() => {
-            const e = { key: 'Enter' } as any;
-            // Trigger manual logic same as Enter
-            if (definitionTab === 'payment_methods') {
-                const id = Math.random().toString(36).substr(2, 9);
-                const icon = newPaymentMethod.type === 'cash' ? '💵' : (newPaymentMethod.type === 'card' ? '💳' : '🏦');
-                const newVal = {
-                    id,
-                    label: newItemInput || 'Yeni Hesap',
-                    type: newPaymentMethod.type,
-                    icon,
-                    linkedKasaId: ''
-                };
-                updatePaymentMethods([...(paymentMethods || []), newVal]).then(() => {
-                    setNewItemInput('');
-                    if (showSuccess) showSuccess('Başarılı', 'Ödeme yöntemi eklendi.');
-                }).catch(err => {
-                    console.error(err);
-                    if (showError) showError('Hata', 'Eklenemedi');
-                });
-            } else {
-                if (definitionTab === 'brands') addDefinition('brands', brands, setBrands);
-                else if (definitionTab === 'prod_cat') addDefinition('prod_cat', prodCats, setProdCats);
-                else if (definitionTab === 'cust_class') addDefinition('custClasses', custClasses, setCustClasses);
-                else if (definitionTab === 'supp_class') addDefinition('suppClasses', suppClasses, setSuppClasses);
-                else if (definitionTab === 'warranties') addDefinition('warranties', warranties, setWarranties);
-                else if (definitionTab === 'vehicle_types') addDefinition('vehicleTypes', vehicleTypes, setVehicleTypes);
-            }
-        }}
-        className="btn btn-primary"
-        style={{ padding: '0 24px', borderRadius: '12px', fontSize: '20px' }}
-    >
-        +
-    </button>
+
+
 
     // --- 4. BİLDİRİM AYARLARI ---
     const [notifSettings, setNotifSettings] = useState({
@@ -1812,24 +1778,33 @@ export default function SettingsPage() {
                                 </div>
                             </div>
 
-                            {/* Add New Commission */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr auto', gap: '12px', marginBottom: '20px', padding: '15px', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '8px', border: '1px dashed var(--primary)' }}>
-                                <input
-                                    type="text"
-                                    placeholder="Taksit Türü (örn: 4 Taksit)"
-                                    value={newCommission.installment}
-                                    onChange={e => setNewCommission({ ...newCommission, installment: e.target.value })}
-                                    style={{ padding: '10px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '6px', color: 'var(--text-main)' }}
-                                />
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    placeholder="Oran (%)"
-                                    value={newCommission.rate || ''}
-                                    onChange={e => setNewCommission({ ...newCommission, rate: parseFloat(e.target.value) || 0 })}
-                                    style={{ padding: '10px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '6px', color: 'var(--text-main)' }}
-                                />
-                                <button onClick={addCommissionRate} className="btn btn-primary">+ Ekle</button>
+                            {/* Add New Commission - Streamlined */}
+                            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', padding: '15px', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '12px', border: '1px solid rgba(59, 130, 246, 0.1)' }}>
+                                <div style={{ flex: 2 }}>
+                                    <label style={{ fontSize: '10px', fontWeight: 'bold', display: 'block', marginBottom: '4px', opacity: 0.5 }}>TAKSİT TÜRÜ</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Örn: 4 Taksit"
+                                        value={newCommission.installment}
+                                        onChange={e => setNewCommission({ ...newCommission, installment: e.target.value })}
+                                        style={{ width: '100%', padding: '10px 15px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                    />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ fontSize: '10px', fontWeight: 'bold', display: 'block', marginBottom: '4px', opacity: 0.5 }}>ORAN (%)</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            placeholder="0.0"
+                                            value={newCommission.rate || ''}
+                                            onChange={e => setNewCommission({ ...newCommission, rate: parseFloat(e.target.value) || 0 })}
+                                            style={{ width: '100%', padding: '10px 30px 10px 15px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                        />
+                                        <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-40%)', fontSize: '12px', opacity: 0.5 }}>%</span>
+                                    </div>
+                                </div>
+                                <button onClick={addCommissionRate} className="btn btn-primary" style={{ alignSelf: 'flex-end', height: '42px', padding: '0 20px', borderRadius: '8px' }}>+ EKLE</button>
                             </div>
 
                             {/* Commission Table */}

@@ -209,7 +209,7 @@ export async function POST(request: Request) {
                     const settingsRes = await tx.appSettings.findUnique({ where: { key: 'salesExpenses' } });
                     const salesExpenses = settingsRes?.value as any;
 
-                    if (salesExpenses?.posCommissions) {
+                    if (Array.isArray(salesExpenses?.posCommissions)) {
                         const instLabelRaw = body.installmentLabel;
                         const instCount = body.installments || body.installmentCount || 1;
                         const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
@@ -217,7 +217,7 @@ export async function POST(request: Request) {
                         let commissionConfig = salesExpenses.posCommissions.find((c: any) =>
                             c.installment === instLabelRaw ||
                             c.installment === instLabelFallback ||
-                            (instCount === 1 && c.installment === 'Tek Çekim')
+                            (instCount === 1 && (c.installment === 'Tek Çekim' || c.installment === 'Nakit/Tek'))
                         );
 
                         if (commissionConfig && Number(commissionConfig.rate) > 0) {

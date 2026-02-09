@@ -29,6 +29,7 @@ export const ACCOUNTS = {
     HESAPLANAN_KDV: '391',
     SERMAYE: '500',
     YURT_ICI_SATIS: '600',
+    SATIS_ISKONTOLARI: '611',
     GENEL_GIDER: '770',
     FINANSMAN_GIDER: '780'
 };
@@ -435,6 +436,37 @@ export async function createJournalFromSale(order: any, items: any[], kasaId: st
             });
         }
     });
+
+    // --- BALANCING (DISCOUNTS) ---
+    const currentDebt = amount;
+    const currentCredit = entryLines.filter(l => l.type === 'Alacak').reduce((s, l) => s + l.amount, 0);
+    const diff = currentCredit - currentDebt;
+
+    if (Math.abs(diff) > 0.01) {
+        if (diff > 0) {
+            // Credit is higher than Debt -> We gave a discount (Iskonto)
+            // 611 Satış İskontoları Borçlanmalı
+            entryLines.push({
+                accountCode: ACCOUNTS.SATIS_ISKONTOLARI + '.01',
+                accountName: 'SATIŞ İSKONTOLARI',
+                type: 'Borç',
+                amount: diff,
+                description: 'Satış İskontosu / Kampanya',
+                documentType: 'FATURA'
+            });
+        } else {
+            // Debt is higher than Credit -> Extra Charge or Rounding
+            // 600 Yurt İçi Satışlar artırılmalı veya 649 Diğer Olağan Gelirler
+            entryLines.push({
+                accountCode: ACCOUNTS.YURT_ICI_SATIS + '.99',
+                accountName: 'DİĞER GELİRLER / YUVARLAMA',
+                type: 'Alacak',
+                amount: Math.abs(diff),
+                description: 'Yuvarlama Farkı',
+                documentType: 'FATURA'
+            });
+        }
+    }
 
     return createAccountingSlip({
         description: `POS Satışı: ${order.orderNumber} - ${order.customerName}`,

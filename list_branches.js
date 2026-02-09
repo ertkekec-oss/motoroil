@@ -4,7 +4,9 @@ const prisma = new PrismaClient();
 
 async function main() {
     const branches = await prisma.branch.findMany();
-    console.log('Branches:', JSON.stringify(branches, null, 2));
+    branches.forEach(b => {
+        console.log(`ID: ${b.id}, Company: ${b.companyId}, Name: ${b.name}`);
+    });
 }
 
 main()

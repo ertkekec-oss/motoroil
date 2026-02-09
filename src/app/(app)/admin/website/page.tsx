@@ -58,6 +58,14 @@ export default function WebsiteManagerPage() {
         try {
             const res = await fetch('/api/admin/website');
             const json = await res.json();
+
+            if (json.error) {
+                console.error(json.error);
+                alert(json.error);
+                setLoading(false);
+                return;
+            }
+
             setData(json);
             if (json.settings) setSettings(json.settings);
 
@@ -69,21 +77,18 @@ export default function WebsiteManagerPage() {
             } else if (json.pages?.length > 0) {
                 setSelectedPage(json.pages[0]);
             }
-            if (json.error) {
-                console.error(json.error);
-            } else {
-                if (!json.menus || json.menus.length === 0) {
-                    json.menus = [
-                        { id: 'new_header', name: 'Header', items: [] },
-                        { id: 'new_footer', name: 'Footer', items: [] }
-                    ];
-                }
-                setData(json);
-                setLoading(false);
-            };
+
+            if (!json.menus || json.menus.length === 0) {
+                json.menus = [
+                    { id: 'new_header', name: 'Header', items: [] },
+                    { id: 'new_footer', name: 'Footer', items: [] }
+                ];
+            }
+            setData(json);
+            setLoading(false);
         } catch (error) {
             console.error(error);
-            setLoading(false); // Ensure loading is set to false on error
+            setLoading(false);
         }
     };
 

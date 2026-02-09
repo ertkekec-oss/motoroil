@@ -250,6 +250,18 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
         }
     };
 
+    const refreshSalesExpenses = async () => {
+        try {
+            const res = await fetch(`/api/settings?t=${Date.now()}`, { cache: 'no-store' });
+            const data = await res.json();
+            if (data && data.salesExpenses) {
+                setSalesExpenses(data.salesExpenses);
+            }
+        } catch (err) {
+            console.error('Sales expenses fetch failed', err);
+        }
+    };
+
     const { isAuthenticated } = useAuth();
 
     // SEMANTIC READINESS: Invalidate stale data immediately on branch change
@@ -270,7 +282,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
             Promise.all([
                 refreshTransactions(),
                 refreshKasalar(),
-                refreshChecks()
+                refreshChecks(),
+                refreshSalesExpenses()
             ])
                 .then(() => {
                     // Mark data as belonging to this branch

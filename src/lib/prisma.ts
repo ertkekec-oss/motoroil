@@ -88,13 +88,11 @@ const prismaClientSingleton = () => {
 
                     if (session) {
                         const role = session.role?.toUpperCase() || '';
+                        const isPlatformAdmin = session.tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN';
 
                         // --- 2. Platform Admin Bypass ---
-                        // Users in PLATFORM_ADMIN tenant with ADMIN or SUPER_ADMIN roles can bypass isolation
-                        if (session.tenantId === 'PLATFORM_ADMIN' && (role === 'SUPER_ADMIN' || role === 'ADMIN')) {
-                            if (operation !== 'findUnique' && operation !== 'findFirst') {
-                                console.log(`[SECURITY] PLATFORM_ADMIN_BYPASS (${session.username}) for ${model}.${operation}`);
-                            }
+                        // Platform owners or Super Admins can see everything
+                        if (isPlatformAdmin) {
                             return query(args);
                         }
 
