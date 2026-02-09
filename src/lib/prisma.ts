@@ -8,9 +8,10 @@ const operationalModels = [
     'product', 'customer', 'supplier', 'transaction', 'kasa', 'check', 'order',
     'salesinvoice', 'purchaseinvoice', 'servicerecord', 'quote', 'paymentplan',
     'stockmovement', 'variantattribute', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
-    'journal', 'coupon', 'suspendedsale', 'company', 'branch',
+    'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'company', 'branch',
     'notification', 'staff', 'user', 'tenant', 'subscription'
 ];
+
 
 // Prisma Decimal to Number Transformer
 const prismaClientSingleton = () => {
@@ -123,6 +124,7 @@ const prismaClientSingleton = () => {
                             else if (modelName === 'notification') { a.where = { ...a.where, user: { tenantId: effectiveTenantId } }; }
                             else if (modelName === 'coupon') { a.where = { ...a.where, OR: [{ customer: { company: { tenantId: effectiveTenantId } } }, { customer: null }] }; }
                             else if (modelName === 'suspendedsale') { return query(args); }
+                            else if (modelName === 'journalitem') { a.where = { ...a.where, journal: { company: { tenantId: effectiveTenantId } } }; }
                             else { a.where = { ...a.where, company: { tenantId: effectiveTenantId } }; }
                         }
 
@@ -140,6 +142,7 @@ const prismaClientSingleton = () => {
                             else if (modelName === 'notification') { a.where = { ...a.where, user: { tenantId: effectiveTenantId } }; }
                             else if (modelName === 'coupon') { a.where = { ...a.where, OR: [{ customer: { company: { tenantId: effectiveTenantId } } }, { customer: null }] }; }
                             else if (modelName === 'suspendedsale') { return query(args); }
+                            else if (modelName === 'journalitem') { a.where = { ...a.where, journal: { company: { tenantId: effectiveTenantId } } }; }
                             else { a.where = { ...a.where, company: { tenantId: effectiveTenantId } }; }
                         }
 

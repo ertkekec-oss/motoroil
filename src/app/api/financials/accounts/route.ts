@@ -35,22 +35,35 @@ export async function GET() {
         });
 
         if (!company && session.tenantId !== 'PLATFORM_ADMIN') {
+            console.error(`[Account API] Company not found for tenant: ${session.tenantId}`);
             return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
         }
 
         // 1. Check if any accounts exist for THIS company (Skip for PLATFORM_ADMIN if no company selected)
-        const count = company ? await prisma.account.count({
-            where: { companyId: company.id }
-        }) : 0;
+        let count = 0;
+        if (company) {
+            count = await prisma.account.count({
+                where: { companyId: company.id }
+            });
+        }
 
-        // 2. If empty, SEED the default chart of accounts for THIS company
-        if (count === 0) {
-            console.log(`Seeding Default Chart of Accounts for Company: ${company.name}`);
+        // 2. If empty and we have a company, SEED the default chart of accounts
+        if (count === 0 && company) {
+            console.log(`[Account API] Seeding Default Chart of Accounts for Company: ${company.name} (${company.id})`);
             try {
-                for (const acc of DEFAULT_CHART_OF_ACCOUNTS) {
-                    await prisma.account.create({
-                        data: {
-                            companyId: company.id, // Bind to company
+                // Bulk seed defaults
+                await Promise.all(DEFAULT_CHART_OF_ACCOUNTS.map(acc =>
+                    prisma.account.upsert({
+                        where: {
+                            code_branch_companyId: {
+                                code: acc.code,
+                                branch: 'Merkez',
+                                companyId: company.id
+                            }
+                        },
+                        update: {}, // Don't overwrite if exists (though count check should prevent this)
+                        create: {
+                            companyId: company.id,
                             code: acc.code,
                             name: acc.name,
                             type: acc.type,
@@ -61,24 +74,29 @@ export async function GET() {
                             parentCode: null,
                             isActive: true,
                             balance: 0,
-                            branch: 'Merkez' // Explicitly set branch
+                            branch: 'Merkez'
                         }
-                    });
-                }
+                    })
+                ));
+                console.log(`[Account API] Seeding completed for ${company.name}`);
             } catch (seedError) {
-                console.error("Seeding Error:", seedError);
-                // Continue execution
+                console.error("[Account API] Seeding Error:", seedError);
             }
         }
 
         // 4. Fetch all accounts sorted by code (Filtered by Company if present)
+        // With prisma middleware, findMany is already isolated by tenant.
+        // We add manual companyId if found for extra precision.
         const accountsRaw = await prisma.account.findMany({
-            where: company ? { companyId: company.id } : {}, // Skip filter for platform admin
+            where: company ? { companyId: company.id } : {},
             orderBy: { code: 'asc' }
         });
 
+        console.log(`[Account API] Found ${accountsRaw.length} accounts for tenant ${session.tenantId}`);
+
         // 5. Calculate Correct Balances (TDHP Logic)
         const accounts = accountsRaw.map(acc => {
+
             const rawBalance = Number(acc.balance);
             let debitBalance = 0;
             let creditBalance = 0;

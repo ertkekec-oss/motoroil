@@ -211,6 +211,7 @@ export async function POST(request: Request) {
             // G. Bank Commission
             if (effectivePaymentMode === 'credit_card') {
                 try {
+                    console.log(`[Commission] Starting calculation for total: ${finalTotal}, Mode: ${effectivePaymentMode}`);
                     const settingsRes = await tx.appSettings.findUnique({ where: { key: 'salesExpenses' } });
                     const salesExpenses = settingsRes?.value as any;
 
@@ -219,38 +220,58 @@ export async function POST(request: Request) {
                         const instCount = body.installments || body.installmentCount || 1;
                         const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
 
-                        let commissionConfig = salesExpenses.posCommissions.find((c: any) =>
-                            c.installment === instLabelRaw ||
-                            c.installment === instLabelFallback ||
-                            (instCount === 1 && (c.installment === 'Tek Çekim' || c.installment === 'Nakit/Tek'))
-                        );
+                        console.log(`[Commission] Finding config for: labelRaw="${instLabelRaw}", fallback="${instLabelFallback}", instCount=${instCount}`);
 
-                        if (commissionConfig && Number(commissionConfig.rate) > 0) {
-                            const rate = Number(commissionConfig.rate);
-                            const commissionAmount = (finalTotal * rate) / 100;
+                        // Case-insensitive and trimmed lookup
+                        let commissionConfig = salesExpenses.posCommissions.find((c: any) => {
+                            const configLabel = String(c.installment || '').toLowerCase().trim();
+                            const lookups = [
+                                String(instLabelRaw || '').toLowerCase().trim(),
+                                String(instLabelFallback || '').toLowerCase().trim(),
+                                (instCount === 1 ? 'tek çekim' : ''),
+                                (instCount === 1 ? 'nakit/tek' : ''),
+                                (instCount === 1 ? 'peşin' : '')
+                            ].filter(Boolean);
 
-                            const commTrx = await (tx as any).transaction.create({
-                                data: {
-                                    companyId: companyId,
-                                    type: 'Expense',
-                                    amount: commissionAmount,
-                                    description: `Banka POS Komisyon Gideri (${commissionConfig.installment})`,
-                                    kasaId: targetKasaId,
-                                    date: new Date(),
-                                    branch: branch || 'Merkez'
-                                }
-                            });
+                            return lookups.includes(configLabel);
+                        });
 
-                            await createJournalFromTransaction(commTrx, tx);
+                        if (commissionConfig) {
+                            const rate = Number(commissionConfig.rate || 0);
+                            if (rate > 0) {
+                                const commissionAmount = (finalTotal * rate) / 100;
+                                console.log(`[Commission] Found config: ${commissionConfig.installment}, Rate: %${rate}, Amount: ${commissionAmount}`);
 
-                            await tx.kasa.update({
-                                where: { id: targetKasaId },
-                                data: { balance: { decrement: commissionAmount } }
-                            });
+                                const commTrx = await (tx as any).transaction.create({
+                                    data: {
+                                        companyId: companyId,
+                                        type: 'Expense',
+                                        amount: commissionAmount,
+                                        description: `Banka POS Komisyon Gideri (${commissionConfig.installment})`,
+                                        kasaId: targetKasaId,
+                                        date: new Date(),
+                                        branch: branch || 'Merkez'
+                                    }
+                                });
+
+                                await createJournalFromTransaction(commTrx, tx);
+
+                                await tx.kasa.update({
+                                    where: { id: targetKasaId },
+                                    data: { balance: { decrement: commissionAmount } }
+                                });
+                                console.log(`[Commission] Successfully recorded commission expense: ${commTrx.id}`);
+                            } else {
+                                console.log(`[Commission] Config found but rate is 0 or invalid.`);
+                            }
+                        } else {
+                            console.warn(`[Commission] No matching commission config found in settings.`);
                         }
+                    } else {
+                        console.warn(`[Commission] No posCommissions found in appSettings.`);
                     }
                 } catch (commErr) {
-                    console.error('Commission Error:', commErr);
+                    console.error('[Commission] Error calculating or recording commission:', commErr);
                 }
             }
 

@@ -49,7 +49,7 @@ export default function TreasuryPage() {
             filtered = filtered.filter(t => new Date(t.date) >= lastYear);
         }
 
-        return filtered.reduce((acc, t) => acc + t.amount, 0);
+        return filtered.reduce((acc, t) => acc + Number(t.amount || 0), 0);
     };
 
     const expenseTotal = getExpenseTotal();

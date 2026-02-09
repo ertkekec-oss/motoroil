@@ -390,124 +390,156 @@ function POSContent() {
       </div>
 
       {/* RIGHT PANEL (Payment) */}
-      <div className="w-[380px] bg-[var(--bg-card)] border border-[var(--border-light)] rounded-2xl p-6 flex flex-col shadow-xl">
-        <h2 className="text-xs font-bold opacity-50 mb-6 tracking-widest text-center">SATIŞ ÖZETİ</h2>
+      <div className="w-[380px] bg-[var(--bg-card)] border border-[var(--border-light)] rounded-2xl p-6 flex flex-col shadow-xl sticky top-4 h-[calc(100vh-2rem)] overflow-hidden">
+        <h2 className="text-xs font-bold opacity-50 mb-6 tracking-widest text-center shrink-0">SATIŞ ÖZETİ</h2>
 
-        {/* Customer */}
-        <div className="mb-4">
-          <label className="text-[10px] font-bold opacity-50 block mb-2 uppercase">MÜŞTERİ</label>
-          <div onClick={() => setIsCustomerModalOpen(true)} className="flex justify-between items-center bg-black/20 p-3 rounded-lg border border-white/5 cursor-pointer hover:border-white/20 transition-all">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px]">{selectedCustomer.charAt(0)}</div>
-              <span className="font-bold text-sm truncate max-w-[200px]">{selectedCustomer}</span>
-            </div>
-            <div className="text-[10px] text-primary font-bold">DEĞİŞTİR ▾</div>
-          </div>
-        </div>
-
-        {/* Promo */}
-        <button onClick={() => setShowPromoInputs(!showPromoInputs)} className="w-full bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-600/20 p-3 rounded-lg font-bold text-xs mb-4 flex items-center justify-center gap-2">
-          🎁 KOD VEYA REFERANS UYGULA
-        </button>
-
-        {showPromoInputs && (
-          <div className="mb-4 space-y-2 bg-black/20 p-2 rounded-lg animate-in slide-in-from-top-2">
-            <div className="flex gap-1">
-              <input placeholder="Kupon Kodu" value={couponCode} onChange={e => setCouponCode(e.target.value)} className="flex-1 bg-white/5 rounded px-2 text-xs h-8" />
-              <button onClick={handleValidateCoupon} className="bg-white/10 px-2 text-[10px] rounded">DOĞRULA</button>
-            </div>
-            <div className="flex gap-1">
-              <input placeholder="Referans" value={referenceCode} onChange={e => setReferenceCode(e.target.value)} className="flex-1 bg-white/5 rounded px-2 text-xs h-8" />
-              <button onClick={handleApplyReference} className="bg-white/10 px-2 text-[10px] rounded">UYGULA</button>
+        {/* Scrollable Middle Section */}
+        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
+          {/* Customer */}
+          <div className="mb-4">
+            <label className="text-[10px] font-bold opacity-50 block mb-2 uppercase">MÜŞTERİ</label>
+            <div onClick={() => setIsCustomerModalOpen(true)} className="flex justify-between items-center bg-black/20 p-3 rounded-lg border border-white/5 cursor-pointer hover:border-white/20 transition-all">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px]">{selectedCustomer.charAt(0)}</div>
+                <span className="font-bold text-sm truncate max-w-[200px]">{selectedCustomer}</span>
+              </div>
+              <div className="text-[10px] text-primary font-bold">DEĞİŞTİR ▾</div>
             </div>
           </div>
-        )}
 
-        {/* Manual Discount */}
-        <div className="grid grid-cols-2 gap-2 mb-6">
-          <div>
-            <label className="text-[9px] font-bold opacity-50 block mb-1">İNDİRİM</label>
-            <div className="flex bg-black/20 rounded border border-white/5 overflow-hidden">
-              <input type="number" value={discountValue} onChange={e => setDiscountValue(Number(e.target.value))} className="w-full bg-transparent border-none text-right px-2 text-xs h-8" />
-              <button onClick={() => setDiscountType(t => t === 'percent' ? 'amount' : 'percent')} className="bg-primary px-2 text-[10px] font-bold">{discountType === 'percent' ? '%' : '₺'}</button>
+          {/* Promo */}
+          <button onClick={() => setShowPromoInputs(!showPromoInputs)} className="w-full bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-600/20 p-3 rounded-lg font-bold text-xs flex items-center justify-center gap-2">
+            🎁 KOD VEYA REFERANS UYGULA
+          </button>
+
+          {showPromoInputs && (
+            <div className="space-y-2 bg-black/20 p-2 rounded-lg animate-in slide-in-from-top-2">
+              <div className="flex gap-1">
+                <input placeholder="Kupon Kodu" value={couponCode} onChange={e => setCouponCode(e.target.value)} className="flex-1 bg-white/5 rounded px-2 text-xs h-8" />
+                <button onClick={handleValidateCoupon} className="bg-white/10 px-2 text-[10px] rounded">DOĞRULA</button>
+              </div>
+              <div className="flex gap-1">
+                <input placeholder="Referans" value={referenceCode} onChange={e => setReferenceCode(e.target.value)} className="flex-1 bg-white/5 rounded px-2 text-xs h-8" />
+                <button onClick={handleApplyReference} className="bg-white/10 px-2 text-[10px] rounded">UYGULA</button>
+              </div>
             </div>
-          </div>
-          <div>
-            <label className="text-[9px] font-bold opacity-50 block mb-1">PUAN</label>
-            <input type="number" value={pointsToUse} onChange={e => setPointsToUse(Number(e.target.value))} className="w-full bg-black/20 border border-white/5 rounded px-2 text-xs h-8 text-right" />
-          </div>
-        </div>
-
-        {/* Totals */}
-        <div className="space-y-2 mb-6">
-          <div className="flex justify-between text-xs opacity-60"><span>Ara Toplam</span><span>₺{subtotal.toLocaleString()}</span></div>
-          {totalDiscount > 0 && <div className="flex justify-between text-xs text-green-400"><span>İndirim</span><span>-₺{totalDiscount.toLocaleString()}</span></div>}
-          <div className="flex justify-between text-xs opacity-40"><span>KDV Hariç</span><span>₺{vatExcludedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
-          <div className="flex justify-between items-end mt-2 pt-2 border-t border-white/10">
-            <span className="font-bold text-sm">TOPLAM</span>
-            <span className="text-3xl font-black text-primary">₺{finalTotal.toLocaleString()}</span>
-          </div>
-        </div>
-
-        {/* Payment Methods */}
-        <div className="mb-2 flex justify-between items-center text-[10px] font-bold opacity-50">
-          <span>ÖDEME YÖNTEMİ</span>
-          {paymentMode && paymentMode !== 'account' && (
-            <select value={selectedKasa} onChange={e => setSelectedKasa(e.target.value)} className="bg-transparent border-none text-right text-[10px] text-primary focus:outline-none">
-              <option value="" className="bg-black">Kasa Seçin</option>
-              {kasalar?.filter(k =>
-                (paymentMode === 'cash' && k.type === 'Nakit') ||
-                (paymentMode === 'card' && (k.type === 'Kredi Kartı' || k.type.includes('POS'))) ||
-                (paymentMode === 'transfer' && (k.type === 'Banka' || k.type === 'Havale'))
-              ).map(k => (
-                <option key={k.id} value={k.id} className="bg-black">{k.name} ({k.currency || 'TL'})</option>
-              ))}
-            </select>
           )}
-        </div>
 
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          {[{ id: 'cash', l: 'Nakit', i: '💵' }, { id: 'card', l: 'Kredi Kartı', i: '💳' }, { id: 'transfer', l: 'Havale/EFT', i: '🏦' }, { id: 'account', l: 'VERESİYE', i: '📖' }].map(m => (
-            <button key={m.id} onClick={() => setPaymentMode(m.id as any)} className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${paymentMode === m.id ? 'bg-white/10 border-primary text-white shadow-lg' : 'bg-black/20 border-white/5 hover:bg-white/5 text-white/50'}`}>
-              <span className="text-xl mb-1">{m.i}</span>
-              <span className="text-[9px] font-bold uppercase">{m.l}</span>
-            </button>
-          ))}
-        </div>
+          {/* Manual Discount & Points */}
+          <div className="grid grid-cols-2 gap-2 mt-4">
+            <div>
+              <label className="text-[9px] font-bold opacity-50 block mb-1">İNDİRİM</label>
+              <div className="flex bg-black/20 rounded border border-white/5 overflow-hidden">
+                <input type="number" value={discountValue} onChange={e => setDiscountValue(Number(e.target.value))} className="w-full bg-transparent border-none text-right px-2 text-xs h-8" />
+                <button onClick={() => setDiscountType(t => t === 'percent' ? 'amount' : 'percent')} className="bg-primary px-2 text-[10px] font-bold">{discountType === 'percent' ? '%' : '₺'}</button>
+              </div>
+            </div>
+            <div>
+              <label className="text-[9px] font-bold opacity-50 block mb-1">PUAN</label>
+              <input type="number" value={pointsToUse} onChange={e => setPointsToUse(Number(e.target.value))} className="w-full bg-black/20 border border-white/5 rounded px-2 text-xs h-8 text-right" />
+            </div>
+          </div>
 
-        {paymentMode === 'card' && (
-          <div className="grid grid-cols-4 gap-1 mb-4">
-            {/* Dynamic POS Commissions */}
-            {appSettings?.salesExpenses?.posCommissions?.length > 0 ? (
-              appSettings.salesExpenses.posCommissions.map((comm: any, idx: number) => {
-                const count = comm.installment === 'Tek Çekim' ? 1 : parseInt(comm.installment);
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => setInstallmentCount(count || 1)}
-                    className={`p-1 text-[10px] rounded border flex flex-col items-center justify-center ${installmentCount === (count || 1) ? 'bg-primary border-primary' : 'bg-transparent border-white/10'}`}
-                  >
-                    <span>{comm.installment}</span>
-                    <span className="text-[8px] opacity-60">%{comm.rate}</span>
-                  </button>
-                );
-              })
-            ) : (
-              // Fallback to hardcoded if no settings found
-              [1, 2, 3, 6, 9, 12].map(i => (
-                <button key={i} onClick={() => setInstallmentCount(i)} className={`p-1 text-[10px] rounded border ${installmentCount === i ? 'bg-primary border-primary' : 'bg-transparent border-white/10'}`}>{i} Taksit</button>
-              ))
+          {/* Totals */}
+          <div className="space-y-2 border-t border-white/10 pt-4 mt-4">
+            <div className="flex justify-between text-xs opacity-60"><span>Ara Toplam</span><span>₺{subtotal.toLocaleString()}</span></div>
+            {totalDiscount > 0 && <div className="flex justify-between text-xs text-green-400"><span>İndirim</span><span>-₺{totalDiscount.toLocaleString()}</span></div>}
+            <div className="flex justify-between text-xs opacity-40"><span>KDV Hariç</span><span>₺{vatExcludedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+            <div className="flex justify-between items-end pt-2">
+              <span className="font-bold text-sm">TOPLAM</span>
+              <span className="text-3xl font-black text-primary">₺{finalTotal.toLocaleString()}</span>
+            </div>
+          </div>
+
+          {/* Payment Methods */}
+          <div className="pt-4 border-t border-white/10 mt-4 overflow-hidden">
+            <div className="flex justify-between items-center text-[10px] font-bold opacity-50 mb-2">
+              <span>ÖDEME YÖNTEMİ</span>
+              {paymentMode && paymentMode !== 'account' && (
+                <select value={selectedKasa} onChange={e => setSelectedKasa(e.target.value)} className="bg-transparent border-none text-right text-[10px] text-primary focus:outline-none max-w-[150px] truncate">
+                  <option value="" className="bg-black">Kasa Seçin</option>
+                  {kasalar?.filter(k =>
+                    (paymentMode === 'cash' && k.type === 'Nakit') ||
+                    (paymentMode === 'card' && (k.type === 'Kredi Kartı' || k.type.includes('POS'))) ||
+                    (paymentMode === 'transfer' && (k.type === 'Banka' || k.type === 'Havale'))
+                  ).map(k => (
+                    <option key={k.id} value={k.id} className="bg-black">{k.name} ({k.currency || 'TL'})</option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {[{ id: 'cash', l: 'Nakit', i: '💵' }, { id: 'card', l: 'Kredi Kartı', i: '💳' }, { id: 'transfer', l: 'Havale/EFT', i: '🏦' }, { id: 'account', l: 'VERESİYE', i: '📖' }].map(m => (
+                <button
+                  key={m.id}
+                  onClick={() => setPaymentMode(m.id as any)}
+                  className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${paymentMode === m.id ? 'bg-white/10 border-primary text-white shadow-lg' : 'bg-black/20 border-white/5 hover:bg-white/5 text-white/50'}`}
+                >
+                  <span className="text-xl mb-1">{m.i}</span>
+                  <span className="text-[9px] font-bold uppercase">{m.l}</span>
+                </button>
+              ))}
+            </div>
+
+            {paymentMode === 'card' && (
+              <div className="mt-4 animate-in slide-in-from-top-2">
+                <label className="text-[9px] font-bold opacity-50 block mb-2">TAKSİT SEÇENEKLERİ</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {/* Dynamic POS Commissions */}
+                  {appSettings?.salesExpenses?.posCommissions?.length > 0 ? (
+                    appSettings.salesExpenses.posCommissions.map((comm: any, idx: number) => {
+                      const count = comm.installment === 'Tek Çekim' ? 1 : parseInt(comm.installment);
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => setInstallmentCount(count || 1)}
+                          className={`p-2 h-14 text-[10px] rounded-lg border flex flex-col items-center justify-center gap-0.5 transition-all ${installmentCount === (count || 1) ? 'bg-primary border-primary text-white font-bold' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}
+                        >
+                          <span className="text-[11px]">{comm.installment}</span>
+                          <span className="text-[9px] opacity-60">%{comm.rate}</span>
+                        </button>
+                      );
+                    })
+                  ) : (
+                    // Fallback to hardcoded if no settings found
+                    [1, 2, 3, 6, 9, 12].map(i => (
+                      <button key={i} onClick={() => setInstallmentCount(i)} className={`p-2 h-12 text-[10px] rounded-lg border ${installmentCount === i ? 'bg-primary border-primary' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>{i} Taksit</button>
+                    ))
+                  )}
+                </div>
+              </div>
             )}
           </div>
-        )}
+        </div>
 
-        <button disabled={cart.length === 0} onClick={() => setShowSuspendModal(true)} className="w-full bg-amber-500/10 border border-amber-500/20 text-amber-500 font-bold text-xs py-3 rounded-lg mb-2 flex justify-center items-center gap-2 hover:bg-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed">⌛ BEKLEMEYE AL</button>
+        {/* Action Buttons at the Bottom */}
+        <div className="pt-4 mt-4 border-t border-white/10 space-y-3 shrink-0">
+          <button
+            disabled={cart.length === 0}
+            onClick={() => setShowSuspendModal(true)}
+            className="w-full bg-amber-500/10 border border-amber-500/20 text-amber-500 font-bold text-xs py-3 rounded-lg flex justify-center items-center gap-2 hover:bg-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            ⌛ BEKLEMEYE AL
+          </button>
 
-        <button onClick={handleFinalize} disabled={isProcessing || cart.length === 0} className="w-full bg-primary py-4 rounded-xl font-black text-white shadow-lg shadow-orange-900/20 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] transition-transform">
-          {isProcessing ? 'İŞLENİYOR...' : 'ONAYLA ➔'}
-        </button>
-
+          <button
+            onClick={handleFinalize}
+            disabled={isProcessing || cart.length === 0}
+            className={`w-full py-4 rounded-xl font-black text-white shadow-lg transition-all duration-300 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 ${cart.length > 0 ? 'bg-gradient-to-r from-orange-600 to-orange-400 shadow-orange-600/20' : 'bg-white/10 border border-white/5 text-white/30'}`}
+          >
+            {isProcessing ? (
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                <span>İŞLENİYOR...</span>
+              </div>
+            ) : (
+              'ONAYLA ➔'
+            )}
+          </button>
+        </div>
       </div>
+
 
       {/* --- MODALS --- */}
 
