@@ -139,6 +139,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         if (!app.isInitialLoading && auth.isAuthenticated && pathname) {
             // Absolute system admin bypasses all UI gates
             const isSuperAdmin = auth.user?.role === 'SUPER_ADMIN';
+            const isAdmin = auth.user?.role === 'ADMIN';
 
             const config = permMap[pathname];
             if (config) {
@@ -148,10 +149,10 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                     return;
                 }
 
-                // 2. Super Admin Bypass
-                if (isSuperAdmin) return;
+                // 2. Admin Bypass - ADMIN and SUPER_ADMIN bypass all permission checks
+                if (isSuperAdmin || isAdmin) return;
 
-                // 3. Permission Check
+                // 3. Permission Check (only for non-admin users)
                 if (config.perm && !app.hasPermission(config.perm)) {
                     const targetFallback = app.hasPermission('pos_access') ? '/' : '/field-mobile/routes';
                     router.push(targetFallback);
