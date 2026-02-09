@@ -94,7 +94,7 @@ export async function POST(request: Request) {
 
             // Update Kasa Balance
             if (!isAccountTransaction && kasaId && type !== 'Transfer') {
-                const isPositive = ['Sales', 'Collection'].includes(type);
+                const isPositive = ['Sales', 'Collection', 'Income'].includes(type);
                 const effect = isPositive ? amount : -amount;
                 // Verify ownership implicitly via ID, but good to double check if needed.
                 // Kasa IDs should be unique globally (CUID), but collision unlikely.
@@ -212,7 +212,7 @@ export async function DELETE(request: Request) {
 
             // 1. Reverse Kasa
             if (oldTransaction.kasaId) {
-                const isPositive = ['Sales', 'Collection'].includes(oldTransaction.type);
+                const isPositive = ['Sales', 'Collection', 'Income'].includes(oldTransaction.type);
                 const reverseEffect = isPositive ? -amount : amount;
                 await tx.kasa.update({
                     where: { id: oldTransaction.kasaId },

@@ -19,7 +19,7 @@ export default function AccountingModals({
 
     // Form States
     const [formData, setFormData] = useState<any>({
-        type: type === 'debt' ? 'Expense' : type === 'collection' ? 'Income' : 'Expense', // Default
+        type: type === 'debt' ? 'Payment' : type === 'collection' ? 'Collection' : 'Expense', // Default
         description: '',
         amount: '',
         date: new Date().toISOString().split('T')[0],
@@ -52,7 +52,7 @@ export default function AccountingModals({
             let res;
             if (type === 'transaction' || type === 'debt' || type === 'collection' || type === 'expense') {
                 // Adjust type based on modal context
-                const txType = type === 'debt' ? 'Expense' : type === 'collection' ? 'Income' : formData.type;
+                const txType = type === 'debt' ? 'Payment' : type === 'collection' ? 'Collection' : formData.type;
 
                 // Prepare Data
                 const payload = {
