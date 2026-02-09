@@ -23,8 +23,11 @@ export async function PATCH(request: Request, props: { params: Promise<{ id: str
 
         // Use transaction for consistency
         const updatedProduct = await prisma.$transaction(async (tx) => {
-            // 1. Separate stock from other fields
-            const { stock, branch: _b, ...productData } = body;
+            // 1. Separate stock and branch from other fields
+            const productData = { ...body };
+            const stock = productData.stock;
+            delete productData.stock;
+            delete productData.branch;
 
             // 2. Update Product Basic Info
             const product = await tx.product.update({
