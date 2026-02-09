@@ -68,7 +68,7 @@ export async function POST(request: Request) {
                     currency: currency || 'TRY',
                     buyPrice: bPrice,
                     purchaseCurrency: purchaseCurrency || 'TRY',
-                    supplier: supplier || '',
+                    supplierName: supplier || '', // Fix: supplier -> supplierName
                     branch: 'Merkez',
                     unit: unit || 'Adet',
                     salesVat: parseInt(salesVat) || 20,
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
                             currency: currency || 'TRY',
                             buyPrice: parseFloat(v.buyPrice) || bPrice,
                             purchaseCurrency: purchaseCurrency || 'TRY',
-                            supplier: supplier || '',
+                            supplierName: supplier || '', // Fix: supplier -> supplierName
                             branch: 'Merkez',
                             parentId: mainProduct.id,
                             unit: unit || 'Adet',
