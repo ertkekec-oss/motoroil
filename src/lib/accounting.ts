@@ -427,7 +427,7 @@ export async function createJournalFromSale(order: any, items: any[], kasaId: st
     Object.entries(vatGroups).forEach(([rate, vatAmt]) => {
         if (vatAmt > 0) {
             entryLines.push({
-                accountCode: `${ACCOUNTS.HESAPLANAN_KDV}.${rate.padStart(2, '0')}`,
+                accountCode: `${ACCOUNTS.HESAPLANAN_KDV}.${rate.toString().padStart(2, '0')}`,
                 accountName: `%${rate} HESAPLANAN KDV`,
                 type: 'Alacak',
                 amount: vatAmt,

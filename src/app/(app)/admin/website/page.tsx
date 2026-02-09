@@ -14,19 +14,47 @@ export default function WebsiteManagerPage() {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Check file size (max 2MB for safety)
-        if (file.size > 2 * 1024 * 1024) {
-            alert("Dosya boyutu çok büyük! Lütfen 2MB'dan küçük bir görsel yükleyin.");
-            return;
-        }
+        // Reset input value so same file can be selected again
+        e.target.value = '';
 
         setUploading(true);
 
         const reader = new FileReader();
         reader.onloadend = () => {
-            setUploading(false);
             if (typeof reader.result === 'string') {
-                onSuccess(reader.result);
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Maksimum genişliği 1920px olarak belirleyelim (Performans için)
+                    const MAX_WIDTH = 1920;
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) {
+                        ctx.drawImage(img, 0, 0, width, height);
+                        // Kaliteyi %80 olarak ayarlayalım
+                        const resizedUrl = canvas.toDataURL('image/jpeg', 0.82);
+                        setUploading(false);
+                        onSuccess(resizedUrl);
+                    } else {
+                        setUploading(false);
+                        onSuccess(reader.result as string);
+                    }
+                };
+                img.onerror = () => {
+                    setUploading(false);
+                    alert("Görsel işlenirken hata oluştu.");
+                };
+                img.src = reader.result;
             }
         };
         reader.onerror = () => {
@@ -35,6 +63,21 @@ export default function WebsiteManagerPage() {
         };
 
         reader.readAsDataURL(file);
+    };
+
+    const updateSectionContent = (index: number, field: string, value: any) => {
+        setSelectedPage((prev: any) => {
+            if (!prev) return prev;
+            const newSections = [...prev.sections];
+            newSections[index] = {
+                ...newSections[index],
+                content: {
+                    ...newSections[index].content,
+                    [field]: value
+                }
+            };
+            return { ...prev, sections: newSections };
+        });
     };
 
     // Form States
@@ -215,14 +258,7 @@ export default function WebsiteManagerPage() {
         setSelectedPage({ ...selectedPage, sections: newSections });
     };
 
-    const updateSectionContent = (index: number, field: string, value: any) => {
-        const newSections = [...selectedPage.sections];
-        newSections[index].content = {
-            ...newSections[index].content,
-            [field]: value
-        };
-        setSelectedPage({ ...selectedPage, sections: newSections });
-    };
+
 
     const updateSectionType = (index: number, type: string) => {
         const newSections = [...selectedPage.sections];
@@ -492,13 +528,30 @@ export default function WebsiteManagerPage() {
                                                             </select>
                                                         </div>
                                                         <div className="flex-1">
-                                                            <input
-                                                                type="text"
-                                                                className="font-bold bg-transparent border-none focus:ring-0 text-xl p-0 text-slate-900 placeholder:text-slate-300 w-full"
-                                                                placeholder="Bölüm Başlığı..."
-                                                                value={section.content.title || section.content.text || ''}
-                                                                onChange={(e) => updateSectionContent(idx, section.type === 'BANNER' ? 'text' : 'title', e.target.value)}
-                                                            />
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <input
+                                                                    type="text"
+                                                                    className="font-bold bg-transparent border-none focus:ring-0 text-xl p-0 text-slate-900 placeholder:text-slate-300 w-full"
+                                                                    placeholder="Bölüm Başlığı..."
+                                                                    value={section.content.title || section.content.mainTitle || section.content.text || ''}
+                                                                    onChange={(e) => {
+                                                                        const val = e.target.value;
+                                                                        updateSectionContent(idx, 'title', val);
+                                                                        if (section.type === 'BANNER') updateSectionContent(idx, 'text', val);
+                                                                        if (['COMPARISON', 'METRICS', 'EXPLORE', 'FOOTER'].includes(section.type)) updateSectionContent(idx, 'mainTitle', val);
+                                                                    }}
+                                                                />
+                                                                <button
+                                                                    onClick={() => setSelectedPage((prev: any) => {
+                                                                        const newSections = [...prev.sections];
+                                                                        newSections[idx] = { ...newSections[idx], isActive: !newSections[idx].isActive };
+                                                                        return { ...prev, sections: newSections };
+                                                                    })}
+                                                                    className={`px-2 py-1 rounded text-[10px] font-black transition-all ${section.isActive ? 'bg-green-100 text-green-600 border border-green-200' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}
+                                                                >
+                                                                    {section.isActive ? 'AKTİF' : 'PASİF'}
+                                                                </button>
+                                                            </div>
                                                             <StyleFields section={section} idx={idx} type="title" />
                                                         </div>
                                                     </div>
@@ -577,7 +630,7 @@ export default function WebsiteManagerPage() {
                                                                         <label className="text-[10px] font-black text-slate-500 uppercase block">ROZET METNİ (BADGE)</label>
                                                                         <input
                                                                             type="text"
-                                                                            className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-3 text-slate-900"
+                                                                            className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900"
                                                                             placeholder="ör: ⭐ 4.4 | G2"
                                                                             value={section.content.badgeText || ''}
                                                                             onChange={(e) => updateSectionContent(idx, 'badgeText', e.target.value)}
@@ -587,17 +640,35 @@ export default function WebsiteManagerPage() {
                                                                         <label className="text-[10px] font-black text-slate-500 uppercase block">YORUM METNİ</label>
                                                                         <input
                                                                             type="text"
-                                                                            className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-3 text-slate-900"
+                                                                            className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900"
                                                                             placeholder="1,000+ reviews"
                                                                             value={section.content.reviewsText || ''}
                                                                             onChange={(e) => updateSectionContent(idx, 'reviewsText', e.target.value)}
                                                                         />
                                                                     </div>
                                                                 </div>
+
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[10px] font-black text-blue-600 uppercase block underline">ANA GÖRSEL (HERO IMAGE)</label>
+                                                                    <div className="flex gap-2">
+                                                                        <input
+                                                                            type="text"
+                                                                            className="flex-1 text-sm border-blue-200 rounded-lg bg-blue-50/30 p-3 text-slate-900 focus:bg-white"
+                                                                            placeholder="Görsel URL veya yükleyin..."
+                                                                            value={section.content.visualUrl || ''}
+                                                                            onChange={(e) => updateSectionContent(idx, 'visualUrl', e.target.value)}
+                                                                        />
+                                                                        <label className="bg-blue-600 text-white px-4 py-3 rounded-lg cursor-pointer text-xs font-black shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center justify-center min-w-[100px]">
+                                                                            {uploading ? '⌛...' : '📁 YÜKLE'}
+                                                                            <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'visualUrl', url))} />
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                                                                         <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">BİRİNCİ BUTON</label>
-                                                                        <div className="grid grid-cols-2 gap-2">
+                                                                        <div className="grid grid-cols-1 gap-2">
                                                                             <input
                                                                                 type="text"
                                                                                 className="text-xs border-slate-200 rounded p-2"
@@ -614,9 +685,9 @@ export default function WebsiteManagerPage() {
                                                                             />
                                                                         </div>
                                                                     </div>
-                                                                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                                                                         <label className="text-[10px] font-black text-slate-500 uppercase block mb-2">İKİNCİ BUTON</label>
-                                                                        <div className="grid grid-cols-2 gap-2">
+                                                                        <div className="grid grid-cols-1 gap-2">
                                                                             <input
                                                                                 type="text"
                                                                                 className="text-xs border-slate-200 rounded p-2"
@@ -633,16 +704,6 @@ export default function WebsiteManagerPage() {
                                                                             />
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                                <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-                                                                    <label className="text-[10px] font-black text-blue-500 uppercase block mb-2 underline">ANA GÖRSEL (VISUAL URL)</label>
-                                                                    <input
-                                                                        type="text"
-                                                                        className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900"
-                                                                        placeholder="https://example.com/image.png"
-                                                                        value={section.content.visualUrl || ''}
-                                                                        onChange={(e) => updateSectionContent(idx, 'visualUrl', e.target.value)}
-                                                                    />
                                                                 </div>
                                                             </div>
                                                         )}
@@ -777,24 +838,42 @@ export default function WebsiteManagerPage() {
                                                                 <p className={`text-[10px] font-black ${section.type === 'METRICS' ? 'text-purple-400' : 'text-blue-400'} uppercase tracking-widest mb-2`}>{section.type} BAŞLIKLARI</p>
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-900">
                                                                     <div>
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-1">BİRİNCİ KISIM</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-1">BİRİNCİ KISIM (ÜST)</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg p-2"
+                                                                            placeholder="örn: 20,000+ scaling teams"
                                                                             value={section.content.topTitle || ''}
                                                                             onChange={(e) => updateSectionContent(idx, 'topTitle', e.target.value)}
                                                                         />
                                                                     </div>
                                                                     <div>
-                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-1">İKİNCİ KISIM (RENKLİ)</label>
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block mb-1">İKİNCİ KISIM (ANA / RENKLİ)</label>
                                                                         <input
                                                                             type="text"
                                                                             className="w-full text-sm border-slate-200 rounded-lg p-2"
+                                                                            placeholder="örn: without the baggage"
                                                                             value={section.content.mainTitle || ''}
                                                                             onChange={(e) => updateSectionContent(idx, 'mainTitle', e.target.value)}
                                                                         />
                                                                     </div>
                                                                 </div>
+                                                                {section.type === 'COMPARISON' && (
+                                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-blue-100">
+                                                                        <div>
+                                                                            <label className="text-[10px] font-black text-red-500 uppercase block mb-1 underline text-center">ÖNCESİ (BEFORE) BAŞLIK</label>
+                                                                            <input type="text" className="w-full text-sm border-slate-200 rounded-lg p-2" value={section.content.beforeTitle || ''} placeholder="BEFORE DATABOX" onChange={(e) => updateSectionContent(idx, 'beforeTitle', e.target.value)} />
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase block mt-2 mb-1">MADDELER (Her satıra bir tane)</label>
+                                                                            <textarea className="w-full text-[11px] border-slate-200 rounded-lg p-2 min-h-[100px]" value={(section.content.beforeList || []).join('\n')} onChange={(e) => updateSectionContent(idx, 'beforeList', e.target.value.split('\n').filter(s => s.trim()))} />
+                                                                        </div>
+                                                                        <div>
+                                                                            <label className="text-[10px] font-black text-green-500 uppercase block mb-1 underline text-center">SONRASI (AFTER) BAŞLIK</label>
+                                                                            <input type="text" className="w-full text-sm border-slate-200 rounded-lg p-2" value={section.content.afterTitle || ''} placeholder="AFTER DATABOX" onChange={(e) => updateSectionContent(idx, 'afterTitle', e.target.value)} />
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase block mt-2 mb-1">MADDELER (Her satıra bir tane)</label>
+                                                                            <textarea className="w-full text-[11px] border-slate-200 rounded-lg p-2 min-h-[100px]" value={(section.content.afterList || []).join('\n')} onChange={(e) => updateSectionContent(idx, 'afterList', e.target.value.split('\n').filter(s => s.trim()))} />
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         )}
                                                         {!(section.type === 'PARTNERS' || section.type === 'BANNER' || section.type === 'NAV') && (
@@ -861,7 +940,7 @@ export default function WebsiteManagerPage() {
                                                                                                 />
                                                                                                 <label className="bg-slate-900 text-white px-3 py-2 rounded-lg cursor-pointer transition flex items-center gap-1 font-bold text-[10px] hover:bg-slate-800 shadow-lg shadow-slate-200">
                                                                                                     {uploading ? '⌛' : '📁 YÜKLE'}
-                                                                                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => {
+                                                                                                    <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => {
                                                                                                         const newItems = [...section.content.items];
                                                                                                         const currentName = typeof item === 'string' ? item : (item.name || 'Logo');
                                                                                                         newItems[iidx] = { ...item, name: currentName, url: url };
@@ -886,7 +965,7 @@ export default function WebsiteManagerPage() {
                                                                                             <input
                                                                                                 className="text-sm font-bold w-full border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white"
                                                                                                 placeholder={section.type === 'FAQ' ? 'Soru' : section.type === 'PRICING' ? 'Paket Adı' : section.type === 'METRICS' ? 'Stat (örn: ↑ 55%)' : section.type === 'FOOTER' ? 'Kolon Başlığı' : 'Başlık'}
-                                                                                                value={item.title || item.stat || item.question || item.q || ''}
+                                                                                                value={section.type === 'FAQ' ? (item.question || '') : (section.type === 'METRICS' ? (item.stat || '') : (item.title || ''))}
                                                                                                 onChange={(e) => {
                                                                                                     const newItems = [...section.content.items];
                                                                                                     const key = section.type === 'FAQ' ? 'question' : (section.type === 'METRICS' ? 'stat' : 'title');
@@ -927,7 +1006,7 @@ export default function WebsiteManagerPage() {
                                                                                         )}
                                                                                     </div>
 
-                                                                                    {section.type === 'PRICING' && (
+                                                                                    {(section.type === 'PRICING' || section.type === 'METRICS') && (
                                                                                         <div className="grid grid-cols-2 gap-3">
                                                                                             <div>
                                                                                                 <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block underline">LİNK METNİ</label>
@@ -963,7 +1042,7 @@ export default function WebsiteManagerPage() {
                                                                                         <textarea
                                                                                             className="text-sm w-full border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white"
                                                                                             placeholder={section.type === 'FAQ' ? 'Cevap' : 'Açıklama'}
-                                                                                            value={item.desc || item.subtitle || item.answer || item.a || ''}
+                                                                                            value={section.type === 'FAQ' ? (item.answer || '') : (item.desc || '')}
                                                                                             onChange={(e) => {
                                                                                                 const newItems = [...section.content.items];
                                                                                                 const key = section.type === 'FAQ' ? 'answer' : 'desc';
@@ -1048,145 +1127,131 @@ export default function WebsiteManagerPage() {
                                                         )}
                                                     </div>
 
-                                                    {section.type === 'FOOTER' && (
-                                                        <div className="bg-slate-100 p-6 rounded-2xl border border-slate-200 space-y-4 mb-6">
-                                                            <div className="flex justify-between items-center mb-2">
-                                                                <label className="text-[10px] font-black text-slate-500 uppercase block tracking-widest">ALT BİLGİ (FOOTER) AYARLARI</label>
-                                                                <span className="text-[9px] font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded italic">FOOTER ÖZEL</span>
-                                                            </div>
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                                <div className="space-y-1">
-                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block">FOOTER LOGOSU (OPSİYONEL)</label>
-                                                                    <div className="flex gap-2">
+                                                    {
+                                                        section.type === 'FOOTER' && (
+                                                            <div className="bg-slate-100 p-6 rounded-2xl border border-slate-200 space-y-4 mb-6">
+                                                                <div className="flex justify-between items-center mb-2">
+                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block tracking-widest">ALT BİLGİ (FOOTER) AYARLARI</label>
+                                                                    <span className="text-[9px] font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded italic">FOOTER ÖZEL</span>
+                                                                </div>
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">FOOTER LOGOSU (OPSİYONEL)</label>
+                                                                        <div className="flex gap-2">
+                                                                            <input
+                                                                                type="text"
+                                                                                className="flex-1 text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white"
+                                                                                placeholder="Boş bırakılırsa ana logo kullanılır"
+                                                                                value={section.content.footerLogoUrl || ''}
+                                                                                onChange={(e) => updateSectionContent(idx, 'footerLogoUrl', e.target.value)}
+                                                                            />
+                                                                            <label className="bg-slate-900 text-white p-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-200">
+                                                                                {uploading ? '⌛' : '📁 YÜKLE'}
+                                                                                <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'footerLogoUrl', url))} />
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">FOOTER ARKA PLAN RENGİ</label>
                                                                         <input
                                                                             type="text"
-                                                                            className="flex-1 text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white"
-                                                                            placeholder="Boş bırakılırsa ana logo kullanılır"
-                                                                            value={section.content.footerLogoUrl || ''}
-                                                                            onChange={(e) => updateSectionContent(idx, 'footerLogoUrl', e.target.value)}
+                                                                            className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white"
+                                                                            placeholder="#0d0e12"
+                                                                            value={section.content.bg || ''}
+                                                                            onChange={(e) => updateSectionContent(idx, 'bg', e.target.value)}
                                                                         />
-                                                                        <label className="bg-slate-900 text-white p-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition">
-                                                                            {uploading ? '⌛' : '📁'}
-                                                                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'footerLogoUrl', url))} />
-                                                                        </label>
+                                                                    </div>
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">LOGO YÜKSEKLİĞİ (PX)</label>
+                                                                        <input
+                                                                            type="number"
+                                                                            className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white"
+                                                                            placeholder="32"
+                                                                            value={section.content.footerLogoHeight || 32}
+                                                                            onChange={(e) => updateSectionContent(idx, 'footerLogoHeight', e.target.value)}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2 pt-6">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            id={`footer-hide-title-${idx}`}
+                                                                            className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                                                                            checked={section.content.footerHideTitle}
+                                                                            onChange={(e) => updateSectionContent(idx, 'footerHideTitle', e.target.checked)}
+                                                                        />
+                                                                        <label htmlFor={`footer-hide-title-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">Site Başlığını Gizle</label>
                                                                     </div>
                                                                 </div>
-                                                                <div className="space-y-1">
-                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block">FOOTER ARKA PLAN RENGİ</label>
-                                                                    <input
-                                                                        type="text"
-                                                                        className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white"
-                                                                        placeholder="#0d0e12"
-                                                                        value={section.content.bg || ''}
-                                                                        onChange={(e) => updateSectionContent(idx, 'bg', e.target.value)}
-                                                                    />
-                                                                </div>
-                                                                <div className="space-y-1">
-                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block">LOGO YÜKSEKLİĞİ (PX)</label>
-                                                                    <input
-                                                                        type="number"
-                                                                        className="w-full text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white"
-                                                                        placeholder="32"
-                                                                        value={section.content.footerLogoHeight || 32}
-                                                                        onChange={(e) => updateSectionContent(idx, 'footerLogoHeight', e.target.value)}
-                                                                    />
-                                                                </div>
-                                                                <div className="flex items-center gap-2 pt-6">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        id={`footer-hide-title-${idx}`}
-                                                                        className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
-                                                                        checked={section.content.footerHideTitle}
-                                                                        onChange={(e) => updateSectionContent(idx, 'footerHideTitle', e.target.checked)}
-                                                                    />
-                                                                    <label htmlFor={`footer-hide-title-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">Site Başlığını Gizle</label>
+                                                                <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                                                                    <p className="text-[10px] text-blue-700 italic font-medium leading-relaxed">
+                                                                        * Footer renk ve logosunu buradan değiştirebilirsiniz. Linkleri ise aşağıdaki liste öğelerinden yönetebilirsiniz.
+                                                                    </p>
                                                                 </div>
                                                             </div>
-                                                            <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                                                                <p className="text-[10px] text-blue-700 italic font-medium leading-relaxed">
-                                                                    * Footer renk ve logosunu buradan değiştirebilirsiniz. Linkleri ise aşağıdaki liste öğelerinden yönetebilirsiniz.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    )}
+                                                        )
+                                                    }
 
-                                                    {section.type === 'NAV' && (
-                                                        <div className="bg-slate-100 p-6 rounded-2xl border border-slate-200 space-y-4 mb-6">
-                                                            <div className="flex justify-between items-center mb-2">
-                                                                <label className="text-[10px] font-black text-slate-500 uppercase block tracking-widest">SİTE LOGOSU (ANA LOGO)</label>
-                                                                <span className="text-[9px] font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded italic">GLOBAL AYAR</span>
-                                                            </div>
-                                                            <div className="flex gap-4 items-center">
-                                                                <div className="flex-1 flex gap-2">
-                                                                    <input
-                                                                        type="text"
-                                                                        className="flex-1 text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500"
-                                                                        placeholder="https://..."
-                                                                        value={settings.logoUrl || ''}
-                                                                        onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
-                                                                    />
-                                                                    <label className="bg-slate-900 text-white px-4 py-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-300 flex items-center gap-2">
-                                                                        {uploading ? '⌛' : '📁 LOGO YÜKLE'}
-                                                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setSettings({ ...settings, logoUrl: url }))} />
-                                                                    </label>
+                                                    {
+                                                        section.type === 'NAV' && (
+                                                            <div className="bg-slate-100 p-6 rounded-2xl border border-slate-200 space-y-4 mb-6">
+                                                                <div className="flex justify-between items-center mb-2">
+                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block tracking-widest">SİTE LOGOSU (ANA LOGO)</label>
+                                                                    <span className="text-[9px] font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded italic">GLOBAL AYAR</span>
                                                                 </div>
-                                                                {settings.logoUrl && (
-                                                                    <div className="h-16 w-16 bg-white border border-slate-200 rounded-xl p-2 flex items-center justify-center shadow-sm">
-                                                                        <img src={settings.logoUrl} alt="Logo" className="max-h-full max-w-full object-contain" />
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                            <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-xl border border-slate-200">
-                                                                <div className="space-y-1">
-                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block">LOGO YÜKSEKLİĞİ (PX)</label>
-                                                                    <input
-                                                                        type="number"
-                                                                        className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900"
-                                                                        placeholder="40"
-                                                                        value={section.content.logoHeight || 40}
-                                                                        onChange={(e) => updateSectionContent(idx, 'logoHeight', e.target.value)}
-                                                                    />
-                                                                </div>
-                                                                <div className="flex items-center gap-2 pt-4">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        id={`hide-title-${idx}`}
-                                                                        className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
-                                                                        checked={section.content.hideTitle}
-                                                                        onChange={(e) => updateSectionContent(idx, 'hideTitle', e.target.checked)}
-                                                                    />
-                                                                    <label htmlFor={`hide-title-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">Site Başlığını Gizle</label>
-                                                                </div>
-                                                            </div>
-                                                            <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                                                                <p className="text-[10px] text-blue-700 italic font-medium leading-relaxed">
-                                                                    * Bu bölümden yüklediğiniz logo tüm sayfalardaki üst menü (Navigation) alanında görüntülenecektir. Menü içeriğini "Menü Yönetimi" tabından düzenleyebilirsiniz.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {section.type === 'HERO' && (
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-100 p-6 rounded-2xl border border-slate-200">
-                                                            <div className="space-y-4">
-                                                                <div className="space-y-1">
-                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block">GÖRSEL (MAIN VISUAL)</label>
-                                                                    <div className="flex gap-2">
+                                                                <div className="flex gap-4 items-center">
+                                                                    <div className="flex-1 flex gap-2">
                                                                         <input
                                                                             type="text"
-                                                                            className="flex-1 text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white"
+                                                                            className="flex-1 text-sm border-slate-200 rounded-lg bg-white p-3 text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500"
                                                                             placeholder="https://..."
-                                                                            value={section.content.visualUrl || ''}
-                                                                            onChange={(e) => updateSectionContent(idx, 'visualUrl', e.target.value)}
+                                                                            value={settings.logoUrl || ''}
+                                                                            onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
                                                                         />
-                                                                        <label className="bg-slate-900 text-white p-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-200">
-                                                                            {uploading ? '⌛' : '📁 YÜKLE'}
-                                                                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'visualUrl', url))} />
+                                                                        <label className="bg-slate-900 text-white px-4 py-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-300 flex items-center gap-2">
+                                                                            {uploading ? '⌛' : '📁 LOGO YÜKLE'}
+                                                                            <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setSettings({ ...settings, logoUrl: url }))} />
                                                                         </label>
                                                                     </div>
+                                                                    {settings.logoUrl && (
+                                                                        <div className="h-16 w-16 bg-white border border-slate-200 rounded-xl p-2 flex items-center justify-center shadow-sm">
+                                                                            <img src={settings.logoUrl} alt="Logo" className="max-h-full max-w-full object-contain" />
+                                                                        </div>
+                                                                    )}
                                                                 </div>
+                                                                <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-xl border border-slate-200">
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] font-black text-slate-500 uppercase block">LOGO YÜKSEKLİĞİ (PX)</label>
+                                                                        <input
+                                                                            type="number"
+                                                                            className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900"
+                                                                            placeholder="40"
+                                                                            value={section.content.logoHeight || 40}
+                                                                            onChange={(e) => updateSectionContent(idx, 'logoHeight', e.target.value)}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2 pt-4">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            id={`hide-title-${idx}`}
+                                                                            className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                                                                            checked={section.content.hideTitle}
+                                                                            onChange={(e) => updateSectionContent(idx, 'hideTitle', e.target.checked)}
+                                                                        />
+                                                                        <label htmlFor={`hide-title-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">Site Başlığını Gizle</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                                                                    <p className="text-[10px] text-blue-700 italic font-medium leading-relaxed">
+                                                                        * Bu bölümden yüklediğiniz logo tüm sayfalardaki üst menü (Navigation) alanında görüntülenecektir. Menü içeriğini "Menü Yönetimi" tabından düzenleyebilirsiniz.
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        )}
 
-                                                                <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200 w-fit">
+                                                    {
+                                                        section.type === 'HERO' && (
+                                                            <div className="bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                                                                <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 w-fit">
                                                                     <input
                                                                         type="checkbox"
                                                                         id={`floating-${idx}`}
@@ -1194,16 +1259,16 @@ export default function WebsiteManagerPage() {
                                                                         checked={section.content.showFloatingCard}
                                                                         onChange={(e) => updateSectionContent(idx, 'showFloatingCard', e.target.checked)}
                                                                     />
-                                                                    <label htmlFor={`floating-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">Floating Card Göster</label>
+                                                                    <label htmlFor={`floating-${idx}`} className="text-[11px] font-black text-slate-700 cursor-pointer uppercase tracking-tighter">İkincil Kart (Floating Card) Göster</label>
                                                                 </div>
 
                                                                 {section.content.showFloatingCard && (
-                                                                    <div className="space-y-4 p-4 bg-white rounded-xl border border-slate-200">
+                                                                    <div className="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-200 ring-4 ring-slate-50">
                                                                         <div className="space-y-1">
                                                                             <label className="text-[10px] font-black text-slate-500 uppercase block">KART BAŞLIĞI</label>
                                                                             <input
                                                                                 type="text"
-                                                                                className="w-full text-sm border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white"
+                                                                                className="w-full text-sm border-slate-200 rounded-lg bg-white p-2 text-slate-900 focus:bg-white"
                                                                                 value={section.content.floatingCardTitle || ''}
                                                                                 onChange={(e) => updateSectionContent(idx, 'floatingCardTitle', e.target.value)}
                                                                             />
@@ -1213,201 +1278,225 @@ export default function WebsiteManagerPage() {
                                                                             <div className="flex gap-2">
                                                                                 <input
                                                                                     type="text"
-                                                                                    className="flex-1 text-sm border-slate-200 rounded-lg bg-slate-50 p-2 text-slate-900 focus:bg-white"
+                                                                                    className="flex-1 text-sm border-slate-200 rounded-lg bg-white p-2 text-slate-900 focus:bg-white"
                                                                                     value={section.content.floatingCardVisualUrl || ''}
                                                                                     onChange={(e) => updateSectionContent(idx, 'floatingCardVisualUrl', e.target.value)}
                                                                                 />
-                                                                                <label className="bg-slate-200 text-slate-700 px-3 py-2 rounded-lg cursor-pointer text-[10px] font-bold hover:bg-slate-300 transition">
-                                                                                    {uploading ? '⌛' : '📁 YÜKLE'}
-                                                                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'floatingCardVisualUrl', url))} />
+                                                                                <label className="bg-slate-900 text-white px-4 py-2 rounded-lg cursor-pointer text-xs font-black hover:bg-slate-800 transition flex items-center justify-center min-w-[100px]">
+                                                                                    {uploading ? '⌛...' : '📁 YÜKLE'}
+                                                                                    <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'floatingCardVisualUrl', url))} />
                                                                                 </label>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 )}
-                                                            </div>
 
-                                                            <div className="space-y-2">
-                                                                <label className="text-[10px] font-black text-slate-500 uppercase block">ÖNİZLEME</label>
-                                                                <div className="aspect-video bg-white rounded-xl border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center relative shadow-inner">
-                                                                    {section.content.visualUrl ? (
-                                                                        <img src={section.content.visualUrl} className="w-full h-full object-cover" />
-                                                                    ) : (
-                                                                        <span className="text-slate-300 text-[10px] font-black italic">ÖNİZLEME YOK</span>
-                                                                    )}
-                                                                    {section.content.showFloatingCard && section.content.floatingCardVisualUrl && (
-                                                                        <div className="absolute bottom-2 right-2 w-1/3 aspect-square bg-white border border-slate-200 rounded-lg shadow-xl p-1 overflow-hidden">
-                                                                            <img src={section.content.floatingCardVisualUrl} className="w-full h-full object-cover rounded" />
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {section.type === 'ROLES' ? (
-                                                        <div>
-                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-2 block">ROLLER (ACCORDION ITEMS)</label>
-                                                            <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100 max-h-[400px] overflow-y-auto">
-                                                                {(section.content.items || []).map((role: any, rIdx: number) => (
-                                                                    <div key={rIdx} className="bg-white p-3 rounded-lg border border-slate-200 space-y-2 text-xs">
-                                                                        <div className="flex gap-2 items-end">
-                                                                            <div className="flex-1 space-y-1">
-                                                                                <label className="text-[9px] font-black text-slate-400 uppercase">İKON / GÖRSEL</label>
-                                                                                <div className="flex gap-1">
-                                                                                    <input
-                                                                                        type="text" placeholder="İkon" className="flex-1 border-slate-100 rounded text-slate-900 text-[10px]"
-                                                                                        value={role.icon}
-                                                                                        onChange={(e) => {
-                                                                                            const newItems = [...section.content.items];
-                                                                                            newItems[rIdx].icon = e.target.value;
-                                                                                            updateSectionContent(idx, 'items', newItems);
-                                                                                        }}
-                                                                                    />
-                                                                                    <label className="bg-slate-900 text-white px-2 py-1.5 rounded cursor-pointer transition flex items-center gap-1 font-bold text-[9px] hover:bg-slate-800">
-                                                                                        {uploading ? '⌛' : '📁'}
-                                                                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => {
-                                                                                            const newItems = [...section.content.items];
-                                                                                            newItems[rIdx].icon = url;
-                                                                                            updateSectionContent(idx, 'items', newItems);
-                                                                                        })} />
-                                                                                    </label>
-                                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[10px] font-black text-slate-500 uppercase block">CANLI ÖNİZLEME</label>
+                                                                    <div className="aspect-video bg-slate-50 rounded-xl border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center relative shadow-inner group">
+                                                                        {section.content.visualUrl ? (
+                                                                            <>
+                                                                                <img
+                                                                                    src={section.content.visualUrl}
+                                                                                    className="w-full h-full object-contain transition duration-500 group-hover:scale-110"
+                                                                                    onError={(e) => {
+                                                                                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Görsel+Yüklenemedi';
+                                                                                    }}
+                                                                                />
+                                                                                <button
+                                                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition shadow-lg"
+                                                                                    onClick={() => updateSectionContent(idx, 'visualUrl', '')}
+                                                                                    title="Görseli Kaldır"
+                                                                                >❌</button>
+                                                                            </>
+                                                                        ) : (
+                                                                            <div className="flex flex-col items-center gap-2">
+                                                                                <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-400">🖼️</div>
+                                                                                <span className="text-slate-400 text-[10px] font-black italic">ANA GÖRSEL SEÇİLMEDİ</span>
                                                                             </div>
-                                                                            <div className="flex-1 space-y-1">
-                                                                                <label className="text-[9px] font-black text-slate-400 uppercase">ROL BAŞLIĞI</label>
-                                                                                <input
-                                                                                    type="text" placeholder="Rol Başlığı" className="w-full border-slate-100 rounded font-bold text-slate-900 text-[10px]"
-                                                                                    value={role.title}
-                                                                                    onChange={(e) => {
-                                                                                        const newItems = [...section.content.items];
-                                                                                        newItems[rIdx].title = e.target.value;
-                                                                                        updateSectionContent(idx, 'items', newItems);
+                                                                        )}
+                                                                        {section.content.showFloatingCard && section.content.floatingCardVisualUrl && (
+                                                                            <div className="absolute bottom-4 right-4 w-1/4 aspect-square bg-white border-2 border-white rounded-xl shadow-2xl p-0.5 overflow-hidden animate-in fade-in zoom-in duration-300">
+                                                                                <img
+                                                                                    src={section.content.floatingCardVisualUrl}
+                                                                                    className="w-full h-full object-contain rounded-lg"
+                                                                                    onError={(e) => {
+                                                                                        (e.target as HTMLImageElement).src = 'https://placehold.co/100x100?text=!';
                                                                                     }}
                                                                                 />
                                                                             </div>
-                                                                            <div className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded border border-slate-100">
-                                                                                {role.icon && (role.icon.startsWith('http') || role.icon.startsWith('/') || role.icon.startsWith('data:')) ? (
-                                                                                    <img src={role.icon} alt="Icon" className="w-6 h-6 object-contain" />
-                                                                                ) : (
-                                                                                    <span className="text-lg">{role.icon || '👤'}</span>
-                                                                                )}
-                                                                            </div>
-                                                                            <button className="text-red-300 hover:text-red-500 pb-1" onClick={() => {
-                                                                                const newItems = section.content.items.filter((_: any, i: number) => i !== rIdx);
-                                                                                updateSectionContent(idx, 'items', newItems);
-                                                                            }}>×</button>
-                                                                        </div>
-                                                                        <textarea
-                                                                            placeholder="Kısa açıklama" className="w-full border-slate-100 rounded text-slate-900"
-                                                                            value={role.desc}
-                                                                            onChange={(e) => {
-                                                                                const newItems = [...section.content.items];
-                                                                                newItems[rIdx].desc = e.target.value;
-                                                                                updateSectionContent(idx, 'items', newItems);
-                                                                            }}
-                                                                        />
-                                                                        <input
-                                                                            placeholder="Özellikler (virgülle ayırın)" className="w-full border-slate-100 rounded text-[10px] text-slate-900"
-                                                                            value={(role.list || role.items || []).join(', ')}
-                                                                            onChange={(e) => {
-                                                                                const newItems = [...section.content.items];
-                                                                                newItems[rIdx].list = e.target.value.split(',').map(s => s.trim());
-                                                                                updateSectionContent(idx, 'items', newItems);
-                                                                            }}
-                                                                        />
+                                                                        )}
                                                                     </div>
-                                                                ))}
-                                                                <button
-                                                                    className="w-full py-2 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black hover:bg-blue-100 transition"
-                                                                    onClick={() => {
-                                                                        const newItems = [...(section.content.items || []), { title: 'Yeni Rol', desc: '', icon: '👤', list: [] }];
-                                                                        updateSectionContent(idx, 'items', newItems);
-                                                                    }}
-                                                                >
-                                                                    + YENİ ROL EKLE
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <>
-                                                            {section.type === 'COMPARISON' && (
-                                                                <div className="grid grid-cols-2 gap-4">
-                                                                    <div>
-                                                                        <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">BEFORE BAŞLIĞI</label>
-                                                                        <input
-                                                                            type="text"
-                                                                            className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 mb-2 text-slate-900"
-                                                                            value={section.content.beforeTitle || ''}
-                                                                            onChange={(e) => updateSectionContent(idx, 'beforeTitle', e.target.value)}
-                                                                        />
-                                                                        <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">BEFORE LİSTESİ</label>
-                                                                        <textarea
-                                                                            className="w-full text-[10px] border-slate-200 rounded bg-slate-50 min-h-[150px] text-slate-900"
-                                                                            placeholder="Her satıra bir madde..."
-                                                                            value={(section.content.beforeList || []).join('\n')}
-                                                                            onChange={(e) => updateSectionContent(idx, 'beforeList', e.target.value.split('\n'))}
-                                                                        />
-                                                                    </div>
-                                                                    <div>
-                                                                        <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">AFTER BAŞLIĞI</label>
-                                                                        <input
-                                                                            type="text"
-                                                                            className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 mb-2 text-slate-900"
-                                                                            value={section.content.afterTitle || ''}
-                                                                            onChange={(e) => updateSectionContent(idx, 'afterTitle', e.target.value)}
-                                                                        />
-                                                                        <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">AFTER LİSTESİ</label>
-                                                                        <textarea
-                                                                            className="w-full text-[10px] border-slate-200 rounded bg-slate-50 min-h-[150px] text-slate-900"
-                                                                            placeholder="Her satıra bir madde..."
-                                                                            value={(section.content.afterList || []).join('\n')}
-                                                                            onChange={(e) => updateSectionContent(idx, 'afterList', e.target.value.split('\n'))}
-                                                                        />
-                                                                    </div>
+                                                                    <p className="text-[9px] text-slate-400 italic text-center">Önizleme mobil ve masaüstü arasında farklılık gösterebilir.</p>
                                                                 </div>
-                                                            )}
-                                                            {!(section.type === 'HERO' || section.type === 'CTA' || section.type === 'COMPARISON' || section.type === 'BANNER' || section.type === 'PARTNERS' || section.type === 'NAV') && (
-                                                                <>
-                                                                    <div>
-                                                                        <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">ARKAPLAN RENGİ</label>
-                                                                        <input
-                                                                            type="text"
-                                                                            className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 text-slate-900"
-                                                                            placeholder="#ffffff"
-                                                                            value={section.content.bg || ''}
-                                                                            onChange={(e) => updateSectionContent(idx, 'bg', e.target.value)}
-                                                                        />
-                                                                    </div>
-                                                                    {(section.type === 'FEATURES' || section.type === 'GRID') && (
-                                                                        <div>
-                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">KOLON SAYISI</label>
-                                                                            <select
-                                                                                className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 text-slate-900"
-                                                                                value={section.content.cols || 3}
-                                                                                onChange={(e) => updateSectionContent(idx, 'cols', parseInt(e.target.value))}
-                                                                            >
-                                                                                <option value={2}>2 Kolon</option>
-                                                                                <option value={3}>3 Kolon</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    )}
-                                                                    {(section.type === 'FEATURES' || section.type === 'GRID' || section.type === 'EXPLORE' || section.type === 'METRICS' || section.type === 'ROLES') && (
-                                                                        <div>
-                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">İKON / GÖRSEL BOYUTU (PX)</label>
+                                                            </div>
+                                                        )}
+
+                                                    {
+                                                        section.type === 'ROLES' ? (
+                                                            <div>
+                                                                <label className="text-[10px] font-black text-slate-400 uppercase mb-2 block">ROLLER (ACCORDION ITEMS)</label>
+                                                                <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100 max-h-[400px] overflow-y-auto">
+                                                                    {(section.content.items || []).map((role: any, rIdx: number) => (
+                                                                        <div key={rIdx} className="bg-white p-3 rounded-lg border border-slate-200 space-y-2 text-xs">
+                                                                            <div className="flex gap-2 items-end">
+                                                                                <div className="flex-1 space-y-1">
+                                                                                    <label className="text-[9px] font-black text-slate-400 uppercase">İKON / GÖRSEL</label>
+                                                                                    <div className="flex gap-1">
+                                                                                        <input
+                                                                                            type="text" placeholder="İkon" className="flex-1 border-slate-100 rounded text-slate-900 text-[10px]"
+                                                                                            value={role.icon}
+                                                                                            onChange={(e) => {
+                                                                                                const newItems = [...section.content.items];
+                                                                                                newItems[rIdx].icon = e.target.value;
+                                                                                                updateSectionContent(idx, 'items', newItems);
+                                                                                            }}
+                                                                                        />
+                                                                                        <label className="bg-slate-900 text-white px-2 py-1.5 rounded cursor-pointer transition flex items-center gap-1 font-bold text-[9px] hover:bg-slate-800">
+                                                                                            {uploading ? '⌛' : '📁'}
+                                                                                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => {
+                                                                                                const newItems = [...section.content.items];
+                                                                                                newItems[rIdx].icon = url;
+                                                                                                updateSectionContent(idx, 'items', newItems);
+                                                                                            })} />
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="flex-1 space-y-1">
+                                                                                    <label className="text-[9px] font-black text-slate-400 uppercase">ROL BAŞLIĞI</label>
+                                                                                    <input
+                                                                                        type="text" placeholder="Rol Başlığı" className="w-full border-slate-100 rounded font-bold text-slate-900 text-[10px]"
+                                                                                        value={role.title}
+                                                                                        onChange={(e) => {
+                                                                                            const newItems = [...section.content.items];
+                                                                                            newItems[rIdx].title = e.target.value;
+                                                                                            updateSectionContent(idx, 'items', newItems);
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                                <div className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded border border-slate-100">
+                                                                                    {role.icon && (role.icon.startsWith('http') || role.icon.startsWith('/') || role.icon.startsWith('data:')) ? (
+                                                                                        <img src={role.icon} alt="Icon" className="w-6 h-6 object-contain" />
+                                                                                    ) : (
+                                                                                        <span className="text-lg">{role.icon || '👤'}</span>
+                                                                                    )}
+                                                                                </div>
+                                                                                <button className="text-red-300 hover:text-red-500 pb-1" onClick={() => {
+                                                                                    const newItems = section.content.items.filter((_: any, i: number) => i !== rIdx);
+                                                                                    updateSectionContent(idx, 'items', newItems);
+                                                                                }}>×</button>
+                                                                            </div>
+                                                                            <textarea
+                                                                                placeholder="Kısa açıklama" className="w-full border-slate-100 rounded text-slate-900"
+                                                                                value={role.desc}
+                                                                                onChange={(e) => {
+                                                                                    const newItems = [...section.content.items];
+                                                                                    newItems[rIdx].desc = e.target.value;
+                                                                                    updateSectionContent(idx, 'items', newItems);
+                                                                                }}
+                                                                            />
                                                                             <input
-                                                                                type="number"
-                                                                                className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 text-slate-900"
-                                                                                placeholder="40"
-                                                                                value={section.content.iconSize || ''}
-                                                                                onChange={(e) => updateSectionContent(idx, 'iconSize', e.target.value)}
+                                                                                placeholder="Özellikler (virgülle ayırın)" className="w-full border-slate-100 rounded text-[10px] text-slate-900"
+                                                                                value={(role.list || role.items || []).join(', ')}
+                                                                                onChange={(e) => {
+                                                                                    const newItems = [...section.content.items];
+                                                                                    newItems[rIdx].list = e.target.value.split(',').map(s => s.trim());
+                                                                                    updateSectionContent(idx, 'items', newItems);
+                                                                                }}
                                                                             />
                                                                         </div>
-                                                                    )}
-                                                                </>
-                                                            )}
-                                                        </>
-                                                    )}
+                                                                    ))}
+                                                                    <button
+                                                                        className="w-full py-2 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black hover:bg-blue-100 transition"
+                                                                        onClick={() => {
+                                                                            const newItems = [...(section.content.items || []), { title: 'Yeni Rol', desc: '', icon: '👤', list: [] }];
+                                                                            updateSectionContent(idx, 'items', newItems);
+                                                                        }}
+                                                                    >
+                                                                        + YENİ ROL EKLE
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                {section.type === 'COMPARISON' && (
+                                                                    <div className="grid grid-cols-2 gap-4">
+                                                                        <div>
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">BEFORE BAŞLIĞI</label>
+                                                                            <input
+                                                                                type="text"
+                                                                                className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 mb-2 text-slate-900"
+                                                                                value={section.content.beforeTitle || ''}
+                                                                                onChange={(e) => updateSectionContent(idx, 'beforeTitle', e.target.value)}
+                                                                            />
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">BEFORE LİSTESİ</label>
+                                                                            <textarea
+                                                                                className="w-full text-[10px] border-slate-200 rounded bg-slate-50 min-h-[150px] text-slate-900"
+                                                                                placeholder="Her satıra bir madde..."
+                                                                                value={(section.content.beforeList || []).join('\n')}
+                                                                                onChange={(e) => updateSectionContent(idx, 'beforeList', e.target.value.split('\n'))}
+                                                                            />
+                                                                        </div>
+                                                                        <div>
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">AFTER BAŞLIĞI</label>
+                                                                            <input
+                                                                                type="text"
+                                                                                className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 mb-2 text-slate-900"
+                                                                                value={section.content.afterTitle || ''}
+                                                                                onChange={(e) => updateSectionContent(idx, 'afterTitle', e.target.value)}
+                                                                            />
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">AFTER LİSTESİ</label>
+                                                                            <textarea
+                                                                                className="w-full text-[10px] border-slate-200 rounded bg-slate-50 min-h-[150px] text-slate-900"
+                                                                                placeholder="Her satıra bir madde..."
+                                                                                value={(section.content.afterList || []).join('\n')}
+                                                                                onChange={(e) => updateSectionContent(idx, 'afterList', e.target.value.split('\n'))}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {!(section.type === 'HERO' || section.type === 'CTA' || section.type === 'COMPARISON' || section.type === 'BANNER' || section.type === 'PARTNERS' || section.type === 'NAV') && (
+                                                                    <>
+                                                                        <div>
+                                                                            <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">ARKAPLAN RENGİ</label>
+                                                                            <input
+                                                                                type="text"
+                                                                                className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 text-slate-900"
+                                                                                placeholder="#ffffff"
+                                                                                value={section.content.bg || ''}
+                                                                                onChange={(e) => updateSectionContent(idx, 'bg', e.target.value)}
+                                                                            />
+                                                                        </div>
+                                                                        {(section.type === 'FEATURES' || section.type === 'GRID') && (
+                                                                            <div>
+                                                                                <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">KOLON SAYISI</label>
+                                                                                <select
+                                                                                    className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 text-slate-900"
+                                                                                    value={section.content.cols || 3}
+                                                                                    onChange={(e) => updateSectionContent(idx, 'cols', parseInt(e.target.value))}
+                                                                                >
+                                                                                    <option value={2}>2 Kolon</option>
+                                                                                    <option value={3}>3 Kolon</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        )}
+                                                                        {(section.type === 'FEATURES' || section.type === 'GRID' || section.type === 'EXPLORE' || section.type === 'METRICS' || section.type === 'ROLES') && (
+                                                                            <div>
+                                                                                <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">İKON / GÖRSEL BOYUTU (PX)</label>
+                                                                                <input
+                                                                                    type="number"
+                                                                                    className="w-full text-sm border-slate-200 rounded-lg bg-slate-50/50 text-slate-900"
+                                                                                    placeholder="40"
+                                                                                    value={section.content.iconSize || ''}
+                                                                                    onChange={(e) => updateSectionContent(idx, 'iconSize', e.target.value)}
+                                                                                />
+                                                                            </div>
+                                                                        )}
+                                                                    </>
+                                                                )}
+                                                            </>
+                                                        )
+                                                    }
                                                 </div>
                                             </div>
                                         ))}
@@ -1424,322 +1513,325 @@ export default function WebsiteManagerPage() {
                             )}
                         </div>
                     </div>
-                )}
+                )
+                }
 
-                {activeTab === 'menus' && (
-                    <div className="p-8 max-w-6xl mx-auto space-y-8">
-                        <div className="flex justify-between items-center mb-6">
-                            <div>
-                                <h2 className="text-2xl font-black text-slate-800">Menü Yönetimi</h2>
-                                <p className="text-sm text-slate-500">Mega menü ve dropdown yapılarını buradan yönetebilirsiniz.</p>
+                {
+                    activeTab === 'menus' && (
+                        <div className="p-8 max-w-6xl mx-auto space-y-8">
+                            <div className="flex justify-between items-center mb-6">
+                                <div>
+                                    <h2 className="text-2xl font-black text-slate-800">Menü Yönetimi</h2>
+                                    <p className="text-sm text-slate-500">Mega menü ve dropdown yapılarını buradan yönetebilirsiniz.</p>
+                                </div>
+                                <button
+                                    onClick={saveMenus}
+                                    disabled={saving}
+                                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 shadow-lg shadow-blue-200"
+                                >
+                                    {saving ? 'KAYDEDİLİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
+                                </button>
                             </div>
-                            <button
-                                onClick={saveMenus}
-                                disabled={saving}
-                                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 shadow-lg shadow-blue-200"
-                            >
-                                {saving ? 'KAYDEDİLİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
-                            </button>
-                        </div>
 
-                        <div className="space-y-12">
-                            {data.menus?.map((menu: any, mIdx: number) => (
-                                <div key={menu.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                                    <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
-                                        <h3 className="font-bold text-xl text-slate-800 flex items-center gap-3">
-                                            <span className="bg-slate-100 p-2 rounded-lg">🍔</span>
-                                            {menu.name}
-                                        </h3>
-                                        <span className="text-xs font-bold bg-blue-50 text-blue-600 px-3 py-1 rounded-full uppercase tracking-wider">{menu.items?.length || 0} ÖĞE</span>
-                                    </div>
+                            <div className="space-y-12">
+                                {data.menus?.map((menu: any, mIdx: number) => (
+                                    <div key={menu.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                                        <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+                                            <h3 className="font-bold text-xl text-slate-800 flex items-center gap-3">
+                                                <span className="bg-slate-100 p-2 rounded-lg">🍔</span>
+                                                {menu.name}
+                                            </h3>
+                                            <span className="text-xs font-bold bg-blue-50 text-blue-600 px-3 py-1 rounded-full uppercase tracking-wider">{menu.items?.length || 0} ÖĞE</span>
+                                        </div>
 
-                                    <div className="space-y-4">
-                                        {(menu.items || []).map((item: any, i: number) => (
-                                            <div key={i} className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden transition-all hover:border-blue-300 group">
-                                                {/* Item Header / Summary */}
-                                                <div className="p-4 flex gap-4 items-start">
-                                                    <div className="flex flex-col items-center justify-center gap-1 pt-2">
-                                                        <button
-                                                            onClick={() => {
-                                                                const newMenus = [...data.menus];
-                                                                if (i > 0) {
-                                                                    [newMenus[mIdx].items[i], newMenus[mIdx].items[i - 1]] = [newMenus[mIdx].items[i - 1], newMenus[mIdx].items[i]];
-                                                                    setData({ ...data, menus: newMenus });
-                                                                }
-                                                            }}
-                                                            className="text-slate-300 hover:text-blue-500"
-                                                        >⬆️</button>
-                                                        <button
-                                                            onClick={() => {
-                                                                const newMenus = [...data.menus];
-                                                                if (i < newMenus[mIdx].items.length - 1) {
-                                                                    [newMenus[mIdx].items[i], newMenus[mIdx].items[i + 1]] = [newMenus[mIdx].items[i + 1], newMenus[mIdx].items[i]];
-                                                                    setData({ ...data, menus: newMenus });
-                                                                }
-                                                            }}
-                                                            className="text-slate-300 hover:text-blue-500"
-                                                        >⬇️</button>
-                                                    </div>
-
-                                                    <div className="flex-1 space-y-4">
-                                                        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                                                            <div className="md:col-span-3">
-                                                                <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">GÖRÜNEN İSİM</label>
-                                                                <input
-                                                                    type="text"
-                                                                    className="w-full text-sm border-slate-200 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-blue-500"
-                                                                    value={item.label}
-                                                                    onChange={(e) => {
-                                                                        const newMenus = [...data.menus];
-                                                                        newMenus[mIdx].items[i].label = e.target.value;
+                                        <div className="space-y-4">
+                                            {(menu.items || []).map((item: any, i: number) => (
+                                                <div key={i} className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden transition-all hover:border-blue-300 group">
+                                                    {/* Item Header / Summary */}
+                                                    <div className="p-4 flex gap-4 items-start">
+                                                        <div className="flex flex-col items-center justify-center gap-1 pt-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newMenus = [...data.menus];
+                                                                    if (i > 0) {
+                                                                        [newMenus[mIdx].items[i], newMenus[mIdx].items[i - 1]] = [newMenus[mIdx].items[i - 1], newMenus[mIdx].items[i]];
                                                                         setData({ ...data, menus: newMenus });
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            <div className="md:col-span-3">
-                                                                <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">HEDEF URL</label>
-                                                                <input
-                                                                    type="text"
-                                                                    className="w-full text-sm border-slate-200 rounded-lg text-slate-600 font-mono focus:ring-2 focus:ring-blue-500"
-                                                                    value={item.link}
-                                                                    onChange={(e) => {
-                                                                        const newMenus = [...data.menus];
-                                                                        newMenus[mIdx].items[i].link = e.target.value;
+                                                                    }
+                                                                }}
+                                                                className="text-slate-300 hover:text-blue-500"
+                                                            >⬆️</button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newMenus = [...data.menus];
+                                                                    if (i < newMenus[mIdx].items.length - 1) {
+                                                                        [newMenus[mIdx].items[i], newMenus[mIdx].items[i + 1]] = [newMenus[mIdx].items[i + 1], newMenus[mIdx].items[i]];
                                                                         setData({ ...data, menus: newMenus });
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            <div className="md:col-span-2">
-                                                                <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">TİP</label>
-                                                                <select
-                                                                    className="w-full text-sm border-slate-200 rounded-lg font-bold text-slate-700 focus:ring-2 focus:ring-blue-500"
-                                                                    value={item.type || 'link'}
-                                                                    onChange={(e) => {
-                                                                        const newMenus = [...data.menus];
-                                                                        newMenus[mIdx].items[i].type = e.target.value;
-                                                                        if (e.target.value === 'mega' && !newMenus[mIdx].items[i].sidebar) {
-                                                                            const defaultId = `cat_${Date.now()}`;
-                                                                            newMenus[mIdx].items[i].sidebar = [{ id: defaultId, label: 'Kategori 1' }];
-                                                                            newMenus[mIdx].items[i].content = [];
-                                                                        }
-                                                                        setData({ ...data, menus: newMenus });
-                                                                    }}
-                                                                >
-                                                                    <option value="link">Normal Link</option>
-                                                                    <option value="mega">Mega Menü</option>
-                                                                    {/* <option value="dropdown">Basit Liste</option> */}
-                                                                </select>
-                                                            </div>
-                                                            <div className="md:col-span-4 flex items-end justify-end">
-                                                                <button
-                                                                    onClick={() => {
-                                                                        const newMenus = [...data.menus];
-                                                                        newMenus[mIdx].items = newMenus[mIdx].items.filter((_: any, idx: number) => idx !== i);
-                                                                        setData({ ...data, menus: newMenus });
-                                                                    }}
-                                                                    className="text-red-400 hover:text-red-600 font-bold text-xs bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition"
-                                                                >
-                                                                    SİL
-                                                                </button>
-                                                            </div>
+                                                                    }
+                                                                }}
+                                                                className="text-slate-300 hover:text-blue-500"
+                                                            >⬇️</button>
                                                         </div>
 
-                                                        {/* MEGA MENU EDITOR */}
-                                                        {item.type === 'mega' && (
-                                                            <div className="mt-4 border-t border-slate-200 pt-4 animate-in fade-in slide-in-from-top-2">
-                                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                                    {/* Sidebar Categories */}
-                                                                    <div className="bg-white p-4 rounded-xl border border-slate-200">
-                                                                        <div className="flex justify-between items-center mb-2">
-                                                                            <h4 className="text-[10px] font-black text-slate-500 uppercase">KATEGORİLER (SOL MENÜ)</h4>
-                                                                            <button
-                                                                                onClick={() => {
-                                                                                    const newMenus = [...data.menus];
-                                                                                    if (!newMenus[mIdx].items[i].sidebar) newMenus[mIdx].items[i].sidebar = [];
-                                                                                    const newItemId = `cat_${Date.now()}`;
-                                                                                    newMenus[mIdx].items[i].sidebar.push({ id: newItemId, label: 'Yeni Kategori' });
-                                                                                    setData({ ...data, menus: newMenus });
-                                                                                }}
-                                                                                className="text-blue-600 text-[10px] font-black hover:underline"
-                                                                            >+ EKLE</button>
-                                                                        </div>
-                                                                        <div className="space-y-2 max-h-[250px] overflow-y-auto">
-                                                                            {(item.sidebar || []).map((sb: any, sbIdx: number) => (
-                                                                                <div key={sbIdx} className="flex gap-1 items-center bg-slate-50 p-1 rounded-lg border border-slate-100">
-                                                                                    <input
-                                                                                        type="text"
-                                                                                        className="w-1/2 text-xs border-none bg-transparent p-1.5 focus:ring-0 text-slate-900 font-bold border-r border-slate-100"
-                                                                                        placeholder="Kategori Adı"
-                                                                                        value={sb.label}
-                                                                                        onChange={(e) => {
-                                                                                            const newMenus = [...data.menus];
-                                                                                            newMenus[mIdx].items[i].sidebar[sbIdx].label = e.target.value;
-                                                                                            setData({ ...data, menus: newMenus });
-                                                                                        }}
-                                                                                    />
-                                                                                    <input
-                                                                                        type="text"
-                                                                                        className="flex-1 text-[10px] border-none bg-transparent p-1.5 focus:ring-0 text-blue-600 font-mono"
-                                                                                        placeholder="Link (Opsiyonel)"
-                                                                                        value={sb.link || ''}
-                                                                                        onChange={(e) => {
-                                                                                            const newMenus = [...data.menus];
-                                                                                            newMenus[mIdx].items[i].sidebar[sbIdx].link = e.target.value;
-                                                                                            setData({ ...data, menus: newMenus });
-                                                                                        }}
-                                                                                    />
-                                                                                    <button
-                                                                                        onClick={() => {
-                                                                                            const newMenus = [...data.menus];
-                                                                                            newMenus[mIdx].items[i].sidebar = newMenus[mIdx].items[i].sidebar.filter((_: any, idx: number) => idx !== sbIdx);
-                                                                                            setData({ ...data, menus: newMenus });
-                                                                                        }}
-                                                                                        className="text-red-300 hover:text-red-500 px-2 text-lg"
-                                                                                        title="Sil"
-                                                                                    >×</button>
-                                                                                </div>
-                                                                            ))}
-                                                                            {(!item.sidebar || item.sidebar.length === 0) && (
-                                                                                <p className="text-[10px] text-slate-400 italic text-center py-4">Henüz kategori eklenmedi.</p>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
+                                                        <div className="flex-1 space-y-4">
+                                                            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                                                <div className="md:col-span-3">
+                                                                    <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">GÖRÜNEN İSİM</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        className="w-full text-sm border-slate-200 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-blue-500"
+                                                                        value={item.label}
+                                                                        onChange={(e) => {
+                                                                            const newMenus = [...data.menus];
+                                                                            newMenus[mIdx].items[i].label = e.target.value;
+                                                                            setData({ ...data, menus: newMenus });
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                                <div className="md:col-span-3">
+                                                                    <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">HEDEF URL</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        className="w-full text-sm border-slate-200 rounded-lg text-slate-600 font-mono focus:ring-2 focus:ring-blue-500"
+                                                                        value={item.link}
+                                                                        onChange={(e) => {
+                                                                            const newMenus = [...data.menus];
+                                                                            newMenus[mIdx].items[i].link = e.target.value;
+                                                                            setData({ ...data, menus: newMenus });
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                                <div className="md:col-span-2">
+                                                                    <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">TİP</label>
+                                                                    <select
+                                                                        className="w-full text-sm border-slate-200 rounded-lg font-bold text-slate-700 focus:ring-2 focus:ring-blue-500"
+                                                                        value={item.type || 'link'}
+                                                                        onChange={(e) => {
+                                                                            const newMenus = [...data.menus];
+                                                                            newMenus[mIdx].items[i].type = e.target.value;
+                                                                            if (e.target.value === 'mega' && !newMenus[mIdx].items[i].sidebar) {
+                                                                                const defaultId = `cat_${Date.now()}`;
+                                                                                newMenus[mIdx].items[i].sidebar = [{ id: defaultId, label: 'Kategori 1' }];
+                                                                                newMenus[mIdx].items[i].content = [];
+                                                                            }
+                                                                            setData({ ...data, menus: newMenus });
+                                                                        }}
+                                                                    >
+                                                                        <option value="link">Normal Link</option>
+                                                                        <option value="mega">Mega Menü</option>
+                                                                        {/* <option value="dropdown">Basit Liste</option> */}
+                                                                    </select>
+                                                                </div>
+                                                                <div className="md:col-span-4 flex items-end justify-end">
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const newMenus = [...data.menus];
+                                                                            newMenus[mIdx].items = newMenus[mIdx].items.filter((_: any, idx: number) => idx !== i);
+                                                                            setData({ ...data, menus: newMenus });
+                                                                        }}
+                                                                        className="text-red-400 hover:text-red-600 font-bold text-xs bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition"
+                                                                    >
+                                                                        SİL
+                                                                    </button>
+                                                                </div>
+                                                            </div>
 
-                                                                    {/* Content Cards */}
-                                                                    <div className="md:col-span-2 bg-white p-4 rounded-xl border border-slate-200">
-                                                                        <div className="flex justify-between items-center mb-2">
-                                                                            <h4 className="text-[10px] font-black text-slate-500 uppercase">İÇERİK KARTLARI (KATEGORİYE BAĞLI)</h4>
-                                                                            <button
-                                                                                onClick={() => {
-                                                                                    const newMenus = [...data.menus];
-                                                                                    if (!newMenus[mIdx].items[i].content) newMenus[mIdx].items[i].content = [];
-                                                                                    const firstCatId = newMenus[mIdx].items[i].sidebar?.[0]?.id || '';
-                                                                                    newMenus[mIdx].items[i].content.push({
-                                                                                        categoryId: firstCatId,
-                                                                                        title: 'Yeni Kart',
-                                                                                        desc: 'Açıklama',
-                                                                                        icon: '✨',
-                                                                                        link: '#'
-                                                                                    });
-                                                                                    setData({ ...data, menus: newMenus });
-                                                                                }}
-                                                                                className="bg-blue-600 text-white px-3 py-1.5 rounded text-[10px] font-black hover:bg-blue-700 shadow-sm"
-                                                                            >+ KARTI EKLE</button>
+                                                            {/* MEGA MENU EDITOR */}
+                                                            {item.type === 'mega' && (
+                                                                <div className="mt-4 border-t border-slate-200 pt-4 animate-in fade-in slide-in-from-top-2">
+                                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                                        {/* Sidebar Categories */}
+                                                                        <div className="bg-white p-4 rounded-xl border border-slate-200">
+                                                                            <div className="flex justify-between items-center mb-2">
+                                                                                <h4 className="text-[10px] font-black text-slate-500 uppercase">KATEGORİLER (SOL MENÜ)</h4>
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        const newMenus = [...data.menus];
+                                                                                        if (!newMenus[mIdx].items[i].sidebar) newMenus[mIdx].items[i].sidebar = [];
+                                                                                        const newItemId = `cat_${Date.now()}`;
+                                                                                        newMenus[mIdx].items[i].sidebar.push({ id: newItemId, label: 'Yeni Kategori' });
+                                                                                        setData({ ...data, menus: newMenus });
+                                                                                    }}
+                                                                                    className="text-blue-600 text-[10px] font-black hover:underline"
+                                                                                >+ EKLE</button>
+                                                                            </div>
+                                                                            <div className="space-y-2 max-h-[250px] overflow-y-auto">
+                                                                                {(item.sidebar || []).map((sb: any, sbIdx: number) => (
+                                                                                    <div key={sbIdx} className="flex gap-1 items-center bg-slate-50 p-1 rounded-lg border border-slate-100">
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            className="w-1/2 text-xs border-none bg-transparent p-1.5 focus:ring-0 text-slate-900 font-bold border-r border-slate-100"
+                                                                                            placeholder="Kategori Adı"
+                                                                                            value={sb.label}
+                                                                                            onChange={(e) => {
+                                                                                                const newMenus = [...data.menus];
+                                                                                                newMenus[mIdx].items[i].sidebar[sbIdx].label = e.target.value;
+                                                                                                setData({ ...data, menus: newMenus });
+                                                                                            }}
+                                                                                        />
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            className="flex-1 text-[10px] border-none bg-transparent p-1.5 focus:ring-0 text-blue-600 font-mono"
+                                                                                            placeholder="Link (Opsiyonel)"
+                                                                                            value={sb.link || ''}
+                                                                                            onChange={(e) => {
+                                                                                                const newMenus = [...data.menus];
+                                                                                                newMenus[mIdx].items[i].sidebar[sbIdx].link = e.target.value;
+                                                                                                setData({ ...data, menus: newMenus });
+                                                                                            }}
+                                                                                        />
+                                                                                        <button
+                                                                                            onClick={() => {
+                                                                                                const newMenus = [...data.menus];
+                                                                                                newMenus[mIdx].items[i].sidebar = newMenus[mIdx].items[i].sidebar.filter((_: any, idx: number) => idx !== sbIdx);
+                                                                                                setData({ ...data, menus: newMenus });
+                                                                                            }}
+                                                                                            className="text-red-300 hover:text-red-500 px-2 text-lg"
+                                                                                            title="Sil"
+                                                                                        >×</button>
+                                                                                    </div>
+                                                                                ))}
+                                                                                {(!item.sidebar || item.sidebar.length === 0) && (
+                                                                                    <p className="text-[10px] text-slate-400 italic text-center py-4">Henüz kategori eklenmedi.</p>
+                                                                                )}
+                                                                            </div>
                                                                         </div>
-                                                                        <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-                                                                            {(item.content || []).map((content: any, cIdx: number) => (
-                                                                                <div key={cIdx} className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-3 relative group/card">
-                                                                                    <div className="flex gap-2 items-center">
-                                                                                        <div className="w-1/3">
-                                                                                            <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">BAĞLI KATEGORİ</label>
-                                                                                            <select
-                                                                                                className="w-full text-[10px] border-slate-200 rounded-lg p-1.5 font-bold bg-white text-slate-900 border"
-                                                                                                value={content.categoryId}
-                                                                                                onChange={(e) => {
-                                                                                                    const newMenus = [...data.menus];
-                                                                                                    newMenus[mIdx].items[i].content[cIdx].categoryId = e.target.value;
-                                                                                                    setData({ ...data, menus: newMenus });
-                                                                                                }}
-                                                                                            >
-                                                                                                <option value="">Kategori Seç...</option>
-                                                                                                {(item.sidebar || []).map((s: any) => (
-                                                                                                    <option key={s.id} value={s.id}>{s.label}</option>
-                                                                                                ))}
-                                                                                            </select>
+
+                                                                        {/* Content Cards */}
+                                                                        <div className="md:col-span-2 bg-white p-4 rounded-xl border border-slate-200">
+                                                                            <div className="flex justify-between items-center mb-2">
+                                                                                <h4 className="text-[10px] font-black text-slate-500 uppercase">İÇERİK KARTLARI (KATEGORİYE BAĞLI)</h4>
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        const newMenus = [...data.menus];
+                                                                                        if (!newMenus[mIdx].items[i].content) newMenus[mIdx].items[i].content = [];
+                                                                                        const firstCatId = newMenus[mIdx].items[i].sidebar?.[0]?.id || '';
+                                                                                        newMenus[mIdx].items[i].content.push({
+                                                                                            categoryId: firstCatId,
+                                                                                            title: 'Yeni Kart',
+                                                                                            desc: 'Açıklama',
+                                                                                            icon: '✨',
+                                                                                            link: '#'
+                                                                                        });
+                                                                                        setData({ ...data, menus: newMenus });
+                                                                                    }}
+                                                                                    className="bg-blue-600 text-white px-3 py-1.5 rounded text-[10px] font-black hover:bg-blue-700 shadow-sm"
+                                                                                >+ KARTI EKLE</button>
+                                                                            </div>
+                                                                            <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+                                                                                {(item.content || []).map((content: any, cIdx: number) => (
+                                                                                    <div key={cIdx} className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-3 relative group/card">
+                                                                                        <div className="flex gap-2 items-center">
+                                                                                            <div className="w-1/3">
+                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">BAĞLI KATEGORİ</label>
+                                                                                                <select
+                                                                                                    className="w-full text-[10px] border-slate-200 rounded-lg p-1.5 font-bold bg-white text-slate-900 border"
+                                                                                                    value={content.categoryId}
+                                                                                                    onChange={(e) => {
+                                                                                                        const newMenus = [...data.menus];
+                                                                                                        newMenus[mIdx].items[i].content[cIdx].categoryId = e.target.value;
+                                                                                                        setData({ ...data, menus: newMenus });
+                                                                                                    }}
+                                                                                                >
+                                                                                                    <option value="">Kategori Seç...</option>
+                                                                                                    {(item.sidebar || []).map((s: any) => (
+                                                                                                        <option key={s.id} value={s.id}>{s.label}</option>
+                                                                                                    ))}
+                                                                                                </select>
+                                                                                            </div>
+                                                                                            <div className="w-12">
+                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">İKON</label>
+                                                                                                <input
+                                                                                                    className="w-full text-center border-slate-200 rounded-lg p-1.5 bg-white text-slate-900 border"
+                                                                                                    placeholder="✨"
+                                                                                                    value={content.icon}
+                                                                                                    onChange={(e) => {
+                                                                                                        const newMenus = [...data.menus];
+                                                                                                        newMenus[mIdx].items[i].content[cIdx].icon = e.target.value;
+                                                                                                        setData({ ...data, menus: newMenus });
+                                                                                                    }}
+                                                                                                />
+                                                                                            </div>
+                                                                                            <div className="flex-1">
+                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">BAŞLIK</label>
+                                                                                                <input
+                                                                                                    className="w-full font-bold border-slate-200 rounded-lg p-1.5 bg-white text-slate-900 border"
+                                                                                                    placeholder="Kart Başlığı"
+                                                                                                    value={content.title}
+                                                                                                    onChange={(e) => {
+                                                                                                        const newMenus = [...data.menus];
+                                                                                                        newMenus[mIdx].items[i].content[cIdx].title = e.target.value;
+                                                                                                        setData({ ...data, menus: newMenus });
+                                                                                                    }}
+                                                                                                />
+                                                                                            </div>
+                                                                                            <button className="text-red-300 hover:text-red-500 px-1 pt-4" onClick={() => {
+                                                                                                const newMenus = [...data.menus];
+                                                                                                newMenus[mIdx].items[i].content = newMenus[mIdx].items[i].content.filter((_: any, idx: number) => idx !== cIdx);
+                                                                                                setData({ ...data, menus: newMenus });
+                                                                                            }}>×</button>
                                                                                         </div>
-                                                                                        <div className="w-12">
-                                                                                            <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">İKON</label>
-                                                                                            <input
-                                                                                                className="w-full text-center border-slate-200 rounded-lg p-1.5 bg-white text-slate-900 border"
-                                                                                                placeholder="✨"
-                                                                                                value={content.icon}
-                                                                                                onChange={(e) => {
-                                                                                                    const newMenus = [...data.menus];
-                                                                                                    newMenus[mIdx].items[i].content[cIdx].icon = e.target.value;
-                                                                                                    setData({ ...data, menus: newMenus });
-                                                                                                }}
-                                                                                            />
+                                                                                        <div className="grid grid-cols-2 gap-2">
+                                                                                            <div>
+                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">AÇIKLAMA</label>
+                                                                                                <input
+                                                                                                    className="w-full border-slate-200 rounded-lg p-1.5 text-slate-600 bg-white border"
+                                                                                                    placeholder="Küçük açıklama yazısı"
+                                                                                                    value={content.desc}
+                                                                                                    onChange={(e) => {
+                                                                                                        const newMenus = [...data.menus];
+                                                                                                        newMenus[mIdx].items[i].content[cIdx].desc = e.target.value;
+                                                                                                        setData({ ...data, menus: newMenus });
+                                                                                                    }}
+                                                                                                />
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">LİNK (URL)</label>
+                                                                                                <input
+                                                                                                    className="w-full border-slate-200 rounded-lg p-1.5 font-mono text-blue-600 bg-white border"
+                                                                                                    placeholder="/services/web"
+                                                                                                    value={content.link}
+                                                                                                    onChange={(e) => {
+                                                                                                        const newMenus = [...data.menus];
+                                                                                                        newMenus[mIdx].items[i].content[cIdx].link = e.target.value;
+                                                                                                        setData({ ...data, menus: newMenus });
+                                                                                                    }}
+                                                                                                />
+                                                                                            </div>
                                                                                         </div>
-                                                                                        <div className="flex-1">
-                                                                                            <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">BAŞLIK</label>
-                                                                                            <input
-                                                                                                className="w-full font-bold border-slate-200 rounded-lg p-1.5 bg-white text-slate-900 border"
-                                                                                                placeholder="Kart Başlığı"
-                                                                                                value={content.title}
-                                                                                                onChange={(e) => {
-                                                                                                    const newMenus = [...data.menus];
-                                                                                                    newMenus[mIdx].items[i].content[cIdx].title = e.target.value;
-                                                                                                    setData({ ...data, menus: newMenus });
-                                                                                                }}
-                                                                                            />
-                                                                                        </div>
-                                                                                        <button className="text-red-300 hover:text-red-500 px-1 pt-4" onClick={() => {
-                                                                                            const newMenus = [...data.menus];
-                                                                                            newMenus[mIdx].items[i].content = newMenus[mIdx].items[i].content.filter((_: any, idx: number) => idx !== cIdx);
-                                                                                            setData({ ...data, menus: newMenus });
-                                                                                        }}>×</button>
                                                                                     </div>
-                                                                                    <div className="grid grid-cols-2 gap-2">
-                                                                                        <div>
-                                                                                            <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">AÇIKLAMA</label>
-                                                                                            <input
-                                                                                                className="w-full border-slate-200 rounded-lg p-1.5 text-slate-600 bg-white border"
-                                                                                                placeholder="Küçük açıklama yazısı"
-                                                                                                value={content.desc}
-                                                                                                onChange={(e) => {
-                                                                                                    const newMenus = [...data.menus];
-                                                                                                    newMenus[mIdx].items[i].content[cIdx].desc = e.target.value;
-                                                                                                    setData({ ...data, menus: newMenus });
-                                                                                                }}
-                                                                                            />
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            <label className="text-[9px] font-black text-slate-400 uppercase block mb-1">LİNK (URL)</label>
-                                                                                            <input
-                                                                                                className="w-full border-slate-200 rounded-lg p-1.5 font-mono text-blue-600 bg-white border"
-                                                                                                placeholder="/services/web"
-                                                                                                value={content.link}
-                                                                                                onChange={(e) => {
-                                                                                                    const newMenus = [...data.menus];
-                                                                                                    newMenus[mIdx].items[i].content[cIdx].link = e.target.value;
-                                                                                                    setData({ ...data, menus: newMenus });
-                                                                                                }}
-                                                                                            />
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            ))}
-                                                                            {(!item.content || item.content.length === 0) && (
-                                                                                <p className="text-[10px] text-slate-400 italic text-center py-8">Henüz içerik kartı eklenmedi. Önce bir kategori seçerek başlayın.</p>
-                                                                            )}
+                                                                                ))}
+                                                                                {(!item.content || item.content.length === 0) && (
+                                                                                    <p className="text-[10px] text-slate-400 italic text-center py-8">Henüz içerik kartı eklenmedi. Önce bir kategori seçerek başlayın.</p>
+                                                                                )}
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        )}
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                            ))}
+                                        </div>
 
-                                    <button
-                                        onClick={() => {
-                                            const newMenus = [...data.menus];
-                                            if (!newMenus[mIdx].items) newMenus[mIdx].items = [];
-                                            newMenus[mIdx].items.push({ label: 'Yeni Link', link: '#', type: 'link' });
-                                            setData({ ...data, menus: newMenus });
-                                        }}
-                                        className="w-full mt-6 py-4 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold hover:border-blue-300 hover:text-blue-500 hover:bg-slate-50 transition uppercase tracking-widest text-xs flex justify-center items-center gap-2"
-                                    >
-                                        <span className="text-xl">➕</span> YENİ MENÜ ÖĞESİ EKLE
-                                    </button>
-                                </div>
-                            ))}
+                                        <button
+                                            onClick={() => {
+                                                const newMenus = [...data.menus];
+                                                if (!newMenus[mIdx].items) newMenus[mIdx].items = [];
+                                                newMenus[mIdx].items.push({ label: 'Yeni Link', link: '#', type: 'link' });
+                                                setData({ ...data, menus: newMenus });
+                                            }}
+                                            className="w-full mt-6 py-4 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold hover:border-blue-300 hover:text-blue-500 hover:bg-slate-50 transition uppercase tracking-widest text-xs flex justify-center items-center gap-2"
+                                        >
+                                            <span className="text-xl">➕</span> YENİ MENÜ ÖĞESİ EKLE
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
-            </div>
-        </div>
+                    )
+                }
+            </div >
+        </div >
     );
 }

@@ -6,9 +6,9 @@ import { getSession } from './auth';
 // List of models that require strict Tenant isolation
 const operationalModels = [
     'product', 'customer', 'supplier', 'transaction', 'kasa', 'check', 'order',
-    'salesInvoice', 'purchaseInvoice', 'serviceRecord', 'quote', 'paymentPlan',
-    'stockMovement', 'variantAttribute',
-    'journal', 'coupon', 'suspendedSale', 'company', 'branch',
+    'salesinvoice', 'purchaseinvoice', 'servicerecord', 'quote', 'paymentplan',
+    'stockmovement', 'variantattribute', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
+    'journal', 'coupon', 'suspendedsale', 'company', 'branch',
     'notification', 'staff', 'user', 'tenant', 'subscription'
 ];
 
@@ -120,6 +120,9 @@ const prismaClientSingleton = () => {
                             }
                             else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else if (modelName === 'notification') { a.where = { ...a.where, user: { tenantId: effectiveTenantId } }; }
+                            else if (modelName === 'coupon') { a.where = { ...a.where, OR: [{ customer: { company: { tenantId: effectiveTenantId } } }, { customer: null }] }; }
+                            else if (modelName === 'suspendedsale') { return query(args); }
                             else { a.where = { ...a.where, company: { tenantId: effectiveTenantId } }; }
                         }
 
@@ -134,6 +137,9 @@ const prismaClientSingleton = () => {
                             }
                             else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else if (modelName === 'notification') { a.where = { ...a.where, user: { tenantId: effectiveTenantId } }; }
+                            else if (modelName === 'coupon') { a.where = { ...a.where, OR: [{ customer: { company: { tenantId: effectiveTenantId } } }, { customer: null }] }; }
+                            else if (modelName === 'suspendedsale') { return query(args); }
                             else { a.where = { ...a.where, company: { tenantId: effectiveTenantId } }; }
                         }
 

@@ -27,7 +27,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 404 });
         }
 
-        console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode });
+        const companyId = company?.id;
+
+        console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode, companyId });
 
         // 1. Kasa ID Güvenli Seçim
         let targetKasaId = (kasaId === 'CashKasa' || !kasaId) ? undefined : kasaId;
@@ -36,23 +38,26 @@ export async function POST(request: Request) {
         const effectivePaymentMode = (paymentMode === 'card' || paymentMode === 'credit_card') ? 'credit_card' : paymentMode;
 
         if (effectivePaymentMode === 'credit_card') {
-            const posKasa = await prisma.kasa.findFirst({
-                where: {
-                    isActive: true,
-                    type: { contains: 'POS' },
-                    companyId: company.id // Strict Tenant Isolation
-                }
-            });
-            targetKasaId = posKasa?.id;
-            if (!targetKasaId) {
+            if (companyId) {
+                const posKasa = await prisma.kasa.findFirst({
+                    where: {
+                        isActive: true,
+                        type: { contains: 'POS' },
+                        companyId: companyId
+                    }
+                });
+                if (posKasa) targetKasaId = posKasa.id;
+            }
+
+            if (!targetKasaId && companyId) {
                 const bankKasa = await prisma.kasa.findFirst({
                     where: {
                         isActive: true,
                         type: 'Banka',
-                        companyId: company.id // Strict Tenant Isolation
+                        companyId: companyId
                     }
                 });
-                targetKasaId = bankKasa?.id;
+                if (bankKasa) targetKasaId = bankKasa.id;
             }
         } else if (effectivePaymentMode === 'transfer') {
             const bankKasa = await prisma.kasa.findFirst({
@@ -65,11 +70,11 @@ export async function POST(request: Request) {
             targetKasaId = bankKasa?.id;
         }
 
-        if (!targetKasaId) {
+        if (!targetKasaId && companyId) {
             const anyKasa = await prisma.kasa.findFirst({
                 where: {
                     isActive: true,
-                    companyId: company.id // Strict Tenant Isolation
+                    companyId: companyId
                 }
             });
             targetKasaId = anyKasa?.id;
@@ -92,7 +97,7 @@ export async function POST(request: Request) {
                     marketplace: 'POS',
                     marketplaceId: 'LOCAL',
                     orderNumber: orderNumber,
-                    companyId: company?.id,
+                    companyId: companyId,
                     customerName: customerName || 'Perakende Müşteri',
                     totalAmount: finalTotal,
                     currency: 'TRY',
@@ -127,7 +132,7 @@ export async function POST(request: Request) {
                             data: {
                                 productId: String(item.productId),
                                 branch: targetBranch,
-                                companyId: company?.id,
+                                companyId: companyId,
                                 quantity: -qty,
                                 type: 'SALE',
                                 referenceId: order.id,
@@ -167,7 +172,7 @@ export async function POST(request: Request) {
 
             await (tx as any).transaction.create({
                 data: {
-                    companyId: company?.id,
+                    companyId: companyId,
                     type: 'Sales',
                     amount: finalTotal,
                     description: transactionDesc,
@@ -226,7 +231,7 @@ export async function POST(request: Request) {
 
                             const commTrx = await (tx as any).transaction.create({
                                 data: {
-                                    companyId: company?.id,
+                                    companyId: companyId,
                                     type: 'Expense',
                                     amount: commissionAmount,
                                     description: `Banka POS Komisyon Gideri (${commissionConfig.installment})`,

@@ -197,7 +197,7 @@ export default function LandingPage() {
             <div style={{ marginTop: '40px', position: 'relative', maxWidth: '1000px', margin: '40px auto 0' }}>
               <div className="m-card-white" style={{ padding: '20px', borderRadius: '24px', boxShadow: '0 40px 120px rgba(0,0,0,0.1)' }}>
                 <div style={{ background: '#f8faff', borderRadius: '16px', height: '320px', overflow: 'hidden' }}>
-                  <img src={content.visualUrl || 'https://databox.com/wp-content/uploads/2023/04/databox-dashboards.png'} alt="Visual" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={content.visualUrl || 'https://databox.com/wp-content/uploads/2023/04/databox-dashboards.png'} alt="Visual" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
                 </div>
               </div>
               {content.showFloatingCard && (
@@ -216,7 +216,7 @@ export default function LandingPage() {
                   <h4 className="text-[18px] font-black mb-6">{content.floatingCardTitle || 'Explore Features'}</h4>
                   {content.floatingCardVisualUrl ? (
                     <div style={{ background: '#f8faff', borderRadius: '12px', height: '200px', overflow: 'hidden' }}>
-                      <img src={content.floatingCardVisualUrl} alt="Floating Visual" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={content.floatingCardVisualUrl} alt="Floating Visual" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
                     </div>
                   ) : (
                     <div className="grid grid-cols-3 gap-3">
@@ -299,6 +299,13 @@ export default function LandingPage() {
                 <span className="block text-[#9333ea] mb-2" style={getStyle(content.subtitleSize, content.subtitleColor)}>{content.topTitle || '20,000+ scaling teams & agencies'}</span>
                 <span className="block text-[#0d0e12]" style={getStyle(content.titleSize, content.titleColor)}>{content.mainTitle || 'drive results that matter'}</span>
               </h2>
+              {(content.subtitle || content.desc) && (
+                <p
+                  className="m-intro mb-8"
+                  style={getStyle(content.subtitleSize, content.subtitleColor)}
+                  dangerouslySetInnerHTML={{ __html: content.subtitle || content.desc }}
+                />
+              )}
               <div className="m-grid-container m-grid-3" style={{ marginTop: '30px' }}>
                 {(content.items || [
                   { stat: '↑ 55%', label: 'increase in sales YoY', logo: 'https://databox.com/wp-content/uploads/2023/04/first-response.png' },
@@ -603,10 +610,12 @@ export default function LandingPage() {
 
   // Helper to render Navigation
   const renderNav = (customContent?: any) => {
-    let menuItems = getMenuData(cms, 'Header');
+    let menuItems = (customContent?.menuItems && customContent.menuItems.length > 0)
+      ? customContent.menuItems
+      : getMenuData(cms, 'Header');
 
     // --- DEMO MEGA MENU DATA (Fallback if CMS is empty) ---
-    const useDemoMenu = menuItems.length === 0 || (menuItems.length === 3 && menuItems[0].label === 'Özellikler');
+    const useDemoMenu = menuItems.length === 0 || (menuItems.length === 3 && menuItems[0].label === 'Özellikler' && !customContent?.menuItems);
 
     if (useDemoMenu) {
       menuItems = [
