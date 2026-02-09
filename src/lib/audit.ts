@@ -9,6 +9,8 @@ interface LogParams {
     entityId?: string;
     before?: any;
     after?: any;
+    oldData?: any; // Compat
+    newData?: any; // Compat
     details?: string;
     ipAddress?: string;
     userAgent?: string;
@@ -25,8 +27,8 @@ export async function logActivity(params: LogParams) {
                 action: params.action,
                 entity: params.entity,
                 entityId: params.entityId,
-                before: params.before ? JSON.parse(JSON.stringify(params.before)) : undefined,
-                after: params.after ? JSON.parse(JSON.stringify(params.after)) : undefined,
+                before: params.before ? JSON.parse(JSON.stringify(params.before)) : (params.oldData ? JSON.parse(JSON.stringify(params.oldData)) : undefined),
+                after: params.after ? JSON.parse(JSON.stringify(params.after)) : (params.newData ? JSON.parse(JSON.stringify(params.newData)) : undefined),
                 details: params.details,
                 ipAddress: params.ipAddress,
                 userAgent: params.userAgent,
