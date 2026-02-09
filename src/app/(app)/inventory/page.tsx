@@ -334,12 +334,17 @@ function InventoryContent() {
         if (!auditReport || !auditReport.items) return;
         setIsProcessing(true);
         try {
+            const branch = currentUser?.branch || 'Merkez';
+
             // Update items sequentially
             for (const item of auditReport.items) {
                 await fetch(`/api/products/${item.id}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ stock: item.counted })
+                    body: JSON.stringify({
+                        stock: item.counted,
+                        branch: branch
+                    })
                 });
             }
 

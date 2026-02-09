@@ -19,28 +19,86 @@ export async function PATCH(request: Request, props: { params: Promise<{ id: str
             return NextResponse.json({ success: false, error: 'Product ID is missing' }, { status: 400 });
         }
 
-        const oldProduct = await prisma.product.findUnique({ where: { id: params.id } });
+        const targetBranch = body.branch || session.branch || 'Merkez';
 
-        const product = await prisma.product.update({
-            where: { id: params.id },
-            data: body
+        // Use transaction for consistency
+        const updatedProduct = await prisma.$transaction(async (tx) => {
+            // 1. Separate stock from other fields
+            const { stock, branch: _b, ...productData } = body;
+
+            // 2. Update Product Basic Info
+            const product = await tx.product.update({
+                where: { id: params.id },
+                data: productData
+            });
+
+            // 3. Handle Stock Update if provided
+            if (stock !== undefined && stock !== null) {
+                const newQty = Number(stock);
+
+                // Get current stock (for diff calculation)
+                const currentStockRecord = await tx.stock.findUnique({
+                    where: { productId_branch: { productId: params.id, branch: targetBranch } }
+                });
+
+                // If checking 'Merkez', fallback to product.stock if no Stock record? 
+                // Better to rely on Stock table if possible, or treat 0 as default.
+                const oldQty = currentStockRecord ? currentStockRecord.quantity : (targetBranch === 'Merkez' ? product.stock : 0);
+                const diff = newQty - oldQty;
+
+                // Sync/Upsert Stock Record
+                await tx.stock.upsert({
+                    where: { productId_branch: { productId: params.id, branch: targetBranch } },
+                    update: { quantity: newQty },
+                    create: {
+                        productId: params.id,
+                        branch: targetBranch,
+                        quantity: newQty
+                    }
+                });
+
+                // Sync Legacy Field if Merkez
+                if (targetBranch === 'Merkez') {
+                    await tx.product.update({
+                        where: { id: params.id },
+                        data: { stock: newQty }
+                    });
+                }
+
+                // Log Movement if changed
+                if (diff !== 0) {
+                    await tx.stockMovement.create({
+                        data: {
+                            productId: params.id,
+                            branch: targetBranch,
+                            companyId: product.companyId,
+                            quantity: diff,
+                            price: product.buyPrice || 0,
+                            type: 'ADJUSTMENT',
+                            referenceId: `MANUAL_UPDATE_${new Date().getTime()}`
+                        }
+                    });
+                }
+            }
+
+            return product;
         });
 
-        // Log activity
+        // Log activity (Audit)
         await logActivity({
             userId: session.id as string,
             userName: session.username as string,
             action: 'UPDATE',
             entity: 'Product',
             entityId: params.id,
-            oldData: oldProduct,
-            newData: product,
-            details: `${product.name} ürünü güncellendi.`,
+            after: body,
+            details: `${updatedProduct.name} ürünü güncellendi (${targetBranch}).`,
             branch: session.branch as string
         });
 
-        return NextResponse.json({ success: true, product });
+        return NextResponse.json({ success: true, product: updatedProduct });
     } catch (error: any) {
+        console.error('Product Update Error:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
@@ -75,7 +133,7 @@ export async function DELETE(request: Request, props: { params: Promise<{ id: st
             action: 'DELETE',
             entity: 'Product',
             entityId: params.id,
-            oldData: oldProduct,
+            before: oldProduct,
             details: `${oldProduct?.name} ürünü silindi (Soft Delete).`,
             branch: session.branch as string
         });

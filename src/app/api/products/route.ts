@@ -8,8 +8,16 @@ export async function GET() {
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
+        // Resolve Company
+        const tenantId = (session as any).tenantId;
+        const company = await prisma.company.findFirst({ where: { tenantId } });
+        if (!company) return NextResponse.json({ success: true, products: [] });
+
         const products = await prisma.product.findMany({
-            where: { deletedAt: null },
+            where: {
+                deletedAt: null,
+                companyId: company.id
+            },
             orderBy: { createdAt: 'desc' },
             include: { stocks: true }
         });
@@ -131,6 +139,7 @@ export async function POST(request: Request) {
                         await tx.stockMovement.create({
                             data: {
                                 productId: childProduct.id,
+                                companyId: company.id,
                                 branch: targetBranch,
                                 quantity: parseFloat(v.stock),
                                 price: parseFloat(v.buyPrice) || bPrice,
@@ -147,6 +156,7 @@ export async function POST(request: Request) {
                 await tx.stockMovement.create({
                     data: {
                         productId: mainProduct.id,
+                        companyId: company.id,
                         branch: targetBranch,
                         quantity: initialQty,
                         price: bPrice,
@@ -163,7 +173,7 @@ export async function POST(request: Request) {
                 action: 'CREATE',
                 entity: 'Product',
                 entityId: mainProduct.id,
-                newData: mainProduct,
+                after: mainProduct,
                 details: `${mainProduct.name} ${isParent ? 'ana ürün' : 'ürünü'} oluşturuldu.`,
                 branch: session.branch as string
             });
