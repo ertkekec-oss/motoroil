@@ -1265,19 +1265,19 @@ function InventoryContent() {
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
                             <h3 className="text-sm font-bold text-white/80 border-b border-white/10 pb-2">📦 Fiyatlandırma & Vergi Yönetimi</h3>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Alış Fiyatı */}
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted uppercase block">Alış Fiyatı</label>
                                     <div className="flex gap-2 relative">
                                         <input
                                             type="number"
-                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none min-w-0"
+                                            className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none min-w-0"
                                             placeholder="0.00"
                                             value={newProduct.buyPrice}
                                             onChange={e => setNewProduct({ ...newProduct, buyPrice: parseFloat(e.target.value) })}
                                         />
-                                        <div className="w-24 shrink-0">
+                                        <div className="w-28 shrink-0">
                                             <select
                                                 className="w-full h-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none appearance-none cursor-pointer text-center font-bold"
                                                 value={newProduct.purchaseCurrency}
@@ -1309,14 +1309,14 @@ function InventoryContent() {
                                             </select>
                                             <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">▼</span>
                                         </div>
-                                        <label className="flex items-center gap-2 cursor-pointer h-full px-2 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
+                                        <label className="flex items-center gap-2 cursor-pointer h-full px-3 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
                                             <input
                                                 type="checkbox"
                                                 className="w-5 h-5 accent-primary rounded cursor-pointer"
                                                 checked={newProduct.purchaseVatIncluded}
                                                 onChange={e => setNewProduct({ ...newProduct, purchaseVatIncluded: e.target.checked })}
                                             />
-                                            <span className="text-[10px] font-bold text-muted uppercase leading-none">Dahil</span>
+                                            <span className="text-xs font-bold text-muted uppercase leading-none">Dahil</span>
                                         </label>
                                     </div>
                                 </div>
@@ -1327,12 +1327,12 @@ function InventoryContent() {
                                     <div className="flex gap-2">
                                         <input
                                             type="number"
-                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none min-w-0"
+                                            className="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none min-w-0"
                                             placeholder="0.00"
                                             value={newProduct.price}
                                             onChange={e => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
                                         />
-                                        <div className="w-24 shrink-0">
+                                        <div className="w-28 shrink-0">
                                             <select
                                                 className="w-full h-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none appearance-none cursor-pointer text-center font-bold"
                                                 value={newProduct.currency}
@@ -1364,20 +1364,20 @@ function InventoryContent() {
                                             </select>
                                             <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">▼</span>
                                         </div>
-                                        <label className="flex items-center gap-2 cursor-pointer h-full px-2 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
+                                        <label className="flex items-center gap-2 cursor-pointer h-full px-3 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
                                             <input
                                                 type="checkbox"
                                                 className="w-5 h-5 accent-primary rounded cursor-pointer"
                                                 checked={newProduct.salesVatIncluded}
                                                 onChange={e => setNewProduct({ ...newProduct, salesVatIncluded: e.target.checked })}
                                             />
-                                            <span className="text-[10px] font-bold text-muted uppercase leading-none">Dahil</span>
+                                            <span className="text-xs font-bold text-muted uppercase leading-none">Dahil</span>
                                         </label>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-xs font-bold text-muted uppercase mb-1 block">Alış İskonto (%)</label>
                                     <input type="number" className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
