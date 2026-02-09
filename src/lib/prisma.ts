@@ -112,7 +112,12 @@ const prismaClientSingleton = () => {
                         if (['findMany', 'findFirst', 'findUnique', 'count', 'aggregate', 'groupBy'].includes(operation)) {
                             if (modelName === 'company') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'user') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'tenant') { a.where = { ...a.where, id: effectiveTenantId }; }
+                            else if (modelName === 'tenant') {
+                                // Platform Admins should always see all tenants to be able to switch between them
+                                if (!isPlatformAdmin) {
+                                    a.where = { ...a.where, id: effectiveTenantId };
+                                }
+                            }
                             else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else { a.where = { ...a.where, company: { tenantId: effectiveTenantId } }; }
@@ -122,7 +127,11 @@ const prismaClientSingleton = () => {
                         if (['update', 'updateMany', 'delete', 'deleteMany', 'upsert'].includes(operation)) {
                             if (modelName === 'company') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'user') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'tenant') { a.where = { ...a.where, id: effectiveTenantId }; }
+                            else if (modelName === 'tenant') {
+                                if (!isPlatformAdmin) {
+                                    a.where = { ...a.where, id: effectiveTenantId };
+                                }
+                            }
                             else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else { a.where = { ...a.where, company: { tenantId: effectiveTenantId } }; }

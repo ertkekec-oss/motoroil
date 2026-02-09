@@ -182,7 +182,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         try {
             const res = await fetch('/api/admin/tenants');
             const data = await res.json();
-            if (data.tenants) setAvailableTenants(data.tenants);
+            if (data.data) setAvailableTenants(data.data);
         } catch (e) { console.error('Tenants fetch failed', e); }
     };
 

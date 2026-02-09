@@ -177,7 +177,7 @@ export default function Sidebar() {
                     <div>
                         <div style={{ fontSize: '9px', fontWeight: '900', color: 'var(--text-muted)', opacity: 0.5, letterSpacing: '1.5px', marginBottom: '8px', textTransform: 'uppercase' }}>Operasyonel Şube</div>
                         <select
-                            disabled={hasPermission('branch_isolation') && !isSystemAdmin}
+                            disabled={(hasPermission('branch_isolation') && !isSystemAdmin) || (isPlatformAdmin && !activeTenantId && branches.length === 0)}
                             value={activeBranchName}
                             onChange={handleBranchChange}
                             style={{
@@ -186,11 +186,15 @@ export default function Sidebar() {
                                 borderRadius: '12px', color: 'var(--text-main)', cursor: 'pointer', outline: 'none',
                                 fontSize: '13px', fontWeight: '700', transition: '0.3s'
                             }}>
-                            {branches.map(b => (
-                                <option key={b.id} value={b.name}>
-                                    {b.type === 'Merkez' ? '🏢' : '🔧'} {b.name.toUpperCase()}
-                                </option>
-                            ))}
+                            {branches.length > 0 ? (
+                                branches.map(b => (
+                                    <option key={b.id} value={b.name}>
+                                        {b.type === 'Merkez' ? '🏢' : '🔧'} {b.name.toUpperCase()}
+                                    </option>
+                                ))
+                            ) : (
+                                <option value="">{activeTenantId ? 'ŞUBE YÜKLENİYOR...' : 'ÖNCE ŞİRKET SEÇİN'}</option>
+                            )}
                         </select>
                     </div>
                 </div>

@@ -125,6 +125,7 @@ export async function POST(request: Request) {
             role: targetUser.role || 'Personel',
             branch: (targetUser as any).branch || 'Merkez',
             name: targetUser.name,
+            tenantId: targetUser.tenantId || 'PLATFORM_ADMIN',
             permissions: (targetUser as any).permissions || [],
             setupState: (targetUser as any).setupState || 'COMPLETED'
         });

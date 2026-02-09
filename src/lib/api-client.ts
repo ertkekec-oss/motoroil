@@ -11,10 +11,12 @@ export const getActiveTenantId = () => {
 };
 
 export const apiFetch = async (url: string, options: any = {}) => {
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers
-    };
+    const headers = { ...options.headers };
+
+    // Auto-inject JSON Content-Type if body is present and not FormData
+    if (options.body && !(options.body instanceof FormData) && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+    }
 
     // Inject Target Tenant ID for Impersonation
     const tenantId = getActiveTenantId();
