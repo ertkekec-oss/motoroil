@@ -34,14 +34,14 @@ export async function GET() {
             where: { tenantId: session.tenantId }
         });
 
-        if (!company) {
+        if (!company && session.tenantId !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
         }
 
-        // 1. Check if any accounts exist for THIS company
-        const count = await prisma.account.count({
+        // 1. Check if any accounts exist for THIS company (Skip for PLATFORM_ADMIN if no company selected)
+        const count = company ? await prisma.account.count({
             where: { companyId: company.id }
-        });
+        }) : 0;
 
         // 2. If empty, SEED the default chart of accounts for THIS company
         if (count === 0) {
@@ -71,9 +71,9 @@ export async function GET() {
             }
         }
 
-        // 4. Fetch all accounts sorted by code (Filtered by Company)
+        // 4. Fetch all accounts sorted by code (Filtered by Company if present)
         const accountsRaw = await prisma.account.findMany({
-            where: { companyId: company.id },
+            where: company ? { companyId: company.id } : {}, // Skip filter for platform admin
             orderBy: { code: 'asc' }
         });
 

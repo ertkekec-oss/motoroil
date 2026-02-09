@@ -24,14 +24,14 @@ export async function GET(request: Request) {
             where: { tenantId: session.tenantId }
         });
 
-        if (!company) {
+        if (!company && session.tenantId !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
         }
 
         const transactions = await prisma.transaction.findMany({
             where: {
                 deletedAt: null,
-                companyId: company.id // Strict Isolation
+                ...(company ? { companyId: company.id } : {}) // Skip filter for platform admin
             },
             orderBy: {
                 date: 'desc'

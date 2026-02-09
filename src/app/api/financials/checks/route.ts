@@ -22,13 +22,14 @@ export async function GET(req: Request) {
             where: { tenantId: session.tenantId }
         });
 
-        if (!company) {
+        if (!company && session.tenantId !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
         }
 
-        const where: any = {
-            companyId: company.id, // Strict Isolation
-        };
+        const where: any = {};
+        if (company) {
+            where.companyId = company.id;
+        }
 
         if (type && type !== 'all') where.type = type;
         if (status && status !== 'all') where.status = status;

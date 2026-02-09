@@ -18,14 +18,14 @@ export async function GET() {
             where: { tenantId: session.tenantId }
         });
 
-        if (!company) {
+        if (!company && session.tenantId !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
         }
 
         const kasalar = await prisma.kasa.findMany({
             where: {
                 isActive: true,
-                companyId: company.id // Strict Isolation
+                ...(company ? { companyId: company.id } : {}) // Skip filter for platform admin
             },
             orderBy: { name: 'asc' }
         });
