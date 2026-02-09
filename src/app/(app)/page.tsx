@@ -261,29 +261,11 @@ function POSContent() {
       {/* LEFT MAIN AREA */}
       <div className="flex-1 flex flex-col gap-4 min-w-0">
 
-        {/* ROW 1: USER WELCOME + INSIGHTS */}
+        {/* ROW 1: USER WELCOME */}
         <div className="space-y-4">
           <div>
             <h2 className="text-2xl font-black mb-1">Hoş geldin, <span className="text-primary">{currentUser?.name?.split(' ')[0]}</span> 👋</h2>
             <p className="text-xs opacity-50">Sistemdeki genel durumun ve sana özel ipuçları aşağıda.</p>
-          </div>
-          {/* Insights Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group hover:border-white/10 transition-all cursor-pointer">
-              <div className="text-3xl">📄</div>
-              <div>
-                <div className="font-bold text-sm mb-1">E-Fatura'ya Geçin</div>
-                <div className="text-[10px] opacity-60 leading-relaxed">Henüz resmi fatura kesmediniz. Entegrasyonu tamamlayın.</div>
-                <div className="text-[10px] text-primary font-bold mt-2 group-hover:underline">Entegrasyonu Tamamla ➔</div>
-              </div>
-            </div>
-            <div className="bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden">
-              <div className="text-3xl">💡</div>
-              <div>
-                <div className="font-bold text-sm mb-1">Verimlilik Saati</div>
-                <div className="text-[10px] opacity-60 leading-relaxed">İstatistiklerinize göre en verimli saatiniz öğleden önce 10:00.</div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -312,18 +294,7 @@ function POSContent() {
           </div>
         </div>
 
-        {/* ROW 3: FORECAST CARDS */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-indigo-900 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden">
-            <div><div className="text-[10px] font-bold text-indigo-400 mb-1">GELECEK HAFTA</div><div className="text-2xl font-black">₺{insightsData?.stats?.forecast?.nextWeekRevenue?.toLocaleString() || '0'}</div></div>
-            <div className="text-right"><div className="text-[10px] opacity-50">Güven Skoru</div><div className="text-xs font-bold text-white">%{insightsData?.stats?.forecast?.confidence || 0}</div></div>
-          </div>
-
-          <div className="bg-gradient-to-br from-emerald-900 to-slate-900 border border-emerald-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden">
-            <div><div className="text-[10px] font-bold text-emerald-400 mb-1">BÜYÜME HIZI</div><div className="text-2xl font-black">%{insightsData?.stats?.docGrowth || 0}</div></div>
-            <div className="text-right"><div className="text-[10px] opacity-50">Fatura Artışı</div><div className="text-xs font-bold text-white">{insightsData?.stats?.thisMonthDocs || 0} Adet</div></div>
-          </div>
-        </div>
+        {/* ROW 2: CHARTS & NOTIFICATIONS (Grid adjusted) */}
 
         {/* ROW 4: SEARCH + ACTIONS */}
         <div className="flex flex-wrap gap-4">
@@ -387,14 +358,44 @@ function POSContent() {
           )}
         </div>
 
+        {/* ROW 5: INSIGHTS & FORECAST (Moved below cart) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group hover:border-white/10 transition-all cursor-pointer">
+            <div className="text-3xl">📄</div>
+            <div>
+              <div className="font-bold text-sm mb-1">E-Fatura'ya Geçin</div>
+              <div className="text-[10px] opacity-60 leading-relaxed">Henüz resmi fatura kesmediniz. Entegrasyonu tamamlayın.</div>
+              <div className="text-[10px] text-primary font-bold mt-2 group-hover:underline">Entegrasyonu Tamamla ➔</div>
+            </div>
+          </div>
+          <div className="bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden">
+            <div className="text-3xl">💡</div>
+            <div>
+              <div className="font-bold text-sm mb-1">Verimlilik Saati</div>
+              <div className="text-[10px] opacity-60 leading-relaxed">İstatistiklerinize göre en verimli saatiniz öğleden önce 10:00.</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-gradient-to-br from-indigo-900 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden">
+            <div><div className="text-[10px] font-bold text-indigo-400 mb-1">GELECEK HAFTA</div><div className="text-2xl font-black">₺{insightsData?.stats?.forecast?.nextWeekRevenue?.toLocaleString() || '0'}</div></div>
+            <div className="text-right"><div className="text-[10px] opacity-50">Güven Skoru</div><div className="text-xs font-bold text-white">%{insightsData?.stats?.forecast?.confidence || 0}</div></div>
+          </div>
+
+          <div className="bg-gradient-to-br from-emerald-900 to-slate-900 border border-emerald-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden">
+            <div><div className="text-[10px] font-bold text-emerald-400 mb-1">BÜYÜME HIZI</div><div className="text-2xl font-black">%{insightsData?.stats?.docGrowth || 0}</div></div>
+            <div className="text-right"><div className="text-[10px] opacity-50">Fatura Artışı</div><div className="text-xs font-bold text-white">{insightsData?.stats?.thisMonthDocs || 0} Adet</div></div>
+          </div>
+        </div>
       </div>
 
       {/* RIGHT PANEL (Payment) */}
       <div className="w-[380px] bg-[var(--bg-card)] border border-[var(--border-light)] rounded-2xl p-6 flex flex-col shadow-xl sticky top-4 h-[calc(100vh-2rem)] overflow-hidden">
         <h2 className="text-xs font-bold opacity-50 mb-6 tracking-widest text-center shrink-0">SATIŞ ÖZETİ</h2>
 
-        {/* Scrollable Middle Section */}
-        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
+        {/* Scrollable Middle Section (Scrollbar hidden) */}
+        <div className="flex-1 overflow-y-auto pr-0 space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {/* Customer */}
           <div className="mb-4">
             <label className="text-[10px] font-bold opacity-50 block mb-2 uppercase">MÜŞTERİ</label>
