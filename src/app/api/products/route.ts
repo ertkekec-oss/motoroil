@@ -28,6 +28,20 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
         }
 
+        // Get tenant's company
+        const tenantId = (session as any).tenantId;
+        if (!tenantId) {
+            return NextResponse.json({ error: 'Tenant bilgisi bulunamadı' }, { status: 400 });
+        }
+
+        const company = await prisma.company.findFirst({
+            where: { tenantId }
+        });
+
+        if (!company) {
+            return NextResponse.json({ error: 'Şirket bilgisi bulunamadı' }, { status: 400 });
+        }
+
         const body = await request.json();
         const { name, code, barcode, brand, category, type, stock, price, buyPrice, supplier, branch,
             salesVat, salesVatIncluded, purchaseVat, purchaseVatIncluded,
@@ -42,6 +56,7 @@ export async function POST(request: Request) {
             // 1. Create the Main Product (Parent)
             const mainProduct = await tx.product.create({
                 data: {
+                    companyId: company.id, // Add companyId for tenant isolation
                     name,
                     code: code || `SKU-${Date.now()}`,
                     barcode: barcode || '',
@@ -79,6 +94,7 @@ export async function POST(request: Request) {
                 for (const v of variantsData) {
                     const childProduct = await tx.product.create({
                         data: {
+                            companyId: company.id, // Add companyId for tenant isolation
                             name: `${name} (${v.variantLabel})`,
                             code: v.code || `${mainProduct.code}-${v.variantLabel.replace(/\s+/g, '-').toUpperCase()}`,
                             barcode: v.barcode || '',
