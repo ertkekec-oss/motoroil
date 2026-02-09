@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFinancials } from "@/contexts/FinancialContext";
+import { useCRM } from "@/contexts/CRMContext"; // Added useCRM
 import { formatCurrency } from "@/lib/utils";
 
 import AccountingModals from "./components/AccountingModals";
@@ -19,13 +20,23 @@ export default function AccountingPage() {
         isInitialLoading
     } = useFinancials();
 
+    const { customers, suppliers, refreshCustomers, refreshSuppliers } = useCRM(); // Get CRM data
+
     const [activeTab, setActiveTab] = useState("receivables");
     const [modalType, setModalType] = useState<string | null>(null);
 
     // Calculate Stats
     const stats = React.useMemo(() => {
-        const totalReceivables = checks.filter(c => c.type === 'In' && c.status !== 'Tahsil Edildi').reduce((sum, c) => sum + c.amount, 0);
-        const totalPayables = checks.filter(c => c.type === 'Out' && c.status !== 'Ödendi').reduce((sum, c) => sum + c.amount, 0);
+        // Alacaklar: Tahsil edilmemiş Çekler + Müşteri Bakiyeleri (Pozitif)
+        const checkReceivables = checks.filter(c => c.type === 'In' && c.status !== 'Tahsil Edildi').reduce((sum, c) => sum + c.amount, 0);
+        const customerReceivables = customers.reduce((sum, c) => sum + (Number(c.balance) > 0 ? Number(c.balance) : 0), 0);
+        const totalReceivables = checkReceivables + customerReceivables;
+
+        // Borçlar: Ödenmemiş Çekler + Tedarikçi Bakiyeleri (Pozitif - Borcumuz)
+        const checkPayables = checks.filter(c => c.type === 'Out' && c.status !== 'Ödendi').reduce((sum, c) => sum + c.amount, 0);
+        const supplierPayables = suppliers.reduce((sum, s) => sum + (Number(s.balance) > 0 ? Number(s.balance) : 0), 0);
+        const totalPayables = checkPayables + supplierPayables;
+
         const totalExpenses = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
         const netCash = kasalar.reduce((sum, k) => sum + k.balance, 0);
 
@@ -35,17 +46,23 @@ export default function AccountingPage() {
             totalExpenses,
             netCash
         };
-    }, [transactions, checks, kasalar]);
+    }, [transactions, checks, kasalar, customers, suppliers]);
 
     const refreshData = async () => {
-        await Promise.all([refreshTransactions(), refreshKasalar(), refreshChecks()]);
+        await Promise.all([
+            refreshTransactions(),
+            refreshKasalar(),
+            refreshChecks(),
+            refreshCustomers(),
+            refreshSuppliers()
+        ]);
     };
 
     const cards = [
         {
             title: "TOPLAM ALACAKLAR",
             value: stats.totalReceivables,
-            desc: "Seçili dönemdeki taksit ve çekler",
+            desc: "Cari hesaplar ve planlı alacaklar", // Updated description
             icon: "🗓️",
             color: "text-blue-400",
             bg: "bg-blue-500/10",
@@ -54,7 +71,7 @@ export default function AccountingPage() {
         {
             title: "TOPLAM ÖDEMELER",
             value: stats.totalPayables,
-            desc: "Seçili dönemdeki borç ve çekler",
+            desc: "Tedarikçi borçları ve ödemeler", // Updated description
             icon: "💸",
             color: "text-emerald-400",
             bg: "bg-emerald-500/10",
@@ -92,7 +109,7 @@ export default function AccountingPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-2">Muhasebe & Finans</h1>
-                    <p className="text-white/60">Nakit akışı, alacak/borç ve kasa yönetimi</p>
+                    <p className="text-white/60">Nakit akışı, cari hesaplar ve kasa yönetimi</p>
                 </div>
                 <button
                     onClick={() => refreshData()}
@@ -161,7 +178,7 @@ export default function AccountingPage() {
                 {activeTab === 'receivables' && (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-xl font-bold text-white">Tahsil Edilecekler</h3>
+                            <h3 className="text-xl font-bold text-white">Alacak Takibi (Cari & Çek)</h3>
                             <button
                                 onClick={() => setModalType('collection')}
                                 className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium text-sm transition-colors shadow-lg shadow-orange-900/20"
@@ -170,30 +187,53 @@ export default function AccountingPage() {
                             </button>
                         </div>
 
-                        {/* Empty State / Placeholder */}
-                        {checks.filter(c => c.type === 'In').length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-20 text-white/20">
-                                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-2xl">
-                                    📋
-                                </div>
-                                <p>Planlı alacak bulunmuyor.</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-12 gap-4 text-xs font-bold text-white/30 uppercase tracking-wider px-4 border-b border-white/5 pb-2">
-                                <div className="col-span-4">Cari Bilgisi</div>
-                                <div className="col-span-2 text-center">Vade</div>
-                                <div className="col-span-3 text-right">Kalan Tutar</div>
-                                <div className="col-span-3 text-center">Durum</div>
-                            </div>
-                        )}
-                        {/* List rendering matches existing patterns */}
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm text-white/70">
+                                <thead className="text-xs font-bold text-white/30 uppercase border-b border-white/5">
+                                    <tr>
+                                        <th className="py-3">Müşteri / Açıklama</th>
+                                        <th className="py-3">Tip</th>
+                                        <th className="py-3 text-center">Vade / Son İşlem</th>
+                                        <th className="py-3 text-right">Tutar</th>
+                                        <th className="py-3 text-right">Durum</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5">
+                                    {/* Müşteri CARİLERİ */}
+                                    {customers.filter(c => Number(c.balance) > 0).map((customer, i) => (
+                                        <tr key={`cust-${i}`} className="hover:bg-white/5">
+                                            <td className="py-3 font-bold text-white">{customer.name}</td>
+                                            <td className="py-3"><span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-orange-500/10 text-orange-400 tracking-wide">CARİ HESAP</span></td>
+                                            <td className="py-3 text-center opacity-50 text-xs">Güncel Bakiye</td>
+                                            <td className="py-3 text-right font-black text-white">{formatCurrency(customer.balance)}</td>
+                                            <td className="py-3 text-right"><span className="text-[10px] font-bold uppercase text-orange-400">ÖDEME BEKLİYOR</span></td>
+                                        </tr>
+                                    ))}
+
+                                    {/* ÇEKLER */}
+                                    {checks.filter(c => c.type === 'In').map((check, i) => (
+                                        <tr key={`check-${i}`} className="hover:bg-white/5">
+                                            <td className="py-3 font-medium text-white">{check.description || 'Çek/Senet'} {check.customer ? `(${check.customer.name})` : ''}</td>
+                                            <td className="py-3"><span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-blue-500/10 text-blue-400 tracking-wide">ÇEK/SENET</span></td>
+                                            <td className="py-3 text-center">{new Date(check.dueDate).toLocaleDateString('tr-TR')}</td>
+                                            <td className="py-3 text-right font-black text-white">{formatCurrency(check.amount)}</td>
+                                            <td className="py-3 text-right text-xs opacity-70">{check.status}</td>
+                                        </tr>
+                                    ))}
+
+                                    {customers.filter(c => Number(c.balance) > 0).length === 0 && checks.filter(c => c.type === 'In').length === 0 && (
+                                        <tr><td colSpan={5} className="text-center py-8 text-white/30">Alacak kaydı bulunamadı.</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
 
                 {activeTab === 'payables' && (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-xl font-bold text-white">Ödenecek Borçlar</h3>
+                            <h3 className="text-xl font-bold text-white">Borç Takibi (Tedarikçi & Çek)</h3>
                             <button
                                 onClick={() => setModalType('debt')}
                                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium text-sm transition-colors shadow-lg shadow-rose-900/20"
@@ -205,16 +245,32 @@ export default function AccountingPage() {
                             <table className="w-full text-left text-sm text-white/70">
                                 <thead className="text-xs font-bold text-white/30 uppercase border-b border-white/5">
                                     <tr>
-                                        <th className="py-3">Açıklama</th>
-                                        <th className="py-3 text-center">Vade</th>
+                                        <th className="py-3">Tedarikçi / Açıklama</th>
+                                        <th className="py-3">Tip</th>
+                                        <th className="py-3 text-center">Vade / Son İşlem</th>
                                         <th className="py-3 text-center">Tutar</th>
                                         <th className="py-3 text-right">Durum</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
+                                    {/* Tedarikçi CARİLERİ */}
+                                    {suppliers.filter(s => Number(s.balance) > 0).map((supplier, i) => (
+                                        <tr key={`supp-${i}`} className="hover:bg-white/5">
+                                            <td className="py-3 font-medium text-white">{supplier.name}</td>
+                                            <td className="py-3"><span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-rose-500/10 text-rose-400 tracking-wide">CARİ HESAP</span></td>
+                                            <td className="py-3 text-center opacity-50 text-xs">Güncel Bakiye</td>
+                                            <td className="py-3 text-center font-bold text-rose-400">{formatCurrency(supplier.balance)}</td>
+                                            <td className="py-3 text-right">
+                                                <span className="text-[10px] font-bold uppercase text-rose-400">BORÇLUYUZ</span>
+                                            </td>
+                                        </tr>
+                                    ))}
+
+                                    {/* ÇEKLER */}
                                     {checks.filter(c => c.type === 'Out').map((check, i) => (
-                                        <tr key={i} className="hover:bg-white/5">
+                                        <tr key={`check-${i}`} className="hover:bg-white/5">
                                             <td className="py-3 font-medium text-white">{check.description || 'Borç Kaydı'}</td>
+                                            <td className="py-3"><span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-rose-500/10 text-rose-400 tracking-wide">ÇEK/SENET</span></td>
                                             <td className="py-3 text-center">{new Date(check.dueDate).toLocaleDateString('tr-TR')}</td>
                                             <td className="py-3 text-center font-bold text-rose-400">{formatCurrency(check.amount)}</td>
                                             <td className="py-3 text-right">
@@ -224,8 +280,9 @@ export default function AccountingPage() {
                                             </td>
                                         </tr>
                                     ))}
-                                    {checks.filter(c => c.type === 'Out').length === 0 && (
-                                        <tr><td colSpan={4} className="text-center py-8 text-white/30">Kayıt bulunamadı.</td></tr>
+
+                                    {suppliers.filter(s => Number(s.balance) > 0).length === 0 && checks.filter(c => c.type === 'Out').length === 0 && (
+                                        <tr><td colSpan={5} className="text-center py-8 text-white/30">Borç kaydı bulunamadı.</td></tr>
                                     )}
                                 </tbody>
                             </table>
