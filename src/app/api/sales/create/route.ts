@@ -216,31 +216,38 @@ export async function POST(request: Request) {
                     const salesExpenses = settingsRes?.value as any;
 
                     if (Array.isArray(salesExpenses?.posCommissions)) {
-                        const instLabelRaw = body.installmentLabel;
-                        const instCount = body.installments || body.installmentCount || 1;
+                        const instLabelRaw = String(body.installmentLabel || '');
+                        // Force parse int safely
+                        let instCount = 1;
+                        try {
+                            const rawCount = body.installments || body.installmentCount;
+                            instCount = parseInt(String(rawCount || '1'), 10);
+                            if (isNaN(instCount)) instCount = 1;
+                        } catch (e) { instCount = 1; }
+
                         const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
 
                         console.log(`[Commission] Finding config for: labelRaw="${instLabelRaw}", fallback="${instLabelFallback}", instCount=${instCount}`);
 
                         // Case-insensitive and trimmed lookup
                         const lookups = [
-                            String(instLabelRaw || '').toLowerCase().trim(),
-                            String(instLabelFallback || '').toLowerCase().trim(),
+                            instLabelRaw.toLowerCase().trim(),
+                            instLabelFallback.toLowerCase().trim(),
                             (instCount === 1 ? 'tek çekim' : ''),
                             (instCount === 1 ? 'nakit' : ''),
                             (instCount === 1 ? 'peşin' : '')
                         ].filter(Boolean);
 
                         let commissionConfig = salesExpenses.posCommissions.find((c: any) => {
+                            if (!c || typeof c !== 'object') return false;
                             const configLabel = String(c.installment || '').toLowerCase().trim();
                             // Extract number from config (e.g. "3 Taksit" -> 3, "3" -> 3)
-                            const configNum = parseInt(configLabel.replace(/\D/g, ''));
+                            const configNum = parseInt(configLabel.replace(/\D/g, ''), 10);
 
                             // 1. Direct String Match against lookups
                             if (lookups.includes(configLabel)) return true;
 
                             // 2. Numeric Match (for installments > 1)
-                            // If config is "3" and count is 3, match.
                             if (instCount > 1 && !isNaN(configNum) && configNum === instCount) {
                                 return true;
                             }
