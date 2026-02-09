@@ -6,6 +6,7 @@ import { useFinancials } from './FinancialContext';
 import { useCRM } from './CRMContext';
 import { useModal } from './ModalContext';
 import { useAuth } from './AuthContext';
+import { apiFetch } from '@/lib/api-client';
 
 export interface SuspendedSale {
     id: string;
@@ -36,7 +37,7 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
 
     const refreshSuspended = async () => {
         try {
-            const res = await fetch('/api/suspended-sales');
+            const res = await apiFetch('/api/suspended-sales');
             const data = await res.json();
             if (Array.isArray(data)) {
                 setSuspendedSales(data.map((s: any) => ({ ...s, timestamp: new Date(s.createdAt) })));
@@ -46,9 +47,8 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
 
     const suspendSale = async (label: string, items: any[], customer: any | null, total: number) => {
         try {
-            await fetch('/api/suspended-sales', {
+            await apiFetch('/api/suspended-sales', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ label, items, customer, total, branch: activeBranchName })
             });
             await refreshSuspended();
@@ -57,7 +57,7 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
 
     const removeSuspendedSale = async (id: string) => {
         try {
-            await fetch(`/api/suspended-sales?id=${id}`, { method: 'DELETE' });
+            await apiFetch(`/api/suspended-sales?id=${id}`, { method: 'DELETE' });
             setSuspendedSales(prev => prev.filter(s => s.id !== id));
         } catch (e) { console.error('Remove suspended sale failed', e); }
     };
@@ -109,9 +109,8 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
         } as any);
 
         try {
-            const res = await fetch('/api/sales/create', {
+            const res = await apiFetch('/api/sales/create', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...saleData, branch: saleBranch })
             });
 

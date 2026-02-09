@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { apiFetch } from '@/lib/api-client';
 
 export interface Customer {
     id: number | string;
@@ -72,7 +73,7 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
     const refreshCustomers = async () => {
         try {
             // Correct API endpoint
-            const res = await fetch('/api/customers');
+            const res = await apiFetch('/api/customers');
             if (!res.ok) throw new Error('CRM_CUSTOMERS_Failed to fetch customer data');
             const data = await res.json();
 
@@ -90,7 +91,7 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
     const refreshSuppliers = async () => {
         try {
             // Correct API endpoint
-            const res = await fetch('/api/suppliers');
+            const res = await apiFetch('/api/suppliers');
             if (!res.ok) throw new Error('CRM_SUPPLIERS_Failed to fetch supplier data');
             const data = await res.json();
 

@@ -9,6 +9,7 @@ import { InventoryProvider, Product } from './InventoryContext';
 import { CRMProvider, Customer, Supplier } from './CRMContext';
 import { SalesProvider } from './SalesContext';
 import { SettingsProvider } from './SettingsContext';
+import { apiFetch } from '@/lib/api-client';
 
 // Re-export core types for backward compatibility
 export type { Product, Customer, Supplier };
@@ -91,6 +92,11 @@ interface AppContextType {
     isSidebarOpen: boolean;
     setIsSidebarOpen: (open: boolean) => void;
     isInitialLoading: boolean;
+
+    // Impersonation (Platform Admin Only)
+    activeTenantId: string | null;
+    setActiveTenantId: (id: string | null) => void;
+    availableTenants: any[];
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -102,6 +108,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
     const isAdminPath = pathname?.startsWith('/admin');
+
+    // IMPERSONATION STATE
+    const [activeTenantId, setActiveTenantIdState] = useState<string | null>(() => {
+        if (typeof window !== 'undefined') return localStorage.getItem('periodya_activeTenantId');
+        return null;
+    });
+    const [availableTenants, setAvailableTenants] = useState<any[]>([]);
+
+    const setActiveTenantId = (id: string | null) => {
+        setActiveTenantIdState(id);
+        if (id) localStorage.setItem('periodya_activeTenantId', id);
+        else localStorage.removeItem('periodya_activeTenantId');
+
+        // When tenant changes, we should probably reset other states or trigger a full reload
+        if (typeof window !== 'undefined') window.location.reload();
+    };
 
     // Feature to Path Mapping for redirection
     const featurePathMap: Record<string, string> = {
@@ -133,7 +155,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const refreshSubscription = async () => {
         try {
-            const res = await fetch('/api/billing/subscription');
+            const res = await apiFetch('/api/billing/subscription');
             const data = await res.json();
             if (data && !data.error) {
                 setSubscription(data);
@@ -145,12 +167,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const refreshBranches = async () => {
         try {
-            const res = await fetch('/api/branches', { cache: 'no-store' });
+            const res = await apiFetch('/api/branches', { cache: 'no-store' });
             const data = await res.json();
             if (data.success) {
                 setBranches(data.branches || []);
             }
         } catch (error) { console.error('Branches fetch failed', error); }
+    };
+
+    const refreshTenants = async () => {
+        const isPlatformAdmin = authUser?.tenantId === 'PLATFORM_ADMIN' || authUser?.role === 'SUPER_ADMIN';
+        if (!isPlatformAdmin) return;
+
+        try {
+            const res = await fetch('/api/admin/tenants');
+            const data = await res.json();
+            if (data.tenants) setAvailableTenants(data.tenants);
+        } catch (e) { console.error('Tenants fetch failed', e); }
     };
 
     const handleSetActiveBranchName = (name: string) => {
@@ -164,7 +197,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const refreshStaff = async () => {
         try {
-            const res = await fetch('/api/staff', { cache: 'no-store' });
+            const res = await apiFetch('/api/staff', { cache: 'no-store' });
             const data = await res.json();
             if (Array.isArray(data)) setStaff(data);
         } catch (err) { console.error('Staff refresh failed', err); }
@@ -200,7 +233,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             }
 
             // Load all core requirements in parallel
-            Promise.all([refreshBranches(), refreshStaff(), refreshSubscription()]).finally(() => {
+            Promise.all([refreshBranches(), refreshStaff(), refreshSubscription(), refreshTenants()]).finally(() => {
                 const savedBranch = localStorage.getItem('periodya_activeBranch') || localStorage.getItem('motoroil_activeBranch');
 
                 if (!activeBranchName) {
@@ -258,7 +291,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const refreshNotifications = async () => {
         try {
-            const res = await fetch('/api/notifications');
+            const res = await apiFetch('/api/notifications');
             const data = await res.json();
             if (Array.isArray(data)) setNotifications(data);
         } catch (err) { console.error('Notifications fetch failed', err); }
@@ -266,9 +299,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const addNotification = async (n: Omit<AppNotification, 'id' | 'timestamp'>) => {
         try {
-            await fetch('/api/notifications', {
+            await apiFetch('/api/notifications', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(n)
             });
             refreshNotifications();
@@ -277,7 +309,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const removeNotification = async (id: string) => {
         try {
-            await fetch(`/api/notifications?id=${id}`, { method: 'DELETE' });
+            await apiFetch(`/api/notifications?id=${id}`, { method: 'DELETE' });
             refreshNotifications();
         } catch (err) { console.error('Remove notification failed', err); }
     };
@@ -294,7 +326,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const refreshSecurity = async () => {
         try {
-            const res = await fetch('/api/security/events');
+            const res = await apiFetch('/api/security/events');
             const data = await res.json();
             if (Array.isArray(data)) setSuspiciousEvents(data);
         } catch (err) { console.error('Security fetch failed', err); }
@@ -308,9 +340,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const addSuspiciousEvent = async (event: SuspiciousEvent) => {
         try {
-            await fetch('/api/security/events', {
+            await apiFetch('/api/security/events', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(event)
             });
             setSuspiciousEvents(prev => [event, ...prev].slice(0, 100));
@@ -319,7 +350,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const clearSuspiciousEvents = async (id?: string) => {
         try {
-            await fetch(`/api/security/events${id ? `?id=${id}` : ''}`, { method: 'DELETE' });
+            await apiFetch(`/api/security/events${id ? `?id=${id}` : ''}`, { method: 'DELETE' });
             if (id) setSuspiciousEvents(prev => prev.filter(e => e.id !== id));
             else setSuspiciousEvents([]);
         } catch (err) { console.error('Clear security events failed', err); }
@@ -374,7 +405,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             branches, activeBranchName, setActiveBranchName: handleSetActiveBranchName, refreshBranches,
             notifications, addNotification, removeNotification,
             suspiciousEvents, addSuspiciousEvent, clearSuspiciousEvents, lastSaleTime, recordSale,
-            isSidebarOpen, setIsSidebarOpen, isInitialLoading
+            isSidebarOpen, setIsSidebarOpen, isInitialLoading,
+            activeTenantId, setActiveTenantId, availableTenants
         }}>
             <InventoryProvider>
                 <CRMProvider>

@@ -4,10 +4,12 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { useRouter, usePathname } from 'next/navigation';
 
 interface User {
+    id: string; // Add ID as it's useful
     username: string;
     role: string;
     branch: string;
     name: string;
+    tenantId: string;
     permissions: string[];
     setupState?: 'PENDING' | 'COMPLETED';
 }

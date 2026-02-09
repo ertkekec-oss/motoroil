@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { apiFetch } from '@/lib/api-client';
 
 export interface Campaign {
     id: string;
@@ -72,7 +73,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
     const refreshSettings = async () => {
         try {
-            const res = await fetch('/api/settings');
+            const res = await apiFetch('/api/settings');
             const data = await res.json();
             if (data && !data.error) {
                 setAppSettings(data);
@@ -89,7 +90,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     };
     const refreshCampaigns = async () => {
         try {
-            const res = await fetch('/api/campaigns');
+            const res = await apiFetch('/api/campaigns');
             const data = await res.json();
             if (data.success) setCampaigns(data.campaigns);
         } catch (e) { console.error('Campaigns fetch failed', e); }
@@ -97,7 +98,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
     const refreshCoupons = async () => {
         try {
-            const res = await fetch('/api/coupons');
+            const res = await apiFetch('/api/coupons');
             const data = await res.json();
             if (data.success) setCoupons(data.coupons);
         } catch (e) { console.error('Coupons fetch failed', e); }
@@ -105,30 +106,29 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
     const updateServiceSettings = async (s: any) => {
         setServiceSettings(s);
-        await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ serviceSettings: s }) });
+        await apiFetch('/api/settings', { method: 'POST', body: JSON.stringify({ serviceSettings: s }) });
     };
 
     const updateInvoiceSettings = async (s: any) => {
         setInvoiceSettings(s);
-        await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ invoiceSettings: s }) });
+        await apiFetch('/api/settings', { method: 'POST', body: JSON.stringify({ invoiceSettings: s }) });
     };
 
     const updateReferralSettings = async (s: any) => {
         setReferralSettings(s);
-        await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ referralSettings: s }) });
+        await apiFetch('/api/settings', { method: 'POST', body: JSON.stringify({ referralSettings: s }) });
     };
 
     const updateWarranties = async (w: string[]) => {
         setWarranties(w);
-        await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ warranties: w }) });
+        await apiFetch('/api/settings', { method: 'POST', body: JSON.stringify({ warranties: w }) });
     };
 
     const updateAppSetting = async (key: string, value: any) => {
         setAppSettings(prev => ({ ...prev, [key]: value }));
         try {
-            await fetch('/api/settings', {
+            await apiFetch('/api/settings', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ [key]: value })
             });
         } catch (e) { console.error('Update setting failed', e); }

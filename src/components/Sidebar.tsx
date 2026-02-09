@@ -14,10 +14,12 @@ export default function Sidebar() {
         currentUser, hasPermission, hasFeature, subscription,
         branches, activeBranchName, setActiveBranchName,
         suspiciousEvents, isSidebarOpen, setIsSidebarOpen,
-        isInitialLoading
+        isInitialLoading,
+        activeTenantId, setActiveTenantId, availableTenants
     } = useApp();
 
     const isSystemAdmin = currentUser === null || currentUser?.role === 'SUPER_ADMIN' || (currentUser?.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
+    const isPlatformAdmin = authUser?.tenantId === 'PLATFORM_ADMIN' || authUser?.role === 'SUPER_ADMIN';
     const isAuditor = currentUser?.role === 'AUDITOR';
     const displayUser = currentUser || authUser;
 
@@ -96,6 +98,10 @@ export default function Sidebar() {
         setActiveBranchName(e.target.value);
     };
 
+    const handleTenantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setActiveTenantId(e.target.value === 'null' ? null : e.target.value);
+    };
+
     if (!displayUser) return null;
 
     return (
@@ -133,7 +139,7 @@ export default function Sidebar() {
                 ✕
             </button>
 
-            {/* LOGO & BRANCH */}
+            {/* LOGO & SELECTORS */}
             <div style={{ flexShrink: 0 }}>
                 <div style={{ padding: '32px 24px 20px 24px' }}>
                     <h1 style={{ fontSize: '26px', fontWeight: '900', letterSpacing: '-1.5px', marginBottom: '4px' }}>
@@ -142,24 +148,51 @@ export default function Sidebar() {
                     <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--primary)', letterSpacing: '2px', opacity: 0.6 }}>SYSTEM V3.0</div>
                 </div>
 
-                <div style={{ padding: '0 24px 24px 24px' }}>
-                    <div style={{ fontSize: '9px', fontWeight: '900', color: 'var(--text-muted)', opacity: 0.5, letterSpacing: '1.5px', marginBottom: '8px', textTransform: 'uppercase' }}>Operasyonel Şube</div>
-                    <select
-                        disabled={hasPermission('branch_isolation') && !isSystemAdmin}
-                        value={activeBranchName}
-                        onChange={handleBranchChange}
-                        style={{
-                            width: '100%', padding: '12px 14px',
-                            background: 'var(--bg-hover)', border: '1px solid var(--border-light)',
-                            borderRadius: '12px', color: 'var(--text-main)', cursor: 'pointer', outline: 'none',
-                            fontSize: '13px', fontWeight: '700', transition: '0.3s'
-                        }}>
-                        {branches.map(b => (
-                            <option key={b.id} value={b.name}>
-                                {b.type === 'Merkez' ? '🏢' : '🔧'} {b.name.toUpperCase()}
-                            </option>
-                        ))}
-                    </select>
+                <div style={{ padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    {/* TENANT SELECTOR (IMPERSONATION) */}
+                    {isPlatformAdmin && (
+                        <div>
+                            <div style={{ fontSize: '9px', fontWeight: '900', color: 'var(--text-muted)', opacity: 0.5, letterSpacing: '1.5px', marginBottom: '8px', textTransform: 'uppercase' }}>Hangi Şirket?</div>
+                            <select
+                                value={activeTenantId || 'null'}
+                                onChange={handleTenantChange}
+                                style={{
+                                    width: '100%', padding: '12px 14px',
+                                    background: activeTenantId ? 'rgba(255, 85, 0, 0.1)' : 'var(--bg-hover)',
+                                    border: activeTenantId ? '1px solid var(--primary)' : '1px solid var(--border-light)',
+                                    borderRadius: '12px', color: 'var(--text-main)', cursor: 'pointer', outline: 'none',
+                                    fontSize: '13px', fontWeight: '700', transition: '0.3s'
+                                }}>
+                                <option value="null">🏢 TÜM SİSTEM</option>
+                                {availableTenants.map(t => (
+                                    <option key={t.id} value={t.id}>
+                                        👥 {t.name?.toUpperCase()}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    {/* BRANCH SELECTOR */}
+                    <div>
+                        <div style={{ fontSize: '9px', fontWeight: '900', color: 'var(--text-muted)', opacity: 0.5, letterSpacing: '1.5px', marginBottom: '8px', textTransform: 'uppercase' }}>Operasyonel Şube</div>
+                        <select
+                            disabled={hasPermission('branch_isolation') && !isSystemAdmin}
+                            value={activeBranchName}
+                            onChange={handleBranchChange}
+                            style={{
+                                width: '100%', padding: '12px 14px',
+                                background: 'var(--bg-hover)', border: '1px solid var(--border-light)',
+                                borderRadius: '12px', color: 'var(--text-main)', cursor: 'pointer', outline: 'none',
+                                fontSize: '13px', fontWeight: '700', transition: '0.3s'
+                            }}>
+                            {branches.map(b => (
+                                <option key={b.id} value={b.name}>
+                                    {b.type === 'Merkez' ? '🏢' : '🔧'} {b.name.toUpperCase()}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
 

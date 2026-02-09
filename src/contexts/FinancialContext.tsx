@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { useModal } from './ModalContext';
+import { apiFetch } from '@/lib/api-client';
 
 export interface Transaction {
     id: string;
@@ -108,7 +109,7 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
     const refreshKasalar = async () => {
         try {
             // Correct API endpoint
-            const res = await fetch(`/api/kasalar?t=${Date.now()}`, { cache: 'no-store' });
+            const res = await apiFetch(`/api/kasalar?t=${Date.now()}`, { cache: 'no-store' });
             if (!res.ok) throw new Error('FINANCIAL_KASA_Failed to fetch accounts');
             const data = await res.json();
             setKasalar(data.kasalar || []); // Ensure array
@@ -122,7 +123,7 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
     const refreshTransactions = async () => {
         try {
             // Correct API endpoint for transactions
-            const res = await fetch(`/api/financials/transactions?t=${Date.now()}`, { cache: 'no-store' });
+            const res = await apiFetch(`/api/financials/transactions?t=${Date.now()}`, { cache: 'no-store' });
             if (!res.ok) throw new Error('FINANCIAL_TX_Failed to fetch transactions');
             const data = await res.json();
 
@@ -140,7 +141,7 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
 
     const refreshChecks = async () => {
         try {
-            const res = await fetch(`/api/checks?t=${Date.now()}`, { cache: 'no-store' });
+            const res = await apiFetch(`/api/checks?t=${Date.now()}`, { cache: 'no-store' });
             if (!res.ok) throw new Error('FINANCIAL_CHECKS_Failed to fetch checks');
             const data = await res.json();
             setChecks(data.checks || []);
@@ -173,9 +174,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
 
     const addFinancialTransaction = async (data: any) => {
         try {
-            const res = await fetch('/api/financials/transactions', {
+            const res = await apiFetch('/api/financials/transactions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...data, branch: data.branch || activeBranchName || 'Merkez' })
             });
             const result = await res.json();
@@ -193,9 +193,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
 
     const addCheck = async (data: any) => {
         try {
-            const res = await fetch('/api/financials/checks', {
+            const res = await apiFetch('/api/financials/checks', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...data, branch: data.branch || activeBranchName || 'Merkez' })
             });
             const result = await res.json();
@@ -210,9 +209,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
         try {
             const check = checks.find(c => c.id === checkId);
             const newStatus = check?.type === 'Out' ? 'Ödendi' : 'Tahsil Edildi';
-            const res = await fetch(`/api/financials/checks/${checkId}/status`, {
+            const res = await apiFetch(`/api/financials/checks/${checkId}/status`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus, kasaId: targetKasaId })
             });
             const result = await res.json();
@@ -227,9 +225,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
     const updatePaymentMethods = async (methods: PaymentMethod[]) => {
         setPaymentMethods(methods);
         try {
-            await fetch('/api/settings', {
+            await apiFetch('/api/settings', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ paymentMethods: methods })
             });
         } catch (e) { console.error('Payment methods save error', e); }
@@ -238,9 +235,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
     const updateSalesExpenses = async (settings: any) => {
         setSalesExpenses(settings);
         try {
-            await fetch('/api/settings', {
+            await apiFetch('/api/settings', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ salesExpenses: settings })
             });
             setError(null);
@@ -252,7 +248,7 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
 
     const refreshSalesExpenses = async () => {
         try {
-            const res = await fetch(`/api/settings?t=${Date.now()}`, { cache: 'no-store' });
+            const res = await apiFetch(`/api/settings?t=${Date.now()}`, { cache: 'no-store' });
             const data = await res.json();
             if (data && data.salesExpenses) {
                 setSalesExpenses(data.salesExpenses);

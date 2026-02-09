@@ -89,7 +89,19 @@ export async function getSession() {
 
     try {
         const { payload } = await jwtVerify(token, JWT_SECRET);
-        return payload;
+        const session: any = { ...payload };
+
+        // Support for Platform Admin Impersonation
+        const role = session.role?.toUpperCase() || '';
+        if (session.tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN') {
+            const targetTenantId = headersList.get('x-target-tenant-id');
+            if (targetTenantId) {
+                session.impersonateTenantId = targetTenantId;
+                session.isImpersonating = true;
+            }
+        }
+
+        return session;
     } catch (err) {
         return null;
     }

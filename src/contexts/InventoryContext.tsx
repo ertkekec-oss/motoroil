@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { useModal } from './ModalContext';
+import { apiFetch } from '@/lib/api-client';
 
 export interface Product {
     id: number | string;
@@ -91,7 +92,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     const refreshProducts = async () => {
         try {
             // Fetch normal products
-            const res = await fetch('/api/products');
+            const res = await apiFetch('/api/products');
             if (!res.ok) throw new Error('INVENTORY_PRODUCTS_Failed to fetch products');
             const data = await res.json();
 
@@ -112,7 +113,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     const refreshStockTransfers = async () => {
         try {
             // Correct API path based on directory listing
-            const res = await fetch('/api/inventory/transfer');
+            const res = await apiFetch('/api/inventory/transfer');
             const data = await res.json();
 
             // Handle { success: true, transfers: [] } wrapper
@@ -127,7 +128,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
 
     const refreshPending = async () => {
         try {
-            const res = await fetch('/api/inventory/pending');
+            const res = await apiFetch('/api/inventory/pending');
             const data = await res.json();
             if (Array.isArray(data)) setPendingProducts(data);
         } catch (e) { }
@@ -135,9 +136,8 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
 
     const requestProductCreation = async (product: Partial<Product>) => {
         try {
-            await fetch('/api/inventory/pending', {
+            await apiFetch('/api/inventory/pending', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(product)
             });
             await refreshPending();
@@ -150,9 +150,8 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
 
     const approveProduct = async (id: string, finalData?: any) => {
         try {
-            await fetch('/api/inventory/pending', {
+            await apiFetch('/api/inventory/pending', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, action: 'approve', finalData })
             });
             await Promise.all([refreshPending(), refreshProducts()]);
@@ -165,9 +164,8 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
 
     const rejectProduct = async (id: string) => {
         try {
-            await fetch('/api/inventory/pending', {
+            await apiFetch('/api/inventory/pending', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, action: 'reject' })
             });
             await refreshPending();
@@ -181,9 +179,8 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     // Implement real transfer functions or keep placeholders if API not ready
     const startStockTransfer = async (data: any) => {
         try {
-            const res = await fetch('/api/inventory/stock-transfers', { // Corrected endpoint guess
+            const res = await apiFetch('/api/inventory/stock-transfers', { // Corrected endpoint guess
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
             if (res.ok) {

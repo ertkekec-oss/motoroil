@@ -90,60 +90,56 @@ const prismaClientSingleton = () => {
                         const role = session.role?.toUpperCase() || '';
                         const isPlatformAdmin = session.tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN';
 
-                        // --- 2. Platform Admin Bypass ---
-                        // Platform owners or Super Admins can see everything
+                        // --- 2. Platform Admin Bypass / Impersonation ---
                         if (isPlatformAdmin) {
-                            return query(args);
+                            // If NOT impersonating, allow full access (current behavior)
+                            if (!session.impersonateTenantId) {
+                                return query(args);
+                            }
+                            // If impersonating, we continue below but shift the tenantId context
                         }
 
-                        const tenantId = session.tenantId;
-                        if (!tenantId) {
+                        // Determine which tenant's data we are looking at
+                        const effectiveTenantId = session.impersonateTenantId || session.tenantId;
+
+                        if (!effectiveTenantId) {
                             throw new Error("SECURITY_ERROR: Tenant context missing in session.");
                         }
 
                         const a = args as any;
 
-                        // --- 1. Create-time Assertion (Write-time Tenant Assertion) ---
-                        if (['create', 'createMany'].includes(operation)) {
-                            // If it's not a special model like 'company' or 'user' themselves
-                            if (!['company', 'user', 'tenant', 'subscription'].includes(modelName)) {
-                                const data = a.data;
-                                if (data) {
-                                    // Multiple records (createMany)
-                                    if (Array.isArray(data)) {
-                                        for (const item of data) {
-                                            if (!item.companyId) {
-                                                throw new Error(`SECURITY_ERROR: companyId is mandatory for ${model} creation.`);
-                                            }
-                                        }
-                                    } else {
-                                        // Single record (create)
-                                        if (!data.companyId && !data.company?.connect?.id) {
-                                            throw new Error(`SECURITY_ERROR: companyId is mandatory for ${model} creation.`);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
                         // READ FILTERING
                         if (['findMany', 'findFirst', 'findUnique', 'count', 'aggregate', 'groupBy'].includes(operation)) {
-                            if (modelName === 'company') { a.where = { ...a.where, tenantId }; }
-                            else if (modelName === 'user') { a.where = { ...a.where, tenantId }; }
-                            else if (modelName === 'tenant') { a.where = { ...a.where, id: tenantId }; }
-                            else if (modelName === 'subscription') { a.where = { ...a.where, tenantId }; }
-                            else if (modelName === 'staff') { a.where = { ...a.where, tenantId }; }
-                            else { a.where = { ...a.where, company: { tenantId: tenantId } }; }
+                            if (modelName === 'company') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else if (modelName === 'user') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else if (modelName === 'tenant') { a.where = { ...a.where, id: effectiveTenantId }; }
+                            else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else { a.where = { ...a.where, company: { tenantId: effectiveTenantId } }; }
                         }
 
                         // WRITE PROTECTION
                         if (['update', 'updateMany', 'delete', 'deleteMany', 'upsert'].includes(operation)) {
-                            if (modelName === 'company') { a.where = { ...a.where, tenantId }; }
-                            else if (modelName === 'user') { a.where = { ...a.where, tenantId }; }
-                            else if (modelName === 'tenant') { a.where = { ...a.where, id: tenantId }; }
-                            else if (modelName === 'subscription') { a.where = { ...a.where, tenantId }; }
-                            else if (modelName === 'staff') { a.where = { ...a.where, tenantId }; }
-                            else { a.where = { ...a.where, company: { tenantId: tenantId } }; }
+                            if (modelName === 'company') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else if (modelName === 'user') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else if (modelName === 'tenant') { a.where = { ...a.where, id: effectiveTenantId }; }
+                            else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else { a.where = { ...a.where, company: { tenantId: effectiveTenantId } }; }
+                        }
+
+                        // CREATE PROTECTION (Write-time Tenant Assertion)
+                        if (['create', 'createMany'].includes(operation)) {
+                            if (!['company', 'user', 'tenant', 'subscription'].includes(modelName)) {
+                                const data = a.data;
+                                if (data) {
+                                    if (Array.isArray(data)) {
+                                        data.forEach((item: any) => { if (!item.companyId && !isPlatformAdmin) throw new Error("SECURITY_ERROR: missing companyId"); });
+                                    } else {
+                                        if (!data.companyId && !data.company?.connect?.id && !isPlatformAdmin) throw new Error("SECURITY_ERROR: missing companyId");
+                                    }
+                                }
+                            }
                         }
 
                         return query(args);
