@@ -115,12 +115,35 @@ export default function ReportsPage() {
         });
     }, [transactions, dateRange, reportScope, selectedBranch]);
 
-    // Filter products by branch
+    // Filter and process products by branch/stock
     const filteredProducts = useMemo(() => {
-        if (reportScope === 'all') {
-            return products;
-        }
-        return products.filter(p => p.branch === selectedBranch || (!p.branch && selectedBranch === 'Merkez'));
+        return products.map(p => {
+            let effectiveStock = 0;
+            if (reportScope === 'all') {
+                // If there are branch-specific stocks, use their sum. Otherwise fallback to p.stock
+                if (p.stocks && p.stocks.length > 0) {
+                    effectiveStock = p.stocks.reduce((sum: number, s: any) => sum + Number(s.quantity), 0);
+                } else {
+                    effectiveStock = Number(p.stock);
+                }
+            } else {
+                // Find stock for specific branch
+                const branchStock = p.stocks?.find((s: any) => s.branch === selectedBranch);
+                if (branchStock) {
+                    effectiveStock = Number(branchStock.quantity);
+                } else {
+                    // Fallback to p.stock ONLY if branch names match (legacy data)
+                    const pBranch = (p as any).branch || 'Merkez';
+                    effectiveStock = (pBranch === selectedBranch) ? Number(p.stock) : 0;
+                }
+            }
+            return { ...p, stock: effectiveStock };
+        }).filter(p => {
+            // Only show products that actually exist in this scope (positive stock or belongs to branch)
+            if (reportScope === 'all') return true;
+            const branchMatches = (p as any).branch === selectedBranch || (!(p as any).branch && selectedBranch === 'Merkez');
+            return branchMatches || p.stock > 0;
+        });
     }, [products, reportScope, selectedBranch]);
 
     // Filter customers by branch
