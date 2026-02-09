@@ -146,16 +146,17 @@ export async function GET(request: Request) {
             where: { tenantId: session.tenantId }
         });
 
-        if (!company) {
+        if (!company && session.tenantId !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
         }
 
         const { searchParams } = new URL(request.url);
         const branch = searchParams.get('branch');
 
-        const whereClause: any = {
-            companyId: company.id // Strict Tenant Isolation
-        };
+        const whereClause: any = {};
+        if (company) {
+            whereClause.companyId = company.id;
+        }
 
         if (branch && branch !== 'Tümü' && branch !== 'Merkez') {
             /* whereClause.branch = branch; */
