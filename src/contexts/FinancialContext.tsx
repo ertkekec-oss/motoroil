@@ -23,6 +23,7 @@ export interface Kasa {
     balance: number;
     type: string;
     branch?: string;
+    currency?: string;
 }
 
 export interface PaymentMethod {

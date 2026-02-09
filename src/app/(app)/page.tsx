@@ -463,9 +463,27 @@ function POSContent() {
 
         {paymentMode === 'card' && (
           <div className="grid grid-cols-4 gap-1 mb-4">
-            {[1, 2, 3, 6, 9, 12].map(i => (
-              <button key={i} onClick={() => setInstallmentCount(i)} className={`p-1 text-[10px] rounded border ${installmentCount === i ? 'bg-primary border-primary' : 'bg-transparent border-white/10'}`}>{i} Taksit</button>
-            ))}
+            {/* Dynamic POS Commissions */}
+            {appSettings?.salesExpenses?.posCommissions?.length > 0 ? (
+              appSettings.salesExpenses.posCommissions.map((comm: any, idx: number) => {
+                const count = comm.installment === 'Tek Çekim' ? 1 : parseInt(comm.installment);
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setInstallmentCount(count || 1)}
+                    className={`p-1 text-[10px] rounded border flex flex-col items-center justify-center ${installmentCount === (count || 1) ? 'bg-primary border-primary' : 'bg-transparent border-white/10'}`}
+                  >
+                    <span>{comm.installment}</span>
+                    <span className="text-[8px] opacity-60">%{comm.rate}</span>
+                  </button>
+                );
+              })
+            ) : (
+              // Fallback to hardcoded if no settings found
+              [1, 2, 3, 6, 9, 12].map(i => (
+                <button key={i} onClick={() => setInstallmentCount(i)} className={`p-1 text-[10px] rounded border ${installmentCount === i ? 'bg-primary border-primary' : 'bg-transparent border-white/10'}`}>{i} Taksit</button>
+              ))
+            )}
           </div>
         )}
 
@@ -528,7 +546,7 @@ function POSContent() {
                   <div key={sale.id} className="p-3 bg-white/5 rounded-xl border border-white/5 flex justify-between items-center">
                     <div>
                       <div className="font-bold text-amber-500">{sale.label}</div>
-                      <div className="text-xs opacity-50">{new Date(sale.date).toLocaleTimeString()} - {sale.items.length} Ürün</div>
+                      <div className="text-xs opacity-50">{new Date(sale.timestamp).toLocaleTimeString()} - {sale.items.length} Ürün</div>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="font-bold text-lg">₺{sale.total.toLocaleString()}</div>
