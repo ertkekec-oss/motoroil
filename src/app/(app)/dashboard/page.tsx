@@ -185,7 +185,10 @@ export default function DashboardPage() {
       .filter(k => k.type === 'Nakit')
       .reduce((sum, k) => sum + Number(k.balance || 0), 0);
 
-    const criticalStockCount = (products || []).filter(p => Number(p.stock) <= Number(p.minStock || 5)).length;
+    const criticalStockCount = (products || []).filter(p => {
+      const s = p.stocks?.reduce((acc: any, st: any) => acc + (st.quantity || 0), 0) ?? (p.stock || 0);
+      return s <= (p.minStock || 5);
+    }).length;
     const inTransitCount = (stockTransfers || []).filter(t => t.status === 'IN_TRANSIT').length;
 
     return {

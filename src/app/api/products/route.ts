@@ -3,20 +3,16 @@ import prisma from '@/lib/prisma';
 import { getSession, hasPermission } from '@/lib/auth';
 import { logActivity } from '@/lib/audit';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
     try {
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
-        // Resolve Company
-        const tenantId = (session as any).tenantId;
-        const company = await prisma.company.findFirst({ where: { tenantId } });
-        if (!company) return NextResponse.json({ success: true, products: [] });
-
         const products = await prisma.product.findMany({
             where: {
-                deletedAt: null,
-                companyId: company.id
+                deletedAt: null
             },
             orderBy: { createdAt: 'desc' },
             include: { stocks: true }

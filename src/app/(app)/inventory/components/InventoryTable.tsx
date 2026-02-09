@@ -167,7 +167,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className="flex items-center gap-2">
                                                         <div className={`w-1.5 h-1.5 rounded-full ${item.stock <= 0 ? 'bg-red-500' :
-                                                            item.stock <= 5 ? 'bg-amber-500' : 'bg-emerald-500'
+                                                            item.stock <= (item.minStock || 5) ? 'bg-amber-500' : 'bg-emerald-500'
                                                             }`}></div>
                                                         <span className="text-[12px] font-medium text-white/80">{item.stock} {item.unit || 'Adet'}</span>
                                                         <span className="text-[10px] text-white/30 ml-1">{item.branch || 'Merkez'}</span>

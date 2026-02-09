@@ -77,8 +77,8 @@ export function ModalProvider({ children }: { children: ReactNode }) {
         setModal(prev => ({ ...prev, isOpen: false }));
     };
 
-    const handleConfirm = () => {
-        if (modal.onConfirm) modal.onConfirm();
+    const handleConfirm = async () => {
+        if (modal.onConfirm) await modal.onConfirm();
         closeModal();
     };
 

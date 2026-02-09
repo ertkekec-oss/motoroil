@@ -8,6 +8,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         const session = await getSession();
         if (!session) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
+        const company = await (prisma as any).company.findFirst({
+            where: { tenantId: session.tenantId || 'PLATFORM_ADMIN' }
+        });
+        if (!company) throw new Error('Firma bulunamadı.');
+
+        const companyId = company.id;
+
         const result = await prisma.$transaction(async (tx) => {
             // 1. Fetch Quote
             const quote = await tx.quote.findUnique({
@@ -19,13 +26,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             if (quote.status === 'Converted') throw new Error('Bu teklif zaten faturalandırılmış.');
 
             const items: any[] = quote.items as any[];
-            const branch = quote.branch || session.branch || 'Merkez';
+            const branch = quote.branch || (session as any).branch || 'Merkez';
 
             // 2. Create Sales Invoice
             const invoice = await tx.salesInvoice.create({
                 data: {
-                    invoiceNo: `INV-${Date.now()}`, // Or generate a sequential ID
+                    invoiceNo: `INV-${Date.now()}`,
                     customerId: quote.customerId,
+                    companyId: companyId,
                     description: `Tekliften dönüştürüldü: ${quote.quoteNo} - ${quote.description || ''}`,
                     amount: quote.subTotal,
                     taxAmount: quote.taxAmount,
@@ -50,18 +58,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             });
 
             // 5. Update Stock
-            const updates = [];
             for (const item of items) {
                 if (item.productId) {
                     const qty = Number(item.quantity || 1);
 
-                    // Main Stock
-                    await tx.product.update({
-                        where: { id: String(item.productId) },
-                        data: { stock: { decrement: qty } }
-                    });
-
-                    // Branch Stock
+                    // Branch Stock (Modern)
                     await tx.stock.upsert({
                         where: { productId_branch: { productId: String(item.productId), branch: branch } },
                         create: { productId: String(item.productId), branch: branch, quantity: -qty },
@@ -73,6 +74,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
                         data: {
                             productId: String(item.productId),
                             branch: branch,
+                            companyId: companyId,
                             quantity: -qty,
                             price: item.price || 0,
                             type: 'SALE',
@@ -80,6 +82,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
                             details: `Sales Invoice: ${invoice.invoiceNo}`
                         }
                     });
+
+                    // Legacy sync for Merkez
+                    if (branch === 'Merkez') {
+                        await tx.product.update({
+                            where: { id: String(item.productId) },
+                            data: { stock: { decrement: qty } }
+                        });
+                    }
                 }
             }
 
@@ -88,6 +98,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             if (defaultKasa) {
                 await tx.transaction.create({
                     data: {
+                        companyId: companyId,
                         type: 'SalesInvoice',
                         amount: quote.totalAmount,
                         description: `Faturalı Satış (Teklif: ${quote.quoteNo}): ${invoice.invoiceNo}`,

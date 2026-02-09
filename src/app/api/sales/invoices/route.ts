@@ -272,6 +272,7 @@ export async function POST(request: Request) {
                 data: {
                     invoiceNo: `INV-${Date.now()}`,
                     customerId,
+                    companyId: customer?.companyId || (session as any).companyId,
                     amount,
                     taxAmount,
                     totalAmount,
@@ -293,6 +294,7 @@ export async function POST(request: Request) {
                 if (defaultKasa) {
                     await tx.transaction.create({
                         data: {
+                            companyId: customer?.companyId || invoice.companyId,
                             type: 'SalesInvoice',
                             amount: totalAmount,
                             description: `Faturalı Satış: ${invoice.invoiceNo}`,
@@ -318,6 +320,7 @@ export async function POST(request: Request) {
                             data: {
                                 productId: pId,
                                 branch: String(targetBranch),
+                                companyId: customer?.companyId || invoice.companyId,
                                 quantity: -qty,
                                 price: item.price || 0,
                                 type: 'SALE',

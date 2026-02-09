@@ -167,9 +167,11 @@ function POSContent() {
   const finalTotal = Math.max(0, subtotal - totalDiscount);
   const customer = customers.find(c => c.name === selectedCustomer);
 
+  const processingRef = useRef(false);
+
   // --- HANDLERS ---
   const handleFinalize = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || processingRef.current || isProcessing) return;
     if (!paymentMode) return showWarning("Hata", "Lütfen bir ödeme yöntemi seçiniz.");
     if (paymentMode !== 'account' && !selectedKasa) return showWarning("Hata", "Lütfen kasa/banka seçiniz.");
     if (paymentMode === 'account' && selectedCustomer === 'Perakende Müşteri') return showWarning("Hata", "Perakende müşterisine veresiye satılamaz.");
@@ -177,6 +179,7 @@ function POSContent() {
     const canContinue = await checkUpsell('INVOICE_PAGE');
     if (!canContinue) return;
 
+    processingRef.current = true;
     setIsProcessing(true);
     try {
       const success = await processSale({
@@ -208,7 +211,10 @@ function POSContent() {
         showError("Hata", "Satış kaydedilemedi.");
       }
     } catch (e: any) { showError("Hata", e.message); }
-    finally { setIsProcessing(false); }
+    finally {
+      setIsProcessing(false);
+      processingRef.current = false;
+    }
   };
 
   const handleValidateCoupon = async () => {

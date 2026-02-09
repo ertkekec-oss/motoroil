@@ -41,8 +41,8 @@ export async function POST(request: Request) {
         });
 
         if (targetUser) {
-            // Staff members are platform admins by default for isolation purposes
-            (targetUser as any).tenantId = 'PLATFORM_ADMIN';
+            // Respect existing tenantId if set (e.g. for tenant-level staff), otherwise default to PLATFORM_ADMIN
+            (targetUser as any).tenantId = targetUser.tenantId || 'PLATFORM_ADMIN';
         }
 
         // 2. Search in User if not found in Staff

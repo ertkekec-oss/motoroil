@@ -89,10 +89,11 @@ const prismaClientSingleton = () => {
                     if (session) {
                         const role = session.role?.toUpperCase() || '';
 
-                        // --- 2. Logging for SUPER_ADMIN / PLATFORM_ADMIN Bypass ---
-                        if (role === 'SUPER_ADMIN' || session.tenantId === 'PLATFORM_ADMIN') {
-                            if (operation !== 'findUnique' && operation !== 'findFirst') { // Avoid spamming common lookups
-                                console.log(`[SECURITY] ${role} (${session.username}) bypassed tenant isolation for ${model}.${operation}`);
+                        // --- 2. Platform Admin Bypass ---
+                        // Users in PLATFORM_ADMIN tenant with ADMIN or SUPER_ADMIN roles can bypass isolation
+                        if (session.tenantId === 'PLATFORM_ADMIN' && (role === 'SUPER_ADMIN' || role === 'ADMIN')) {
+                            if (operation !== 'findUnique' && operation !== 'findFirst') {
+                                console.log(`[SECURITY] PLATFORM_ADMIN_BYPASS (${session.username}) for ${model}.${operation}`);
                             }
                             return query(args);
                         }
@@ -133,7 +134,7 @@ const prismaClientSingleton = () => {
                             else if (modelName === 'user') { a.where = { ...a.where, tenantId }; }
                             else if (modelName === 'tenant') { a.where = { ...a.where, id: tenantId }; }
                             else if (modelName === 'subscription') { a.where = { ...a.where, tenantId }; }
-                            else if (modelName === 'staff') { return query(args); }
+                            else if (modelName === 'staff') { a.where = { ...a.where, tenantId }; }
                             else { a.where = { ...a.where, company: { tenantId: tenantId } }; }
                         }
 
@@ -143,6 +144,7 @@ const prismaClientSingleton = () => {
                             else if (modelName === 'user') { a.where = { ...a.where, tenantId }; }
                             else if (modelName === 'tenant') { a.where = { ...a.where, id: tenantId }; }
                             else if (modelName === 'subscription') { a.where = { ...a.where, tenantId }; }
+                            else if (modelName === 'staff') { a.where = { ...a.where, tenantId }; }
                             else { a.where = { ...a.where, company: { tenantId: tenantId } }; }
                         }
 

@@ -2,6 +2,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { stornoJournalEntry } from '@/lib/accounting';
+import { getSession } from '@/lib/auth';
+import { logActivity } from '@/lib/audit';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -35,6 +37,8 @@ export async function DELETE(
             return NextResponse.json({ success: false, error: 'Sipariş bulunamadı.' }, { status: 404 });
         }
 
+        const targetBranch = order.branch || 'Merkez';
+
         // Reversal logic for POS
         await prisma.$transaction(async (tx) => {
             // 1. Revert Stocks
@@ -42,12 +46,38 @@ export async function DELETE(
             if (Array.isArray(items)) {
                 for (const item of items) {
                     if (item.productId) {
+                        const qty = Number(item.qty || item.quantity || 1);
                         try {
-                            await tx.product.update({
-                                where: { id: String(item.productId) },
-                                data: { stock: { increment: Number(item.qty || item.quantity || 1) } }
+                            // Sync Stock Record (increment because we are returning items to shelf)
+                            await tx.stock.upsert({
+                                where: { productId_branch: { productId: String(item.productId), branch: targetBranch } },
+                                update: { quantity: { increment: qty } },
+                                create: { productId: String(item.productId), branch: targetBranch, quantity: qty }
                             });
-                        } catch (e) { console.error("Stock reversal error:", e); }
+
+                            // Create Stock Movement
+                            await (tx as any).stockMovement.create({
+                                data: {
+                                    productId: String(item.productId),
+                                    branch: targetBranch,
+                                    companyId: order.companyId,
+                                    quantity: qty,
+                                    type: 'RETURN',
+                                    referenceId: order.id,
+                                    price: Number(item.price || 0)
+                                }
+                            });
+
+                            // Revert Legacy field if Merkez
+                            if (targetBranch === 'Merkez') {
+                                await tx.product.update({
+                                    where: { id: String(item.productId) },
+                                    data: { stock: { increment: qty } }
+                                });
+                            }
+                        } catch (e) {
+                            console.error("Stock reversal error:", e);
+                        }
                     }
                 }
             }

@@ -11,7 +11,12 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const branch = searchParams.get('branch');
 
-    const where: any = { deletedAt: null };
+    // Strict Tenant Isolation for GET
+    const where: any = {
+        deletedAt: null,
+        tenantId: auth.user.tenantId || 'PLATFORM_ADMIN'
+    };
+
     if (branch && branch !== 'all') {
         where.branch = branch;
     }
@@ -34,7 +39,7 @@ export async function POST(req: Request) {
     try {
         const body = await req.json();
 
-        const { name, role, salary, branch, phone, email, type, username } = body;
+        const { name, role, salary, branch, phone, email, type, username, companyId } = body;
 
         // Basic validation
         if (!name) return NextResponse.json({ success: false, error: 'İsim zorunludur' }, { status: 400 });
@@ -49,6 +54,8 @@ export async function POST(req: Request) {
                 branch: branch || 'Merkez',
                 email,
                 type: type || 'service',
+                tenantId: auth.user.tenantId || 'PLATFORM_ADMIN',
+                companyId: companyId || auth.user.companyId
             }
         });
 

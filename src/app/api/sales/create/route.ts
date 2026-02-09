@@ -106,12 +106,42 @@ export async function POST(request: Request) {
 
             // B. Update Product Stocks
             if (Array.isArray(items)) {
+                const targetBranch = branch || 'Merkez';
                 for (const item of items) {
                     if (item.productId) {
-                        await tx.product.update({
-                            where: { id: String(item.productId) },
-                            data: { stock: { decrement: Number(item.qty || item.quantity || 1) } }
-                        }).catch(e => console.error("Stock update error:", e));
+                        const qty = Number(item.qty || item.quantity || 1);
+
+                        // 1. Update/Upsert Stock Record
+                        await tx.stock.upsert({
+                            where: { productId_branch: { productId: String(item.productId), branch: targetBranch } },
+                            update: { quantity: { decrement: qty } },
+                            create: {
+                                productId: String(item.productId),
+                                branch: targetBranch,
+                                quantity: -qty
+                            }
+                        });
+
+                        // 2. Log Movement
+                        await tx.stockMovement.create({
+                            data: {
+                                productId: String(item.productId),
+                                branch: targetBranch,
+                                companyId: company?.id,
+                                quantity: -qty,
+                                type: 'SALE',
+                                referenceId: order.id,
+                                price: Number(item.price || 0)
+                            }
+                        });
+
+                        // 3. Sync Legacy Field if Merkez
+                        if (targetBranch === 'Merkez') {
+                            await tx.product.update({
+                                where: { id: String(item.productId) },
+                                data: { stock: { decrement: qty } }
+                            }).catch(e => console.error("Legacy stock sync error:", e));
+                        }
                     }
                 }
             }

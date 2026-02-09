@@ -76,8 +76,26 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
         setProducts(prev => prev.map(p => {
             const item = saleData.items.find((si: any) => String(si.productId) === String(p.id));
             if (item) {
-                const newStock = p.stock - item.qty;
-                return { ...p, stock: newStock, status: newStock <= 0 ? 'out' : (newStock < 5 ? 'low' : 'ok') };
+                // Update legacy stock
+                const newStock = (p.stock || 0) - item.qty;
+
+                // Update multi-branch stocks optimistically
+                const newStocks = (p.stocks || []).map((s: any) => {
+                    if (s.branch === saleBranch) {
+                        return { ...s, quantity: (s.quantity || 0) - item.qty };
+                    }
+                    return s;
+                });
+
+                // If branch wasn't found in stocks, consider adding it if it's Merkez or similar
+                // But for optimistic, we usually expect it to exist if they are selling from it.
+
+                return {
+                    ...p,
+                    stock: newStock,
+                    stocks: newStocks,
+                    status: newStock <= 0 ? 'out' : (newStock < 5 ? 'low' : 'ok')
+                };
             }
             return p;
         }));

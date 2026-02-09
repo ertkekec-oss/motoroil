@@ -32,14 +32,14 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
     if (!user) {
         const staff = await (prisma as any).staff.findUnique({
             where: { id: session.id },
-            select: { id: true, role: true, lastActive: true }
+            select: { id: true, role: true, lastActive: true, tenantId: true }
         });
 
         if (staff) {
             isStaff = true;
             user = {
                 id: staff.id,
-                tenantId: 'PLATFORM_ADMIN',
+                tenantId: staff.tenantId || 'PLATFORM_ADMIN',
                 role: (staff.role || 'Staff').toUpperCase(),
                 lastActiveAt: staff.lastActive
             };

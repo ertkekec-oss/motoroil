@@ -17,12 +17,19 @@ export async function POST(request: Request) {
 
         const body = await request.json();
         const { supplierId, invoiceNo, invoiceDate, items, totalAmount } = body;
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId || 'PLATFORM_ADMIN' }
+        });
+        if (!company) return NextResponse.json({ error: 'Firma bulunamadı' }, { status: 404 });
+
+        const companyId = company.id;
 
         const result = await prisma.$transaction(async (tx) => {
             // 1. Create Purchase Invoice
             const invoice = await tx.purchaseInvoice.create({
                 data: {
                     invoiceNo,
+                    companyId: companyId,
                     invoiceDate: new Date(invoiceDate),
                     amount: totalAmount,
                     totalAmount: totalAmount,
@@ -35,19 +42,27 @@ export async function POST(request: Request) {
             // 2. Update Product Stocks & Record Movements
             for (const item of items) {
                 if (item.productId) {
-                    const branch = session.branch || 'Merkez';
+                    const branch = (session as any).branch || 'Merkez';
 
-                    // Update Product table
-                    await tx.product.update({
-                        where: { id: item.productId },
-                        data: { stock: { increment: item.qty }, buyPrice: item.price }
-                    });
+                    // Update Product table (legacy sync)
+                    if (branch === 'Merkez') {
+                        await tx.product.update({
+                            where: { id: item.productId },
+                            data: { stock: { increment: item.qty }, buyPrice: item.price }
+                        });
+                    } else {
+                        await tx.product.update({
+                            where: { id: item.productId },
+                            data: { buyPrice: item.price }
+                        });
+                    }
 
-                    // Record FIFO Movement
+                    // Record Movement
                     await (tx as any).stockMovement.create({
                         data: {
                             productId: item.productId,
                             branch: branch as string,
+                            companyId: companyId,
                             quantity: item.qty,
                             price: item.price,
                             type: 'PURCHASE',
@@ -64,15 +79,16 @@ export async function POST(request: Request) {
                 }
             }
 
-            // 3. Create Financial Transaction (for tracking in Finansal Hareketler)
+            // 3. Create Financial Transaction
             const transaction = await tx.transaction.create({
                 data: {
+                    companyId: companyId,
                     type: 'Purchase',
                     amount: totalAmount,
                     description: `Alış Faturası: ${invoiceNo} - ${(await tx.supplier.findUnique({ where: { id: supplierId } }))?.name || 'Tedarikçi'}`,
-                    kasaId: null, // Alış genelde vadeli, ödeme ayrı yapılır
+                    kasaId: null,
                     supplierId: supplierId,
-                    branch: session.branch as string || 'Merkez'
+                    branch: (session as any).branch || 'Merkez'
                 }
             });
 
@@ -91,13 +107,13 @@ export async function POST(request: Request) {
                 entityId: invoice.id,
                 newData: invoice,
                 details: `${invoiceNo} numaralı alış faturası işlendi.`,
-                branch: session.branch as string
+                branch: (session as any).branch || 'Merkez'
             });
 
             return { invoice, transaction };
         });
 
-        // Create Accounting Journal Entry (in background, non-blocking)
+        // Create Accounting Journal Entry (in background)
         (async () => {
             try {
                 const { createJournalFromTransaction } = await import('@/lib/accounting');

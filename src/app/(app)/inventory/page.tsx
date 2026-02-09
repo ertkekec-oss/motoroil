@@ -127,13 +127,33 @@ function InventoryContent() {
     const [showCloseWarning, setShowCloseWarning] = useState(false);
     const [showValueModal, setShowValueModal] = useState(false);
 
+    const getEffectiveStock = (p: any, branchName: string | null) => {
+        if (!p.stocks || !Array.isArray(p.stocks)) return p.stock || 0;
+
+        if (!branchName || branchName === 'Tümü' || branchName === 'Hepsi' || branchName === 'all') {
+            // Aggregate all branches for "All" view
+            return p.stocks.reduce((acc: number, s: any) => acc + (s.quantity || 0), 0);
+        }
+
+        const entry = p.stocks.find((s: any) => s.branch === branchName);
+        return entry ? (entry.quantity || 0) : 0;
+    };
+
+    const mappedProducts = useMemo(() => {
+        if (!products) return [];
+        return products.map(p => {
+            const effectiveStock = getEffectiveStock(p, activeBranchName);
+            return { ...p, stock: effectiveStock, originalStock: p.stock };
+        });
+    }, [products, activeBranchName]);
+
     const inventoryValueResult = () => {
         let buyExt = 0;
         let buyInc = 0;
         let sellExt = 0;
         let sellInc = 0;
 
-        (products || []).forEach(p => {
+        mappedProducts.forEach(p => {
             const qty = p.stock || 0;
             const bVat = p.purchaseVat || 20;
             const sVat = p.salesVat || 20;
@@ -173,30 +193,7 @@ function InventoryContent() {
 
     // Memoized filtering
     const filteredProducts = useMemo(() => {
-        if (!products) return [];
-
-        // Map products to include relevant stock for the current branch
-        const mappedProducts = products.map(p => {
-            // If p.stocks is available (from new API), use it. Fallback to p.stock for old data/safety.
-            let effectiveStock = p.stock || 0;
-
-            if (p.stocks && Array.isArray(p.stocks)) {
-                // Defines which branch's stock to show
-                const targetBranch = (activeBranchName && activeBranchName !== 'Tümü' && activeBranchName !== 'Hepsi')
-                    ? activeBranchName
-                    : 'Merkez';
-
-                const stockEntry = p.stocks.find((s: any) => s.branch === targetBranch);
-                // If we found an entry, use it. If not, and we are looking for a specific branch, it's 0.
-                // If we are looking for Merkez and no entry exists, maybe fallback to p.stock?
-                if (stockEntry) {
-                    effectiveStock = stockEntry.quantity;
-                } else if (targetBranch !== 'Merkez' && !stockEntry) {
-                    effectiveStock = 0;
-                }
-            }
-            return { ...p, stock: effectiveStock, originalStock: p.stock };
-        });
+        if (!mappedProducts) return [];
 
         return mappedProducts.filter((p: any) => {
             const matchesSearch = (p.name || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
@@ -851,11 +848,11 @@ function InventoryContent() {
                         <div>
                             <div className="text-muted text-xs font-bold uppercase tracking-wider mb-1">Kritik Stok</div>
                             <div className="text-3xl font-black text-red-400">
-                                {(products || []).filter(p => (p.stock || 0) <= 5).length}
+                                {mappedProducts.filter(p => (p.stock || 0) <= (p.minStock || 5)).length}
                             </div>
                         </div>
                         <div className="text-[10px] text-red-500/50 font-medium mt-4">
-                            {(products || []).filter(p => (p.stock || 0) <= 0).length} ürün tükendi
+                            {mappedProducts.filter(p => (p.stock || 0) <= 0).length} ürün tükendi
                         </div>
                     </div>
                 </div>
@@ -863,7 +860,7 @@ function InventoryContent() {
 
             {!isCounting && activeTab === 'all' && (
                 <CriticalStockBanner
-                    products={products || []}
+                    products={mappedProducts}
                     onFilterCritical={() => {
                         setSpecialFilter('critical-stock');
                         setActiveTab('all');

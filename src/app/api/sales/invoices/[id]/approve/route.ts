@@ -30,14 +30,38 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
         // 2. Update Stocks
         const items = invoice.items as any[];
+        const targetBranch = invoice.branch || 'Merkez';
         for (const item of items) {
             if (item.productId) {
-                await prisma.product.update({
-                    where: { id: item.productId },
+                const qty = Number(item.qty || 1);
+
+                // Update Stock table (branch specific)
+                await prisma.stock.upsert({
+                    where: { productId_branch: { productId: item.productId, branch: targetBranch } },
+                    update: { quantity: { decrement: qty } },
+                    create: { productId: item.productId, branch: targetBranch, quantity: -qty }
+                });
+
+                // Create Stock Movement
+                await (prisma as any).stockMovement.create({
                     data: {
-                        stock: { decrement: item.qty }
+                        productId: item.productId,
+                        branch: targetBranch,
+                        companyId: invoice.companyId,
+                        quantity: -qty,
+                        type: 'SALE',
+                        referenceId: invoice.id,
+                        price: item.price || 0
                     }
-                }).catch(e => console.error(`Stock update failed for ${item.productId}`, e));
+                });
+
+                // Sync Legacy Field if Merkez
+                if (targetBranch === 'Merkez') {
+                    await prisma.product.update({
+                        where: { id: item.productId },
+                        data: { stock: { decrement: qty } }
+                    }).catch(e => console.error(`Legacy stock sync failed for ${item.productId}`, e));
+                }
             }
         }
 

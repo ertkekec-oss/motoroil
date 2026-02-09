@@ -70,6 +70,7 @@ model Company {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   Journal           Journal[]
+  staff            Staff[]
   MarketplaceConfig MarketplaceConfig[]
 
   @@unique([tenantId, vkn])
@@ -706,6 +707,8 @@ model SuspendedSale {
 
 model Staff {
   id               String          @id @default(cuid())
+  tenantId         String?         @default("PLATFORM_ADMIN")
+  companyId        String?
   username         String          @unique
   password         String?
   email            String?
@@ -714,6 +717,13 @@ model Staff {
   role             String?
   branch           String?         @default("Merkez")
   type             String?         @default("service")
+  
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([companyId])
+  @@index([username])
+
   status           String?         @default("Boşta")
   currentJob       String?
   permissions      String[]        @default([])
@@ -736,7 +746,6 @@ model Staff {
   salesOrders      SalesOrder[]
   targets          StaffTarget[]
 
-  @@index([username])
 }
 
 model Message {

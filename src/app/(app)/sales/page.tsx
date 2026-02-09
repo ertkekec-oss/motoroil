@@ -153,8 +153,12 @@ export default function SalesPage() {
         }
     }, [activeTab, invoiceSubTab]);
 
+    const [isApprovincing, setIsApproving] = useState<string | null>(null);
+
     const handleApproveInvoice = async (id: string) => {
+        if (isApprovincing) return;
         showConfirm('Onay', 'Bu faturayı onaylamak istiyor musunuz? Stoklar düşülecek ve cari bakiye güncellenecektir.', async () => {
+            setIsApproving(id);
             try {
                 const res = await fetch(`/api/sales/invoices/${id}/approve`, { method: 'POST' });
                 const data = await res.json();
@@ -163,6 +167,7 @@ export default function SalesPage() {
                     fetchInvoices();
                 } else { showError('Hata', '❌ Hata: ' + data.error); }
             } catch (e) { showError('Hata', 'Hata oluştu.'); }
+            finally { setIsApproving(null); }
         });
     };
 
@@ -189,6 +194,8 @@ export default function SalesPage() {
     };
 
     const handleSendToELogo = async (invoiceId: string, type: 'EARSIV' | 'EFATURA' | 'EIRSALIYE') => {
+        if (isProcessingAction) return;
+
         if (type === 'EIRSALIYE') {
             setSelectedInvoiceForDespatch(invoiceId);
             setShowDespatchModal(true);
@@ -199,6 +206,7 @@ export default function SalesPage() {
         const msg = 'Bu faturayı e-Fatura/e-Arşiv olarak resmileştirmek istiyor musunuz? Müşteri VKN durumuna göre otomatik belirlenecektir.';
 
         showConfirm(title, msg, async () => {
+            setIsProcessingAction(invoiceId);
             try {
                 const res = await fetch('/api/sales/invoices', {
                     method: 'POST',
@@ -226,8 +234,8 @@ export default function SalesPage() {
                     const technicalDetail = (data.errorCode ? ` (Hata Kodu: ${data.errorCode})` : '') + (data.details ? `\nDetay: ${data.details}` : '');
                     showError('Hata', '❌ ' + (data.error || 'Gönderim başarısız') + technicalDetail);
                 }
-            } catch (e: any) {
-                showError('Hata', 'Bağlantı hatası: ' + e.message);
+            } finally {
+                setIsProcessingAction(null);
             }
         });
     };
@@ -244,7 +252,8 @@ export default function SalesPage() {
     });
 
     const handleFinalSendDespatch = async () => {
-        if (!selectedInvoiceForDespatch) return;
+        if (!selectedInvoiceForDespatch || isSendingDespatch) return;
+        setIsSendingDespatch(true);
 
         try {
             const res = await fetch('/api/sales/invoices', {
@@ -271,10 +280,14 @@ export default function SalesPage() {
             } else {
                 showError('Hata', '❌ ' + (data.error || 'Gönderim başarısız'));
             }
-        } catch (e: any) {
-            showError('Hata', 'Bağlantı hatası: ' + e.message);
+        } finally {
+            setIsSendingDespatch(false);
         }
     };
+
+    const [isSavingWayslip, setIsSavingWayslip] = useState(false);
+
+    const [isSendingDespatch, setIsSendingDespatch] = useState(false);
 
     const [newWayslipData, setNewWayslipData] = useState({
         customerId: '',
@@ -323,16 +336,18 @@ export default function SalesPage() {
                 showSuccess('Başarılı', '✅ İrsaliye oluşturuldu (Sistem Kaydına Eklendi).');
                 setView('list');
             }
-        } catch (e) {
-            showSuccess('Başarılı', '✅ İrsaliye oluşturuldu (Local Kayıt).');
-            setView('list');
+        } finally {
+            setIsSavingWayslip(false);
         }
     };
 
+    const [isProcessingAction, setIsProcessingAction] = useState<string | null>(null);
+
     const handleAcceptPurchaseInvoice = async (id: string) => {
+        if (isProcessingAction) return;
         showConfirm('Kabul Et', 'Bu faturayı kabul etmek ve stoklara işlemek istediğinize emin misiniz?', async () => {
+            setIsProcessingAction(id);
             try {
-                // Simulate approve endpoint
                 const res = await fetch(`/api/purchasing/${id}/approve`, { method: 'POST' });
                 const data = await res.json();
                 if (data.success) {
@@ -340,6 +355,7 @@ export default function SalesPage() {
                     fetchPurchaseInvoices();
                 } else { showError('Hata', data.error || 'İşlem başarısız.'); }
             } catch (e) { showError('Hata', 'Bağlantı hatası.'); }
+            finally { setIsProcessingAction(null); }
         });
     };
 
@@ -1736,11 +1752,11 @@ export default function SalesPage() {
                                             onClick={finalizeInvoice}
                                             className="btn btn-primary w-full"
                                             style={{ padding: '16px', fontWeight: 'bold', marginTop: '20px', fontSize: '15px' }}
-                                            disabled={selectedOrder.items.some((i: any) => !mappedItems[i.name])}
+                                            disabled={isLoadingMapping || selectedOrder.items.some((i: any) => !mappedItems[i.name])}
                                         >
-                                            {selectedOrder.items.some((i: any) => !mappedItems[i.name]) ?
-                                                '⚠️ Lütfen Eşleşmeyen Ürünleri Seçin' :
-                                                '✅ KAYDET VE FATURAYI OLUŞTUR'
+                                            {isLoadingMapping ? '⌛ İŞLENİYOR...' : (selectedOrder.items.some((i: any) => !mappedItems[i.name]) ?
+                                                '⚠️ Lütfen Eşleştirme Seçin' :
+                                                '✅ KAYDET VE FATURAYI OLUŞTUR')
                                             }
                                         </button>
                                     </div>
@@ -1860,8 +1876,9 @@ export default function SalesPage() {
                                 <button onClick={() => setView('list')} className="btn btn-ghost">Vazgeç</button>
                                 <button
                                     onClick={handleSaveWayslip}
+                                    disabled={isSavingWayslip}
                                     className="btn btn-primary px-8 py-3 font-bold"
-                                >Oluştur ve Kaydet</button>
+                                >{isSavingWayslip ? 'Kaydediliyor...' : 'Oluştur ve Kaydet'}</button>
                             </div>
                         </div>
                     </div>
@@ -1958,9 +1975,10 @@ export default function SalesPage() {
                                     </button>
                                     <button
                                         onClick={handleFinalSendDespatch}
+                                        disabled={isSendingDespatch}
                                         className="px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all"
                                     >
-                                        Resmileştir ve Gönder
+                                        {isSendingDespatch ? 'GÖNDERİLİYOR...' : 'Resmileştir ve Gönder'}
                                     </button>
                                 </div>
                             </div>

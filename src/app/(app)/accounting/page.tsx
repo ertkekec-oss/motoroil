@@ -419,27 +419,77 @@ export default function AccountingPage() {
                             <table className="w-full text-left text-sm text-white/70">
                                 <thead className="text-xs font-bold text-white/30 uppercase border-b border-white/5">
                                     <tr>
-                                        <th className="py-3">Tarih</th>
-                                        <th className="py-3">İşlem Türü</th>
+                                        <th className="py-3">Tarih / Saat</th>
+                                        <th className="py-3">İşlem</th>
+                                        <th className="py-3">Cari / Hesap</th>
                                         <th className="py-3">Açıklama</th>
                                         <th className="py-3 text-right">Tutar</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
-                                    {transactions.map((tx, i) => (
-                                        <tr key={i} className="hover:bg-white/5">
-                                            <td className="py-3">{new Date(tx.date).toLocaleDateString('tr-TR')}</td>
-                                            <td className="py-3">
-                                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${['Sales', 'Collection', 'SalesInvoice'].includes(tx.type) ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
-                                                    {['Sales', 'Collection', 'SalesInvoice'].includes(tx.type) ? 'GELİR' : 'GİDER'}
-                                                </span>
-                                            </td>
-                                            <td className="py-3 font-medium text-white">{tx.description}</td>
-                                            <td className={`py-3 text-right font-bold ${['Sales', 'Collection', 'SalesInvoice'].includes(tx.type) ? 'text-emerald-400' : 'text-rose-400'}`}>{formatCurrency(tx.amount)}</td>
-                                        </tr>
-                                    ))}
+                                    {transactions.map((tx: any, i) => {
+                                        const isIncome = ['Sales', 'Collection', 'SalesInvoice'].includes(tx.type);
+
+                                        // Helper for transaction type label
+                                        const getTxLabel = (type: string) => {
+                                            const labels: Record<string, string> = {
+                                                'Sales': 'Satış',
+                                                'SalesInvoice': 'Satış (Fatura)',
+                                                'Collection': 'Tahsilat',
+                                                'Payment': 'Ödeme',
+                                                'Purchase': 'Alım / Borç',
+                                                'Expense': 'Gider',
+                                                'Transfer': 'Transfer'
+                                            };
+                                            return labels[type] || type;
+                                        };
+
+                                        // Helper for Cari name
+                                        const getCariName = () => {
+                                            if (tx.customerId) {
+                                                const c = customers.find(x => String(x.id) === String(tx.customerId));
+                                                return c ? c.name : `Müşteri (ID: ${tx.customerId})`;
+                                            }
+                                            if (tx.supplierId) {
+                                                const s = suppliers.find(x => String(x.id) === String(tx.supplierId));
+                                                return s ? s.name : `Tedarikçi (ID: ${tx.supplierId})`;
+                                            }
+                                            if (tx.description?.startsWith('POS:')) {
+                                                return tx.description.replace('POS:', '').trim();
+                                            }
+                                            return "Genel / Kasa";
+                                        };
+
+                                        return (
+                                            <tr key={i} className="hover:bg-white/5 border-b border-white/[0.02]">
+                                                <td className="py-4 text-[11px] font-medium opacity-60">
+                                                    {new Date(tx.date).toLocaleString('tr-TR', {
+                                                        day: '2-digit', month: '2-digit', year: 'numeric',
+                                                        hour: '2-digit', minute: '2-digit'
+                                                    })}
+                                                </td>
+                                                <td className="py-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="font-bold text-white text-xs">{getTxLabel(tx.type)}</span>
+                                                        <span className={`w-fit px-1.5 py-0.5 rounded text-[9px] font-black tracking-tighter ${isIncome ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                                                            {isIncome ? 'GELİR' : 'GİDER'}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="py-4 font-bold text-white/90 text-xs">
+                                                    {getCariName()}
+                                                </td>
+                                                <td className="py-4 text-xs opacity-50 truncate max-w-[200px]" title={tx.description}>
+                                                    {tx.description}
+                                                </td>
+                                                <td className={`py-4 text-right font-black ${isIncome ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                                    {formatCurrency(tx.amount)}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                     {transactions.length === 0 && (
-                                        <tr><td colSpan={4} className="text-center py-8 text-white/30">İşlem kaydı bulunamadı.</td></tr>
+                                        <tr><td colSpan={5} className="text-center py-8 text-white/30">İşlem kaydı bulunamadı.</td></tr>
                                     )}
                                 </tbody>
                             </table>
