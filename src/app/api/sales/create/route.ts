@@ -223,17 +223,34 @@ export async function POST(request: Request) {
                         console.log(`[Commission] Finding config for: labelRaw="${instLabelRaw}", fallback="${instLabelFallback}", instCount=${instCount}`);
 
                         // Case-insensitive and trimmed lookup
+                        const lookups = [
+                            String(instLabelRaw || '').toLowerCase().trim(),
+                            String(instLabelFallback || '').toLowerCase().trim(),
+                            (instCount === 1 ? 'tek çekim' : ''),
+                            (instCount === 1 ? 'nakit' : ''),
+                            (instCount === 1 ? 'peşin' : '')
+                        ].filter(Boolean);
+
                         let commissionConfig = salesExpenses.posCommissions.find((c: any) => {
                             const configLabel = String(c.installment || '').toLowerCase().trim();
-                            const lookups = [
-                                String(instLabelRaw || '').toLowerCase().trim(),
-                                String(instLabelFallback || '').toLowerCase().trim(),
-                                (instCount === 1 ? 'tek çekim' : ''),
-                                (instCount === 1 ? 'nakit/tek' : ''),
-                                (instCount === 1 ? 'peşin' : '')
-                            ].filter(Boolean);
+                            // Extract number from config (e.g. "3 Taksit" -> 3, "3" -> 3)
+                            const configNum = parseInt(configLabel.replace(/\D/g, ''));
 
-                            return lookups.includes(configLabel);
+                            // 1. Direct String Match against lookups
+                            if (lookups.includes(configLabel)) return true;
+
+                            // 2. Numeric Match (for installments > 1)
+                            // If config is "3" and count is 3, match.
+                            if (instCount > 1 && !isNaN(configNum) && configNum === instCount) {
+                                return true;
+                            }
+
+                            // 3. Special Case for "Tek Çekim" / "Peşin"
+                            if (instCount === 1) {
+                                return ['tek', 'tek çekim', 'peşin', 'nakit', '1', '1 taksit'].includes(configLabel);
+                            }
+
+                            return false;
                         });
 
                         if (commissionConfig) {
