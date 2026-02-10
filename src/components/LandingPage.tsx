@@ -182,7 +182,10 @@ export default function LandingPage() {
   );
 
   const renderSection = (section: any) => {
-    const { type, content } = section;
+    const { type: rawType, content } = section;
+    const type = rawType?.toString().toUpperCase();
+
+    if (!content) return null;
     if (!content) return null;
 
     switch (type) {
