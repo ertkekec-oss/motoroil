@@ -814,7 +814,7 @@ export default function LandingPage() {
       }
 
       {/* Main Content Sections */}
-      {sections.length > 0 ? (
+      {sections.filter((s: any) => s.type !== 'NAV' && s.type !== 'BANNER' && s.type !== 'FOOTER').length > 0 ? (
         sections
           .filter((s: any) => s.type !== 'NAV' && s.type !== 'BANNER' && s.type !== 'FOOTER')
           .map((section: any) => renderSection(section))
