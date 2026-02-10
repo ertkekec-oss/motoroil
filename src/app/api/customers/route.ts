@@ -147,26 +147,30 @@ export async function POST(request: Request) {
             if (referredByCode) {
                 const searchCode = referredByCode.trim().toUpperCase();
                 const referrer = await tx.customer.findUnique({ where: { referralCode: searchCode } });
+
                 if (referrer) {
                     const settings = await tx.appSettings.findUnique({ where: { key: 'referralSettings' } });
                     const s = (settings?.value as any) || { referrerDiscount: 10, refereeGift: 50 };
 
                     await tx.coupon.create({
                         data: {
-                            code: `REF-FOR-${referrer.id.substring(0, 4)}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`,
-                            type: 'percent',
+                            code: `REF-${referrer.id.substring(0, 4)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
+                            type: s.referrerRewardType || 'percent',
                             value: Number(s.referrerDiscount || 10),
                             customerId: referrer.id,
-                            isUsed: false
+                            isUsed: false,
+                            usageLimit: 1
                         }
                     });
+
                     await tx.coupon.create({
                         data: {
-                            code: `WELCOME-${newCustomer.id.substring(0, 4)}`,
-                            type: 'amount',
+                            code: `WELCOME-${newCustomer.id.substring(0, 4)}-${Math.random().toString(36).substring(2, 4).toUpperCase()}`,
+                            type: s.refereeGiftType || 'amount',
                             value: Number(s.refereeGift || 50),
                             customerId: newCustomer.id,
-                            isUsed: false
+                            isUsed: false,
+                            usageLimit: 1
                         }
                     });
                 }

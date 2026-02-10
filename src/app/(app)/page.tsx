@@ -276,7 +276,7 @@ function POSContent() {
               <div className="flex items-center gap-2"><span className="text-lg">📈</span><span className="text-xs font-bold opacity-70">HAFTALIK TREND</span></div>
             </div>
             {insightsData?.stats?.weeklyTrend ? (
-              <ResponsiveContainer width="100%" height={100}><AreaChart data={insightsData.stats.weeklyTrend}><Area type="monotone" dataKey="value" stroke="#FF5500" fill="#FF5500" fillOpacity={0.1} strokeWidth={2} /></AreaChart></ResponsiveContainer>
+              <ResponsiveContainer width="100%" aspect={2.8}><AreaChart data={insightsData.stats.weeklyTrend}><Area type="monotone" dataKey="value" stroke="#FF5500" fill="#FF5500" fillOpacity={0.1} strokeWidth={2} /></AreaChart></ResponsiveContainer>
             ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri yükleniyor...</div>}
           </div>
 

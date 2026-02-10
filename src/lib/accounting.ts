@@ -567,10 +567,7 @@ export async function syncKasaBalancesToLedger(branch: string = 'Merkez', compan
  * 3. Hatalı bakiye yönlerini düzeltir.
  */
 export async function repairAccounting(branch: string = 'Merkez', companyId: string, prismaClient: any = globalPrisma) {
-    // 1. Kasa Bakiyelerini Eşitle (Açılış Fişi)
-    await syncKasaBalancesToLedger(branch, companyId, prismaClient);
-
-    // 2. Eksik Komisyon Fişlerini Bul ve Tamamla
+    // 1. Eksik Komisyon Fişlerini Bul ve Tamamla
     const transactions = await prismaClient.transaction.findMany({
         where: {
             type: 'Expense',
@@ -591,6 +588,9 @@ export async function repairAccounting(branch: string = 'Merkez', companyId: str
             await createJournalFromTransaction(trx, prismaClient);
         }
     }
+
+    // 2. Kasa Bakiyelerini Eşitle (Açılış Fişi) - Bu işlemi SONRA yap ki, eksik fişler eklendikten sonra kalan farkı düzeltsin.
+    await syncKasaBalancesToLedger(branch, companyId, prismaClient);
 
     return { success: true };
 }

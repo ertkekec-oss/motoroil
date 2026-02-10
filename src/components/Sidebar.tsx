@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { useApp } from "../contexts/AppContext";
-import NotificationCenter from "./NotificationCenter";
+
 
 export default function Sidebar() {
     const pathname = usePathname();
@@ -256,10 +256,7 @@ export default function Sidebar() {
                 borderTop: '1px solid var(--border-light)',
                 background: 'var(--bg-hover)'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-muted)' }}>BİLDİRİMLER</div>
-                    <NotificationCenter />
-                </div>
+
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px' }}>
                     <div style={{
                         width: '40px', height: '40px', borderRadius: '14px',

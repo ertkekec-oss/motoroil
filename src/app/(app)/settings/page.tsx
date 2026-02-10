@@ -2525,7 +2525,17 @@ export default function SettingsPage() {
 
                                     <div className="grid-cols-2 gap-8 mb-8">
                                         <div style={{ background: 'var(--bg-deep)', padding: '20px', borderRadius: '16px', border: '1px solid var(--border-light)' }}>
-                                            <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5, display: 'block', marginBottom: '12px' }}>REFERANS OLAN KİŞİYE ÖDÜL</label>
+                                            <div className="flex-between mb-2">
+                                                <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>REFERANS OLAN KİŞİYE ÖDÜL</label>
+                                                <select
+                                                    value={referralSettings.referrerRewardType || 'percent'}
+                                                    onChange={e => setReferralSettings({ ...referralSettings, referrerRewardType: e.target.value })}
+                                                    style={{ background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '6px', color: 'white', fontSize: '11px', padding: '4px 8px' }}
+                                                >
+                                                    <option value="percent">Yüzde (%)</option>
+                                                    <option value="amount">Tutar (₺)</option>
+                                                </select>
+                                            </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                                                 <div style={{ flex: 1 }}>
                                                     <input type="number"
@@ -2533,15 +2543,29 @@ export default function SettingsPage() {
                                                         onChange={e => setReferralSettings({ ...referralSettings, referrerDiscount: parseFloat(e.target.value) || 0 })}
                                                         style={{ width: '100%', fontSize: '24px', fontWeight: '900', background: 'transparent', border: 'none', color: 'white', outline: 'none' }}
                                                     />
-                                                    <div style={{ fontSize: '10px', fontWeight: '700', color: 'var(--primary)' }}>İNDİRİM ORANI (%)</div>
+                                                    <div style={{ fontSize: '10px', fontWeight: '700', color: 'var(--primary)' }}>
+                                                        {referralSettings.referrerRewardType === 'amount' ? 'İNDİRİM TUTARI (₺)' : 'İNDİRİM ORANI (%)'}
+                                                    </div>
                                                 </div>
-                                                <div style={{ fontSize: '24px', opacity: 0.2 }}>%</div>
+                                                <div style={{ fontSize: '24px', opacity: 0.2 }}>
+                                                    {referralSettings.referrerRewardType === 'amount' ? '₺' : '%'}
+                                                </div>
                                             </div>
-                                            <p style={{ fontSize: '11px', marginTop: '15px', color: 'var(--text-muted)' }}>Mevcut müşteri, yeni birini getirdiğinde bu oranda bir indirim kuponu kazanır.</p>
+                                            <p style={{ fontSize: '11px', marginTop: '15px', color: 'var(--text-muted)' }}>Mevcut müşteri, yeni birini getirdiğinde bu değerde bir indirim kuponu kazanır.</p>
                                         </div>
 
                                         <div style={{ background: 'var(--bg-deep)', padding: '20px', borderRadius: '16px', border: '1px solid var(--border-light)' }}>
-                                            <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5, display: 'block', marginBottom: '12px' }}>YENİ GELEN KİŞİYE HEDİYE</label>
+                                            <div className="flex-between mb-2">
+                                                <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>YENİ GELEN KİŞİYE HEDİYE</label>
+                                                <select
+                                                    value={referralSettings.refereeGiftType || 'amount'}
+                                                    onChange={e => setReferralSettings({ ...referralSettings, refereeGiftType: e.target.value })}
+                                                    style={{ background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '6px', color: 'white', fontSize: '11px', padding: '4px 8px' }}
+                                                >
+                                                    <option value="percent">Yüzde (%)</option>
+                                                    <option value="amount">Tutar (₺)</option>
+                                                </select>
+                                            </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                                                 <div style={{ flex: 1 }}>
                                                     <input type="number"
@@ -2549,11 +2573,15 @@ export default function SettingsPage() {
                                                         onChange={e => setReferralSettings({ ...referralSettings, refereeGift: parseFloat(e.target.value) || 0 })}
                                                         style={{ width: '100%', fontSize: '24px', fontWeight: '900', background: 'transparent', border: 'none', color: 'white', outline: 'none' }}
                                                     />
-                                                    <div style={{ fontSize: '10px', fontWeight: '700', color: 'var(--success)' }}>HEDİYE TUTAR (₺)</div>
+                                                    <div style={{ fontSize: '10px', fontWeight: '700', color: 'var(--success)' }}>
+                                                        {referralSettings.refereeGiftType === 'percent' ? 'HEDİYE ORANI (%)' : 'HEDİYE TUTAR (₺)'}
+                                                    </div>
                                                 </div>
-                                                <div style={{ fontSize: '24px', opacity: 0.2 }}>₺</div>
+                                                <div style={{ fontSize: '24px', opacity: 0.2 }}>
+                                                    {referralSettings.refereeGiftType === 'percent' ? '%' : '₺'}
+                                                </div>
                                             </div>
-                                            <p style={{ fontSize: '11px', marginTop: '15px', color: 'var(--text-muted)' }}>Yeni müşteri ilk alışverişinde bu tutar kadar anında hoşgeldin indirimi alır.</p>
+                                            <p style={{ fontSize: '11px', marginTop: '15px', color: 'var(--text-muted)' }}>Yeni müşteri ilk alışverişinde bu değerde anında hoşgeldin indirimi alır.</p>
                                         </div>
                                     </div>
 

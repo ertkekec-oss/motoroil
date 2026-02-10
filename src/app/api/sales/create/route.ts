@@ -233,82 +233,81 @@ export async function POST(request: Request) {
         // G. Bank Commission (Post-Transaction)
         // Moved outside main transaction to avoid aborting the sale if commission logic fails
         if (effectivePaymentMode === 'credit_card') {
-            (async () => {
-                try {
-                    console.log(`[Commission] Starting calculation for total: ${finalTotal}, Mode: ${effectivePaymentMode}`);
-                    const settingsRes = await prisma.appSettings.findUnique({ where: { key: 'salesExpenses' } });
-                    const salesExpenses = settingsRes?.value as any;
+            // Awaiting commission logic to prevent serverless timeout race conditions
+            try {
+                console.log(`[Commission] Starting calculation for total: ${finalTotal}, Mode: ${effectivePaymentMode}`);
+                const settingsRes = await prisma.appSettings.findUnique({ where: { key: 'salesExpenses' } });
+                const salesExpenses = settingsRes?.value as any;
 
-                    if (Array.isArray(salesExpenses?.posCommissions)) {
-                        const instLabelRaw = String(body.installmentLabel || '');
-                        let instCount = 1;
-                        try {
-                            const rawCount = body.installments || body.installmentCount;
-                            instCount = parseInt(String(rawCount || '1'), 10);
-                            if (isNaN(instCount)) instCount = 1;
-                        } catch (e) { instCount = 1; }
+                if (Array.isArray(salesExpenses?.posCommissions)) {
+                    const instLabelRaw = String(body.installmentLabel || '');
+                    let instCount = 1;
+                    try {
+                        const rawCount = body.installments || body.installmentCount;
+                        instCount = parseInt(String(rawCount || '1'), 10);
+                        if (isNaN(instCount)) instCount = 1;
+                    } catch (e) { instCount = 1; }
 
-                        const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
+                    const instLabelFallback = instCount > 1 ? `${instCount} Taksit` : 'Tek Çekim';
 
-                        console.log(`[Commission] Finding config for: labelRaw="${instLabelRaw}", fallback="${instLabelFallback}", instCount=${instCount}`);
+                    console.log(`[Commission] Finding config for: labelRaw="${instLabelRaw}", fallback="${instLabelFallback}", instCount=${instCount}`);
 
-                        const lookups = [
-                            instLabelRaw.toLowerCase().trim(),
-                            instLabelFallback.toLowerCase().trim(),
-                            (instCount === 1 ? 'tek çekim' : ''),
-                            (instCount === 1 ? 'nakit' : ''),
-                            (instCount === 1 ? 'peşin' : '')
-                        ].filter(Boolean);
+                    const lookups = [
+                        instLabelRaw.toLowerCase().trim(),
+                        instLabelFallback.toLowerCase().trim(),
+                        (instCount === 1 ? 'tek çekim' : ''),
+                        (instCount === 1 ? 'nakit' : ''),
+                        (instCount === 1 ? 'peşin' : '')
+                    ].filter(Boolean);
 
-                        let commissionConfig = salesExpenses.posCommissions.find((c: any) => {
-                            if (!c || typeof c !== 'object') return false;
-                            const configLabel = String(c.installment || '').toLowerCase().trim();
-                            const configNum = parseInt(configLabel.replace(/\D/g, ''), 10);
+                    let commissionConfig = salesExpenses.posCommissions.find((c: any) => {
+                        if (!c || typeof c !== 'object') return false;
+                        const configLabel = String(c.installment || '').toLowerCase().trim();
+                        const configNum = parseInt(configLabel.replace(/\D/g, ''), 10);
 
-                            if (lookups.includes(configLabel)) return true;
-                            if (instCount > 1 && !isNaN(configNum) && configNum === instCount) return true;
-                            if (instCount === 1) {
-                                return ['tek', 'tek çekim', 'peşin', 'nakit', '1', '1 taksit'].includes(configLabel);
-                            }
-                            return false;
-                        });
-
-                        if (commissionConfig) {
-                            const rate = Number(commissionConfig.rate || 0);
-                            if (rate > 0) {
-                                const commissionAmount = (finalTotal * rate) / 100;
-                                console.log(`[Commission] Found config: ${commissionConfig.installment}, Rate: %${rate}, Amount: ${commissionAmount}`);
-
-                                const commTrx = await prisma.transaction.create({
-                                    data: {
-                                        companyId: companyId,
-                                        type: 'Expense',
-                                        amount: commissionAmount,
-                                        description: `Banka POS Komisyon Gideri (${commissionConfig.installment})`,
-                                        kasaId: targetKasaId,
-                                        date: new Date(),
-                                        branch: branch || 'Merkez'
-                                    }
-                                });
-
-                                await createJournalFromTransaction(commTrx, prisma);
-
-                                await prisma.kasa.update({
-                                    where: { id: targetKasaId },
-                                    data: { balance: { decrement: commissionAmount } }
-                                });
-                                console.log(`[Commission] Successfully recorded commission expense: ${commTrx.id}`);
-                            } else {
-                                console.log(`[Commission] Config found but rate is 0 or invalid.`);
-                            }
-                        } else {
-                            console.warn(`[Commission] No matching commission config found in settings.`);
+                        if (lookups.includes(configLabel)) return true;
+                        if (instCount > 1 && !isNaN(configNum) && configNum === instCount) return true;
+                        if (instCount === 1) {
+                            return ['tek', 'tek çekim', 'peşin', 'nakit', '1', '1 taksit'].includes(configLabel);
                         }
+                        return false;
+                    });
+
+                    if (commissionConfig) {
+                        const rate = Number(commissionConfig.rate || 0);
+                        if (rate > 0) {
+                            const commissionAmount = (finalTotal * rate) / 100;
+                            console.log(`[Commission] Found config: ${commissionConfig.installment}, Rate: %${rate}, Amount: ${commissionAmount}`);
+
+                            const commTrx = await prisma.transaction.create({
+                                data: {
+                                    companyId: companyId,
+                                    type: 'Expense',
+                                    amount: commissionAmount,
+                                    description: `Banka POS Komisyon Gideri (${commissionConfig.installment})`,
+                                    kasaId: targetKasaId,
+                                    date: new Date(),
+                                    branch: branch || 'Merkez'
+                                }
+                            });
+
+                            await createJournalFromTransaction(commTrx, prisma);
+
+                            await prisma.kasa.update({
+                                where: { id: targetKasaId },
+                                data: { balance: { decrement: commissionAmount } }
+                            });
+                            console.log(`[Commission] Successfully recorded commission expense: ${commTrx.id}`);
+                        } else {
+                            console.log(`[Commission] Config found but rate is 0 or invalid.`);
+                        }
+                    } else {
+                        console.warn(`[Commission] No matching commission config found in settings.`);
                     }
-                } catch (commErr) {
-                    console.error('[Commission] Error calculating or recording commission (Safe Mode):', commErr);
                 }
-            })();
+            } catch (commErr) {
+                console.error('[Commission] Error calculating or recording commission (Safe Mode):', commErr);
+            }
         }
 
         // AUDIT LOG

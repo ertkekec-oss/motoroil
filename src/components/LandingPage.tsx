@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import '../app/landing.css';
@@ -63,12 +63,60 @@ export default function LandingPage() {
     fetchCms();
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+
+
+
+
+
+
+  // Robust Scroll Detection
+  useLayoutEffect(() => {
+    const findScrollParent = (node: HTMLElement | null): HTMLElement | Window => {
+      if (!node) return window;
+      const overflowY = window.getComputedStyle(node).overflowY;
+      const isScrollable = overflowY !== 'visible' && overflowY !== 'hidden' && overflowY !== 'clip'; // Added 'clip' for completeness
+      if (isScrollable && node.scrollHeight > node.clientHeight) return node;
+      return findScrollParent(node.parentElement);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement | Document;
+      let offset = 0;
+
+      // Handle Window/Document scroll
+      if (target === document || target === window.document) {
+        offset = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      }
+      // Handle Element scroll
+      else if (target instanceof HTMLElement) {
+        offset = target.scrollTop;
+      }
+
+      setScrolled(offset > 10);
+    };
+
+    // Find the true scrolling container
+    // We start searching from a known element in this component, or body fallback
+    const startNode = document.querySelector('.m-nav') as HTMLElement || document.body;
+    const scrollParent = findScrollParent(startNode);
+
+    // Attach to the identified parent
+    scrollParent.addEventListener('scroll', handleScroll, { passive: true, capture: true });
+
+    // Also attach to window just in case
+    window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
+
+    // Initial check
+    if (scrollParent instanceof HTMLElement) {
+      setScrolled(scrollParent.scrollTop > 10);
+    } else {
+      setScrolled(window.scrollY > 10);
+    }
+
+    return () => {
+      scrollParent.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const handleDemo = () => {
@@ -98,38 +146,33 @@ export default function LandingPage() {
           dangerouslySetInnerHTML={{ __html: content.title || 'Frequently Asked Questions' }}
         ></h2>
         <div className="w-full max-w-4xl mx-auto text-left">
-          {(content.items || [
-            { q: 'Is there a free trial?', a: 'Yes! You can start for free with no credit card required.' },
-            { q: 'Can I connect my own data?', a: 'Databox supports 130+ native integrations and any custom data via API or SQL.' },
-            { q: 'How is Databox different from PowerBI?', a: 'Databox is designed for teams that need answers fast, without the complexity of IT-heavy tools.' }
-          ]).map((item: any, i: number) => (
-            <div key={i} className="border-b border-gray-200">
+          {(content.items || []).map((faq: any, i: number) => (
+            <div key={i} className="" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', marginBottom: '16px' }}>
               <button
+                className="w-full text-left py-4 flex justify-between items-center text-lg font-bold hover:text-blue-600 transition"
                 onClick={() => toggle(i)}
-                className="w-full py-6 flex justify-between items-center text-left focus:outline-none group hover:bg-slate-50/50 transition-colors px-4 rounded-lg"
               >
-                <span className="text-[17px] font-bold text-slate-800 m-font-heading group-hover:text-blue-700 transition-colors pr-8">
-                  {item.question || item.q}
-                </span>
-                <span className={`transform transition-transform duration-300 text-slate-400 ${openIndex === i ? 'rotate-180 text-blue-600' : ''}`}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
+                {faq.question}
+                <span className={`transform transition-transform ${openIndex === i ? 'rotate-180' : ''}`}>
+                  ▼
                 </span>
               </button>
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${openIndex === i ? 'max-h-96 opacity-100 mb-6' : 'max-h-0 opacity-0'}`}
-              >
-                <p className="text-[16px] text-slate-500 leading-relaxed px-4">
-                  {item.answer || item.a}
-                </p>
-              </div>
+              {openIndex === i && (
+                <div className="pb-6 text-slate-600 leading-relaxed animate-in">
+                  {faq.answer}
+                </div>
+              )}
             </div>
           ))}
         </div>
       </section>
     );
   };
+
+  const getStyle = (size: any, color: any) => ({
+    ...(size && { fontSize: isNaN(Number(size)) ? size : `${size}px` }),
+    ...(color && { color })
+  });
 
   const XIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#ef4444' }}>
@@ -138,101 +181,146 @@ export default function LandingPage() {
     </svg>
   );
 
-  const ChevronIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', opacity: 0.7 }}>
-      <polyline points="6 9 12 15 18 9"></polyline>
-    </svg>
-  );
-
-  const getStyle = (size: any, color: any) => ({
-    ...(size && { fontSize: isNaN(Number(size)) ? size : `${size}px` }),
-    ...(color && { color })
-  });
-
   const renderSection = (section: any) => {
     const { type, content } = section;
+    if (!content) return null;
 
     switch (type) {
-      case 'BANNER':
-        if (!bannerVisible) return null;
-        return (
-          <div className="m-top-banner" key={section.id} style={{ position: 'relative' }}>
-            <span
-              style={getStyle(content.titleSize, content.titleColor)}
-              dangerouslySetInnerHTML={{ __html: content.text }}
-            ></span>
-            {content.linkUrl && <a href={content.linkUrl} target="_blank" rel="noopener noreferrer">{content.linkText || 'Learn more'}</a>}
-            <button onClick={() => setBannerVisible(false)} style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '20px', opacity: 0.6 }}>×</button>
-          </div>
-        );
-
       case 'HERO':
         return (
           <header className="m-hero" key={section.id}>
             <div className="m-hero-bg"></div>
-            {content.badgeText && (
+            {content.pillText && (
               <div className="m-pill-row">
-                {content.badgeText.split(';').map((pill: string, idx: number) => (
-                  <div className="m-pill" key={idx}>
-                    {pill.trim()}
-                  </div>
-                ))}
-                {content.reviewsText && <span className="text-[13px] text-slate-400 font-medium self-center ml-2">{content.reviewsText}</span>}
+                <div className="m-pill">{content.pillText}</div>
               </div>
             )}
-            <h1
-              style={getStyle(content.titleSize, content.titleColor)}
-              dangerouslySetInnerHTML={{ __html: content.title }}
-            ></h1>
-            <p
-              style={getStyle(content.subtitleSize, content.subtitleColor)}
-              dangerouslySetInnerHTML={{ __html: content.subtitle }}
-            ></p>
+            <h1 style={getStyle(content.titleSize, content.titleColor)} dangerouslySetInnerHTML={{ __html: content.title }}></h1>
+            <p style={{ color: content.descColor, fontSize: content.descSize ? `${content.descSize}px` : undefined }} dangerouslySetInnerHTML={{ __html: content.desc }}></p>
             <div className="m-hero-btns">
-              <Link href={content.primaryBtnUrl || "/register"} className="m-btn m-btn-primary" style={{ padding: '14px 36px', fontSize: '15px' }}>{content.primaryBtnText || 'Try It Free'}</Link>
-              <button onClick={() => content.secondaryBtnUrl ? router.push(content.secondaryBtnUrl) : handleDemo()} className="m-btn m-btn-outline" style={{ padding: '14px 36px', fontSize: '15px' }}>{content.secondaryBtnText || 'Book a Demo'}</button>
+              {content.primaryBtnText && <Link href={content.primaryBtnLink || '/register'} className="m-btn m-btn-primary">{content.primaryBtnText}</Link>}
+              {content.secondaryBtnText && <Link href={content.secondaryBtnLink || '#'} className="m-btn m-btn-outline">{content.secondaryBtnText}</Link>}
             </div>
-            {content.noteText && <div className="m-hero-note">{content.noteText}</div>}
-
-            <div style={{ marginTop: '40px', position: 'relative', maxWidth: '1000px', margin: '40px auto 0' }}>
-              <div className="m-card-white" style={{ padding: '20px', borderRadius: '24px', boxShadow: '0 40px 120px rgba(0,0,0,0.1)' }}>
-                <div style={{ background: '#f8faff', borderRadius: '16px', height: '320px', overflow: 'hidden' }}>
-                  <img src={content.visualUrl || 'https://databox.com/wp-content/uploads/2023/04/databox-dashboards.png'} alt="Visual" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
+            {content.visual && (
+              <div style={{ marginTop: '40px', position: 'relative', maxWidth: '1000px', margin: '40px auto 0' }}>
+                <div className="m-card-white" style={{ padding: '20px', borderRadius: '24px' }}>
+                  <img
+                    src={content.visual}
+                    alt="Hero Visual"
+                    style={{ width: '100%', height: 'auto', maxHeight: '500px', objectFit: 'cover', objectPosition: 'center top', borderRadius: '16px' }}
+                  />
                 </div>
               </div>
-              {content.showFloatingCard && (
-                <div className="hidden lg:block" style={{
-                  position: 'absolute',
-                  right: '-40px',
-                  bottom: '40px',
-                  width: '320px',
-                  background: '#fff',
-                  padding: '32px',
-                  borderRadius: '24px',
-                  boxShadow: '0 40px 80px rgba(0,0,0,0.12)',
-                  textAlign: 'left',
-                  border: '1px solid #f2f4f7'
-                }}>
-                  <h4 className="text-[18px] font-black mb-6">{content.floatingCardTitle || 'Explore Features'}</h4>
-                  {content.floatingCardVisualUrl ? (
-                    <div style={{ background: '#f8faff', borderRadius: '12px', height: '200px', overflow: 'hidden' }}>
-                      <img src={content.floatingCardVisualUrl} alt="Floating Visual" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff' }} />
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-3 gap-3">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                        <div key={i} className="aspect-square bg-slate-50 rounded-xl flex items-center justify-center text-xl hover:bg-blue-50 cursor-pointer transition">
-                          <div className="w-6 h-6 bg-blue-100 rounded-md"></div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            )}
           </header>
         );
+      case 'LOGO_CLOUD':
+        return (
+          <div className="m-logo-cloud" key={section.id} style={{ background: content.bg }}>
+            <div className="m-logo-scroll">
+              {[...(content.logos || []), ...(content.logos || [])].map((logo: string, i: number) => (
+                <img key={i} src={logo} alt="Client Logo" />
+              ))}
+            </div>
+          </div>
+        );
+      case 'FEATURES':
+        return (
+          <section className="m-section" key={section.id}>
+            <div className="m-container">
+              <div className="text-center mb-16">
+                <h5 className="text-blue-600 font-bold uppercase tracking-widest mb-4">{content.topTitle}</h5>
+                <h2 style={getStyle(content.titleSize, content.titleColor)}>{content.title}</h2>
+                <p className="max-w-2xl mx-auto mt-4 text-slate-500">{content.desc}</p>
+              </div>
+              <div className="grid md:grid-cols-3 gap-8">
+                {(content.items || []).map((item: any, i: number) => (
+                  <div key={i} className="m-feature-card">
+                    <div className="text-4xl mb-4">{item.icon}</div>
+                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                    <p className="text-slate-500">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      case 'CONTENT_BLOCK':
+        return (
+          <section className="m-section" key={section.id} style={{ background: content.bg }}>
+            <div className={`m-container flex flex-col md:flex-row items-center gap-12 ${content.layout === 'right' ? 'md:flex-row-reverse' : ''}`}>
+              <div className="flex-1">
+                <h5 className="text-blue-600 font-bold uppercase tracking-widest mb-4">{content.topTitle}</h5>
+                <h2 className="mb-6" style={getStyle(content.titleSize, content.titleColor)}>{content.title}</h2>
+                <p className="text-lg text-slate-600 mb-8 leading-relaxed">{content.desc}</p>
+                <ul className="space-y-3">
+                  {(content.list || []).map((li: string, i: number) => (
+                    <li key={i} className="flex items-center gap-3 font-medium text-slate-700">
+                      <CheckIcon />
+                      {li}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flex-1">
+                {content.visual && <img src={content.visual} alt="Feature" className="rounded-2xl shadow-2xl border border-slate-100" />}
+              </div>
+            </div>
+          </section>
+        );
+      case 'TESTIMONIALS':
+        return (
+          <section className="m-section bg-slate-50" key={section.id}>
+            <div className="text-center mb-16">
+              <h2 style={getStyle(content.titleSize, content.titleColor)}>{content.title}</h2>
+            </div>
+            <div className="m-container grid md:grid-cols-3 gap-6">
+              {(content.items || []).map((t: any, i: number) => (
+                <div key={i} className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm relative">
+                  <div className="text-yellow-400 text-xl mb-4">★★★★★</div>
+                  <p className="text-slate-700 font-medium mb-6">"{t.quote}"</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-slate-200 rounded-full overflow-hidden">
+                      {t.avatar && <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />}
+                    </div>
+                    <div>
+                      <div className="font-bold text-slate-900">{t.name}</div>
+                      <div className="text-xs text-slate-500">{t.role}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      case 'CTA':
+        return (
+          <section className="py-24 relative overflow-hidden" key={section.id} style={{ background: '#0f172a' }}>
+            <div className="absolute inset-0 opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+            <div className="m-container relative text-center text-white">
+              <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">{content.title}</h2>
+              <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">{content.desc}</p>
+              <div className="flex justify-center gap-4">
+                <Link href={content.btnLink || '/register'} className="m-btn m-btn-primary text-lg px-8 py-4 shadow-xl shadow-blue-500/30">
+                  {content.btnText || 'Get Started Now'}
+                </Link>
+              </div>
+            </div>
+          </section>
+        );
+      case 'FAQ':
+        return <FAQSection section={section} getStyle={getStyle} key={section.id} />;
+      case 'FOOTER':
+        // Footer is handled globally below
+        return null;
+      case 'NAV':
+        // Nav is handled globally
+        return null;
+      case 'BANNER':
+        // Banner is handled globally
+        return null;
 
+      // NEW CASES FROM OLD CODEBLOCK - RESTORING
       case 'PARTNERS':
         return (
           <div style={{ padding: '30px 0', background: 'transparent', display: 'flex', justifyContent: 'center', width: '100%' }} key={section.id}>
@@ -333,42 +421,6 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-            </div>
-          </section>
-        );
-
-      case 'FEATURES':
-      case 'GRID':
-        return (
-          <section className="m-section" style={{ background: content.bg || '#fcfcfd' }} key={section.id}>
-            <h2
-              style={getStyle(content.titleSize, content.titleColor)}
-              dangerouslySetInnerHTML={{ __html: content.title }}
-            ></h2>
-            <p
-              className="m-intro"
-              style={getStyle(content.subtitleSize, content.subtitleColor)}
-              dangerouslySetInnerHTML={{ __html: content.subtitle }}
-            ></p>
-            <div className={`m-grid-container ${content.cols === 2 ? 'm-grid-2' : 'm-grid-3'}`}>
-              {(content.items || []).map((c: any, i: number) => (
-                <div key={i} className="m-card-white">
-                  <div className="m-card-icon" style={{ fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {(c.icon && (c.icon.startsWith('http') || c.icon.startsWith('/') || c.icon.startsWith('data:'))) ? (
-                      <img
-                        src={c.icon}
-                        alt={c.title}
-                        className="object-contain"
-                        style={{ height: content.iconSize ? `${content.iconSize}px` : '40px', width: content.iconSize ? `${content.iconSize}px` : '40px' }}
-                      />
-                    ) : (
-                      <span style={{ fontSize: content.iconSize ? `${content.iconSize * 0.6}px` : '24px' }}>{c.icon || (i + 1)}</span>
-                    )}
-                  </div>
-                  <h3>{c.title}</h3>
-                  <p>{c.desc}</p>
-                </div>
-              ))}
             </div>
           </section>
         );
@@ -535,74 +587,6 @@ export default function LandingPage() {
           </section>
         );
 
-      case 'FAQ':
-        return <FAQSection key={section.id} section={section} getStyle={getStyle} />;
-
-      case 'CTA':
-        return (
-          <section className="m-section m-cta-block" key={section.id}>
-            <h2 className="text-[clamp(32px,5vw,56px)] font-black text-center mb-12" style={getStyle(content.titleSize, content.titleColor)} dangerouslySetInnerHTML={{ __html: content.title || 'Make better decisions,<br />together, faster' }}>
-            </h2>
-            <div className="flex justify-center gap-4 flex-wrap">
-              <Link href={content.primaryBtnUrl || '/register'} className="m-btn" style={{ background: '#fff', color: '#000', padding: '14px 40px', borderRadius: '8px', fontWeight: 800 }}>{content.primaryBtnText || 'Try It Free'}</Link>
-              <button onClick={() => content.secondaryBtnUrl ? router.push(content.secondaryBtnUrl) : handleDemo()} className="m-btn" style={{ background: 'transparent', color: '#fff', border: '1px solid #fff', padding: '14px 40px', borderRadius: '8px', fontWeight: 800 }}>{content.secondaryBtnText || 'Book a Demo'}</button>
-            </div>
-          </section>
-        );
-
-      case 'NAV':
-        return renderNav(content);
-
-      case 'FOOTER':
-        return (
-          <footer className="m-footer-dark" style={{ background: content.bg || undefined }} key={section.id}>
-            <div className="m-footer-grid">
-              <div>
-                <div className="m-logo" style={{ color: content.titleColor || '#fff', marginBottom: '20px' }}>
-                  {(content.footerLogoUrl || cms?.settings?.logoUrl) ? (
-                    <img
-                      src={content.footerLogoUrl || cms.settings.logoUrl}
-                      alt="Logo"
-                      style={{ height: content.footerLogoHeight ? `${content.footerLogoHeight}px` : '32px' }}
-                      className="object-contain"
-                    />
-                  ) : (
-                    !content.footerHideTitle && <div className="m-logo-icon"><span></span><span></span><span></span></div>
-                  )}
-                  {!content.footerHideTitle && (cms?.settings?.siteTitle || 'Periodya')}
-                </div>
-                <div className="m-footer-info" dangerouslySetInnerHTML={{ __html: content.desc || 'Databox Inc.<br/>HQ: Boston, MA, USA' }}></div>
-                <div className="m-footer-tagline mt-8">{content.subtitle || 'Modern BI for teams that needs answers now'}</div>
-                <div className="flex gap-4 mb-12 opacity-60">
-                  {/* Social links could be here */}
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="w-5 h-5 bg-white/20 rounded-full"></div>
-                  ))}
-                </div>
-              </div>
-
-              {(content.items || []).map((col: any, i: number) => (
-                <div key={i} className="m-footer-col">
-                  {col.topTitle && <div className="text-[10px] font-black text-blue-400 mb-1 uppercase tracking-widest">{col.topTitle}</div>}
-                  <h5>{col.title}</h5>
-                  <ul>
-                    {(col.list || []).map((li: string, j: number) => {
-                      const [text, url] = li.split('|');
-                      return (
-                        <li key={j}>
-                          <Link href={url || '#'}>{text}</Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: '100px', borderTop: '1px solid #1e293b', paddingTop: '40px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
-              © {new Date().getFullYear()} {cms?.settings?.siteTitle || 'Databox'} Inc.
-            </div>
-          </footer>
-        );
       default:
         return null;
     }
@@ -643,20 +627,39 @@ export default function LandingPage() {
 
     const loginText = customContent?.loginText || 'Login';
     const loginUrl = customContent?.loginUrl || '/login';
-    const primaryBtnText = customContent?.primaryBtnText || 'Try It Free';
+    const primaryBtnText = customContent?.primaryBtnText || 'Ücretsiz Dene';
     const primaryBtnUrl = customContent?.primaryBtnUrl || '/register';
-    const secondaryBtnText = customContent?.secondaryBtnText || 'Book a Demo';
+    const secondaryBtnText = customContent?.secondaryBtnText || 'Demo İste';
     const secondaryBtnUrl = customContent?.secondaryBtnUrl;
 
     return (
-      <nav className={`m-nav ${scrolled ? 'scrolled' : ''}`} key={customContent ? 'nav-custom' : 'nav-default'}>
-        <div className="m-logo">
+      <nav
+        className={`m-nav ${scrolled ? 'scrolled' : ''}`}
+        key={customContent ? 'nav-custom' : 'nav-default'}
+        style={{
+          backgroundColor: scrolled ? '#ffffff' : 'transparent',
+          borderBottom: scrolled ? '1px solid rgba(0,0,0,0.05)' : 'none',
+          transition: 'background-color 0.3s ease'
+        }}
+      >
+        <div className="m-logo" style={{ background: 'transparent' }}>
           {cms?.settings?.logoUrl ? (
             <img
               src={cms.settings.logoUrl}
               alt="Logo"
-              style={{ height: customContent?.logoHeight ? `${customContent.logoHeight}px` : '40px' }}
-              className="object-contain"
+              ref={(el) => {
+                if (el) {
+                  el.style.setProperty('background-color', 'transparent', 'important');
+                  el.style.setProperty('max-width', '180px', 'important');
+                  el.style.setProperty('max-height', '48px', 'important');
+                  el.style.setProperty('width', 'auto', 'important');
+                  el.style.setProperty('object-fit', 'contain', 'important');
+                  el.style.setProperty('display', 'block', 'important');
+                }
+              }}
+              style={{
+                height: (customContent?.logoHeight || cms?.settings?.logoHeight) ? `${customContent?.logoHeight || cms.settings.logoHeight}px` : '40px',
+              }}
             />
           ) : (
             <div className="m-logo-icon"><span></span><span></span><span></span></div>
@@ -794,8 +797,8 @@ export default function LandingPage() {
         ? sections.filter((s: any) => s.type === 'BANNER').map((s: any) => renderSection(s))
         : (bannerVisible && !sections.length) && (
           <div className="m-top-banner">
-            Use AI to <strong>talk to your data</strong> and move from insights to action faster. 👆
-            <a href="#">Read the blog.</a>
+            İşletmeniz için <strong>akıllı çözümler</strong> ile tanışın. 👆
+            <a href="/register">Hemen Başlayın.</a>
             <button onClick={() => setBannerVisible(false)} style={{ position: 'absolute', right: '20px', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '18px' }}>×</button>
           </div>
         )
@@ -845,13 +848,13 @@ export default function LandingPage() {
               <div>
                 <div className="m-logo" style={{ color: '#fff', marginBottom: '20px' }}>
                   <div className="m-logo-icon"><span></span><span></span><span></span></div>
-                  databox
+                  {cms?.settings?.siteTitle || 'Periodya'}
                 </div>
-                <div className="m-footer-info">Databox Inc.</div>
-                <div className="m-footer-info">HQ: Boston, MA, USA</div>
+                <div className="m-footer-info">{cms?.settings?.siteTitle || 'Periodya'} Inc.</div>
+                <div className="m-footer-info">Türkiye</div>
 
                 <div className="m-footer-tagline mt-8">
-                  Modern BI for teams that needs answers now
+                  İşletmenizi büyütmek için modern çözümler.
                 </div>
 
                 <div className="flex gap-4 mb-12 opacity-60">
@@ -936,7 +939,7 @@ export default function LandingPage() {
               )}
             </div>
             <div style={{ marginTop: '100px', borderTop: '1px solid #1e293b', paddingTop: '40px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
-              © {new Date().getFullYear()} Databox Inc.
+              © {new Date().getFullYear()} {cms?.settings?.siteTitle || 'Periodya'} Inc. Tüm hakları saklıdır.
             </div>
           </footer>
         )

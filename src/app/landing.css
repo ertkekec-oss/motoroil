@@ -45,7 +45,6 @@
 /* Ensure sections show the global background */
 .m-section,
 .m-hero,
-.m-nav,
 .m-hero-bg,
 .m-integrations {
     background: transparent !important;
@@ -88,7 +87,7 @@
 }
 
 .m-nav.scrolled {
-    background: rgba(255, 255, 255, 0.8);
+    background: #ffffff !important;
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     height: 76px;
