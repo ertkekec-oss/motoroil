@@ -30,12 +30,64 @@ export default function AccountingPage() {
 
     const [activeTab, setActiveTab] = useState(initialTab);
     const [modalType, setModalType] = useState<string | null>(null);
+    const [syncStates, setSyncStates] = useState<Record<string, 'IDLE' | 'SYNCING' | 'DONE' | 'ERROR'>>({});
+    const [duplicates, setDuplicates] = useState<any[]>([]);
+
+    const isAdmin = user?.role === 'SUPER_ADMIN' || (user?.role?.toLowerCase().includes('admin'));
+
+    const findDuplicates = async () => {
+        try {
+            const res = await fetch('/api/fintech/banking/duplicates');
+            const data = await res.json();
+            if (data.success) setDuplicates(data.duplicates);
+        } catch (e) { console.error(e); }
+    };
+
+    const handleMerge = async (duplicate: any) => {
+        if (!confirm('Bu manuel hesabı open banking bağlantısı ile birleştirmek istediğinize emin misiniz?')) return;
+        try {
+            const res = await fetch('/api/fintech/banking/merge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kasaId: duplicate.kasaId, connectionId: duplicate.connectionId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Hesaplar başarıyla birleştirildi.');
+                setDuplicates(prev => prev.filter(d => d.kasaId !== duplicate.kasaId));
+                refreshData();
+            }
+        } catch (e) { alert('Hata oluştu'); }
+    };
+
+    const syncAccount = async (connectionId?: string) => {
+        const key = connectionId || 'GLOBAL';
+        setSyncStates(prev => ({ ...prev, [key]: 'SYNCING' }));
+        try {
+            const res = await fetch('/api/fintech/banking/sync', {
+                method: 'POST',
+                body: JSON.stringify({ connectionId })
+            });
+            const data = await res.json();
+            setSyncStates(prev => ({ ...prev, [key]: data.success ? 'DONE' : 'ERROR' }));
+            if (data.success) {
+                refreshData();
+                setTimeout(() => setSyncStates(prev => ({ ...prev, [key]: 'IDLE' })), 3000);
+            }
+        } catch (e) {
+            setSyncStates(prev => ({ ...prev, [key]: 'ERROR' }));
+        }
+    };
 
     // Sync activeTab with URL is optional but helpful
     useEffect(() => {
         const tab = searchParams.get('tab');
         if (tab) setActiveTab(tab);
+        if (tab === 'banks') findDuplicates();
     }, [searchParams]);
+
+    // ... rest of the component ...
+    // Note: I will only replace the banks tab content below
 
     // Calculate Stats
     const stats = React.useMemo(() => {
@@ -350,6 +402,31 @@ export default function AccountingPage() {
 
                 {activeTab === 'banks' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                        {/* Merge Alerts */}
+                        {duplicates.length > 0 && (
+                            <div className="space-y-2">
+                                {duplicates.map((dup, idx) => (
+                                    <div key={idx} className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl flex items-center justify-between animate-pulse">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xl">🔗</span>
+                                            <div>
+                                                <p className="text-sm font-bold text-amber-200">Duplicate IBAN Tespit Edildi!</p>
+                                                <p className="text-xs text-amber-200/70">
+                                                    <b>{dup.kasaName}</b> manuel hesabı, <b>{dup.bankName}</b> entegrasyonu ile aynı IBAN'a sahip.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleMerge(dup)}
+                                            className="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/40 text-amber-400 text-xs font-black rounded-lg transition-all"
+                                        >
+                                            HESAPLARI BİRLEŞTİR
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <div className="flex justify-between items-center">
                             <h3 className="text-xl font-bold text-white flex items-center gap-2">
                                 <span className="bg-amber-500/10 p-2 rounded-lg text-amber-400">💰</span>
@@ -357,13 +434,14 @@ export default function AccountingPage() {
                             </h3>
                             <div className="flex gap-2">
                                 <button
-                                    onClick={async () => {
-                                        await fetch('/api/fintech/banking/sync', { method: 'POST' });
-                                        await refreshData();
-                                    }}
-                                    className="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 rounded-xl font-bold text-xs transition-all flex items-center gap-2"
+                                    onClick={() => syncAccount()}
+                                    disabled={syncStates['GLOBAL'] === 'SYNCING'}
+                                    className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-2 border ${syncStates['GLOBAL'] === 'SYNCING' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' :
+                                            syncStates['GLOBAL'] === 'DONE' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
+                                                'bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border-emerald-500/30'
+                                        }`}
                                 >
-                                    🔄 Banka Güncelle
+                                    {syncStates['GLOBAL'] === 'SYNCING' ? '🔄 AKTARILIYOR...' : '🔄 TAMAMINI GÜNCELLE'}
                                 </button>
                                 <Link
                                     href="/fintech/open-banking"
@@ -412,8 +490,18 @@ export default function AccountingPage() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button className="text-white/20 hover:text-white">⚙️</button>
+                                        <div className="flex flex-col items-end gap-2">
+                                            {kasa.bankConnectionId && (
+                                                <button
+                                                    onClick={() => syncAccount(kasa.bankConnectionId)}
+                                                    disabled={syncStates[kasa.bankConnectionId] === 'SYNCING'}
+                                                    className={`p-2 rounded-lg transition-all ${syncStates[kasa.bankConnectionId] === 'SYNCING' ? 'bg-amber-500/20 text-amber-500 animate-spin' : 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20'
+                                                        }`}
+                                                    title="Sadece Bu Bankayı Güncelle"
+                                                >
+                                                    🔄
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
 
@@ -423,22 +511,11 @@ export default function AccountingPage() {
                                         </div>
                                         <div className="pt-4 border-t border-white/5 flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-white/30">
                                             <span>{kasa.branch || 'Merkez'} Şubesi</span>
-                                            <span>Son İşlem: BUGÜN</span>
+                                            <span>{kasa.bankConnectionId ? 'LİVE SENKRON' : 'MANUEL KAYIT'}</span>
                                         </div>
                                     </div>
                                 </div>
                             ))}
-                            {kasalar.length === 0 && (
-                                <div className="col-span-full py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
-                                    <p className="text-white/20 text-sm font-bold uppercase tracking-widest">Henüz bir hesap eklenmedi</p>
-                                    <button
-                                        onClick={() => setModalType('account')}
-                                        className="mt-4 text-xs font-black text-amber-500 hover:underline"
-                                    >
-                                        İLK KASANI ŞİMDİ OLUŞTUR →
-                                    </button>
-                                </div>
-                            )}
                         </div>
 
                         {/* Recent Bank Streams Integration */}
@@ -475,20 +552,30 @@ export default function AccountingPage() {
                                                         <span className="text-[9px] text-gray-500 font-bold uppercase">{bt.status}</span>
                                                     </div>
                                                 </div>
-                                                <button
-                                                    onClick={async () => {
-                                                        const res = await fetch('/api/fintech/banking/replay', {
-                                                            method: 'POST',
-                                                            body: JSON.stringify({ transactionId: bt.id })
-                                                        });
-                                                        const json = await res.json();
-                                                        if (json.success) alert('İşlem yeniden işlendi!');
-                                                    }}
-                                                    className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-white"
-                                                    title="Yeniden İşlet"
-                                                >
-                                                    🔄
-                                                </button>
+                                                {isAdmin && (
+                                                    <button
+                                                        onClick={async () => {
+                                                            const res = await fetch('/api/fintech/banking/replay', {
+                                                                method: 'POST',
+                                                                body: JSON.stringify({ transactionId: bt.id })
+                                                            });
+                                                            const json = await res.json();
+                                                            if (json.success) {
+                                                                const message = json.mode === 'DRY_RUN'
+                                                                    ? 'Simülasyon Tamamlandı (DRY_RUN): Kayıt atılmadı.'
+                                                                    : 'İşlem Başarıyla Muhasebeleştirildi (LIVE).';
+                                                                alert(message);
+                                                                refreshData();
+                                                            } else {
+                                                                alert('Hata: ' + json.error);
+                                                            }
+                                                        }}
+                                                        className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-white"
+                                                        title="Yeniden İşlet (Admin Only)"
+                                                    >
+                                                        🔄
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     ))}

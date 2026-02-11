@@ -22,8 +22,15 @@ export class BankSyncEngine {
         });
 
         const results = [];
+        // Sequential sync to avoid rate limits and queue bloat
         for (const conn of connections) {
-            results.push(await this.syncConnection(conn));
+            try {
+                const result = await this.syncConnection(conn);
+                results.push(result);
+            } catch (err: any) {
+                console.error(`[BankSync] Failed to sync ${conn.bankName}:`, err);
+                results.push({ connection: conn.bankName, success: false, error: err.message });
+            }
         }
         return results;
     }
@@ -32,51 +39,82 @@ export class BankSyncEngine {
      * Sycs a single bank connection
      */
     static async syncConnection(connection: any) {
-        // 0. Ensure Single Source of Truth (Kasa entry)
-        await this.ensureKasaAccount(connection);
+        console.log(`[BankSync] Starting sync for: ${connection.bankName} (${connection.iban})`);
 
-        // 1. Fetch from Partner/Mock API (Production would use Aggregator SDK)
-        const rawTransactions = await this.fetchFromPartner(connection);
+        try {
+            // 0. Ensure Single Source of Truth (Kasa entry)
+            const kasa = await this.ensureKasaAccount(connection);
 
-        // 2. Normalize and Save (Idempotent)
-        const savedCount = await this.processTransactions(connection, rawTransactions);
+            // 1. Fetch from Partner/Mock API
+            const rawTransactions = await this.fetchFromPartner(connection);
 
-        // 3. Update sync timestamp
-        await (prisma as any).bankConnection.update({
-            where: { id: connection.id },
-            data: { lastSyncAt: new Date() }
-        });
+            // 2. Normalize and Save (Idempotent)
+            const savedCount = await this.processTransactions(connection, rawTransactions);
 
-        return { connection: connection.bankName, imported: savedCount };
+            // 3. Update sync timestamp and status
+            await (prisma as any).bankConnection.update({
+                where: { id: connection.id },
+                data: {
+                    lastSyncAt: new Date(),
+                    status: 'ACTIVE'
+                }
+            });
+
+            return { connection: connection.bankName, imported: savedCount, success: true };
+        } catch (err: any) {
+            await (prisma as any).bankConnection.update({
+                where: { id: connection.id },
+                data: { status: 'ERROR' }
+            });
+            throw err;
+        }
     }
 
     /**
      * Creates or updates a Kasa record in the accounting system for this bank connection.
-     * This ensures the bank appears in the regular "Banka & Kasa" page.
      */
     private static async ensureKasaAccount(connection: any) {
         const companyId = connection.companyId;
 
         // Check if Kasa already exists for this connection
-        const existingKasa = await (prisma as any).kasa.findUnique({
+        let existingKasa = await (prisma as any).kasa.findUnique({
             where: { bankConnectionId: connection.id }
         });
 
         if (!existingKasa) {
-            console.log(`[BankSync] Creating SSOT Kasa for bank: ${connection.bankName}`);
-            await (prisma as any).kasa.create({
-                data: {
+            // DUPLICATE DETECTION: Check if any manual Kasa has the same IBAN
+            const manualKasa = await (prisma as any).kasa.findFirst({
+                where: {
                     companyId,
-                    name: `${connection.bankName} (${connection.iban.slice(-4)})`,
-                    type: 'bank',
-                    bankConnectionId: connection.id,
-                    currency: connection.currency || 'TRY',
-                    branch: 'Merkez', // Default for now
-                    isActive: true,
-                    balance: 0 // Will be updated from transactions or balance sync
+                    iban: connection.iban,
+                    bankConnectionId: null // It's manual
                 }
             });
+
+            if (manualKasa) {
+                console.log(`[BankSync] Duplicate IBAN detected for manual Kasa: ${manualKasa.name}. Linking instead of creating.`);
+                existingKasa = await (prisma as any).kasa.update({
+                    where: { id: manualKasa.id },
+                    data: { bankConnectionId: connection.id }
+                });
+            } else {
+                console.log(`[BankSync] Creating SSOT Kasa for bank: ${connection.bankName}`);
+                existingKasa = await (prisma as any).kasa.create({
+                    data: {
+                        companyId,
+                        name: `${connection.bankName} (${connection.iban.slice(-4)})`,
+                        type: 'bank',
+                        iban: connection.iban,
+                        bankConnectionId: connection.id,
+                        currency: connection.currency || 'TRY',
+                        branch: 'Merkez',
+                        isActive: true,
+                        balance: 0
+                    }
+                });
+            }
         }
+        return existingKasa;
     }
 
     private static async processTransactions(connection: any, raw: RawBankTransaction[]) {

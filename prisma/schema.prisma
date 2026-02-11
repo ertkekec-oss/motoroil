@@ -580,6 +580,7 @@ model Kasa {
   type         String        @default("Nakit")
   balance      Decimal       @default(0) @db.Decimal(12, 2)
   currency     String        @default("TRY")
+  iban         String?
   isActive     Boolean       @default(true)
   deletedAt    DateTime?
   createdAt    DateTime      @default(now())

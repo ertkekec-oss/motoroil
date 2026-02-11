@@ -14,6 +14,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        // 1. ADMIN AUTHORIZATION
+        const isAdmin = session.user.role === 'SUPER_ADMIN' || (session.user.role?.toLowerCase().includes('admin'));
+        if (!isAdmin) {
+            return NextResponse.json({ error: 'Sadece yöneticiler işlemleri yeniden işletebilir.' }, { status: 403 });
+        }
+
         const { transactionId } = await req.json();
 
         const tx = await (prisma as any).bankTransaction.findUnique({
@@ -21,8 +27,12 @@ export async function POST(req: Request) {
         });
 
         if (!tx || tx.companyId !== session.user.companyId) {
-            return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
+            return NextResponse.json({ error: 'İşlem bulunamadı' }, { status: 404 });
         }
+
+        // 2. MODE ENGINE
+        const isLive = process.env.FINTECH_LIVE_MODE === 'true';
+        console.log(`[FINTECH] Replaying transaction ${tx.id} (Mode: ${isLive ? 'LIVE' : 'DRY_RUN'})`);
 
         // Trigger Replay
         const result = await prisma.$transaction(async (prismaTx) => {
@@ -32,18 +42,23 @@ export async function POST(req: Request) {
                 aggregateId: tx.id,
                 eventType: 'BANK_TRANSACTION_REPLAYED',
                 payload: {
-                    ...tx.rawPayload as any,
+                    ...(tx.rawPayload as any),
                     description: tx.description,
                     amount: Number(tx.amount),
                     direction: tx.direction,
-                    bankTransactionId: tx.id
+                    bankTransactionId: tx.id,
+                    mode: isLive ? 'LIVE' : 'DRY_RUN'
                 }
             };
 
             return await PaymentMatchingEngine.processBankTransaction(prismaTx, event);
         });
 
-        return NextResponse.json({ success: true, match: result });
+        return NextResponse.json({
+            success: true,
+            match: result,
+            mode: isLive ? 'LIVE' : 'DRY_RUN'
+        });
 
     } catch (error: any) {
         console.error('Replay Error:', error);
