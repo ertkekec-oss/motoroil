@@ -47,6 +47,10 @@ export default function Sidebar() {
         '/security/suspicious': { perm: 'security_access' },
         '/billing': { perm: 'settings_manage' },
         '/field-mobile/routes': { perm: 'field_sales_access' },
+        '/fintech/control-tower': { perm: 'finance_view' },
+        '/fintech/profitability-heatmap': { perm: 'finance_view' },
+        '/fintech/open-banking': { perm: 'finance_view' },
+        '/fintech/smart-pricing': { perm: 'finance_view' },
     };
 
     const menuItems = [
@@ -61,6 +65,10 @@ export default function Sidebar() {
         { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
         { name: 'Servis Masası', href: '/service', icon: '🛠️' },
         { name: 'Veri Analizi', href: '/reports', icon: '📊' },
+        { name: 'Finansal Kontrol Kulesi', href: '/fintech/control-tower', icon: '🗼' },
+        { name: 'Açık Bankacılık', href: '/fintech/open-banking', icon: '🏦' },
+        { name: 'Kârlılık Isı Haritası', href: '/fintech/profitability-heatmap', icon: '🔥' },
+        { name: 'Otonom Fiyatlandırma', href: '/fintech/smart-pricing', icon: '🤖' },
         { name: 'İş Zekası (CEO)', href: '/reports/ceo', icon: '🧠' },
         { name: 'Denetim Kayıtları', href: '/admin/audit-logs', icon: '🔍' },
         { name: 'Kaçak Satış Tespit', href: '/security/suspicious', icon: '🚨' },

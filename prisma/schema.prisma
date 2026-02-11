@@ -73,6 +73,24 @@ model Company {
   staff            Staff[]
   MarketplaceConfig MarketplaceConfig[]
 
+  // Fintech Core Relations
+  domainEvents      DomainEvent[]
+  journalEntries    JournalEntry[]
+  inventoryLayers   InventoryLayer[]
+  orderFinances     MarketplaceOrderFinance[]
+  settlements       MarketplaceSettlement[]
+  bankStatements    BankStatement[]
+  transactionLedgers MarketplaceTransactionLedger[]
+  marketplacePnls   MarketplaceProductPnl[]
+  smartPricingRules SmartPricingRule[]
+  bankConnections   BankConnection[]
+  bankTransactions  BankTransaction[]
+  autopilotConfigs  PricingAutopilotConfig[]
+  paymentMatches    PaymentMatch[]
+  matchingRules     MatchingRule[]
+  cashflowForecasts CashflowForecast[]
+  fintechAudits     FintechAudit[]
+
   @@unique([tenantId, vkn])
   @@index([vkn])
 }
@@ -281,6 +299,8 @@ model Product {
   stocks          Stock[]
   movements       StockMovement[]
   salesOrderItems SalesOrderItem[]
+  marketplacePnls MarketplaceProductPnl[]
+  pricingRules    SmartPricingRule[]
   
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
@@ -1394,6 +1414,363 @@ model StaffTarget {
   staff         Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
   company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  @@index([staffId])
   @@index([companyId])
+}
+
+// ------------------------------------------
+// FINTECH IMMUTABLE CORE (PHASE 10)
+// ------------------------------------------
+
+model DomainEvent {
+  id            String   @id @default(cuid())
+  companyId     String
+  tenantId      String?
+  eventType     String   // Örn: "PURCHASE_CREATED", "SALE_COMPLETED"
+  aggregateType String   // Örn: "ORDER", "INVENTORY", "JOURNAL"
+  aggregateId   String
+  payload       Json     // Tüm event verisi
+  metadata      Json?    // IP, UserAgent vb.
+  createdAt     DateTime @default(now())
+  createdBy     String?
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, aggregateType, createdAt])
+  @@index([aggregateId])
+}
+
+model InventoryLayer {
+  id                String   @id @default(cuid())
+  companyId         String
+  productId         String
+  sourceEventId     String   // DomainEvent ID referansı
+  quantityInitial   Decimal  @db.Decimal(15, 4)
+  quantityRemaining Decimal  @db.Decimal(15, 4)
+  unitCost          Decimal  @db.Decimal(15, 4)
+  branch            String?  @default("Merkez")
+  createdAt         DateTime @default(now())
+
+  company   Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  consumptions InventoryConsumption[]
+
+  @@index([productId, quantityRemaining, createdAt])
+  @@index([companyId])
+}
+
+model InventoryConsumption {
+  id                 String   @id @default(cuid())
+  companyId          String
+  layerId            String
+  consumptionEventId String   // DomainEvent ID referansı (Örn: SALE_COMPLETED)
+  quantity           Decimal  @db.Decimal(15, 4)
+  unitCostAtTime     Decimal  @db.Decimal(15, 4) // Tüketim anındaki maliyet kaydı
+  createdAt          DateTime @default(now())
+
+  layer InventoryLayer @relation(fields: [layerId], references: [id])
+
+  @@index([layerId])
+  @@index([consumptionEventId])
+}
+
+model JournalEntry {
+  id            String   @id @default(cuid())
+  entryNumber   Int      @unique @default(autoincrement())
+  companyId     String
+  sourceEventId String?  @unique // Idempotency: Hangi event bu fişi oluşturdu?
+  description   String
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now())
+  createdBy     String?
+
+  company Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lines   JournalLine[]
+
+  @@index([companyId, date])
+}
+
+model JournalLine {
+  id                String  @id @default(cuid())
+  journalEntryId    String
+  accountCode       String
+  debit             Decimal @default(0) @db.Decimal(15, 2)
+  credit            Decimal @default(0) @db.Decimal(15, 2)
+  externalReference String? // Trendyol Transaction ID vb.
+  companyId         String
+  isOpen            Boolean @default(true) // Reconcile edilip edilmediğini takip eder
+
+  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+
+  @@index([accountCode, companyId, isOpen])
+}
+
+model MarketplaceOrderFinance {
+  id                String    @id @default(cuid())
+  companyId         String
+  orderId           String    @unique
+  orderNumber       String
+  marketplace       String
+  commissionRate    Decimal   @db.Decimal(5, 2)
+  commissionAmount  Decimal   @db.Decimal(15, 2)
+  shippingFee       Decimal   @db.Decimal(15, 2)
+  otherFees         Decimal   @db.Decimal(15, 2)
+  netProfit         Decimal   @db.Decimal(15, 2)
+  receivableBalance Decimal   @db.Decimal(15, 2)
+  isSettled         Boolean   @default(false)
+  currency          String    @default("TRY")
+  lastMatchedAt     DateTime?
+  createdAt         DateTime  @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, marketplace])
+}
+
+model MarketplaceSettlement {
+  id                String    @id @default(cuid())
+  companyId         String
+  marketplace       String
+  settlementId      String    @unique
+  periodStart       DateTime
+  periodEnd         DateTime
+  totalAmount       Decimal   @db.Decimal(15, 2)
+  commissionTotal   Decimal   @db.Decimal(15, 2)
+  payoutAmount      Decimal   @db.Decimal(15, 2)
+  status            String    @default("PENDING") // PENDING, RECONCILED, ERROR
+  externalReference String?
+  journalEntryId    String?
+  reconciledAt      DateTime?
+  createdAt         DateTime  @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, marketplace, status])
+}
+
+model MarketplaceTransactionLedger {
+  id                     String   @id @default(cuid())
+  companyId              String
+  marketplace            String
+  externalReference      String   @unique
+  orderId                String?
+  orderNumber            String?
+  transactionType        String   // SALE, COMMISSION, CARGO, REFUND, PAYOUT
+  amount                 Decimal  @db.Decimal(15, 2)
+  transactionDate        DateTime
+  processingStatus       String   @default("PENDING") // PENDING, MATCHED, RECONCILED, SUSPENSE
+  reconciliationStatus   String?  // FULL, PARTIAL, TOLERATED, MISMATCH
+  journalEntryId         String?
+  matchedBankStatementId String?
+  createdAt              DateTime @default(now())
+
+  company       Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  bankStatement BankStatement? @relation(fields: [matchedBankStatementId], references: [id])
+
+  @@index([companyId, marketplace, processingStatus])
+  @@index([externalReference])
+}
+
+model BankStatement {
+  id               String   @id @default(cuid())
+  companyId        String
+  bankAccountCode  String   // 102.01 vb.
+  statementDate    DateTime
+  referenceNo      String   @unique
+  description      String
+  debit            Decimal  @db.Decimal(15, 2)
+  credit           Decimal  @db.Decimal(15, 2)
+  balance          Decimal? @db.Decimal(15, 2)
+  isMatched        Boolean  @default(false)
+  matchedJournalId String?
+  createdAt        DateTime @default(now())
+
+  company      Company                        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  transLedgers MarketplaceTransactionLedger[]
+
+  @@index([companyId, statementDate])
+  @@index([referenceNo])
+}
+
+model MarketplaceProductPnl {
+  id                String   @id @default(cuid())
+  companyId         String
+  productId         String
+  marketplace       String   // Trendyol, HepsiBurada, vb.
+  
+  grossRevenue      Decimal  @default(0) @db.Decimal(15, 2)
+  commissionTotal   Decimal  @default(0) @db.Decimal(15, 2)
+  shippingTotal     Decimal  @default(0) @db.Decimal(15, 2)
+  otherFeesTotal    Decimal  @default(0) @db.Decimal(15, 2)
+  fifoCostTotal     Decimal  @default(0) @db.Decimal(15, 2)
+  refundCostTotal   Decimal  @default(0) @db.Decimal(15, 2)
+  
+  netProfit         Decimal  @default(0) @db.Decimal(15, 2)
+  profitMargin      Decimal  @default(0) @db.Decimal(5, 2) // % bazında
+  
+  saleCount         Int      @default(0)
+  refundCount       Int      @default(0)
+  
+  lastUpdatedAt     DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, productId, marketplace])
+  @@index([companyId, marketplace])
+}
+
+model SmartPricingRule {
+  id              String   @id @default(cuid())
+  companyId       String
+  productId       String
+  marketplace     String
+  targetMargin    Decimal  @db.Decimal(5, 2) // Hedeflenen net kâr marjı (%)
+  minPrice        Decimal  @db.Decimal(15, 2)
+  maxPrice        Decimal  @db.Decimal(15, 2)
+  isActive        Boolean  @default(true)
+  lastUpdated     DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, productId, marketplace])
+}
+
+model BankConnection {
+  id              String   @id @default(cuid())
+  companyId       String
+  provider        String   // moka, aggregatorX, vb.
+  providerRef     String   // partner account id
+  bankName        String
+  iban            String
+  currency        String
+  consentId       String?
+  accessToken     String?
+  refreshToken    String?
+  lastSyncAt      DateTime?
+  status          String   @default("ACTIVE") // ACTIVE, EXPIRED, ERROR
+  createdAt       DateTime @default(now())
+
+  company      Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  transactions BankTransaction[]
+  balances     BankAccountBalance[]
+
+  @@index([companyId])
+}
+
+model BankAccountBalance {
+  id               String         @id @default(cuid())
+  bankConnectionId String
+  balance          Decimal        @db.Decimal(15, 2)
+  currency         String
+  asOf             DateTime
+  createdAt        DateTime       @default(now())
+  
+  connection       BankConnection @relation(fields: [bankConnectionId], references: [id], onDelete: Cascade)
+}
+
+model BankTransaction {
+  id               String         @id @default(cuid())
+  companyId        String
+  bankConnectionId String
+  transactionId    String         // provider unique id
+  amount           Decimal        @db.Decimal(15, 2)
+  currency         String
+  description      String?
+  transactionDate  DateTime
+  valueDate        DateTime?
+  referenceNo      String?
+  direction        String         // IN / OUT
+  status           String         @default("PENDING") // PENDING, MATCHED, RECONCILED
+  rawPayload       Json
+  createdAt        DateTime       @default(now())
+
+  company    Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  connection BankConnection @relation(fields: [bankConnectionId], references: [id], onDelete: Cascade)
+  matches    PaymentMatch[]
+
+  @@unique([bankConnectionId, transactionId])
+  @@index([companyId, transactionDate])
+}
+
+model PricingAutopilotConfig {
+  id                    String   @id @default(cuid())
+  companyId             String
+  marketplace           String
+  enabled               Boolean  @default(false)
+  minMargin             Decimal  @db.Decimal(5, 2)
+  maxDailyChangePct     Decimal  @db.Decimal(5, 2)
+  pauseOnNegativeStock  Boolean  @default(true)
+  pauseOnHighReturnRate Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, marketplace])
+}
+
+model PaymentMatch {
+  id                String   @id @default(cuid())
+  companyId         String
+  bankTransactionId String
+  ledgerId          String?   // MarketplaceTransactionLedger reference if applicable
+  matchType         String    // AUTO, MANUAL
+  confidenceScore   Int       @default(100)
+  confidenceBucket  String    @default("HIGH") // HIGH, MEDIUM, LOW
+  status            String    @default("PENDING") // PENDING, CONFIRMED, REJECTED
+  journalEntryId    String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  bankTransaction BankTransaction @relation(fields: [bankTransactionId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, status])
+}
+
+model MatchingRule {
+  id          String   @id @default(cuid())
+  companyId   String
+  pattern     String   // "ZIRAAT EFT KIRA"
+  targetType  String   // EXPENSE, INVOICE, MARKETPLACE
+  entityName  String?  // "TRENDYOL"
+  accountCode String?  // "770.01"
+  confidence  Int      @default(100)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, pattern])
+}
+
+model CashflowForecast {
+  id           String   @id @default(cuid())
+  companyId    String
+  horizonDays  Int      // 7, 14, 30
+  expectedIn   Decimal  @db.Decimal(15, 2)
+  expectedOut  Decimal  @db.Decimal(15, 2)
+  netPosition  Decimal  @db.Decimal(15, 2)
+  calculatedAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, calculatedAt])
+}
+
+model FintechAudit {
+  id            String   @id @default(cuid())
+  companyId     String
+  who           String   // "system" or userId
+  action        String   // "PRICE_AUTOPILOT_PUSHED"
+  details       String?  // JSON or text
+  before        Json?
+  after         Json?
+  sourceEventId String?
+  createdAt     DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, action])
+  @@index([createdAt])
 }
