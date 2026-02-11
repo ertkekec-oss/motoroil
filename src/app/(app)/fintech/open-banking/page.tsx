@@ -23,14 +23,33 @@ export default function OpenBankingDashboard() {
     const [loading, setLoading] = useState(true);
     const [connections, setConnections] = useState<any[]>([]);
     const [syncing, setSyncing] = useState(false);
+    const [selectingBank, setSelectingBank] = useState(false);
+
+    const refreshConnections = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch('/api/fintech/banking/transactions'); // Re-using this to get connections implicitly via tx or create a dedicated endpoint
+            // Actually let's create a dedicated connections endpoint or just fetch from treasury/kasalar
+            const kRes = await fetch('/api/kasalar');
+            const kData = await kRes.json();
+            const bankConns = kData.kasalar.filter((k: any) => k.bankConnectionId);
+            setConnections(bankConns.map((k: any) => ({
+                id: k.bankConnectionId,
+                bankName: k.name.split(' (')[0],
+                iban: 'TR...' + k.name.split('(')[1]?.replace(')', '') || '****',
+                status: 'ACTIVE',
+                lastSync: 'Recently',
+                balance: k.balance
+            })));
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        // Mocking connections for now
-        setConnections([
-            { id: '1', bankName: 'Akbank', iban: 'TR...0034', status: 'ACTIVE', lastSync: '10 mins ago', balance: 145000.50 },
-            { id: '2', bankName: 'Garanti BBVA', iban: 'TR...9982', status: 'ACTIVE', lastSync: '2 hours ago', balance: 28540.00 },
-        ]);
-        setLoading(false);
+        refreshConnections();
     }, []);
 
     const handleSync = async () => {
@@ -40,6 +59,29 @@ export default function OpenBankingDashboard() {
             const json = await res.json();
             if (json.success) {
                 alert('Tüm banka hareketleri başarıyla senkronize edildi!');
+                refreshConnections();
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setSyncing(false);
+        }
+    };
+
+    const connectBank = async (bankName: string) => {
+        setSyncing(true);
+        try {
+            const iban = `TR${Math.floor(Math.random() * 10000000000000000000000000).toString()}`;
+            const res = await fetch('/api/fintech/banking/connect', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bankName, iban })
+            });
+            const json = await res.json();
+            if (json.success) {
+                alert(`${bankName} başarıyla bağlandı!`);
+                setSelectingBank(false);
+                refreshConnections();
             }
         } catch (err) {
             console.error(err);
@@ -52,6 +94,31 @@ export default function OpenBankingDashboard() {
 
     return (
         <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {selectingBank && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[3000] flex items-center justify-center p-4">
+                    <div className="bg-[#111] border border-white/10 p-8 rounded-3xl max-w-md w-full animate-in zoom-in-95">
+                        <h3 className="text-xl font-black text-white mb-6">Banka Seçiniz</h3>
+                        <div className="grid grid-cols-1 gap-3">
+                            {['Akbank', 'Garanti BBVA', 'İş Bankası', 'Yapı Kredi', 'QNB Finansbank'].map(bank => (
+                                <button
+                                    key={bank}
+                                    onClick={() => connectBank(bank)}
+                                    className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-left font-bold text-white transition-all hover:scale-[1.02]"
+                                >
+                                    {bank}
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => setSelectingBank(false)}
+                            className="w-full mt-6 py-3 text-gray-500 font-bold hover:text-white transition-colors"
+                        >
+                            Vazgeç
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
@@ -71,7 +138,10 @@ export default function OpenBankingDashboard() {
                         <IconRefresh className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
                         {syncing ? 'Senkronize Ediliyor...' : 'Tümünü Güncelle'}
                     </button>
-                    <button className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white transition-all font-bold text-sm shadow-xl shadow-indigo-500/20">
+                    <button
+                        onClick={() => setSelectingBank(true)}
+                        className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white transition-all font-bold text-sm shadow-xl shadow-indigo-500/20"
+                    >
                         <Plus className="w-4 h-4" />
                         Yeni Banka Bağla
                     </button>
