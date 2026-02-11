@@ -190,28 +190,40 @@ export default function LandingPage() {
 
     switch (type) {
       case 'HERO':
+        const heroVisual = content.visualUrl || content.visual;
         return (
           <header className="m-hero" key={section.id}>
             <div className="m-hero-bg"></div>
-            {content.pillText && (
+            {(content.pillText || content.badgeText) && (
               <div className="m-pill-row">
-                <div className="m-pill">{content.pillText}</div>
+                <div className="m-pill">{content.pillText || content.badgeText}</div>
+                {content.reviewsText && <span className="text-[13px] text-slate-400 font-medium self-center ml-2">{content.reviewsText}</span>}
               </div>
             )}
-            <h1 style={getStyle(content.titleSize, content.titleColor)} dangerouslySetInnerHTML={{ __html: content.title }}></h1>
-            <p style={{ color: content.descColor, fontSize: content.descSize ? `${content.descSize}px` : undefined }} dangerouslySetInnerHTML={{ __html: content.desc }}></p>
+            <h1 style={getStyle(content.titleSize, content.titleColor)} dangerouslySetInnerHTML={{ __html: content.title || 'Modern BI Software' }}></h1>
+            <p style={{ color: content.descColor || content.subtitleColor, fontSize: content.descSize ? `${content.descSize}px` : undefined }} dangerouslySetInnerHTML={{ __html: content.desc || content.subtitle || '' }}></p>
             <div className="m-hero-btns">
-              {content.primaryBtnText && <Link href={content.primaryBtnLink || '/register'} className="m-btn m-btn-primary">{content.primaryBtnText}</Link>}
-              {content.secondaryBtnText && <Link href={content.secondaryBtnLink || '#'} className="m-btn m-btn-outline">{content.secondaryBtnText}</Link>}
+              {(content.primaryBtnText) && <Link href={content.primaryBtnLink || content.primaryBtnUrl || '/register'} className="m-btn m-btn-primary">{content.primaryBtnText}</Link>}
+              {(content.secondaryBtnText) && <Link href={content.secondaryBtnLink || content.secondaryBtnUrl || '#'} className="m-btn m-btn-outline">{content.secondaryBtnText}</Link>}
             </div>
-            {content.visual && (
+            {heroVisual && (
               <div style={{ marginTop: '40px', position: 'relative', maxWidth: '1000px', margin: '40px auto 0' }}>
                 <div className="m-card-white" style={{ padding: '20px', borderRadius: '24px' }}>
                   <img
-                    src={content.visual}
+                    src={heroVisual}
                     alt="Hero Visual"
-                    style={{ width: '100%', height: 'auto', maxHeight: '500px', objectFit: 'cover', objectPosition: 'center top', borderRadius: '16px' }}
+                    style={{ width: '100%', height: 'auto', maxHeight: '560px', objectFit: 'cover', objectPosition: 'center top', borderRadius: '16px' }}
                   />
+                  {content.showFloatingCard && content.floatingCardVisualUrl && (
+                    <div className="absolute -bottom-6 -right-6 w-1/3 aspect-square bg-white border-8 border-white rounded-3xl shadow-2xl overflow-hidden hidden md:block animate-in fade-in zoom-in duration-700">
+                      <img src={content.floatingCardVisualUrl} className="w-full h-full object-cover" alt="Detail" />
+                      {content.floatingCardTitle && (
+                        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                          <div className="text-white text-xs font-bold">{content.floatingCardTitle}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -320,8 +332,52 @@ export default function LandingPage() {
         // Nav is handled globally
         return null;
       case 'BANNER':
-        // Banner is handled globally
-        return null;
+        if (!bannerVisible) return null;
+        return (
+          <div className="m-top-banner" key={section.id} style={{ background: content.bg || '#2a1b3d', position: 'relative' }}>
+            <div dangerouslySetInnerHTML={{ __html: content.text || content.title }}></div>
+            {(content.linkText || content.btnText) && <Link href={content.linkUrl || content.btnLink || '#'}>{content.linkText || content.btnText}</Link>}
+            <button
+              onClick={() => setBannerVisible(false)}
+              style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '18px', opacity: 0.7 }}
+            >
+              ×
+            </button>
+          </div>
+        );
+      case 'GRID':
+        return (
+          <section className="m-section" key={section.id}>
+            <div className="m-container">
+              <div className="text-center mb-16 px-4">
+                <h2 style={getStyle(content.titleSize, content.titleColor)} dangerouslySetInnerHTML={{ __html: content.title || content.mainTitle }}></h2>
+                {(content.desc || content.subtitle) && <p className="max-w-2xl mx-auto mt-4 text-slate-500" dangerouslySetInnerHTML={{ __html: content.desc || content.subtitle }}></p>}
+              </div>
+              <div className="m-grid-container m-grid-3 px-4">
+                {(content.items || []).map((item: any, i: number) => (
+                  <div key={i} className="m-card-white overflow-hidden flex flex-col" style={{ padding: '0' }}>
+                    {(item.imageUrl || item.imgUrl || item.image) && (
+                      <div className="w-full h-48 overflow-hidden bg-slate-100">
+                        <img src={item.imageUrl || item.imgUrl || item.image} alt={item.title} className="w-full h-full object-cover transition duration-500 hover:scale-110" />
+                      </div>
+                    )}
+                    <div style={{ padding: '32px' }}>
+                      <div className="m-card-icon text-3xl mb-6">
+                        {(item.icon && (item.icon.startsWith('http') || item.icon.startsWith('/') || item.icon.startsWith('data:'))) ? (
+                          <img src={item.icon} alt={item.title} className="w-12 h-12 object-contain" />
+                        ) : (
+                          <span>{item.icon || '✨'}</span>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                      <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
 
       // NEW CASES FROM OLD CODEBLOCK - RESTORING
       case 'PARTNERS':
@@ -794,18 +850,9 @@ export default function LandingPage() {
   const sections = cms?.sections || [];
 
   return (
-    <div className="m-container landing-page-root">
-      {/* Global Navigation & Banner Logic */}
-      {sections.some((s: any) => s.type === 'BANNER')
-        ? sections.filter((s: any) => s.type === 'BANNER').map((s: any) => renderSection(s))
-        : (bannerVisible && !sections.length) && (
-          <div className="m-top-banner">
-            İşletmeniz için <strong>akıllı çözümler</strong> ile tanışın. 👆
-            <a href="/register">Hemen Başlayın.</a>
-            <button onClick={() => setBannerVisible(false)} style={{ position: 'absolute', right: '20px', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '18px' }}>×</button>
-          </div>
-        )
-      }
+    <div className="landing-page-root animate-in fade-in duration-700">
+      {/* 0. Banner Logic: Ensure it's at the absolute top */}
+      {sections.filter((s: any) => s.type === 'BANNER').map((s: any) => renderSection(s))}
 
       {/* Navigation */}
       {sections.some((s: any) => s.type === 'NAV')
@@ -814,32 +861,38 @@ export default function LandingPage() {
       }
 
       {/* Main Content Sections */}
-      {sections.filter((s: any) => s.type !== 'NAV' && s.type !== 'BANNER' && s.type !== 'FOOTER').length > 0 ? (
-        sections
-          .filter((s: any) => s.type !== 'NAV' && s.type !== 'BANNER' && s.type !== 'FOOTER')
-          .map((section: any) => renderSection(section))
-      ) : (
-        <header className="m-hero">
-          <div className="m-hero-bg"></div>
-          <div className="m-pill-row">
-            <div className="m-pill">⭐ 4.4 | G2</div>
-            <div className="m-pill">✨ 4.6 | CAPTERRA</div>
-            <span className="text-[13px] text-slate-400 font-medium self-center ml-2">based on 1,000+ reviews</span>
-          </div>
-          <h1>Modern BI software for agencies <br />that need answers now</h1>
-          <p>Empower your entire team to easily see, share and act on data — without the cost or complexity of legacy BI software.</p>
-          <div className="m-hero-btns">
-            <Link href="/register" className="m-btn m-btn-primary" style={{ padding: '14px 36px', fontSize: '15px' }}>Try It Free</Link>
-            <button onClick={handleDemo} className="m-btn m-btn-outline" style={{ padding: '14px 36px', fontSize: '15px' }}>Book a Demo</button>
-          </div>
-          <div className="m-hero-note" style={{ color: '#667085', fontWeight: 700 }}>No card required</div>
-          <div style={{ marginTop: '40px', position: 'relative', maxWidth: '1000px', margin: '40px auto 0' }}>
-            <div className="m-card-white" style={{ padding: '20px', borderRadius: '24px' }}>
-              <img src="https://databox.com/wp-content/uploads/2023/04/databox-dashboards.png" alt="Mockup" style={{ width: '100%', height: '320px', objectFit: 'cover', borderRadius: '16px' }} />
+      {/* 1. Hero Logic: If custom HERO exists, show it. Otherwise show default HERO. */}
+      {sections.some((s: any) => s.type === 'HERO')
+        ? sections.filter((s: any) => s.type === 'HERO').map((section: any) => renderSection(section))
+        : (
+          <header className="m-hero">
+            <div className="m-hero-bg"></div>
+            <div className="m-pill-row">
+              <div className="m-pill">⭐ 4.4 | G2</div>
+              <div className="m-pill">✨ 4.6 | CAPTERRA</div>
+              <span className="text-[13px] text-slate-400 font-medium self-center ml-2">based on 1,000+ reviews</span>
             </div>
-          </div>
-        </header>
-      )}
+            <h1>Modern BI software for agencies <br />that need answers now</h1>
+            <p>Empower your entire team to easily see, share and act on data — without the cost or complexity of legacy BI software.</p>
+            <div className="m-hero-btns">
+              <Link href="/register" className="m-btn m-btn-primary" style={{ padding: '14px 36px', fontSize: '15px' }}>Try It Free</Link>
+              <button onClick={handleDemo} className="m-btn m-btn-outline" style={{ padding: '14px 36px', fontSize: '15px' }}>Book a Demo</button>
+            </div>
+            <div className="m-hero-note" style={{ color: '#667085', fontWeight: 700 }}>No card required</div>
+            <div style={{ marginTop: '40px', position: 'relative', maxWidth: '1000px', margin: '40px auto 0' }}>
+              <div className="m-card-white" style={{ padding: '20px', borderRadius: '24px' }}>
+                <img src="https://databox.com/wp-content/uploads/2023/04/databox-dashboards.png" alt="Mockup" style={{ width: '100%', height: '320px', objectFit: 'cover', borderRadius: '16px' }} />
+              </div>
+            </div>
+          </header>
+        )
+      }
+
+      {/* 2. Other Content Sections (Exclude already rendered Nav, Banner, Footer, and Hero) */}
+      {sections
+        .filter((s: any) => s.type !== 'NAV' && s.type !== 'BANNER' && s.type !== 'FOOTER' && s.type !== 'HERO')
+        .map((section: any) => renderSection(section))
+      }
 
       {/* Global Footer (Dynamic Settings) */}
       {/* Footer */}
