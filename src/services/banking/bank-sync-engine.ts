@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import { EventBus } from '../fintech/event-bus';
 import { TransactionNormalizer } from './transaction-normalizer';
+import { generateTransactionFingerprint } from './utils';
 
 export interface RawBankTransaction {
     id: string;
@@ -16,56 +17,78 @@ export class BankSyncEngine {
      * Synchronizes transactions for all active connections.
      * Can be triggered via Webhook or Cron.
      */
+    /**
+     * Synchronizes transactions for all active connections.
+     * Respects process.env.BANK_LIVE_MODE: DRY_RUN | LIVE_PULL | LIVE_ALL
+     */
     static async syncAll(companyId: string) {
+        const startTime = Date.now();
+        const mode = process.env.BANK_LIVE_MODE || 'DRY_RUN';
+
         const connections = await (prisma as any).bankConnection.findMany({
             where: { companyId, status: 'ACTIVE' }
         });
 
+        console.log(`[BankSync] Starting Batch Sync (Mode: ${mode}) for ${connections.length} connections.`);
+
         const results = [];
-        // Sequential sync to avoid rate limits and queue bloat
         for (const conn of connections) {
             try {
-                const result = await this.syncConnection(conn);
+                const result = await this.syncConnection(conn, mode);
                 results.push(result);
             } catch (err: any) {
                 console.error(`[BankSync] Failed to sync ${conn.bankName}:`, err);
                 results.push({ connection: conn.bankName, success: false, error: err.message });
             }
         }
-        return results;
+
+        const duration = Date.now() - startTime;
+        console.log(`[BankSync] Batch Sync Completed in ${duration}ms.`);
+
+        return { results, duration, mode };
     }
 
     /**
-     * Sycs a single bank connection
+     * Syncs a single bank connection
      */
-    static async syncConnection(connection: any) {
-        console.log(`[BankSync] Starting sync for: ${connection.bankName} (${connection.iban})`);
+    static async syncConnection(connection: any, mode: string = 'DRY_RUN') {
+        const startTime = Date.now();
+        console.log(`[BankSync] Starting sync for: ${connection.bankName} (${connection.iban}) in ${mode} mode.`);
 
         try {
             // 0. Ensure Single Source of Truth (Kasa entry)
+            // Even in DRY_RUN, we want to ensure the Kasa exists to test the link
             const kasa = await this.ensureKasaAccount(connection);
 
             // 1. Fetch from Partner/Mock API
+            // In a real scenario, this would choose an adapter based on connection.integrationMethod
             const rawTransactions = await this.fetchFromPartner(connection);
 
             // 2. Normalize and Save (Idempotent)
-            const savedCount = await this.processTransactions(connection, rawTransactions);
+            // processTransactions handles fingerprinting and saving. 
+            // In DRY_RUN, we still save so we can see them in the UI and test idempotency on next run.
+            const savedCount = await this.processTransactions(connection, rawTransactions, mode);
 
-            // 3. Update sync timestamp and status
-            await (prisma as any).bankConnection.update({
-                where: { id: connection.id },
-                data: {
-                    lastSyncAt: new Date(),
-                    status: 'ACTIVE'
-                }
-            });
+            // 3. Update sync timestamp and status (if not pure dry_run)
+            if (mode !== 'DRY_RUN') {
+                await (prisma as any).bankConnection.update({
+                    where: { id: connection.id },
+                    data: {
+                        lastSyncAt: new Date(),
+                        status: 'ACTIVE'
+                    }
+                });
+            }
 
-            return { connection: connection.bankName, imported: savedCount, success: true };
+            const duration = Date.now() - startTime;
+            return { connection: connection.bankName, imported: savedCount, success: true, duration };
         } catch (err: any) {
-            await (prisma as any).bankConnection.update({
-                where: { id: connection.id },
-                data: { status: 'ERROR' }
-            });
+            if (mode !== 'DRY_RUN') {
+                await (prisma as any).bankConnection.update({
+                    where: { id: connection.id },
+                    data: { status: 'ERROR' }
+                });
+            }
             throw err;
         }
     }
@@ -117,17 +140,28 @@ export class BankSyncEngine {
         return existingKasa;
     }
 
-    private static async processTransactions(connection: any, raw: RawBankTransaction[]) {
+    public static async processTransactions(connection: any, raw: RawBankTransaction[], mode: string = 'DRY_RUN') {
         let imported = 0;
 
         for (const tx of raw) {
             try {
-                // Check idempotency
+                // 1. Generate Robust Fingerprint
+                const fingerprint = generateTransactionFingerprint({
+                    iban: connection.iban,
+                    direction: tx.amount > 0 ? 'IN' : 'OUT',
+                    amount: tx.amount.toString(),
+                    currency: tx.currency,
+                    bookingDate: new Date(tx.date).toISOString().split('T')[0],
+                    description: tx.description,
+                    bankRef: tx.reference || tx.id
+                });
+
+                // 2. Check idempotency via Fingerprint
                 const existing = await (prisma as any).bankTransaction.findUnique({
                     where: {
-                        bankConnectionId_transactionId: {
+                        bankConnectionId_transactionFingerprint: {
                             bankConnectionId: connection.id,
-                            transactionId: tx.id
+                            transactionFingerprint: fingerprint
                         }
                     }
                 });
@@ -143,22 +177,27 @@ export class BankSyncEngine {
                         companyId: connection.companyId,
                         bankConnectionId: connection.id,
                         transactionId: tx.id,
+                        transactionFingerprint: fingerprint,
                         amount: tx.amount,
                         currency: tx.currency,
                         description: tx.description,
                         transactionDate: new Date(tx.date),
                         direction: tx.amount > 0 ? 'IN' : 'OUT',
+                        bankRef: tx.reference,
                         rawPayload: tx as any
                     }
                 });
 
                 // 5. Emit Domain Event for Reconciliation
+                // If Mode is LIVE_PULL, we still emit but the Matchers might skip autonomous actions.
+                // If mode is DRY_RUN, we pass it in metadata.
                 await EventBus.emit({
                     companyId: connection.companyId,
                     eventType: 'BANK_TRANSACTION_IMPORTED',
                     aggregateType: 'JOURNAL', // Triggers accounting logic
                     aggregateId: newTx.id,
-                    payload: { ...newTx, ...tags }
+                    payload: { ...newTx, ...tags },
+                    metadata: { mode }
                 });
 
                 imported++;

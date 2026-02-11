@@ -226,7 +226,7 @@ model Order {
   id              String    @id @default(cuid())
   companyId       String
   marketplaceId   String
-  orderNumber     String    @unique
+  orderNumber     String
   marketplace     String
   customerName    String
   customerEmail   String?
@@ -247,6 +247,7 @@ model Order {
 
   company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
+  @@unique([companyId, orderNumber])
   @@index([marketplace, orderNumber])
   @@index([customerName])
   @@index([orderDate])
@@ -587,6 +588,7 @@ model Kasa {
   updatedAt    DateTime      @updatedAt
   branch           String?        @default("Merkez")
   bankConnectionId String?        @unique
+  bankConnection   BankConnection? @relation(fields: [bankConnectionId], references: [id])
   transactions     Transaction[]
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -1610,6 +1612,7 @@ model MarketplaceProductPnl {
   
   saleCount         Int      @default(0)
   refundCount       Int      @default(0)
+  refundedQuantity  Int      @default(0)
   
   lastUpdatedAt     DateTime @updatedAt
 
@@ -1638,25 +1641,31 @@ model SmartPricingRule {
 }
 
 model BankConnection {
-  id              String   @id @default(cuid())
-  companyId       String
-  provider        String   // moka, aggregatorX, vb.
-  providerRef     String   // partner account id
-  bankName        String
-  iban            String
-  currency        String
-  consentId       String?
-  accessToken     String?
-  refreshToken    String?
-  lastSyncAt      DateTime?
-  status          String   @default("ACTIVE") // ACTIVE, EXPIRED, ERROR
-  createdAt       DateTime @default(now())
+  id                  String   @id @default(cuid())
+  companyId           String
+  bankName            String
+  bankId             String?  // BANK_FORM_DEFINITIONS key (AKBANK, GARANTI, etc.)
+  iban                String   @unique
+  currency            String   @default("TRY")
+  status              String   @default("ACTIVE") // ACTIVE, ERROR, PENDING_ONBOARDING
+  lastSyncAt          DateTime?
+  connectionType      String   @default("OPEN_BANKING") // OPEN_BANKING, XML_IMPORT, AUTO_PULL
+  integrationMethod   String   @default("MANUAL_UPLOAD") // PULL_HTTP, SFTP_PULL, etc.
+  
+  // SECURE CREDENTIALS
+  credentialsEncrypted Json?    // Encryption at rest (KMS/AES-256)
+  credentialsVersion   Int      @default(1)
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   company      Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  transactions BankTransaction[]
   balances     BankAccountBalance[]
+  transactions BankTransaction[]
+  kasalar      Kasa[]
 
   @@index([companyId])
+  @@index([companyId, bankId])
 }
 
 model BankAccountBalance {
@@ -1671,26 +1680,26 @@ model BankAccountBalance {
 }
 
 model BankTransaction {
-  id               String         @id @default(cuid())
-  companyId        String
+  id              String   @id @default(cuid())
+  companyId       String
   bankConnectionId String
-  transactionId    String         // provider unique id
-  amount           Decimal        @db.Decimal(15, 2)
-  currency         String
-  description      String?
-  transactionDate  DateTime
-  valueDate        DateTime?
-  referenceNo      String?
-  direction        String         // IN / OUT
-  status           String         @default("PENDING") // PENDING, MATCHED, RECONCILED
-  rawPayload       Json
-  createdAt        DateTime       @default(now())
+  transactionId   String   // External Bank ID if provided
+  transactionFingerprint String // IBAN + Date + Amount + Desc Hash for Idempotency
+  amount          Decimal  @db.Decimal(14, 2)
+  currency        String
+  description     String?
+  transactionDate DateTime
+  valueDate       DateTime?
+  direction       String   // IN, OUT
+  bankRef         String?
+  rawPayload      Json
+  createdAt       DateTime @default(now())
 
   company    Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   connection BankConnection @relation(fields: [bankConnectionId], references: [id], onDelete: Cascade)
   matches    PaymentMatch[]
 
-  @@unique([bankConnectionId, transactionId])
+  @@unique([bankConnectionId, transactionFingerprint])
   @@index([companyId, transactionDate])
 }
 

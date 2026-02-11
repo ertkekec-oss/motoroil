@@ -1,0 +1,29 @@
+{
+  "payload": {
+    "id": "cmlimwmzf000o107r3dojmi04",
+    "type": "EXPENSE",
+    "amount": -25000,
+    "bankRef": "KRA-2026-02",
+    "subType": "RENT",
+    "currency": "TRY",
+    "companyId": "cmlims29n0002kja6yp1kv4gd",
+    "createdAt": "2026-02-11T23:01:44.668Z",
+    "direction": "OUT",
+    "valueDate": null,
+    "entityName": "Office Rent",
+    "rawPayload": {
+      "id": "KRA-2026-02",
+      "date": "2026-02-01",
+      "amount": -25000,
+      "currency": "TRY",
+      "reference": "KRA-2026-02",
+      "description": "SUBAT 2026 KIRA ODEMESI - MERKEZ OFIS"
+    },
+    "description": "SUBAT 2026 KIRA ODEMESI - MERKEZ OFIS",
+    "transactionId": "KRA-2026-02",
+    "transactionDate": "2026-02-01T00:00:00.000Z",
+    "bankConnectionId": "cmlimupwm0001git3v02xohgi",
+    "transactionFingerprint": "192904fd0c45f71cce47c42279dc0f08b07f94d1713cf512c6cfdedfe2e61429"
+  },
+  "timestamp": "2026-02-11T23:01:44.958Z"
+}

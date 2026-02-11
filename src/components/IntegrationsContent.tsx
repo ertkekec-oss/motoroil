@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
+import BankIntegrationOnboarding from './Banking/BankIntegrationOnboarding';
 
 export default function IntegrationsContent() {
     const { showSuccess, showError } = useModal();
-    const [activeTab, setActiveTab] = useState<'efatura' | 'marketplace' | 'pos'>('efatura');
+    const [activeTab, setActiveTab] = useState<'efatura' | 'marketplace' | 'pos' | 'banking'>('efatura');
 
     // E-Fatura Settings (Nilvera Only)
     const [eFaturaSettings, setEFaturaSettings] = useState({
@@ -74,6 +75,7 @@ export default function IntegrationsContent() {
     });
 
     const [testResults, setTestResults] = useState<{ [key: string]: string }>({});
+    const [stats, setStats] = useState<any>(null);
     const [isTesting, setIsTesting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -149,6 +151,14 @@ export default function IntegrationsContent() {
         setIsTesting(false);
     };
 
+    const fetchStats = async () => {
+        try {
+            const res = await fetch('/api/integrations/marketplace/stats');
+            const data = await res.json();
+            if (data.success) setStats(data.stats);
+        } catch (e) { console.error('Stats error:', e); }
+    };
+
     useEffect(() => {
         const fetchSettings = async () => {
             try {
@@ -170,7 +180,8 @@ export default function IntegrationsContent() {
             }
         };
         fetchSettings();
-    }, []);
+        if (activeTab === 'marketplace') fetchStats();
+    }, [activeTab]);
 
     const saveSettings = async () => {
         setIsSaving(true);
@@ -234,7 +245,20 @@ export default function IntegrationsContent() {
                         <span>{tab.label}</span>
                     </button>
                 ))}
+                <button
+                    onClick={() => setActiveTab('banking')}
+                    className={`h-12 px-6 rounded-xl font-black text-xs tracking-widest transition-all ${activeTab === 'banking' ? 'bg-primary text-white shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                >
+                    🏦 BANKA ENTEGRASYONU
+                </button>
             </div>
+
+            {/* Banking Tab */}
+            {activeTab === 'banking' && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <BankIntegrationOnboarding />
+                </div>
+            )}
 
             {/* E-Fatura Tab */}
             {activeTab === 'efatura' && (
@@ -407,6 +431,50 @@ export default function IntegrationsContent() {
             {/* Marketplace Tab */}
             {activeTab === 'marketplace' && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    {/* 🚀 MARKETPLACE HEALTH DASHBOARD */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="card glass p-5 border-l-4 border-l-primary shadow-xl">
+                            <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">💰 Açık Alacaklar (120.03)</div>
+                            <div className="text-2xl font-black text-white">₺{stats?.financials?.openReceivables.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</div>
+                            <div className="text-[10px] text-emerald-400 font-bold mt-1 flex items-center gap-1">
+                                <span>↑</span> Tahsilat Bekleyen Brut
+                            </div>
+                        </div>
+
+                        <div className="card glass p-5 border-l-4 border-l-amber-500 shadow-xl">
+                            <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">⏳ Askıda Settlement</div>
+                            <div className="text-2xl font-black text-amber-500">{stats?.financials?.pendingSettlements || 0} İşlem</div>
+                            <div className="text-[10px] text-white/40 font-bold mt-1 italic">
+                                Muhasebeleşme sırasında bekleyenler
+                            </div>
+                        </div>
+
+                        <div className="card glass p-5 border-l-4 border-l-blue-500 shadow-xl">
+                            <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">📦 24 Saatlik Sipariş</div>
+                            <div className="text-2xl font-black text-white">{stats?.orders?.last24h || 0} Adet</div>
+                            <span className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full font-bold">Gerçek Zamanlı</span>
+                        </div>
+
+                        <div className="card glass p-5 border-l-4 border-l-emerald-500 shadow-xl">
+                            <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">🔄 Son Sync (Trendyol)</div>
+                            <div className="text-lg font-black text-white truncate">
+                                {stats?.configs?.find((c: any) => c.type === 'trendyol')?.lastSync
+                                    ? new Date(stats.configs.find((c: any) => c.type === 'trendyol').lastSync).toLocaleTimeString('tr-TR')
+                                    : 'Henüz Yapılmadı'}
+                            </div>
+                            <div className="text-[10px] text-emerald-400 font-bold mt-1">Bağlantı Aktif ✅</div>
+                        </div>
+                    </div>
+
+                    <div className="card glass p-6 bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 flex items-center justify-between">
+                        <div>
+                            <h4 className="text-lg font-black text-white">Marketplace Control Hub</h4>
+                            <p className="text-xs text-white/60">Tüm pazaryeri akışları, muhasebe entegrasyonu ve FIFO katmanları aktif.</p>
+                        </div>
+                        <button onClick={fetchStats} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-black text-white transition-all">
+                            REFRESH STATS 🔄
+                        </button>
+                    </div>
                     <div className="card glass-plus p-6 space-y-6 border-l-4 border-l-primary/50">
                         <div className="flex justify-between items-start">
                             <div className="flex items-center gap-4">

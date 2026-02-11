@@ -1,0 +1,29 @@
+{
+  "payload": {
+    "id": "cmlimusaa000hgit3zesyp1uu",
+    "type": "INVOICE_PAYMENT",
+    "amount": 5000,
+    "bankRef": "EFT-123",
+    "subType": "COLLECTION",
+    "currency": "TRY",
+    "companyId": "cmlims29n0002kja6yp1kv4gd",
+    "createdAt": "2026-02-11T23:00:18.226Z",
+    "direction": "IN",
+    "reference": "ALI",
+    "valueDate": null,
+    "rawPayload": {
+      "id": "EFT-123",
+      "date": "2026-02-11",
+      "amount": 5000,
+      "currency": "TRY",
+      "reference": "EFT-123",
+      "description": "EFT: ALI VELI - SIPARIS#4455"
+    },
+    "description": "EFT: ALI VELI - SIPARIS#4455",
+    "transactionId": "EFT-123",
+    "transactionDate": "2026-02-11T00:00:00.000Z",
+    "bankConnectionId": "cmlimupwm0001git3v02xohgi",
+    "transactionFingerprint": "41108b0ccfb9696cc4db805b49450ce500f6209ae8aaf56c3e28882383dee357"
+  },
+  "timestamp": "2026-02-11T23:00:18.506Z"
+}

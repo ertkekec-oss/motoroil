@@ -1,0 +1,29 @@
+{
+  "payload": {
+    "id": "cmlimwkz40003107rpyx6cci7",
+    "type": "MARKETPLACE",
+    "amount": 1540.5,
+    "bankRef": "TRN-998877",
+    "subType": "SETTLEMENT",
+    "currency": "TRY",
+    "companyId": "cmlims29n0002kja6yp1kv4gd",
+    "createdAt": "2026-02-11T23:01:42.064Z",
+    "direction": "IN",
+    "valueDate": null,
+    "entityName": "Trendyol",
+    "rawPayload": {
+      "id": "TRN-998877",
+      "date": "2026-02-12",
+      "amount": 1540.5,
+      "currency": "TRY",
+      "reference": "TRN-998877",
+      "description": "TRENDYOL HAKEDIS ODEMESI 2026/FEB/12"
+    },
+    "description": "TRENDYOL HAKEDIS ODEMESI 2026/FEB/12",
+    "transactionId": "TRN-998877",
+    "transactionDate": "2026-02-12T00:00:00.000Z",
+    "bankConnectionId": "cmlimupwm0001git3v02xohgi",
+    "transactionFingerprint": "5983c59cee86323e73ee5cbe4ca3b006cabee0a346678f21ede7fce7d298f0ef"
+  },
+  "timestamp": "2026-02-11T23:01:43.016Z"
+}

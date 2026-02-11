@@ -26,6 +26,7 @@ export interface Kasa {
     branch?: string;
     currency?: string;
     bankConnectionId?: string;
+    iban?: string;
 }
 
 export interface PaymentMethod {

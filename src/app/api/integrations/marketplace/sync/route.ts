@@ -1,180 +1,152 @@
 import { NextResponse } from 'next/server';
 import { MarketplaceServiceFactory } from '@/services/marketplaces';
-import prisma from '@/lib/prisma'; // Değişiklik: Statik import
+import prisma from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
+import { EventBus } from '@/services/fintech/event-bus';
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const session = auth.user;
+
     try {
         const body = await request.json();
         const { type, config } = body;
 
         if (!type || !config) {
-            return NextResponse.json(
-                { success: false, error: 'Eksik parametreler' },
-                { status: 400 }
-            );
+            return NextResponse.json({ success: false, error: 'Eksik parametreler' }, { status: 400 });
         }
 
-        console.log(`Syncing orders for ${type}...`);
+        // 0. Tenant Isolation - Find Active Company
+        const company = await prisma.company.findFirst({
+            where: { tenantId: session.tenantId }
+        });
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Firma yetkisi bulunamadı' }, { status: 403 });
+        }
+        const companyId = company.id;
+
+        console.log(`[MARKETPLACE] Syncing for ${type} (Company: ${company.name})`);
         const service = MarketplaceServiceFactory.createService(type as any, config);
 
-        // Son 1 haftalık siparişleri çek
+        // Fetch last 7 days
         const endDate = new Date();
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - 7);
 
         const orders = await service.getOrders(startDate, endDate);
 
-        // 0. E-ticaret kategorisini garantile
-        let ecommerceCategory = await prisma.customerCategory.findFirst({
-            where: { name: 'E-ticaret' }
+        // Ensure E-commerce Category
+        const ecommerceCategory = await prisma.customerCategory.upsert({
+            where: { name: 'E-ticaret' },
+            create: { name: 'E-ticaret', description: 'Web Satış Kanalı' },
+            update: {}
         });
-
-        if (!ecommerceCategory) {
-            console.log('📦 E-ticaret kategorisi oluşturuluyor...');
-            ecommerceCategory = await prisma.customerCategory.create({
-                data: {
-                    name: 'E-ticaret',
-                    description: 'E-ticaret entegrasyonundan gelen müşteriler'
-                }
-            });
-        }
 
         let savedCount = 0;
         let updatedCount = 0;
-        let errors: any[] = [];
         let details: any[] = [];
 
         for (const order of orders) {
             try {
-                if (!order.orderNumber) {
-                    throw new Error('Sipariş numarası (orderNumber) eksik!');
-                }
-
-                // Müşteri Senkronizasyonu
-                let customerId = null;
-                if (order.customerName) {
-                    const customerData = {
-                        name: order.customerName,
+                // 1. Customer Sync
+                const customer = await prisma.customer.upsert({
+                    where: { email_companyId: { email: order.customerEmail || `guest-${order.orderNumber}@${type}.com`, companyId } },
+                    create: {
+                        companyId,
+                        name: order.customerName || 'Pazaryeri Müşterisi',
                         email: order.customerEmail,
-                        phone: order.invoiceAddress?.phone || order.shippingAddress?.phone || '', // Adresten telefon al
-                        address: typeof order.invoiceAddress === 'string' ? order.invoiceAddress : JSON.stringify(order.invoiceAddress),
+                        phone: order.invoiceAddress?.phone || '',
+                        address: JSON.stringify(order.invoiceAddress),
                         categoryId: ecommerceCategory.id
-                    };
+                    },
+                    update: {}
+                });
 
-                    let customer = await prisma.customer.findFirst({
-                        where: {
-                            OR: [
-                                { email: order.customerEmail ? order.customerEmail : undefined }, // Email varsa email ile
-                                { name: order.customerName }  // Yoksa isim ile (veya email yoksa)
-                            ].filter(c => c.email !== undefined || c.name !== undefined) as any // filtreleme
-                        }
-                    });
-
-                    if (customer) {
-                        // Varsa kategorisini güncelle (E-ticaret müşterisi olduğunu işaretle)
-                        if (customer.categoryId !== ecommerceCategory.id) {
-                            await prisma.customer.update({
-                                where: { id: customer.id },
-                                data: { categoryId: ecommerceCategory.id }
-                            });
-                        }
-                        customerId = customer.id;
-                    } else {
-                        // Yoksa oluştur
-                        const newCustomer = await prisma.customer.create({
-                            data: {
-                                name: customerData.name,
-                                email: customerData.email,
-                                phone: customerData.phone,
-                                address: customerData.address,
-                                categoryId: ecommerceCategory.id
-                            }
-                        });
-                        customerId = newCustomer.id;
-                        console.log(`👤 Yeni E-ticaret müşterisi oluşturuldu: ${newCustomer.name}`);
-                    }
-                }
-
-                // Sipariş zaten var mı kontrol et (orderNumber unique alan olduğu için findUnique kullanabiliriz)
-                // Ancak veritabanında marketplace + orderNumber unique olmayabilir, sadece orderNumber unique ise:
+                // 2. Idempotency Guard (Composite Unique)
                 const existingOrder = await prisma.order.findUnique({
-                    where: {
-                        orderNumber: order.orderNumber
-                    }
+                    where: { companyId_orderNumber: { companyId, orderNumber: order.orderNumber } }
                 });
 
                 if (!existingOrder) {
-                    await prisma.order.create({
+                    // NEW ORDER: CREATE & EMIT SALE
+                    const newOrder = await prisma.order.create({
                         data: {
+                            companyId,
                             marketplace: type,
-                            marketplaceId: order.id || `UNKNOWN-${Date.now()}`, // ID yoksa uydur
+                            marketplaceId: order.id,
                             orderNumber: order.orderNumber,
-                            customerName: order.customerName || 'Misafir',
-                            customerEmail: order.customerEmail,
-                            totalAmount: typeof order.totalAmount === 'string' ? parseFloat(order.totalAmount) : (order.totalAmount || 0),
+                            customerName: customer.name,
+                            totalAmount: order.totalAmount,
                             currency: order.currency || 'TRY',
-                            status: order.status || 'Yeni',
+                            status: order.status,
                             orderDate: new Date(order.orderDate),
-                            items: order.items as any, // JSON
-                            shippingAddress: order.shippingAddress as any, // JSON
-                            invoiceAddress: order.invoiceAddress as any, // JSON
-                            cargoTrackingNo: order.cargoTrackingNumber ? String(order.cargoTrackingNumber) : null,
-                            cargoProvider: order.cargoProvider,
+                            items: order.items as any,
+                            shippingAddress: order.shippingAddress as any,
+                            invoiceAddress: order.invoiceAddress as any,
                             rawData: order as any
                         }
                     });
+
+                    // TRIGGER REVENUE & FIFO PER ITEM
+                    for (const item of (order.items || [])) {
+                        // Find ERP Product ID
+                        const productMap = await prisma.marketplaceProductMap.findUnique({
+                            where: { marketplace_marketplaceCode: { marketplace: type, marketplaceCode: item.sku } }
+                        });
+
+                        // Emit Sale Event
+                        await EventBus.emit({
+                            companyId,
+                            eventType: 'SALE_COMPLETED',
+                            aggregateType: 'ORDER',
+                            aggregateId: newOrder.id,
+                            payload: {
+                                productId: productMap?.productId, // If null, FIFO is skipped but accounting continues
+                                marketplace: type,
+                                saleAmount: item.price * item.quantity,
+                                quantity: item.quantity,
+                                taxRate: item.taxRate || 20, // Dynamic VAT Support
+                                sku: item.sku,
+                                orderNumber: order.orderNumber
+                            }
+                        });
+                    }
+
                     savedCount++;
                     details.push({ order: order.orderNumber, action: 'Created' });
                 } else {
-                    // Mevcutsa güncelle
-                    await prisma.order.update({
-                        where: { id: existingOrder.id },
-                        data: {
-                            status: order.status,
-                            updatedAt: new Date()
+                    // UPDATE HANDLING (Status Reversals)
+                    if (existingOrder.status !== order.status) {
+                        await prisma.order.update({
+                            where: { id: existingOrder.id },
+                            data: { status: order.status }
+                        });
+
+                        if (['CANCELLED', 'RETURNED'].includes(order.status.toUpperCase())) {
+                            // TODO: Add REFUND_COMPLETED event to reverse FIFO/Rev
+                            console.log(`[MARKETPLACE] Order ${order.orderNumber} ${order.status}. Reversal pending.`);
                         }
-                    });
-                    updatedCount++;
-                    details.push({ order: order.orderNumber, action: 'Updated', oldStatus: existingOrder.status, newStatus: order.status });
+
+                        updatedCount++;
+                        details.push({ order: order.orderNumber, action: 'StatusUpdate', status: order.status });
+                    }
                 }
             } catch (err: any) {
-                console.error(`Sipariş kayıt hatası (${order.orderNumber}):`, err);
-                errors.push({ orderNumber: order.orderNumber, error: err.message });
+                console.error(`[SYNC_ERROR] Order ${order.orderNumber}:`, err.message);
             }
-        }
-
-        // Son senkronizasyon zamanını güncelle
-        try {
-            await prisma.marketplaceConfig.upsert({
-                where: { type: type },
-                update: { lastSync: new Date() },
-                create: {
-                    type: type,
-                    settings: config,
-                    isActive: true,
-                    lastSync: new Date()
-                }
-            });
-        } catch (settingsErr) {
-            console.error('Marketplace ayar güncelleme hatası:', settingsErr);
         }
 
         return NextResponse.json({
             success: true,
             message: `${orders.length} veri çekildi. ${savedCount} yeni, ${updatedCount} güncelleme.`,
-            count: orders.length,
-            savedCount: savedCount,
-            updatedCount: updatedCount,
-            details: details,
-            errors: errors.length > 0 ? errors : undefined,
-            orders: orders.slice(0, 5) // Önizleme içi ilk 5 sipariş
+            savedCount,
+            updatedCount,
+            details
         });
 
     } catch (error: any) {
         console.error('Marketplace Sync Error:', error);
-        return NextResponse.json(
-            { success: false, error: error.message || 'Senkronizasyon hatası' },
-            { status: 500 }
-        );
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

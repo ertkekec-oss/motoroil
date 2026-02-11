@@ -15,7 +15,26 @@ export class SettlementReconciliationEngine {
             });
             if (existing) return existing;
 
-            // 2. Create Ledger Entry (The Pre-Accounting Step)
+            // 2. Data Enrichment: Find Product ID from Order if missing
+            let productId = transaction.productId;
+            if (!productId && transaction.orderNumber) {
+                const order = await tx.order.findUnique({
+                    where: { companyId_orderNumber: { companyId, orderNumber: transaction.orderNumber } }
+                });
+                if (order && order.items) {
+                    // If single item order, we can attribute cost. If multi-item, attribution is harder.
+                    // For now, take the first product as a proxy if it's a general fee.
+                    const items = order.items as any[];
+                    if (items.length > 0) {
+                        const productMap = await tx.marketplaceProductMap.findUnique({
+                            where: { marketplace_marketplaceCode: { marketplace, marketplaceCode: items[0].sku } }
+                        });
+                        productId = productMap?.productId;
+                    }
+                }
+            }
+
+            // 3. Create Ledger Entry
             const ledger = await tx.marketplaceTransactionLedger.create({
                 data: {
                     companyId,
@@ -23,40 +42,31 @@ export class SettlementReconciliationEngine {
                     externalReference: transaction.transactionId,
                     orderId: transaction.orderId,
                     orderNumber: transaction.orderNumber,
-                    transactionType: transaction.type, // SALE, COMMISSION, etc.
+                    transactionType: transaction.type,
                     amount: new Decimal(transaction.amount),
                     transactionDate: new Date(transaction.transactionDate),
                     processingStatus: 'PENDING'
                 }
             });
 
-            // 3. Trigger Immutable Domain Event
+            // 4. Trigger Immutable Domain Event
+            const eventPayload = { ...transaction, productId, amount: ledger.amount };
             const event = await EventBus.emit({
                 companyId,
                 eventType: `${marketplace.toUpperCase()}_TRANSACTION_RECORDED`,
                 aggregateType: 'SETTLEMENT',
                 aggregateId: ledger.id,
-                payload: transaction
-            });
-
-            // 4. Post to Immutable Ledger (Accounting Engine)
-            const entry = await AccountingEngine.postToLedger(tx, {
-                id: event.id,
-                companyId,
-                payload: { ...transaction, amount: ledger.amount },
-                eventType: event.eventType
+                payload: eventPayload
             });
 
             // 5. Update Processing Status
-            if (entry) {
-                await tx.marketplaceTransactionLedger.update({
-                    where: { id: ledger.id },
-                    data: {
-                        processingStatus: 'MATCHED',
-                        journalEntryId: entry.id
-                    }
-                });
-            }
+            await tx.marketplaceTransactionLedger.update({
+                where: { id: ledger.id },
+                data: {
+                    processingStatus: 'MATCHED',
+                    journalEntryId: event.id // EventId corresponds to Journal ID in EventBus logic
+                }
+            });
 
             return ledger;
         });

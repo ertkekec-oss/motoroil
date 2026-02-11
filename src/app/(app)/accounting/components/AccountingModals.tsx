@@ -40,6 +40,7 @@ export default function AccountingModals({
 
     // Statement Import State
     const [file, setFile] = useState<File | null>(null);
+    const [selectedIban, setSelectedIban] = useState('');
     const [parsedTransactions, setParsedTransactions] = useState<any[]>([]);
 
     if (!isOpen) return null;
@@ -111,13 +112,35 @@ export default function AccountingModals({
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0];
-        if (f) {
-            setFile(f);
-            const data = new FormData();
-            data.append('file', f);
+        if (!f) return;
+        setFile(f);
 
-            setLoading(true);
-            try {
+        const data = new FormData();
+        data.append('file', f);
+
+        setLoading(true);
+        try {
+            if (f.name.toLowerCase().endsWith('.xml')) {
+                if (!selectedIban) {
+                    showError('Hata', 'Lütfen XML ithalatı için bir IBAN seçiniz.');
+                    setLoading(false);
+                    return;
+                }
+                data.append('iban', selectedIban);
+                const res = await fetch('/api/fintech/banking/import-xml', {
+                    method: 'POST',
+                    body: data
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showSuccess('Başarılı', `${result.imported} işlem içeri aktarıldı.`);
+                    refreshKasalar();
+                    onClose();
+                } else {
+                    showError('Hata', result.error);
+                }
+            } else {
+                // Original PDF Parsing
                 const res = await fetch('/api/financials/statements/parse', { // Use verified endpoint
                     method: 'POST',
                     body: data
@@ -128,11 +151,11 @@ export default function AccountingModals({
                 } else {
                     showError('Hata', result.error);
                 }
-            } catch (err) {
-                showError('Hata', 'Dosya okunamadı.');
-            } finally {
-                setLoading(false);
             }
+        } catch (err) {
+            showError('Hata', 'Dosya okunamadı.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -171,13 +194,27 @@ export default function AccountingModals({
 
                 {type === 'statement' ? (
                     <div className="space-y-4">
-                        <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-blue-500/50 transition-colors">
-                            <input type="file" onChange={handleFileUpload} accept=".pdf" className="hidden" id="file-upload" />
-                            <label htmlFor="file-upload" className="cursor-pointer block">
-                                <div className="text-4xl mb-2">📄</div>
-                                <div className="text-sm font-bold text-white">PDF Ekstre Yükle</div>
-                                <div className="text-xs text-white/40 mt-1">Bankanızdan aldığınız PDF ekstresini buraya sürükleyin.</div>
-                            </label>
+                        <div className="space-y-4">
+                            <label className="block text-xs font-bold text-white/50 mb-1">İşlem Yapılacak IBAN (XML için zorunlu)</label>
+                            <select
+                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none mb-4"
+                                value={selectedIban}
+                                onChange={e => setSelectedIban(e.target.value)}
+                            >
+                                <option value="">IBAN Seçiniz</option>
+                                {kasalar.filter(k => k.type === 'bank').map(k => (
+                                    <option key={k.id} value={k.iban}>{k.name} - {k.iban}</option>
+                                ))}
+                            </select>
+
+                            <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-blue-500/50 transition-colors">
+                                <input type="file" onChange={handleFileUpload} accept=".pdf,.xml" className="hidden" id="file-upload" />
+                                <label htmlFor="file-upload" className="cursor-pointer block">
+                                    <div className="text-4xl mb-2">📄</div>
+                                    <div className="text-sm font-bold text-white">PDF veya XML Ekstre Yükle</div>
+                                    <div className="text-xs text-white/40 mt-1">Bankanızdan aldığınız PDF veya XML (BizimHesap) ekstrelerini buraya sürükleyin.</div>
+                                </label>
+                            </div>
                         </div>
 
                         {loading && <div className="text-center text-white/50 text-sm">İşleniyor...</div>}

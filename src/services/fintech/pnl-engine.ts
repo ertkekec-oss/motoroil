@@ -24,16 +24,20 @@ export class PnLEngine {
         // 2. MARKETPLACE_TRANSACTION_RECORDED: Handle commissions, shipping, etc.
         if (eventType.includes('TRANSACTION_RECORDED')) {
             const { productId, marketplace, type, amount } = payload;
-            // Sometimes marketplace events don't have productId directly, 
-            // but for P&L we need it. Expecting it in payload.
             if (!productId || !marketplace) return;
 
             const updates: any = {};
             const absAmount = new Decimal(amount || 0).abs();
 
-            if (type === 'COMMISSION') updates.commissionTotal = absAmount;
-            if (type === 'CARGO' || type === 'SHIPPING') updates.shippingTotal = absAmount;
-            if (type === 'SERVICE_FEE' || type === 'OTHER_FEE') updates.otherFeesTotal = absAmount;
+            const txType = type?.toUpperCase();
+
+            if (txType === 'COMMISSION') updates.commissionTotal = absAmount;
+            if (txType === 'CARGO' || txType === 'SHIPPING') updates.shippingTotal = absAmount;
+            if (txType === 'SERVICE_FEE' || txType === 'OTHER_FEE') updates.otherFeesTotal = absAmount;
+            if (txType === 'REFUND') {
+                updates.refundCostTotal = absAmount;
+                updates.refundCount = 1;
+            }
 
             if (Object.keys(updates).length > 0) {
                 await this.adjustMetrics(tx, companyId, productId, marketplace, updates);
@@ -73,6 +77,7 @@ export class PnLEngine {
                     refundCostTotal: updates.refundCostTotal || 0,
                     saleCount: updates.saleCount || 0,
                     refundCount: updates.refundCount || 0,
+                    refundedQuantity: updates.refundedQuantity || 0,
                     netProfit: 0,
                     profitMargin: 0
                 }
@@ -87,6 +92,7 @@ export class PnLEngine {
             if (updates.refundCostTotal) data.refundCostTotal = { increment: updates.refundCostTotal };
             if (updates.saleCount) data.saleCount = { increment: updates.saleCount };
             if (updates.refundCount) data.refundCount = { increment: updates.refundCount };
+            if (updates.refundedQuantity) data.refundedQuantity = { increment: updates.refundedQuantity };
 
             await tx.marketplaceProductPnl.update({
                 where: { id: existing.id },
@@ -99,15 +105,21 @@ export class PnLEngine {
             where: { companyId_productId_marketplace: { companyId, productId, marketplace } }
         });
 
-        const gross = Number(latest.grossRevenue);
-        const costs = Number(latest.commissionTotal)
-            + Number(latest.shippingTotal)
-            + Number(latest.otherFeesTotal)
-            + Number(latest.fifoCostTotal)
-            + Number(latest.refundCostTotal);
+        // FORMULA: Realized Profit
+        // Net Revenue = Gross Sales - Returns
+        // Net Cost = FIFO Cost - (Cost of Returned Items - if back in stock)
+        // Fees = Commission + Shipping + Other
 
-        const netProfit = gross - costs;
-        const margin = gross > 0 ? (netProfit / gross) * 100 : 0;
+        const gross = Number(latest.grossRevenue);
+        const refunds = Number(latest.refundCostTotal);
+        const fees = Number(latest.commissionTotal)
+            + Number(latest.shippingTotal)
+            + Number(latest.otherFeesTotal);
+        const inventoryCost = Number(latest.fifoCostTotal);
+
+        const netProfit = gross - refunds - inventoryCost - fees;
+        const netRevenue = gross - refunds;
+        const margin = netRevenue > 0 ? (netProfit / netRevenue) * 100 : 0;
 
         await tx.marketplaceProductPnl.update({
             where: { id: latest.id },

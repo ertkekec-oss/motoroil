@@ -34,6 +34,25 @@ export class EventBus {
             });
 
             // 2. Trigger synchronous processing (e.g., Accounting, FIFO, P&L)
+
+            // FIFO Consumption for Sales
+            if (event.eventType === 'SALE_COMPLETED') {
+                const { FIFOEngine } = require('./fifo-engine');
+                const { productId, quantity } = event.payload;
+                if (productId && quantity > 0) {
+                    await FIFOEngine.consume(tx, {
+                        companyId: event.companyId,
+                        productId,
+                        quantity,
+                        eventId: recordedEvent.id
+                    });
+                }
+            }
+
+            // Sync with Ledger (GL Entry)
+            const { AccountingEngine } = require('./accounting-engine');
+            const entry = await AccountingEngine.postToLedger(tx, recordedEvent);
+
             // Incremental P&L Update
             await PnLEngine.updatePnl(tx, recordedEvent);
 

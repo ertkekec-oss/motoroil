@@ -19,8 +19,11 @@ export class PaymentMatchingEngine {
 
         console.log(`[FINTECH] Processing Bank Transaction: ${bankTxId} - ${amount} ${payload.currency}`);
 
-        // 0. LIVE_MODE Guard Initial Check
-        const isLive = process.env.FINTECH_LIVE_MODE === 'true';
+        // 0. LIVE_MODE Guard: Hierarchy: Event Metadata > Env Var
+        const mode = event.metadata?.mode || process.env.BANK_LIVE_MODE || 'DRY_RUN';
+        const isLive = mode === 'LIVE_ALL' || process.env.FINTECH_LIVE_MODE === 'true';
+
+        console.log(`[FINTECH] Processing Bank Transaction: ${bankTxId} (Mode: ${mode}, isLive: ${isLive})`);
 
         // 1. Snapshotting (First 5 transactions)
         await this.takeSnapshot(tx, companyId, payload);
@@ -75,7 +78,7 @@ export class PaymentMatchingEngine {
             console.log(`[PAYMENT_MATCH] Medium confidence match found for ${description}. Manual review suggested.`);
         } else {
             // LOW -> Suspense & Log Edge Case Diary
-            await this.postToSuspense(tx, companyId, bankTxId, amount, description);
+            await this.postToSuspense(tx, companyId, bankTxId, amount, description, isLive);
             await this.logEdgeCase(companyId, payload, confidenceScore, matchDetails);
         }
 
@@ -190,7 +193,11 @@ export class PaymentMatchingEngine {
         });
     }
 
-    private static async postToSuspense(tx: any, companyId: string, bankTxId: string, amount: number, description: string) {
+    private static async postToSuspense(tx: any, companyId: string, bankTxId: string, amount: number, description: string, isLive: boolean) {
+        if (!isLive) {
+            console.log(`[FINTECH] DRY RUN: Suspense entry skipped for ${bankTxId}`);
+            return;
+        }
         // 397.01 - Pazaryeri Mutabakat Bekleyen Farklar / Suspense Account
         await AccountingEngine.postToLedger(tx, {
             id: `SUSPENSE_${bankTxId}`,
