@@ -81,7 +81,6 @@ export default function Sidebar() {
 
         // SİSTEM & AYARLAR
         { name: 'Mali Müşavir', href: '/advisor', icon: '💼' },
-        { name: 'Banka Entegrasyonları', href: '/accounting?tab=banks', icon: '🔗' },
         { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
         { name: 'Ekip & Yetki', href: '/staff', icon: '👥' },
         { name: 'Abonelik & Planlar', href: '/billing', icon: '💎' },
