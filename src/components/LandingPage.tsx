@@ -850,7 +850,7 @@ export default function LandingPage() {
   const sections = cms?.sections || [];
 
   return (
-    <div className="landing-page-root animate-in fade-in duration-700">
+    <div className="m-container landing-page-root relative min-h-screen" style={{ width: '100%', display: 'block', overflowX: 'hidden' }}>
       {/* 0. Banner Logic: Ensure it's at the absolute top */}
       {sections.filter((s: any) => s.type === 'BANNER').map((s: any) => renderSection(s))}
 
