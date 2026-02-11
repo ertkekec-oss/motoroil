@@ -1,8 +1,13 @@
 import prisma from '@/lib/prisma';
 import { EventBus } from './event-bus';
 import { AccountingEngine } from './accounting-engine';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class PaymentMatchingEngine {
+    private static EDGE_DIARY_PATH = path.join(process.cwd(), 'logs', 'fintech-edge.jsonl');
+    private static SNAPSHOT_COUNT = 5;
+
     /**
      * Processes a newly imported bank transaction.
      * Matches against existing receivables or uses learning rules.
@@ -11,6 +16,14 @@ export class PaymentMatchingEngine {
         const { companyId, payload, aggregateId } = event;
         const bankTxId = aggregateId;
         const { description, amount, direction } = payload;
+
+        console.log(`[FINTECH] Processing Bank Transaction: ${bankTxId} - ${amount} ${payload.currency}`);
+
+        // 0. LIVE_MODE Guard Initial Check
+        const isLive = process.env.FINTECH_LIVE_MODE === 'true';
+
+        // 1. Snapshotting (First 5 transactions)
+        await this.takeSnapshot(tx, companyId, payload);
 
         // 1. Check Learning Rules (AI/Pattern Matching)
         const rule = await this.findMatchingRule(companyId, description);
@@ -51,17 +64,66 @@ export class PaymentMatchingEngine {
 
         // 5. Otonom Actions
         if (confidenceBucket === 'HIGH') {
-            await this.autoConfirmMatch(tx, match, matchDetails, event);
+            if (isLive) {
+                await this.autoConfirmMatch(tx, match, matchDetails, event);
+                // 5.1 FIRST_REAL_MONEY_RECEIVED Milestone
+                await this.checkFirstMoneyMilestone(companyId);
+            } else {
+                console.warn(`[AUTOPILOT] DRY RUN: Auto-confirm skipped (LIVE_MODE=false)`);
+            }
         } else if (confidenceBucket === 'MEDIUM') {
-            // In a real app, this would trigger a notification
             console.log(`[PAYMENT_MATCH] Medium confidence match found for ${description}. Manual review suggested.`);
-            // Phase 2.2: "24 saat içinde otomatik confirm (override edilmezse)" -> This would be handled by a cron job separately
         } else {
-            // LOW -> Suspense
+            // LOW -> Suspense & Log Edge Case Diary
             await this.postToSuspense(tx, companyId, bankTxId, amount, description);
+            await this.logEdgeCase(companyId, payload, confidenceScore, matchDetails);
         }
 
         return match;
+    }
+
+    private static async takeSnapshot(tx: any, companyId: string, payload: any) {
+        try {
+            const count = await (prisma as any).bankTransaction.count({ where: { companyId } });
+            if (count < this.SNAPSHOT_COUNT) {
+                const snapshotDir = path.join(process.cwd(), 'logs', 'snapshots');
+                if (!fs.existsSync(snapshotDir)) fs.mkdirSync(snapshotDir, { recursive: true });
+                const filePath = path.join(snapshotDir, `tx_${Date.now()}.json`);
+                fs.writeFileSync(filePath, JSON.stringify({ payload, timestamp: new Date() }, null, 2));
+            }
+        } catch (e) { console.error('Snapshot error:', e); }
+    }
+
+    private static async logEdgeCase(companyId: string, payload: any, confidence: number, candidates: any) {
+        const entry = {
+            time: new Date().toISOString(),
+            companyId,
+            direction: payload.direction,
+            amount: payload.amount,
+            description: payload.description,
+            confidence,
+            topCandidates: candidates
+        };
+        try {
+            const dir = path.dirname(this.EDGE_DIARY_PATH);
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+            fs.appendFileSync(this.EDGE_DIARY_PATH, JSON.stringify(entry) + '\n');
+        } catch (e) { console.error('Edge diary log error:', e); }
+    }
+
+    private static async checkFirstMoneyMilestone(companyId: string) {
+        const existing = await (prisma as any).domainEvent.findFirst({
+            where: { companyId, eventType: 'FIRST_REAL_MONEY_RECEIVED' }
+        });
+        if (!existing) {
+            await EventBus.emit({
+                companyId,
+                eventType: 'FIRST_REAL_MONEY_RECEIVED',
+                aggregateType: 'JOURNAL',
+                aggregateId: 'SYSTEM',
+                payload: { message: 'First real money processed autonomously!' }
+            });
+        }
     }
 
     private static async findMatchingRule(companyId: string, description: string) {

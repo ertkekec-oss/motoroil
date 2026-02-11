@@ -42,37 +42,70 @@ const MetricCard = ({ title, value, unit, subtitle, color, icon: Icon, trend }: 
     </div>
 );
 
-const HealthGauge = ({ status, riskScore }: any) => {
-    const isHealthy = status === 'HEALTHY' || (riskScore && riskScore > 70);
-    const isWarning = status === 'WARNING' || (riskScore && riskScore > 40 && riskScore <= 70);
+const HealthSnapshot = ({ data }: any) => (
+    <div className="card glass p-6 space-y-4">
+        <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider">Health Snapshot</h3>
+        <div className="space-y-3">
+            <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500 font-medium">Connected Banks</span>
+                <span className="text-sm font-black text-white">{data?.connectedBanks}</span>
+            </div>
+            <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500 font-medium">Auto-Matched %</span>
+                <span className="text-sm font-black text-emerald-400">{data?.todayMatchedPct?.toFixed(1)}%</span>
+            </div>
+            <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500 font-medium">Mode</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded font-black ${data?.autopilotState === 'LIVE' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                    {data?.autopilotState}
+                </span>
+            </div>
+        </div>
+    </div>
+);
+
+const ConfidenceChart = ({ dist }: any) => {
+    const total = dist?.high + dist?.medium + dist?.low || 1;
+    const hp = (dist?.high / total) * 100;
+    const mp = (dist?.medium / total) * 100;
+    const lp = (dist?.low / total) * 100;
 
     return (
-        <div className="card glass p-6 flex flex-col items-center justify-center text-center group">
-            <div className="relative w-24 h-24 mb-4">
-                {/* Score Gauge Background */}
-                <svg className="w-full h-full transform -rotate-90">
-                    <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-white/5" />
-                    <circle
-                        cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent"
-                        strokeDasharray={251.2}
-                        strokeDashoffset={251.2 - (251.2 * (riskScore || 0)) / 100}
-                        className={`transition-all duration-1000 ease-out ${isHealthy ? 'text-emerald-500' : isWarning ? 'text-amber-500' : 'text-rose-500'
-                            }`}
-                    />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-xl font-black text-white">{riskScore || 0}</span>
-                    <span className="text-[8px] text-gray-500 font-bold uppercase">Risk</span>
+        <div className="card glass p-6">
+            <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">Matching Confidence</h3>
+            <div className="h-4 w-full bg-white/5 rounded-full overflow-hidden flex mb-4">
+                <div style={{ width: `${hp}%` }} className="h-full bg-emerald-500" title="High" />
+                <div style={{ width: `${mp}%` }} className="h-full bg-amber-500" title="Medium" />
+                <div style={{ width: `${lp}%` }} className="h-full bg-rose-500" title="Low" />
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+                <div><p className="text-[10px] text-gray-500 font-bold uppercase">High</p><p className="text-xs font-black text-emerald-400">{dist?.high}</p></div>
+                <div><p className="text-[10px] text-gray-500 font-bold uppercase">Med</p><p className="text-xs font-black text-amber-400">{dist?.medium}</p></div>
+                <div><p className="text-[10px] text-gray-500 font-bold uppercase">Low</p><p className="text-xs font-black text-rose-400">{dist?.low}</p></div>
+            </div>
+        </div>
+    );
+};
+
+const FlowAccuracy = ({ data }: any) => {
+    const accuracy = data?.forecast > 0 ? (1 - Math.abs(data.actual - data.forecast) / data.forecast) * 100 : 0;
+    return (
+        <div className="card glass p-6">
+            <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">Forecast vs Reality</h3>
+            <div className="space-y-3">
+                <div className="flex justify-between items-end">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase">Daily Target</p>
+                    <p className="text-sm font-black text-white">{data?.forecast?.toLocaleString('tr-TR')} ₺</p>
+                </div>
+                <div className="flex justify-between items-end">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase">Actual Inflow</p>
+                    <p className="text-sm font-black text-emerald-400">{data?.actual?.toLocaleString('tr-TR')} ₺</p>
+                </div>
+                <div className="pt-2 border-t border-white/5 flex justify-between items-center">
+                    <span className="text-[10px] text-gray-500 font-bold uppercase">Model Accuracy</span>
+                    <span className={`text-xs font-black ${accuracy > 80 ? 'text-emerald-400' : 'text-amber-400'}`}>{accuracy.toFixed(1)}%</span>
                 </div>
             </div>
-            <div className="flex items-center gap-2 mb-1">
-                <div className={`w-2 h-2 rounded-full ${isHealthy ? 'bg-emerald-500' : isWarning ? 'bg-amber-500' : 'bg-rose-500'} animate-pulse`} />
-                <h3 className={`text-lg font-black uppercase tracking-tighter ${isHealthy ? 'text-emerald-400' : isWarning ? 'text-amber-400' : 'text-rose-400'
-                    }`}>
-                    {isHealthy ? 'HEALTHY' : isWarning ? 'WARNING' : 'CRITICAL'}
-                </h3>
-            </div>
-            <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Financial Health Score</p>
         </div>
     );
 };
@@ -118,57 +151,86 @@ export default function FintechControlTower() {
 
     return (
         <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-24">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-8">
+            {/* Premium Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h1 className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">
-                        FINANCIAL CONTROL TOWER
+                    <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-emerald-400 to-white animate-gradient">
+                        FINTECH CONTROL TOWER <span className="text-xs align-top bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded ml-2">PHASE 3: LIVE EXAM</span>
                     </h1>
-                    <p className="text-gray-500 text-sm font-medium mt-1 uppercase tracking-wider flex items-center gap-2">
-                        <IconActivity className="w-4 h-4 text-indigo-500" /> Real-time Immutable Fintech Core Monitoring
+                    <p className="text-gray-500 text-sm font-medium mt-1 uppercase tracking-widest flex items-center gap-2">
+                        <IconShield className="w-4 h-4 text-emerald-500" /> Autonomous Financial Command Center
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className={`px-4 py-2 bg-white/5 rounded-xl border border-white/10 flex items-center gap-2 ${metrics.engine.autopilotEnabled ? 'border-emerald-500/30' : 'border-white/10'
-                        }`}>
-                        <div className={`w-2 h-2 rounded-full ${metrics.engine.autopilotEnabled ? 'bg-emerald-500 animate-ping' : 'bg-gray-600'}`} />
-                        <span className="text-[10px] font-bold text-gray-300 uppercase tracking-tighter">
-                            {metrics.engine.autopilotEnabled ? `Autopilot Active: ${metrics.engine.autopilotCount} Rules` : 'Autopilot Inactive'}
-                        </span>
+                <div className="flex items-center gap-4">
+                    <div className="px-4 py-2 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${metrics.healthSnapshot.autopilotState === 'LIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                        <span className="text-xs font-black text-white">{metrics.healthSnapshot.autopilotState || 'DRY_RUN'}</span>
                     </div>
-                    <button className="btn-secondary text-[10px] py-2 px-4 uppercase font-black tracking-widest">Global Safety Breaker</button>
+                    <button className="btn-premium px-6 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2">
+                        <IconActivity className="w-4 h-4" /> System Audit Trail
+                    </button>
+                </div>
+            </div>
+
+            {/* Phase 3 Milestone Banner */}
+            {metrics.healthSnapshot.todayMatchedPct > 0 && (
+                <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-between group animate-in slide-in-from-top duration-700">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                            <IconZap className="w-6 h-6 text-emerald-400" />
+                        </div>
+                        <div>
+                            <h4 className="text-sm font-black text-white">AUTONOMOUS SUCCESS</h4>
+                            <p className="text-[10px] text-gray-500 font-bold uppercase">Sistem bugün banka hareketlerinin %{metrics.healthSnapshot.todayMatchedPct?.toFixed(0)}'ini insan müdahalesi olmadan işledi.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Performance Hub & Health Dashboard */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <HealthSnapshot data={metrics.healthSnapshot} />
+                <ConfidenceChart dist={metrics.confidenceDist} />
+                <FlowAccuracy data={metrics.flowReality} />
+                <div className="card glass p-6 flex flex-col items-center justify-center text-center">
+                    <div className="flex items-center gap-2 mb-2">
+                        <IconActivity className="w-4 h-4 text-emerald-500" />
+                        <span className="text-xs font-black text-white">SAFETY BREAKER</span>
+                    </div>
+                    <p className={`text-lg font-black ${metrics.engine.safetyBreakerStatus === 'TRIGGERED' ? 'text-rose-500' : 'text-emerald-500'}`}>
+                        {metrics.engine.safetyBreakerStatus}
+                    </p>
+                    <p className="text-[9px] text-gray-500 uppercase mt-1 font-bold">Limit: 500 TL Suspense</p>
                 </div>
             </div>
 
             {/* Main Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <MetricCard
-                    title="Total Receivables (120.03)"
+                    title="Marketplace Receivables"
                     value={metrics.financials.totalReceivable.toLocaleString('tr-TR')}
                     unit="₺"
                     subtitle={`${metrics.financials.openInvoiceCount} pending items`}
-                    color="bg-blue-500"
-                    icon={IconCreditCard}
-                    trend={12.5}
+                    color="bg-emerald-500"
+                    icon={IconTrendingUp}
+                    trend={12}
                 />
                 <MetricCard
-                    title="Suspense Balance (397.01)"
+                    title="Suspense Balance"
                     value={metrics.financials.suspenseAmount.toLocaleString('tr-TR')}
                     unit="₺"
                     subtitle="Awaiting manual review"
                     color="bg-rose-500"
                     icon={IconAlert}
-                    trend={-5.2}
                 />
                 <MetricCard
                     title="Reconciled Today"
                     value={metrics.financials.reconciledTodayAmount?.toLocaleString('tr-TR') || "0"}
                     unit="₺"
                     subtitle={`${metrics.financials.reconciledTodayCount || 0} settlements closed`}
-                    color="bg-emerald-500"
+                    color="bg-blue-500"
                     icon={IconCheck}
                 />
-                <HealthGauge status={metrics.health.grade} riskScore={metrics.health.riskScore} />
             </div>
 
             {/* Middle Section: Cashflow & Aging */}

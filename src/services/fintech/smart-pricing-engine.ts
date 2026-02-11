@@ -101,6 +101,12 @@ export class SmartPricingEngine {
      * Simulates pushing price to marketplace API.
      */
     private static async pushPriceToMarketplace(rule: any, recommendation: any) {
+        // 0. LIVE_MODE Guard
+        if (process.env.FINTECH_MARKETPLACE_PUSH_ENABLED !== 'true') {
+            console.warn(`[AUTOPILOT] DRY RUN: Price push skipped for ${recommendation.productName} (LIVE_MODE=false)`);
+            return;
+        }
+
         // In production, this would call Trendyol/Hepsiburada API
         console.log(`[AUTOPILOT] Pushing price to ${rule.marketplace}: ${recommendation.productName} -> ${recommendation.recommendedPrice}`);
 

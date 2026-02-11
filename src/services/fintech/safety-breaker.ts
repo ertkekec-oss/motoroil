@@ -2,8 +2,8 @@ import prisma from '@/lib/prisma';
 import { EventBus } from './event-bus';
 
 export class SafetyBreaker {
-    private static readonly SUSPENSE_LIMIT = 50000; // 50.000 TL
-    private static readonly FAILED_EVENT_LIMIT = 10;
+    private static readonly SUSPENSE_LIMIT = Number(process.env.FINTECH_SAFE_SUSPENSE_THRESHOLD) || 500;
+    private static readonly FAILED_EVENT_LIMIT = 5; // Reduced for go-live safety
 
     /**
      * Checks system health and triggers safety breaker if necessary.

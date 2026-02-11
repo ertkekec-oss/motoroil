@@ -55,24 +55,33 @@ export default function Sidebar() {
 
     const menuItems = [
         { name: 'POS Terminal', href: '/', icon: '🏮' },
+
+        // FINANSAL YÖNETİM GRUBU
         { name: 'Finansal Yönetim', href: '/accounting', icon: '🏛️' },
         { name: 'Satış Yönetimi', href: '/sales', icon: '🧾' },
-        { name: 'Saha Satış Yönetimi', href: '/field-sales/admin/routes', icon: '🗺️' },
-        { name: 'Saha Satış (Mobil)', href: '/field-mobile/routes', icon: '📱' },
-        { name: 'Teklifler', href: '/quotes', icon: '📋' },
         { name: 'Cari Hesaplar', href: '/customers', icon: '🤝' },
         { name: 'Tedarikçi Ağı', href: '/suppliers', icon: '🚚' },
-        { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
-        { name: 'Servis Masası', href: '/service', icon: '🛠️' },
-        { name: 'Veri Analizi', href: '/reports', icon: '📊' },
+
+        // AKILLI SİSTEMLER GRUBU
         { name: 'Finansal Kontrol Kulesi', href: '/fintech/control-tower', icon: '🗼' },
-        { name: 'Açık Bankacılık', href: '/fintech/open-banking', icon: '🏦' },
-        { name: 'Kârlılık Isı Haritası', href: '/fintech/profitability-heatmap', icon: '🔥' },
         { name: 'Otonom Fiyatlandırma', href: '/fintech/smart-pricing', icon: '🤖' },
+        { name: 'Kârlılık Isı Haritası', href: '/fintech/profitability-heatmap', icon: '🔥' },
+
+        // OPERASYON GRUBU
+        { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
+        { name: 'Saha Satış Yönetimi', href: '/field-sales/admin/routes', icon: '🗺️' },
+        { name: 'Teklifler', href: '/quotes', icon: '📋' },
+        { name: 'Servis Masası', href: '/service', icon: '🛠️' },
+
+        // ANALİZ & DENETİM
+        { name: 'Veri Analizi', href: '/reports', icon: '📊' },
         { name: 'İş Zekası (CEO)', href: '/reports/ceo', icon: '🧠' },
         { name: 'Denetim Kayıtları', href: '/admin/audit-logs', icon: '🔍' },
         { name: 'Kaçak Satış Tespit', href: '/security/suspicious', icon: '🚨' },
+
+        // SİSTEM & AYARLAR
         { name: 'Mali Müşavir', href: '/advisor', icon: '💼' },
+        { name: 'Banka Entegrasyonları', href: '/accounting?tab=banks', icon: '🔗' },
         { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
         { name: 'Ekip & Yetki', href: '/staff', icon: '👥' },
         { name: 'Abonelik & Planlar', href: '/billing', icon: '💎' },

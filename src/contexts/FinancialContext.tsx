@@ -25,6 +25,7 @@ export interface Kasa {
     type: string;
     branch?: string;
     currency?: string;
+    bankConnectionId?: string;
 }
 
 export interface PaymentMethod {
@@ -59,6 +60,8 @@ interface FinancialContextType {
     transactions: Transaction[];
     setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
     refreshTransactions: () => Promise<void>;
+    bankTransactions: any[];
+    refreshBankTransactions: () => Promise<void>;
     addTransaction: (t: Omit<Transaction, 'id' | 'date'>) => void;
     checks: Check[];
     refreshChecks: () => Promise<void>;
@@ -87,6 +90,7 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
 
     const [kasalar, setKasalar] = useState<Kasa[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [bankTransactions, setBankTransactions] = useState<any[]>([]);
     const [checks, setChecks] = useState<Check[]>([]);
 
     // Global Error Gate State
@@ -135,6 +139,19 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
             setError(null);
         } catch (err: any) {
             console.error('Transactions fetch failed', err);
+            setError(err);
+        }
+    };
+
+    const refreshBankTransactions = async () => {
+        try {
+            const res = await apiFetch(`/api/fintech/banking/transactions?t=${Date.now()}`, { cache: 'no-store' });
+            if (!res.ok) throw new Error('FINANCIAL_BANK_TX_Failed to fetch bank transactions');
+            const data = await res.json();
+            setBankTransactions(data.transactions || []);
+            setError(null);
+        } catch (err: any) {
+            console.error('Bank Transactions fetch failed', err);
             setError(err);
         }
     };
@@ -277,6 +294,7 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
             setIsInitialLoading(true);
             Promise.all([
                 refreshTransactions(),
+                refreshBankTransactions(),
                 refreshKasalar(),
                 refreshChecks(),
                 refreshSalesExpenses()
@@ -304,6 +322,7 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
     return (
         <FinancialContext.Provider value={{
             kasalar, setKasalar, refreshKasalar, transactions, setTransactions, refreshTransactions,
+            bankTransactions, refreshBankTransactions,
             addTransaction, checks, refreshChecks,
             addFinancialTransaction, addCheck, collectCheck, paymentMethods, updatePaymentMethods,
             kasaTypes, setKasaTypes, salesExpenses, updateSalesExpenses,

@@ -1,14 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFinancials } from "@/contexts/FinancialContext";
 import { useCRM } from "@/contexts/CRMContext"; // Added useCRM
 import { formatCurrency } from "@/lib/utils";
 
+import { useSearchParams } from "next/navigation";
 import AccountingModals from "./components/AccountingModals";
 
 export default function AccountingPage() {
+    const searchParams = useSearchParams();
+    const initialTab = searchParams.get('tab') || 'receivables';
+
     const { user } = useAuth();
     const {
         transactions,
@@ -17,13 +22,20 @@ export default function AccountingPage() {
         refreshTransactions,
         refreshKasalar,
         refreshChecks,
+        refreshBankTransactions,
         isInitialLoading
     } = useFinancials();
 
     const { customers, suppliers, refreshCustomers, refreshSuppliers } = useCRM(); // Get CRM data
 
-    const [activeTab, setActiveTab] = useState("receivables");
+    const [activeTab, setActiveTab] = useState(initialTab);
     const [modalType, setModalType] = useState<string | null>(null);
+
+    // Sync activeTab with URL is optional but helpful
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab) setActiveTab(tab);
+    }, [searchParams]);
 
     // Calculate Stats
     const stats = React.useMemo(() => {
@@ -53,6 +65,7 @@ export default function AccountingPage() {
             refreshTransactions(),
             refreshKasalar(),
             refreshChecks(),
+            refreshBankTransactions(),
             refreshCustomers(),
             refreshSuppliers()
         ]);
@@ -336,32 +349,152 @@ export default function AccountingPage() {
                 )}
 
                 {activeTab === 'banks' && (
-                    <div className="space-y-6">
+                    <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-xl font-bold text-white">Kasa & Banka Hesapları</h3>
-                            <button
-                                onClick={() => setModalType('account')}
-                                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium text-sm transition-colors"
-                            >
-                                + Hesap Ekle
-                            </button>
+                            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                                <span className="bg-amber-500/10 p-2 rounded-lg text-amber-400">💰</span>
+                                Kasa & Banka Merkezi
+                            </h3>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={async () => {
+                                        await fetch('/api/fintech/banking/sync', { method: 'POST' });
+                                        await refreshData();
+                                    }}
+                                    className="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 rounded-xl font-bold text-xs transition-all flex items-center gap-2"
+                                >
+                                    🔄 Banka Güncelle
+                                </button>
+                                <Link
+                                    href="/fintech/open-banking"
+                                    className="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/30 rounded-xl font-bold text-xs transition-all flex items-center gap-2"
+                                >
+                                    🔗 Banka Bağla
+                                </Link>
+                                <button
+                                    onClick={() => setModalType('account')}
+                                    className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl font-bold text-xs transition-all"
+                                >
+                                    + Manuel Hesap
+                                </button>
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {kasalar.map((kasa, i) => (
-                                <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center">
-                                    <div>
-                                        <div className="text-sm font-bold text-white uppercase tracking-wider">{kasa.name}</div>
-                                        <div className="text-xs text-white/40 mt-1">{kasa.type === 'bank' ? '🏦 Banka Hesabı' : '💵 Nakit Kasa'}</div>
+                                <div
+                                    key={i}
+                                    className={`group relative p-6 rounded-2xl border transition-all duration-300 hover:scale-[1.02] ${kasa.bankConnectionId
+                                        ? 'bg-emerald-500/5 border-emerald-500/20 shadow-lg shadow-emerald-500/5'
+                                        : 'bg-white/5 border-white/10'
+                                        }`}
+                                >
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${kasa.bankConnectionId ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-white/40'
+                                                }`}>
+                                                {kasa.type === 'bank' ? '🏦' : '💵'}
+                                            </div>
+                                            <div>
+                                                <h4 className="text-sm font-black text-white uppercase tracking-tight group-hover:text-emerald-400 transition-colors">
+                                                    {kasa.name}
+                                                </h4>
+                                                <div className="flex items-center gap-1.5 mt-1">
+                                                    {kasa.bankConnectionId ? (
+                                                        <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase">
+                                                            🔗 LIVE ACCOUNT
+                                                        </span>
+                                                    ) : (
+                                                        <span className="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[10px] font-black uppercase italic">
+                                                            ✏️ MANUEL
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button className="text-white/20 hover:text-white">⚙️</button>
+                                        </div>
                                     </div>
-                                    <div className={`text-xl font-black ${kasa.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                        {formatCurrency(kasa.balance)}
+
+                                    <div className="space-y-4">
+                                        <div className={`text-3xl font-black ${kasa.balance >= 0 ? 'text-white' : 'text-rose-500'}`}>
+                                            {formatCurrency(kasa.balance)}
+                                        </div>
+                                        <div className="pt-4 border-t border-white/5 flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-white/30">
+                                            <span>{kasa.branch || 'Merkez'} Şubesi</span>
+                                            <span>Son İşlem: BUGÜN</span>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
                             {kasalar.length === 0 && (
-                                <div className="col-span-2 text-center py-8 text-white/30">Kasa/Banka hesabı bulunamadı.</div>
+                                <div className="col-span-full py-20 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                                    <p className="text-white/20 text-sm font-bold uppercase tracking-widest">Henüz bir hesap eklenmedi</p>
+                                    <button
+                                        onClick={() => setModalType('account')}
+                                        className="mt-4 text-xs font-black text-amber-500 hover:underline"
+                                    >
+                                        İLK KASANI ŞİMDİ OLUŞTUR →
+                                    </button>
+                                </div>
                             )}
                         </div>
+
+                        {/* Recent Bank Streams Integration */}
+                        {(useFinancials as any)().bankTransactions?.length > 0 && (
+                            <div className="mt-8 space-y-4">
+                                <h4 className="text-xs font-black text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    CANLI BANKA AKIŞLARI (HUB GÖRÜNÜMÜ)
+                                </h4>
+                                <div className="grid grid-cols-1 divide-y divide-white/5 bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden">
+                                    {(useFinancials as any)().bankTransactions.slice(0, 10).map((bt: any) => (
+                                        <div key={bt.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-2 rounded-lg ${bt.direction === 'IN' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                                                    {bt.direction === 'IN' ? '↓' : '↑'}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[9px] font-bold text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded">BANK</span>
+                                                        <p className="text-xs font-bold text-white max-w-[300px] truncate">{bt.description}</p>
+                                                    </div>
+                                                    <p className="text-[10px] text-gray-500 font-medium uppercase">
+                                                        {bt.connection?.bankName} • {new Date(bt.transactionDate).toLocaleString('tr-TR')}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-6">
+                                                <div className="text-right">
+                                                    <p className={`text-sm font-black ${bt.direction === 'IN' ? 'text-white' : 'text-rose-400'}`}>
+                                                        {bt.direction === 'IN' ? '+' : ''}{formatCurrency(bt.amount)}
+                                                    </p>
+                                                    <div className="flex items-center gap-1 justify-end">
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${bt.status === 'RECONCILED' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                                        <span className="text-[9px] text-gray-500 font-bold uppercase">{bt.status}</span>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={async () => {
+                                                        const res = await fetch('/api/fintech/banking/replay', {
+                                                            method: 'POST',
+                                                            body: JSON.stringify({ transactionId: bt.id })
+                                                        });
+                                                        const json = await res.json();
+                                                        if (json.success) alert('İşlem yeniden işlendi!');
+                                                    }}
+                                                    className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-white"
+                                                    title="Yeniden İşlet"
+                                                >
+                                                    🔄
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 

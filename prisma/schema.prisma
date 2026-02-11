@@ -584,8 +584,9 @@ model Kasa {
   deletedAt    DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  branch       String?       @default("Merkez")
-  transactions Transaction[]
+  branch           String?        @default("Merkez")
+  bankConnectionId String?        @unique
+  transactions     Transaction[]
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 

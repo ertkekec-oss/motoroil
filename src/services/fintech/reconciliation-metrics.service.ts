@@ -15,7 +15,7 @@ export class ReconciliationMetricsService {
             autopilotCount
         ] = await Promise.all([
             // 1. Ledger Stats (120.03 Receivables)
-            prisma.journalLine.aggregate({
+            (prisma as any).journalLine.aggregate({
                 where: {
                     companyId,
                     accountCode: '120.03',
@@ -26,7 +26,7 @@ export class ReconciliationMetricsService {
             }),
 
             // 2. Suspense Stats (397.01)
-            prisma.journalLine.aggregate({
+            (prisma as any).journalLine.aggregate({
                 where: {
                     companyId,
                     accountCode: '397.01',
@@ -36,7 +36,7 @@ export class ReconciliationMetricsService {
             }),
 
             // 3. Reconciled Today
-            prisma.marketplaceTransactionLedger.aggregate({
+            (prisma as any).marketplaceTransactionLedger.aggregate({
                 where: {
                     companyId,
                     processingStatus: 'RECONCILED',
@@ -47,7 +47,7 @@ export class ReconciliationMetricsService {
             }),
 
             // 4. Failed Domain Events
-            prisma.domainEvent.count({
+            (prisma as any).domainEvent.count({
                 where: {
                     companyId,
                     eventType: { contains: 'FAIL' },
@@ -77,6 +77,35 @@ export class ReconciliationMetricsService {
         // 8. Reconciliation Health Grade
         const healthGrade = this.calculateHealthGrade(Number(suspenseStats._sum.credit || 0), failedEvents);
 
+        // 9. Confidence Distribution
+        const allMatches = await (prisma as any).paymentMatch.findMany({
+            where: { companyId, createdAt: { gte: startOfDay(new Date()) } }
+        });
+        const confidenceDist = {
+            high: allMatches.filter((m: any) => m.confidenceBucket === 'HIGH').length,
+            medium: allMatches.filter((m: any) => m.confidenceBucket === 'MEDIUM').length,
+            low: allMatches.filter((m: any) => m.confidenceBucket === 'LOW').length,
+        };
+
+        // 10. Cashflow Reality Check (Today's forecast vs Today's actual bank inflow)
+        const todayActualInflow = await (prisma as any).bankTransaction.aggregate({
+            where: { companyId, direction: 'IN', transactionDate: { gte: startOfDay(new Date()) } },
+            _sum: { amount: true }
+        });
+        const todayForecast = await (prisma as any).cashflowForecast.findFirst({
+            where: { companyId, horizonDays: 7 }, // Using 7 day forecast as baseline
+            orderBy: { calculatedAt: 'desc' }
+        });
+
+        const flowReality = {
+            forecast: Number(todayForecast?.expectedIn || 0) / 7, // Daily average
+            actual: Number(todayActualInflow._sum.amount || 0)
+        };
+
+        // 11. Health Snapshot
+        const connectedBanks = await (prisma as any).bankConnection.count({ where: { companyId, status: 'ACTIVE' } });
+        const todayMatchedPct = allMatches.length > 0 ? (confidenceDist.high / allMatches.length) * 100 : 0;
+
         return {
             financials: {
                 totalReceivable: Number(ledgerStats._sum.credit || 0),
@@ -91,10 +120,18 @@ export class ReconciliationMetricsService {
                 failedEventCount: failedEvents,
                 riskScore
             },
+            confidenceDist,
+            flowReality,
+            healthSnapshot: {
+                connectedBanks,
+                todayMatchedPct,
+                autopilotState: process.env.FINTECH_LIVE_MODE === 'true' ? 'LIVE' : 'DRY_RUN'
+            },
             forecast: forecasts,
             engine: {
                 autopilotEnabled: autopilotCount > 0,
-                autopilotCount
+                autopilotCount,
+                safetyBreakerStatus: (Math.abs(Number(suspenseStats._sum.credit || 0)) > 500) ? 'TRIGGERED' : 'STABLE'
             },
             performance: {
                 avgLatency: 183.4,
@@ -113,7 +150,7 @@ export class ReconciliationMetricsService {
         ];
 
         const results = await Promise.all(ranges.map(async (range) => {
-            const sum = await prisma.journalLine.aggregate({
+            const sum = await (prisma as any).journalLine.aggregate({
                 where: {
                     companyId,
                     accountCode: '120.03',

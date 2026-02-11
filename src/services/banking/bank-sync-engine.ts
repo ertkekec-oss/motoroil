@@ -32,6 +32,9 @@ export class BankSyncEngine {
      * Sycs a single bank connection
      */
     static async syncConnection(connection: any) {
+        // 0. Ensure Single Source of Truth (Kasa entry)
+        await this.ensureKasaAccount(connection);
+
         // 1. Fetch from Partner/Mock API (Production would use Aggregator SDK)
         const rawTransactions = await this.fetchFromPartner(connection);
 
@@ -45,6 +48,35 @@ export class BankSyncEngine {
         });
 
         return { connection: connection.bankName, imported: savedCount };
+    }
+
+    /**
+     * Creates or updates a Kasa record in the accounting system for this bank connection.
+     * This ensures the bank appears in the regular "Banka & Kasa" page.
+     */
+    private static async ensureKasaAccount(connection: any) {
+        const companyId = connection.companyId;
+
+        // Check if Kasa already exists for this connection
+        const existingKasa = await (prisma as any).kasa.findUnique({
+            where: { bankConnectionId: connection.id }
+        });
+
+        if (!existingKasa) {
+            console.log(`[BankSync] Creating SSOT Kasa for bank: ${connection.bankName}`);
+            await (prisma as any).kasa.create({
+                data: {
+                    companyId,
+                    name: `${connection.bankName} (${connection.iban.slice(-4)})`,
+                    type: 'bank',
+                    bankConnectionId: connection.id,
+                    currency: connection.currency || 'TRY',
+                    branch: 'Merkez', // Default for now
+                    isActive: true,
+                    balance: 0 // Will be updated from transactions or balance sync
+                }
+            });
+        }
     }
 
     private static async processTransactions(connection: any, raw: RawBankTransaction[]) {
