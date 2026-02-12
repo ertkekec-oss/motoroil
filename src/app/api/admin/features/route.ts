@@ -11,18 +11,47 @@ export async function GET(req: NextRequest) {
         }
 
         // Migration: Fix keys to match frontend expectations
+        // Migration: Fix keys to match frontend expectations
         try {
+            // 1. Finance/Accounting -> financials
             const oldFinance = await prisma.feature.findUnique({ where: { key: 'finance' } });
-            const newAccounting = await prisma.feature.findUnique({ where: { key: 'accounting' } });
-            if (oldFinance && !newAccounting) {
-                await prisma.feature.update({ where: { key: 'finance' }, data: { key: 'accounting' } });
+            const oldAccounting = await prisma.feature.findUnique({ where: { key: 'accounting' } });
+            const newFinancials = await prisma.feature.findUnique({ where: { key: 'financials' } });
+
+            if (oldFinance && !newFinancials) {
+                await prisma.feature.update({ where: { key: 'finance' }, data: { key: 'financials' } });
+            } else if (oldAccounting && !newFinancials) {
+                await prisma.feature.update({ where: { key: 'accounting' }, data: { key: 'financials' } });
             }
 
+            // 2. Einvoice -> e_invoice
             const oldEinvoice = await prisma.feature.findUnique({ where: { key: 'einvoice' } });
             const newEInvoice = await prisma.feature.findUnique({ where: { key: 'e_invoice' } });
             if (oldEinvoice && !newEInvoice) {
                 await prisma.feature.update({ where: { key: 'einvoice' }, data: { key: 'e_invoice' } });
             }
+
+            // 3. CRM -> current_accounts
+            const oldCRM = await prisma.feature.findUnique({ where: { key: 'crm' } });
+            const newCurrentAccounts = await prisma.feature.findUnique({ where: { key: 'current_accounts' } });
+            if (oldCRM && !newCurrentAccounts) {
+                await prisma.feature.update({ where: { key: 'crm' }, data: { key: 'current_accounts' } });
+            }
+
+            // 4. Reporting -> analytics
+            const oldReporting = await prisma.feature.findUnique({ where: { key: 'reporting' } });
+            const newAnalytics = await prisma.feature.findUnique({ where: { key: 'analytics' } });
+            if (oldReporting && !newAnalytics) {
+                await prisma.feature.update({ where: { key: 'reporting' }, data: { key: 'analytics' } });
+            }
+
+            // 5. Service -> service_desk
+            const oldService = await prisma.feature.findUnique({ where: { key: 'service' } });
+            const newServiceDesk = await prisma.feature.findUnique({ where: { key: 'service_desk' } });
+            if (oldService && !newServiceDesk) {
+                await prisma.feature.update({ where: { key: 'service' }, data: { key: 'service_desk' } });
+            }
+
         } catch (e) {
             console.log('Feature key migration skipped or failed:', e);
         }

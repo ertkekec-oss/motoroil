@@ -38,6 +38,7 @@ export default async function AdminLayout({
                     <NavLink href="/admin/plans" icon="tag">Paketler & Fiyatlar</NavLink>
                     <NavLink href="/admin/transactions" icon="credit-card">Ödemeler</NavLink>
                     <NavLink href="/admin/audit-logs" icon="activity">Denetim Kayıtları</NavLink>
+                    <NavLink href="/admin/marketplace/ops" icon="radar">Pazaryeri Operasyonları</NavLink>
                     <NavLink href="/admin/logs" icon="terminal">Sistem Logları</NavLink>
 
                     <div className="pt-4 mt-4 border-t border-slate-700">

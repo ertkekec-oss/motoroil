@@ -26,31 +26,31 @@ export default function Sidebar() {
     // UI mapping for permissions
     const permMap: Record<string, { perm?: string, feature?: string }> = {
         '/': { perm: 'pos_access', feature: 'pos' },
-        '/accounting': { perm: 'finance_view', feature: 'accounting' },
-        '/customers': { perm: 'customer_view', feature: 'crm' },
-        '/suppliers': { perm: 'supplier_view', feature: 'crm' },
+        '/accounting': { perm: 'finance_view', feature: 'financials' },
+        '/customers': { perm: 'customer_view', feature: 'current_accounts' },
+        '/suppliers': { perm: 'supplier_view', feature: 'suppliers' },
         '/inventory': { perm: 'inventory_view', feature: 'inventory' },
-        '/service': { perm: 'service_view', feature: 'service' },
+        '/service': { perm: 'service_view', feature: 'service_desk' },
         '/sales': { perm: 'sales_archive', feature: 'sales' },
-        '/field-sales/admin/routes': { perm: 'field_sales_admin', feature: 'sales' },
-        '/quotes': { perm: 'offer_create', feature: 'sales' },
-        '/reports': { perm: 'reports_view', feature: 'reporting' },
-        '/reports/ceo': { perm: 'reports_view', feature: 'reporting' },
-        '/reports/daily': { perm: 'reports_view', feature: 'reporting' },
-        '/reports/suppliers': { perm: 'reports_view', feature: 'reporting' },
+        '/field-sales/admin/routes': { perm: 'field_sales_admin', feature: 'field_sales' },
+        '/quotes': { perm: 'offer_create', feature: 'quotes' },
+        '/reports': { perm: 'reports_view', feature: 'analytics' },
+        '/reports/ceo': { perm: 'reports_view', feature: 'ceo_intel' },
+        '/reports/daily': { perm: 'reports_view', feature: 'analytics' },
+        '/reports/suppliers': { perm: 'reports_view', feature: 'analytics' },
         '/integrations': { perm: 'settings_manage', feature: 'e_invoice' },
         '/settings/branch': { perm: 'settings_manage' },
         '/settings': { perm: 'settings_manage' },
-        '/staff': { perm: 'staff_manage' },
-        '/advisor': { perm: 'finance_view', feature: 'accounting' },
+        '/staff': { perm: 'staff_manage', feature: 'team_management' },
+        '/advisor': { perm: 'finance_view', feature: 'accountant' },
         '/admin/audit-logs': { perm: 'audit_view' },
         '/security/suspicious': { perm: 'security_access' },
         '/billing': { perm: 'settings_manage' },
         '/field-mobile/routes': { perm: 'field_sales_access' },
-        '/fintech/control-tower': { perm: 'finance_view' },
-        '/fintech/profitability-heatmap': { perm: 'finance_view' },
+        '/fintech/control-tower': { perm: 'finance_view', feature: 'fintech_tower' },
+        '/fintech/profitability-heatmap': { perm: 'finance_view', feature: 'pnl_heatmap' },
         '/fintech/open-banking': { perm: 'finance_view' },
-        '/fintech/smart-pricing': { perm: 'finance_view' },
+        '/fintech/smart-pricing': { perm: 'finance_view', feature: 'smart_pricing' },
     };
 
     const menuItems = [
@@ -132,7 +132,8 @@ export default function Sidebar() {
                 zIndex: 2000,
                 overflow: 'hidden',
                 fontFamily: "'Outfit', sans-serif",
-                transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                flexShrink: 0
             }}>
             {/* MOBILE CLOSE BUTTON */}
             <button

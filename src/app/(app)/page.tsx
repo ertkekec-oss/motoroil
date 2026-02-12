@@ -92,7 +92,7 @@ function POSContent() {
     const filtered = (kasalar || []).filter(k =>
       (!k.branch || k.branch === 'Global' || k.branch === activeBranchName) &&
       ((paymentMode === 'cash' && k.type === 'Nakit') ||
-        (paymentMode === 'card' && (k.type === 'Kredi Kartı' || k.type.includes('POS'))) ||
+        (paymentMode === 'card' && (k.type === 'Kredi Kartı' || k.type?.includes('POS'))) ||
         (paymentMode === 'transfer' && (k.type === 'Banka' || k.type === 'Havale')))
     );
 
@@ -112,13 +112,16 @@ function POSContent() {
   // Product Filter
   const filteredProducts = useMemo(() => {
     if (!searchInput || searchInput.length < 2) return [];
-    return (products || []).filter(p => p.name.toLowerCase().includes(searchInput.toLowerCase()) || p.barcode.includes(searchInput)).slice(0, 10);
+    return (products || []).filter(p =>
+      (p.name?.toLowerCase().includes(searchInput.toLowerCase())) ||
+      (p.barcode?.includes(searchInput))
+    ).slice(0, 10);
   }, [products, searchInput]);
 
   // Customer Filter
   const filteredCustomers = useMemo(() => {
     if (!customerSearch) return (customers || []).slice(0, 20);
-    return (customers || []).filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()));
+    return (customers || []).filter(c => c.name?.toLowerCase().includes(customerSearch.toLowerCase()));
   }, [customers, customerSearch]);
 
   const addToCart = useCallback((product: any) => {

@@ -21,7 +21,7 @@ export class ReconciliationMetricsService {
                     accountCode: '120.03',
                     isOpen: true
                 },
-                _sum: { credit: true },
+                _sum: { debit: true, credit: true },
                 _count: { id: true }
             }),
 
@@ -106,9 +106,15 @@ export class ReconciliationMetricsService {
         const connectedBanks = await (prisma as any).bankConnection.count({ where: { companyId, status: 'ACTIVE' } });
         const todayMatchedPct = allMatches.length > 0 ? (confidenceDist.high / allMatches.length) * 100 : 0;
 
+        // Fetch Live Mode from DB
+        const liveModeSetting = await (prisma as any).appSettings.findUnique({
+            where: { key: 'FINTECH_AUTOPILOT_LIVE' }
+        });
+        const isLiveMode = liveModeSetting?.value === 'true' || process.env.FINTECH_LIVE_MODE === 'true';
+
         return {
             financials: {
-                totalReceivable: Number(ledgerStats._sum.credit || 0),
+                totalReceivable: Number(ledgerStats._sum.debit || 0),
                 openInvoiceCount: ledgerStats._count.id,
                 suspenseAmount: Number(suspenseStats._sum.credit || 0),
                 reconciledTodayAmount: Number(payoutsToday._sum.amount || 0),
@@ -125,7 +131,7 @@ export class ReconciliationMetricsService {
             healthSnapshot: {
                 connectedBanks,
                 todayMatchedPct,
-                autopilotState: process.env.FINTECH_LIVE_MODE === 'true' ? 'LIVE' : 'DRY_RUN'
+                autopilotState: isLiveMode ? 'LIVE' : 'DRY_RUN'
             },
             forecast: forecasts,
             engine: {
@@ -162,9 +168,9 @@ export class ReconciliationMetricsService {
                         }
                     }
                 },
-                _sum: { credit: true }
+                _sum: { debit: true }
             });
-            return { label: range.label, amount: Number(sum._sum.credit || 0) };
+            return { label: range.label, amount: Number(sum._sum.debit || 0) };
         }));
 
         return results;

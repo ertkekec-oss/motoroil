@@ -211,10 +211,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     const hasPermission = (permId: string) => {
-        if (currentUser === null) return true;
+        if (!currentUser) return true;
         // ADMIN and SUPER_ADMIN roles have all permissions
         if (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN') return true;
-        return currentUser.permissions.includes('*') || currentUser.permissions.includes(permId);
+
+        const perms = currentUser.permissions || [];
+        return perms.includes('*') || perms.includes(permId);
     };
 
     const hasFeature = (featureKey: string) => {

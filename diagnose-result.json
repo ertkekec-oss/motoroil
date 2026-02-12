@@ -1,0 +1,31 @@
+{
+  "scanFor": "admin@kech.tr",
+  "inUserTable": true,
+  "userId": "cmljl67ps00011g2nvgnsz32p",
+  "userHash": "$2b$10$xyF.B6fQ",
+  "inStaffTable": false,
+  "conflictDetected": false,
+  "recentAttempts": [
+    {
+      "id": "cmljlcss50000mhfall168l0n",
+      "ip": "88.234.238.233",
+      "username": "admin@kech.tr",
+      "success": true,
+      "createdAt": "2026-02-12T15:06:05.621Z"
+    },
+    {
+      "id": "cmljl9x460002vrdbivuvr8qq",
+      "ip": "88.234.238.233",
+      "username": "admin@kech.tr",
+      "success": true,
+      "createdAt": "2026-02-12T15:03:51.270Z"
+    },
+    {
+      "id": "cmljl9my20000vrdbf209ps6h",
+      "ip": "88.234.238.233",
+      "username": "admin@kech.tr",
+      "success": false,
+      "createdAt": "2026-02-12T15:03:38.091Z"
+    }
+  ]
+}

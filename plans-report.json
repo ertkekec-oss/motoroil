@@ -1,0 +1,188 @@
+{
+  "allFeatures": [
+    {
+      "key": "e_invoice",
+      "name": "🧾 E-Fatura Entegrasyonu"
+    },
+    {
+      "key": "marketplaces",
+      "name": "🏪 Pazaryeri Entegrasyonu"
+    },
+    {
+      "key": "ecommerce",
+      "name": "🌐 E-Ticaret Entegrasyonu"
+    },
+    {
+      "key": "pos",
+      "name": "🏮 POS Terminal"
+    },
+    {
+      "key": "financials",
+      "name": "🏛️ Finansal Yönetim"
+    },
+    {
+      "key": "sales",
+      "name": "🧾 Satış Yönetimi"
+    },
+    {
+      "key": "current_accounts",
+      "name": "🤝 Cari Hesaplar"
+    },
+    {
+      "key": "suppliers",
+      "name": "🚚 Tedarikçi Ağı"
+    },
+    {
+      "key": "fintech_tower",
+      "name": "🗼 Finansal Kontrol Kulesi"
+    },
+    {
+      "key": "smart_pricing",
+      "name": "🤖 Otonom Fiyatlandırma"
+    },
+    {
+      "key": "pnl_heatmap",
+      "name": "🔥 Kârlılık Isı Haritası"
+    },
+    {
+      "key": "inventory",
+      "name": "📥 Envanter & Depo"
+    },
+    {
+      "key": "field_sales",
+      "name": "🗺️ Saha Satış Yönetimi"
+    },
+    {
+      "key": "quotes",
+      "name": "📋 Teklifler"
+    },
+    {
+      "key": "service_desk",
+      "name": "🛠️ Servis Masası"
+    },
+    {
+      "key": "analytics",
+      "name": "📊 Veri Analizi"
+    },
+    {
+      "key": "ceo_intel",
+      "name": "🧠 İş Zekası (CEO)"
+    },
+    {
+      "key": "audit_logs",
+      "name": "🔍 Denetim Kayıtları"
+    },
+    {
+      "key": "leakage_detection",
+      "name": "🚨 Kaçak Satış Tespit"
+    },
+    {
+      "key": "accountant",
+      "name": "💼 Mali Müşavir"
+    },
+    {
+      "key": "system_settings",
+      "name": "⚙️ Sistem Ayarları"
+    },
+    {
+      "key": "team_management",
+      "name": "👥 Ekip & Yetki"
+    }
+  ],
+  "plans": [
+    {
+      "id": "trial-default",
+      "name": "Free Trial",
+      "features": [
+        {
+          "key": "system_settings",
+          "name": "⚙️ Sistem Ayarları"
+        },
+        {
+          "key": "ecommerce",
+          "name": "🌐 E-Ticaret Entegrasyonu"
+        },
+        {
+          "key": "financials",
+          "name": "🏛️ Finansal Yönetim"
+        },
+        {
+          "key": "marketplaces",
+          "name": "🏪 Pazaryeri Entegrasyonu"
+        },
+        {
+          "key": "pos",
+          "name": "🏮 POS Terminal"
+        },
+        {
+          "key": "team_management",
+          "name": "👥 Ekip & Yetki"
+        },
+        {
+          "key": "accountant",
+          "name": "💼 Mali Müşavir"
+        },
+        {
+          "key": "analytics",
+          "name": "📊 Veri Analizi"
+        },
+        {
+          "key": "quotes",
+          "name": "📋 Teklifler"
+        },
+        {
+          "key": "inventory",
+          "name": "📥 Envanter & Depo"
+        },
+        {
+          "key": "audit_logs",
+          "name": "🔍 Denetim Kayıtları"
+        },
+        {
+          "key": "pnl_heatmap",
+          "name": "🔥 Kârlılık Isı Haritası"
+        },
+        {
+          "key": "field_sales",
+          "name": "🗺️ Saha Satış Yönetimi"
+        },
+        {
+          "key": "fintech_tower",
+          "name": "🗼 Finansal Kontrol Kulesi"
+        },
+        {
+          "key": "suppliers",
+          "name": "🚚 Tedarikçi Ağı"
+        },
+        {
+          "key": "leakage_detection",
+          "name": "🚨 Kaçak Satış Tespit"
+        },
+        {
+          "key": "service_desk",
+          "name": "🛠️ Servis Masası"
+        },
+        {
+          "key": "smart_pricing",
+          "name": "🤖 Otonom Fiyatlandırma"
+        },
+        {
+          "key": "current_accounts",
+          "name": "🤝 Cari Hesaplar"
+        },
+        {
+          "key": "ceo_intel",
+          "name": "🧠 İş Zekası (CEO)"
+        },
+        {
+          "key": "e_invoice",
+          "name": "🧾 E-Fatura Entegrasyonu"
+        },
+        {
+          "key": "sales",
+          "name": "🧾 Satış Yönetimi"
+        }
+      ]
+    }
+  ]
+}

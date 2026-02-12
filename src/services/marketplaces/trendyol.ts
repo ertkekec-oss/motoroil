@@ -155,6 +155,20 @@ export class TrendyolService implements IMarketplaceService {
         }
     }
 
+    async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
+        try {
+            const url = `${this.baseUrl}/${this.config.supplierId}/orders?orderNumber=${encodeURIComponent(orderNumber)}`;
+            const response = await fetch(url, {
+                headers: { Authorization: this.getAuthHeader() },
+            });
+            if (!response.ok) return null;
+            const data = await response.json();
+            return data.content?.[0] ? this.mapOrder(data.content[0]) : null;
+        } catch {
+            return null;
+        }
+    }
+
     private mapOrder(ptOrder: any): MarketplaceOrder {
         return {
             id: ptOrder.id.toString(),

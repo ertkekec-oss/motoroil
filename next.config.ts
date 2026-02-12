@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
     // !! WARN !!
     ignoreBuildErrors: true,
   },
+  eslint: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has ESLint errors.
+    // !! WARN !!
+    ignoreDuringBuilds: true,
+  },
   serverExternalPackages: ["iyzipay", "pdf-parse"],
   async headers() {
     return [

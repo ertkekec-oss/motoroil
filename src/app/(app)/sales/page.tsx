@@ -11,6 +11,7 @@ import { useSales } from '@/contexts/SalesContext';
 import { useFinancials } from '@/contexts/FinancialContext';
 import { useCRM } from '@/contexts/CRMContext';
 import Pagination from '@/components/Pagination';
+import { MarketplaceActionButton } from '@/components/marketplaces/MarketplaceActionButton';
 
 export default function SalesPage() {
     const { showSuccess, showError, showConfirm, showWarning, showQuotaExceeded, closeModal } = useModal();
@@ -373,28 +374,28 @@ export default function SalesPage() {
     };
 
     // Fetch online orders
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                // Pazaryerinden gelen ve veritabanına kaydedilen siparişleri çek (status=Yeni vb.)
-                const res = await fetch('/api/orders/pending');
-                const data = await res.json();
-                if (data.success && Array.isArray(data.orders)) {
-                    // API'den gelen veriyi güvenli hale getir
-                    const safeOrders = data.orders.map((o: any) => ({
-                        ...o,
-                        items: typeof o.items === 'string' ? JSON.parse(o.items) : (Array.isArray(o.items) ? o.items : [])
-                    }));
-                    setOnlineOrders(safeOrders);
-                }
-            } catch (err) {
-                console.error("Sipariş getirme hatası", err);
+    const fetchOnlineOrders = async () => {
+        try {
+            // Pazaryerinden gelen ve veritabanına kaydedilen siparişleri çek (status=Yeni vb.)
+            const res = await fetch('/api/orders/pending');
+            const data = await res.json();
+            if (data.success && Array.isArray(data.orders)) {
+                // API'den gelen veriyi güvenli hale getir
+                const safeOrders = data.orders.map((o: any) => ({
+                    ...o,
+                    items: typeof o.items === 'string' ? JSON.parse(o.items) : (Array.isArray(o.items) ? o.items : [])
+                }));
+                setOnlineOrders(safeOrders);
             }
-        };
+        } catch (err) {
+            console.error("Sipariş getirme hatası", err);
+        }
+    };
 
-        fetchOrders();
+    useEffect(() => {
+        fetchOnlineOrders();
         // Her 30 sn'de bir yenile
-        const interval = setInterval(fetchOrders, 30000);
+        const interval = setInterval(fetchOnlineOrders, 30000);
         return () => clearInterval(interval);
     }, []);
 
@@ -508,9 +509,9 @@ export default function SalesPage() {
         // Statü Filtresi
         let statusMatch = true;
         if (statusFilter !== 'ALL') {
-            if (statusFilter === 'NEW') statusMatch = ['Yeni', 'Created', 'Picking', 'WaitingForApproval'].includes(order.status);
-            else if (statusFilter === 'SHIPPED') statusMatch = ['Kargolandı', 'Shipped', 'Hazırlanıyor'].includes(order.status);
-            else if (statusFilter === 'COMPLETED') statusMatch = ['Tamamlandı', 'Delivered', 'Cancelled', 'Faturalandırıldı'].includes(order.status);
+            if (statusFilter === 'NEW') statusMatch = ['Yeni', 'Created', 'Picking', 'WaitingForApproval', 'Preparing', 'ReadyToShip', 'Unpaid'].includes(order.status);
+            else if (statusFilter === 'SHIPPED') statusMatch = ['Kargolandı', 'Shipped', 'Hazırlanıyor', 'Invoiced'].includes(order.status);
+            else if (statusFilter === 'COMPLETED') statusMatch = ['Tamamlandı', 'Delivered', 'Cancelled', 'Faturalandırıldı', 'Returned'].includes(order.status);
         }
 
         // Tarih Filtresi
@@ -1131,6 +1132,37 @@ export default function SalesPage() {
                                                                 {(!o.items || o.items.length === 0) && (
                                                                     <div className="text-muted text-center" style={{ fontSize: '11px', padding: '10px' }}>Ürün detayı bulunamadı.</div>
                                                                 )}
+
+                                                                {/* PLATFORM ACTIONS */}
+                                                                <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-light)' }}>
+                                                                    <h5 style={{ color: 'var(--text-muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>Platform Aksiyonları</h5>
+                                                                    <div className="flex gap-3">
+                                                                        <MarketplaceActionButton
+                                                                            orderId={o.id}
+                                                                            marketplace={o.marketplace}
+                                                                            actionKey="REFRESH_STATUS"
+                                                                            onSuccess={fetchOnlineOrders}
+                                                                        />
+                                                                        {o.marketplace === 'Trendyol' && (
+                                                                            <>
+                                                                                <MarketplaceActionButton
+                                                                                    orderId={o.id}
+                                                                                    marketplace={o.marketplace}
+                                                                                    actionKey="PRINT_LABEL_A4"
+                                                                                    shipmentPackageId={o.shipmentPackageId}
+                                                                                />
+                                                                                <MarketplaceActionButton
+                                                                                    orderId={o.id}
+                                                                                    marketplace={o.marketplace}
+                                                                                    actionKey="CHANGE_CARGO"
+                                                                                    variant="ghost"
+                                                                                    shipmentPackageId={o.shipmentPackageId}
+                                                                                    onSuccess={fetchOnlineOrders}
+                                                                                />
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </td>
                                                     </tr>

@@ -163,7 +163,7 @@ export default function AccountingPage() {
     ];
 
     return (
-        <div className="p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
+        <div className="w-full min-h-full p-6 md:p-8 space-y-8">
             <AccountingModals
                 isOpen={!!modalType}
                 onClose={() => setModalType(null)}
@@ -437,8 +437,8 @@ export default function AccountingPage() {
                                     onClick={() => syncAccount()}
                                     disabled={syncStates['GLOBAL'] === 'SYNCING'}
                                     className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-2 border ${syncStates['GLOBAL'] === 'SYNCING' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' :
-                                            syncStates['GLOBAL'] === 'DONE' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
-                                                'bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border-emerald-500/30'
+                                        syncStates['GLOBAL'] === 'DONE' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
+                                            'bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border-emerald-500/30'
                                         }`}
                                 >
                                     {syncStates['GLOBAL'] === 'SYNCING' ? '🔄 AKTARILIYOR...' : '🔄 TAMAMINI GÜNCELLE'}

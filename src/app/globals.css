@@ -111,7 +111,7 @@ body::before {
 /* Layout System - Rock Solid Flexbox Structure */
 .main-shell {
   display: flex;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   height: 100dvh;
   background: var(--bg-deep);

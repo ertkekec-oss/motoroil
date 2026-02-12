@@ -11,8 +11,8 @@ export default function ServiceDashboard() {
     const router = useRouter();
 
     useEffect(() => {
-        if (!hasFeature('service') && currentUser !== null) {
-            router.push('/billing?upsell=service');
+        if (!hasFeature('service_desk') && currentUser !== null) {
+            router.push('/billing?upsell=service_desk');
         }
     }, [hasFeature, currentUser, router]);
 

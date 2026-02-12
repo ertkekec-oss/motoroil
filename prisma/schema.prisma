@@ -239,6 +239,7 @@ model Order {
   invoiceAddress  Json?
   cargoTrackingNo String?
   cargoProvider   String?
+  shipmentPackageId String?
   rawData         Json?
   deletedAt       DateTime?
   createdAt       DateTime  @default(now())
@@ -518,6 +519,7 @@ model Customer {
 
   company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
+  @@unique([email, companyId])
   @@index([name])
   @@index([phone])
   @@index([email])
@@ -1178,7 +1180,7 @@ model Quote {
 model MarketplaceConfig {
   id        String    @id @default(cuid())
   companyId String?
-  type      String    @unique
+  type      String
   settings  Json
   isActive  Boolean   @default(false)
   lastSync  DateTime?
@@ -1187,6 +1189,7 @@ model MarketplaceConfig {
 
   company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
+  @@unique([companyId, type])
   @@index([companyId])
 }
 
@@ -1791,4 +1794,42 @@ model FintechAudit {
 
   @@index([companyId, action])
   @@index([createdAt])
+}
+
+model MarketplaceActionAudit {
+  id             String   @id @default(cuid())
+  companyId       String
+  marketplace     String
+  orderId         String?
+  actionKey       String   // "REFRESH_STATUS" | "PRINT_LABEL_A4"
+  idempotencyKey  String   @unique
+  status          String   // "SUCCESS" | "FAILED" | "PENDING"
+  lockExpiresAt   DateTime?
+  jobId           String?
+  retryCount      Int      @default(0)
+  failureHistory  Json?    // Array of { error: string, at: Date }
+  requestPayload  Json?
+  responsePayload Json?
+  errorMessage    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([companyId, marketplace, createdAt])
+  @@index([orderId])
+}
+
+model MarketplaceLabel {
+  id                 String   @id @default(cuid())
+  companyId          String
+  marketplace        String
+  shipmentPackageId  String
+  storageKey         String   // labels/{companyId}/{marketplace}/{shipmentPackageId}.pdf
+  sha256             String
+  size               Int
+  contentType        String   @default("application/pdf")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([companyId, marketplace, shipmentPackageId])
+  @@index([companyId, createdAt])
 }

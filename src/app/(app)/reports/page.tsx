@@ -32,8 +32,8 @@ export default function ReportsPage() {
     const router = useRouter();
 
     useEffect(() => {
-        if (!hasFeature('reporting') && currentUser !== null) {
-            router.push('/billing?upsell=reporting');
+        if (!hasFeature('analytics') && currentUser !== null) {
+            router.push('/billing?upsell=analytics');
         }
     }, [hasFeature, currentUser, router]);
 
