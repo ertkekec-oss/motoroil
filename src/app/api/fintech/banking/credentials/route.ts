@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { authorize } from '@/lib/auth';
 import { encrypt } from '@/lib/encryption';
+import { BANK_FORM_DEFINITIONS } from '@/services/banking/bank-definitions';
+import { BankConnectionService, BankConnectionStatus } from '@/services/banking/bank-connection-service';
 
 export async function POST(request: Request) {
     const auth = await authorize();
@@ -9,10 +11,25 @@ export async function POST(request: Request) {
     const session = auth.user;
 
     try {
-        const { bankId, integrationMethod, credentials } = await request.json();
+        const { bankId, integrationMethod, credentials, status } = await request.json();
 
         if (!bankId || !credentials) {
             return NextResponse.json({ success: false, error: 'Banka ve bilgiler gereklidir.' }, { status: 400 });
+        }
+
+        const bankDef = BANK_FORM_DEFINITIONS[bankId];
+        if (!bankDef) {
+            return NextResponse.json({ success: false, error: 'Banka tanımı bulunamadı.' }, { status: 400 });
+        }
+
+        // DYNAMIC VALIDATION: Check for required credentials based on bank policy
+        const missing = bankDef.requiredCredentials.filter(key => !credentials[key] || credentials[key].trim() === '');
+        if (missing.length > 0) {
+            const labels = missing.map(m => bankDef.onboardingFields.find(f => f.key === m)?.label || m);
+            return NextResponse.json({
+                success: false,
+                error: `Eksik zorunlu alanlar: ${labels.join(', ')}`
+            }, { status: 400 });
         }
 
         const company = await prisma.company.findFirst({ where: { tenantId: session.tenantId } });
@@ -29,8 +46,6 @@ export async function POST(request: Request) {
         }
 
         // Find or Update BankConnection
-        // BizimHesap modelinde IBAN bazlı bağlantı kurulur. 
-        // Eğer seçilen banka için IBAN girilmişse o bağlantıyı güncelleriz.
         const iban = credentials.iban || 'PENDING';
 
         const connection = await (prisma as any).bankConnection.upsert({
@@ -39,7 +54,6 @@ export async function POST(request: Request) {
                 bankId,
                 integrationMethod,
                 credentialsEncrypted: encryptedData,
-                status: 'ACTIVE',
                 updatedAt: new Date()
             },
             create: {
@@ -49,10 +63,17 @@ export async function POST(request: Request) {
                 iban,
                 integrationMethod,
                 credentialsEncrypted: encryptedData,
-                status: 'ACTIVE',
                 connectionType: 'AUTO_PULL'
             }
         });
+
+        // Use Service for Status Transition
+        if (status) {
+            await BankConnectionService.updateStatus(connection.id, status as BankConnectionStatus, {
+                actorId: session.id,
+                reasonCode: 'USER_CONFIGURATION_UPDATE'
+            });
+        }
 
         // Audit Log
         await (prisma as any).fintechAudit.create({
@@ -71,6 +92,30 @@ export async function POST(request: Request) {
 
     } catch (error: any) {
         console.error('Bank Credentials Update Error:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+}
+
+export async function GET(request: Request) {
+    const auth = await authorize();
+    if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    try {
+        const connections = await (prisma as any).bankConnection.findMany({
+            where: { companyId: auth.user.companyId },
+            select: {
+                id: true,
+                bankName: true,
+                bankId: true,
+                iban: true,
+                status: true,
+                currency: true,
+                lastSyncAt: true
+            }
+        });
+
+        return NextResponse.json({ success: true, connections });
+    } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

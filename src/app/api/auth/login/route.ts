@@ -40,7 +40,10 @@ export async function POST(request: Request) {
             }
         });
 
+        let foundInStaff = false;
+
         if (targetUser) {
+            foundInStaff = true;
             // Respect existing tenantId if set (e.g. for tenant-level staff), otherwise default to PLATFORM_ADMIN
             (targetUser as any).tenantId = targetUser.tenantId || 'PLATFORM_ADMIN';
         }
@@ -88,13 +91,13 @@ export async function POST(request: Request) {
         // Auto-migration: If password was plain text, hash it now
         if (!targetUser.password.startsWith('$2')) {
             const hashed = await hashPassword(password);
-            if (targetUser.tenantId) {
-                await (prisma as any).user.update({
+            if (foundInStaff) {
+                await (prisma as any).staff.update({
                     where: { id: targetUser.id },
                     data: { password: hashed }
                 });
             } else {
-                await (prisma as any).staff.update({
+                await (prisma as any).user.update({
                     where: { id: targetUser.id },
                     data: { password: hashed }
                 });

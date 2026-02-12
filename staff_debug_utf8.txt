@@ -1,0 +1,2 @@
+Staff List:
+[cmljaz7kd0000s2s80aqflowl] User: admin | Email: admin@kech.tr | Tenant: PLATFORM_ADMIN | Role: SUPER_ADMIN

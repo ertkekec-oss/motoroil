@@ -77,18 +77,18 @@ export async function GET(req: NextRequest) {
         });
 
         // Convert to Array for Analysis
-        const users = Object.values(userStats);
+        const users: any[] = Object.values(userStats);
         if (users.length === 0) return NextResponse.json({ anomalies: [] });
 
         const anomalies: any[] = [];
 
         // Analyzer: Refund/Cancel Rate
         // Calculate Mean
-        const totalRefunds = users.reduce((sum: number, u: any) => sum + (u.actions['REFUND'] || 0) + (u.actions['CANCEL_SALE'] || 0), 0);
+        const totalRefunds = users.reduce((sum: number, u: any) => sum + (Number(u.actions['REFUND']) || 0) + (Number(u.actions['CANCEL_SALE']) || 0), 0);
         const avgRefunds = totalRefunds / Math.max(1, users.length);
 
         users.forEach((u: any) => {
-            const userRefunds = (u.actions['REFUND'] || 0) + (u.actions['CANCEL_SALE'] || 0);
+            const userRefunds = (Number(u.actions['REFUND']) || 0) + (Number(u.actions['CANCEL_SALE']) || 0);
 
             // Heuristic: Must have at least 3 refunds to be considered (noise filter), and > 2x average
             if (userRefunds > 3 && userRefunds > (avgRefunds * refundThresholdMultiplier)) {
@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
 
         // Analyzer: Voids (Item Deletion) BEFORE sale
         // If we track 'DELETE_ITEM' in audit logs (from POS)
-        const totalVoids = users.reduce((sum: number, u: any) => sum + (u.actions['DELETE_ITEM'] || 0), 0);
+        const totalVoids = users.reduce((sum: number, u: any) => sum + (Number(u.actions['DELETE_ITEM']) || 0), 0);
         const avgVoids = totalVoids / Math.max(1, users.length);
 
         users.forEach((u: any) => {

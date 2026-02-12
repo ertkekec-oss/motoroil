@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { getRequestContext } from '@/lib/api-context';
 import prisma from '@/lib/prisma';
 import { PaymentMatchingEngine } from '@/services/fintech/payment-matching-engine';
 
@@ -7,15 +7,15 @@ import { PaymentMatchingEngine } from '@/services/fintech/payment-matching-engin
  * Replays a specific bank transaction through the matching engine.
  * Critical for debugging edge cases and re-processing transactions after rule updates.
  */
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const session = await getSession();
-        if (!session || !session.user.companyId) {
+        const ctx = await getRequestContext(req);
+        if (!ctx.companyId && ctx.tenantId !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         // 1. ADMIN AUTHORIZATION
-        const isAdmin = session.user.role === 'SUPER_ADMIN' || (session.user.role?.toLowerCase().includes('admin'));
+        const isAdmin = ctx.role === 'SUPER_ADMIN' || ctx.role?.toLowerCase().includes('admin');
         if (!isAdmin) {
             return NextResponse.json({ error: 'Sadece yöneticiler işlemleri yeniden işletebilir.' }, { status: 403 });
         }
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
             where: { id: transactionId }
         });
 
-        if (!tx || tx.companyId !== session.user.companyId) {
+        if (!tx || (ctx.tenantId !== 'PLATFORM_ADMIN' && tx.companyId !== ctx.companyId)) {
             return NextResponse.json({ error: 'İşlem bulunamadı' }, { status: 404 });
         }
 

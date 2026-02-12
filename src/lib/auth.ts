@@ -35,7 +35,7 @@ export async function comparePassword(password: string, hash: string) {
         }
         // Fallback for plain text (migration period)
         return password === hash;
-    } catch (e) {
+    } catch {
         return false;
     }
 }
@@ -68,12 +68,22 @@ export async function createSession(user: any) {
 }
 
 export async function getSession() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('session')?.value;
+    let token: string | undefined;
+    try {
+        const cookieStore = await cookies();
+        token = cookieStore.get('session')?.value;
+    } catch {
+        // Not in a request context (e.g. background job, script)
+    }
 
-    // Support for Cron/Internal Service Headers
-    const headersList = await (await import('next/headers')).headers();
-    const cronSecret = headersList.get('x-cron-secret');
+    let headersList: any = null;
+    try {
+        headersList = await (await import('next/headers')).headers();
+    } catch {
+        // Not in a request context
+    }
+
+    const cronSecret = headersList?.get('x-cron-secret');
 
     if (cronSecret && cronSecret === process.env.CRON_SECRET) {
         return {
@@ -94,7 +104,7 @@ export async function getSession() {
         // Support for Platform Admin Impersonation
         const role = session.role?.toUpperCase() || '';
         if (session.tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN') {
-            const targetTenantId = headersList.get('x-target-tenant-id');
+            const targetTenantId = headersList?.get('x-target-tenant-id');
             if (targetTenantId) {
                 session.impersonateTenantId = targetTenantId;
                 session.isImpersonating = true;
@@ -102,7 +112,7 @@ export async function getSession() {
         }
 
         return session;
-    } catch (err) {
+    } catch {
         return null;
     }
 }

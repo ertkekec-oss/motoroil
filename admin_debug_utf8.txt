@@ -1,0 +1,12 @@
+Staff Admin Detail:
+- ID: cmljaz7kd0000s2s80aqflowl
+- Username: admin
+- Email: admin@kech.tr
+- Has Password: true
+- Password starts with $2: false
+- Password Value: admin123
+
+User Admin Detail:
+- ID: cmlineibu0001v7ib2wwxk7ou
+- Email: admin@kech.tr
+- Has Password: true

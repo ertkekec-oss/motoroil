@@ -11,6 +11,8 @@ import {
     IconAlert,
     IconCreditCard
 } from '@/components/icons/PremiumIcons';
+import BankIntegrationOnboarding from '@/components/Banking/BankIntegrationOnboarding';
+import { BANK_FORM_DEFINITIONS } from '@/services/banking/bank-definitions';
 
 // Simple Arrow components
 const ArrowUpRight = ({ className }: any) => <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19L19 5M19 5H10M19 5V14" /></svg>;
@@ -28,15 +30,18 @@ export default function OpenBankingDashboard() {
     const refreshConnections = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/fintech/banking/transactions'); // Re-using this to get connections implicitly via tx or create a dedicated endpoint
-            // Actually let's create a dedicated connections endpoint or just fetch from treasury/kasalar
-            const kRes = await fetch('/api/kasalar');
-            const kData = await kRes.json();
-            const bankConns = kData.kasalar.filter((k: any) => k.bankConnectionId);
+            const res = await fetch('/api/kasalar');
+            const data = await res.json();
+
+            // Fetch real bank connections
+            const bcRes = await fetch('/api/fintech/banking/credentials'); // We need an endpoint to list conns
+            // For now, let's use the kasalar associated with bank connections
+            const bankConns = data.kasalar.filter((k: any) => k.bankConnectionId);
+
             setConnections(bankConns.map((k: any) => ({
                 id: k.bankConnectionId,
                 bankName: k.name.split(' (')[0],
-                iban: 'TR...' + k.name.split('(')[1]?.replace(')', '') || '****',
+                iban: k.iban || 'TR...',
                 status: 'ACTIVE',
                 lastSync: 'Recently',
                 balance: k.balance
@@ -96,25 +101,19 @@ export default function OpenBankingDashboard() {
         <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {selectingBank && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[3000] flex items-center justify-center p-4">
-                    <div className="bg-[#111] border border-white/10 p-8 rounded-3xl max-w-md w-full animate-in zoom-in-95">
-                        <h3 className="text-xl font-black text-white mb-6">Banka Seçiniz</h3>
-                        <div className="grid grid-cols-1 gap-3">
-                            {['Akbank', 'Garanti BBVA', 'İş Bankası', 'Yapı Kredi', 'QNB Finansbank'].map(bank => (
-                                <button
-                                    key={bank}
-                                    onClick={() => connectBank(bank)}
-                                    className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-left font-bold text-white transition-all hover:scale-[1.02]"
-                                >
-                                    {bank}
-                                </button>
-                            ))}
-                        </div>
+                    <div className="bg-[#111] border border-white/10 p-2 rounded-[2rem] max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-in zoom-in-95 relative">
                         <button
-                            onClick={() => setSelectingBank(false)}
-                            className="w-full mt-6 py-3 text-gray-500 font-bold hover:text-white transition-colors"
+                            onClick={() => {
+                                setSelectingBank(false);
+                                refreshConnections();
+                            }}
+                            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-all z-50 font-bold"
                         >
-                            Vazgeç
+                            ✕
                         </button>
+                        <div className="p-8">
+                            <BankIntegrationOnboarding />
+                        </div>
                     </div>
                 </div>
             )}

@@ -1,17 +1,17 @@
-import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { getRequestContext } from '@/lib/api-context';
 import { ReconciliationMetricsService } from '@/services/fintech/reconciliation-metrics.service';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
-        const session = await getSession();
-        if (!session || !session.user.companyId) {
+        const ctx = await getRequestContext(req);
+        if (!ctx.companyId && ctx.tenantId !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ error: 'Oturum veya şirket bilgisi eksik' }, { status: 401 });
         }
 
-        const metrics = await ReconciliationMetricsService.getControlTowerMetrics(session.user.companyId);
+        const metrics = await ReconciliationMetricsService.getControlTowerMetrics(ctx.companyId || '');
 
         return NextResponse.json({
             success: true,

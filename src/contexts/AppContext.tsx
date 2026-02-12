@@ -128,15 +128,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // Feature to Path Mapping for redirection
     const featurePathMap: Record<string, string> = {
         '/': 'pos',
-        '/accounting': 'accounting',
+        '/accounting': 'financials',
         '/inventory': 'inventory',
-        '/service': 'service',
+        '/service': 'service_desk',
         '/sales': 'sales',
-        '/reports': 'reporting',
-        '/customers': 'crm',
-        '/suppliers': 'crm',
-        '/advisor': 'accounting',
-        '/quotes': 'quotes'
+        '/reports': 'analytics',
+        '/reports/ceo': 'ceo_intel',
+        '/customers': 'current_accounts',
+        '/suppliers': 'suppliers',
+        '/field-sales': 'field_sales',
+        '/advisor': 'accountant',
+        '/fintech/control-tower': 'fintech_tower',
+        '/fintech/smart-pricing': 'smart_pricing',
+        '/fintech/profitability-heatmap': 'pnl_heatmap',
+        '/quotes': 'quotes',
+        '/settings': 'system_settings',
+        '/staff': 'team_management'
     };
 
     // 1. BRANCH STATE

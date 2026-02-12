@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma';
 import { EventBus } from '../fintech/event-bus';
 import { TransactionNormalizer } from './transaction-normalizer';
 import { generateTransactionFingerprint } from './utils';
+import { BankConnectionService } from './bank-connection-service';
 
 export interface RawBankTransaction {
     id: string;
@@ -13,10 +14,6 @@ export interface RawBankTransaction {
 }
 
 export class BankSyncEngine {
-    /**
-     * Synchronizes transactions for all active connections.
-     * Can be triggered via Webhook or Cron.
-     */
     /**
      * Synchronizes transactions for all active connections.
      * Respects process.env.BANK_LIVE_MODE: DRY_RUN | LIVE_PULL | LIVE_ALL
@@ -48,35 +45,24 @@ export class BankSyncEngine {
         return { results, duration, mode };
     }
 
-    /**
-     * Syncs a single bank connection
-     */
     static async syncConnection(connection: any, mode: string = 'DRY_RUN') {
         const startTime = Date.now();
         console.log(`[BankSync] Starting sync for: ${connection.bankName} (${connection.iban}) in ${mode} mode.`);
 
         try {
-            // 0. Ensure Single Source of Truth (Kasa entry)
-            // Even in DRY_RUN, we want to ensure the Kasa exists to test the link
             const kasa = await this.ensureKasaAccount(connection);
-
-            // 1. Fetch from Partner/Mock API
-            // In a real scenario, this would choose an adapter based on connection.integrationMethod
             const rawTransactions = await this.fetchFromPartner(connection);
-
-            // 2. Normalize and Save (Idempotent)
-            // processTransactions handles fingerprinting and saving. 
-            // In DRY_RUN, we still save so we can see them in the UI and test idempotency on next run.
             const savedCount = await this.processTransactions(connection, rawTransactions, mode);
 
-            // 3. Update sync timestamp and status (if not pure dry_run)
             if (mode !== 'DRY_RUN') {
+                await BankConnectionService.updateStatus(connection.id, 'ACTIVE', {
+                    actorId: 'system',
+                    reasonCode: 'SUCCESSFUL_SYNC'
+                });
+
                 await (prisma as any).bankConnection.update({
                     where: { id: connection.id },
-                    data: {
-                        lastSyncAt: new Date(),
-                        status: 'ACTIVE'
-                    }
+                    data: { lastSyncAt: new Date() }
                 });
             }
 
@@ -84,9 +70,14 @@ export class BankSyncEngine {
             return { connection: connection.bankName, imported: savedCount, success: true, duration };
         } catch (err: any) {
             if (mode !== 'DRY_RUN') {
-                await (prisma as any).bankConnection.update({
-                    where: { id: connection.id },
-                    data: { status: 'ERROR' }
+                const errorCode = BankConnectionService.classifyError(err);
+                const newStatus = errorCode === 'AUTH_FAILED' ? 'EXPIRED' : 'ERROR';
+
+                await BankConnectionService.updateStatus(connection.id, newStatus, {
+                    actorId: 'system',
+                    errorCode,
+                    errorMessage: err.message,
+                    reasonCode: 'SYNC_FAILURE'
                 });
             }
             throw err;

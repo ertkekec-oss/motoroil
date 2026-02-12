@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { getRequestContext } from '@/lib/api-context';
 import prisma from '@/lib/prisma';
 import { BankSyncEngine } from '@/services/banking/bank-sync-engine';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const session = await getSession();
-        if (!session || !session.user.companyId) {
+        const ctx = await getRequestContext(req);
+        if (!ctx.companyId && ctx.tenantId !== 'PLATFORM_ADMIN') {
             return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
         }
 
@@ -17,12 +17,12 @@ export async function POST(req: Request) {
             const conn = await (prisma as any).bankConnection.findUnique({
                 where: { id: connectionId }
             });
-            if (!conn || conn.companyId !== session.user.companyId) {
+            if (!conn || (ctx.tenantId !== 'PLATFORM_ADMIN' && conn.companyId !== ctx.companyId)) {
                 return NextResponse.json({ error: 'Bağlantı bulunamadı' }, { status: 404 });
             }
             results = [await BankSyncEngine.syncConnection(conn)];
         } else {
-            results = await BankSyncEngine.syncAll(session.user.companyId);
+            results = await BankSyncEngine.syncAll(ctx.companyId || '');
         }
 
         return NextResponse.json({

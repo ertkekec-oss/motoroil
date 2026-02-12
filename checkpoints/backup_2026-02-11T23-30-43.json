@@ -1,0 +1,236 @@
+{
+  "metadata": {
+    "timestamp": "2026-02-11T23:30:43.723Z",
+    "version": "4.2.0",
+    "checkpointId": "BACKUP_2026-02-11T23-30-43",
+    "stats": {
+      "users": 1,
+      "staff": 0,
+      "branches": 1,
+      "products": 0,
+      "customers": 0,
+      "suppliers": 0,
+      "kasalar": 2,
+      "transactions": 0,
+      "salesInvoices": 0,
+      "purchaseInvoices": 0,
+      "checks": 0,
+      "orders": 0,
+      "serviceRecords": 0,
+      "stockTransfers": 0,
+      "campaigns": 0,
+      "coupons": 0,
+      "warranties": 0,
+      "auditLogs": 2,
+      "securityEvents": 0,
+      "notifications": 0,
+      "pendingProducts": 0,
+      "pendingTransfers": 0,
+      "inventoryAudits": 0,
+      "appSettings": 9,
+      "marketplaceConfigs": 0,
+      "marketplaceProductMaps": 0,
+      "customerCategories": 0,
+      "customerDocuments": 0
+    }
+  },
+  "data": {
+    "users": [
+      {
+        "id": "cmlineibu0001v7ib2wwxk7ou",
+        "tenantId": "test-tenant-id",
+        "email": "admin@kech.tr",
+        "name": "Periodya Admin",
+        "password": "$2b$10$HCqy6uZK2bjK8BtYp02l6e6U2qmUYYguOVivJdhD6tPBsPe3n.lCS",
+        "role": "ADMIN",
+        "permissions": [],
+        "createdAt": "2026-02-11T23:15:38.441Z",
+        "updatedAt": "2026-02-11T23:26:49.038Z",
+        "lastActiveAt": "2026-02-11T23:26:49.035Z"
+      }
+    ],
+    "staff": [],
+    "branches": [
+      {
+        "id": 1,
+        "companyId": "test-company-id",
+        "name": "merkez",
+        "type": "Şube",
+        "city": "Kayseri",
+        "district": "Talas",
+        "address": "",
+        "phone": null,
+        "manager": null,
+        "status": "Active",
+        "createdAt": "2026-02-11T23:19:08.794Z",
+        "updatedAt": "2026-02-11T23:19:08.794Z",
+        "deletedAt": null
+      }
+    ],
+    "products": [],
+    "customers": [],
+    "suppliers": [],
+    "kasalar": [
+      {
+        "id": "cmlinj0td000213kv5dehv1lj",
+        "companyId": "test-company-id",
+        "name": "Merkez TL Kasası",
+        "type": "Nakit",
+        "balance": "0",
+        "currency": "TRY",
+        "iban": null,
+        "isActive": true,
+        "deletedAt": null,
+        "createdAt": "2026-02-11T23:19:09.025Z",
+        "updatedAt": "2026-02-11T23:19:09.025Z",
+        "branch": "merkez",
+        "bankConnectionId": null
+      },
+      {
+        "id": "cmlinj193000513kvoh6516sy",
+        "companyId": "test-company-id",
+        "name": "Ana Banka Hesabı (TL)",
+        "type": "Banka",
+        "balance": "0",
+        "currency": "TRY",
+        "iban": null,
+        "isActive": true,
+        "deletedAt": null,
+        "createdAt": "2026-02-11T23:19:09.591Z",
+        "updatedAt": "2026-02-11T23:19:09.591Z",
+        "branch": "merkez",
+        "bankConnectionId": null
+      }
+    ],
+    "transactions": [],
+    "salesInvoices": [],
+    "purchaseInvoices": [],
+    "checks": [],
+    "orders": [],
+    "serviceRecords": [],
+    "stockTransfers": [],
+    "campaigns": [],
+    "coupons": [],
+    "warranties": [],
+    "auditLogs": [
+      {
+        "id": "cmlinify20003p9hy2vk1fksg",
+        "tenantId": "test-tenant-id",
+        "userId": "cmlineibu0001v7ib2wwxk7ou",
+        "userName": "admin@kech.tr",
+        "action": "LOGIN",
+        "entity": "User",
+        "entityId": "cmlineibu0001v7ib2wwxk7ou",
+        "before": null,
+        "after": null,
+        "details": "Sisteme giriş yapıldı.",
+        "ipAddress": "88.234.238.233",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+        "branch": "Merkez",
+        "createdAt": "2026-02-11T23:18:41.979Z"
+      },
+      {
+        "id": "cmlinlazn0001aql9g673974h",
+        "tenantId": "test-tenant-id",
+        "userId": "cmlineibu0001v7ib2wwxk7ou",
+        "userName": "admin@kech.tr",
+        "action": "LOGIN",
+        "entity": "User",
+        "entityId": "cmlineibu0001v7ib2wwxk7ou",
+        "before": null,
+        "after": null,
+        "details": "Sisteme giriş yapıldı.",
+        "ipAddress": "88.234.238.233",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+        "branch": "Merkez",
+        "createdAt": "2026-02-11T23:20:55.523Z"
+      }
+    ],
+    "securityEvents": [],
+    "notifications": [],
+    "pendingProducts": [],
+    "pendingTransfers": [],
+    "inventoryAudits": [],
+    "appSettings": [
+      {
+        "id": "cmlik52990000i8e8ib7uie8d",
+        "key": "company_name",
+        "value": "mOTOROİL",
+        "updatedAt": "2026-02-11T21:44:18.861Z"
+      },
+      {
+        "id": "cmlik52k80001i8e8v647usvu",
+        "key": "company_slogan",
+        "value": "",
+        "updatedAt": "2026-02-11T21:44:19.256Z"
+      },
+      {
+        "id": "cmlik52td0002i8e8o4i2148p",
+        "key": "company_email",
+        "value": "",
+        "updatedAt": "2026-02-11T21:44:19.586Z"
+      },
+      {
+        "id": "cmlik538z0003i8e8ox5sowlz",
+        "key": "company_website",
+        "value": "",
+        "updatedAt": "2026-02-11T21:44:20.055Z"
+      },
+      {
+        "id": "cmlik53h30004i8e8ifhsfoch",
+        "key": "company_address",
+        "value": "",
+        "updatedAt": "2026-02-11T21:44:20.439Z"
+      },
+      {
+        "id": "cmlik53pf0005i8e8ig7ibdxw",
+        "key": "company_city",
+        "value": "Adana",
+        "updatedAt": "2026-02-11T21:44:20.739Z"
+      },
+      {
+        "id": "cmlik540y0006i8e858ojov0k",
+        "key": "company_district",
+        "value": "Kozan",
+        "updatedAt": "2026-02-11T21:44:21.154Z"
+      },
+      {
+        "id": "cmlik54990007i8e81s7cuxx3",
+        "key": "company_phone",
+        "value": "",
+        "updatedAt": "2026-02-11T21:44:21.454Z"
+      },
+      {
+        "id": "cmlinj13v000313kvp17a0kg6",
+        "key": "paymentMethods",
+        "value": [
+          {
+            "id": "cash",
+            "icon": "💵",
+            "type": "cash",
+            "label": "Nakit",
+            "linkedKasaId": "cmlinj0td000213kv5dehv1lj"
+          },
+          {
+            "id": "card",
+            "icon": "💳",
+            "type": "card",
+            "label": "Kredi Kartı"
+          },
+          {
+            "id": "transfer",
+            "icon": "🏦",
+            "type": "transfer",
+            "label": "Havale/EFT",
+            "linkedKasaId": "cmlinj193000513kvoh6516sy"
+          }
+        ],
+        "updatedAt": "2026-02-11T23:19:09.778Z"
+      }
+    ],
+    "marketplaceConfigs": [],
+    "marketplaceProductMaps": [],
+    "customerCategories": [],
+    "customerDocuments": []
+  }
+}

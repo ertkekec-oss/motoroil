@@ -1647,7 +1647,7 @@ model BankConnection {
   bankId             String?  // BANK_FORM_DEFINITIONS key (AKBANK, GARANTI, etc.)
   iban                String   @unique
   currency            String   @default("TRY")
-  status              String   @default("ACTIVE") // ACTIVE, ERROR, PENDING_ONBOARDING
+  status              String   @default("DRAFT") // DRAFT, PENDING_ACTIVATION, ACTIVE, ERROR, EXPIRED
   lastSyncAt          DateTime?
   connectionType      String   @default("OPEN_BANKING") // OPEN_BANKING, XML_IMPORT, AUTO_PULL
   integrationMethod   String   @default("MANUAL_UPLOAD") // PULL_HTTP, SFTP_PULL, etc.
@@ -1658,6 +1658,13 @@ model BankConnection {
   
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+
+  // Error context & production hardening
+  lastErrorCode       String?
+  lastErrorMessage    String?
+  lastErrorAt         DateTime?
+  consecutiveFailures Int      @default(0)
+  nextRetryAt         DateTime?
 
   company      Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   balances     BankAccountBalance[]

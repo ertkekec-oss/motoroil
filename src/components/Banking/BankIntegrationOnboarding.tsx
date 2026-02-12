@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { BANK_FORM_DEFINITIONS, BankDefinition } from '@/services/banking/bank-definitions';
 import { useModal } from '@/contexts/ModalContext';
+import { jsPDF } from 'jspdf';
+import { BankConnectionStatus } from '@/services/banking/bank-connection-service';
 
 export default function BankOnboardingHub() {
     const { showSuccess, showError } = useModal();
@@ -10,13 +12,101 @@ export default function BankOnboardingHub() {
     const [selectedBankId, setSelectedBankId] = useState<string>('');
     const [isSaving, setIsSaving] = useState(false);
     const [credentials, setCredentials] = useState<Record<string, string>>({});
+    const [isTesting, setIsTesting] = useState(false);
+    const [testResults, setTestResults] = useState<{
+        connectivity: { status: 'PASS' | 'FAIL', latencyMs: number, message: string, errorCode: string | null },
+        permission: { status: 'PASS' | 'FAIL', message: string, errorCode: string | null }
+    } | null>(null);
+    const [currentStepStatus, setCurrentStepStatus] = useState<string>('DRAFT');
 
     const selectedBank = selectedBankId ? BANK_FORM_DEFINITIONS[selectedBankId] : null;
 
+    const isFormValid = () => {
+        if (!selectedBank) return false;
+        return selectedBank.requiredCredentials.every(key => credentials[key] && credentials[key].trim() !== '');
+    };
+
     const handleDownloadForm = () => {
         if (!selectedBank) return;
-        // In a real app, this would generate a PDF via a library like jsPDF or a server-side route
-        showSuccess('Başarılı', `${selectedBank.displayName} için başvuru dokümanları hazırlandı. PDF indiriliyor...`);
+
+        const doc = new jsPDF();
+
+        // Header
+        doc.setFontSize(22);
+        doc.text("BANKA ENTEGRASYON BAŞVURU FORMU", 105, 20, { align: "center" });
+
+        doc.setFontSize(14);
+        doc.text(`Banka: ${selectedBank.displayName}`, 20, 40);
+        doc.text(`Tarih: ${new Date().toLocaleDateString('tr-TR')}`, 20, 50);
+
+        doc.setFontSize(12);
+        doc.text("Aşağıdaki alanların banka tarafından tanımlanması ve taraflara iletilmesi rica olunur.", 20, 70);
+
+        let y = 85;
+        selectedBank.onboardingFields.forEach((field) => {
+            const isRequired = selectedBank.requiredCredentials.includes(field.key);
+            let statusText = isRequired ? "[ZORUNLU]" : "[OPSİYONEL - VARSA]";
+
+            // Special rule for Kuveyt Turk
+            if (selectedBank.id === 'KUVEYT_TURK' && (field.key === 'serviceUsername' || field.key === 'servicePassword')) {
+                statusText = "[OPSİYONEL - VARSA DOLDURUNUZ]";
+            }
+
+            doc.text(`${field.label}: ____________________ ${statusText}`, 20, y);
+            y += 10;
+        });
+
+        y += 10;
+        doc.setFontSize(10);
+        doc.text("Teknik Notlar:", 20, y);
+        y += 5;
+        selectedBank.technicalAppendix.protocolNotes.forEach(note => {
+            doc.text(`- ${note}`, 25, y);
+            y += 5;
+        });
+
+        doc.save(`${selectedBank.id}_Basvuru_Formu.pdf`);
+        showSuccess('Başarılı', `${selectedBank.displayName} için başvuru dokümanları (PDF) indirildi.`);
+        setCurrentStepStatus('PENDING_ACTIVATION');
+    };
+
+    const handleTestConnection = async () => {
+        if (!selectedBank) return;
+        setIsTesting(true);
+        setTestResults(null);
+        try {
+            const res = await fetch('/api/fintech/banking/test-connection', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    bankId: selectedBankId,
+                    credentials
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setTestResults({
+                    connectivity: data.connectivity,
+                    permission: data.permission
+                });
+
+                if (data.connectivity.status === 'PASS' && data.permission.status === 'PASS') {
+                    showSuccess('Bağlantı Başarılı', 'Banka API erişimi ve yetkilendirme doğrulandı.');
+                } else {
+                    showError('Doğrulama Sorunu', data.permission.message || data.connectivity.message);
+                }
+
+                if (data.recommendedStatus) {
+                    setCurrentStepStatus(data.recommendedStatus);
+                }
+            } else {
+                showError('Hata', data.error || 'Test yapılamadı.');
+            }
+        } catch (err) {
+            showError('Hata', 'Test sırasında bir iletişim hatası oluştu.');
+        } finally {
+            setIsTesting(false);
+        }
     };
 
     const handleSaveCredentials = async (e: React.FormEvent) => {
@@ -31,7 +121,8 @@ export default function BankOnboardingHub() {
                 body: JSON.stringify({
                     bankId: selectedBankId,
                     integrationMethod: selectedBank.integrationMethod,
-                    credentials
+                    credentials,
+                    status: currentStepStatus
                 })
             });
             const data = await res.json();
@@ -162,13 +253,18 @@ export default function BankOnboardingHub() {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {selectedBank.onboardingFields.map(field => (
                                             <div key={field.key} className="space-y-2">
-                                                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">{field.label}</label>
+                                                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">
+                                                    {field.label} {selectedBank.requiredCredentials.includes(field.key) && <span className="text-rose-500">*</span>}
+                                                </label>
                                                 {field.type === 'select' ? (
                                                     <select
-                                                        required={field.required}
+                                                        required={selectedBank.requiredCredentials.includes(field.key)}
                                                         className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
                                                         value={credentials[field.key] || field.default || ''}
-                                                        onChange={e => setCredentials({ ...credentials, [field.key]: e.target.value })}
+                                                        onChange={e => {
+                                                            setCredentials({ ...credentials, [field.key]: e.target.value });
+                                                            setTestResults(null);
+                                                        }}
                                                     >
                                                         <option value="">Seçiniz</option>
                                                         {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -176,11 +272,14 @@ export default function BankOnboardingHub() {
                                                 ) : (
                                                     <input
                                                         type={field.type}
-                                                        required={field.required}
+                                                        required={selectedBank.requiredCredentials.includes(field.key)}
                                                         placeholder={field.placeholder}
                                                         className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono"
                                                         value={credentials[field.key] || ''}
-                                                        onChange={e => setCredentials({ ...credentials, [field.key]: e.target.value })}
+                                                        onChange={e => {
+                                                            setCredentials({ ...credentials, [field.key]: e.target.value });
+                                                            setTestResults(null);
+                                                        }}
                                                     />
                                                 )}
                                                 {field.helperText && <p className="text-[10px] text-white/40 italic pl-1">{field.helperText}</p>}
@@ -188,19 +287,78 @@ export default function BankOnboardingHub() {
                                         ))}
                                     </div>
 
-                                    {!selectedBank.supportsAutoPull && (
-                                        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-500 font-bold">
-                                            ⚠️ Bu banka otomatik çekimi (Auto Pull) desteklememektedir. İşlemleri MANUEL YÜKLEME sekmesinden aktarabilirsiniz.
+                                    {testResults && (
+                                        <div className="space-y-3">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div className={`p-4 rounded-xl border flex items-center justify-between ${testResults.connectivity.status === 'PASS' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}>
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-lg">{testResults.connectivity.status === 'PASS' ? '✅' : '❌'}</span>
+                                                        <div>
+                                                            <p className="text-[10px] font-black text-white/40 uppercase">Erişim (Connectivity)</p>
+                                                            <p className={`text-xs font-bold ${testResults.connectivity.status === 'PASS' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                                                {testResults.connectivity.status === 'PASS' ? `Aktif (${testResults.connectivity.latencyMs}ms)` : 'Erişim Yok'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className={`p-4 rounded-xl border flex items-center justify-between ${testResults.permission.status === 'PASS' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}>
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-lg">{testResults.permission.status === 'PASS' ? '✅' : '❌'}</span>
+                                                        <div>
+                                                            <p className="text-[10px] font-black text-white/40 uppercase">Yetki (Permission)</p>
+                                                            <p className={`text-xs font-bold ${testResults.permission.status === 'PASS' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                                                {testResults.permission.status === 'PASS' ? 'Doğrulandı' : 'Hatalı'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {(testResults.connectivity.status === 'FAIL' || testResults.permission.status === 'FAIL') && (
+                                                <div className="p-4 bg-white/5 border-l-4 border-l-amber-500 rounded-xl space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-amber-500">🛡️</span>
+                                                        <h5 className="text-xs font-black text-white uppercase">Ne yapmalıyım?</h5>
+                                                    </div>
+                                                    <p className="text-xs text-white/60 font-medium">
+                                                        {testResults.connectivity.errorCode === 'IP_NOT_WHITELISTED' && "Bankaya Periodya IP'lerini whitelist ettirmeniz gerekmektedir. Teknik dokümandaki IP listesini banka temsilcinize iletin."}
+                                                        {testResults.permission.errorCode === 'AUTH_FAILED' && "Kullanıcı adı veya şifre banka sisteminde geçersiz. Lütfen bilgileri kontrol edip tekrar deneyin."}
+                                                        {testResults.connectivity.errorCode === 'TIMEOUT' && "Banka servisi yanıt vermiyor. Lütfen kısa süre sonra tekrar deneyin veya banka servis durumunu kontrol edin."}
+                                                        {(!testResults.connectivity.errorCode && testResults.permission.status === 'FAIL') && "Bağlantı sağlandı ancak yetki testi başarısız oldu. Lütfen servis kullanım izinlerinizin aktif olduğundan emin olun."}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
-                                    <button
-                                        type="submit"
-                                        disabled={isSaving}
-                                        className="w-full h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black text-sm tracking-widest shadow-xl shadow-emerald-900/20 transition-all"
-                                    >
-                                        {isSaving ? 'KAYDEDİLİYOR...' : '✅ BAĞLANTIYI KAYDET VE AKTİF ET'}
-                                    </button>
+                                    <div className="flex gap-4">
+                                        <button
+                                            type="button"
+                                            onClick={handleTestConnection}
+                                            disabled={isTesting || !isFormValid()}
+                                            className={`flex-1 h-14 rounded-xl font-black text-sm tracking-widest transition-all flex items-center justify-center gap-2 ${isTesting || !isFormValid() ? 'bg-white/5 text-white/20' : testResults?.permission.status === 'PASS' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                                        >
+                                            {isTesting ? '🌐 PING...' : testResults?.permission.status === 'PASS' ? '✅ TEST BAŞARILI' : testResults?.permission.status === 'FAIL' ? '❌ TEST BAŞARISIZ' : '🧪 BAĞLANTIYI TEST ET'}
+                                        </button>
+
+                                        <button
+                                            type="submit"
+                                            disabled={isSaving || !isFormValid() || testResults?.permission.status !== 'PASS'}
+                                            className={`flex-1 h-14 rounded-xl font-black text-sm tracking-widest transition-all ${isSaving || !isFormValid() || testResults?.permission.status !== 'PASS' ? 'bg-white/5 text-white/20 cursor-not-allowed' : 'bg-primary text-white shadow-xl shadow-primary/20'}`}
+                                        >
+                                            {isSaving ? 'KAYDEDİLİYOR...' : '🚀 AKTİF ET & KAYDET'}
+                                        </button>
+                                    </div>
+
+                                    <div className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-2 h-2 rounded-full shadow-[0_0_8px] ${currentStepStatus === 'ACTIVE' ? 'bg-emerald-500 shadow-emerald-500/60' : currentStepStatus === 'PENDING_ACTIVATION' ? 'bg-amber-500 shadow-amber-500/60' : 'bg-blue-500 shadow-blue-500/60'}`}></div>
+                                            <span className="text-[10px] font-black text-white/60 uppercase">Mevcut Durum:</span>
+                                        </div>
+                                        <span className={`px-2 py-1 rounded text-[10px] font-black ${currentStepStatus === 'ACTIVE' ? 'bg-emerald-500/20 text-emerald-400' : currentStepStatus === 'PENDING_ACTIVATION' ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-500/20 text-slate-400'}`}>
+                                            {currentStepStatus.replace(/_/g, ' ')}
+                                        </span>
+                                    </div>
                                 </form>
                             )}
                         </div>
