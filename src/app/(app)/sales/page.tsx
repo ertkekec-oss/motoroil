@@ -1135,7 +1135,9 @@ export default function SalesPage() {
 
                                                                 {/* PLATFORM ACTIONS */}
                                                                 <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-light)' }}>
-                                                                    <h5 style={{ color: 'var(--text-muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>Platform Aksiyonları</h5>
+                                                                    <h5 style={{ color: 'var(--text-muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+                                                                        🚀 Platform Aksiyonları (Marketplace: {o.marketplace})
+                                                                    </h5>
                                                                     <div className="flex gap-3">
                                                                         <MarketplaceActionButton
                                                                             orderId={o.id}
