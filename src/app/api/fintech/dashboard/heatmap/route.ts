@@ -1,17 +1,26 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { getRequestContext } from '@/lib/api-context';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
-        const session = await getSession();
-        if (!session || !session.user.companyId) {
-            return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
-        }
+        const ctx = await getRequestContext(req as any);
 
-        const companyId = session.user.companyId;
+        let companyId = ctx.companyId;
+
+        if (!companyId) {
+            // FALLBACK: If header is missing (e.g. Onboarding), try to find the default company for this tenant
+            const defaultCompany = await (prisma as any).company.findFirst({
+                where: { tenantId: ctx.tenantId }
+            });
+
+            if (!defaultCompany) {
+                return NextResponse.json({ error: 'Firma bulunamadı' }, { status: 404 });
+            }
+            companyId = defaultCompany.id;
+        }
 
         const pnlData = await (prisma as any).marketplaceProductPnl.findMany({
             where: { companyId },

@@ -2,16 +2,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getRequestContext } from '@/lib/api-context';
 import { ReconciliationMetricsService } from '@/services/fintech/reconciliation-metrics.service';
 
+import prisma from '@/lib/prisma';
+
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
     try {
         const ctx = await getRequestContext(req);
-        if (!ctx.companyId && ctx.tenantId !== 'PLATFORM_ADMIN') {
-            return NextResponse.json({ error: 'Oturum veya şirket bilgisi eksik' }, { status: 401 });
+
+        // Fallback logic for missing company header
+        let companyId = ctx.companyId;
+        if (!companyId) {
+            const defaultCompany = await (prisma as any).company.findFirst({
+                where: { tenantId: ctx.tenantId }
+            });
+            if (defaultCompany) {
+                companyId = defaultCompany.id;
+            } else if (ctx.tenantId !== 'PLATFORM_ADMIN') {
+                return NextResponse.json({ error: 'Oturum veya şirket bilgisi eksik' }, { status: 401 });
+            }
         }
 
-        const metrics = await ReconciliationMetricsService.getControlTowerMetrics(ctx.companyId || '');
+        const metrics = await ReconciliationMetricsService.getControlTowerMetrics(companyId || '');
 
         return NextResponse.json({
             success: true,

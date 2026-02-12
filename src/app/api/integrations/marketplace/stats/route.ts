@@ -37,7 +37,7 @@ export async function GET(request: Request) {
         // Sum debits - credits for 120.03
         const balanceResult: any = await prisma.$queryRaw`
             SELECT SUM(debit - credit) as balance 
-            FROM "JournalEntryLine" 
+            FROM "JournalLine" 
             WHERE "companyId" = ${companyId} AND "accountCode" = '120.03'
         `;
         const openBalance = Number(balanceResult[0]?.balance || 0);
