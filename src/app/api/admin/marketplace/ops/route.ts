@@ -1,23 +1,25 @@
-import { NextResponse } from "next/server";
-import { authorize } from "@/lib/auth";
+import { NextRequest } from "next/server";
+import { getRequestContext, apiResponse, apiError } from "@/lib/api-context";
 import prisma from "@/lib/prisma";
 import { marketplaceQueue, marketplaceDlq } from "@/lib/queue";
 
-export async function GET(request: Request) {
-    const auth = await authorize();
-    if (!auth.authorized) return auth.response;
+export const dynamic = 'force-dynamic';
 
-    // RBAC: Sadece sistem yöneticileri erişebilir
-    const role = (auth.user.role || "").toUpperCase();
-    if (role !== "PLATFORM_ADMIN" && role !== "SUPER_ADMIN") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    }
-
-    const url = new URL(request.url);
-    const status = url.searchParams.get("status");
-    const marketplace = url.searchParams.get("marketplace");
-
+export async function GET(req: NextRequest) {
+    let ctx;
     try {
+        ctx = await getRequestContext(req);
+
+        // RBAC: Sadece sistem yöneticileri erişebilir
+        const role = (ctx.role || "").toUpperCase();
+        if (role !== "PLATFORM_ADMIN" && role !== "SUPER_ADMIN") {
+            return apiError({ message: "Unauthorized", status: 403, code: 'FORBIDDEN' }, ctx.requestId);
+        }
+
+        const url = new URL(req.url);
+        const status = url.searchParams.get("status");
+        const marketplace = url.searchParams.get("marketplace");
+
         const audits = await (prisma as any).marketplaceActionAudit.findMany({
             where: {
                 ...(status ? { status } : {}),
@@ -36,38 +38,38 @@ export async function GET(request: Request) {
             marketplaceDlq.getJobs(['waiting', 'active', 'failed', 'completed', 'delayed']).then(j => j.length)
         ]);
 
-        return NextResponse.json({
+        return apiResponse({
             audits,
             stats: { waiting, active, failed, completed, dlq }
-        });
+        }, { requestId: ctx.requestId });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
 
-export async function POST(request: Request) {
-    const auth = await authorize();
-    if (!auth.authorized) return auth.response;
-
-    // RBAC: Sadece sistem yöneticileri operasyon yapabilir
-    const role = auth.user.role?.toUpperCase() || "";
-    if (role !== "PLATFORM_ADMIN" && role !== "SUPER_ADMIN") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    }
-
+export async function POST(req: NextRequest) {
+    let ctx;
     try {
-        const { action, auditId } = await request.json();
+        ctx = await getRequestContext(req);
+
+        // RBAC: Sadece sistem yöneticileri operasyon yapabilir
+        const role = ctx.role?.toUpperCase() || "";
+        if (role !== "PLATFORM_ADMIN" && role !== "SUPER_ADMIN") {
+            return apiError({ message: "Unauthorized", status: 403, code: 'FORBIDDEN' }, ctx.requestId);
+        }
+
+        const { action, auditId } = await req.json();
 
         // Safety: Global Read-Only Mode
         if (process.env.MARKETPLACE_OPS_READONLY === 'true') {
-            return NextResponse.json({ error: "SİSTEM KORUMASI: Şu anda sadece okuma moduna izin verilmektedir (Outage Window)." }, { status: 503 });
+            return apiError({ message: "SİSTEM KORUMASI: Şu anda sadece okuma moduna izin verilmektedir (Outage Window).", status: 503, code: 'READ_ONLY' }, ctx.requestId);
         }
 
         const audit = await (prisma as any).marketplaceActionAudit.findUnique({
             where: { id: auditId }
         });
 
-        if (!audit) return NextResponse.json({ error: "Audit not found" }, { status: 404 });
+        if (!audit) return apiError({ message: "Audit not found", status: 404, code: 'NOT_FOUND' }, ctx.requestId);
 
         if (action === "RETRY") {
             // Re-enqueue the job using the same idempotency key as jobId
@@ -81,7 +83,7 @@ export async function POST(request: Request) {
                 data: { status: "PENDING", errorMessage: null, lockExpiresAt: new Date(Date.now() + 60000) }
             });
 
-            return NextResponse.json({ success: true, message: "Job re-enqueued" });
+            return apiResponse({ success: true, message: "Job re-enqueued" }, { requestId: ctx.requestId });
         }
 
         if (action === "UNLOCK") {
@@ -89,12 +91,13 @@ export async function POST(request: Request) {
                 where: { id: auditId },
                 data: { lockExpiresAt: new Date(0), status: "FAILED", errorMessage: "Force unlocked by admin" }
             });
-            return NextResponse.json({ success: true, message: "Job unlocked" });
+            return apiResponse({ success: true, message: "Job unlocked" }, { requestId: ctx.requestId });
         }
 
-        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+        return apiError({ message: "Invalid action", status: 400, code: 'BAD_REQUEST' }, ctx.requestId);
 
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
+

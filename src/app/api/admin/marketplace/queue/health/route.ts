@@ -4,10 +4,13 @@ import prisma from '@/lib/prisma';
 import { logger } from '@/lib/observability';
 import { apiResponse, apiError } from '@/lib/api-context';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/admin/marketplace/queue/health
  * Evaluates SLOs and returns system health status
  */
+
 
 export async function GET(req: NextRequest) {
     try {

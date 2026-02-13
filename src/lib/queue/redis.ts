@@ -1,15 +1,19 @@
 import IORedis from 'ioredis';
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
-if (!process.env.REDIS_URL) {
-    throw new Error('❌ REDIS_URL environment variable is missing. Please configure Upstash Redis.');
+
+if (!process.env.REDIS_URL && process.env.NODE_ENV === 'production') {
+    console.warn('⚠️ REDIS_URL is missing. Redis functionality will be limited.');
 }
 
 // Upstash Redis connection with TLS support
-export const redisConnection = new IORedis(process.env.REDIS_URL, {
+export const redisConnection = new IORedis(redisUrl, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
-    tls: {}, // Standard TLS for Upstash rediss://
+    lazyConnect: true,
+    ...(process.env.REDIS_URL?.startsWith('rediss://') ? { tls: {} } : {}),
 });
+
 
 // Connection event logging (NO SECRETS)
 redisConnection.on('connect', () => {

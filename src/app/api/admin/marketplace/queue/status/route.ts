@@ -1,27 +1,25 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { marketplaceQueue, marketplaceDlq } from '@/lib/queue';
-import { authorize } from '@/lib/auth';
+import { getRequestContext, apiResponse, apiError } from '@/lib/api-context';
 import prisma from '@/lib/prisma';
-import { v4 as uuidv4 } from 'uuid';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/admin/marketplace/queue/status
  * Returns marketplace queue statistics, forensic DLQ data, and recent audits
  */
-export async function GET(request: Request) {
-    const rid = uuidv4();
-    const serverTime = new Date().toISOString();
-
+export async function GET(req: NextRequest) {
+    let ctx;
     try {
-        const auth = await authorize();
-        if (!auth.authorized) return auth.response;
+        ctx = await getRequestContext(req);
 
-        const role = (auth.user.role || "").toUpperCase();
+        const role = (ctx.role || "").toUpperCase();
         if (role !== "PLATFORM_ADMIN" && role !== "SUPER_ADMIN") {
-            return NextResponse.json({ error: 'Unauthorized', rid }, { status: 403 });
+            return apiError({ message: 'Unauthorized', status: 403, code: 'FORBIDDEN' }, ctx.requestId);
         }
 
-        const url = new URL(request.url);
+        const url = new URL(req.url);
         const limit = Math.min(parseInt(url.searchParams.get('limit') || '50'), 100);
         const skip = parseInt(url.searchParams.get('skip') || '0');
         const mplace = url.searchParams.get('marketplace');
@@ -58,10 +56,8 @@ export async function GET(request: Request) {
             input: j.data?.input
         }));
 
-        return NextResponse.json({
+        return apiResponse({
             version: 'v2',
-            rid,
-            serverTime,
             status: 'READY',
             counts: {
                 waiting,
@@ -73,14 +69,10 @@ export async function GET(request: Request) {
             },
             forensics,
             audits
-        });
+        }, { requestId: ctx.requestId });
 
     } catch (error: any) {
-        return NextResponse.json({
-            status: 'ERROR',
-            message: error.message,
-            rid,
-            serverTime
-        }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
+

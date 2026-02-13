@@ -1,38 +1,40 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { marketplaceQueue, marketplaceDlq } from '@/lib/queue';
 import { redisConnection } from '@/lib/queue/redis';
-import { authorize } from '@/lib/auth';
+import { getRequestContext, apiResponse, apiError } from '@/lib/api-context';
 import prisma from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/admin/marketplace/queue/replay
  * Replays a specific job from DLQ back to the main queue with guardrails
  */
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
+    let ctx;
     try {
-        const auth = await authorize();
-        if (!auth.authorized) return auth.response;
+        ctx = await getRequestContext(req);
 
-        const role = (auth.user.role || "").toUpperCase();
+        const role = (ctx.role || "").toUpperCase();
         if (role !== "PLATFORM_ADMIN" && role !== "SUPER_ADMIN") {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+            return apiError({ message: 'Unauthorized', status: 403, code: 'FORBIDDEN' }, ctx.requestId);
         }
 
-        const { dlqJobId, action, reason, companyId: targetCompanyId } = await request.json();
+        const { dlqJobId, action, reason, companyId: targetCompanyId } = await req.json();
 
         // Safety: Global Read-Only Mode
         if (process.env.MARKETPLACE_OPS_READONLY === 'true') {
-            return NextResponse.json({ error: "SİSTEM KORUMASI: Şu anda sadece okuma moduna izin verilmektedir (Outage Window)." }, { status: 503 });
+            return apiError({ message: "SİSTEM KORUMASI: Şu anda sadece okuma moduna izin verilmektedir (Outage Window).", status: 503, code: 'READ_ONLY' }, ctx.requestId);
         }
 
         if (action === "REPLAY_DLQ" && dlqJobId) {
             if (!reason || reason.length < 5) {
-                return NextResponse.json({ error: 'Lütfen geçerli bir Replay sebebi girin (min 5 karakter).' }, { status: 400 });
+                return apiError({ message: 'Lütfen geçerli bir Replay sebebi girin (min 5 karakter).', status: 400, code: 'BAD_REQUEST' }, ctx.requestId);
             }
 
             const job = await marketplaceDlq.getJob(dlqJobId);
             if (!job) {
-                return NextResponse.json({ error: 'Job not found in DLQ' }, { status: 404 });
+                return apiError({ message: 'Job not found in DLQ', status: 404, code: 'NOT_FOUND' }, ctx.requestId);
             }
 
             const data = job.data;
@@ -41,14 +43,14 @@ export async function POST(request: Request) {
 
             // Security Check
             if (targetCompanyId && jobCompanyId !== targetCompanyId) {
-                return NextResponse.json({ error: 'Tenant Mismatch: Yetkisiz erişim.' }, { status: 403 });
+                return apiError({ message: 'Tenant Mismatch: Yetkisiz erişim.', status: 403, code: 'FORBIDDEN' }, ctx.requestId);
             }
 
             // 1. Cooldown Check (60s)
             const coolKey = `replay_cooldown:${idempotencyKey}`;
             const isCooling = await (redisConnection as any).get(coolKey);
             if (isCooling) {
-                return NextResponse.json({ error: 'Bu işlem için cooldown aktif. Lütfen 60 saniye bekleyin.' }, { status: 429 });
+                return apiError({ message: 'Bu işlem için cooldown aktif. Lütfen 60 saniye bekleyin.', status: 429, code: 'TOO_MANY_REQUESTS' }, ctx.requestId);
             }
 
             // 2. Replay Action
@@ -71,10 +73,10 @@ export async function POST(request: Request) {
                         push: {
                             timestamp: new Date().toISOString(),
                             event: 'MANUAL_REPLAY',
-                            operator: auth.user.email,
+                            operator: ctx.username || 'System',
                             reason: reason,
                             replayId,
-                            verifiedCompanyId: jobCompanyId
+                            verifiedCompanyId: jobCompanyId || null
                         }
                     }
                 }
@@ -83,18 +85,16 @@ export async function POST(request: Request) {
             // 5. Remove from DLQ
             await job.remove();
 
-            return NextResponse.json({
+            return apiResponse({
                 success: true,
                 message: `Action re-enqueued successfully. Tracking ID: ${replayId}`
-            });
+            }, { requestId: ctx.requestId });
         }
 
-        return NextResponse.json({ error: 'Invalid operation' }, { status: 400 });
+        return apiError({ message: 'Invalid operation', status: 400, code: 'BAD_REQUEST' }, ctx.requestId);
 
     } catch (error: any) {
-        return NextResponse.json({
-            success: false,
-            error: error.message
-        }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
+
