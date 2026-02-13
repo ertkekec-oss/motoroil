@@ -48,6 +48,7 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error('Manual Match Error:', error);
+        if (error.status) return NextResponse.json({ success: false, error: error.message }, { status: error.status });
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

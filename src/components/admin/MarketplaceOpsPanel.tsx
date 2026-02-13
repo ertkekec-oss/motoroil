@@ -58,15 +58,17 @@ export function MarketplaceOpsPanel() {
             // Fetch Status and Health in parallel
             const [statusRes, healthRes] = await Promise.all([
                 fetch(`/api/admin/marketplace/queue/status?${query}`, { cache: 'no-store' }),
-                fetch(`/api/admin/marketplace/queue/health`, { cache: 'no-store' })
+                fetch(`/api/admin/marketplace/queue/health`, { cache: 'no-store', headers: { 'x-health-key': 'dev-key' } })
             ]);
 
-            if (statusRes.status === 403) {
-                setError("YETKİSİZ ERİŞİM: Panel sadece SUPER_ADMIN/PLATFORM_ADMIN içindir.");
+            if (statusRes.status === 401 || statusRes.status === 403) {
+                setError("YETKİSİZ ERİŞİM: Panel erişimi için oturumunuzun aktif ve Admin yetkili olması gerekir.");
                 return;
             }
 
             const [statusJson, healthJson] = await Promise.all([statusRes.json(), healthRes.json()]);
+
+            // Handle standardized format { ok, code, requestId, ...data }
             setData(statusJson);
             setHealth(healthJson);
             setError(null);
@@ -76,6 +78,7 @@ export function MarketplaceOpsPanel() {
             setLoading(false);
         }
     }, [filters]);
+
 
     useEffect(() => {
         fetchData();
@@ -156,17 +159,33 @@ export function MarketplaceOpsPanel() {
                     </button>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-6">
+                    <div className="flex gap-4 border-r border-slate-100 pr-6 mr-2">
+                        <div className="text-center">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase mb-0.5">DB</p>
+                            <div className="h-1.5 w-6 bg-emerald-500 rounded-full mx-auto shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase mb-0.5">BANK</p>
+                            <div className={`h-1.5 w-6 rounded-full mx-auto ${health?.metrics?.recentBankFailures > 0 ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`}></div>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase mb-0.5">QUEUE</p>
+                            <div className={`h-1.5 w-6 rounded-full mx-auto ${data?.counts?.dlq > 10 ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`}></div>
+                        </div>
+                    </div>
+
                     <div className="text-right">
                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">System Status</p>
                         <p className={`text-xs font-black flex items-center gap-1 ${health?.status === 'HEALTHY' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                            {health?.status}
+                            {health?.status || 'UNKNOWN'}
                         </p>
                     </div>
                     <Button variant="ghost" size="sm" onClick={fetchData} className="rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-100">
                         <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                     </Button>
                 </div>
+
             </div>
 
             {activeTab === 'dashboard' ? (
@@ -174,11 +193,11 @@ export function MarketplaceOpsPanel() {
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {[
-                            { label: "Queued", value: data?.counts.waiting, icon: Clock, color: "blue" },
-                            { label: "Processing", value: data?.counts.active, icon: Activity, color: "amber" },
-                            { label: "Completed", value: data?.counts.completed, icon: CheckCircle2, color: "emerald" },
-                            { label: "Retrying", value: data?.counts.failed, icon: RefreshCw, color: "orange" },
-                            { label: "Killed (DLQ)", value: data?.counts.dlq, icon: Skull, color: "rose" },
+                            { label: "Queued", value: data?.counts?.waiting ?? 0, icon: Clock, color: "blue" },
+                            { label: "Processing", value: data?.counts?.active ?? 0, icon: Activity, color: "amber" },
+                            { label: "Completed", value: data?.counts?.completed ?? 0, icon: CheckCircle2, color: "emerald" },
+                            { label: "Retrying", value: data?.counts?.failed ?? 0, icon: RefreshCw, color: "orange" },
+                            { label: "Killed (DLQ)", value: data?.counts?.dlq ?? 0, icon: Skull, color: "rose" },
                         ].map((s, i) => (
                             <div key={i} className="bg-white p-5 rounded-3xl border border-slate-100 hover:shadow-md transition-all group overflow-hidden relative">
                                 <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity`}>
@@ -257,7 +276,7 @@ export function MarketplaceOpsPanel() {
                                     <h2 className="font-black text-white text-xl tracking-tight uppercase">Triage Laboratory</h2>
                                 </div>
                                 <div className="space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar pr-3 relative z-10">
-                                    {data?.forensics.length === 0 && <div className="py-20 text-center text-slate-600 font-mono italic text-sm">No forensic evidence found. Radar clear.</div>}
+                                    {(!data?.forensics || data.forensics.length === 0) && <div className="py-20 text-center text-slate-600 font-mono italic text-sm">No forensic evidence found. Radar clear.</div>}
                                     {data?.forensics.map((f: any) => (
                                         <div key={f.id} className="bg-white/5 border border-white/5 rounded-3xl p-5 space-y-3 hover:bg-white/10 transition-all border-l-4 border-l-rose-500/50 hover:border-l-rose-500">
                                             <div className="flex justify-between items-start">
@@ -292,10 +311,10 @@ export function MarketplaceOpsPanel() {
                         </div>
                         <div className="space-y-6">
                             {[
-                                { label: "Availability / Success Rate", value: health?.metrics.successRate, threshold: "> 95%", status: parseFloat(health?.metrics.successRate) > 95 ? 'pass' : 'fail' },
-                                { label: "DLQ Saturation (10m)", value: health?.metrics.recentDlqCount, threshold: "< 5", status: health?.metrics.recentDlqCount < 5 ? 'pass' : 'fail' },
-                                { label: "Auth Integrity", value: health?.metrics.recentAuthFailures + " Fails", threshold: "0", status: health?.metrics.recentAuthFailures === 0 ? 'pass' : 'fail' },
-                                { label: "In-Flight Concurrency", value: data?.counts.active, threshold: "< 20", status: data?.counts.active < 20 ? 'pass' : 'fail' },
+                                { label: "Availability / Success Rate", value: health?.metrics?.successRate || '0%', threshold: "> 95%", status: parseFloat(health?.metrics?.successRate || '0') > 95 ? 'pass' : 'fail' },
+                                { label: "DLQ Saturation (10m)", value: health?.metrics?.recentDlqCount ?? 0, threshold: "< 5", status: (health?.metrics?.recentDlqCount ?? 0) < 5 ? 'pass' : 'fail' },
+                                { label: "Auth Integrity", value: (health?.metrics?.recentAuthFailures ?? 0) + " Fails", threshold: "0", status: (health?.metrics?.recentAuthFailures ?? 0) === 0 ? 'pass' : 'fail' },
+                                { label: "In-Flight Concurrency", value: data?.counts?.active ?? 0, threshold: "< 20", status: (data?.counts?.active ?? 0) < 20 ? 'pass' : 'fail' },
                             ].map((m, i) => (
                                 <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
                                     <div>

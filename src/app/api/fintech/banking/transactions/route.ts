@@ -1,28 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getRequestContext } from '@/lib/api-context';
+import { NextRequest } from 'next/server';
+import { getRequestContext, apiResponse, apiError } from '@/lib/api-context';
 import prisma from '@/lib/prisma';
+import Redis from 'ioredis';
+
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 export async function GET(req: NextRequest) {
+    let ctx;
     try {
-        const ctx = await getRequestContext(req);
+        ctx = await getRequestContext(req);
         const { searchParams } = new URL(req.url);
         const limit = parseInt(searchParams.get('limit') || '50');
 
-        const where: any = {};
+        // CIRCUIT BREAKER CHECK
+        const breakerKey = `breaker:bank:${ctx.tenantId}`;
+        const isBroken = await redis.get(breakerKey);
+        if (isBroken) {
+            return apiError({ message: 'Banka servisi geçici olarak devre dışı (Circuit Breaker)', status: 503, code: 'SERVICE_DEGRADED' }, ctx.requestId);
+        }
 
-        // Only filter by companyId if not platform admin or if explicitly requested
+        const where: any = {};
         if (ctx.tenantId !== 'PLATFORM_ADMIN') {
             if (!ctx.companyId) {
-                // FALLBACK: If header is missing (e.g. Onboarding), try to find the default company for this tenant
-                const defaultCompany = await (prisma as any).company.findFirst({
-                    where: { tenantId: ctx.tenantId }
-                });
-
-                if (!defaultCompany) {
-                    // Valid 400 if really no company exists? 
-                    // Better: Return empty list to prevent UI errors during onboarding
-                    return NextResponse.json({ success: true, transactions: [] });
-                }
+                const defaultCompany = await (prisma as any).company.findFirst({ where: { tenantId: ctx.tenantId } });
+                if (!defaultCompany) return apiResponse({ transactions: [] }, { requestId: ctx.requestId });
                 where.companyId = defaultCompany.id;
             } else {
                 where.companyId = ctx.companyId;
@@ -31,25 +32,42 @@ export async function GET(req: NextRequest) {
             where.companyId = ctx.companyId;
         }
 
-        const transactions = await (prisma as any).bankTransaction.findMany({
-            where,
-            include: {
-                connection: true,
-                matches: true
-            },
-            orderBy: {
-                transactionDate: 'desc'
-            },
-            take: limit
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-        return NextResponse.json({
-            success: true,
-            transactions
-        });
+        try {
+            const transactions = await (prisma as any).bankTransaction.findMany({
+                where,
+                include: { connection: true, matches: true },
+                orderBy: { transactionDate: 'desc' },
+                take: limit
+            });
+            clearTimeout(timeoutId);
+            return apiResponse({ transactions }, { requestId: ctx.requestId });
+        } catch (dbError: any) {
+            clearTimeout(timeoutId);
+
+            // TRACK FAILURES
+            const failCount = await redis.incr(`fails:bank:${ctx.tenantId}`);
+            await redis.expire(`fails:bank:${ctx.tenantId}`, 60);
+
+            if (failCount >= 5) {
+                await redis.set(breakerKey, 'TRUE', 'EX', 60); // Break for 60s
+                logger.warn(`Circuit Breaker Tripped for Tenant ${ctx.tenantId}`, { tenantId: ctx.tenantId });
+            }
+
+            if (dbError.name === 'AbortError') {
+                return apiError({ message: 'Banka verileri zaman aşımı.', status: 504, code: 'TIMEOUT' }, ctx.requestId);
+            }
+            throw dbError;
+        }
 
     } catch (error: any) {
         console.error('Fetch Bank Transactions Error:', error);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
+
+import { logger } from '@/lib/observability';
+
+

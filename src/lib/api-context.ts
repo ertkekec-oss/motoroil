@@ -3,19 +3,60 @@ import { NextRequest } from 'next/server';
 import { getSession } from './auth';
 import prisma from './prisma';
 
+
+import { v4 as uuidv4 } from 'uuid';
+
+export class ApiError extends Error {
+    constructor(
+        public message: string,
+        public status: number,
+        public code: string = 'INTERNAL_ERROR'
+    ) {
+        super(message);
+        this.name = 'ApiError';
+    }
+}
+
 export interface RequestContext {
     userId: string;
     username?: string;
     tenantId: string;
     companyId?: string | null;
     role: string;
+    requestId: string;
 }
 
+export function apiResponse(data: any, options: { status?: number, ok?: boolean, code?: string, requestId?: string } = {}) {
+    const { status = 200, ok = true, code = 'SUCCESS', requestId } = options;
+    return Response.json({
+        ok,
+        code,
+        requestId,
+        ...data
+    }, { status });
+}
+
+export function apiError(error: any, requestId?: string) {
+    const status = error.status || 500;
+    const code = error.code || 'INTERNAL_ERROR';
+    const message = error.message || 'Bir hata oluştu.';
+
+    return Response.json({
+        ok: false,
+        code,
+        requestId,
+        error: message
+    }, { status });
+}
+
+
 export async function getRequestContext(req: NextRequest): Promise<RequestContext> {
+
+    const requestId = uuidv4();
     const session: any = await getSession();
 
     if (!session || !session.id) {
-        throw new Error("UNAUTHORIZED: Oturum bulunamadı.");
+        throw new ApiError("UNAUTHORIZED: Oturum bulunamadı.", 401, 'AUTH_REQUIRED');
     }
 
     const companyId = req.headers.get('X-Company-Id');
@@ -47,11 +88,11 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
     }
 
     if (!user) {
-        throw new Error("UNAUTHORIZED: Kullanıcı veritabanında bulunamadı.");
+        throw new ApiError("UNAUTHORIZED: Kullanıcı veritabanında bulunamadı.", 401, 'USER_NOT_FOUND');
     }
 
     if (!user.tenantId) {
-        throw new Error("FORBIDDEN: Kullanıcının Tenant bilgisi eksik.");
+        throw new ApiError("FORBIDDEN: Kullanıcının Tenant bilgisi eksik.", 403, 'TENANT_MISSING');
     }
 
     // --- ACTIVITY TRACKING ---
@@ -75,7 +116,8 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
         username: session.username,
         tenantId: user.tenantId,
         companyId: companyId,
-        role: user.role
+        role: user.role,
+        requestId
     };
 }
 

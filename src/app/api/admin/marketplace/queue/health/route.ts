@@ -1,24 +1,25 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { marketplaceQueue, marketplaceDlq } from '@/lib/queue';
-import { authorize } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { logger } from '@/lib/observability';
+import { apiResponse, apiError } from '@/lib/api-context';
 
 /**
  * GET /api/admin/marketplace/queue/health
  * Evaluates SLOs and returns system health status
  */
-export async function GET() {
-    try {
-        const auth = await authorize();
-        if (!auth.authorized) return auth.response;
 
-        const role = (auth.user.role || "").toUpperCase();
-        if (role !== "PLATFORM_ADMIN" && role !== "SUPER_ADMIN") {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+export async function GET(req: NextRequest) {
+    try {
+        // Security check via secret key
+        const authKey = req.headers.get('x-health-key');
+        if (process.env.NODE_ENV === 'production' && (!authKey || authKey !== process.env.HEALTHCHECK_KEY)) {
+            return apiError({ message: 'Unauthorized', status: 401, code: 'UNAUTHORIZED' });
         }
 
+        // Health endpoint is public (with key) to prevent domino effects when session lookups fail
         const now = new Date();
+
         const tenMinsAgo = new Date(now.getTime() - 10 * 60 * 1000);
         const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
 
@@ -91,7 +92,7 @@ export async function GET() {
             });
         }
 
-        return NextResponse.json({
+        return apiResponse({
             status: health,
             timestamp: now.toISOString(),
             metrics: {
@@ -110,9 +111,7 @@ export async function GET() {
         });
 
     } catch (error: any) {
-        return NextResponse.json({
-            status: 'ERROR',
-            message: error.message
-        }, { status: 500 });
+        return apiError(error);
     }
 }
+

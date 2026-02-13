@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error('Bank Sync API Error:', error);
+        if (error.status) return NextResponse.json({ success: false, error: error.message }, { status: error.status });
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
