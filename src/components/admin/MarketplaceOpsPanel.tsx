@@ -18,6 +18,7 @@ import {
     ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
+import { safeJson } from "@/lib/safeJson";
 
 // Runbook / Troubleshooting Mapping
 const RUNBOOK: Record<string, { steps: string[], priority: 'low' | 'high' | 'critical' }> = {
@@ -58,10 +59,7 @@ export function MarketplaceOpsPanel() {
             // Fetch Status and Health in parallel
             const [statusRes, healthRes] = await Promise.all([
                 fetch(`/api/admin/marketplace/queue/status?${query}`, { cache: 'no-store' }),
-                fetch(`/api/admin/marketplace/queue/health`, {
-                    cache: 'no-store',
-                    headers: { 'x-health-key': process.env.NEXT_PUBLIC_HEALTHCHECK_KEY || 'dev-key' }
-                })
+                fetch(`/api/ops-internal/queue-health`, { cache: 'no-store' })
             ]);
 
             if (statusRes.status === 401 || statusRes.status === 403) {
@@ -69,12 +67,26 @@ export function MarketplaceOpsPanel() {
                 return;
             }
 
-            const [statusJson, healthJson] = await Promise.all([statusRes.json(), healthRes.json()]);
+            const [statusOut, healthOut] = await Promise.all([
+                safeJson(statusRes),
+                safeJson(healthRes)
+            ]);
 
-            // Handle standardized format { ok, code, requestId, ...data }
-            setData(statusJson);
-            setHealth(healthJson);
-            setError(null);
+            if (!statusOut.ok) {
+                setError(`Status Error: ${statusOut.status} - ${typeof statusOut.error === 'string' ? statusOut.error : JSON.stringify(statusOut.error)}`);
+                setData(null);
+            } else {
+                setData(statusOut.data || {});
+            }
+
+            if (!healthOut.ok) {
+                // Non-critical, just log or set partial health
+                setHealth({ status: 'UNKNOWN' });
+            } else {
+                setHealth(healthOut.data || {});
+            }
+
+            if (statusOut.ok) setError(null);
         } catch (err: any) {
             setError(err.message || "Bağlantı hatası.");
         } finally {
@@ -114,11 +126,12 @@ export function MarketplaceOpsPanel() {
                     reason
                 })
             });
-            const resData = await res.json();
-            if (resData.success) {
+            const resData = await safeJson(res);
+
+            if (resData.ok && resData.data?.success) {
                 toast.success(resData.message);
                 fetchData();
-            } else throw new Error(resData.error || "İşlem başarısız.");
+            } else throw new Error(resData.data?.error || resData.error || "İşlem başarısız.");
         } catch (err: any) { toast.error(err.message); }
         finally { setProcessingId(null); }
     };
@@ -239,7 +252,7 @@ export function MarketplaceOpsPanel() {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-50">
-                                            {data?.audits?.map((a: any) => (
+                                            {(data?.audits || []).map((a: any) => (
                                                 <tr key={a.id} className="hover:bg-indigo-50/10 transition-colors group">
                                                     <td className="px-8 py-5 whitespace-nowrap">
                                                         <div className="font-black text-slate-900 text-sm">{new Date(a.createdAt).toLocaleTimeString("tr-TR")}</div>
@@ -280,7 +293,7 @@ export function MarketplaceOpsPanel() {
                                 </div>
                                 <div className="space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar pr-3 relative z-10">
                                     {(!data?.forensics || data.forensics.length === 0) && <div className="py-20 text-center text-slate-600 font-mono italic text-sm">No forensic evidence found. Radar clear.</div>}
-                                    {data?.forensics.map((f: any) => (
+                                    {(data?.forensics || []).map((f: any) => (
                                         <div key={f.id} className="bg-white/5 border border-white/5 rounded-3xl p-5 space-y-3 hover:bg-white/10 transition-all border-l-4 border-l-rose-500/50 hover:border-l-rose-500">
                                             <div className="flex justify-between items-start">
                                                 <div>
