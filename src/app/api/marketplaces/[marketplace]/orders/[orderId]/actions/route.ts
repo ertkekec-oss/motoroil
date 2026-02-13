@@ -82,7 +82,8 @@ export async function POST(
         const config = await (prisma as any).marketplaceConfig.findFirst({
             where: {
                 companyId: company.id,
-                type: { in: [mplaceLower, normalizedMarketplace, marketplace] }
+                type: { in: [mplaceLower, normalizedMarketplace, marketplace] },
+                deletedAt: null
             },
         });
 

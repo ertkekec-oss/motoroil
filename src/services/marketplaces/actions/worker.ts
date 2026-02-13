@@ -41,7 +41,7 @@ export const marketplaceWorker = new Worker(
 
             // 2. Get Config
             const config = await (prisma as any).marketplaceConfig.findFirst({
-                where: { companyId, type: marketplace },
+                where: { companyId, type: marketplace, deletedAt: null },
             });
             if (!config) throw new Error('Yapılandırma bulunamadı');
 

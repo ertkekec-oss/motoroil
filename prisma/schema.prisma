@@ -8,142 +8,117 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ------------------------------------------
-// SAAS CORE & TENANT MANAGEMENT
-// ------------------------------------------
-
 model Tenant {
-  id         String @id @default(cuid())
-  name       String // Hesap/Müşteri Adı
-  ownerEmail String // Ana Hesap Sahibi
-  phone      String? // İletişim Telefonu (WhatsApp için)
-  status     String @default("ACTIVE") // ACTIVE, SUSPENDED, TRIAL
-  setupState String @default("PENDING") // PENDING, COMPLETED
-
-  subscription Subscription?
+  id           String        @id @default(cuid())
+  name         String
+  ownerEmail   String
+  phone        String?
+  status       String        @default("ACTIVE")
+  setupState   String        @default("PENDING")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   companies    Company[]
+  growthEvents GrowthEvent[]
+  subscription Subscription?
+  upsellEvents UpsellEvent[]
   users        User[]
-  upsellEvents  UpsellEvent[]
-  growthEvents  GrowthEvent[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Company {
-  id        String  @id @default(cuid())
-  tenantId  String
-  name      String
-  vkn       String
-  taxOffice String?
-  address       String?
-  district      String?
-  city          String?
-
+  id                 String                         @id @default(cuid())
+  tenantId           String
+  name               String
+  vkn                String
+  taxOffice          String?
+  address            String?
+  district           String?
+  city               String?
+  createdAt          DateTime                       @default(now())
+  updatedAt          DateTime                       @updatedAt
+  accounts           Account[]
+  bankConnections    BankConnection[]
+  bankStatements     BankStatement[]
+  bankTransactions   BankTransaction[]
+  branches           Branch[]
+  cashflowForecasts  CashflowForecast[]
+  checks             Check[]
+  tenant             Tenant                         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customers          Customer[]
+  domainEvents       DomainEvent[]
+  fintechAudits      FintechAudit[]
   integratorSettings IntegratorSettings?
-
-  tenant Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  users  UserCompanyAccess[]
-
-  // Operational Relationships - Modified to include relations
-  invoices         SalesInvoice[]
-  purchaseInvoices PurchaseInvoice[]
-  products         Product[]
-  customers        Customer[]
-  suppliers        Supplier[]
-  accounts         Account[]
-  transactions     Transaction[]
-  stockMovements   StockMovement[]
-  kasalar          Kasa[]
-  checks           Check[]
-  serviceRecords   ServiceRecord[]
-  quotes           Quote[]
-  paymentPlans     PaymentPlan[]
-  orders           Order[]
-  stockTransfers   StockTransfer[]
-  branches         Branch[]
-  routes           Route[]
-  visits           SalesVisit[]
-  salesOrders      SalesOrder[]
-  staffTargets     StaffTarget[]
-
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  Journal           Journal[]
-  staff            Staff[]
-  MarketplaceConfig MarketplaceConfig[]
-
-  // Fintech Core Relations
-  domainEvents      DomainEvent[]
-  journalEntries    JournalEntry[]
-  inventoryLayers   InventoryLayer[]
-  orderFinances     MarketplaceOrderFinance[]
-  settlements       MarketplaceSettlement[]
-  bankStatements    BankStatement[]
+  inventoryLayers    InventoryLayer[]
+  Journal            Journal[]
+  journalEntries     JournalEntry[]
+  kasalar            Kasa[]
+  MarketplaceConfig  MarketplaceConfig[]
+  orderFinances      MarketplaceOrderFinance[]
+  marketplacePnls    MarketplaceProductPnl[]
+  settlements        MarketplaceSettlement[]
   transactionLedgers MarketplaceTransactionLedger[]
-  marketplacePnls   MarketplaceProductPnl[]
-  smartPricingRules SmartPricingRule[]
-  bankConnections   BankConnection[]
-  bankTransactions  BankTransaction[]
-  autopilotConfigs  PricingAutopilotConfig[]
-  paymentMatches    PaymentMatch[]
-  matchingRules     MatchingRule[]
-  cashflowForecasts CashflowForecast[]
-  fintechAudits     FintechAudit[]
+  matchingRules      MatchingRule[]
+  orders             Order[]
+  paymentMatches     PaymentMatch[]
+  paymentPlans       PaymentPlan[]
+  autopilotConfigs   PricingAutopilotConfig[]
+  products           Product[]
+  purchaseInvoices   PurchaseInvoice[]
+  quotes             Quote[]
+  routes             Route[]
+  invoices           SalesInvoice[]
+  salesOrders        SalesOrder[]
+  visits             SalesVisit[]
+  serviceRecords     ServiceRecord[]
+  smartPricingRules  SmartPricingRule[]
+  staff              Staff[]
+  staffTargets       StaffTarget[]
+  stockMovements     StockMovement[]
+  stockTransfers     StockTransfer[]
+  suppliers          Supplier[]
+  transactions       Transaction[]
+  users              UserCompanyAccess[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
 }
 
-// ------------------------------------------
-// ENTEGRATOR & SETTINGS
-// ------------------------------------------
-
 model IntegratorSettings {
   id          String  @id @default(cuid())
   companyId   String  @unique
-  provider    String // NILVERA, SOVOS...
-  credentials String // Encrypted JSON
+  provider    String
+  credentials String
   isActive    Boolean @default(true)
   environment String  @default("PRODUCTION")
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
-// ------------------------------------------
-// SUBSCRIPTION & PLAN MANAGEMENT
-// ------------------------------------------
-
 model Plan {
-  id          String  @id @default(cuid())
-  name        String
-  description     String?
-  price           Decimal  @default(0) @db.Decimal(10, 2)
-  currency        String   @default("TRY")
-  interval        String   @default("MONTHLY") // MONTHLY, YEARLY
-  iyzicoPlanCode  String?  // Iyzico Product Code
-  isActive        Boolean  @default(true)
-
-  features      PlanFeature[]
-  limits        PlanLimit[]
-  subscriptions Subscription[]
+  id             String         @id @default(cuid())
+  name           String
+  description    String?
+  price          Decimal        @default(0) @db.Decimal(10, 2)
+  currency       String         @default("TRY")
+  interval       String         @default("MONTHLY")
+  iyzicoPlanCode String?
+  isActive       Boolean        @default(true)
+  features       PlanFeature[]
+  limits         PlanLimit[]
+  subscriptions  Subscription[]
 }
 
 model Feature {
-  id          String  @id @default(cuid())
-  key         String  @unique
+  id          String        @id @default(cuid())
+  key         String        @unique
   name        String
   description String?
-
-  plans PlanFeature[]
+  plans       PlanFeature[]
 }
 
 model PlanFeature {
   planId    String
   featureId String
-
-  plan    Plan    @relation(fields: [planId], references: [id], onDelete: Cascade)
-  feature Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  feature   Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  plan      Plan    @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   @@id([planId, featureId])
 }
@@ -152,101 +127,86 @@ model PlanLimit {
   id       String @id @default(cuid())
   planId   String
   resource String
-  limit    Int // -1 = Unlimited
-
-  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  limit    Int
+  plan     Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   @@unique([planId, resource])
 }
 
 model Subscription {
-  id       String @id @default(cuid())
-  tenantId String @unique
-  externalId String? @unique // Iyzico Reference Code
-  planId   String
-
-  status String
-  period String
-
-  startDate DateTime
-  endDate   DateTime
-
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  plan   Plan   @relation(fields: [planId], references: [id])
-
-  history SubscriptionHistory[]
+  id         String                @id @default(cuid())
+  tenantId   String                @unique
+  externalId String?               @unique
+  planId     String
+  status     String
+  period     String
+  startDate  DateTime
+  endDate    DateTime
+  plan       Plan                  @relation(fields: [planId], references: [id])
+  tenant     Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  history    SubscriptionHistory[]
 }
 
 model SubscriptionHistory {
-  id             String   @id @default(cuid())
+  id             String       @id @default(cuid())
   subscriptionId String
   action         String
   prevPlanId     String?
   newPlanId      String
-  createdAt      DateTime @default(now())
-
-  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 }
 
-// ------------------------------------------
-// EXISTING MODELS WITH RELATION UPDATES
-// ------------------------------------------
-
 model User {
-  id        String   @id @default(cuid())
-  tenantId  String
-  email     String   @unique
-  name      String?
-  password  String
-  role      String   @default("USER")
-  permissions String[] @default([])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  lastActiveAt DateTime? 
-
+  id                  String              @id @default(cuid())
+  email               String              @unique
+  name                String?
+  password            String
+  role                String              @default("USER")
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  lastActiveAt        DateTime?
+  tenantId            String
+  permissions         String[]            @default([])
+  notifications       Notification[]
   tenant              Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   accessibleCompanies UserCompanyAccess[]
-  notifications       Notification[]
 }
 
 model UserCompanyAccess {
   userId    String
   companyId String
-  role      String // COMPANY_ADMIN, ACCOUNTANT, VIEWER
-
-  user    User    @relation(fields: [userId], references: [id])
-  company Company @relation(fields: [companyId], references: [id])
+  role      String
+  company   Company @relation(fields: [companyId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
 
   @@id([userId, companyId])
 }
 
-// --- Operational Models ---
-
 model Order {
-  id              String    @id @default(cuid())
-  companyId       String
-  marketplaceId   String
-  orderNumber     String
-  marketplace     String
-  customerName    String
-  customerEmail   String?
-  totalAmount     Decimal   @db.Decimal(10, 2)
-  currency        String    @default("TRY")
-  status          String
-  orderDate       DateTime
-  items           Json
-  shippingAddress Json?
-  invoiceAddress  Json?
-  cargoTrackingNo String?
-  cargoProvider   String?
+  id                String    @id @default(cuid())
+  marketplaceId     String
+  orderNumber       String
+  marketplace       String
+  customerName      String
+  customerEmail     String?
+  totalAmount       Decimal   @db.Decimal(10, 2)
+  currency          String    @default("TRY")
+  status            String
+  orderDate         DateTime
+  items             Json
+  shippingAddress   Json?
+  invoiceAddress    Json?
+  cargoTrackingNo   String?
+  cargoProvider     String?
+  rawData           Json?
+  deletedAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  branch            String?   @default("Merkez")
+  companyId         String
   shipmentPackageId String?
-  rawData         Json?
-  deletedAt       DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  branch          String?   @default("Merkez")
-
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company           Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, orderNumber])
   @@index([marketplace, orderNumber])
@@ -257,56 +217,52 @@ model Order {
 }
 
 model Product {
-  id                  String    @id @default(cuid())
-  companyId           String
+  id                  String                  @id @default(cuid())
   name                String
   code                String
   barcode             String?
-  price               Decimal   @db.Decimal(10, 2)
-  currency            String    @default("TRY")
-  buyPrice            Decimal   @default(0) @db.Decimal(10, 2)
-  purchaseCurrency    String    @default("TRY")
-  stock               Int       @default(0)
+  price               Decimal                 @db.Decimal(10, 2)
+  buyPrice            Decimal                 @default(0) @db.Decimal(10, 2)
+  stock               Int                     @default(0)
   category            String?
   description         String?
   imageUrl            String?
-  minStock            Int       @default(5)
+  minStock            Int                     @default(5)
   brand               String?
-  type                String?   @default("Ürün")
-  supplierName        String? // Changed from 'supplier' to match relation removal if conflict, but keeping as string field for now or linking? Original was String?
-  branch              String?   @default("Merkez")
-  salesVat            Int?      @default(20)
-  salesVatIncluded    Boolean?  @default(true)
-  purchaseVat         Int?      @default(20)
-  purchaseVatIncluded Boolean?  @default(true)
-  salesOiv            Decimal?  @default(0) @db.Decimal(10, 2)
-  salesOtv            Decimal?  @default(0) @db.Decimal(10, 2)
-  otvType             String?   @default("Ö.T.V yok")
+  type                String?                 @default("Ürün")
+  branch              String?                 @default("Merkez")
+  salesVat            Int?                    @default(20)
+  salesVatIncluded    Boolean?                @default(true)
+  purchaseVat         Int?                    @default(20)
+  purchaseVatIncluded Boolean?                @default(true)
+  salesOiv            Decimal?                @default(0) @db.Decimal(10, 2)
+  salesOtv            Decimal?                @default(0) @db.Decimal(10, 2)
+  otvType             String?                 @default("Ö.T.V yok")
   gtip                String?
-  purchaseDiscount    Decimal?  @default(0) @db.Decimal(5, 2)
-  otvCode             String?   @default("7")
-  unit                String?   @default("Adet")
+  purchaseDiscount    Decimal?                @default(0) @db.Decimal(5, 2)
+  otvCode             String?                 @default("7")
   deletedAt           DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+  companyId           String
+  currency            String                  @default("TRY")
+  isParent            Boolean                 @default(false)
+  parentId            String?
+  purchaseCurrency    String                  @default("TRY")
+  supplierName        String?
+  unit                String?                 @default("Adet")
+  marketplaceMaps     MarketplaceProductMap[]
+  marketplacePnls     MarketplaceProductPnl[]
+  company             Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  parent              Product?                @relation("ProductVariants", fields: [parentId], references: [id])
+  variants            Product[]               @relation("ProductVariants")
+  variantValues       ProductVariantValue[]
+  salesOrderItems     SalesOrderItem[]
+  pricingRules        SmartPricingRule[]
+  stocks              Stock[]
+  movements           StockMovement[]
 
-  // Variants Support
-  isParent      Boolean               @default(false)
-  parentId      String?
-  parent        Product?              @relation("ProductVariants", fields: [parentId], references: [id])
-  variants      Product[]             @relation("ProductVariants")
-  variantValues ProductVariantValue[]
-
-  marketplaceMaps MarketplaceProductMap[]
-  stocks          Stock[]
-  movements       StockMovement[]
-  salesOrderItems SalesOrderItem[]
-  marketplacePnls MarketplaceProductPnl[]
-  pricingRules    SmartPricingRule[]
-  
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@unique([code, branch, companyId]) // Updated unique constraint for multi-company
+  @@unique([code, branch, companyId])
   @@index([name])
   @@index([barcode])
   @@index([code])
@@ -318,7 +274,7 @@ model Product {
 model VariantAttribute {
   id        String                  @id @default(cuid())
   companyId String?
-  name      String // "Renk", "Beden"
+  name      String
   branch    String?                 @default("Merkez")
   values    VariantAttributeValue[]
 
@@ -328,9 +284,9 @@ model VariantAttribute {
 model VariantAttributeValue {
   id          String                @id @default(cuid())
   attributeId String
-  value       String // "Kırmızı", "XL"
-  attribute   VariantAttribute      @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  value       String
   products    ProductVariantValue[]
+  attribute   VariantAttribute      @relation(fields: [attributeId], references: [id], onDelete: Cascade)
 
   @@index([attributeId])
 }
@@ -338,24 +294,24 @@ model VariantAttributeValue {
 model ProductVariantValue {
   productId        String
   attributeValueId String
-  product          Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
   attributeValue   VariantAttributeValue @relation(fields: [attributeValueId], references: [id], onDelete: Cascade)
+  product          Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([productId, attributeValueId])
 }
 
 model StockMovement {
   id          String   @id @default(cuid())
-  companyId   String?
   productId   String
   branch      String
-  quantity    Int // + for in, - for out
-  price       Decimal  @db.Decimal(10, 2) // Purchase price or cost price
-  type        String // 'PURCHASE', 'SALE', 'ADJUSTMENT', 'TRANSFER'
-  referenceId String? // ID of PurchaseInvoice, SalesInvoice, etc.
+  quantity    Int
+  price       Decimal  @db.Decimal(10, 2)
+  type        String
+  referenceId String?
   createdAt   DateTime @default(now())
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  companyId   String?
   company     Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
   @@index([branch])
@@ -365,7 +321,6 @@ model StockMovement {
 
 model Stock {
   id        String   @id @default(cuid())
-  // companyId implied via product
   productId String
   branch    String
   quantity  Int      @default(0)
@@ -391,13 +346,10 @@ model MarketplaceProductMap {
 
 model Supplier {
   id            String            @id @default(cuid())
-  companyId     String
   name          String
   phone         String?
   email         String?
   address       String?
-  district      String?
-  city          String?
   category      String?
   taxNumber     String?
   taxOffice     String?
@@ -409,11 +361,13 @@ model Supplier {
   deletedAt     DateTime?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
+  city          String?
+  companyId     String
+  district      String?
   checks        Check[]
   invoices      PurchaseInvoice[]
+  company       Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   transactions  Transaction[]
-
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([name])
   @@index([taxNumber])
@@ -423,7 +377,6 @@ model Supplier {
 
 model PurchaseInvoice {
   id          String    @id @default(cuid())
-  companyId   String
   invoiceNo   String
   invoiceDate DateTime
   dueDate     DateTime?
@@ -437,8 +390,9 @@ model PurchaseInvoice {
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  supplier    Supplier  @relation(fields: [supplierId], references: [id])
+  companyId   String
   company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  supplier    Supplier  @relation(fields: [supplierId], references: [id])
 
   @@index([invoiceNo])
   @@index([invoiceDate])
@@ -449,7 +403,6 @@ model PurchaseInvoice {
 
 model SalesInvoice {
   id           String    @id @default(cuid())
-  companyId    String
   invoiceNo    String    @unique
   invoiceDate  DateTime  @default(now())
   amount       Decimal   @db.Decimal(10, 2)
@@ -460,16 +413,17 @@ model SalesInvoice {
   items        Json
   status       String    @default("Taslak")
   isFormal     Boolean   @default(false)
-  formalType   String?
-  formalId     String?   @unique
-  formalUuid   String?   @unique
-  formalStatus String?
   branch       String?   @default("Merkez")
   deletedAt    DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  customer     Customer  @relation(fields: [customerId], references: [id])
+  companyId    String
+  formalId     String?   @unique
+  formalStatus String?
+  formalType   String?
+  formalUuid   String?   @unique
   company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer     Customer  @relation(fields: [customerId], references: [id])
 
   @@index([customerId])
   @@index([invoiceDate])
@@ -479,45 +433,44 @@ model SalesInvoice {
 }
 
 model Customer {
-  id            String             @id @default(cuid())
-  companyId     String
-  name          String
-  email         String?
-  phone         String?
-  address       String?
-  district      String?
-  city          String?
-  taxNumber     String?
-  taxOffice     String?
-  contactPerson String?
-  iban          String?
-  balance       Decimal            @default(0) @db.Decimal(12, 2)
-  points        Decimal            @default(0) @db.Decimal(10, 2)
-  branch        String?            @default("Merkez")
-  categoryId    String?
-  supplierClass String?
-  customerClass String?
-  deletedAt     DateTime?
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  referralCode  String?            @unique
-  portalPassword  String?
+  id              String             @id @default(cuid())
+  name            String
+  email           String?
+  phone           String?
+  address         String?
+  taxNumber       String?
+  taxOffice       String?
+  contactPerson   String?
+  iban            String?
+  balance         Decimal            @default(0) @db.Decimal(12, 2)
+  points          Decimal            @default(0) @db.Decimal(10, 2)
+  branch          String?            @default("Merkez")
+  categoryId      String?
+  supplierClass   String?
+  customerClass   String?
+  deletedAt       DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  referralCode    String?            @unique
+  city            String?
+  companyId       String
+  district        String?
   isPortalActive  Boolean            @default(false)
   lastPortalLogin DateTime?
-  checks        Check[]
-  coupons       Coupon[]
-  category      CustomerCategory?  @relation(fields: [categoryId], references: [id])
-  documents     CustomerDocument[]
-  invoices      SalesInvoice[]
-  services      ServiceRecord[]
-  transactions  Transaction[]
-  warranties    Warranty[]
-  quotes        Quote[]
-  routeStops    RouteStop[]
-  visits        SalesVisit[]
-  salesOrders   SalesOrder[]
-
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  portalPassword  String?
+  checks          Check[]
+  coupons         Coupon[]
+  category        CustomerCategory?  @relation(fields: [categoryId], references: [id])
+  company         Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documents       CustomerDocument[]
+  quotes          Quote[]
+  routeStops      RouteStop[]
+  invoices        SalesInvoice[]
+  salesOrders     SalesOrder[]
+  visits          SalesVisit[]
+  services        ServiceRecord[]
+  transactions    Transaction[]
+  warranties      Warranty[]
 
   @@unique([email, companyId])
   @@index([name])
@@ -529,7 +482,6 @@ model Customer {
 
 model ServiceRecord {
   id            String    @id @default(cuid())
-  companyId     String?
   customerId    String
   plate         String?
   km            Int?
@@ -544,8 +496,9 @@ model ServiceRecord {
   deletedAt     DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  customer      Customer  @relation(fields: [customerId], references: [id])
+  companyId     String?
   company       Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer      Customer  @relation(fields: [customerId], references: [id])
 
   @@index([customerId])
   @@index([plate])
@@ -577,23 +530,22 @@ model CustomerCategory {
 }
 
 model Kasa {
-  id           String        @id @default(cuid())
-  companyId    String
-  name         String
-  type         String        @default("Nakit")
-  balance      Decimal       @default(0) @db.Decimal(12, 2)
-  currency     String        @default("TRY")
-  iban         String?
-  isActive     Boolean       @default(true)
-  deletedAt    DateTime?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  branch           String?        @default("Merkez")
-  bankConnectionId String?        @unique
+  id               String          @id @default(cuid())
+  name             String
+  type             String          @default("Nakit")
+  balance          Decimal         @default(0) @db.Decimal(12, 2)
+  currency         String          @default("TRY")
+  isActive         Boolean         @default(true)
+  deletedAt        DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  branch           String?         @default("Merkez")
+  companyId        String
+  bankConnectionId String?         @unique
+  iban             String?
   bankConnection   BankConnection? @relation(fields: [bankConnectionId], references: [id])
+  company          Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   transactions     Transaction[]
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([name, branch, companyId])
   @@index([companyId])
@@ -601,7 +553,6 @@ model Kasa {
 
 model Transaction {
   id           String    @id @default(cuid())
-  companyId    String
   type         String
   amount       Decimal   @db.Decimal(12, 2)
   description  String?
@@ -614,10 +565,11 @@ model Transaction {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   branch       String?   @default("Merkez")
+  companyId    String
+  company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customer     Customer? @relation(fields: [customerId], references: [id])
   kasa         Kasa?     @relation(fields: [kasaId], references: [id])
   supplier     Supplier? @relation(fields: [supplierId], references: [id])
-  company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([supplierId])
@@ -631,7 +583,6 @@ model Transaction {
 
 model Check {
   id          String    @id @default(cuid())
-  companyId   String
   type        String
   number      String
   bank        String?
@@ -644,9 +595,10 @@ model Check {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   branch      String?   @default("Merkez")
+  companyId   String
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customer    Customer? @relation(fields: [customerId], references: [id])
   supplier    Supplier? @relation(fields: [supplierId], references: [id])
-  company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([dueDate])
   @@index([status])
@@ -656,20 +608,20 @@ model Check {
 }
 
 model AuditLog {
-  id        String   @id @default(cuid()) // Keeping cuid as used throughout the project
-  tenantId  String?
+  id        String   @id @default(cuid())
   userId    String?
   userName  String?
-  action    String   // 'CREATE', 'UPDATE', 'DELETE', etc.
-  entity    String   // 'Customer', 'Product', 'Transaction', etc.
+  action    String
+  entity    String
   entityId  String?
-  before    Json?    // RENAMED from oldData for alignment
-  after     Json?    // RENAMED from newData for alignment
   details   String?
   ipAddress String?
-  userAgent String?  // ADDED
   branch    String?
   createdAt DateTime @default(now())
+  after     Json?
+  before    Json?
+  tenantId  String?
+  userAgent String?
 
   @@index([action, entity])
   @@index([entityId])
@@ -691,20 +643,20 @@ model LoginAttempt {
 
 model Branch {
   id        Int              @id @default(autoincrement())
-  companyId String
   name      String
   type      String           @default("Şube")
   city      String?
-  district  String?
   address   String?
   phone     String?
   manager   String?
   status    String           @default("Aktif")
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
-  deletedAt DateTime? // Soft delete
-  documents BranchDocument[]
+  deletedAt DateTime?
+  companyId String
+  district  String?
   company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documents BranchDocument[]
 
   @@unique([companyId, name])
 }
@@ -735,23 +687,13 @@ model SuspendedSale {
 
 model Staff {
   id               String          @id @default(cuid())
-  tenantId         String?         @default("PLATFORM_ADMIN")
-  companyId        String?
   username         String          @unique
   password         String?
   email            String?
-  phone            String?
   name             String
   role             String?
   branch           String?         @default("Merkez")
   type             String?         @default("service")
-  
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId])
-  @@index([companyId])
-  @@index([username])
-
   status           String?         @default("Boşta")
   currentJob       String?
   permissions      String[]        @default([])
@@ -763,17 +705,24 @@ model Staff {
   salary           Decimal?        @default(17002) @db.Decimal(10, 2)
   address          String?
   age              Int?
+  companyId        String?
+  phone            String?
+  tenantId         String?         @default("PLATFORM_ADMIN")
   leaveRequests    LeaveRequest[]
-  payrolls         Payroll[]
-  shifts           Shift[]
-  documents        StaffDocument[]
-  sentMessages     Message[]       @relation("SentMessages")
   receivedMessages Message[]       @relation("ReceivedMessages")
+  sentMessages     Message[]       @relation("SentMessages")
+  payrolls         Payroll[]
   routes           Route[]
-  visits           SalesVisit[]
   salesOrders      SalesOrder[]
+  visits           SalesVisit[]
+  shifts           Shift[]
+  company          Company?        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documents        StaffDocument[]
   targets          StaffTarget[]
 
+  @@index([tenantId])
+  @@index([companyId])
+  @@index([username])
 }
 
 model Message {
@@ -783,9 +732,8 @@ model Message {
   receiverId String?
   isRead     Boolean  @default(false)
   createdAt  DateTime @default(now())
-
-  sender   Staff  @relation("SentMessages", fields: [senderId], references: [id])
-  receiver Staff? @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiver   Staff?   @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  sender     Staff    @relation("SentMessages", fields: [senderId], references: [id])
 
   @@index([senderId])
   @@index([receiverId])
@@ -859,15 +807,14 @@ model Payroll {
 
 model Notification {
   id        String   @id @default(cuid())
-  userId    String
-  title     String
-  message   String
-  type      String   @default("INFO") // INFO, WARNING, SUCCESS, ERROR
+  type      String   @default("INFO")
   isRead    Boolean  @default(false)
-  link      String?
   createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
+  link      String?
+  message   String
+  title     String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([isRead])
@@ -893,7 +840,6 @@ model PendingTransfer {
 
 model StockTransfer {
   id          String    @id @default(cuid())
-  companyId   String?
   productId   String
   productName String
   productCode String
@@ -907,10 +853,10 @@ model StockTransfer {
   receivedBy  String?
   trackingNo  String?
   notes       String?
-  
-  company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  companyId   String?
+  company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([companyId])
@@ -1016,7 +962,6 @@ model Coupon {
 
 model PaymentPlan {
   id               String        @id @default(cuid())
-  companyId        String?
   title            String
   totalAmount      Decimal       @db.Decimal(12, 2)
   installmentCount Int
@@ -1030,9 +975,9 @@ model PaymentPlan {
   customerId       String?
   direction        String        @default("OUT")
   supplierId       String?
+  companyId        String?
   installments     Installment[]
-
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company          Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
 }
@@ -1055,39 +1000,28 @@ model Installment {
   @@index([status])
 }
 
-// --- RESMİ MUHASEBE (ACCOUNTING CORE) ---
-
 model Account {
-  id         String  @id @default(cuid())
-  companyId  String?
-  code       String // Örn: "100.01.001"
-  name       String // Örn: "Merkez Nakit Kasa"
-  parentCode String? // Örn: "100.01" (Ağaç yapısı için)
-
-  // Muhasebe Standartları (Yeni Alanlar)
-  accountClass  String? // AKTIF | PASIF | OZKAYNAK | GELIR | GIDER
-  normalBalance String? // BORC | ALACAK
-  reportGroup   String? // Dönen Varlık, Satış, Finansman vb.
-  reportType    String? // BILANCO | GELIR_TABLOSU
-
-  type     String // Eski tip (Uyum için tutuluyor: "Borç" / "Alacak")
-  balance  Decimal @default(0) @db.Decimal(15, 2)
-  isActive Boolean @default(true)
-
-  // Ön Muhasebe ile Eşleştirme (Mapping)
-  kasaId     String? @unique
-  bankId     String? @unique // Kasa tablosundaki 'Banka' tipli kayıtlar için
-  customerId String?
-  supplierId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Branching support for accounts
-  branch String? @default("Merkez")
-
-  journalItems JournalItem[]
-  company      Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id            String        @id @default(cuid())
+  code          String
+  name          String
+  parentCode    String?
+  accountClass  String?
+  normalBalance String?
+  reportGroup   String?
+  reportType    String?
+  type          String
+  balance       Decimal       @default(0) @db.Decimal(15, 2)
+  isActive      Boolean       @default(true)
+  kasaId        String?       @unique
+  bankId        String?       @unique
+  customerId    String?
+  supplierId    String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  branch        String?       @default("Merkez")
+  companyId     String?
+  company       Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  journalItems  JournalItem[]
 
   @@unique([code, branch, companyId])
   @@index([code])
@@ -1096,30 +1030,24 @@ model Account {
 }
 
 model Journal {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
+  date        DateTime      @default(now())
+  fisNo       String
+  description String?
+  type        String        @default("Mahsup")
+  totalDebt   Decimal       @db.Decimal(15, 2)
+  totalCredit Decimal       @db.Decimal(15, 2)
+  isBalanced  Boolean
+  status      String        @default("Draft")
+  branch      String?       @default("Merkez")
+  sourceType  String?
+  sourceId    String?
+  isReversal  Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   companyId   String?
-  date        DateTime @default(now())
-  fisNo       String // Unique per company/year usually, but keep simple unique first
-  description String? // Fiş Açıklaması
-  type        String   @default("Mahsup") // Tahsil, Tediye, Mahsup
-
-  totalDebt   Decimal @db.Decimal(15, 2)
-  totalCredit Decimal @db.Decimal(15, 2)
-  isBalanced  Boolean // Borç == Alacak kontrolü
-
-  status String  @default("Draft") // Draft, Approved, Locked (Deftere Yazıldı)
-  branch String? @default("Merkez")
-
-  sourceType String? // "Sales", "Purchase", "Payment", "Collection"
-  sourceId   String? // Transaction ID, Invoice ID vb.
-
-  isReversal Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  items   JournalItem[]
-  company Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company     Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  items       JournalItem[]
 
   @@unique([fisNo, companyId, branch])
   @@index([date])
@@ -1129,24 +1057,19 @@ model Journal {
 }
 
 model JournalItem {
-  id          String  @id @default(cuid())
-  journalId   String
-  accountId   String
-  description String?
-
-  debt   Decimal @default(0) @db.Decimal(15, 2) // Borç
-  credit Decimal @default(0) @db.Decimal(15, 2) // Alacak
-
-  // e-Defter Required Fields
-  documentType  String? // Örn: "FATURA", "MAKBUZ", "CEK", "BANKA_ISLEM"
-  documentNo    String? // Belge No
-  documentDate  DateTime? // Belge Tarihi
-  paymentMethod String? // Örn: "NAKIT", "KREDI_KARTI", "HAVALE"
-
-  createdAt DateTime @default(now())
-
-  account Account @relation(fields: [accountId], references: [id])
-  journal Journal @relation(fields: [journalId], references: [id], onDelete: Cascade)
+  id            String    @id @default(cuid())
+  journalId     String
+  accountId     String
+  description   String?
+  debt          Decimal   @default(0) @db.Decimal(15, 2)
+  credit        Decimal   @default(0) @db.Decimal(15, 2)
+  documentType  String?
+  documentNo    String?
+  documentDate  DateTime?
+  paymentMethod String?
+  createdAt     DateTime  @default(now())
+  account       Account   @relation(fields: [accountId], references: [id])
+  journal       Journal   @relation(fields: [journalId], references: [id], onDelete: Cascade)
 
   @@index([journalId])
   @@index([accountId])
@@ -1154,7 +1077,6 @@ model JournalItem {
 
 model Quote {
   id          String    @id @default(cuid())
-  companyId   String?
   quoteNo     String    @unique
   date        DateTime  @default(now())
   validUntil  DateTime?
@@ -1163,13 +1085,14 @@ model Quote {
   subTotal    Decimal   @default(0) @db.Decimal(10, 2)
   taxAmount   Decimal   @default(0) @db.Decimal(10, 2)
   totalAmount Decimal   @default(0) @db.Decimal(10, 2)
-  status      String    @default("Draft") // Draft, Sent, Accepted, Rejected, Converted
+  status      String    @default("Draft")
   description String?
   branch      String?   @default("Merkez")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  customer    Customer  @relation(fields: [customerId], references: [id])
+  companyId   String?
   company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer    Customer  @relation(fields: [customerId], references: [id])
 
   @@index([customerId])
   @@index([quoteNo])
@@ -1179,27 +1102,28 @@ model Quote {
 
 model MarketplaceConfig {
   id        String    @id @default(cuid())
-  companyId String?
   type      String
   settings  Json
   isActive  Boolean   @default(false)
   lastSync  DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  deletedAt DateTime?
+  companyId String
+  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, type])
   @@index([companyId])
+  @@index([deletedAt])
 }
 
 model ExternalRequest {
   id              String   @id @default(cuid())
-  provider        String   // "NILVERA", "IYZICO"
+  provider        String
   idempotencyKey  String
-  entityType      String   // "SALES_INVOICE", "SUBSCRIPTION"
+  entityType      String
   entityId        String
-  status          String   // PENDING | SUCCESS | FAILED
+  status          String
   responsePayload Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -1209,20 +1133,15 @@ model ExternalRequest {
   @@index([status])
 }
 
-// ------------------------------------------
-// GROWTH & AUTOMATION (PHASE 9)
-// ------------------------------------------
-
 model GrowthEvent {
   id        String   @id @default(cuid())
   tenantId  String
-  type      String   // INACTIVITY_7D, INACTIVITY_14D, LIMIT_80, GROWTH_SIGNAL
-  status    String   @default("PENDING") // PENDING, SENT, FAILED, IGNORED
+  type      String
+  status    String   @default("PENDING")
   payload   Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@index([type])
@@ -1232,74 +1151,64 @@ model GrowthEvent {
 model UpsellEvent {
   id           String   @id @default(cuid())
   tenantId     String
-  type         String   // SOFT, CONTEXTUAL, HARD
-  source       String   // DASHBOARD, INVOICE_PAGE, LIMIT_LOCK
+  type         String
+  source       String
   targetPlanId String?
   converted    Boolean  @default(false)
   payload      Json?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@index([type])
   @@index([converted])
 }
 
-// ------------------------------------------
-// CMS & WEBSITE MANAGEMENT (NEW)
-// ------------------------------------------
-
 model CmsPage {
-  id            String       @id @default(cuid())
-  slug          String       @unique // "index", "privacy", etc.
-  title         String
-  description   String?      // SEO Meta Description
-  keywords      String?      // SEO Keywords
-  isActive      Boolean      @default(true)
-  sections      CmsSection[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  title       String
+  description String?
+  keywords    String?
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  sections    CmsSection[]
 }
 
 model CmsSection {
-  id          String   @id @default(cuid())
-  pageId      String
-  type        String   // HERO, FEATURES, COMPARISON, ROLES, STATS, FAQ, CONTACT, FOOTER
-  order       Int      @default(0)
-  content     Json     // { title: "", subtitle: "", items: [], settings: { fontSize: "16px", ... } }
-  isActive    Boolean  @default(true)
-  
-  page        CmsPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  id       String  @id @default(cuid())
+  pageId   String
+  type     String
+  order    Int     @default(0)
+  content  Json
+  isActive Boolean @default(true)
+  page     CmsPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   @@index([pageId])
 }
 
 model CmsMenu {
   id        String   @id @default(cuid())
-  name      String   // "Header", "Footer"
-  items     Json     // [{ label: "Hizmetler", link: "/#features" }, ...]
+  name      String
+  items     Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model CmsGeneralSettings {
-  id            String   @id @default(cuid())
-  logoUrl       String?
-  faviconUrl    String?
-  siteTitle     String   @default("Periodya")
-  footerText    String?
-  primaryColor  String   @default("#446ee7")
-  contactEmail  String?
+  id             String   @id @default(cuid())
+  logoUrl        String?
+  faviconUrl     String?
+  siteTitle      String   @default("Periodya")
+  footerText     String?
+  primaryColor   String   @default("#446ee7")
+  contactEmail   String?
   whatsappNumber String?
-  customCss     String?
-  updatedAt     DateTime @updatedAt
+  customCss      String?
+  updatedAt      DateTime @updatedAt
 }
-
-// ------------------------------------------
-// FIELD SALES & ROUTE MANAGEMENT
-// ------------------------------------------
 
 model Route {
   id        String      @id @default(cuid())
@@ -1307,13 +1216,12 @@ model Route {
   staffId   String
   name      String
   date      DateTime
-  status    String      @default("PENDING") // PENDING, ACTIVE, COMPLETED, CANCELLED
-  stops     RouteStop[]
+  status    String      @default("PENDING")
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
-
   company   Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
   staff     Staff       @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  stops     RouteStop[]
 
   @@index([companyId])
   @@index([staffId])
@@ -1321,42 +1229,40 @@ model Route {
 }
 
 model RouteStop {
-  id         String      @id @default(cuid())
-  routeId    String
-  customerId String
-  sequence   Int
-  status     String      @default("PENDING") // PENDING, SKIPPED, VISITED
+  id          String       @id @default(cuid())
+  routeId     String
+  customerId  String
+  sequence    Int
+  status      String       @default("PENDING")
   plannedTime DateTime?
-  
-  route      Route       @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  customer   Customer    @relation(fields: [customerId], references: [id])
-  visits     SalesVisit[]
+  customer    Customer     @relation(fields: [customerId], references: [id])
+  route       Route        @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  visits      SalesVisit[]
 
   @@index([routeId])
   @@index([customerId])
 }
 
 model SalesVisit {
-  id               String   @id @default(cuid())
+  id               String       @id @default(cuid())
   companyId        String
   routeStopId      String?
   customerId       String
   staffId          String
-  checkInTime      DateTime @default(now())
+  checkInTime      DateTime     @default(now())
   checkOutTime     DateTime?
-  checkInLocation  Json?    // {lat, lng, acc}
+  checkInLocation  Json?
   checkOutLocation Json?
   notes            String?
   photos           String[]
-  isOutOfRange     Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  company    Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  stop       RouteStop? @relation(fields: [routeStopId], references: [id])
-  customer   Customer   @relation(fields: [customerId], references: [id])
-  staff      Staff      @relation(fields: [staffId], references: [id])
-  orders     SalesOrder[]
+  isOutOfRange     Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  orders           SalesOrder[]
+  company          Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer         Customer     @relation(fields: [customerId], references: [id])
+  stop             RouteStop?   @relation(fields: [routeStopId], references: [id])
+  staff            Staff        @relation(fields: [staffId], references: [id])
 
   @@index([companyId])
   @@index([staffId])
@@ -1365,22 +1271,21 @@ model SalesVisit {
 }
 
 model SalesOrder {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   companyId   String
   visitId     String?
   customerId  String
   staffId     String
-  totalAmount Decimal  @db.Decimal(10, 2)
-  status      String   @default("PENDING") // PENDING, APPROVED, INVOICED, CANCELLED
-  items       SalesOrderItem[]
+  totalAmount Decimal          @db.Decimal(10, 2)
+  status      String           @default("PENDING")
   notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  visit     SalesVisit? @relation(fields: [visitId], references: [id])
-  customer  Customer   @relation(fields: [customerId], references: [id])
-  staff     Staff      @relation(fields: [staffId], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  company     Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer    Customer         @relation(fields: [customerId], references: [id])
+  staff       Staff            @relation(fields: [staffId], references: [id])
+  visit       SalesVisit?      @relation(fields: [visitId], references: [id])
+  items       SalesOrderItem[]
 
   @@index([companyId])
   @@index([visitId])
@@ -1388,124 +1293,113 @@ model SalesOrder {
 }
 
 model SalesOrderItem {
-  id           String     @id @default(cuid())
-  orderId      String
-  productId    String
-  productName  String
-  quantity     Int
-  unitPrice    Decimal    @db.Decimal(10, 2)
-  totalPrice   Decimal    @db.Decimal(10, 2)
-
-  order   SalesOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product    @relation(fields: [productId], references: [id])
+  id          String     @id @default(cuid())
+  orderId     String
+  productId   String
+  productName String
+  quantity    Int
+  unitPrice   Decimal    @db.Decimal(10, 2)
+  totalPrice  Decimal    @db.Decimal(10, 2)
+  order       SalesOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product    @relation(fields: [productId], references: [id])
 
   @@index([orderId])
 }
 
 model StaffTarget {
-  id            String   @id @default(cuid())
-  staffId       String
-  companyId     String
-  type          String   // 'TURNOVER', 'VISIT', 'ORDER_COUNT'
-  targetValue   Decimal  @db.Decimal(12, 2)
-  currentValue  Decimal  @default(0) @db.Decimal(12, 2)
-  period        String   // 'MONTHLY', 'WEEKLY'
-  month         Int?     // 1-12
-  year          Int?
-  startDate     DateTime
-  endDate       DateTime
-  status        String   @default("ACTIVE") // ACTIVE, COMPLETED, FAILED
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  staff         Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
-  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  staffId      String
+  companyId    String
+  type         String
+  targetValue  Decimal  @db.Decimal(12, 2)
+  currentValue Decimal  @default(0) @db.Decimal(12, 2)
+  period       String
+  month        Int?
+  year         Int?
+  startDate    DateTime
+  endDate      DateTime
+  status       String   @default("ACTIVE")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  staff        Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
 }
-
-// ------------------------------------------
-// FINTECH IMMUTABLE CORE (PHASE 10)
-// ------------------------------------------
 
 model DomainEvent {
   id            String   @id @default(cuid())
   companyId     String
   tenantId      String?
-  eventType     String   // Örn: "PURCHASE_CREATED", "SALE_COMPLETED"
-  aggregateType String   // Örn: "ORDER", "INVENTORY", "JOURNAL"
+  eventType     String
+  aggregateType String
   aggregateId   String
-  payload       Json     // Tüm event verisi
-  metadata      Json?    // IP, UserAgent vb.
+  payload       Json
+  metadata      Json?
   createdAt     DateTime @default(now())
   createdBy     String?
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId, aggregateType, createdAt])
   @@index([aggregateId])
 }
 
 model InventoryLayer {
-  id                String   @id @default(cuid())
+  id                String                 @id @default(cuid())
   companyId         String
   productId         String
-  sourceEventId     String   // DomainEvent ID referansı
-  quantityInitial   Decimal  @db.Decimal(15, 4)
-  quantityRemaining Decimal  @db.Decimal(15, 4)
-  unitCost          Decimal  @db.Decimal(15, 4)
-  branch            String?  @default("Merkez")
-  createdAt         DateTime @default(now())
-
-  company   Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  consumptions InventoryConsumption[]
+  sourceEventId     String
+  quantityInitial   Decimal                @db.Decimal(15, 4)
+  quantityRemaining Decimal                @db.Decimal(15, 4)
+  unitCost          Decimal                @db.Decimal(15, 4)
+  branch            String?                @default("Merkez")
+  createdAt         DateTime               @default(now())
+  consumptions      InventoryConsumption[]
+  company           Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([productId, quantityRemaining, createdAt])
   @@index([companyId])
 }
 
 model InventoryConsumption {
-  id                 String   @id @default(cuid())
+  id                 String         @id @default(cuid())
   companyId          String
   layerId            String
-  consumptionEventId String   // DomainEvent ID referansı (Örn: SALE_COMPLETED)
-  quantity           Decimal  @db.Decimal(15, 4)
-  unitCostAtTime     Decimal  @db.Decimal(15, 4) // Tüketim anındaki maliyet kaydı
-  createdAt          DateTime @default(now())
-
-  layer InventoryLayer @relation(fields: [layerId], references: [id])
+  consumptionEventId String
+  quantity           Decimal        @db.Decimal(15, 4)
+  unitCostAtTime     Decimal        @db.Decimal(15, 4)
+  createdAt          DateTime       @default(now())
+  layer              InventoryLayer @relation(fields: [layerId], references: [id])
 
   @@index([layerId])
   @@index([consumptionEventId])
 }
 
 model JournalEntry {
-  id            String   @id @default(cuid())
-  entryNumber   Int      @unique @default(autoincrement())
+  id            String        @id @default(cuid())
+  entryNumber   Int           @unique @default(autoincrement())
   companyId     String
-  sourceEventId String?  @unique // Idempotency: Hangi event bu fişi oluşturdu?
+  sourceEventId String?       @unique
   description   String
-  date          DateTime @default(now())
-  createdAt     DateTime @default(now())
+  date          DateTime      @default(now())
+  createdAt     DateTime      @default(now())
   createdBy     String?
-
-  company Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  lines   JournalLine[]
+  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lines         JournalLine[]
 
   @@index([companyId, date])
 }
 
 model JournalLine {
-  id                String  @id @default(cuid())
+  id                String       @id @default(cuid())
   journalEntryId    String
   accountCode       String
-  debit             Decimal @default(0) @db.Decimal(15, 2)
-  credit            Decimal @default(0) @db.Decimal(15, 2)
-  externalReference String? // Trendyol Transaction ID vb.
+  debit             Decimal      @default(0) @db.Decimal(15, 2)
+  credit            Decimal      @default(0) @db.Decimal(15, 2)
+  externalReference String?
   companyId         String
-  isOpen            Boolean @default(true) // Reconcile edilip edilmediğini takip eder
-
-  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  isOpen            Boolean      @default(true)
+  journalEntry      JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
 
   @@index([accountCode, companyId, isOpen])
 }
@@ -1526,8 +1420,7 @@ model MarketplaceOrderFinance {
   currency          String    @default("TRY")
   lastMatchedAt     DateTime?
   createdAt         DateTime  @default(now())
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company           Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId, marketplace])
 }
@@ -1542,137 +1435,122 @@ model MarketplaceSettlement {
   totalAmount       Decimal   @db.Decimal(15, 2)
   commissionTotal   Decimal   @db.Decimal(15, 2)
   payoutAmount      Decimal   @db.Decimal(15, 2)
-  status            String    @default("PENDING") // PENDING, RECONCILED, ERROR
+  status            String    @default("PENDING")
   externalReference String?
   journalEntryId    String?
   reconciledAt      DateTime?
   createdAt         DateTime  @default(now())
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company           Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId, marketplace, status])
 }
 
 model MarketplaceTransactionLedger {
-  id                     String   @id @default(cuid())
+  id                     String         @id @default(cuid())
   companyId              String
   marketplace            String
-  externalReference      String   @unique
+  externalReference      String         @unique
   orderId                String?
   orderNumber            String?
-  transactionType        String   // SALE, COMMISSION, CARGO, REFUND, PAYOUT
-  amount                 Decimal  @db.Decimal(15, 2)
+  transactionType        String
+  amount                 Decimal        @db.Decimal(15, 2)
   transactionDate        DateTime
-  processingStatus       String   @default("PENDING") // PENDING, MATCHED, RECONCILED, SUSPENSE
-  reconciliationStatus   String?  // FULL, PARTIAL, TOLERATED, MISMATCH
+  processingStatus       String         @default("PENDING")
+  reconciliationStatus   String?
   journalEntryId         String?
   matchedBankStatementId String?
-  createdAt              DateTime @default(now())
-
-  company       Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  bankStatement BankStatement? @relation(fields: [matchedBankStatementId], references: [id])
+  createdAt              DateTime       @default(now())
+  company                Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  bankStatement          BankStatement? @relation(fields: [matchedBankStatementId], references: [id])
 
   @@index([companyId, marketplace, processingStatus])
   @@index([externalReference])
 }
 
 model BankStatement {
-  id               String   @id @default(cuid())
+  id               String                         @id @default(cuid())
   companyId        String
-  bankAccountCode  String   // 102.01 vb.
+  bankAccountCode  String
   statementDate    DateTime
-  referenceNo      String   @unique
+  referenceNo      String                         @unique
   description      String
-  debit            Decimal  @db.Decimal(15, 2)
-  credit           Decimal  @db.Decimal(15, 2)
-  balance          Decimal? @db.Decimal(15, 2)
-  isMatched        Boolean  @default(false)
+  debit            Decimal                        @db.Decimal(15, 2)
+  credit           Decimal                        @db.Decimal(15, 2)
+  balance          Decimal?                       @db.Decimal(15, 2)
+  isMatched        Boolean                        @default(false)
   matchedJournalId String?
-  createdAt        DateTime @default(now())
-
-  company      Company                        @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  transLedgers MarketplaceTransactionLedger[]
+  createdAt        DateTime                       @default(now())
+  company          Company                        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  transLedgers     MarketplaceTransactionLedger[]
 
   @@index([companyId, statementDate])
   @@index([referenceNo])
 }
 
 model MarketplaceProductPnl {
-  id                String   @id @default(cuid())
-  companyId         String
-  productId         String
-  marketplace       String   // Trendyol, HepsiBurada, vb.
-  
-  grossRevenue      Decimal  @default(0) @db.Decimal(15, 2)
-  commissionTotal   Decimal  @default(0) @db.Decimal(15, 2)
-  shippingTotal     Decimal  @default(0) @db.Decimal(15, 2)
-  otherFeesTotal    Decimal  @default(0) @db.Decimal(15, 2)
-  fifoCostTotal     Decimal  @default(0) @db.Decimal(15, 2)
-  refundCostTotal   Decimal  @default(0) @db.Decimal(15, 2)
-  
-  netProfit         Decimal  @default(0) @db.Decimal(15, 2)
-  profitMargin      Decimal  @default(0) @db.Decimal(5, 2) // % bazında
-  
-  saleCount         Int      @default(0)
-  refundCount       Int      @default(0)
-  refundedQuantity  Int      @default(0)
-  
-  lastUpdatedAt     DateTime @updatedAt
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id               String   @id @default(cuid())
+  companyId        String
+  productId        String
+  marketplace      String
+  grossRevenue     Decimal  @default(0) @db.Decimal(15, 2)
+  commissionTotal  Decimal  @default(0) @db.Decimal(15, 2)
+  shippingTotal    Decimal  @default(0) @db.Decimal(15, 2)
+  otherFeesTotal   Decimal  @default(0) @db.Decimal(15, 2)
+  fifoCostTotal    Decimal  @default(0) @db.Decimal(15, 2)
+  refundCostTotal  Decimal  @default(0) @db.Decimal(15, 2)
+  netProfit        Decimal  @default(0) @db.Decimal(15, 2)
+  profitMargin     Decimal  @default(0) @db.Decimal(5, 2)
+  saleCount        Int      @default(0)
+  refundCount      Int      @default(0)
+  lastUpdatedAt    DateTime @updatedAt
+  refundedQuantity Int      @default(0)
+  company          Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, productId, marketplace])
   @@index([companyId, marketplace])
 }
 
 model SmartPricingRule {
-  id              String   @id @default(cuid())
-  companyId       String
-  productId       String
-  marketplace     String
-  targetMargin    Decimal  @db.Decimal(5, 2) // Hedeflenen net kâr marjı (%)
-  minPrice        Decimal  @db.Decimal(15, 2)
-  maxPrice        Decimal  @db.Decimal(15, 2)
-  isActive        Boolean  @default(true)
-  lastUpdated     DateTime @updatedAt
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  companyId    String
+  productId    String
+  marketplace  String
+  targetMargin Decimal  @db.Decimal(5, 2)
+  minPrice     Decimal  @db.Decimal(15, 2)
+  maxPrice     Decimal  @db.Decimal(15, 2)
+  isActive     Boolean  @default(true)
+  lastUpdated  DateTime @updatedAt
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, productId, marketplace])
 }
 
 model BankConnection {
-  id                  String   @id @default(cuid())
-  companyId           String
-  bankName            String
-  bankId             String?  // BANK_FORM_DEFINITIONS key (AKBANK, GARANTI, etc.)
-  iban                String   @unique
-  currency            String   @default("TRY")
-  status              String   @default("DRAFT") // DRAFT, PENDING_ACTIVATION, ACTIVE, ERROR, EXPIRED
-  lastSyncAt          DateTime?
-  connectionType      String   @default("OPEN_BANKING") // OPEN_BANKING, XML_IMPORT, AUTO_PULL
-  integrationMethod   String   @default("MANUAL_UPLOAD") // PULL_HTTP, SFTP_PULL, etc.
-  
-  // SECURE CREDENTIALS
-  credentialsEncrypted Json?    // Encryption at rest (KMS/AES-256)
-  credentialsVersion   Int      @default(1)
-  
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  // Error context & production hardening
-  lastErrorCode       String?
-  lastErrorMessage    String?
-  lastErrorAt         DateTime?
-  consecutiveFailures Int      @default(0)
-  nextRetryAt         DateTime?
-
-  company      Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  balances     BankAccountBalance[]
-  transactions BankTransaction[]
-  kasalar      Kasa[]
+  id                   String               @id @default(cuid())
+  companyId            String
+  bankName             String
+  iban                 String               @unique
+  currency             String               @default("TRY")
+  lastSyncAt           DateTime?
+  status               String               @default("DRAFT")
+  createdAt            DateTime             @default(now())
+  bankId               String?
+  connectionType       String               @default("OPEN_BANKING")
+  consecutiveFailures  Int                  @default(0)
+  credentialsEncrypted Json?
+  credentialsVersion   Int                  @default(1)
+  integrationMethod    String               @default("MANUAL_UPLOAD")
+  lastErrorAt          DateTime?
+  lastErrorCode        String?
+  lastErrorMessage     String?
+  nextRetryAt          DateTime?
+  updatedAt            DateTime             @updatedAt
+  balances             BankAccountBalance[]
+  company              Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  transactions         BankTransaction[]
+  kasalar              Kasa?
 
   @@index([companyId])
   @@index([companyId, bankId])
@@ -1685,29 +1563,27 @@ model BankAccountBalance {
   currency         String
   asOf             DateTime
   createdAt        DateTime       @default(now())
-  
   connection       BankConnection @relation(fields: [bankConnectionId], references: [id], onDelete: Cascade)
 }
 
 model BankTransaction {
-  id              String   @id @default(cuid())
-  companyId       String
-  bankConnectionId String
-  transactionId   String   // External Bank ID if provided
-  transactionFingerprint String // IBAN + Date + Amount + Desc Hash for Idempotency
-  amount          Decimal  @db.Decimal(14, 2)
-  currency        String
-  description     String?
-  transactionDate DateTime
-  valueDate       DateTime?
-  direction       String   // IN, OUT
-  bankRef         String?
-  rawPayload      Json
-  createdAt       DateTime @default(now())
-
-  company    Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  connection BankConnection @relation(fields: [bankConnectionId], references: [id], onDelete: Cascade)
-  matches    PaymentMatch[]
+  id                     String         @id @default(cuid())
+  companyId              String
+  bankConnectionId       String
+  transactionId          String
+  amount                 Decimal        @db.Decimal(14, 2)
+  currency               String
+  description            String?
+  transactionDate        DateTime
+  valueDate              DateTime?
+  direction              String
+  rawPayload             Json
+  createdAt              DateTime       @default(now())
+  bankRef                String?
+  transactionFingerprint String
+  connection             BankConnection @relation(fields: [bankConnectionId], references: [id], onDelete: Cascade)
+  company                Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  matches                PaymentMatch[]
 
   @@unique([bankConnectionId, transactionFingerprint])
   @@index([companyId, transactionDate])
@@ -1724,27 +1600,25 @@ model PricingAutopilotConfig {
   pauseOnHighReturnRate Boolean  @default(true)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company               Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, marketplace])
 }
 
 model PaymentMatch {
-  id                String   @id @default(cuid())
+  id                String          @id @default(cuid())
   companyId         String
   bankTransactionId String
-  ledgerId          String?   // MarketplaceTransactionLedger reference if applicable
-  matchType         String    // AUTO, MANUAL
-  confidenceScore   Int       @default(100)
-  confidenceBucket  String    @default("HIGH") // HIGH, MEDIUM, LOW
-  status            String    @default("PENDING") // PENDING, CONFIRMED, REJECTED
+  ledgerId          String?
+  matchType         String
+  confidenceScore   Int             @default(100)
+  confidenceBucket  String          @default("HIGH")
+  status            String          @default("PENDING")
   journalEntryId    String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  bankTransaction BankTransaction @relation(fields: [bankTransactionId], references: [id], onDelete: Cascade)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  bankTransaction   BankTransaction @relation(fields: [bankTransactionId], references: [id], onDelete: Cascade)
+  company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId, status])
 }
@@ -1752,15 +1626,14 @@ model PaymentMatch {
 model MatchingRule {
   id          String   @id @default(cuid())
   companyId   String
-  pattern     String   // "ZIRAAT EFT KIRA"
-  targetType  String   // EXPENSE, INVOICE, MARKETPLACE
-  entityName  String?  // "TRENDYOL"
-  accountCode String?  // "770.01"
+  pattern     String
+  targetType  String
+  entityName  String?
+  accountCode String?
   confidence  Int      @default(100)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId, pattern])
 }
@@ -1768,13 +1641,12 @@ model MatchingRule {
 model CashflowForecast {
   id           String   @id @default(cuid())
   companyId    String
-  horizonDays  Int      // 7, 14, 30
+  horizonDays  Int
   expectedIn   Decimal  @db.Decimal(15, 2)
   expectedOut  Decimal  @db.Decimal(15, 2)
   netPosition  Decimal  @db.Decimal(15, 2)
   calculatedAt DateTime @default(now())
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId, calculatedAt])
 }
@@ -1782,53 +1654,52 @@ model CashflowForecast {
 model FintechAudit {
   id            String   @id @default(cuid())
   companyId     String
-  who           String   // "system" or userId
-  action        String   // "PRICE_AUTOPILOT_PUSHED"
-  details       String?  // JSON or text
+  who           String
+  action        String
+  details       String?
   before        Json?
   after         Json?
   sourceEventId String?
   createdAt     DateTime @default(now())
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId, action])
   @@index([createdAt])
 }
 
 model MarketplaceActionAudit {
-  id             String   @id @default(cuid())
+  id              String    @id @default(cuid())
   companyId       String
   marketplace     String
   orderId         String?
-  actionKey       String   // "REFRESH_STATUS" | "PRINT_LABEL_A4"
-  idempotencyKey  String   @unique
-  status          String   // "SUCCESS" | "FAILED" | "PENDING"
-  lockExpiresAt   DateTime?
-  jobId           String?
-  retryCount      Int      @default(0)
-  failureHistory  Json?    // Array of { error: string, at: Date }
+  actionKey       String
+  idempotencyKey  String    @unique
+  status          String
   requestPayload  Json?
   responsePayload Json?
   errorMessage    String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  jobId           String?
+  lockExpiresAt   DateTime?
+  failureHistory  Json?
+  retryCount      Int       @default(0)
 
   @@index([companyId, marketplace, createdAt])
   @@index([orderId])
 }
 
 model MarketplaceLabel {
-  id                 String   @id @default(cuid())
-  companyId          String
-  marketplace        String
-  shipmentPackageId  String
-  storageKey         String   // labels/{companyId}/{marketplace}/{shipmentPackageId}.pdf
-  sha256             String
-  size               Int
-  contentType        String   @default("application/pdf")
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                String   @id @default(cuid())
+  companyId         String
+  marketplace       String
+  shipmentPackageId String
+  storageKey        String
+  sha256            String
+  size              Int
+  contentType       String   @default("application/pdf")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@unique([companyId, marketplace, shipmentPackageId])
   @@index([companyId, createdAt])
