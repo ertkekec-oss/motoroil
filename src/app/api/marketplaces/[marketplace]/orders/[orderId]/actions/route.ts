@@ -63,6 +63,7 @@ export async function POST(
         });
 
         if (!company) {
+            console.error(`[ACTIONS] Company not found for tenantId: ${auth.user.tenantId}`);
             return NextResponse.json(
                 {
                     status: "FAILED",
@@ -76,15 +77,22 @@ export async function POST(
         // ============================================================================
         // 4. VALIDATE MARKETPLACE CONFIG
         // ============================================================================
+        // Case-insensitive lookup or handle naming mismatch (Trendyol vs trendyol)
+        const normalizedMarketplace = marketplace.charAt(0).toUpperCase() + marketplace.slice(1).toLowerCase(); // trendyol -> Trendyol
+
         const config = await (prisma as any).marketplaceConfig.findFirst({
-            where: { companyId: company.id, type: marketplace },
+            where: {
+                companyId: company.id,
+                type: { in: [marketplace, normalizedMarketplace, marketplace.toLowerCase()] }
+            },
         });
 
         if (!config) {
+            console.warn(`[ACTIONS] Marketplace config not found for ${marketplace} (Company: ${company.id})`);
             return NextResponse.json(
                 {
                     status: "FAILED",
-                    errorMessage: `Marketplace configuration not found for ${marketplace}`,
+                    errorMessage: `Marketplace configuration not found for ${marketplace}. Please connect your account first.`,
                     code: "CONFIG_NOT_FOUND"
                 },
                 { status: 400 }
@@ -100,6 +108,7 @@ export async function POST(
         });
 
         if (!order) {
+            console.warn(`[ACTIONS] Order not found: ${orderId} (Company: ${company.id})`);
             return NextResponse.json(
                 {
                     status: "FAILED",
@@ -129,7 +138,30 @@ export async function POST(
         // ============================================================================
         // 7. EXECUTE ACTION
         // ============================================================================
-        const provider = ActionProviderRegistry.getProvider(marketplace);
+        let provider;
+        try {
+            provider = ActionProviderRegistry.getProvider(marketplace);
+        } catch (registryError: any) {
+            return NextResponse.json(
+                {
+                    status: "FAILED",
+                    errorMessage: registryError.message || `Provider not found for ${marketplace}`,
+                    code: "PROVIDER_NOT_FOUND"
+                },
+                { status: 400 }
+            );
+        }
+
+        if (!provider) {
+            return NextResponse.json(
+                {
+                    status: "FAILED",
+                    errorMessage: "Marketplace provider instance is null",
+                    code: "PROVIDER_NULL"
+                },
+                { status: 400 }
+            );
+        }
 
         const result = await provider.executeAction({
             companyId: company.id,

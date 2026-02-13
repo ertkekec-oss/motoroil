@@ -5,11 +5,13 @@ import { TrendyolActionProvider } from "./providers/trendyol-actions";
 export class ActionProviderRegistry {
     static getProvider(marketplace: string): MarketplaceActionProvider {
         initMarketplaceWorker(); // Ensure worker is listening
-        switch (marketplace.toLowerCase()) {
+        const normalized = marketplace.toLowerCase();
+
+        switch (normalized) {
             case "trendyol":
                 return new TrendyolActionProvider();
             default:
-                throw new Error(`Marketplace provider not found: ${marketplace}`);
+                throw new Error(`Marketplace provider not found for: ${marketplace}`);
         }
     }
 }
