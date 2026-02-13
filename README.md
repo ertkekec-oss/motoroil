@@ -189,6 +189,102 @@ motoroil/
 
 ---
 
+## ⚙️ PRODUCTION SETUP (Marketplace Action Platform)
+
+### 🔴 Redis Kurulumu (Upstash - Ücretsiz)
+
+Marketplace aksiyonları (etiket yazdırma, kargo değiştirme, durum yenileme) için Redis gereklidir.
+
+#### 1. Upstash Redis Oluştur
+```bash
+# https://upstash.com adresine git
+# → Create Database
+# → Region: EU (Europe) seç
+# → Database Name: motoroil-redis
+# → Create
+```
+
+#### 2. Redis URL'i Kopyala
+```bash
+# Dashboard → motoroil-redis → Details
+# → REDIS_URL'i kopyala
+# Örnek: rediss://default:YOUR_PASSWORD@optimal-mollusk-18716.upstash.io:6379
+```
+
+#### 3. Vercel Environment Variables Ekle
+```bash
+# Vercel Dashboard → motoroil-projects → Settings → Environment Variables
+
+# Eklenecek değişken:
+REDIS_URL=rediss://default:YOUR_PASSWORD@optimal-mollusk-18716.upstash.io:6379
+```
+
+#### 4. Deploy
+```bash
+git add .
+git commit -m "Production: Upstash Redis configured"
+vercel --prod
+```
+
+### ✅ Production Validation Checklist
+
+Deployment sonrası aşağıdaki kontrolleri yapın:
+
+```bash
+# 1. REDIS_URL var mı?
+vercel env ls
+# → REDIS_URL görünmeli
+
+# 2. Redis bağlantısı çalışıyor mu?
+# Vercel Logs → "redis_connected" event'i arayın
+
+# 3. Marketplace Actions API çalışıyor mu?
+# Test: POST /api/marketplaces/trendyol/orders/{orderId}/actions
+# Expected: 202 Accepted
+
+# 4. Queue çalışıyor mu?
+# Vercel Logs → "job_enqueued" event'i arayın
+
+# 5. Worker processing yapıyor mu?
+# Vercel Logs → "worker_started" event'i arayın
+# Vercel Logs → "job_active" event'i arayın
+
+# 6. Label download çalışıyor mu?
+# Test: GET /api/marketplaces/trendyol/orders/{orderId}/label?shipmentPackageId=XXX
+# Expected: 302 Redirect to S3
+```
+
+### 🚨 Troubleshooting
+
+**Sorun**: `REDIS_URL missing` hatası  
+**Çözüm**: Vercel environment variables'a `REDIS_URL` ekleyin ve redeploy yapın
+
+**Sorun**: `ECONNREFUSED 127.0.0.1:6379`  
+**Çözüm**: Localhost Redis kullanılıyor. `REDIS_URL` environment variable'ını kontrol edin
+
+**Sorun**: `503 Service Unavailable`  
+**Çözüm**: Redis bağlantısı başarısız. Upstash dashboard'dan Redis'in aktif olduğunu kontrol edin
+
+**Sorun**: `409 shipmentPackageId missing`  
+**Çözüm**: Önce "Durum Yenile" butonuna tıklayın, ardından etiket yazdırın
+
+### 📊 Monitoring
+
+Vercel Functions Logs'u izleyin:
+```bash
+vercel logs https://www.kech.tr --follow
+```
+
+Aranacak event'ler:
+- `redis_connected` - Redis bağlantısı başarılı
+- `job_enqueued` - İş kuyruğa eklendi
+- `worker_started` - Worker başlatıldı
+- `job_active` - İş işleniyor
+- `job_completed` - İş tamamlandı
+- `job_failed` - İş başarısız
+
+---
+
 ## 🔒 GÜVENLİK
 
 ### Kurulum Sonrası

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { authorize } from "@/lib/auth";
 import { ActionProviderRegistry } from "@/services/marketplaces/actions/registry";
+import { isRedisHealthy } from "@/lib/queue";
 
 export const runtime = "nodejs";
 
@@ -15,26 +16,119 @@ export async function POST(
     const { marketplace, orderId } = params;
 
     try {
+        // ============================================================================
+        // 1. REDIS HEALTH CHECK
+        // ============================================================================
+        const redisHealthy = await isRedisHealthy();
+        if (!redisHealthy) {
+            console.error(JSON.stringify({
+                event: 'redis_unavailable',
+                timestamp: new Date().toISOString(),
+                marketplace,
+                orderId,
+            }));
+            return NextResponse.json(
+                {
+                    status: "FAILED",
+                    errorMessage: "Queue service temporarily unavailable. Please try again later.",
+                    code: "REDIS_UNAVAILABLE"
+                },
+                { status: 503 } // Service Unavailable
+            );
+        }
+
+        // ============================================================================
+        // 2. VALIDATE REQUEST BODY
+        // ============================================================================
         const body = await request.json();
         const { actionKey, idempotencyKey, payload } = body ?? {};
 
         if (!actionKey || !idempotencyKey) {
             return NextResponse.json(
-                { status: "FAILED", errorMessage: "actionKey ve idempotencyKey gerekli" },
+                {
+                    status: "FAILED",
+                    errorMessage: "actionKey and idempotencyKey are required",
+                    code: "MISSING_REQUIRED_FIELDS"
+                },
                 { status: 400 }
             );
         }
 
-        // ✅ companyId resolve (tenantId -> company)
+        // ============================================================================
+        // 3. RESOLVE COMPANY
+        // ============================================================================
         const company = await prisma.company.findFirst({
             where: { tenantId: auth.user.tenantId },
             select: { id: true },
         });
 
         if (!company) {
-            return NextResponse.json({ status: "FAILED", errorMessage: "Firma bulunamadı" }, { status: 403 });
+            return NextResponse.json(
+                {
+                    status: "FAILED",
+                    errorMessage: "Company not found",
+                    code: "COMPANY_NOT_FOUND"
+                },
+                { status: 403 }
+            );
         }
 
+        // ============================================================================
+        // 4. VALIDATE MARKETPLACE CONFIG
+        // ============================================================================
+        const config = await (prisma as any).marketplaceConfig.findFirst({
+            where: { companyId: company.id, type: marketplace },
+        });
+
+        if (!config) {
+            return NextResponse.json(
+                {
+                    status: "FAILED",
+                    errorMessage: `Marketplace configuration not found for ${marketplace}`,
+                    code: "CONFIG_NOT_FOUND"
+                },
+                { status: 400 }
+            );
+        }
+
+        // ============================================================================
+        // 5. VALIDATE ORDER EXISTS
+        // ============================================================================
+        const order = await prisma.order.findFirst({
+            where: { id: orderId, companyId: company.id },
+            select: { id: true, shipmentPackageId: true, marketplace: true },
+        });
+
+        if (!order) {
+            return NextResponse.json(
+                {
+                    status: "FAILED",
+                    errorMessage: "Order not found",
+                    code: "ORDER_NOT_FOUND"
+                },
+                { status: 404 }
+            );
+        }
+
+        // ============================================================================
+        // 6. VALIDATE shipmentPackageId FOR LABEL/CARGO ACTIONS
+        // ============================================================================
+        const requiresShipmentId = actionKey === 'PRINT_LABEL_A4' || actionKey === 'CHANGE_CARGO';
+        if (requiresShipmentId && !order.shipmentPackageId && !payload?.labelShipmentPackageId && !payload?.shipmentPackageId) {
+            return NextResponse.json(
+                {
+                    status: "FAILED",
+                    errorMessage: "shipmentPackageId is required for this action. Please refresh order status first.",
+                    code: "SHIPMENT_PACKAGE_ID_MISSING",
+                    hint: "Click 'Refresh Status' button to fetch shipmentPackageId from marketplace"
+                },
+                { status: 409 } // Conflict - order exists but missing required field
+            );
+        }
+
+        // ============================================================================
+        // 7. EXECUTE ACTION
+        // ============================================================================
         const provider = ActionProviderRegistry.getProvider(marketplace);
 
         const result = await provider.executeAction({
@@ -46,10 +140,12 @@ export async function POST(
             payload,
         });
 
-        // 5) Hata Ayıklama İçin JSON Log
+        // ============================================================================
+        // 8. STRUCTURED LOGGING
+        // ============================================================================
         console.log(JSON.stringify({
-            level: "INFO",
-            event: "MARKETPLACE_ACTION_TRIGGERED",
+            event: 'job_enqueued',
+            timestamp: new Date().toISOString(),
             requestId: request.headers.get("x-request-id") || `req_${Date.now()}`,
             companyId: company.id,
             orderId,
@@ -57,21 +153,31 @@ export async function POST(
             idempotencyKey,
             auditId: result.auditId,
             user: auth.user.username,
-            timestamp: new Date().toISOString()
+            marketplace,
         }));
 
-        // Return 202 for all queued actions
+        // Return 202 Accepted for all queued actions
         return NextResponse.json(result, { status: 202 });
+
     } catch (error: any) {
+        // ============================================================================
+        // 9. GENERIC ERROR HANDLER (Last Resort)
+        // ============================================================================
         console.error(JSON.stringify({
-            level: "ERROR",
-            event: "MARKETPLACE_ACTION_ERROR",
+            event: 'marketplace_action_error',
+            timestamp: new Date().toISOString(),
             error: error.message,
             stack: error.stack,
-            timestamp: new Date().toISOString()
+            marketplace,
+            orderId,
         }));
+
         return NextResponse.json(
-            { status: "FAILED", errorMessage: error?.message ?? "Unknown error" },
+            {
+                status: "FAILED",
+                errorMessage: error?.message ?? "Internal server error",
+                code: "INTERNAL_ERROR"
+            },
             { status: 500 }
         );
     }

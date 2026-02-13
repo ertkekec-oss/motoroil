@@ -1,5 +1,4 @@
 import { Worker, Job } from 'bullmq';
-import { redisConnection } from '../../../lib/queue';
 import prisma from '../../../lib/prisma';
 import { MarketplaceServiceFactory } from '../index';
 import { TrendyolService } from '../trendyol';
@@ -52,7 +51,10 @@ export const marketplaceWorker = new Worker(
 
                 await prisma.order.updateMany({
                     where: { id: orderId, companyId },
-                    data: { status: updatedOrder.status },
+                    data: {
+                        status: updatedOrder.status,
+                        shipmentPackageId: updatedOrder.shipmentPackageId || order.shipmentPackageId, // Update if available
+                    },
                 });
 
                 result = {
@@ -156,5 +158,5 @@ export const marketplaceWorker = new Worker(
             throw error;
         }
     },
-    { connection: redisConnection as any }
+    { connection: process.env.REDIS_URL } // Use REDIS_URL string directly
 );

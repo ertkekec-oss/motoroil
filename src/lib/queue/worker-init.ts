@@ -5,14 +5,41 @@ let isInitialized = false;
 export function initMarketplaceWorker() {
     if (isInitialized) return;
 
-    console.log('🤖 Marketplace Action Worker initialized and listening...');
+    console.log(JSON.stringify({
+        event: 'worker_started',
+        timestamp: new Date().toISOString(),
+        queue: 'marketplace-actions',
+    }));
 
     marketplaceWorker.on('completed', (job) => {
-        console.log(`✅ Job ${job.id} completed`);
+        console.log(JSON.stringify({
+            event: 'job_completed',
+            timestamp: new Date().toISOString(),
+            jobId: job.id,
+            jobName: job.name,
+            duration: job.finishedOn ? job.finishedOn - (job.processedOn || job.timestamp) : null,
+        }));
     });
 
     marketplaceWorker.on('failed', (job, err) => {
-        console.error(`❌ Job ${job?.id} failed:`, err.message);
+        console.error(JSON.stringify({
+            event: 'job_failed',
+            timestamp: new Date().toISOString(),
+            jobId: job?.id,
+            jobName: job?.name,
+            error: err.message,
+            stack: err.stack,
+            attemptsMade: job?.attemptsMade,
+        }));
+    });
+
+    marketplaceWorker.on('active', (job) => {
+        console.log(JSON.stringify({
+            event: 'job_active',
+            timestamp: new Date().toISOString(),
+            jobId: job.id,
+            jobName: job.name,
+        }));
     });
 
     isInitialized = true;
