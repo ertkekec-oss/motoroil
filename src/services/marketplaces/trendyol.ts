@@ -182,6 +182,8 @@ export class TrendyolService implements IMarketplaceService {
             cargoTrackingNumber: ptOrder.cargoTrackingNumber,
             cargoTrackingLink: ptOrder.cargoTrackingLink,
             cargoProvider: ptOrder.cargoProviderName,
+            // CRITICAL: Map shipmentPackageId from Trendyol API
+            shipmentPackageId: ptOrder.shipmentPackageId || ptOrder.packageId || ptOrder.lines?.[0]?.shipmentPackageId || null,
             shippingAddress: {
                 fullName: `${ptOrder.shipmentAddress.firstName} ${ptOrder.shipmentAddress.lastName}`,
                 address: ptOrder.shipmentAddress.fullAddress,

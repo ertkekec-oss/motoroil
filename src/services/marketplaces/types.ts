@@ -13,6 +13,7 @@ export interface MarketplaceOrder {
     cargoTrackingNumber?: string;
     cargoTrackingLink?: string;
     cargoProvider?: string;
+    shipmentPackageId?: string | null; // CRITICAL: For Trendyol label printing and cargo operations
 }
 
 export interface MarketplaceOrderItem {

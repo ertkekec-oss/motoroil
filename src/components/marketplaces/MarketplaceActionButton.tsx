@@ -156,16 +156,34 @@ export function MarketplaceActionButton({
 
     const isLoading = status === "PENDING" || status === "POLLING";
 
+    // Check if shipmentPackageId is required but missing
+    const requiresShipmentId = actionKey === "PRINT_LABEL_A4" || actionKey === "CHANGE_CARGO";
+    const isDisabled = isLoading || (requiresShipmentId && !shipmentPackageId);
+
+    const getTooltip = () => {
+        if (requiresShipmentId && !shipmentPackageId) {
+            return "Koli ID henüz gelmedi. Önce 'Durum Yenile' yapın.";
+        }
+        return undefined;
+    };
+
     return (
         <Button
             variant={variant}
             size={size}
             onClick={(e) => {
                 e.stopPropagation();
+                if (requiresShipmentId && !shipmentPackageId) {
+                    toast.error("Koli ID bulunamadı", {
+                        description: "Önce 'Durum Yenile' butonuna tıklayarak sipariş bilgilerini güncelleyin."
+                    });
+                    return;
+                }
                 handleAction();
             }}
-            disabled={isLoading}
-            className={`flex items-center gap-2 transition-all ${status === 'SUCCESS' ? 'border-green-500 text-green-500 bg-green-50' : ''}`}
+            disabled={isDisabled}
+            title={getTooltip()}
+            className={`flex items-center gap-2 transition-all ${status === 'SUCCESS' ? 'border-green-500 text-green-500 bg-green-50' : ''} ${isDisabled && requiresShipmentId ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
             {getIcon()}
             {label || (isLabel ? "Etiket Yazdır" : actionKey === "CHANGE_CARGO" ? "Kargo Değiştir" : "Durum Yenile")}
