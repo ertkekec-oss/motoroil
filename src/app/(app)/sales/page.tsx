@@ -1133,10 +1133,11 @@ export default function SalesPage() {
                                                                     <div className="text-muted text-center" style={{ fontSize: '11px', padding: '10px' }}>Ürün detayı bulunamadı.</div>
                                                                 )}
 
-                                                                {/* PLATFORM ACTIONS */}
+                                                                {/* PLATFORM ACTIONS - ALWAYS SHOW FOR DEBUGGING */}
+                                                                {console.log('🔍 Order Debug:', { id: o.id, marketplace: o.marketplace, shipmentPackageId: o.shipmentPackageId })}
                                                                 <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-light)' }}>
                                                                     <h5 style={{ color: 'var(--text-muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
-                                                                        🚀 Platform Aksiyonları (Marketplace: {o.marketplace})
+                                                                        🚀 Platform Aksiyonları (Marketplace: {o.marketplace || 'BELİRSİZ'})
                                                                     </h5>
                                                                     <div className="flex gap-3">
                                                                         <MarketplaceActionButton
