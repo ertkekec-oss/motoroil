@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { authorize } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { marketplaceQueue } from "@/lib/queue";
+import { marketplaceQueue, marketplaceDlq } from "@/lib/queue";
 
 export async function GET(request: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
 
     // RBAC: Sadece sistem yöneticileri erişebilir
-    const role = auth.user.role?.toUpperCase() || "";
+    const role = (auth.user.role || "").toUpperCase();
     if (role !== "PLATFORM_ADMIN" && role !== "SUPER_ADMIN") {
         return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
@@ -28,22 +28,17 @@ export async function GET(request: Request) {
         });
 
         // Also get queue stats
-        const [waiting, active, failed, completed] = await Promise.all([
+        const [waiting, active, failed, completed, dlq] = await Promise.all([
             marketplaceQueue.getWaitingCount(),
             marketplaceQueue.getActiveCount(),
             marketplaceQueue.getFailedCount(),
-            marketplaceQueue.getCompletedCount()
+            marketplaceQueue.getCompletedCount(),
+            marketplaceDlq.getJobs(['waiting', 'active', 'failed', 'completed', 'delayed']).then(j => j.length)
         ]);
-
-        // Threshold-based Alerting Logic
-        const { logger } = await import("@/lib/observability");
-        if (waiting > 20) {
-            logger.alert(`Queue Backlog High: ${waiting} jobs waiting`, { alertType: 'QUEUE_BACKLOG', size: waiting });
-        }
 
         return NextResponse.json({
             audits,
-            stats: { waiting, active, failed, completed }
+            stats: { waiting, active, failed, completed, dlq }
         });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -62,6 +57,11 @@ export async function POST(request: Request) {
 
     try {
         const { action, auditId } = await request.json();
+
+        // Safety: Global Read-Only Mode
+        if (process.env.MARKETPLACE_OPS_READONLY === 'true') {
+            return NextResponse.json({ error: "SİSTEM KORUMASI: Şu anda sadece okuma moduna izin verilmektedir (Outage Window)." }, { status: 503 });
+        }
 
         const audit = await (prisma as any).marketplaceActionAudit.findUnique({
             where: { id: auditId }

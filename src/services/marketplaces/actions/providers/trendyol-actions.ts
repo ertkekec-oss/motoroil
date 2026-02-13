@@ -1,5 +1,6 @@
 import prisma from "../../../../lib/prisma";
 import {
+    MarketplaceActionErrorCode,
     MarketplaceActionInput,
     MarketplaceActionProvider,
     MarketplaceActionResult,
@@ -87,7 +88,12 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 return { status: winner?.status || "PENDING", auditId: winner?.id! };
             }
             console.error(`${ctx} Error:`, err.message);
-            return { status: "FAILED", auditId: audit?.id || 'unknown', errorMessage: err.message };
+            return {
+                status: "FAILED",
+                auditId: audit?.id || 'unknown',
+                errorMessage: err.message,
+                errorCode: MarketplaceActionErrorCode.E_UNKNOWN
+            };
         }
     }
 }

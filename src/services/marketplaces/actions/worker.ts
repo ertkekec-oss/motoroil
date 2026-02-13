@@ -1,16 +1,30 @@
 import { Worker, Job } from 'bullmq';
+import { redisConnection } from '../../../lib/queue/redis';
+import { marketplaceDlq } from '../../../lib/queue';
 import prisma from '../../../lib/prisma';
 import { MarketplaceServiceFactory } from '../index';
 import { TrendyolService } from '../trendyol';
 import { MarketplaceActionInput } from './types';
 import { logger, metrics } from '../../../lib/observability';
+import { classifyMarketplaceError } from './errors';
+
+// ============================================================================
+// MARKETPLACE ACTION WORKER
+// ============================================================================
 
 export const marketplaceWorker = new Worker(
     'marketplace-actions',
     async (job: Job<MarketplaceActionInput>) => {
         const start = Date.now();
         const { companyId, marketplace, orderId, actionKey, idempotencyKey, payload } = job.data;
-        const logCtx = { companyId, marketplace, actionKey, idempotencyKey, jobId: job.id, retryCount: job.attemptsMade };
+        const logCtx = {
+            companyId,
+            marketplace,
+            actionKey,
+            idempotencyKey,
+            jobId: job.id,
+            retryCount: job.attemptsMade
+        };
 
         logger.info('Worker processing started', logCtx);
 
@@ -135,18 +149,25 @@ export const marketplaceWorker = new Worker(
         } catch (error: any) {
             metrics.externalCall(marketplace, actionKey, 'FAILED');
 
+            const classified = classifyMarketplaceError(error);
+
             // Update Failure History in DB
             const historyUpdate = {
-                error: error.message,
+                error: classified.message,
+                errorCode: classified.errorCode,
                 at: new Date().toISOString(),
-                attempt: job.attemptsMade + 1
+                attempt: job.attemptsMade + 1,
+                retryable: classified.isRetryable
             };
+
+            const shouldRetry = classified.isRetryable && job.attemptsMade < (job.opts.attempts || 1) - 1;
 
             await (prisma as any).marketplaceActionAudit.update({
                 where: { idempotencyKey },
                 data: {
-                    status: job.attemptsMade < (job.opts.attempts || 1) - 1 ? 'PENDING' : 'FAILED',
-                    errorMessage: error.message,
+                    status: shouldRetry ? 'PENDING' : 'FAILED',
+                    errorMessage: classified.message,
+                    errorCode: classified.errorCode,
                     retryCount: job.attemptsMade + 1,
                     failureHistory: {
                         push: historyUpdate
@@ -154,9 +175,93 @@ export const marketplaceWorker = new Worker(
                 }
             });
 
-            logger.error('Worker processing FAILED', error, logCtx);
+            logger.error('Worker processing FAILED', {
+                ...logCtx,
+                errorCode: classified.errorCode,
+                isRetryable: classified.isRetryable,
+                error: classified.message
+            });
+
+            // If not retryable or max attempts reached, move to DLQ
+            if (!shouldRetry) {
+                try {
+                    await marketplaceDlq.add(`dead:${actionKey}`, {
+                        originalJobId: job.id,
+                        input: job.data,
+                        error: {
+                            message: classified.message,
+                            errorCode: classified.errorCode,
+                            stack: error.stack,
+                        },
+                        failedAt: new Date().toISOString(),
+                        attemptsMade: job.attemptsMade + 1,
+                    }, {
+                        jobId: `dlq:${idempotencyKey}` // Deterministic DLQ ID
+                    });
+
+                    logger.info(`Job moved to DLQ: ${idempotencyKey}`, logCtx);
+                } catch (dlqError) {
+                    logger.error('Failed to move job to DLQ', dlqError, logCtx);
+                }
+
+                await job.discard();
+                return; // Stop. Don't throw so BullMQ doesn't auto-retry
+            }
+
             throw error;
         }
     },
-    { connection: process.env.REDIS_URL as any } // Use REDIS_URL string directly
+    {
+        connection: redisConnection as any,
+        concurrency: 5, // Process up to 5 jobs simultaneously
+    }
 );
+
+// ============================================================================
+// EVENT LISTENERS
+// ============================================================================
+
+marketplaceWorker.on('completed', (job) => {
+    console.log(JSON.stringify({
+        event: 'job_completed',
+        timestamp: new Date().toISOString(),
+        jobId: job.id,
+        jobName: job.name,
+        duration: job.finishedOn && job.processedOn ? job.finishedOn - job.processedOn : null,
+    }));
+});
+
+marketplaceWorker.on('failed', (job, err) => {
+    console.error(JSON.stringify({
+        event: 'job_failed',
+        timestamp: new Date().toISOString(),
+        jobId: job?.id,
+        jobName: job?.name,
+        error: err.message,
+        attemptsMade: job?.attemptsMade,
+    }));
+});
+
+// ============================================================================
+// GRACEFUL SHUTDOWN
+// ============================================================================
+
+const handleShutdown = async (signal: string) => {
+    console.log(`\n🛑 Received ${signal}. Shutting down worker gracefully...`);
+
+    try {
+        await marketplaceWorker.close();
+        console.log('✅ Worker closed. No more jobs will be processed.');
+        process.exit(0);
+    } catch (error) {
+        console.error('❌ Error during worker shutdown:', error);
+        process.exit(1);
+    }
+};
+
+process.on('SIGINT', () => handleShutdown('SIGINT'));
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+
+console.log('🤖 Marketplace Action Worker is listening for jobs...');
+
+

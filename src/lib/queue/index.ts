@@ -1,46 +1,12 @@
-import { Queue, Worker, Job } from 'bullmq';
-import IORedis from 'ioredis';
+import { Queue } from 'bullmq';
+import { redisConnection } from './redis';
 
 // ============================================================================
-// PRODUCTION-READY REDIS CONNECTION (Upstash Compatible)
-// ============================================================================
-
-if (!process.env.REDIS_URL) {
-    throw new Error('❌ REDIS_URL environment variable is missing. Please configure Upstash Redis.');
-}
-
-// Upstash Redis connection with TLS support
-export const redisConnection = new IORedis(process.env.REDIS_URL, {
-    maxRetriesPerRequest: null,
-    enableReadyCheck: false,
-    tls: {}, // Enable TLS with proper certificate validation
-});
-
-// Connection event logging (NO SECRETS)
-redisConnection.on('connect', () => {
-    console.log(JSON.stringify({
-        event: 'redis_connected',
-        timestamp: new Date().toISOString(),
-        host: 'upstash', // Hard-coded, no sensitive data
-        status: 'connected',
-    }));
-});
-
-redisConnection.on('error', (err) => {
-    console.error(JSON.stringify({
-        event: 'redis_error',
-        timestamp: new Date().toISOString(),
-        error: err.message,
-        status: 'error',
-    }));
-});
-
-// ============================================================================
-// MARKETPLACE ACTIONS QUEUE
+// MARKETPLACE ACTIONS QUEUE & DLQ
 // ============================================================================
 
 export const marketplaceQueue = new Queue('marketplace-actions', {
-    connection: process.env.REDIS_URL as any, // BullMQ accepts connection string
+    connection: redisConnection as any,
     defaultJobOptions: {
         attempts: 3,
         backoff: {
@@ -54,6 +20,14 @@ export const marketplaceQueue = new Queue('marketplace-actions', {
         removeOnFail: {
             count: 500, // Keep last 500 failed jobs for debugging
         },
+    },
+});
+
+export const marketplaceDlq = new Queue('marketplace-actions-dlq', {
+    connection: redisConnection as any,
+    defaultJobOptions: {
+        removeOnComplete: { count: 1000 },
+        removeOnFail: { count: 5000 },
     },
 });
 
