@@ -13,17 +13,16 @@ if (!process.env.REDIS_URL) {
 export const redisConnection = new IORedis(process.env.REDIS_URL, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
-    tls: {
-        rejectUnauthorized: false, // Required for Upstash
-    },
+    tls: {}, // Enable TLS with proper certificate validation
 });
 
-// Connection event logging
+// Connection event logging (NO SECRETS)
 redisConnection.on('connect', () => {
     console.log(JSON.stringify({
         event: 'redis_connected',
         timestamp: new Date().toISOString(),
-        url: process.env.REDIS_URL?.split('@')[1] || 'unknown', // Log host only (security)
+        host: 'upstash', // Hard-coded, no sensitive data
+        status: 'connected',
     }));
 });
 
@@ -32,6 +31,7 @@ redisConnection.on('error', (err) => {
         event: 'redis_error',
         timestamp: new Date().toISOString(),
         error: err.message,
+        status: 'error',
     }));
 });
 
@@ -40,7 +40,7 @@ redisConnection.on('error', (err) => {
 // ============================================================================
 
 export const marketplaceQueue = new Queue('marketplace-actions', {
-    connection: process.env.REDIS_URL, // BullMQ will parse the URL automatically
+    connection: process.env.REDIS_URL as any, // BullMQ accepts connection string
     defaultJobOptions: {
         attempts: 3,
         backoff: {

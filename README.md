@@ -226,6 +226,55 @@ git commit -m "Production: Upstash Redis configured"
 vercel --prod
 ```
 
+### ⚠️ CRITICAL: Vercel Worker Limitations
+
+**Vercel serverless functions DO NOT support long-running workers!**
+
+#### Problem:
+- Worker başlatılır gibi görünür
+- Hafif trafikte çalışır
+- Sonra **sessizce durur** (Vercel timeout: 10-60 saniye)
+- Queue'da job'lar `waiting` durumunda kalır, `active` olmaz
+
+#### ✅ Production Solutions:
+
+**Option 1: Separate Worker Service (Recommended)**
+```bash
+# Railway.app / Fly.io / VPS'te ayrı worker çalıştır
+# worker.js:
+import { marketplaceWorker } from './src/services/marketplaces/actions/worker';
+import { initMarketplaceWorker } from './src/lib/queue/worker-init';
+
+initMarketplaceWorker();
+console.log('Worker running...');
+```
+
+**Option 2: Upstash QStash (Serverless-friendly)**
+```bash
+# QStash webhook'ları ile job processing
+# https://upstash.com/docs/qstash
+```
+
+**Option 3: Vercel Cron (Polling)**
+```bash
+# vercel.json:
+{
+  "crons": [{
+    "path": "/api/cron/process-queue",
+    "schedule": "* * * * *" // Her dakika
+  }]
+}
+```
+
+#### 🔍 Worker Health Check:
+```bash
+# Vercel Logs'ta kontrol et:
+vercel logs https://www.kech.tr --follow
+
+# ✅ İyi: "job_active" ve "job_completed" görünüyor
+# ❌ Kötü: Sadece "job_enqueued" var, "job_active" yok
+```
+
 ### ✅ Production Validation Checklist
 
 Deployment sonrası aşağıdaki kontrolleri yapın:

@@ -158,5 +158,5 @@ export const marketplaceWorker = new Worker(
             throw error;
         }
     },
-    { connection: process.env.REDIS_URL } // Use REDIS_URL string directly
+    { connection: process.env.REDIS_URL as any } // Use REDIS_URL string directly
 );
