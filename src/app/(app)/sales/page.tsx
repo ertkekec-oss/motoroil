@@ -1098,7 +1098,7 @@ export default function SalesPage() {
                                                 </tr>
                                                 {isExpanded && (
                                                     <tr style={{ borderBottom: '1px solid var(--border-light)', background: 'var(--bg-hover)' }}>
-                                                        <td colSpan={6} style={{ padding: '0 20px 20px 20px' }}>
+                                                        <td colSpan={7} style={{ padding: '0 20px 20px 20px' }}>
                                                             <div style={{ padding: '20px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
                                                                 <div className="flex-between mb-4" style={{ alignItems: 'center' }}>
                                                                     <h4 style={{ color: 'var(--text-main)', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px', margin: 0 }}>📦 Sipariş Detayı</h4>
