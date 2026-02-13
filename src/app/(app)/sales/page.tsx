@@ -1160,22 +1160,22 @@ export default function SalesPage() {
                                                                             onSuccess={fetchOnlineOrders}
                                                                         />
                                                                         {o.marketplace === 'Trendyol' && (
-                                                                            <>
-                                                                                <MarketplaceActionButton
-                                                                                    orderId={o.id}
-                                                                                    marketplace={o.marketplace}
-                                                                                    actionKey="PRINT_LABEL_A4"
-                                                                                    shipmentPackageId={o.shipmentPackageId}
-                                                                                />
-                                                                                <MarketplaceActionButton
-                                                                                    orderId={o.id}
-                                                                                    marketplace={o.marketplace}
-                                                                                    actionKey="CHANGE_CARGO"
-                                                                                    variant="ghost"
-                                                                                    shipmentPackageId={o.shipmentPackageId}
-                                                                                    onSuccess={fetchOnlineOrders}
-                                                                                />
-                                                                            </>
+                                                                            <MarketplaceActionButton
+                                                                                orderId={o.id}
+                                                                                marketplace={o.marketplace}
+                                                                                actionKey="PRINT_LABEL_A4"
+                                                                                shipmentPackageId={o.shipmentPackageId}
+                                                                            />
+                                                                        )}
+                                                                        {o.marketplace === 'Trendyol' && (
+                                                                            <MarketplaceActionButton
+                                                                                orderId={o.id}
+                                                                                marketplace={o.marketplace}
+                                                                                actionKey="CHANGE_CARGO"
+                                                                                variant="ghost"
+                                                                                shipmentPackageId={o.shipmentPackageId}
+                                                                                onSuccess={fetchOnlineOrders}
+                                                                            />
                                                                         )}
                                                                     </div>
                                                                 </div>
