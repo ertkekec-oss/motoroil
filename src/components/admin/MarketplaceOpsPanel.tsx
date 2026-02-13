@@ -58,7 +58,10 @@ export function MarketplaceOpsPanel() {
             // Fetch Status and Health in parallel
             const [statusRes, healthRes] = await Promise.all([
                 fetch(`/api/admin/marketplace/queue/status?${query}`, { cache: 'no-store' }),
-                fetch(`/api/admin/marketplace/queue/health`, { cache: 'no-store', headers: { 'x-health-key': 'dev-key' } })
+                fetch(`/api/admin/marketplace/queue/health`, {
+                    cache: 'no-store',
+                    headers: { 'x-health-key': process.env.NEXT_PUBLIC_HEALTHCHECK_KEY || 'dev-key' }
+                })
             ]);
 
             if (statusRes.status === 401 || statusRes.status === 403) {
