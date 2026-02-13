@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
             }),
             (prisma as any).marketplaceActionAudit.count({
                 where: {
-                    errorCode: 'E_PROVIDER_AUTH',
+                    errorMessage: { contains: 'Auth' },
                     createdAt: { gte: tenMinsAgo }
                 }
             }),
