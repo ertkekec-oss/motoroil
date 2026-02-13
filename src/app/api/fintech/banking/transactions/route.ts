@@ -1,12 +1,11 @@
 import { NextRequest } from 'next/server';
 import { getRequestContext, apiResponse, apiError } from '@/lib/api-context';
 import prisma from '@/lib/prisma';
-import Redis from 'ioredis';
+import { redisConnection as redis } from '@/lib/queue/redis';
 import { logger } from '@/lib/observability';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-
 export const dynamic = 'force-dynamic';
+
 
 export async function GET(req: NextRequest) {
 

@@ -6,13 +6,20 @@ if (!process.env.REDIS_URL && process.env.NODE_ENV === 'production') {
     console.warn('⚠️ REDIS_URL is missing. Redis functionality will be limited.');
 }
 
-// Upstash Redis connection with TLS support
+const isLocal = !process.env.REDIS_URL ||
+    process.env.REDIS_URL.includes('localhost') ||
+    process.env.REDIS_URL.includes('127.0.0.1');
+
+// Upstash Redis connection with TLS support and recommended serverless settings
 export const redisConnection = new IORedis(redisUrl, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
     lazyConnect: true,
-    ...(process.env.REDIS_URL?.startsWith('rediss://') ? { tls: {} } : {}),
+    // Vercel Serverless + Upstash requires TLS
+    ...(isLocal ? {} : { tls: {} }),
 });
+
+
 
 
 // Connection event logging (NO SECRETS)
