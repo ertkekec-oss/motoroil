@@ -13,6 +13,7 @@ type LogContext = {
     retryCount?: number;
     error?: string;
     errorMessage?: string;
+    tenantId?: string;
     alertType?: 'QUEUE_BACKLOG' | 'EXTERNAL_FAILURE_RATE' | 'STUCK_JOB' | 'CANARY_FAILURE';
 };
 
