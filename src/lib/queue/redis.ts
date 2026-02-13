@@ -1,6 +1,6 @@
 import IORedis from 'ioredis';
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
 if (!process.env.REDIS_URL && process.env.NODE_ENV === 'production') {
     console.warn('⚠️ REDIS_URL is missing. Redis functionality will be limited.');
@@ -15,12 +15,9 @@ export const redisConnection = new IORedis(redisUrl, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
     lazyConnect: true,
-    // Vercel Serverless + Upstash requires TLS
+    // CRITICAL: Vercel Serverless + Upstash requires TLS
     ...(isLocal ? {} : { tls: {} }),
 });
-
-
-
 
 // Connection event logging (NO SECRETS)
 redisConnection.on('connect', () => {
@@ -33,6 +30,9 @@ redisConnection.on('connect', () => {
 });
 
 redisConnection.on('error', (err) => {
+    // Avoid spamming logs if it's a known connection issue during build
+    if (process.env.NEXT_PHASE === 'phase-action-build') return;
+
     console.error(JSON.stringify({
         event: 'redis_error',
         timestamp: new Date().toISOString(),

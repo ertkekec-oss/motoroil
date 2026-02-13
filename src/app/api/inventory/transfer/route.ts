@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getRequestContext } from '@/lib/api-context';
+import { getRequestContext, apiResponse, apiError } from '@/lib/api-context';
 
 export async function GET(req: NextRequest) {
     try {
@@ -25,9 +25,9 @@ export async function GET(req: NextRequest) {
             take: 100
         });
 
-        return NextResponse.json({ success: true, transfers });
+        return apiResponse({ transfers }, { requestId: ctx.requestId });
     } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
 
@@ -80,9 +80,9 @@ export async function POST(req: NextRequest) {
             return { success: true, transfer };
         });
 
-        return NextResponse.json(result);
+        return apiResponse(result, { requestId: ctx.requestId });
     } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
 
@@ -170,8 +170,8 @@ export async function PUT(req: NextRequest) {
             }
         });
 
-        return NextResponse.json({ success: true, result });
+        return apiResponse({ result }, { requestId: ctx.requestId });
     } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }

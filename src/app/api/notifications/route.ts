@@ -1,25 +1,28 @@
-
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getRequestContext } from '@/lib/api-context';
+import { getRequestContext, apiResponse, apiError } from '@/lib/api-context';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
+    let ctx;
     try {
-        const ctx = await getRequestContext(req);
+        ctx = await getRequestContext(req);
         const notifications = await (prisma as any).notification.findMany({
             where: { userId: ctx.userId },
             orderBy: { createdAt: 'desc' },
             take: 50
         });
-        return NextResponse.json(notifications);
+        return apiResponse(notifications, { requestId: ctx.requestId });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
 
 export async function POST(req: NextRequest) {
+    let ctx;
     try {
-        const ctx = await getRequestContext(req);
+        ctx = await getRequestContext(req);
         const data = await req.json();
         const notification = await (prisma as any).notification.create({
             data: {
@@ -30,40 +33,55 @@ export async function POST(req: NextRequest) {
                 link: data.link
             }
         });
-        return NextResponse.json(notification);
+        return apiResponse(notification, { requestId: ctx.requestId });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
 
-export async function PUT(request: Request) {
+export async function PUT(req: NextRequest) {
+    let ctx;
     try {
-        const data = await request.json();
+        ctx = await getRequestContext(req);
+        const data = await req.json();
         const { id, isRead } = data;
 
-        const notification = await prisma.notification.update({
+        // Security: Ensure the notification belongs to the user
+        const existing = await (prisma as any).notification.findUnique({ where: { id } });
+        if (!existing) return apiError({ message: 'Notification not found', status: 404 }, ctx.requestId);
+        if (existing.userId !== ctx.userId) return apiError({ message: 'Unauthorized', status: 403 }, ctx.requestId);
+
+        const notification = await (prisma as any).notification.update({
             where: { id },
             data: { isRead }
         });
-        return NextResponse.json(notification);
+        return apiResponse(notification, { requestId: ctx.requestId });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(req: NextRequest) {
+    let ctx;
     try {
-        const { searchParams } = new URL(request.url);
+        ctx = await getRequestContext(req);
+        const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
 
         if (id) {
-            await prisma.notification.delete({ where: { id } });
+            const existing = await (prisma as any).notification.findUnique({ where: { id } });
+            if (!existing) return apiError({ message: 'Notification not found', status: 404 }, ctx.requestId);
+            if (existing.userId !== ctx.userId) return apiError({ message: 'Unauthorized', status: 403 }, ctx.requestId);
+
+            await (prisma as any).notification.delete({ where: { id } });
         } else {
-            // Delete all notifications
-            await prisma.notification.deleteMany({});
+            // Delete all for this user only
+            await (prisma as any).notification.deleteMany({
+                where: { userId: ctx.userId }
+            });
         }
-        return NextResponse.json({ success: true });
+        return apiResponse({ success: true }, { requestId: ctx.requestId });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return apiError(error, ctx?.requestId);
     }
 }
