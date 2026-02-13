@@ -147,7 +147,7 @@ body::before {
   position: relative;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
 
   /* Mobile: Sidebar becomes the classic absolute drawer */
   .sidebar-fixed {

@@ -221,7 +221,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 <main
                     className="main-content flex-1 min-w-0"
                     onClick={() => {
-                        if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 1024) {
+                        if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 768) {
                             app.setIsSidebarOpen(false);
                         }
                     }}
