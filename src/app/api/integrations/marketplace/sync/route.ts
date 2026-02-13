@@ -84,6 +84,7 @@ export async function POST(request: Request) {
                             items: order.items as any,
                             shippingAddress: order.shippingAddress as any,
                             invoiceAddress: order.invoiceAddress as any,
+                            shipmentPackageId: order.shipmentPackageId, // CRITICAL: For Trendyol ops
                             rawData: order as any
                         }
                     });
@@ -116,11 +117,16 @@ export async function POST(request: Request) {
                     savedCount++;
                     details.push({ order: order.orderNumber, action: 'Created' });
                 } else {
-                    // UPDATE HANDLING (Status Reversals)
-                    if (existingOrder.status !== order.status) {
+                    // UPDATE HANDLING (Status Reversals + Missing Data Patching)
+                    const needsUpdate = existingOrder.status !== order.status || (order.shipmentPackageId && !existingOrder.shipmentPackageId);
+
+                    if (needsUpdate) {
                         await prisma.order.update({
                             where: { id: existingOrder.id },
-                            data: { status: order.status }
+                            data: {
+                                status: order.status,
+                                shipmentPackageId: order.shipmentPackageId || existingOrder.shipmentPackageId
+                            }
                         });
 
                         if (['CANCELLED', 'RETURNED'].includes(order.status.toUpperCase())) {

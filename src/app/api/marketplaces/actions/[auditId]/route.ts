@@ -11,7 +11,7 @@ export async function GET(
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
 
-    const { auditId } = params;
+    const { auditId } = await (params as any);
 
     try {
         const audit = await (prisma as any).marketplaceActionAudit.findUnique({

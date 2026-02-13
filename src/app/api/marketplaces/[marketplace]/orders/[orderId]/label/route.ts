@@ -11,7 +11,7 @@ export async function GET(
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
 
-    const { marketplace, orderId } = params;
+    const { marketplace, orderId } = await (params as any);
 
     const url = new URL(request.url);
     const shipmentPackageId = url.searchParams.get("shipmentPackageId");

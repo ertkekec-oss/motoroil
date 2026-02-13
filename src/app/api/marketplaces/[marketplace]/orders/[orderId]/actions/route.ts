@@ -13,7 +13,7 @@ export async function POST(
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
 
-    const { marketplace, orderId } = params;
+    const { marketplace, orderId } = await (params as any);
 
     try {
         // ============================================================================
@@ -40,7 +40,13 @@ export async function POST(
         // ============================================================================
         // 2. VALIDATE REQUEST BODY
         // ============================================================================
-        const body = await request.json();
+        let body: any;
+        try {
+            body = await request.json();
+        } catch (e) {
+            return NextResponse.json({ status: "FAILED", errorMessage: "Invalid JSON body", code: "INVALID_JSON" }, { status: 400 });
+        }
+
         const { actionKey, idempotencyKey, payload } = body ?? {};
 
         if (!actionKey || !idempotencyKey) {
@@ -59,40 +65,32 @@ export async function POST(
         // ============================================================================
         const company = await prisma.company.findFirst({
             where: { tenantId: auth.user.tenantId },
-            select: { id: true },
+            select: { id: true, name: true },
         });
 
         if (!company) {
-            console.error(`[ACTIONS] Company not found for tenantId: ${auth.user.tenantId}`);
-            return NextResponse.json(
-                {
-                    status: "FAILED",
-                    errorMessage: "Company not found",
-                    code: "COMPANY_NOT_FOUND"
-                },
-                { status: 403 }
-            );
+            return NextResponse.json({ status: "FAILED", errorMessage: "Company not found", code: "COMPANY_NOT_FOUND" }, { status: 403 });
         }
 
         // ============================================================================
         // 4. VALIDATE MARKETPLACE CONFIG
         // ============================================================================
-        // Case-insensitive lookup or handle naming mismatch (Trendyol vs trendyol)
-        const normalizedMarketplace = marketplace.charAt(0).toUpperCase() + marketplace.slice(1).toLowerCase(); // trendyol -> Trendyol
+        // IMPORTANT: Always use lowercased string for factory and registry
+        const mplaceLower = marketplace.toLowerCase();
+        const normalizedMarketplace = marketplace.charAt(0).toUpperCase() + marketplace.slice(1).toLowerCase();
 
         const config = await (prisma as any).marketplaceConfig.findFirst({
             where: {
                 companyId: company.id,
-                type: { in: [marketplace, normalizedMarketplace, marketplace.toLowerCase()] }
+                type: { in: [mplaceLower, normalizedMarketplace, marketplace] }
             },
         });
 
         if (!config) {
-            console.warn(`[ACTIONS] Marketplace config not found for ${marketplace} (Company: ${company.id})`);
             return NextResponse.json(
                 {
                     status: "FAILED",
-                    errorMessage: `Marketplace configuration not found for ${marketplace}. Please connect your account first.`,
+                    errorMessage: `Marketplace configuration not found for ${marketplace}.`,
                     code: "CONFIG_NOT_FOUND"
                 },
                 { status: 400 }
@@ -104,40 +102,62 @@ export async function POST(
         // ============================================================================
         const order = await prisma.order.findFirst({
             where: { id: orderId, companyId: company.id },
-            select: { id: true, shipmentPackageId: true, marketplace: true },
+            select: { id: true, shipmentPackageId: true, orderNumber: true },
         });
 
         if (!order) {
-            console.warn(`[ACTIONS] Order not found: ${orderId} (Company: ${company.id})`);
-            return NextResponse.json(
-                {
-                    status: "FAILED",
-                    errorMessage: "Order not found",
-                    code: "ORDER_NOT_FOUND"
-                },
-                { status: 404 }
-            );
+            return NextResponse.json({ status: "FAILED", errorMessage: "Order not found", code: "ORDER_NOT_FOUND" }, { status: 404 });
         }
 
         // ============================================================================
-        // 6. VALIDATE shipmentPackageId FOR LABEL/CARGO ACTIONS
+        // 6. VALIDATE/RESOLVE shipmentPackageId FOR LABEL/CARGO ACTIONS
         // ============================================================================
+        // Trendyol needs shipmentPackageId for almost all operational actions.
+        // If it's missing in DB, we attempt to 'Self-Heal' by fetching it from API.
         const requiresShipmentId = actionKey === 'PRINT_LABEL_A4' || actionKey === 'CHANGE_CARGO';
-        if (requiresShipmentId && !order.shipmentPackageId && !payload?.labelShipmentPackageId && !payload?.shipmentPackageId) {
+
+        let effectiveShipmentPackageId = order.shipmentPackageId || payload?.labelShipmentPackageId || payload?.shipmentPackageId;
+
+        if (requiresShipmentId && !effectiveShipmentPackageId) {
+            try {
+                // IMPORTANT: Ensure mplaceLower is used to avoid factory crash
+                const service = MarketplaceServiceFactory.createService(mplaceLower as any, config.settings);
+                if (order.orderNumber) {
+                    const mOrder = await (service as any).getOrderByNumber(order.orderNumber);
+                    if (mOrder?.shipmentPackageId) {
+                        effectiveShipmentPackageId = mOrder.shipmentPackageId;
+                        await prisma.order.update({
+                            where: { id: orderId },
+                            data: { shipmentPackageId: effectiveShipmentPackageId }
+                        });
+                    }
+                }
+            } catch (healError: any) {
+                console.error(`[ACTIONS] Healing Crash:`, healError.message);
+            }
+        }
+
+        if (requiresShipmentId && !effectiveShipmentPackageId) {
             return NextResponse.json(
                 {
                     status: "FAILED",
-                    errorMessage: "shipmentPackageId is required for this action. Please refresh order status first.",
+                    errorMessage: "E_ORDER_DATA_MISSING: shipmentPackageId bulunamadı. Lütfen önce 'Durum Yenile' yapın veya siparişi kargoya hazır hale getirin.",
                     code: "SHIPMENT_PACKAGE_ID_MISSING",
-                    hint: "Click 'Refresh Status' button to fetch shipmentPackageId from marketplace"
+                    meta: { required: ["shipmentPackageId"] }
                 },
-                { status: 409 } // Conflict - order exists but missing required field
+                { status: 400 } // Controlled failure
             );
         }
 
         // ============================================================================
         // 7. EXECUTE ACTION
         // ============================================================================
+        // Ensure the payload has the resolved shipment ID
+        const finalPayload = {
+            ...payload,
+            shipmentPackageId: effectiveShipmentPackageId,
+            labelShipmentPackageId: effectiveShipmentPackageId
+        };
         let provider;
         try {
             provider = ActionProviderRegistry.getProvider(marketplace);
@@ -165,11 +185,11 @@ export async function POST(
 
         const result = await provider.executeAction({
             companyId: company.id,
-            marketplace: marketplace as any,
+            marketplace: mplaceLower as any,
             orderId,
             actionKey,
             idempotencyKey,
-            payload,
+            payload: finalPayload,
         });
 
         // ============================================================================

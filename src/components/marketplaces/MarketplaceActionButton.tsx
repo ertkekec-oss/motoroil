@@ -49,11 +49,16 @@ export function MarketplaceActionButton({
 
         setStatus("PENDING");
         const idempotencyKey = `${actionKey}:${orderId}:${Date.now()}`;
+        const mplaceLower = marketplace.toLowerCase();
+        const actionUrl = `/api/marketplaces/${encodeURIComponent(mplaceLower)}/orders/${encodeURIComponent(orderId)}/actions`;
+
+        console.log("🚀 EXECUTE ACTION:", { actionUrl, actionKey, idempotencyKey });
 
         try {
             // For labels, we FIRST try the direct label route
             if (isLabel && shipmentPackageId) {
-                const res = await fetch(`/api/marketplaces/${marketplace}/orders/${orderId}/label?shipmentPackageId=${shipmentPackageId}`);
+                const labelUrl = `/api/marketplaces/${encodeURIComponent(mplaceLower)}/orders/${encodeURIComponent(orderId)}/label?shipmentPackageId=${encodeURIComponent(shipmentPackageId)}`;
+                const res = await fetch(labelUrl);
                 if (res.status === 302 || (res.status === 200 && res.redirected)) {
                     window.open(res.url, "_blank");
                     setStatus("IDLE");
@@ -72,7 +77,7 @@ export function MarketplaceActionButton({
             }
 
             // Normal Action POST
-            const res = await fetch(`/api/marketplaces/${marketplace}/orders/${orderId}/actions`, {
+            const res = await fetch(actionUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ actionKey, idempotencyKey, payload })
@@ -88,10 +93,19 @@ export function MarketplaceActionButton({
                 toast.success("İşlem anında tamamlandı");
                 onSuccess?.();
             } else {
-                throw new Error(data.errorMessage || "İşlem başlatılamadı");
+                if (data.code === "SHIPMENT_PACKAGE_ID_MISSING") {
+                    toast.error("İşlem Başarısız: Koli ID Eksik", {
+                        description: data.errorMessage || "Bu işlem için kargo paket bilgisi gereklidir. Lütfen önce 'Durum Yenile' yapın.",
+                        duration: 6000
+                    });
+                } else {
+                    throw new Error(data.errorMessage || "İşlem başlatılamadı");
+                }
             }
         } catch (err: any) {
-            toast.error(err.message);
+            if (err.message !== "İşlem başlatılamadı") {
+                toast.error(err.message);
+            }
             setStatus("FAILED");
         }
     };
