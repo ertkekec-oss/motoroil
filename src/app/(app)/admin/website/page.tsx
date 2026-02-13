@@ -446,9 +446,9 @@ export default function WebsiteManagerPage() {
                                                 onClick={() => setSelectedPage(p)}
                                                 className={`px-6 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap shadow-sm ${selectedPage?.id === p.id ? 'bg-blue-600 text-white shadow-blue-100' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
                                             >
-                                                {p.slug === 'index' ? '🏠' : '📄'} {p.title}
+                                                {p.slug === 'index' ? '🏠' : p.slug === 'login' ? '🔐' : p.slug === 'register' ? '🚀' : '📄'} {p.title}
                                             </button>
-                                            {p.slug !== 'index' && (
+                                            {p.slug !== 'index' && p.slug !== 'login' && p.slug !== 'register' && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); deletePage(p.id); }}
                                                     className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-[10px] items-center justify-center hidden group-hover:flex shadow-lg"
@@ -488,7 +488,7 @@ export default function WebsiteManagerPage() {
                                                 type="text"
                                                 className="w-full border-slate-200 rounded-lg font-mono text-xs bg-slate-50"
                                                 value={selectedPage.slug}
-                                                disabled={selectedPage.slug === 'index'}
+                                                disabled={['index', 'login', 'register'].includes(selectedPage.slug)}
                                                 onChange={(e) => setSelectedPage({ ...selectedPage, slug: e.target.value })}
                                             />
                                         </div>

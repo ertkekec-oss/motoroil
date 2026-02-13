@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
+import { Mail, Lock, Layout, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -16,12 +18,23 @@ export default function LoginPage() {
     const [forgotLoading, setForgotLoading] = useState(false);
     const [forgotMessage, setForgotMessage] = useState('');
 
-    // Eğer zaten giriş yapılmışsa ana sayfaya yönlendir
+    // CMS Data
+    const [cmsData, setCmsData] = useState<any>(null);
+
     useEffect(() => {
-        if (isAuthenticated) {
-            // Let the AuthContext middleware handle the redirection
-        }
-    }, [isAuthenticated]);
+        const fetchCms = async () => {
+            try {
+                const res = await fetch('/api/public/cms/page/login');
+                const data = await res.json();
+                if (data.sections?.length > 0) {
+                    setCmsData(data.sections[0].content);
+                }
+            } catch (e) {
+                console.error("CMS fetch failed", e);
+            }
+        };
+        fetchCms();
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,9 +43,8 @@ export default function LoginPage() {
 
         try {
             const success = await login(username, password);
-
             if (success) {
-                // Success - AuthContext handles the redirect
+                // Success handled by AuthContext
             } else {
                 setError('E-Posta, kullanıcı adı veya şifre hatalı!');
             }
@@ -48,7 +60,6 @@ export default function LoginPage() {
         if (!forgotEmail) return;
         setForgotLoading(true);
         setForgotMessage('');
-
         try {
             const res = await fetch('/api/auth/forgot-password', {
                 method: 'POST',
@@ -74,321 +85,220 @@ export default function LoginPage() {
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'var(--bg-deep)',
-            padding: '20px'
-        }}>
-            <div className="card glass-plus" style={{
-                borderRadius: '20px',
-                padding: '50px 40px',
-                maxWidth: '420px',
-                width: '100%',
-                boxShadow: 'var(--shadow-premium)',
-            }}>
-                {/* Logo & Title */}
-                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-                    <div style={{ fontSize: '56px', marginBottom: '12px' }}>🏍️</div>
-                    <h1 style={{
-                        fontSize: '42px',
-                        marginBottom: '8px',
-                        letterSpacing: '-2px',
-                        fontWeight: 'bold'
-                    }}>
-                        PERIOD<span style={{ color: 'var(--primary)' }}>YA</span>
-                    </h1>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '8px' }}>
-                        Bisiklet & Motosiklet Yönetim Sistemi
-                    </p>
-                    <div style={{
-                        display: 'inline-block',
-                        padding: '6px 12px',
-                        background: 'rgba(59, 130, 246, 0.2)',
-                        border: '1px solid var(--primary)',
-                        borderRadius: '6px',
-                        fontSize: '11px',
-                        color: 'var(--primary)',
-                        marginTop: '8px'
-                    }}>
-                        🔒 Güvenli Giriş
-                    </div>
+        <div className="min-h-screen grid lg:grid-cols-2 bg-[#050510] overflow-hidden">
+            {/* Left Column: Marketing Content (Hidden on Mobile) */}
+            <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden border-r border-white/5">
+                {/* Background Visuals */}
+                <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay transition-transform duration-[20s] hover:scale-110"
+                    style={{ backgroundImage: `url(${cmsData?.visualUrl || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200'})` }} />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-transparent to-orange-600/20" />
+                <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-600/30 rounded-full blur-[120px]" />
+                <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-orange-600/20 rounded-full blur-[120px]" />
+
+                {/* Top Content */}
+                <div className="relative z-10">
+                    <Link href="/" className="inline-flex items-center gap-2 mb-12 group">
+                        <div className="p-2 bg-blue-600 rounded-lg group-hover:scale-110 transition-transform">
+                            <Layout className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-2xl font-black text-white tracking-tighter uppercase italic">
+                            PERIOD<span className="text-blue-500">YA</span>
+                        </span>
+                    </Link>
                 </div>
 
-                {/* Login Form */}
-                <form onSubmit={handleLogin}>
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: '8px',
-                            fontSize: '13px',
-                            color: 'var(--text-muted)',
-                            fontWeight: '500'
-                        }}>
-                            Kullanıcı Adı veya E-Posta
-                        </label>
-                        <input
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder="ornek@sirket.com veya username"
-                            required
-                            autoFocus
-                            disabled={loading}
-                            style={{
-                                width: '100%',
-                                padding: '14px 16px',
-                                background: 'var(--bg-card)',
-                                border: '1px solid var(--border-rich)',
-                                borderRadius: '10px',
-                                color: 'var(--text-main)',
-                                fontSize: '15px',
-                                outline: 'none',
-                                transition: 'all 0.3s',
-                                boxSizing: 'border-box'
-                            }}
-                            onFocus={(e) => {
-                                e.target.style.border = '1px solid var(--primary)';
-                                e.target.style.background = 'rgba(255,255,255,0.12)';
-                            }}
-                            onBlur={(e) => {
-                                e.target.style.border = '1px solid rgba(255,255,255,0.15)';
-                                e.target.style.background = 'rgba(255,255,255,0.08)';
-                            }}
-                        />
-                    </div>
-
-                    <div style={{ marginBottom: '28px' }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: '8px',
-                            fontSize: '13px',
-                            color: 'var(--text-muted)',
-                            fontWeight: '500'
-                        }}>
-                            Şifre
-                        </label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Şifrenizi girin"
-                            required
-                            disabled={loading}
-                            style={{
-                                width: '100%',
-                                padding: '14px 16px',
-                                background: 'var(--bg-card)',
-                                border: '1px solid var(--border-rich)',
-                                borderRadius: '10px',
-                                color: 'var(--text-main)',
-                                fontSize: '15px',
-                                outline: 'none',
-                                transition: 'all 0.3s',
-                                boxSizing: 'border-box'
-                            }}
-                            onFocus={(e) => {
-                                e.target.style.border = '1px solid var(--primary)';
-                                e.target.style.background = 'rgba(255,255,255,0.12)';
-                            }}
-                            onBlur={(e) => {
-                                e.target.style.border = '1px solid rgba(255,255,255,0.15)';
-                                e.target.style.background = 'rgba(255,255,255,0.08)';
-                            }}
-                        />
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-                            <button
-                                type="button"
-                                onClick={() => setShowForgotModal(true)}
-                                style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}
-                            >
-                                Şifremi Unuttum?
-                            </button>
-                        </div>
-                    </div>
-
-                    {error && (
-                        <div style={{
-                            padding: '14px 16px',
-                            background: 'rgba(239, 68, 68, 0.15)',
-                            border: '1px solid var(--danger)',
-                            borderRadius: '10px',
-                            color: 'var(--danger)',
-                            fontSize: '13px',
-                            marginBottom: '24px',
-                            textAlign: 'center',
-                            fontWeight: '500'
-                        }}>
-                            ⚠️ {error}
+                {/* Main Content */}
+                <div className="relative z-10 max-w-xl animate-in fade-in slide-in-from-left-8 duration-700">
+                    {cmsData?.badgeText && (
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold text-white mb-6 border border-white/10">
+                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+                            {cmsData.badgeText}
                         </div>
                     )}
+                    <h1 className="text-5xl font-black text-white leading-[1.1] mb-6 tracking-tight"
+                        dangerouslySetInnerHTML={{ __html: cmsData?.title || 'Sektörün En Güçlü <span class="grad-text">Yönetim Paneli</span>' }} />
+                    <p className="text-lg text-slate-300/80 mb-8 leading-relaxed">
+                        {cmsData?.subtitle || 'Tüm süreçlerinizi tek noktadan yönetmenin keyfini çıkarın. Hemen giriş yapın ve farkı görün.'}
+                    </p>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        style={{
-                            width: '100%',
-                            padding: '16px',
-                            background: loading ? 'var(--text-muted)' : 'linear-gradient(135deg, var(--primary) 0%, #E64A00 100%)',
-                            border: 'none',
-                            borderRadius: '10px',
-                            color: 'white',
-                            fontSize: '16px',
-                            fontWeight: 'bold',
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            transition: 'all 0.3s',
-                            boxShadow: loading ? 'none' : '0 4px 20px rgba(102, 126, 234, 0.4)',
-                            transform: loading ? 'scale(1)' : 'scale(1)',
-                        }}
-                        onMouseOver={(e) => {
-                            if (!loading) {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 6px 25px rgba(102, 126, 234, 0.5)';
-                            }
-                        }}
-                        onMouseOut={(e) => {
-                            if (!loading) {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 4px 20px rgba(102, 126, 234, 0.4)';
-                            }
-                        }}
-                    >
-                        {loading ? '🔄 Giriş yapılıyor...' : '🚀 Giriş Yap'}
-                    </button>
-                </form>
-
-                {/* Demo Credentials - Only in development */}
-                {process.env.NODE_ENV === 'development' && (
-                    <div style={{
-                        marginTop: '32px',
-                        padding: '16px',
-                        background: 'rgba(234, 179, 8, 0.1)',
-                        border: '1px solid var(--warning)',
-                        borderRadius: '10px',
-                        fontSize: '11px',
-                        color: 'var(--text-muted)'
-                    }}>
-                        <div style={{
-                            fontWeight: 'bold',
-                            marginBottom: '8px',
-                            color: 'var(--warning)',
-                            fontSize: '12px'
-                        }}>
-                            🔧 Demo Hesaplar (Development)
+                    <div className="grid grid-cols-2 gap-6 pt-8 border-t border-white/5">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                                <ShieldCheck className="w-5 h-5 text-blue-400" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">Uçtan Uca Güvenlik</span>
                         </div>
-                        <div style={{ lineHeight: '1.8' }}>
-                            <div><strong>Admin:</strong> admin / admin123</div>
-                            <div><strong>Kadıköy:</strong> kadikoy / kadikoy123</div>
-                            <div><strong>Beşiktaş:</strong> besiktas / besiktas123</div>
-                            <div><strong>İzmir:</strong> izmir / izmir123</div>
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-green-500/10 rounded-lg border border-green-500/20">
+                                <CheckCircle2 className="w-5 h-5 text-green-400" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">7/24 Aktif Sistem</span>
                         </div>
                     </div>
-                )}
+                </div>
 
-                {/* Footer */}
-                <div style={{
-                    marginTop: '24px',
-                    textAlign: 'center',
-                    fontSize: '11px',
-                    color: 'var(--text-muted)'
-                }}>
-                    © 2026 Periodya - Tüm hakları saklıdır
+                {/* Bottom Content */}
+                <div className="relative z-10 text-slate-500 text-xs font-medium">
+                    © 2026 Periodya Cloud. Modern Enterprise Solutions.
                 </div>
             </div>
+
+            {/* Right Column: Login Form */}
+            <div className="relative flex flex-col justify-center items-center p-8">
+                {/* Background accents for mobile */}
+                <div className="lg:hidden absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-blue-600/10 to-transparent" />
+
+                <div className="w-full max-w-[420px] animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <div className="lg:hidden flex flex-col items-center mb-10">
+                        <Link href="/" className="inline-flex items-center gap-2 mb-4">
+                            <div className="p-2 bg-blue-600 rounded-lg">
+                                <Layout className="w-5 h-5 text-white" />
+                            </div>
+                            <span className="text-xl font-black text-white tracking-tighter uppercase italic">
+                                PERIOD<span className="text-blue-500">YA</span>
+                            </span>
+                        </Link>
+                    </div>
+
+                    <div className="mb-10 text-center lg:text-left">
+                        <h2 className="text-3xl font-black text-white mb-2">Hoş Geldiniz</h2>
+                        <p className="text-slate-400">Devam etmek için hesabınıza erişin.</p>
+                    </div>
+
+                    <form onSubmit={handleLogin} className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kullanıcı Adı veya E-Posta</label>
+                            <div className="relative">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                                <input
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    placeholder="ornek@sirket.com"
+                                    required
+                                    autoFocus
+                                    disabled={loading}
+                                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-end ml-1">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Şifre</label>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowForgotModal(true)}
+                                    className="text-[10px] font-bold text-blue-500 hover:text-blue-400 transition cursor-pointer"
+                                >
+                                    Şifremi Unuttum?
+                                </button>
+                            </div>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    disabled={loading}
+                                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        {error && (
+                            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-sm font-bold animate-in zoom-in duration-300 text-center">
+                                ⚠️ {error}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={`w-full group relative overflow-hidden rounded-2xl py-4 font-black transition-all ${loading ? 'bg-slate-700 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-900/40 hover:-translate-y-0.5'}`}
+                        >
+                            <span className="relative z-10 flex items-center justify-center gap-2 uppercase tracking-widest">
+                                {loading ? 'SİSTEME GİRİLİYOR...' : 'HESABA ERİŞ'}
+                                {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+                            </span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                        </button>
+                    </form>
+
+                    <div className="mt-10 pt-10 border-t border-white/5 text-center">
+                        <p className="text-slate-400 text-sm">
+                            Henüz bir hesabınız yok mu?{' '}
+                            <Link href="/register" className="text-white font-black hover:text-blue-500 transition-colors uppercase tracking-tight">
+                                Ücretsiz Deneme Başlat
+                            </Link>
+                        </p>
+                    </div>
+
+                    {/* Quick Demo Accounts Toggle */}
+                    {process.env.NODE_ENV === 'development' && (
+                        <div className="mt-8 p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Hızlı Erişim (Dev)</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {['admin', 'kadikoy', 'besiktas', 'izmir'].map((acc) => (
+                                    <button
+                                        key={acc}
+                                        onClick={() => { setUsername(acc); setPassword(acc + '123'); }}
+                                        className="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-[10px] font-bold text-slate-300 transition uppercase"
+                                    >
+                                        {acc}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
             {/* Forgot Password Modal */}
             {showForgotModal && (
-                <div style={{
-                    position: 'fixed', inset: 0,
-                    background: 'rgba(5, 5, 16, 0.7)',
-                    backdropFilter: 'blur(12px)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-                    padding: '20px'
-                }} className="animate-fade-in">
-                    <div className="card glass-plus animate-zoom-in" style={{
-                        width: '100%', maxWidth: '440px',
-                        padding: '40px',
-                        borderRadius: '24px',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-                    }}>
-                        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                            <div style={{ fontSize: '40px', marginBottom: '16px' }}>🔑</div>
-                            <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', marginBottom: '8px' }}>Şifre Sıfırlama</h3>
-                            <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-                                Sisteme kayıtlı e-posta adresinizi giriniz. Size şifre sıfırlama bağlantısı göndereceğiz.
-                            </p>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[#050510]/80 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="w-full max-w-[440px] bg-[#0A0A1F] border border-white/10 rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300">
+                        <div className="text-center mb-8">
+                            <div className="inline-flex p-4 bg-blue-600/10 rounded-2xl mb-4 border border-blue-600/20">
+                                <Lock className="w-8 h-8 text-blue-500" />
+                            </div>
+                            <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">Şifre Kurtarma</h3>
+                            <p className="text-slate-400 text-sm mt-2">Bağlantı göndermek için e-posta adresinizi girin.</p>
                         </div>
 
                         {forgotMessage ? (
-                            <div style={{
-                                padding: '20px',
-                                background: 'rgba(16, 185, 129, 0.1)',
-                                border: '1px solid rgba(16, 185, 129, 0.2)',
-                                borderRadius: '14px',
-                                color: '#10b981',
-                                textAlign: 'center',
-                                fontWeight: 'bold'
-                            }} className="animate-bounce-in">
+                            <div className="p-6 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-500 text-center font-bold animate-bounce-in">
                                 ✅ {forgotMessage}
                             </div>
                         ) : (
-                            <form onSubmit={handleForgotPassword} className="flex flex-col gap-5">
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '13px', marginBottom: '8px', color: 'var(--text-muted)', fontWeight: '500' }}>E-Posta Adresi</label>
+                            <form onSubmit={handleForgotPassword} className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kayıtlı E-Posta</label>
                                     <input
                                         type="email"
                                         required
-                                        autoFocus
-                                        className="input-field"
-                                        style={{
-                                            width: '100%',
-                                            padding: '14px 16px',
-                                            background: 'rgba(255,255,255,0.05)',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            borderRadius: '12px',
-                                            color: 'white',
-                                            boxSizing: 'border-box'
-                                        }}
+                                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-6 text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all font-bold"
                                         value={forgotEmail}
                                         onChange={e => setForgotEmail(e.target.value)}
                                         placeholder="ornek@sirket.com"
                                     />
                                 </div>
-                                <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+                                <div className="flex gap-4 pt-2">
                                     <button
                                         type="button"
                                         onClick={() => setShowForgotModal(false)}
-                                        style={{
-                                            flex: 1,
-                                            padding: '14px',
-                                            background: 'rgba(255,255,255,0.05)',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            borderRadius: '12px',
-                                            color: 'white',
-                                            fontWeight: '600',
-                                            cursor: 'pointer'
-                                        }}
+                                        className="flex-1 px-6 py-4 rounded-2xl font-black border border-white/5 text-slate-400 hover:bg-white/5 transition lowercase italic"
                                     >
-                                        İptal
+                                        vazgeç
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={forgotLoading}
-                                        style={{
-                                            flex: 1.5,
-                                            padding: '14px',
-                                            background: 'linear-gradient(135deg, var(--primary) 0%, #E64A00 100%)',
-                                            border: 'none',
-                                            borderRadius: '12px',
-                                            color: 'white',
-                                            fontWeight: 'bold',
-                                            cursor: forgotLoading ? 'not-allowed' : 'pointer',
-                                            boxShadow: '0 4px 15px rgba(255, 87, 34, 0.3)'
-                                        }}
+                                        className="flex-[1.5] px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-900/20 transition-all hover:-translate-y-0.5"
                                     >
-                                        {forgotLoading ? '⌛ Gönderiliyor...' : 'Bağlantı Gönder'}
+                                        {forgotLoading ? 'GÖNDERİLİYOR...' : 'BAĞLANTI GÖNDER'}
                                     </button>
                                 </div>
                             </form>

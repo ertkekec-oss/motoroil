@@ -179,6 +179,61 @@ export async function GET() {
             pages = [defaultPage];
         }
 
+        // Login ve Register sayfaları yoksa oluştur (Marketing content için)
+        const loginPage = pages.find((p: any) => p.slug === 'login');
+        if (!loginPage) {
+            const lp = await (prisma as any).cmsPage.create({
+                data: {
+                    title: 'Giriş Yap',
+                    slug: 'login',
+                    isActive: true,
+                    sections: {
+                        create: [
+                            {
+                                type: 'HERO',
+                                order: 0,
+                                content: {
+                                    title: 'Sektörün En Güçlü <span class="grad-text">Yönetim Paneli</span>',
+                                    subtitle: 'Tüm süreçlerinizi tek noktadan yönetmenin keyfini çıkarın. Hemen giriş yapın ve farkı görün.',
+                                    badgeText: '✨ GÜVENLİ ERİŞİM',
+                                    visualUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200'
+                                }
+                            }
+                        ]
+                    }
+                },
+                include: { sections: { orderBy: { order: 'asc' } } }
+            });
+            pages.push(lp);
+        }
+
+        const registerPage = pages.find((p: any) => p.slug === 'register');
+        if (!registerPage) {
+            const rp = await (prisma as any).cmsPage.create({
+                data: {
+                    title: 'Kayıt Ol',
+                    slug: 'register',
+                    isActive: true,
+                    sections: {
+                        create: [
+                            {
+                                type: 'HERO',
+                                order: 0,
+                                content: {
+                                    title: 'İşinizi <span class="grad-text">Periodya</span> ile Büyütün',
+                                    subtitle: 'Modern, hızlı ve bulut tabanlı yeni nesil ERP çözümü ile tanışın. 14 gün ücretsiz deneyin.',
+                                    badgeText: '🚀 ÜCRETSİZ DENE',
+                                    visualUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200'
+                                }
+                            }
+                        ]
+                    }
+                },
+                include: { sections: { orderBy: { order: 'asc' } } }
+            });
+            pages.push(rp);
+        }
+
         return NextResponse.json({ settings, pages, menus });
     } catch (error) {
         console.error('CMS GET Error:', error);
