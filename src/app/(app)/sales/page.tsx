@@ -1099,7 +1099,7 @@ export default function SalesPage() {
                                                 {isExpanded && (
                                                     <tr style={{ borderBottom: '1px solid var(--border-light)', background: 'var(--bg-hover)' }}>
                                                         <td colSpan={7} style={{ padding: '0 20px 20px 20px' }}>
-                                                            <div style={{ padding: '20px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                                                            <div style={{ padding: '20px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)', maxHeight: '600px', overflowY: 'auto' }}>
                                                                 <div className="flex-between mb-4" style={{ alignItems: 'center' }}>
                                                                     <h4 style={{ color: 'var(--text-main)', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px', margin: 0 }}>📦 Sipariş Detayı</h4>
                                                                 </div>
@@ -1133,13 +1133,26 @@ export default function SalesPage() {
                                                                     <div className="text-muted text-center" style={{ fontSize: '11px', padding: '10px' }}>Ürün detayı bulunamadı.</div>
                                                                 )}
 
-                                                                {/* PLATFORM ACTIONS - ALWAYS SHOW FOR DEBUGGING */}
+                                                                {/* PLATFORM ACTIONS - SIMPLIFIED AND ALWAYS VISIBLE */}
                                                                 {console.log('🔍 Order Debug:', { id: o.id, marketplace: o.marketplace, shipmentPackageId: o.shipmentPackageId })}
-                                                                <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-light)' }}>
-                                                                    <h5 style={{ color: 'var(--text-muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
-                                                                        🚀 Platform Aksiyonları (Marketplace: {o.marketplace || 'BELİRSİZ'})
+                                                                <div style={{
+                                                                    marginTop: '24px',
+                                                                    paddingTop: '16px',
+                                                                    borderTop: '2px solid #3b82f6',
+                                                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                                                    padding: '16px',
+                                                                    borderRadius: '8px'
+                                                                }}>
+                                                                    <h5 style={{
+                                                                        color: '#3b82f6',
+                                                                        fontSize: '14px',
+                                                                        fontWeight: 'bold',
+                                                                        marginBottom: '12px',
+                                                                        textTransform: 'uppercase'
+                                                                    }}>
+                                                                        🚀 Platform Aksiyonları - {o.marketplace || 'BELİRSİZ'}
                                                                     </h5>
-                                                                    <div className="flex gap-3">
+                                                                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                                                                         <MarketplaceActionButton
                                                                             orderId={o.id}
                                                                             marketplace={o.marketplace}
