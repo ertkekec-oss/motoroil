@@ -24,7 +24,7 @@ export async function GET(req: NextRequest, { params: paramsPromise }: { params:
         if (!plan) return NextResponse.json({ error: 'Plan not found' }, { status: 404 });
 
         return NextResponse.json(plan);
-    } catch (error: any) {
+    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
@@ -75,7 +75,7 @@ export async function PUT(req: Request, { params: paramsPromise }: { params: Pro
         });
 
         return NextResponse.json({ success: true, plan: updatedPlan });
-    } catch (error: any) {
+    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
         console.error("Plan Update Error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -105,7 +105,7 @@ export async function DELETE(req: Request, { params: paramsPromise }: { params: 
         });
 
         return NextResponse.json({ success: true });
-    } catch (error: any) {
+    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
         console.error("Plan Delete Error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
