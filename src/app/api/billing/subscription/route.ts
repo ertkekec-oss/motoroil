@@ -6,7 +6,9 @@ import { getRequestContext } from '@/lib/api-context';
 
 export async function GET(req: NextRequest) {
     try {
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+
         if (!session) return NextResponse.json({ error: 'Auth required' }, { status: 401 });
 
         // Get user/staff to find tenantId

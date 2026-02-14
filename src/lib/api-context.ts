@@ -1,7 +1,7 @@
-
 import { NextRequest } from 'next/server';
 import { getSession } from './auth';
 import prisma from './prisma';
+import { prismaBase } from './prismaBase';
 
 
 import { v4 as uuidv4 } from 'uuid';
@@ -63,7 +63,8 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
     const companyId = req.headers.get('X-Company-Id');
 
     // 1. Önce SaaS kullanıcısı mı diye bak (Tenant bazlı işlemler için)
-    let user = await (prisma as any).user.findUnique({
+    // BYPASS TENANT GUARD: Use prismaBase to find user by ID regardless of context
+    let user = await prismaBase.user.findUnique({
         where: { id: session.id },
         select: { id: true, tenantId: true, role: true, lastActiveAt: true }
     });
@@ -72,7 +73,7 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
 
     // 2. Eğer User tablosunda yoksa Staff tablosuna bak (Adminler ve Personeller burada olabilir)
     if (!user) {
-        const staff = await (prisma as any).staff.findUnique({
+        const staff = await prismaBase.staff.findUnique({
             where: { id: session.id },
             select: { id: true, role: true, lastActive: true, tenantId: true }
         });
