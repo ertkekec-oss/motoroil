@@ -13,20 +13,34 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { type, config } = body;
 
+        // VERIFICATION LOG
+        console.log(`[SYNC_START] User: ${session.username}, SessionCompanyId: ${(session as any).companyId}, TenantId: ${session.tenantId}`);
+
         if (!type || !config) {
             return NextResponse.json({ success: false, error: 'Eksik parametreler' }, { status: 400 });
         }
 
         // 0. Tenant Isolation - Find Active Company
-        const company = await prisma.company.findFirst({
-            where: { tenantId: session.tenantId }
-        });
-        if (!company) {
-            return NextResponse.json({ success: false, error: 'Firma yetkisi bulunamadı' }, { status: 403 });
-        }
-        const companyId = company.id;
+        let companyId = (session as any).companyId;
+        let companyName = 'Unknown';
 
-        console.log(`[MARKETPLACE] Syncing for ${type} (Company: ${company.name})`);
+        if (!companyId) {
+            console.warn('[MARKETPLACE] Session missing companyId. Fallback to DB lookup.');
+            const company = await prisma.company.findFirst({
+                where: { tenantId: session.tenantId }
+            });
+            if (!company) {
+                return NextResponse.json({ success: false, error: 'Firma yetkisi bulunamadı' }, { status: 403 });
+            }
+            companyId = company.id;
+            companyName = company.name;
+        } else {
+            // Optional: Fetch name for logging (or remove logging)
+            // leaving logging simple
+            companyName = 'SessionCompany';
+        }
+
+        console.log(`[MARKETPLACE] Syncing for ${type} (Company: ${companyName})`);
         const service = MarketplaceServiceFactory.createService(type as any, config);
 
         // Fetch settings from config or default
