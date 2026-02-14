@@ -21,26 +21,32 @@ export async function POST(request: Request) {
         }
 
         // 0. Tenant Isolation - Find Active Company
-        let companyId = (session as any).companyId;
+        // 0. Tenant Isolation - Find Active Company
+        // Robust extraction: support both root-level and nested user object (NextAuth style compatibility)
+        let companyId = (session as any).companyId || (session as any).user?.companyId;
         let companyName = 'Unknown';
 
         if (!companyId) {
-            console.warn('[MARKETPLACE] Session missing companyId. Fallback to DB lookup.');
+            console.warn(`[MARKETPLACE] Session missing companyId for user ${session.username}. Attempting DB fallback.`);
             const company = await prisma.company.findFirst({
                 where: { tenantId: session.tenantId }
             });
-            if (!company) {
-                return NextResponse.json({ success: false, error: 'Firma yetkisi bulunamadı' }, { status: 403 });
+
+            if (company) {
+                companyId = company.id;
+                companyName = company.name;
             }
-            companyId = company.id;
-            companyName = company.name;
         } else {
-            // Optional: Fetch name for logging (or remove logging)
-            // leaving logging simple
             companyName = 'SessionCompany';
         }
 
-        console.log(`[MARKETPLACE] Syncing for ${type} (Company: ${companyName})`);
+        // CRITICAL GUARD: Prevent implementation of logic without companyId
+        if (!companyId) {
+            console.error(`[MARKETPLACE] CRITICAL: Company ID missing! User: ${session.username}, Tenant: ${session.tenantId}`);
+            throw new Error("COMPANY_ID_MISSING: Firma yetkisi doğrulanamadı. Lütfen çıkış yapıp tekrar giriş yapın.");
+        }
+
+        console.log(`[MARKETPLACE] Syncing for ${type} (Company: ${companyName}, ID: ${companyId})`);
         const service = MarketplaceServiceFactory.createService(type as any, config);
 
         // Fetch settings from config or default
