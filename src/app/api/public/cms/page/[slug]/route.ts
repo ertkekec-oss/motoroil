@@ -6,9 +6,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
     req: Request,
-    { params }: { params: { slug: string } }
+    { params: paramsPromise }: { params: Promise<{ slug: string }> }
 ) {
-    const slug = params.slug;
+    const { slug } = await paramsPromise;
 
     try {
         const [settings, page] = await Promise.all([

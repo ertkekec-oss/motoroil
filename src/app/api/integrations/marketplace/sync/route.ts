@@ -21,15 +21,15 @@ export async function POST(request: Request) {
         }
 
         // 1. Company ID Resolution (Robust)
-        let companyId = user.companyId;
+        let companyId = (session as any).companyId;
         let companyName = 'Unknown';
 
         if (!companyId) {
-            console.warn(`[MARKETPLACE] Session missing companyId for user ${user.username}. Attempting DB fallback.`);
+            console.warn(`[MARKETPLACE] Session missing companyId for user ${session.username}. Attempting DB fallback.`);
 
             // Fallback: Fetch via User's accessible companies
             const dbUser = await prisma.user.findUnique({
-                where: { id: user.id },
+                where: { id: session.id },
                 include: { accessibleCompanies: { take: 1, include: { company: true } } }
             });
 
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
             } else {
                 // Second Fallback: Tenant's first company (Admin fallback)
                 const company = await prisma.company.findFirst({
-                    where: { tenantId: user.tenantId }
+                    where: { tenantId: session.tenantId }
                 });
                 if (company) {
                     companyId = company.id;
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 
         // CRITICAL GUARD
         if (!companyId) {
-            console.error(`[MARKETPLACE] CRITICAL: Company ID missing! User: ${user.username}, Tenant: ${user.tenantId}`);
+            console.error(`[MARKETPLACE] CRITICAL: Company ID missing! User: ${session.username}, Tenant: ${session.tenantId}`);
             return NextResponse.json({ success: false, error: "COMPANY_ID_MISSING: Firma yetkisi doğrulanamadı. Lütfen çıkış yapıp tekrar giriş yapın." }, { status: 401 });
         }
 
