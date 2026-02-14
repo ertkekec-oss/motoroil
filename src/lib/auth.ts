@@ -46,6 +46,7 @@ export async function createSession(user: any) {
         username: user.username,
         role: user.role,
         tenantId: user.tenantId, // Add tenantId to session
+        companyId: user.companyId || (user.type === 'service' ? user.companyId : undefined), // Ensure companyId is passed if available
         setupState: user.setupState || 'COMPLETED',
         branch: user.branch,
         permissions: user.permissions

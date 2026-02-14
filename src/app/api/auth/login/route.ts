@@ -61,6 +61,9 @@ export async function POST(request: Request) {
                         select: {
                             setupState: true
                         }
+                    },
+                    accessibleCompanies: {
+                        take: 1
                     }
                 }
             });
@@ -68,6 +71,10 @@ export async function POST(request: Request) {
             if (targetUser) {
                 if (!targetUser.username) targetUser.username = targetUser.email;
                 targetUser.setupState = targetUser.tenant?.setupState || 'PENDING';
+                if (targetUser.accessibleCompanies?.length > 0) {
+                    (targetUser as any).companyId = targetUser.accessibleCompanies[0].companyId;
+                    (targetUser as any).role = targetUser.accessibleCompanies[0].role;
+                }
             }
         }
 
