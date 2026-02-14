@@ -4,23 +4,27 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('Ensuring admin@kech.tr exists...');
+    console.log('Ensuring ertugrul.kekec@periodya.com exists as Platform Admin...');
 
-    const email = 'admin@kech.tr';
+    const email = 'ertugrul.kekec@periodya.com';
     let user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-        // Create Tenant if needed
-        let tenant = await prisma.tenant.findFirst({ where: { name: 'Kech' } });
+        // Create Tenant if needed or use existing 'Kech'
+        let tenant = await prisma.tenant.findFirst({ where: { name: 'Periodya' } });
         if (!tenant) {
-            tenant = await prisma.tenant.create({
-                data: {
-                    name: 'Kech',
-                    ownerEmail: email,
-                    status: 'ACTIVE'
-                }
-            });
-            console.log('Tenant Kech created:', tenant.id);
+            // Check if Kech exists and rename or create new? Let's create new or use default.
+            tenant = await prisma.tenant.findFirst();
+            if (!tenant) {
+                tenant = await prisma.tenant.create({
+                    data: {
+                        name: 'Periodya',
+                        ownerEmail: email,
+                        status: 'ACTIVE'
+                    }
+                });
+                console.log('Tenant Periodya created:', tenant.id);
+            }
         }
 
         // Create Company if needed
@@ -29,12 +33,12 @@ async function main() {
             company = await prisma.company.create({
                 data: {
                     tenantId: tenant.id,
-                    name: 'Kech Ops',
+                    name: 'Periodya HQ',
                     vkn: '1111111111',
                     city: 'Istanbul'
                 }
             });
-            console.log('Company Kech Ops created:', company.id);
+            console.log('Company Periodya HQ created:', company.id);
         }
 
         const password = await bcrypt.hash('admin1234', 10);
@@ -42,7 +46,7 @@ async function main() {
             data: {
                 email,
                 password,
-                name: 'System Admin',
+                name: 'Ertuğrul Kekeç',
                 role: 'ADMIN',
                 tenantId: tenant.id
             }
@@ -53,9 +57,30 @@ async function main() {
             data: { userId: user.id, companyId: company.id, role: 'ADMIN' }
         });
 
-        console.log('User admin@kech.tr created successfully.');
+        console.log(`User ${email} created successfully.`);
     } else {
-        console.log('User admin@kech.tr already exists.');
+        console.log(`User ${email} already exists.`);
+
+        // Ensure Admin Role
+        if (user.role !== 'ADMIN') {
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { role: 'ADMIN' }
+            });
+            console.log('User role updated to ADMIN.');
+        }
+
+        // Ensure company access exists (fix for "unauthorized" if user exists but has no company link)
+        const access = await prisma.userCompanyAccess.findFirst({ where: { userId: user.id } });
+        if (!access) {
+            const company = await prisma.company.findFirst();
+            if (company) {
+                await prisma.userCompanyAccess.create({
+                    data: { userId: user.id, companyId: company.id, role: 'ADMIN' }
+                });
+                console.log('Company access restored for user.');
+            }
+        }
     }
 }
 
