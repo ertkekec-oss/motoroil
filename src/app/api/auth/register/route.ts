@@ -68,7 +68,18 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        // 4. Create User (Admin of Tenant) with default permissions
+        // 4. Create Default Company for Tenant
+        const company = await (prisma as any).company.create({
+            data: {
+                tenantId: tenant.id,
+                name: companyName,
+                vkn: '9999999999', // Placeholder
+                address: '',
+                city: ''
+            }
+        });
+
+        // 5. Create User (Admin of Tenant) with default permissions
         const hashedPassword = await hashPassword(password);
         const defaultPermissions = [
             'pos_access',
@@ -92,12 +103,12 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        // 5. Create Default Company for Tenant
-        await (prisma as any).company.create({
+        // 6. Link User to Company (CRITICAL FOR SESSION CONTEXT)
+        await (prisma as any).userCompanyAccess.create({
             data: {
-                tenantId: tenant.id,
-                name: companyName,
-                vkn: '9999999999' // Placeholder
+                userId: user.id,
+                companyId: company.id,
+                role: 'ADMIN'
             }
         });
 

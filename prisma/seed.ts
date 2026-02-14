@@ -7,7 +7,6 @@ async function main() {
     console.log('Seeding database...');
 
     // 1. Create Default Tenant
-    // We use upsert to ensure idempotency
     const tenant = await prisma.tenant.upsert({
         where: { id: 'demo-tenant' },
         update: {},
@@ -43,7 +42,6 @@ async function main() {
     console.log('Company created:', company.name);
 
     // 3. Create Admin User
-    // Password: admin1234
     const passwordHash = await bcrypt.hash('admin1234', 10);
 
     const user = await prisma.user.upsert({
@@ -57,15 +55,15 @@ async function main() {
             email: 'admin@kech.tr',
             name: 'Admin User',
             password: passwordHash,
-            role: 'SUPER_ADMIN',
+            role: 'SUPER_ADMIN', // SUPER_ADMIN has full access
             tenantId: tenant.id,
-            permissions: ['ALL'] // Grant all permissions
+            permissions: ['ALL']
         }
     });
 
     console.log('User created:', user.email);
 
-    // 4. Link User to Company as Admin
+    // 4. Link User to Company as ADMIN
     await prisma.userCompanyAccess.upsert({
         where: {
             userId_companyId: {
@@ -79,7 +77,7 @@ async function main() {
         create: {
             userId: user.id,
             companyId: company.id,
-            role: 'ADMIN'
+            role: 'ADMIN' // High level role for company access
         }
     });
 

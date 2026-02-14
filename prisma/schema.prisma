@@ -61,9 +61,6 @@ model Company {
   paymentMatches     PaymentMatch[]
   paymentPlans       PaymentPlan[]
   autopilotConfigs   PricingAutopilotConfig[]
-  priceLists         PriceList[]
-  priceFormulas      PriceFormula[]
-  customerCategories CustomerCategory[]
   products           Product[]
   purchaseInvoices   PurchaseInvoice[]
   quotes             Quote[]
@@ -264,7 +261,6 @@ model Product {
   pricingRules        SmartPricingRule[]
   stocks              Stock[]
   movements           StockMovement[]
-  prices              ProductPrice[]
 
   @@unique([code, branch, companyId])
   @@index([name])
@@ -464,9 +460,7 @@ model Customer {
   portalPassword  String?
   checks          Check[]
   coupons         Coupon[]
-  category            CustomerCategory?  @relation(fields: [categoryId], references: [id])
-  priceListOverrideId String?
-  priceListOverride   PriceList?         @relation("CustomerOverride", fields: [priceListOverrideId], references: [id])
+  category        CustomerCategory?  @relation(fields: [categoryId], references: [id])
   company         Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
   documents       CustomerDocument[]
   quotes          Quote[]
@@ -527,76 +521,12 @@ model CustomerDocument {
 }
 
 model CustomerCategory {
-  id                String       @id @default(cuid())
-  companyId         String
-  name              String
-  description       String?
-  defaultPriceListId String?
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  company           Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customers         Customer[]
-  defaultPriceList  PriceList?   @relation(fields: [defaultPriceListId], references: [id])
-
-  @@unique([companyId, name], map: "companyId_name")
-  @@index([companyId])
-}
-
-model PriceList {
-  id            String             @id @default(cuid())
-  companyId     String
-  name          String
-  currency      String             @default("TRY")
-  isDefault     Boolean            @default(false)
-  isActive      Boolean            @default(true)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  company       Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  productPrices ProductPrice[]
-  customers     Customer[]         @relation("CustomerOverride")
-  categories    CustomerCategory[]
-  formulasAsTarget PriceFormula[]  @relation("TargetList")
-  formulasAsSource PriceFormula[]  @relation("SourceList")
-
-  @@unique([companyId, name])
-  @@index([companyId])
-}
-
-model ProductPrice {
-  id                String    @id @default(cuid())
-  companyId         String
-  productId         String
-  priceListId       String
-  price             Decimal   @db.Decimal(18, 2)
-  isManualOverride  Boolean   @default(false)
-  derivedFromListId String?
-  formulaMarkupBps  Int?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  product           Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  priceList         PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
-
-  @@unique([companyId, productId, priceListId])
-  @@index([productId])
-  @@index([priceListId])
-}
-
-model PriceFormula {
-  id                String    @id @default(cuid())
-  companyId         String
-  targetPriceListId String
-  sourcePriceListId String
-  markupBps         Int       @default(0) // Basis points (e.g. 100 = 1%)
-  roundMode         String    @default("NONE") // NONE, UP, DOWN, NEAREST
-  roundStep         Decimal?  @db.Decimal(10, 2)
-  isActive          Boolean   @default(true)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  company           Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  targetList        PriceList @relation("TargetList", fields: [targetPriceListId], references: [id], onDelete: Cascade)
-  sourceList        PriceList @relation("SourceList", fields: [sourcePriceListId], references: [id], onDelete: Cascade)
-
-  @@unique([companyId, targetPriceListId])
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  customers   Customer[]
 }
 
 model Kasa {
@@ -1178,8 +1108,8 @@ model MarketplaceConfig {
   lastSync  DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
   companyId String
+  deletedAt DateTime?
   company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, type])

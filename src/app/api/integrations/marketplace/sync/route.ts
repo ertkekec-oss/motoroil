@@ -81,15 +81,12 @@ export async function POST(request: Request) {
         let categoryId: string | null = null;
         try {
             console.log(`[UPSERT_DEBUG] Upserting Category for Company: ${companyId}`);
+            // Schema update: CustomerCategory is now global (unique by name), no companyId
             const ecommerceCategory = await prisma.customerCategory.upsert({
                 where: {
-                    companyId_name: {
-                        companyId: companyId, // Explicit assignment
-                        name: 'E-ticaret'
-                    }
+                    name: 'E-ticaret'
                 },
                 create: {
-                    companyId: companyId, // Explicit assignment
                     name: 'E-ticaret',
                     description: 'Web Satış Kanalı'
                 },
