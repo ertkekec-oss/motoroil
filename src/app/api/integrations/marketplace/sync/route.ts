@@ -29,12 +29,24 @@ export async function POST(request: Request) {
         console.log(`[MARKETPLACE] Syncing for ${type} (Company: ${company.name})`);
         const service = MarketplaceServiceFactory.createService(type as any, config);
 
-        // Fetch last 7 days
+        // Fetch settings from config or default
+        const daysToSync = typeof config.days === 'number' ? config.days : 3; // Reduced default from 7 to 3
+        const processLimit = typeof config.limit === 'number' ? config.limit : 50; // Process max 50 items per execution
+
         const endDate = new Date();
         const startDate = new Date();
-        startDate.setDate(startDate.getDate() - 7);
+        startDate.setDate(startDate.getDate() - daysToSync);
 
-        const orders = await service.getOrders(startDate, endDate);
+        console.log(`[MARKETPLACE] Fetching orders from ${startDate.toISOString()}...`);
+        const t0 = Date.now();
+        const allOrders = await service.getOrders(startDate, endDate);
+        console.log(`[MARKETPLACE] Fetched ${allOrders.length} orders in ${Date.now() - t0}ms`);
+
+        // Slice to avoid Vercel 5min timeout
+        const orders = allOrders.slice(0, processLimit);
+        if (allOrders.length > processLimit) {
+            console.warn(`[MARKETPLACE] Limiting processing to ${processLimit} items (Total: ${allOrders.length}). Run sync again to process more.`);
+        }
 
         // Ensure E-commerce Category
         const ecommerceCategory = await prisma.customerCategory.upsert({
