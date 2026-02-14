@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+import { prismaBase as prisma } from '@/lib/prismaBase';
 import { Decimal } from '@prisma/client/runtime/library';
 
 // Helper types
