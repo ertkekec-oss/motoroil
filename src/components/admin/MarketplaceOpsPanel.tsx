@@ -62,10 +62,8 @@ export function MarketplaceOpsPanel() {
                 fetch(`/api/ops-internal/queue-health`, { cache: 'no-store' })
             ]);
 
-            if (statusRes.status === 401 || statusRes.status === 403) {
-                setError("YETKİSİZ ERİŞİM: Panel erişimi için oturumunuzun aktif ve Admin yetkili olması gerekir.");
-                return;
-            }
+            // We handle auth/error per-request via safeJson, so no early return here.
+
 
             const [statusOut, healthOut] = await Promise.all([
                 safeJson(statusRes),
@@ -73,18 +71,33 @@ export function MarketplaceOpsPanel() {
             ]);
 
             if (!statusOut.ok) {
-                setError(`Status Error: ${statusOut.status} - ${typeof statusOut.error === 'string' ? statusOut.error : JSON.stringify(statusOut.error)}`);
-                setData(null);
+                // If unauthorized or error, set empty data to prevent crashes
+                setData({
+                    counts: { waiting: 0, active: 0, completed: 0, failed: 0, dlq: 0 },
+                    audits: [],
+                    forensics: []
+                });
+                if (statusOut.status === 401 || statusOut.status === 403) {
+                    setError("YETKİSİZ ERİŞİM: Oturum veya yetki hatası.");
+                } else {
+                    // Only show error if explicitly failed, otherwise keep UI quiet but degraded
+                    console.warn("Status fetch failed:", statusOut);
+                }
             } else {
-                setData(statusOut.data || {});
+                setData(statusOut.data || { counts: {}, audits: [], forensics: [] });
             }
 
             if (!healthOut.ok) {
-                // Non-critical, just log or set partial health
-                setHealth({ status: 'UNKNOWN' });
+                setHealth({
+                    status: healthOut.status === 401 ? 'UNAUTHORIZED' : 'ERROR',
+                    metrics: { successRate: '0%', recentDlqCount: 0, recentAuthFailures: 0 }
+                });
             } else {
-                setHealth(healthOut.data || {});
+                setHealth(healthOut.data || { status: 'UNKNOWN' });
             }
+
+            // Global Error Reset if at least one works or we handled it gracefully
+            if (statusOut.ok || healthOut.ok) setError(null);
 
             if (statusOut.ok) setError(null);
         } catch (err: any) {

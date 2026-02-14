@@ -4,6 +4,6 @@ export async function safeJson(res: Response) {
         ? await res.json().catch(() => null)
         : await res.text().catch(() => "");
 
-    if (!res.ok) return { ok: false, status: res.status, error: payload };
-    return { ok: true, data: payload };
+    if (!res.ok) return { ok: false as const, status: res.status, error: payload };
+    return { ok: true as const, data: payload };
 }
