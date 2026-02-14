@@ -104,6 +104,12 @@ const prismaClientSingleton = () => {
                         const effectiveTenantId = session.impersonateTenantId || session.tenantId;
 
                         if (!effectiveTenantId) {
+                            // BYPASS: Allow auth-related models even if tenant context is missing
+                            // This prevents "Tenant context missing" errors during registration/login if a partial session exists
+                            if (['user', 'tenant', 'company', 'plan', 'subscription', 'loginattempt'].includes(modelName)) {
+                                return query(args);
+                            }
+
                             throw new Error("SECURITY_ERROR: Tenant context missing in session.");
                         }
 
