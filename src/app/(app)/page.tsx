@@ -17,7 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUpsell } from '@/hooks/useUpsell';
 import dynamic from 'next/dynamic';
 
-const LandingPage = dynamic(() => import('@/components/LandingPage'), { ssr: false });
+const LoginPageContent = dynamic(() => import('@/components/login/LoginPageContent'), { ssr: false });
 
 function POSContent() {
   const router = useRouter();
@@ -661,6 +661,6 @@ function POSContent() {
 export default function POSPage() {
   const { isAuthenticated, isLoading } = useAuth();
   if (isLoading) return <div className="h-screen flex items-center justify-center bg-[var(--bg-deep)] text-white text-2xl">⏳</div>;
-  if (!isAuthenticated) return <LandingPage />;
+  if (!isAuthenticated) return <LoginPageContent />;
   return <Suspense fallback={<div>Yükleniyor...</div>}><POSContent /></Suspense>;
 }

@@ -49,7 +49,7 @@ async function main() {
                 email,
                 password: passwordHash,
                 name: 'Ertuğrul Kekeç',
-                role: 'ADMIN',
+                role: 'SUPER_ADMIN',
                 tenantId: tenant.id
             }
         });
@@ -68,7 +68,7 @@ async function main() {
             where: { id: user.id },
             data: {
                 password: passwordHash,
-                role: 'ADMIN'
+                role: 'SUPER_ADMIN'
             }
         });
         console.log('Password updated successfully.');
