@@ -101,15 +101,28 @@ export async function getSession() {
 
     try {
         const { payload } = await jwtVerify(token, JWT_SECRET);
-        const session: any = { ...payload };
+
+        // TRANSFORM: Map flat JWT payload to structured session.user object
+        // This ensures session.user.companyId is the single source of truth
+        const sessionUser: any = {
+            ...payload,
+            // Ensure companyId is strictly defined in user object
+            companyId: payload.companyId || (payload as any).user?.companyId
+        };
+
+        const session: any = {
+            user: sessionUser,
+            // Keep some top-level meta if needed by middleware, but logic should use session.user
+            expiry: payload.exp
+        };
 
         // Support for Platform Admin Impersonation
-        const role = session.role?.toUpperCase() || '';
-        if (session.tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN') {
+        const role = sessionUser.role?.toUpperCase() || '';
+        if (sessionUser.tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN') {
             const targetTenantId = headersList?.get('x-target-tenant-id');
             if (targetTenantId) {
-                session.impersonateTenantId = targetTenantId;
-                session.isImpersonating = true;
+                session.user.impersonateTenantId = targetTenantId;
+                session.user.isImpersonating = true;
             }
         }
 
@@ -127,12 +140,15 @@ export async function deleteSession() {
 export function hasPermission(session: any, permission: string): boolean {
     if (!session) return false;
 
+    // Support new structure { user: ... }
+    const user = session.user || session;
+
     // Super admins have all permissions
-    const role = session.role?.toUpperCase() || '';
+    const role = user.role?.toUpperCase() || '';
     if (role === 'SUPER_ADMIN' || role.includes('ADMIN')) return true;
 
     // Check permissions array
-    const permissions = session.permissions || [];
+    const permissions = user.permissions || [];
     if (permissions.includes('*') || permissions.includes('ALL')) return true;
 
     return permissions.includes(permission);
@@ -150,7 +166,8 @@ export async function authorize() {
 }
 
 export function verifyWriteAccess(session: any) {
-    if (session?.role?.toUpperCase() === 'AUDITOR') {
+    const user = session?.user || session;
+    if (user?.role?.toUpperCase() === 'AUDITOR') {
         return {
             authorized: false,
             response: Response.json({ success: false, error: 'Denetçi hesabı veri girişi yapamaz (Read-only).' }, { status: 403 })

@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && next build",
+    "vercel-build": "prisma migrate deploy && prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "backup": "node scripts/create-backup.js",
@@ -14,6 +14,9 @@
     "worker": "tsx src/services/marketplaces/actions/worker.ts",
     "replay-actions": "tsx scripts/replay-market-actions.ts",
     "test:safety": "tsx scripts/safety-tests.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.989.0",

@@ -1,58 +1,96 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
-    // 1. E-ticaret kategorisi
-    const ecommerceCategory = await prisma.customerCategory.upsert({
-        where: { name: 'E-ticaret' },
+    console.log('Seeding database...');
+
+    // 1. Create Default Tenant
+    // We use upsert to ensure idempotency
+    const tenant = await prisma.tenant.upsert({
+        where: { id: 'demo-tenant' },
         update: {},
         create: {
-            name: 'E-ticaret',
-            description: 'Online pazaryerleri ve web sitesi müşterileri'
+            id: 'demo-tenant',
+            name: 'Periodya Demo',
+            ownerEmail: 'admin@kech.tr',
+            status: 'ACTIVE',
+            setupState: 'COMPLETED'
         }
-    })
-    console.log('✅ E-ticaret kategorisi hazır:', ecommerceCategory.id)
+    });
 
-    // 2. Genel kategori
-    const generalCategory = await prisma.customerCategory.upsert({
-        where: { name: 'Genel' },
+    console.log('Tenant created:', tenant.name);
+
+    // 2. Create Default Company
+    const company = await prisma.company.upsert({
+        where: {
+            tenantId_vkn: {
+                tenantId: tenant.id,
+                vkn: '1111111111'
+            }
+        },
         update: {},
         create: {
-            name: 'Genel',
-            description: 'Genel perakende ve servis müşterileri'
+            tenantId: tenant.id,
+            name: 'Merkez Şube',
+            vkn: '1111111111',
+            address: 'Demo Adres',
+            city: 'Istanbul'
         }
-    })
-    console.log('✅ Genel kategori hazır:', generalCategory.id)
-
-    // 3. Mevcut müşterileri Genel kategoriye atayalım (Eğer kategorisi yoksa)
-    const updatedCustomers = await prisma.customer.updateMany({
-        where: { categoryId: null },
-        data: { categoryId: generalCategory.id }
-    })
-    console.log(`✅ ${updatedCustomers.count} adet müşteriye Genel kategori atandı.`)
-
-    // 4. Kasa kayıtları
-    await prisma.kasa.upsert({
-        where: { name: 'Merkez Kasa' },
-        update: {},
-        create: { name: 'Merkez Kasa', type: 'Nakit', balance: 0 }
-    });
-    await prisma.kasa.upsert({
-        where: { name: 'E-ticaret' },
-        update: {},
-        create: { name: 'E-ticaret', type: 'Nakit', balance: 0 }
     });
 
-    console.log('✅ Temel veriler (Seed) tamamlandı.')
+    console.log('Company created:', company.name);
+
+    // 3. Create Admin User
+    // Password: admin1234
+    const passwordHash = await bcrypt.hash('admin1234', 10);
+
+    const user = await prisma.user.upsert({
+        where: { email: 'admin@kech.tr' },
+        update: {
+            password: passwordHash,
+            role: 'SUPER_ADMIN',
+            tenantId: tenant.id
+        },
+        create: {
+            email: 'admin@kech.tr',
+            name: 'Admin User',
+            password: passwordHash,
+            role: 'SUPER_ADMIN',
+            tenantId: tenant.id,
+            permissions: ['ALL'] // Grant all permissions
+        }
+    });
+
+    console.log('User created:', user.email);
+
+    // 4. Link User to Company as Admin
+    await prisma.userCompanyAccess.upsert({
+        where: {
+            userId_companyId: {
+                userId: user.id,
+                companyId: company.id
+            }
+        },
+        update: {
+            role: 'ADMIN'
+        },
+        create: {
+            userId: user.id,
+            companyId: company.id,
+            role: 'ADMIN'
+        }
+    });
+
+    console.log('User linked to company with ADMIN role.');
 }
 
 main()
-    .then(async () => {
-        await prisma.$disconnect()
+    .catch((e) => {
+        console.error(e);
+        process.exit(1);
     })
-    .catch(async (e) => {
-        console.error(e)
-        await prisma.$disconnect()
-        process.exit(1)
-    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });

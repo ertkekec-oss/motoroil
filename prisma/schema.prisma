@@ -538,7 +538,8 @@ model CustomerCategory {
   customers         Customer[]
   defaultPriceList  PriceList?   @relation(fields: [defaultPriceListId], references: [id])
 
-  @@unique([companyId, name])
+  @@unique([companyId, name], map: "companyId_name")
+  @@index([companyId])
 }
 
 model PriceList {

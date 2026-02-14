@@ -20,38 +20,50 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: 'Eksik parametreler' }, { status: 400 });
         }
 
-        // 0. Tenant Isolation - Find Active Company
-        // 0. Tenant Isolation - Find Active Company
-        // Robust extraction: support both root-level and nested user object (NextAuth style compatibility)
-        let companyId = (session as any).companyId || (session as any).user?.companyId;
+        // 1. Company ID Resolution (Robust)
+        let companyId = user.companyId;
         let companyName = 'Unknown';
 
         if (!companyId) {
-            console.warn(`[MARKETPLACE] Session missing companyId for user ${session.username}. Attempting DB fallback.`);
-            const company = await prisma.company.findFirst({
-                where: { tenantId: session.tenantId }
+            console.warn(`[MARKETPLACE] Session missing companyId for user ${user.username}. Attempting DB fallback.`);
+
+            // Fallback: Fetch via User's accessible companies
+            const dbUser = await prisma.user.findUnique({
+                where: { id: user.id },
+                include: { accessibleCompanies: { take: 1, include: { company: true } } }
             });
 
-            if (company) {
-                companyId = company.id;
-                companyName = company.name;
+            if (dbUser?.accessibleCompanies?.[0]) {
+                companyId = dbUser.accessibleCompanies[0].companyId;
+                companyName = dbUser.accessibleCompanies[0].company.name;
+                console.log(`[MARKETPLACE] Recovered companyId from DB: ${companyId}`);
+            } else {
+                // Second Fallback: Tenant's first company (Admin fallback)
+                const company = await prisma.company.findFirst({
+                    where: { tenantId: user.tenantId }
+                });
+                if (company) {
+                    companyId = company.id;
+                    companyName = company.name;
+                    console.log(`[MARKETPLACE] Recovered companyId from Tenant: ${companyId}`);
+                }
             }
         } else {
             companyName = 'SessionCompany';
         }
 
-        // CRITICAL GUARD: Prevent implementation of logic without companyId
+        // CRITICAL GUARD
         if (!companyId) {
-            console.error(`[MARKETPLACE] CRITICAL: Company ID missing! User: ${session.username}, Tenant: ${session.tenantId}`);
-            throw new Error("COMPANY_ID_MISSING: Firma yetkisi doğrulanamadı. Lütfen sistemi tamamen kapatıp tekrar giriş yapmayı deneyin.");
+            console.error(`[MARKETPLACE] CRITICAL: Company ID missing! User: ${user.username}, Tenant: ${user.tenantId}`);
+            return NextResponse.json({ success: false, error: "COMPANY_ID_MISSING: Firma yetkisi doğrulanamadı. Lütfen çıkış yapıp tekrar giriş yapın." }, { status: 401 });
         }
 
         console.log(`[MARKETPLACE] Syncing for ${type} (Company: ${companyName}, ID: ${companyId})`);
         const service = MarketplaceServiceFactory.createService(type as any, config);
 
-        // Fetch settings from config or default
-        const daysToSync = typeof config.days === 'number' ? config.days : 3; // Reduced default from 7 to 3
-        const processLimit = typeof config.limit === 'number' ? config.limit : 50; // Process max 50 items per execution
+        // Fetch settings
+        const daysToSync = typeof config.days === 'number' ? config.days : 3;
+        const processLimit = typeof config.limit === 'number' ? config.limit : 50;
 
         const endDate = new Date();
         const startDate = new Date();
@@ -62,28 +74,33 @@ export async function POST(request: Request) {
         const allOrders = await service.getOrders(startDate, endDate);
         console.log(`[MARKETPLACE] Fetched ${allOrders.length} orders in ${Date.now() - t0}ms`);
 
-        // Slice to avoid Vercel 5min timeout
+        // Slice for Vercel timeout
         const orders = allOrders.slice(0, processLimit);
-        if (allOrders.length > processLimit) {
-            console.warn(`[MARKETPLACE] Limiting processing to ${processLimit} items (Total: ${allOrders.length}). Run sync again to process more.`);
-        }
 
-        // Ensure E-commerce Category
-        console.log(`[UPSERT_DEBUG] ID: ${companyId}, Type: ${typeof companyId}`);
-        const ecommerceCategory = await prisma.customerCategory.upsert({
-            where: {
-                companyId_name: {
-                    companyId: companyId,
-                    name: 'E-ticaret'
-                }
-            },
-            create: {
-                companyId: companyId,
-                name: 'E-ticaret',
-                description: 'Web Satış Kanalı'
-            },
-            update: {}
-        });
+        // SAFE UPSERT WRAPPER for Category
+        let categoryId: string | null = null;
+        try {
+            console.log(`[UPSERT_DEBUG] Upserting Category for Company: ${companyId}`);
+            const ecommerceCategory = await prisma.customerCategory.upsert({
+                where: {
+                    companyId_name: {
+                        companyId: companyId, // Explicit assignment
+                        name: 'E-ticaret'
+                    }
+                },
+                create: {
+                    companyId: companyId, // Explicit assignment
+                    name: 'E-ticaret',
+                    description: 'Web Satış Kanalı'
+                },
+                update: {}
+            });
+            categoryId = ecommerceCategory.id;
+        } catch (catErr: any) {
+            console.error(`[UPSERT_ERROR] Failed to ensure category: ${catErr.message}`);
+            // Continue if possible, but customer creation might fail if category is required or logic depends on it.
+            // However, customer creation below uses categoryId. We'll handle it there.
+        }
 
         let savedCount = 0;
         let updatedCount = 0;
@@ -93,14 +110,14 @@ export async function POST(request: Request) {
             try {
                 // 1. Customer Sync
                 const customer = await prisma.customer.upsert({
-                    where: { email_companyId: { email: order.customerEmail || `guest-${order.orderNumber}@${type}.com`, companyId } },
+                    where: { email_companyId: { email: order.customerEmail || `guest-${order.orderNumber}@${type}.com`, companyId: companyId } }, // Explicit companyId
                     create: {
-                        companyId,
+                        companyId: companyId, // Explicit
                         name: order.customerName || 'Pazaryeri Müşterisi',
                         email: order.customerEmail,
                         phone: order.invoiceAddress?.phone || '',
                         address: JSON.stringify(order.invoiceAddress),
-                        categoryId: ecommerceCategory.id
+                        categoryId: categoryId // Can be null
                     },
                     update: {}
                 });
