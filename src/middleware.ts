@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
         '/api/auth', '/api/public',
         '/api/admin/marketplace/queue/health' // Allow health check for server-side proxy
     ];
-    if (pathname === '/' || publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
+    if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
         return NextResponse.next();
     }
 
