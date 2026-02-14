@@ -7,6 +7,9 @@ async function main() {
     console.log('Ensuring ertugrul.kekec@periodya.com exists as Platform Admin...');
 
     const email = 'ertugrul.kekec@periodya.com';
+    const rawPassword = '12385788'; // As requested by user
+    const passwordHash = await bcrypt.hash(rawPassword, 10);
+
     let user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
@@ -41,11 +44,10 @@ async function main() {
             console.log('Company Periodya HQ created:', company.id);
         }
 
-        const password = await bcrypt.hash('admin1234', 10);
         user = await prisma.user.create({
             data: {
                 email,
-                password,
+                password: passwordHash,
                 name: 'Ertuğrul Kekeç',
                 role: 'ADMIN',
                 tenantId: tenant.id
@@ -57,18 +59,19 @@ async function main() {
             data: { userId: user.id, companyId: company.id, role: 'ADMIN' }
         });
 
-        console.log(`User ${email} created successfully.`);
+        console.log(`User ${email} created successfully with new password.`);
     } else {
-        console.log(`User ${email} already exists.`);
+        console.log(`User ${email} already exists. Updating password and roles...`);
 
-        // Ensure Admin Role
-        if (user.role !== 'ADMIN') {
-            await prisma.user.update({
-                where: { id: user.id },
-                data: { role: 'ADMIN' }
-            });
-            console.log('User role updated to ADMIN.');
-        }
+        // ALWAYS Reset Password to what user requested
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                password: passwordHash,
+                role: 'ADMIN'
+            }
+        });
+        console.log('Password updated successfully.');
 
         // Ensure company access exists (fix for "unauthorized" if user exists but has no company link)
         const access = await prisma.userCompanyAccess.findFirst({ where: { userId: user.id } });
