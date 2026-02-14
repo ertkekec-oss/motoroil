@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getRequestContext, apiResponse, apiError } from '@/lib/api-context';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
     try {
         const { searchParams } = new URL(req.url);
@@ -19,10 +21,15 @@ export async function GET(req: NextRequest) {
             ];
         }
 
-        const transfers = await prisma.stockTransfer.findMany({
+        if (!(prisma as any).stockTransfer) {
+            console.error("CRITICAL: StockTransfer model missing in Prisma Client");
+            throw new Error("StockTransfer model missing");
+        }
+
+        const transfers = await (prisma as any).stockTransfer.findMany({
             where,
             orderBy: { shippedAt: 'desc' },
-            take: 100
+            take: 10
         });
 
         return apiResponse({ transfers }, { requestId: ctx.requestId });

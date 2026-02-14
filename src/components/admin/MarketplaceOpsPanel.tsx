@@ -66,9 +66,9 @@ export function MarketplaceOpsPanel() {
             const [statusRes, healthRes, bankingRes, inventoryRes, notifRes] = await Promise.all([
                 fetch(`/api/admin/marketplace/queue/status?${query}`, { cache: 'no-store' }),
                 fetch(`/api/ops-internal/queue-health`, { cache: 'no-store' }),
-                fetch(`/api/fintech/banking/transactions?limit=1`, { cache: 'no-store' }),
-                fetch(`/api/inventory/transfer?limit=1`, { cache: 'no-store' }),
-                fetch(`/api/notifications?limit=1`, { cache: 'no-store' })
+                fetch(`/api/fintech/banking/transactions?limit=1`, { cache: 'no-store', credentials: 'include' }),
+                fetch(`/api/inventory/transfer?limit=1`, { cache: 'no-store', credentials: 'include' }),
+                fetch(`/api/notifications?limit=1`, { cache: 'no-store', credentials: 'include' })
             ]);
 
             // We handle auth/error per-request via safeJson, so no early return here.
