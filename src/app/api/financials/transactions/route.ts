@@ -11,7 +11,7 @@ import { authorize } from '@/lib/auth';
 export async function GET(request: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const session = auth.user;
+    const session = auth.user.user || auth.user;
 
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '100');
@@ -50,7 +50,7 @@ import { logActivity } from '@/lib/audit';
 export async function POST(request: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const session = auth.user;
+    const session = auth.user.user || auth.user;
 
     // Check permission - using auth.user which is the session
     if (!hasPermission(session, 'transaction_manage')) {
@@ -173,7 +173,7 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const session = auth.user;
+    const session = auth.user.user || auth.user;
 
     if (!hasPermission(session, 'delete_records')) {
         return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });

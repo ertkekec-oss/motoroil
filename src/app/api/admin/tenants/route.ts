@@ -6,7 +6,8 @@ import { getSession } from '@/lib/auth';
 export async function GET(req: NextRequest) {
     try {
         // 1. Yetki Kontrolü
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
         const isPlatformAdmin = session?.role === 'SUPER_ADMIN' || session?.tenantId === 'PLATFORM_ADMIN' || session?.role === 'ADMIN';
 
         if (!session || !isPlatformAdmin) {

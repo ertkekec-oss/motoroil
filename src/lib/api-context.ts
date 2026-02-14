@@ -53,7 +53,8 @@ export function apiError(error: any, requestId?: string) {
 export async function getRequestContext(req: NextRequest): Promise<RequestContext> {
 
     const requestId = uuidv4();
-    const session: any = await getSession();
+    const sessionResult: any = await getSession();
+    const session = sessionResult?.user || sessionResult;
 
     if (!session || !session.id) {
         throw new ApiError("UNAUTHORIZED: Oturum bulunamadı.", 401, 'AUTH_REQUIRED');

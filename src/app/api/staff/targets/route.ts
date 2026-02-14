@@ -7,7 +7,8 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
     try {
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const searchParams = req.nextUrl.searchParams;
@@ -96,7 +97,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const body = await req.json();

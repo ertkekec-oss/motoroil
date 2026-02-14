@@ -59,7 +59,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const session = auth.user;
+    const session = auth.user.user || auth.user;
 
     if (!hasPermission(session, 'check_manage')) {
         // return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 }); 

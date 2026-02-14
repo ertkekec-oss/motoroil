@@ -12,7 +12,7 @@ import { GOLDEN_MOCK_DATASET } from '@/services/banking/mock-dataset';
 export async function POST(req: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const session = auth.user;
+    const session = auth.user.user || auth.user;
 
     try {
         const { mode = 'DRY_RUN', clearExisting = false } = await req.json();

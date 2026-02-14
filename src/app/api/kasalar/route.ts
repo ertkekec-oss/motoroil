@@ -10,7 +10,7 @@ export const revalidate = 0;
 export async function GET() {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const session = auth.user;
+    const session = auth.user.user || auth.user;
 
     try {
         // SECURITY: Tenant Isolation
@@ -46,7 +46,7 @@ export async function GET() {
 export async function POST(request: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const session = auth.user;
+    const session = auth.user.user || auth.user;
 
     try {
         // SECURITY: Tenant Isolation
