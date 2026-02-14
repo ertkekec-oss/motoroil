@@ -8,7 +8,20 @@ export async function POST(req: NextRequest) {
         const ctx = await getRequestContext(req);
         const { customerId } = await req.json();
 
-        const priceList = await resolveCustomerPriceList(ctx.companyId!, customerId);
+        let companyId = ctx.companyId;
+        if (!companyId) {
+            const company = await prisma.company.findFirst({
+                where: { tenantId: ctx.tenantId },
+                select: { id: true }
+            });
+            companyId = company?.id;
+        }
+
+        if (!companyId) {
+            return apiError({ message: 'Firma bağlamı bulunamadı', status: 400 });
+        }
+
+        const priceList = await resolveCustomerPriceList(companyId, customerId);
 
         return apiResponse({ priceList }, { requestId: ctx.requestId });
     } catch (error: any) {

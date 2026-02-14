@@ -5,8 +5,16 @@ import { getRequestContext, apiResponse, apiError } from '@/lib/api-context';
 export async function GET(req: NextRequest) {
     try {
         const ctx = await getRequestContext(req);
+        let companyId = ctx.companyId;
+        if (!companyId) {
+            const company = await prisma.company.findFirst({ where: { tenantId: ctx.tenantId }, select: { id: true } });
+            companyId = company?.id;
+        }
+
+        if (!companyId) return apiError({ message: 'Firma bulunamadı', status: 400 });
+
         const lists = await prisma.priceList.findMany({
-            where: { companyId: ctx.companyId! },
+            where: { companyId },
             orderBy: { isDefault: 'desc' }
         });
         return apiResponse(lists, { requestId: ctx.requestId });
