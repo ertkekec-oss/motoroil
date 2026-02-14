@@ -5,7 +5,9 @@ import { getSession, createSession } from '@/lib/auth';
 
 export async function POST(request: Request) {
     try {
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+
         if (!session || !session.tenantId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -15,13 +17,40 @@ export async function POST(request: Request) {
 
         const tenantId = session.tenantId;
 
-        // 1. Get the default company for this tenant
-        const company = await prisma.company.findFirst({
+        // 1. Get the default company for this tenant OR CREATE IT
+        let company = await prisma.company.findFirst({
             where: { tenantId: tenantId }
         });
 
         if (!company) {
-            return NextResponse.json({ error: 'Firma kaydı bulunamadı. Lütfen destekle iletişime geçin.' }, { status: 404 });
+            console.log(`[Onboarding] Company missing for tenant ${tenantId}. Creating one automatically.`);
+            // Auto-create company if missing (Fix for new tenants)
+            company = await prisma.company.create({
+                data: {
+                    tenantId: tenantId,
+                    name: session.companyName || session.tenantName || 'Şirketim', // Fallback name
+                    isDefault: true
+                }
+            });
+
+            // Also ensure UserCompanyAccess exists for the current user
+            const userId = session.id;
+            if (userId) {
+                await prisma.userCompanyAccess.upsert({
+                    where: {
+                        userId_companyId: {
+                            userId: userId,
+                            companyId: company.id
+                        }
+                    },
+                    create: {
+                        userId: userId,
+                        companyId: company.id,
+                        role: session.role || 'ADMIN'
+                    },
+                    update: {} // Already exists
+                });
+            }
         }
 
         const results = await prisma.$transaction(async (tx) => {
