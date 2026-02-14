@@ -7,14 +7,17 @@ import { EventBus } from '@/services/fintech/event-bus';
 export async function POST(request: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const session = auth.user;
+
+    // Normalize session structure
+    const sessionData = auth.user;
+    const session: any = sessionData.user || sessionData;
 
     try {
         const body = await request.json();
         const { type, config } = body;
 
         // VERIFICATION LOG
-        console.log(`[SYNC_START] User: ${session.username}, SessionCompanyId: ${(session as any).companyId}, TenantId: ${session.tenantId}`);
+        console.log(`[SYNC_START] User: ${session.username}, SessionCompanyId: ${session.companyId}, TenantId: ${session.tenantId}`);
 
         if (!type || !config) {
             return NextResponse.json({ success: false, error: 'Eksik parametreler' }, { status: 400 });
