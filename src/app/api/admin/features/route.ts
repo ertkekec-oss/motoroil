@@ -5,9 +5,12 @@ import { getSession } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
     try {
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+
         if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+            const role = session?.role || 'Unknown';
+            return NextResponse.json({ error: 'Forbidden', debugRole: role }, { status: 403 });
         }
 
         // Migration: Fix keys to match frontend expectations
@@ -107,8 +110,12 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
     try {
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+
         if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
+            const role = session?.role || 'Unknown';
+            console.log(`[Admin Features] Denied Access. Role: ${role}, ID: ${session?.id}`);
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 

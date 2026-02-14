@@ -48,7 +48,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
     try {
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+
         if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }

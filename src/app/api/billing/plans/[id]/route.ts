@@ -6,7 +6,9 @@ import { getSession } from '@/lib/auth';
 export async function GET(req: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await paramsPromise;
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+
         if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
@@ -30,7 +32,9 @@ export async function GET(req: NextRequest, { params: paramsPromise }: { params:
 export async function PUT(req: Request, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await paramsPromise;
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+
         if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
@@ -80,7 +84,9 @@ export async function PUT(req: Request, { params: paramsPromise }: { params: Pro
 export async function DELETE(req: Request, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await paramsPromise;
-        const session: any = await getSession();
+        const sessionResult: any = await getSession();
+        const session = sessionResult?.user || sessionResult;
+
         if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
