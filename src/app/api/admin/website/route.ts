@@ -7,7 +7,9 @@ export const dynamic = 'force-dynamic';
 
 // Get CMS data (Settings + Pages + Menus)
 export async function GET() {
-    const session: any = await getSession();
+    const sessionResult: any = await getSession();
+    const session = sessionResult?.user || sessionResult;
+
     const isPlatformAdmin = session?.role === 'SUPER_ADMIN' || session?.tenantId === 'PLATFORM_ADMIN' || session?.role === 'ADMIN';
 
     if (!session || !isPlatformAdmin) {
@@ -243,7 +245,9 @@ export async function GET() {
 
 // Update General Settings
 export async function POST(req: Request) {
-    const session: any = await getSession();
+    const sessionResult: any = await getSession();
+    const session = sessionResult?.user || sessionResult;
+
     if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

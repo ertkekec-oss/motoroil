@@ -4,7 +4,9 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 
 export async function POST(req: Request) {
-    const session: any = await getSession();
+    const sessionResult: any = await getSession();
+    const session = sessionResult?.user || sessionResult;
+
     if (!session || !['SUPER_ADMIN', 'ADMIN'].includes(session.role?.toUpperCase())) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
