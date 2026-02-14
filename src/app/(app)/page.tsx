@@ -59,6 +59,13 @@ function POSContent() {
   // Data
   const [insightsData, setInsightsData] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [activePriceListId, setActivePriceListId] = useState<string | null>(null);
+  const [priceMap, setPriceMap] = useState<Record<string, number>>({});
+
+  const getPrice = useCallback((product: any) => {
+    if (priceMap[product.id] !== undefined) return priceMap[product.id];
+    return Number(product.price || 0);
+  }, [priceMap]);
 
   // --- EFFECTS ---
 
@@ -98,7 +105,40 @@ function POSContent() {
 
     if (filtered.length === 1) setSelectedKasa(filtered[0].id);
     else if (selectedKasa && !filtered.find(f => String(f.id) === String(selectedKasa))) setSelectedKasa('');
+    if (filtered.length === 1) setSelectedKasa(filtered[0].id);
+    else if (selectedKasa && !filtered.find(f => String(f.id) === String(selectedKasa))) setSelectedKasa('');
   }, [paymentMode, kasalar, activeBranchName]);
+
+  // Resolve Customer Price List
+  useEffect(() => {
+    const resolvePriceList = async () => {
+      if (!selectedCustomer) return;
+      const cust = customers.find(c => c.name === selectedCustomer);
+      const customerId = cust?.id; // If not found (e.g. Retail default name), send null to resolve default list
+
+      try {
+        const res = await fetch('/api/pricing/resolve-customer', {
+          method: 'POST',
+          body: JSON.stringify({ customerId })
+        });
+        const data = await res.json();
+        if (data.success && data.data?.priceList) {
+          const listId = data.data.priceList.id;
+          if (listId !== activePriceListId) {
+            setActivePriceListId(listId);
+            // Fetch prices for this list
+            const pRes = await fetch(`/api/pricing/lists/${listId}/prices`);
+            const pData = await pRes.json();
+            if (pData.success) {
+              setPriceMap(pData.data.priceMap || {});
+            }
+          }
+        }
+      } catch (e) { console.error("Price resolution failed", e); }
+    };
+
+    resolvePriceList();
+  }, [selectedCustomer, customers]);
 
 
   // --- COMPUTED ---
@@ -128,10 +168,12 @@ function POSContent() {
     setCart(prev => {
       const exist = prev.find(i => i.id === product.id);
       if (exist) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
-      return [...prev, { ...product, qty: 1 }];
+      // Use resolved price
+      const resolvedPrice = getPrice(product);
+      return [...prev, { ...product, price: resolvedPrice, qty: 1 }];
     });
     setSearchInput(''); inputRef.current?.focus();
-  }, []);
+  }, [getPrice]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -315,7 +357,7 @@ function POSContent() {
                 {filteredProducts.map(p => (
                   <div key={p.id} onClick={() => addToCart(p)} className="p-3 border-b border-white/5 flex justify-between hover:bg-white/10 cursor-pointer">
                     <div><div className="font-bold text-sm">{p.name}</div><div className="text-[10px] opacity-50">{p.barcode}</div></div>
-                    <div className="font-bold text-primary">₺{Number(p.price).toLocaleString()}</div>
+                    <div className="font-bold text-primary">₺{Number(getPrice(p)).toLocaleString()}</div>
                   </div>
                 ))}
               </div>
