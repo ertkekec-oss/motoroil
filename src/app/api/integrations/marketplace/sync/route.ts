@@ -69,15 +69,16 @@ export async function POST(request: Request) {
         }
 
         // Ensure E-commerce Category
+        console.log(`[UPSERT_DEBUG] ID: ${companyId}, Type: ${typeof companyId}`);
         const ecommerceCategory = await prisma.customerCategory.upsert({
             where: {
                 companyId_name: {
-                    companyId,
+                    companyId: companyId,
                     name: 'E-ticaret'
                 }
             },
             create: {
-                companyId,
+                companyId: companyId,
                 name: 'E-ticaret',
                 description: 'Web Satış Kanalı'
             },
