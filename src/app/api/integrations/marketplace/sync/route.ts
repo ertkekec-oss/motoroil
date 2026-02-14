@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         // CRITICAL GUARD: Prevent implementation of logic without companyId
         if (!companyId) {
             console.error(`[MARKETPLACE] CRITICAL: Company ID missing! User: ${session.username}, Tenant: ${session.tenantId}`);
-            throw new Error("COMPANY_ID_MISSING: Firma yetkisi doğrulanamadı. Lütfen çıkış yapıp tekrar giriş yapın.");
+            throw new Error("COMPANY_ID_MISSING: Firma yetkisi doğrulanamadı. Lütfen sistemi tamamen kapatıp tekrar giriş yapmayı deneyin.");
         }
 
         console.log(`[MARKETPLACE] Syncing for ${type} (Company: ${companyName}, ID: ${companyId})`);
