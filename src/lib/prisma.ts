@@ -85,11 +85,16 @@ const prismaClientSingleton = () => {
                         return query(args);
                     }
 
-                    const session: any = await getSession();
+                    const sessionResult: any = await getSession();
+                    // SUPPORT BOTH: session.user (new) and session (legacy)
+                    const session: any = sessionResult?.user ?? sessionResult;
 
                     if (session) {
-                        const role = session.role?.toUpperCase() || '';
-                        const isPlatformAdmin = session.tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN';
+                        const role = (session.role || '').toUpperCase();
+                        const tenantId = session.tenantId;
+                        const companyId = session.companyId;
+
+                        const isPlatformAdmin = tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN';
 
                         // --- 2. Platform Admin Bypass / Impersonation ---
                         if (isPlatformAdmin) {
@@ -101,7 +106,7 @@ const prismaClientSingleton = () => {
                         }
 
                         // Determine which tenant's data we are looking at
-                        const effectiveTenantId = session.impersonateTenantId || session.tenantId;
+                        const effectiveTenantId = session.impersonateTenantId || tenantId;
 
                         if (!effectiveTenantId) {
                             // BYPASS: Allow auth-related models even if tenant context is missing
