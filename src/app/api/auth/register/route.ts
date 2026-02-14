@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prismaBase as prisma } from '@/lib/prismaBase';
 import { hashPassword } from '@/lib/auth';
 import { sendMail } from '@/lib/mail';
 
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
         }
 
         // 1. Check if email exists
-        const existingUser = await (prisma as any).user.findUnique({
+        const existingUser = await prisma.user.findUnique({
             where: { email }
         });
 
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
         }
 
         // 2. Create Tenant
-        const tenant = await (prisma as any).tenant.create({
+        const tenant = await prisma.tenant.create({
             data: {
                 name: companyName,
                 ownerEmail: email,
@@ -37,13 +37,13 @@ export async function POST(req: NextRequest) {
         });
 
         // 3. Create Subscription (Trial Plan)
-        let trialPlan = await (prisma as any).plan.findFirst({
+        let trialPlan = await prisma.plan.findFirst({
             where: { price: 0, isActive: true }
         });
 
         // Eğer ücretsiz plan yoksa oluştur (FK hatasını önlemek için)
         if (!trialPlan) {
-            trialPlan = await (prisma as any).plan.create({
+            trialPlan = await prisma.plan.create({
                 data: {
                     id: 'trial-default',
                     name: 'Free Trial',
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         const now = new Date();
         const endDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000); // 14 days trial
 
-        await (prisma as any).subscription.create({
+        await prisma.subscription.create({
             data: {
                 tenantId: tenant.id,
                 planId: trialPlan.id,
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
         });
 
         // 4. Create Default Company for Tenant
-        const company = await (prisma as any).company.create({
+        const company = await prisma.company.create({
             data: {
                 tenantId: tenant.id,
                 name: companyName,
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
             'settings_manage'
         ];
 
-        const user = await (prisma as any).user.create({
+        const user = await prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
         });
 
         // 6. Link User to Company (CRITICAL FOR SESSION CONTEXT)
-        await (prisma as any).userCompanyAccess.create({
+        await prisma.userCompanyAccess.create({
             data: {
                 userId: user.id,
                 companyId: company.id,

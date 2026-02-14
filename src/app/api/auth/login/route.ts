@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prismaBase as prisma } from '@/lib/prismaBase';
 import { comparePassword, createSession, hashPassword } from '@/lib/auth';
 import { logActivity } from '@/lib/audit';
 
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
         // 1. Brute Force Protection: Check failed attempts in last 15 mins
         const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
-        const failedAttempts = await (prisma as any).loginAttempt.count({
+        const failedAttempts = await prisma.loginAttempt.count({
             where: {
                 OR: [
                     { ip: ip },
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         }
 
         // 1. Search in Staff
-        let targetUser = await (prisma as any).staff.findFirst({
+        let targetUser = await prisma.staff.findFirst({
             where: {
                 OR: [
                     { username: username },
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
         // 2. Search in User if not found in Staff
         if (!targetUser) {
-            targetUser = await (prisma as any).user.findFirst({
+            targetUser = await prisma.user.findFirst({
                 where: {
                     OR: [
                         { email: username }
@@ -66,21 +66,22 @@ export async function POST(request: Request) {
                         take: 1
                     }
                 }
-            });
+            }) as any; // Cast for user to allow mixed type usage below
+
             // Adapt User object to look like Staff for the rest of logic if needed
             if (targetUser) {
-                if (!targetUser.username) targetUser.username = targetUser.email;
-                targetUser.setupState = targetUser.tenant?.setupState || 'PENDING';
-                if (targetUser.accessibleCompanies?.length > 0) {
-                    (targetUser as any).companyId = targetUser.accessibleCompanies[0].companyId;
-                    (targetUser as any).role = targetUser.accessibleCompanies[0].role;
+                if (!targetUser.username) targetUser.username = (targetUser as any).email;
+                (targetUser as any).setupState = (targetUser as any).tenant?.setupState || 'PENDING';
+                if ((targetUser as any).accessibleCompanies?.length > 0) {
+                    (targetUser as any).companyId = (targetUser as any).accessibleCompanies[0].companyId;
+                    (targetUser as any).role = (targetUser as any).accessibleCompanies[0].role;
                 }
             }
         }
 
         if (!targetUser) {
             // Record failed attempt
-            await (prisma as any).loginAttempt.create({ data: { ip, username, success: false } });
+            await prisma.loginAttempt.create({ data: { ip, username, success: false } });
             return NextResponse.json({ error: 'Geçersiz kullanıcı adı veya şifre' }, { status: 401 });
         }
 
@@ -88,23 +89,23 @@ export async function POST(request: Request) {
 
         if (!isMatch) {
             // Record failed attempt
-            await (prisma as any).loginAttempt.create({ data: { ip, username, success: false } });
+            await prisma.loginAttempt.create({ data: { ip, username, success: false } });
             return NextResponse.json({ error: 'Geçersiz kullanıcı adı veya şifre' }, { status: 401 });
         }
 
         // Record successful attempt
-        await (prisma as any).loginAttempt.create({ data: { ip, username, success: true } });
+        await prisma.loginAttempt.create({ data: { ip, username, success: true } });
 
         // Auto-migration: If password was plain text, hash it now
         if (!targetUser.password.startsWith('$2')) {
             const hashed = await hashPassword(password);
             if (foundInStaff) {
-                await (prisma as any).staff.update({
+                await prisma.staff.update({
                     where: { id: targetUser.id },
                     data: { password: hashed }
                 });
             } else {
-                await (prisma as any).user.update({
+                await prisma.user.update({
                     where: { id: targetUser.id },
                     data: { password: hashed }
                 });

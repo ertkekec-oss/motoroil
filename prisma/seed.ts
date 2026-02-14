@@ -82,6 +82,43 @@ async function main() {
     });
 
     console.log('User linked to company with ADMIN role.');
+
+    // 5. Create Platform Admin Tenant
+    const platformTenant = await prisma.tenant.upsert({
+        where: { id: 'PLATFORM_ADMIN' },
+        update: {},
+        create: {
+            id: 'PLATFORM_ADMIN',
+            name: 'Periodya Platform',
+            ownerEmail: 'ertugrul.kekec@periodya.com',
+            status: 'ACTIVE',
+            setupState: 'COMPLETED'
+        }
+    });
+
+    console.log('Platform Tenant confirmed.');
+
+    // 6. Create Super Admin User
+    const superAdminPass = await bcrypt.hash('12385788', 10);
+    const superAdmin = await prisma.user.upsert({
+        where: { email: 'ertugrul.kekec@periodya.com' },
+        update: {
+            password: superAdminPass,
+            role: 'SUPER_ADMIN',
+            tenantId: platformTenant.id,
+            permissions: ['ALL', 'SUPER_ADMIN']
+        },
+        create: {
+            email: 'ertugrul.kekec@periodya.com',
+            name: 'Ertugrul Kekec',
+            password: superAdminPass,
+            role: 'SUPER_ADMIN',
+            tenantId: platformTenant.id,
+            permissions: ['ALL', 'SUPER_ADMIN']
+        }
+    });
+
+    console.log(`Super Admin created: ${superAdmin.email}`);
 }
 
 main()
