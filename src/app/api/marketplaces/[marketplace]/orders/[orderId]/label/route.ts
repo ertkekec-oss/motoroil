@@ -103,7 +103,8 @@ export async function GET(
             status: 202,
             headers: {
                 "Content-Type": "application/json",
-                "Cache-Control": "no-store"
+                "Cache-Control": "no-store",
+                "Retry-After": "3"
             }
         });
 

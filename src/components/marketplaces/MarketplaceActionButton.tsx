@@ -55,57 +55,59 @@ export function MarketplaceActionButton({
         console.log("🚀 EXECUTE ACTION:", { actionUrl, actionKey, idempotencyKey });
 
         try {
-            // For labels, we use a budgeted polling strategy
+            // For labels, we use a budgeted polling strategy with popup blocker fix
             if (isLabel && shipmentPackageId) {
                 const labelUrl = `/api/marketplaces/${encodeURIComponent(mplaceLower)}/orders/${encodeURIComponent(orderId)}/label?shipmentPackageId=${encodeURIComponent(shipmentPackageId)}`;
 
-                const fetchLabelWithBudget = async (url: string) => {
-                    const TOTAL_BUDGET_MS = 65_000;  // frontend sabrı (backend maxDuration=60 ile senkron)
-                    const STEP_WAIT_MS = 3_000;      // pending bekleme
-                    const PER_REQUEST_TIMEOUT_MS = 70_000; // tek request için güvenli üst sınır
+                // 1. Pre-open popup immediately on click to avoid blocker
+                const popup = window.open("about:blank", "_blank");
 
+                const fetchLabelWithBudget = async (url: string) => {
+                    const TOTAL_BUDGET_MS = 65_000;
                     const start = Date.now();
-                    let lastPendingMessage: string | null = null;
                     let attempt = 0;
+                    let lastPendingMessage: string | null = null;
+                    const STEP_WAIT_MS = 3000;
 
                     while (Date.now() - start < TOTAL_BUDGET_MS) {
                         attempt++;
-                        const controller = new AbortController();
-                        const timer = setTimeout(() => controller.abort(), PER_REQUEST_TIMEOUT_MS);
-
                         try {
-                            const res = await fetch(url, {
-                                method: "GET",
-                                signal: controller.signal,
-                                headers: { "Cache-Control": "no-store" }
-                            });
-
-                            const contentType = res.headers.get("content-type") || "";
+                            const res = await fetch(url, { cache: "no-store" });
+                            const contentType = (res.headers.get("content-type") || "").toLowerCase();
                             const isPdf = contentType.includes("application/pdf") || contentType.includes("pdf");
 
                             // ✅ SUCCESS (PDF Content)
                             if (isPdf) {
                                 const blob = await res.blob();
                                 const fileUrl = URL.createObjectURL(blob);
-                                window.open(fileUrl, "_blank");
+                                if (popup) {
+                                    popup.location.href = fileUrl;
+                                } else {
+                                    window.open(fileUrl, "_blank");
+                                }
                                 setStatus("SUCCESS");
                                 toast.success("Etiket başarıyla alındı", { id: idempotencyKey });
                                 setTimeout(() => setStatus("IDLE"), 2000);
                                 return;
                             }
 
-                            // ✅ REDIRECT (Legacy handling just in case)
+                            // ✅ REDIRECT
                             if (res.status === 302 || res.redirected) {
-                                window.open(res.url, "_blank");
+                                if (popup) {
+                                    popup.location.href = res.url;
+                                } else {
+                                    window.open(res.url, "_blank");
+                                }
                                 setStatus("SUCCESS");
                                 toast.success("Etiket indiriliyor...", { id: idempotencyKey });
                                 setTimeout(() => setStatus("IDLE"), 2000);
                                 return;
                             }
 
-                            // ✅ JSON (PENDING or ERROR)
+                            // 📦 CONSUME JSON ONCE
                             const data = await res.json().catch(() => null);
 
+                            // ✅ PENDING (202 or Audit Status)
                             if (res.status === 202 || data?.status === "PENDING") {
                                 lastPendingMessage = data?.message || "Etiket hazırlanıyor...";
                                 setStatus("POLLING");
@@ -113,49 +115,43 @@ export function MarketplaceActionButton({
                                     id: idempotencyKey,
                                     duration: 4000
                                 });
-                                // Wait before next poll
-                                await new Promise(r => setTimeout(r, STEP_WAIT_MS));
+
+                                const retryAfterHint = Number(res.headers.get("retry-after") || 3);
+                                await new Promise(r => setTimeout(r, retryAfterHint * 1000));
                                 continue;
                             }
 
-                            // ❌ ERROR (4xx, 5xx)
+                            // ❌ ERROR
                             if (!res.ok) {
-                                const data = await res.json().catch(() => ({}));
-                                const msg = data.message || data.error || `Sunucu hatası (HTTP ${res.status})`;
-
-                                // On transient errors (500, 504, 429), we wait and retry if budget allows
                                 if (res.status >= 500 || res.status === 429) {
                                     console.warn(`Transient error ${res.status}, retrying...`);
                                     await new Promise(r => setTimeout(r, STEP_WAIT_MS));
                                     continue;
                                 }
-
-                                throw new Error(msg);
+                                throw new Error(data?.message || data?.error || `Sunucu hatası (HTTP ${res.status})`);
                             }
 
                         } catch (error: any) {
-                            if (error.name === 'AbortError') {
-                                console.warn("Fetch aborted (budget timeout/signal)");
+                            if (error.name === 'AbortError' || error.message?.includes('stream closed')) {
                                 await new Promise(r => setTimeout(r, STEP_WAIT_MS));
                                 continue;
                             }
-                            // If it's not a transient error, we probably should stop
                             throw error;
-                        } finally {
-                            clearTimeout(timer);
                         }
                     }
 
-                    throw new Error(lastPendingMessage || "Etiket hazırlama süresi doldu. Lütfen tekrar deneyin.");
+                    if (popup && popup.location.href.includes("about:blank")) popup.close();
+                    throw new Error(lastPendingMessage || "Etiket hazırlama süresi doldu. Lüttfen tekrar deneyin.");
                 };
 
                 // Start Process
                 toast.loading("Etiket kontrol ediliyor...", { id: idempotencyKey });
                 fetchLabelWithBudget(labelUrl).catch((err: any) => {
-                    console.error("LABEL_FETCH_ERROR", err);
+                    console.error("LABEL_POLLING_FAILED", err);
+                    if (popup && popup.location.href.includes("about:blank")) popup.close();
                     setStatus("FAILED");
                     toast.error(err.message || "İşlem başarısız oldu", { id: idempotencyKey });
-                    setTimeout(() => setStatus("IDLE"), 3000);
+                    setTimeout(() => setStatus("IDLE"), 4000);
                 });
                 return;
             }
