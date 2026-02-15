@@ -66,8 +66,8 @@ export class TrendyolService implements IMarketplaceService {
 
     async getCommonLabel(shipmentPackageId: string): Promise<string | null> {
         let attempts = 0;
-        const maxRetries = 5;
-        const delay = 2500; // 2.5s delay between retries
+        const maxRetries = 10;
+        const delay = 3000; // 3s delay between retries
 
         while (attempts < maxRetries) {
             attempts++;
