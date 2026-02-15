@@ -28,6 +28,11 @@ export async function GET() {
         // Son 24 saatteki "Yeni" veya "Hazırlanıyor" statüsündeki siparişleri çek
         // Not: Pazaryerine göre statü isimleri değişebilir (Created, Picking vb.)
         // Son siparişleri çek (Statü farketmeksizin hepsini getir ki entegrasyonu görelim)
+        // Debug: Get raw count for this tenant
+        const totalTenantOrders = await prisma.order.count({
+            where: { company: { tenantId: session.tenantId } }
+        });
+
         const pendingOrders = await prisma.order.findMany({
             where: {
                 companyId: companyId,
@@ -43,7 +48,12 @@ export async function GET() {
         return NextResponse.json({
             success: true,
             count: pendingOrders.length,
-            orders: pendingOrders
+            orders: pendingOrders,
+            debug: {
+                resolvedCompanyId: companyId,
+                sessionTenantId: session.tenantId,
+                totalTenantOrders
+            }
         });
     } catch (error: any) {
         console.error('Pending Orders Error:', error);
