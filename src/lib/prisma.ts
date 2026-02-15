@@ -95,7 +95,10 @@ const prismaClientSingleton = () => {
 
                         // --- 1. Platform Admin Bypass ---
                         // Super admins see everything unless they are impersonating a specific tenant
-                        if (isPlatformAdmin && !session.impersonateTenantId) {
+                        // ADDED: Allow bypass if 'adminBypass' flag is present in args
+                        if (isPlatformAdmin && (!session.impersonateTenantId || (args as any).adminBypass)) {
+                            // Clear the bypass flag so Prisma doesn't complain
+                            if ((args as any).adminBypass) delete (args as any).adminBypass;
                             return query(args);
                         }
 

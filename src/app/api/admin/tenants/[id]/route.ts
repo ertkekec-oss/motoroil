@@ -1,6 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prismaBase as prisma } from '@/lib/prismaBase';
 import { getSession } from '@/lib/auth';
 
 export async function GET(req: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
@@ -103,13 +103,56 @@ export async function DELETE(req: NextRequest, { params: paramsPromise }: { para
         }
 
         const { id: tenantId } = await paramsPromise;
+        const fs = require('fs');
+        const logFile = 'deletion_debug.log';
+        const log = (msg: string) => fs.appendFileSync(logFile, `${new Date().toISOString()} ${msg}\n`);
+
+        log(`Target Tenant ID: ${tenantId}`);
 
         // Cascade delete is handled by Prisma/DB if configured, 
-        // but let's do a safe transaction if needed or just delete the tenant.
-        // In this project, most relations are defined with onDelete: Cascade in schema or handled manually.
+        // but UserCompanyAccess missing cascade in schema for both Company and User.
 
-        await (prisma as any).tenant.delete({
-            where: { id: tenantId }
+        // 1. Find all context IDs
+        const companies = await (prisma as any).company.findMany({ where: { tenantId } });
+        const users = await (prisma as any).user.findMany({ where: { tenantId } });
+
+        const companyIds = companies.map((c: any) => c.id);
+        const userIds = users.map((u: any) => u.id);
+
+        log(`Found Companies: ${JSON.stringify(companyIds)}`);
+        log(`Found Users: ${JSON.stringify(userIds)}`);
+
+        // 2. Perform deletion in order
+        await (prisma as any).$transaction(async (tx: any) => {
+            log('Starting transaction...');
+            // Priority 1: Clear access records
+            const accessDelete = await tx.userCompanyAccess.deleteMany({
+                where: {
+                    OR: [
+                        { companyId: { in: companyIds } },
+                        { userId: { in: userIds } }
+                    ]
+                }
+            });
+            log(`Deleted ${accessDelete.count} access records.`);
+
+            // Priority 2: Clear companies manually
+            const companyDelete = await (tx as any).company.deleteMany({
+                where: { tenantId: tenantId }
+            });
+            log(`Deleted ${companyDelete.count} companies.`);
+
+            // Priority 3: Clear users manually
+            const userDelete = await (tx as any).user.deleteMany({
+                where: { tenantId: tenantId }
+            });
+            log(`Deleted ${userDelete.count} users.`);
+
+            // Priority 4: Finally delete the tenant
+            await (tx as any).tenant.delete({
+                where: { id: tenantId }
+            });
+            log('Tenant deleted successfully.');
         });
 
         return NextResponse.json({ success: true });
