@@ -60,7 +60,7 @@ export function MarketplaceActionButton({
                 const labelUrl = `/api/marketplaces/${encodeURIComponent(mplaceLower)}/orders/${encodeURIComponent(orderId)}/label?shipmentPackageId=${encodeURIComponent(shipmentPackageId)}`;
 
                 let attempts = 0;
-                const maxAttempts = 5;
+                const maxAttempts = 10;
 
                 const checkLabel = async () => {
                     attempts++;
