@@ -74,7 +74,10 @@ export async function POST(request: Request) {
                 (targetUser as any).setupState = (targetUser as any).tenant?.setupState || 'PENDING';
                 if ((targetUser as any).accessibleCompanies?.length > 0) {
                     (targetUser as any).companyId = (targetUser as any).accessibleCompanies[0].companyId;
-                    (targetUser as any).role = (targetUser as any).accessibleCompanies[0].role;
+                    // Dont degrade SUPER_ADMIN role
+                    if ((targetUser as any).role !== 'SUPER_ADMIN') {
+                        (targetUser as any).role = (targetUser as any).accessibleCompanies[0].role;
+                    }
                 }
             }
         }
