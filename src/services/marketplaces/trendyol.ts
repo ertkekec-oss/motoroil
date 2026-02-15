@@ -65,44 +65,56 @@ export class TrendyolService implements IMarketplaceService {
     }
 
     async getCommonLabel(shipmentPackageId: string): Promise<string | null> {
-        try {
-            // Trendyol Common Label API - PDF formatında etiket al
-            const url = `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`;
+        let attempts = 0;
+        const maxRetries = 5;
+        const delay = 2500; // 2.5s delay between retries
 
-            console.log('🌐 Trendyol API İsteği:');
-            console.log('   URL:', url);
-            console.log('   Supplier ID:', this.config.supplierId);
-            console.log('   ShipmentPackageId:', shipmentPackageId);
+        while (attempts < maxRetries) {
+            attempts++;
+            try {
+                // Trendyol Common Label API - PDF formatında etiket al
+                const url = `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`;
 
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': this.getAuthHeader(),
-                    'User-Agent': `${this.config.supplierId} - Periodya ERP`
+                console.log(`🌐 Trendyol API İsteği (Deneme ${attempts}/${maxRetries}):`);
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': this.getAuthHeader(),
+                        'User-Agent': `${this.config.supplierId} - Periodya ERP`
+                    }
+                });
+
+                if (!response.ok) {
+                    // If 404/400 etc, break loop, likely permanent error
+                    const errorText = await response.text();
+                    console.error(`❌ Trendyol Etiket İndirme Hatası (${response.status}):`, errorText);
+                    return null;
                 }
-            });
 
-            console.log('📡 Trendyol API Yanıtı:');
-            console.log('   Status:', response.status, response.statusText);
-            console.log('   Headers:', Object.fromEntries(response.headers.entries()));
+                const data = await response.json();
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error(`❌ Trendyol Etiket İndirme Hatası (${response.status}):`, errorText);
-                return null;
+                // If content exists, return immediately
+                if (data && data.content && data.content.length > 100) {
+                    console.log('✅ Trendyol etiket başarıyla alındı.');
+                    return data.content;
+                }
+
+                console.log(`⏳ Trendyol yanıt döndü ama içerik boş (Hazırlanıyor...). Bekleniyor...`);
+
+                // Wait before retry
+                if (attempts < maxRetries) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+
+            } catch (error) {
+                console.error(`❌ Trendyol etiket getirme hatası (Deneme ${attempts}):`, error);
+                // On network error, maybe wait and retry?
+                if (attempts < maxRetries) await new Promise(resolve => setTimeout(resolve, delay));
             }
-
-            const data = await response.json();
-            console.log('✅ Trendyol yanıt aldı:', {
-                hasContent: !!data.content,
-                contentLength: data.content?.length || 0,
-                dataKeys: Object.keys(data)
-            });
-
-            return data.content; // Base64 PDF string
-        } catch (error) {
-            console.error('❌ Trendyol etiket getirme hatası:', error);
-            return null;
         }
+
+        console.error('❌ Trendyol etiket deneme süresi doldu, içerik alınamadı.');
+        return null; // All retries failed
     }
 
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
