@@ -122,9 +122,9 @@ export async function POST(request: Request) {
                     update: {}
                 });
 
-                // 2. Idempotency Guard (Composite Unique)
-                const existingOrder = await prisma.order.findUnique({
-                    where: { companyId_orderNumber: { companyId, orderNumber: order.orderNumber } }
+                // 2. Idempotency Guard (Find existing order)
+                const existingOrder = await prisma.order.findFirst({
+                    where: { companyId, orderNumber: order.orderNumber }
                 });
 
                 if (!existingOrder) {

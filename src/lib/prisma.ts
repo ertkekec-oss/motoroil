@@ -92,6 +92,13 @@ const prismaClientSingleton = () => {
                         const role = (session.role || '').toUpperCase();
                         const tenantId = session.tenantId;
                         const isPlatformAdmin = tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN';
+
+                        // --- 1. Platform Admin Bypass ---
+                        // Super admins see everything unless they are impersonating a specific tenant
+                        if (isPlatformAdmin && !session.impersonateTenantId) {
+                            return query(args);
+                        }
+
                         const effectiveTenantId = session.impersonateTenantId || tenantId;
 
                         if (!effectiveTenantId) {
@@ -102,32 +109,22 @@ const prismaClientSingleton = () => {
                         }
 
                         const a = args as any;
-                        let op = operation;
-
-                        // --- REDIRECT: findUnique -> findFirst ---
-                        // findUnique doesn't support relation filters like { company: { tenantId: '...' } }.
-                        if (op === 'findUnique') {
-                            op = 'findFirst' as any;
-                        }
-
                         const isUniqueOp = ['findUnique', 'upsert', 'update', 'delete'].includes(operation);
 
                         // READ FILTERING
                         if (['findMany', 'findFirst', 'findUnique', 'count', 'aggregate', 'groupBy'].includes(operation)) {
                             if (modelName === 'company') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'user') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'tenant') {
-                                if (!isPlatformAdmin) a.where = { ...a.where, id: effectiveTenantId };
-                            }
+                            else if (modelName === 'tenant') { a.where = { ...a.where, id: effectiveTenantId }; }
                             else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'notification') { a.where = { ...a.where, user: { tenantId: effectiveTenantId } }; }
                             else if (modelName === 'coupon') { a.where = { ...a.where, OR: [{ customer: { company: { tenantId: effectiveTenantId } } }, { customer: null }] }; }
-                            else if (modelName === 'suspendedsale') { /* Publicish */ }
+                            else if (modelName === 'suspendedsale') { /* Shared */ }
                             else if (modelName === 'journalitem') { a.where = { ...a.where, journal: { company: { tenantId: effectiveTenantId } } }; }
                             else {
-                                // Only add relation filter if not a unique-mandatory operation (unless we redirected it)
-                                if (!isUniqueOp || op === 'findFirst') {
+                                // Skip relation filter for findUnique to avoid Prisma "not a unique identifier" error
+                                if (operation !== 'findUnique') {
                                     a.where = { ...a.where, company: { tenantId: effectiveTenantId } };
                                 }
                             }
@@ -137,13 +134,9 @@ const prismaClientSingleton = () => {
                         if (['update', 'updateMany', 'delete', 'deleteMany', 'upsert'].includes(operation)) {
                             if (modelName === 'company') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'user') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'tenant') {
-                                if (!isPlatformAdmin) a.where = { ...a.where, id: effectiveTenantId };
-                            }
-                            else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
+                            else if (modelName === 'tenant') { a.where = { ...a.where, id: effectiveTenantId }; }
                             else {
-                                // Skip relation filter for single update/delete/upsert to avoid Prisma crash
+                                // Skip relation filter for single unique operations to avoid Prisma crash
                                 if (!isUniqueOp) {
                                     a.where = { ...a.where, company: { tenantId: effectiveTenantId } };
                                 }
@@ -164,10 +157,6 @@ const prismaClientSingleton = () => {
                             }
                         }
 
-                        // Execute original or redirected operation
-                        if (op !== operation) {
-                            return (prisma as any)[model][op](a);
-                        }
                         return query(args);
                     }
 
