@@ -9,9 +9,7 @@ export async function GET() {
         const session = auth.user;
 
         // Bypass middleware to see EVERYTHING (for debug)
-        // Note: Prisma middleware usually applies to the instance. 
-        // We'll just count all orders in the whole DB first.
-        const orderCountTotal = await (prisma as any).order.count();
+        const totalOrdersInSystem = await (prisma as any).order.count();
 
         const allOrdersInDB = await (prisma as any).order.findMany({
             take: 20,
@@ -19,8 +17,15 @@ export async function GET() {
             select: { id: true, orderNumber: true, companyId: true, marketplace: true, status: true, createdAt: true }
         });
 
-        const companies = await prisma.company.findMany({
-            where: { tenantId: session.tenantId }
+        const allCompaniesInSystem = await (prisma as any).company.findMany({
+            select: {
+                id: true,
+                name: true,
+                tenantId: true,
+                _count: {
+                    select: { orders: true }
+                }
+            }
         });
 
         return NextResponse.json({
@@ -28,13 +33,14 @@ export async function GET() {
             session: {
                 tenantId: session.tenantId,
                 companyId: session.companyId,
-                role: session.role
+                role: session.role,
+                effectiveTenantId: session.impersonateTenantId || session.tenantId
             },
             stats: {
-                systemTotalOrders: orderCountTotal,
-                tenantCompanies: companies.length,
-                companies: companies.map(c => ({ id: c.id, name: c.name }))
+                systemTotalOrders: totalOrdersInSystem,
+                totalCompaniesInSystem: allCompaniesInSystem.length,
             },
+            allCompanies: allCompaniesInSystem,
             allRecentOrdersInSystem: allOrdersInDB,
             tenantSpecificOrders: await prisma.order.findMany({
                 where: { company: { tenantId: session.tenantId } },
