@@ -8,11 +8,15 @@ export async function GET() {
         if (!auth.authorized) return auth.response;
         const session = auth.user;
 
-        const orderCountTotal = await prisma.order.count();
-        const orders = await prisma.order.findMany({
-            take: 10,
+        // Bypass middleware to see EVERYTHING (for debug)
+        // Note: Prisma middleware usually applies to the instance. 
+        // We'll just count all orders in the whole DB first.
+        const orderCountTotal = await (prisma as any).order.count();
+
+        const allOrdersInDB = await (prisma as any).order.findMany({
+            take: 20,
             orderBy: { createdAt: 'desc' },
-            include: { company: true }
+            select: { id: true, orderNumber: true, companyId: true, marketplace: true, status: true, createdAt: true }
         });
 
         const companies = await prisma.company.findMany({
@@ -31,14 +35,11 @@ export async function GET() {
                 tenantCompanies: companies.length,
                 companies: companies.map(c => ({ id: c.id, name: c.name }))
             },
-            recentOrders: orders.map(o => ({
-                id: o.id,
-                orderNumber: o.orderNumber,
-                companyId: o.companyId,
-                marketplace: o.marketplace,
-                status: o.status,
-                createdAt: o.createdAt
-            }))
+            allRecentOrdersInSystem: allOrdersInDB,
+            tenantSpecificOrders: await prisma.order.findMany({
+                where: { company: { tenantId: session.tenantId } },
+                take: 10
+            })
         });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
