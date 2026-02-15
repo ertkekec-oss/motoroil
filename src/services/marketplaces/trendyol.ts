@@ -17,15 +17,21 @@ export class TrendyolService implements IMarketplaceService {
         return `Basic ${Buffer.from(authString).toString('base64')}`;
     }
 
+    private getHeaders(extra: Record<string, string> = {}): Record<string, string> {
+        return {
+            'Authorization': this.getAuthHeader(),
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            'Accept': 'application/json, text/plain, */*',
+            ...extra
+        };
+    }
+
     async validateConnection(): Promise<boolean> {
         try {
             // Basit bir istek ile bağlantıyı doğrula (örneğin siparişleri limit 1 ile çek)
             // Trendyol'da sırf doğrulama için özel bir endpoint yok, orders'ı test ediyoruz
             const response = await fetch(`${this.baseUrl}/${this.config.supplierId}/orders?size=1`, {
-                headers: {
-                    'Authorization': this.getAuthHeader(),
-                    'User-Agent': `${this.config.supplierId} - Periodya ERP`
-                }
+                headers: this.getHeaders()
             });
 
             return response.ok;
@@ -42,11 +48,7 @@ export class TrendyolService implements IMarketplaceService {
 
             const response = await fetch(url, {
                 method: 'PUT',
-                headers: {
-                    'Authorization': this.getAuthHeader(),
-                    'Content-Type': 'application/json',
-                    'User-Agent': `${this.config.supplierId} - Periodya ERP`
-                },
+                headers: this.getHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                     cargoProvider: cargoProviderCode
                 })
@@ -75,10 +77,7 @@ export class TrendyolService implements IMarketplaceService {
             const url = `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`;
 
             const response = await fetch(url, {
-                headers: {
-                    'Authorization': this.getAuthHeader(),
-                    'User-Agent': `${this.config.supplierId} - Periodya ERP`
-                }
+                headers: this.getHeaders()
             });
 
             const httpStatus = response.status;
@@ -153,10 +152,7 @@ export class TrendyolService implements IMarketplaceService {
             console.log('Trendyol Fetching:', url);
 
             const response = await fetch(url, {
-                headers: {
-                    'Authorization': this.getAuthHeader(),
-                    'User-Agent': `${this.config.supplierId} - Periodya ERP`
-                }
+                headers: this.getHeaders()
             });
 
             if (!response.ok) {
@@ -181,7 +177,7 @@ export class TrendyolService implements IMarketplaceService {
         try {
             const url = `${this.baseUrl}/${this.config.supplierId}/orders?orderNumber=${encodeURIComponent(orderNumber)}`;
             const response = await fetch(url, {
-                headers: { Authorization: this.getAuthHeader() },
+                headers: this.getHeaders(),
             });
             if (!response.ok) return null;
             const data = await response.json();
