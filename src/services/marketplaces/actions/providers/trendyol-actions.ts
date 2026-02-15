@@ -64,9 +64,24 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 const shipmentPackageId = payload?.labelShipmentPackageId;
                 if (!shipmentPackageId) throw new Error('shipmentPackageId gerekli');
 
-                const pdfBase64 = await service.getCommonLabel(shipmentPackageId);
-                if (!pdfBase64) throw new Error('Etiket Trendyol\'dan alınamadı (Boş yanıt)');
+                const labelResult = await service.getCommonLabel(shipmentPackageId);
 
+                // Track raw response for debugging
+                await (prisma as any).marketplaceActionAudit.update({
+                    where: { id: audit.id },
+                    data: { responsePayload: labelResult.raw }
+                });
+
+                if (labelResult.status === 'PENDING') {
+                    return { status: "PENDING", auditId: audit.id };
+                }
+
+                if (labelResult.status === 'FAILED') {
+                    throw new Error(labelResult.error || 'Etiket Trendyol\'dan alınamadı');
+                }
+
+                // SUCCESS branch
+                const pdfBase64 = labelResult.pdfBase64!;
                 const pdfBuffer = Buffer.from(pdfBase64, 'base64');
                 const sha256 = createHash('sha256').update(pdfBuffer).digest('hex');
                 const size = pdfBuffer.length;

@@ -64,52 +64,67 @@ export class TrendyolService implements IMarketplaceService {
         }
     }
 
-    async getCommonLabel(shipmentPackageId: string): Promise<string | null> {
-        let attempts = 0;
-        const maxRetries = 20;
-        const delay = 3000; // Base delay
+    async getCommonLabel(shipmentPackageId: string): Promise<{
+        status: 'SUCCESS' | 'PENDING' | 'FAILED';
+        pdfBase64?: string;
+        error?: string;
+        httpStatus?: number;
+        raw?: any;
+    }> {
+        try {
+            const url = `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`;
 
-        while (attempts < maxRetries) {
-            attempts++;
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': this.getAuthHeader(),
+                    'User-Agent': `${this.config.supplierId} - Periodya ERP`
+                }
+            });
+
+            const httpStatus = response.status;
+
+            // 🔥 CRITICAL: Body can only be read ONCE. 
+            // Read as text first, then parse JSON if possible.
+            const responseText = await response.text();
+            let raw: any = null;
             try {
-                // ... (url setup) ...
-                const url = `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`;
-                console.log(`🌐 Trendyol API İsteği (Deneme ${attempts}/${maxRetries}):`);
-
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': this.getAuthHeader(),
-                        'User-Agent': `${this.config.supplierId} - Periodya ERP`
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error(`❌ Trendyol Etiket İndirme Hatası (${response.status}):`, errorText);
-                    return null;
-                }
-
-                const data = await response.json();
-
-                if (data && data.content && data.content.length > 100) {
-                    console.log('✅ Trendyol etiket başarıyla alındı.');
-                    return data.content;
-                }
-
-                console.log(`⏳ Trendyol yanıt döndü ama içerik boş. Bekleniyor...`);
-
-                if (attempts < maxRetries) {
-                    await new Promise(resolve => setTimeout(resolve, delay + (attempts * 500)));
-                }
-
-            } catch (error) {
-                console.error(`❌ Trendyol etiket hata (Deneme ${attempts}):`, error);
-                if (attempts < maxRetries) await new Promise(resolve => setTimeout(resolve, delay + (attempts * 500)));
+                raw = responseText ? JSON.parse(responseText) : null;
+            } catch {
+                raw = responseText; // fallback to raw text if not JSON
             }
-        }
 
-        console.error('❌ Trendyol etiket deneme süresi doldu, içerik alınamadı.');
-        return null; // All retries failed
+            if (!response.ok) {
+                return {
+                    status: 'FAILED',
+                    error: `Trendyol API Hatası: ${httpStatus}`,
+                    httpStatus,
+                    raw
+                };
+            }
+
+            if (raw && raw.content && raw.content.length > 100) {
+                return {
+                    status: 'SUCCESS',
+                    pdfBase64: raw.content,
+                    httpStatus,
+                    raw
+                };
+            }
+
+            // If 200 OK but no content, it's actually PENDING in Trendyol terms
+            return {
+                status: 'PENDING',
+                httpStatus,
+                raw
+            };
+
+        } catch (error: any) {
+            return {
+                status: 'FAILED',
+                error: error.message || 'Bağlantı hatası',
+                raw: error
+            };
+        }
     }
 
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {

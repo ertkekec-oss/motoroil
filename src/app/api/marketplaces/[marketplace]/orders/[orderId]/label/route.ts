@@ -54,7 +54,7 @@ export async function GET(
         }
 
         // 2) If not exists, check if there's an in-progress action or start one
-        const idempotencyKey = `LABEL_A4:${company.id}:${marketplace}:${shipmentPackageId}`;
+        const idempotencyKey = `LABEL_${format}:${company.id}:${marketplace}:${shipmentPackageId}`;
 
         // Check active audit
         const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({
@@ -72,29 +72,62 @@ export async function GET(
             // This forces a re-check against Trendyol API instead of just returning stale DB status.
         }
 
+        // Action Key resolve
+        const actionKey = `PRINT_LABEL_${format}`;
+
+        // --- STEP 3: Time-Budgeted Synchronous Polling Loop ---
         const provider = ActionProviderRegistry.getProvider(marketplace);
+        const deadline = Date.now() + 55_000;
+        let lastResult: any = null;
+        let attempt = 0;
 
-        const result = await provider.executeAction({
-            companyId: company.id,
-            marketplace: marketplace as any,
-            orderId,
-            actionKey: "PRINT_LABEL_A4",
-            idempotencyKey,
-            payload: { labelShipmentPackageId: shipmentPackageId },
-        });
+        while (Date.now() < deadline) {
+            attempt++;
+            const result = await provider.executeAction({
+                companyId: company.id,
+                marketplace: marketplace as any,
+                orderId,
+                actionKey: actionKey as any,
+                idempotencyKey,
+                payload: { labelShipmentPackageId: shipmentPackageId },
+            });
 
-        // Handle Synchronous Success
-        if (result.status === "SUCCESS") {
-            const storageKey = result.result?.storageKey;
+            lastResult = result;
 
-            if (storageKey) {
-                console.log(`[LABEL] Sync Success. redirecting to ${storageKey}`);
-                const { getLabelSignedUrl } = await import("@/lib/s3");
-                const signedUrl = await getLabelSignedUrl(storageKey);
-                return Response.redirect(signedUrl, 302);
+            // ✅ SUCCESS: PDF is ready and stored
+            if (result.status === "SUCCESS") {
+                const storageKey = result.result?.storageKey;
+                if (storageKey) {
+                    console.log(`[LABEL] Success on attempt ${attempt}. Redirecting.`);
+                    const { getLabelSignedUrl } = await import("@/lib/s3");
+                    const signedUrl = await getLabelSignedUrl(storageKey);
+                    return Response.redirect(signedUrl, 302);
+                }
+            }
+
+            // ❌ FAILED: Fatal error (401, 404, etc.)
+            if (result.status === "FAILED") {
+                console.error(`[LABEL] Fatal failure on attempt ${attempt}:`, result.errorMessage);
+                return new Response(JSON.stringify({
+                    error: result.errorMessage || "Etiket alınamadı",
+                    status: "FAILED",
+                    auditId: result.auditId
+                }), {
+                    status: 502,
+                    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
+                });
+            }
+
+            // ⏳ PENDING: Wait and retry if time allows
+            if (result.status === "PENDING") {
+                console.log(`[LABEL] Pending on attempt ${attempt}. Sleeping 3s...`);
+                // Wait 3 seconds before next poll
+                await new Promise(r => setTimeout(r, 3000));
+                continue;
             }
         }
 
+        // --- STEP 4: Fallback to async wait-page if timeout reached ---
         const retryAfterSec = 3;
 
         if (isDocumentRequest(request)) {
@@ -111,7 +144,7 @@ export async function GET(
         return new Response(JSON.stringify({
             status: "PENDING",
             message: "Etiket hazırlanıyor...",
-            auditId: result.auditId
+            auditId: lastResult?.auditId
         }), {
             status: 202,
             headers: {
@@ -140,8 +173,8 @@ export async function GET(
 
 function isDocumentRequest(req: Request) {
     const accept = (req.headers.get("accept") || "").toLowerCase();
-    const dest = (req.headers.get("sec-fetch-dest") || "").toLowerCase();
-    return dest === "document" || accept.includes("text/html");
+    // Prioritize text/html check
+    return accept.includes("text/html");
 }
 
 function pendingHtml(retryAfterSec: number) {
