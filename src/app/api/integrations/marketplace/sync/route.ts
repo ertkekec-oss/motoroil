@@ -105,78 +105,90 @@ export async function POST(request: Request) {
         let savedCount = 0;
         let updatedCount = 0;
         let details: any[] = [];
+        let errors: any[] = [];
 
         for (const order of orders) {
             try {
                 // 1. Customer Sync
-                const customer = await prisma.customer.upsert({
-                    where: { email_companyId: { email: order.customerEmail || `guest-${order.orderNumber}@${type}.com`, companyId: companyId } }, // Explicit companyId
-                    create: {
-                        companyId: companyId, // Explicit
-                        name: order.customerName || 'Pazaryeri Müşterisi',
-                        email: order.customerEmail,
-                        phone: order.invoiceAddress?.phone || '',
-                        address: JSON.stringify(order.invoiceAddress),
-                        categoryId: categoryId // Can be null
-                    },
-                    update: {}
-                });
+                let customer;
+                try {
+                    customer = await prisma.customer.upsert({
+                        where: { email_companyId: { email: order.customerEmail || `guest-${order.orderNumber}@${type}.com`, companyId: companyId } },
+                        create: {
+                            companyId: companyId,
+                            name: order.customerName || 'Pazaryeri Müşterisi',
+                            email: order.customerEmail,
+                            phone: order.invoiceAddress?.phone || '',
+                            address: JSON.stringify(order.invoiceAddress),
+                            categoryId: categoryId
+                        },
+                        update: {}
+                    });
+                } catch (custErr: any) {
+                    throw new Error(`Müşteri kaydı hatası: ${custErr.message}`);
+                }
 
-                // 2. Idempotency Guard (Find existing order)
+                // 2. Idempotency Guard
                 const existingOrder = await prisma.order.findFirst({
                     where: { companyId, orderNumber: order.orderNumber }
                 });
 
                 if (!existingOrder) {
-                    // NEW ORDER: CREATE & EMIT SALE
-                    const newOrder = await prisma.order.create({
-                        data: {
-                            companyId,
-                            marketplace: type,
-                            marketplaceId: order.id,
-                            orderNumber: order.orderNumber,
-                            customerName: customer.name,
-                            totalAmount: order.totalAmount,
-                            currency: order.currency || 'TRY',
-                            status: order.status,
-                            orderDate: new Date(order.orderDate),
-                            items: order.items as any,
-                            shippingAddress: order.shippingAddress as any,
-                            invoiceAddress: order.invoiceAddress as any,
-                            shipmentPackageId: order.shipmentPackageId, // CRITICAL: For Trendyol ops
-                            rawData: order as any
-                        }
-                    });
-
-                    // TRIGGER REVENUE & FIFO PER ITEM
-                    for (const item of (order.items || [])) {
-                        // Find ERP Product ID
-                        const productMap = await prisma.marketplaceProductMap.findUnique({
-                            where: { marketplace_marketplaceCode: { marketplace: type, marketplaceCode: item.sku } }
-                        });
-
-                        // Emit Sale Event
-                        await EventBus.emit({
-                            companyId,
-                            eventType: 'SALE_COMPLETED',
-                            aggregateType: 'ORDER',
-                            aggregateId: newOrder.id,
-                            payload: {
-                                productId: productMap?.productId, // If null, FIFO is skipped but accounting continues
+                    let newOrder;
+                    try {
+                        newOrder = await prisma.order.create({
+                            data: {
+                                companyId,
                                 marketplace: type,
-                                saleAmount: item.price * item.quantity,
-                                quantity: item.quantity,
-                                taxRate: item.taxRate || 20, // Dynamic VAT Support
-                                sku: item.sku,
-                                orderNumber: order.orderNumber
+                                marketplaceId: order.id,
+                                orderNumber: order.orderNumber,
+                                customerName: customer.name,
+                                totalAmount: order.totalAmount,
+                                currency: order.currency || 'TRY',
+                                status: order.status,
+                                orderDate: new Date(order.orderDate),
+                                items: order.items as any,
+                                shippingAddress: order.shippingAddress as any,
+                                invoiceAddress: order.invoiceAddress as any,
+                                shipmentPackageId: order.shipmentPackageId,
+                                rawData: order as any
                             }
                         });
+                    } catch (orderErr: any) {
+                        throw new Error(`Sipariş oluşturma hatası: ${orderErr.message}`);
+                    }
+
+                    // TRIGGER REVENUE & FIFO
+                    for (const item of (order.items || [])) {
+                        try {
+                            const productMap = await prisma.marketplaceProductMap.findUnique({
+                                where: { marketplace_marketplaceCode: { marketplace: type, marketplaceCode: item.sku } }
+                            });
+
+                            await EventBus.emit({
+                                companyId,
+                                eventType: 'SALE_COMPLETED',
+                                aggregateType: 'ORDER',
+                                aggregateId: newOrder.id,
+                                payload: {
+                                    productId: productMap?.productId,
+                                    marketplace: type,
+                                    saleAmount: item.price * item.quantity,
+                                    quantity: item.quantity,
+                                    taxRate: item.taxRate || 20,
+                                    sku: item.sku,
+                                    orderNumber: order.orderNumber
+                                }
+                            });
+                        } catch (eventErr: any) {
+                            console.error(`[SYNC_EVENT_ERROR] Order ${order.orderNumber} item ${item.sku}:`, eventErr.message);
+                            // Event failure shouldn't rollback the order creation in this basic loop
+                        }
                     }
 
                     savedCount++;
                     details.push({ order: order.orderNumber, action: 'Created' });
                 } else {
-                    // UPDATE HANDLING (Status Reversals + Missing Data Patching)
                     const needsUpdate = existingOrder.status !== order.status || (order.shipmentPackageId && !existingOrder.shipmentPackageId);
 
                     if (needsUpdate) {
@@ -188,26 +200,24 @@ export async function POST(request: Request) {
                             }
                         });
 
-                        if (['CANCELLED', 'RETURNED'].includes(order.status.toUpperCase())) {
-                            // TODO: Add REFUND_COMPLETED event to reverse FIFO/Rev
-                            console.log(`[MARKETPLACE] Order ${order.orderNumber} ${order.status}. Reversal pending.`);
-                        }
-
                         updatedCount++;
                         details.push({ order: order.orderNumber, action: 'StatusUpdate', status: order.status });
                     }
                 }
             } catch (err: any) {
                 console.error(`[SYNC_ERROR] Order ${order.orderNumber}:`, err.message);
+                errors.push({ order: order.orderNumber, error: err.message });
             }
         }
 
         return NextResponse.json({
             success: true,
-            message: `${orders.length} veri çekildi. ${savedCount} yeni, ${updatedCount} güncelleme.`,
+            message: `${orders.length} veri çekildi. ${savedCount} yeni, ${updatedCount} güncelleme. ${errors.length} hata.`,
             savedCount,
             updatedCount,
-            details
+            errorCount: errors.length,
+            details,
+            errors
         });
 
     } catch (error: any) {
