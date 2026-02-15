@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { authorize } from "@/lib/auth";
 import { ActionProviderRegistry } from "@/services/marketplaces/actions/registry";
-import { isRedisHealthy } from "@/lib/queue";
+// import { isRedisHealthy } from "@/lib/queue";
 
 export const runtime = "nodejs";
 
@@ -17,25 +17,11 @@ export async function POST(
 
     try {
         // ============================================================================
-        // 1. REDIS HEALTH CHECK
+        // 1. REDIS HEALTH CHECK (DISABLED FOR SYNC EXECUTION)
         // ============================================================================
-        const redisHealthy = await isRedisHealthy();
-        if (!redisHealthy) {
-            console.error(JSON.stringify({
-                event: 'redis_unavailable',
-                timestamp: new Date().toISOString(),
-                marketplace,
-                orderId,
-            }));
-            return NextResponse.json(
-                {
-                    status: "FAILED",
-                    errorMessage: "Queue service temporarily unavailable. Please try again later.",
-                    code: "REDIS_UNAVAILABLE"
-                },
-                { status: 503 } // Service Unavailable
-            );
-        }
+        // We are moving to synchronous execution for critical tasks, so we don't block on Redis.
+        // const redisHealthy = await isRedisHealthy();
+        // if (!redisHealthy) { ... }
 
         // ============================================================================
         // 2. VALIDATE REQUEST BODY
