@@ -95,12 +95,17 @@ export async function GET(
             }
         }
 
-        // Handle Async/Processing
         return new Response(JSON.stringify({
             status: "PENDING",
             message: "Etiket hazırlanıyor...",
             auditId: result.auditId
-        }), { status: 202, headers: { "Content-Type": "application/json" } });
+        }), {
+            status: 202,
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store"
+            }
+        });
 
     } catch (error: any) {
         console.error(`[LABEL_CRITICAL_ERROR]`, error);
@@ -109,7 +114,10 @@ export async function GET(
             stack: error?.stack
         }), {
             status: 500,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store"
+            },
         });
     }
 }

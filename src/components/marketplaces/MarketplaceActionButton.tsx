@@ -55,74 +55,109 @@ export function MarketplaceActionButton({
         console.log("🚀 EXECUTE ACTION:", { actionUrl, actionKey, idempotencyKey });
 
         try {
-            // For labels, we FIRST try the direct label route
+            // For labels, we use a budgeted polling strategy
             if (isLabel && shipmentPackageId) {
                 const labelUrl = `/api/marketplaces/${encodeURIComponent(mplaceLower)}/orders/${encodeURIComponent(orderId)}/label?shipmentPackageId=${encodeURIComponent(shipmentPackageId)}`;
 
-                let attempts = 0;
-                const maxAttempts = 10;
+                const fetchLabelWithBudget = async (url: string) => {
+                    const TOTAL_BUDGET_MS = 65_000;  // frontend sabrı (backend maxDuration=60 ile senkron)
+                    const STEP_WAIT_MS = 3_000;      // pending bekleme
+                    const PER_REQUEST_TIMEOUT_MS = 70_000; // tek request için güvenli üst sınır
 
-                const checkLabel = async () => {
-                    attempts++;
-                    try {
-                        const res = await fetch(labelUrl);
+                    const start = Date.now();
+                    let lastPendingMessage: string | null = null;
+                    let attempt = 0;
 
-                        // Check for PDF content type
-                        const contentType = res.headers.get("content-type");
-                        const isPdf = contentType && contentType.includes("pdf");
+                    while (Date.now() - start < TOTAL_BUDGET_MS) {
+                        attempt++;
+                        const controller = new AbortController();
+                        const timer = setTimeout(() => controller.abort(), PER_REQUEST_TIMEOUT_MS);
 
-                        // 1. Success (Redirect or PDF Content)
-                        if (res.status === 302 || (res.status === 200 && (res.redirected || isPdf))) {
-                            let openUrl = res.url;
+                        try {
+                            const res = await fetch(url, {
+                                method: "GET",
+                                signal: controller.signal,
+                                headers: { "Cache-Control": "no-store" }
+                            });
 
-                            // If it's a blob/pdf response, create object URL
+                            const contentType = res.headers.get("content-type") || "";
+                            const isPdf = contentType.includes("application/pdf") || contentType.includes("pdf");
+
+                            // ✅ SUCCESS (PDF Content)
                             if (isPdf) {
                                 const blob = await res.blob();
-                                openUrl = URL.createObjectURL(blob);
+                                const fileUrl = URL.createObjectURL(blob);
+                                window.open(fileUrl, "_blank");
+                                setStatus("SUCCESS");
+                                toast.success("Etiket başarıyla alındı", { id: idempotencyKey });
+                                setTimeout(() => setStatus("IDLE"), 2000);
+                                return;
                             }
 
-                            window.open(openUrl, "_blank");
-                            setStatus("SUCCESS");
-                            toast.success("Etiket indiriliyor...");
+                            // ✅ REDIRECT (Legacy handling just in case)
+                            if (res.status === 302 || res.redirected) {
+                                window.open(res.url, "_blank");
+                                setStatus("SUCCESS");
+                                toast.success("Etiket indiriliyor...", { id: idempotencyKey });
+                                setTimeout(() => setStatus("IDLE"), 2000);
+                                return;
+                            }
 
-                            // Reset to IDLE after 2s so user can click again if needed
-                            setTimeout(() => setStatus("IDLE"), 2000);
-                            return;
-                        }
+                            // ✅ JSON (PENDING or ERROR)
+                            const data = await res.json().catch(() => null);
 
-                        // 2. Pending (Trendyol is preparing)
-                        if (res.status === 202) {
-                            if (attempts < maxAttempts) {
+                            if (res.status === 202 || data?.status === "PENDING") {
+                                lastPendingMessage = data?.message || "Etiket hazırlanıyor...";
                                 setStatus("POLLING");
-                                toast.info(`Etiket hazırlanıyor... (${attempts}/${maxAttempts})`, {
-                                    id: idempotencyKey, // Update existing toast
+                                toast.info(`${lastPendingMessage} (${attempt})`, {
+                                    id: idempotencyKey,
                                     duration: 4000
                                 });
-                                setTimeout(checkLabel, 3000); // Retry after 3s
-                                return;
-                            } else {
-                                throw new Error("Etiket hazırlama süresi doldu. Lütfen tekrar deneyin.");
+                                // Wait before next poll
+                                await new Promise(r => setTimeout(r, STEP_WAIT_MS));
+                                continue;
                             }
-                        }
 
-                        // 3. Error
-                        if (!res.ok) {
-                            const errData = await res.json().catch(() => ({}));
-                            throw new Error(errData.errorMessage || "Etiket alınamadı");
-                        }
+                            // ❌ ERROR (4xx, 5xx)
+                            if (!res.ok) {
+                                const data = await res.json().catch(() => ({}));
+                                const msg = data.message || data.error || `Sunucu hatası (HTTP ${res.status})`;
 
-                    } catch (error: any) {
-                        console.error(error);
-                        setStatus("FAILED");
-                        toast.error(error.message || "Etiket işleminde hata oluştu");
-                        setTimeout(() => setStatus("IDLE"), 3000);
+                                // On transient errors (500, 504, 429), we wait and retry if budget allows
+                                if (res.status >= 500 || res.status === 429) {
+                                    console.warn(`Transient error ${res.status}, retrying...`);
+                                    await new Promise(r => setTimeout(r, STEP_WAIT_MS));
+                                    continue;
+                                }
+
+                                throw new Error(msg);
+                            }
+
+                        } catch (error: any) {
+                            if (error.name === 'AbortError') {
+                                console.warn("Fetch aborted (budget timeout/signal)");
+                                await new Promise(r => setTimeout(r, STEP_WAIT_MS));
+                                continue;
+                            }
+                            // If it's not a transient error, we probably should stop
+                            throw error;
+                        } finally {
+                            clearTimeout(timer);
+                        }
                     }
+
+                    throw new Error(lastPendingMessage || "Etiket hazırlama süresi doldu. Lütfen tekrar deneyin.");
                 };
 
-                // Start Polling
+                // Start Process
                 toast.loading("Etiket kontrol ediliyor...", { id: idempotencyKey });
-                checkLabel();
-                return; // Stop execution of normal action flow
+                fetchLabelWithBudget(labelUrl).catch((err: any) => {
+                    console.error("LABEL_FETCH_ERROR", err);
+                    setStatus("FAILED");
+                    toast.error(err.message || "İşlem başarısız oldu", { id: idempotencyKey });
+                    setTimeout(() => setStatus("IDLE"), 3000);
+                });
+                return;
             }
 
             // Normal Action POST
