@@ -54,6 +54,26 @@ export async function GET(
         // 2) If not exists, check if there's an in-progress action or start one
         const idempotencyKey = `LABEL_A4:${company.id}:${marketplace}:${shipmentPackageId}`;
 
+        // Check active audit
+        const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({
+            where: { idempotencyKey }
+        });
+
+        if (existingAudit) {
+            if (existingAudit.status === 'SUCCESS' && existingAudit.responsePayload?.storageKey) {
+                const { getLabelSignedUrl } = await import("@/lib/s3");
+                const signedUrl = await getLabelSignedUrl(existingAudit.responsePayload.storageKey);
+                return Response.redirect(signedUrl, 302);
+            }
+            if (existingAudit.status === 'PENDING') {
+                return new Response(JSON.stringify({
+                    status: "PENDING",
+                    message: "Etiket hazırlanıyor (Mevcut İşlem)...",
+                    auditId: existingAudit.id
+                }), { status: 202, headers: { "Content-Type": "application/json" } });
+            }
+        }
+
         const provider = ActionProviderRegistry.getProvider(marketplace);
 
         const result = await provider.executeAction({
