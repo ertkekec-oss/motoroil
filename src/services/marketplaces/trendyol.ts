@@ -20,8 +20,9 @@ export class TrendyolService implements IMarketplaceService {
     private getHeaders(extra: Record<string, string> = {}): Record<string, string> {
         return {
             'Authorization': this.getAuthHeader(),
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-            'Accept': 'application/json, text/plain, */*',
+            'User-Agent': 'Trendyol-Client-Application',
+            'x-supplier-id': this.config.supplierId,
+            'Accept': 'application/json',
             ...extra
         };
     }
