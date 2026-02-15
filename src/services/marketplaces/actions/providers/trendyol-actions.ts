@@ -97,14 +97,25 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 const updatedOrder = await service.getOrderByNumber(order.orderNumber);
                 if (!updatedOrder) throw new Error('Trendyol\'da sipariş bulunamadı');
 
-                await prisma.order.updateMany({
-                    where: { id: orderId, companyId },
-                    data: {
-                        status: updatedOrder.status,
-                        shipmentPackageId: updatedOrder.shipmentPackageId || order.shipmentPackageId, // Update if available
-                        cargoTrackingLink: updatedOrder.cargoTrackingLink,
-                        cargoTrackingNumber: updatedOrder.cargoTrackingNumber
-                    },
+                // Dynamic update object to avoid undefined issues
+                const updateData: any = {
+                    status: updatedOrder.status,
+                };
+
+                if (updatedOrder.shipmentPackageId) {
+                    updateData.shipmentPackageId = updatedOrder.shipmentPackageId;
+                }
+
+                // Map cargoTrackingNumber to cargoTrackingNo (Schema Name Mismatch Fix)
+                if (updatedOrder.cargoTrackingNumber) {
+                    updateData.cargoTrackingNo = updatedOrder.cargoTrackingNumber;
+                }
+
+                // cargoTrackingLink is not in schema, ignoring it.
+
+                await prisma.order.update({
+                    where: { id: orderId }, // Use ID directly since companyId is checked above
+                    data: updateData
                 });
 
                 result = {
@@ -160,7 +171,7 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 data: {
                     status: 'FAILED',
                     errorMessage: error.message,
-                    errorCode: MarketplaceActionErrorCode.E_UNKNOWN
+                    // errorCode: MarketplaceActionErrorCode.E_UNKNOWN // REMOVED: Field not in schema
                 }
             });
 
@@ -171,5 +182,6 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 errorCode: MarketplaceActionErrorCode.E_UNKNOWN
             };
         }
+
     }
 }
