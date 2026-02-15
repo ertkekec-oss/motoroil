@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { authorize } from "@/lib/auth";
 import { ActionProviderRegistry } from "@/services/marketplaces/actions/registry";
+import { MarketplaceServiceFactory } from "@/services/marketplaces";
 // import { isRedisHealthy } from "@/lib/queue";
 
 export const runtime = "nodejs";
@@ -10,18 +11,16 @@ export async function POST(
     request: Request,
     { params }: { params: { marketplace: string; orderId: string } }
 ) {
-    const auth = await authorize();
-    if (!auth.authorized) return auth.response;
-
-    const { marketplace, orderId } = await (params as any);
-
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+
+        const { marketplace, orderId } = await (params as any);
+
         // ============================================================================
-        // 1. REDIS HEALTH CHECK (DISABLED FOR SYNC EXECUTION)
+        // 1. REDIS HEALTH CHECK (DISABLED)
         // ============================================================================
-        // We are moving to synchronous execution for critical tasks, so we don't block on Redis.
         // const redisHealthy = await isRedisHealthy();
-        // if (!redisHealthy) { ... }
 
         // ============================================================================
         // 2. VALIDATE REQUEST BODY
@@ -99,15 +98,13 @@ export async function POST(
         // ============================================================================
         // 6. VALIDATE/RESOLVE shipmentPackageId FOR LABEL/CARGO ACTIONS
         // ============================================================================
-        // Trendyol needs shipmentPackageId for almost all operational actions.
-        // If it's missing in DB, we attempt to 'Self-Heal' by fetching it from API.
         const requiresShipmentId = actionKey === 'PRINT_LABEL_A4' || actionKey === 'CHANGE_CARGO';
 
         let effectiveShipmentPackageId = order.shipmentPackageId || payload?.labelShipmentPackageId || payload?.shipmentPackageId;
 
         if (requiresShipmentId && !effectiveShipmentPackageId) {
             try {
-                // IMPORTANT: Ensure mplaceLower is used to avoid factory crash
+                // Heal logic
                 const service = MarketplaceServiceFactory.createService(mplaceLower as any, config.settings);
                 if (order.orderNumber) {
                     const mOrder = await (service as any).getOrderByNumber(order.orderNumber);
@@ -139,33 +136,18 @@ export async function POST(
         // ============================================================================
         // 7. EXECUTE ACTION
         // ============================================================================
-        // Ensure the payload has the resolved shipment ID
         const finalPayload = {
             ...payload,
             shipmentPackageId: effectiveShipmentPackageId,
             labelShipmentPackageId: effectiveShipmentPackageId
         };
+
         let provider;
         try {
             provider = ActionProviderRegistry.getProvider(marketplace);
         } catch (registryError: any) {
             return NextResponse.json(
-                {
-                    status: "FAILED",
-                    errorMessage: registryError.message || `Provider not found for ${marketplace}`,
-                    code: "PROVIDER_NOT_FOUND"
-                },
-                { status: 400 }
-            );
-        }
-
-        if (!provider) {
-            return NextResponse.json(
-                {
-                    status: "FAILED",
-                    errorMessage: "Marketplace provider instance is null",
-                    code: "PROVIDER_NULL"
-                },
+                { status: "FAILED", errorMessage: registryError.message, code: "PROVIDER_NOT_FOUND" },
                 { status: 400 }
             );
         }
@@ -180,42 +162,36 @@ export async function POST(
         });
 
         // ============================================================================
-        // 8. STRUCTURED LOGGING
+        // 8. STRUCTURED LOGGING & RESPONSE
         // ============================================================================
         console.log(JSON.stringify({
-            event: 'job_enqueued',
-            timestamp: new Date().toISOString(),
-            requestId: request.headers.get("x-request-id") || `req_${Date.now()}`,
+            event: 'action_executed',
+            status: result.status,
             companyId: company.id,
-            orderId,
-            actionKey,
-            idempotencyKey,
-            auditId: result.auditId,
-            user: auth.user.username,
-            marketplace,
+            actionKey
         }));
 
-        // Return 202 Accepted for all queued actions
-        return NextResponse.json(result, { status: 202 });
+        // Return 200 for SUCCESS, 202 for PENDING
+        return NextResponse.json(result, { status: result.status === 'SUCCESS' ? 200 : 202 });
 
     } catch (error: any) {
         // ============================================================================
         // 9. GENERIC ERROR HANDLER (Last Resort)
         // ============================================================================
         console.error(JSON.stringify({
-            event: 'marketplace_action_error',
-            timestamp: new Date().toISOString(),
+            event: 'marketplace_action_critical_error',
             error: error.message,
             stack: error.stack,
-            marketplace,
-            orderId,
+            marketplace: params?.marketplace,
+            orderId: params?.orderId,
         }));
 
         return NextResponse.json(
             {
                 status: "FAILED",
                 errorMessage: error?.message ?? "Internal server error",
-                code: "INTERNAL_ERROR"
+                code: "INTERNAL_ERROR",
+                details: error?.stack
             },
             { status: 500 }
         );
