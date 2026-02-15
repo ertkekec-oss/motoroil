@@ -103,12 +103,12 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 };
 
                 if (updatedOrder.shipmentPackageId) {
-                    updateData.shipmentPackageId = updatedOrder.shipmentPackageId;
+                    updateData.shipmentPackageId = String(updatedOrder.shipmentPackageId);
                 }
 
                 // Map cargoTrackingNumber to cargoTrackingNo (Schema Name Mismatch Fix)
                 if (updatedOrder.cargoTrackingNumber) {
-                    updateData.cargoTrackingNo = updatedOrder.cargoTrackingNumber;
+                    updateData.cargoTrackingNo = String(updatedOrder.cargoTrackingNumber);
                 }
 
                 // cargoTrackingLink is not in schema, ignoring it.
