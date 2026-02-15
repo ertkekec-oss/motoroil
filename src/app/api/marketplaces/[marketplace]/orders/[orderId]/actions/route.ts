@@ -103,17 +103,23 @@ export async function POST(
         let effectiveShipmentPackageId = order.shipmentPackageId || payload?.labelShipmentPackageId || payload?.shipmentPackageId;
 
         if (requiresShipmentId && !effectiveShipmentPackageId) {
+            console.log(`[ACTIONS] shipmentPackageId missing for order ${order.orderNumber}. Attempting self-heal...`);
             try {
                 // Heal logic
-                const service = MarketplaceServiceFactory.createService(mplaceLower as any, config.settings);
+                const service = MarketplaceServiceFactory.createService(mplaceLower as any, config.settings) as any;
                 if (order.orderNumber) {
-                    const mOrder = await (service as any).getOrderByNumber(order.orderNumber);
-                    if (mOrder?.shipmentPackageId) {
+                    const mOrder = await service.getOrderByNumber(order.orderNumber);
+
+                    if (mOrder && mOrder.shipmentPackageId) {
+                        console.log(`[ACTIONS] Self-heal SUCCESS. Found shipmentPackageId: ${mOrder.shipmentPackageId}`);
                         effectiveShipmentPackageId = mOrder.shipmentPackageId;
+
                         await prisma.order.update({
                             where: { id: orderId },
                             data: { shipmentPackageId: effectiveShipmentPackageId }
                         });
+                    } else {
+                        console.warn(`[ACTIONS] Self-heal FAILED. Trendyol returned order but no shipmentPackageId. data: ${JSON.stringify(mOrder)}`);
                     }
                 }
             } catch (healError: any) {
@@ -125,9 +131,12 @@ export async function POST(
             return NextResponse.json(
                 {
                     status: "FAILED",
-                    errorMessage: "E_ORDER_DATA_MISSING: shipmentPackageId bulunamadı. Lütfen önce 'Durum Yenile' yapın veya siparişi kargoya hazır hale getirin.",
+                    errorMessage: "Siparişin 'Kargo Paket Numarası' (shipmentPackageId) Trendyol'dan çekilemedi. Lütfen Trendyol panelinden siparişin durumunu kontrol edin (İptal/İade olabilir).",
                     code: "SHIPMENT_PACKAGE_ID_MISSING",
-                    meta: { required: ["shipmentPackageId"] }
+                    meta: {
+                        required: ["shipmentPackageId"],
+                        details: "Tried fetching from Trendyol API but failed to resolve shipmentPackageId."
+                    }
                 },
                 { status: 400 } // Controlled failure
             );
