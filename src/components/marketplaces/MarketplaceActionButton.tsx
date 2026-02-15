@@ -56,7 +56,6 @@ export function MarketplaceActionButton({
 
         try {
             // For labels, we FIRST try the direct label route
-            // For labels, we FIRST try the direct label route
             if (isLabel && shipmentPackageId) {
                 const labelUrl = `/api/marketplaces/${encodeURIComponent(mplaceLower)}/orders/${encodeURIComponent(orderId)}/label?shipmentPackageId=${encodeURIComponent(shipmentPackageId)}`;
 
@@ -68,11 +67,25 @@ export function MarketplaceActionButton({
                     try {
                         const res = await fetch(labelUrl);
 
-                        // 1. Success (Redirect to S3 or PDF Content)
-                        if (res.status === 302 || (res.status === 200 && res.redirected)) {
-                            window.open(res.url, "_blank");
+                        // Check for PDF content type
+                        const contentType = res.headers.get("content-type");
+                        const isPdf = contentType && contentType.includes("pdf");
+
+                        // 1. Success (Redirect or PDF Content)
+                        if (res.status === 302 || (res.status === 200 && (res.redirected || isPdf))) {
+                            let openUrl = res.url;
+
+                            // If it's a blob/pdf response, create object URL
+                            if (isPdf) {
+                                const blob = await res.blob();
+                                openUrl = URL.createObjectURL(blob);
+                            }
+
+                            window.open(openUrl, "_blank");
                             setStatus("SUCCESS");
                             toast.success("Etiket indiriliyor...");
+
+                            // Reset to IDLE after 2s so user can click again if needed
                             setTimeout(() => setStatus("IDLE"), 2000);
                             return;
                         }
@@ -82,25 +95,27 @@ export function MarketplaceActionButton({
                             if (attempts < maxAttempts) {
                                 setStatus("POLLING");
                                 toast.info(`Etiket hazırlanıyor... (${attempts}/${maxAttempts})`, {
-                                    id: idempotencyKey,
+                                    id: idempotencyKey, // Update existing toast
                                     duration: 4000
                                 });
                                 setTimeout(checkLabel, 3000); // Retry after 3s
                                 return;
                             } else {
-                                throw new Error("Etiket hazırlama süresi doldu.");
+                                throw new Error("Etiket hazırlama süresi doldu. Lütfen tekrar deneyin.");
                             }
                         }
 
                         // 3. Error
                         if (!res.ok) {
-                            const errData = await res.json();
+                            const errData = await res.json().catch(() => ({}));
                             throw new Error(errData.errorMessage || "Etiket alınamadı");
                         }
 
                     } catch (error: any) {
+                        console.error(error);
                         setStatus("FAILED");
                         toast.error(error.message || "Etiket işleminde hata oluştu");
+                        setTimeout(() => setStatus("IDLE"), 3000);
                     }
                 };
 
