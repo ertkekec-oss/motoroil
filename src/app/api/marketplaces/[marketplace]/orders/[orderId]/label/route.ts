@@ -3,6 +3,8 @@ import { authorize } from "@/lib/auth";
 import { ActionProviderRegistry } from "@/services/marketplaces/actions/registry";
 
 export const runtime = "nodejs";
+export const maxDuration = 60; // Allow up to 60 seconds for slow Trendyol responses
+export const dynamic = "force-dynamic";
 
 export async function GET(
     request: Request,

@@ -66,15 +66,14 @@ export class TrendyolService implements IMarketplaceService {
 
     async getCommonLabel(shipmentPackageId: string): Promise<string | null> {
         let attempts = 0;
-        const maxRetries = 10;
-        const delay = 3000; // 3s delay between retries
+        const maxRetries = 20;
+        const delay = 3000; // Base delay
 
         while (attempts < maxRetries) {
             attempts++;
             try {
-                // Trendyol Common Label API - PDF formatında etiket al
+                // ... (url setup) ...
                 const url = `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`;
-
                 console.log(`🌐 Trendyol API İsteği (Deneme ${attempts}/${maxRetries}):`);
 
                 const response = await fetch(url, {
@@ -85,7 +84,6 @@ export class TrendyolService implements IMarketplaceService {
                 });
 
                 if (!response.ok) {
-                    // If 404/400 etc, break loop, likely permanent error
                     const errorText = await response.text();
                     console.error(`❌ Trendyol Etiket İndirme Hatası (${response.status}):`, errorText);
                     return null;
@@ -93,23 +91,20 @@ export class TrendyolService implements IMarketplaceService {
 
                 const data = await response.json();
 
-                // If content exists, return immediately
                 if (data && data.content && data.content.length > 100) {
                     console.log('✅ Trendyol etiket başarıyla alındı.');
                     return data.content;
                 }
 
-                console.log(`⏳ Trendyol yanıt döndü ama içerik boş (Hazırlanıyor...). Bekleniyor...`);
+                console.log(`⏳ Trendyol yanıt döndü ama içerik boş. Bekleniyor...`);
 
-                // Wait before retry
                 if (attempts < maxRetries) {
-                    await new Promise(resolve => setTimeout(resolve, delay));
+                    await new Promise(resolve => setTimeout(resolve, delay + (attempts * 500)));
                 }
 
             } catch (error) {
-                console.error(`❌ Trendyol etiket getirme hatası (Deneme ${attempts}):`, error);
-                // On network error, maybe wait and retry?
-                if (attempts < maxRetries) await new Promise(resolve => setTimeout(resolve, delay));
+                console.error(`❌ Trendyol etiket hata (Deneme ${attempts}):`, error);
+                if (attempts < maxRetries) await new Promise(resolve => setTimeout(resolve, delay + (attempts * 500)));
             }
         }
 
