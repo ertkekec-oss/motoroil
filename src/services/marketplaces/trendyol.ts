@@ -182,8 +182,8 @@ export class TrendyolService implements IMarketplaceService {
             cargoTrackingNumber: ptOrder.cargoTrackingNumber,
             cargoTrackingLink: ptOrder.cargoTrackingLink,
             cargoProvider: ptOrder.cargoProviderName,
-            // CRITICAL: Map shipmentPackageId from Trendyol API
-            shipmentPackageId: ptOrder.shipmentPackageId || ptOrder.packageId || ptOrder.lines?.[0]?.shipmentPackageId || null,
+            // CRITICAL: Map shipmentPackageId from Trendyol API and ensure String
+            shipmentPackageId: (ptOrder.shipmentPackageId || ptOrder.packageId || ptOrder.lines?.[0]?.shipmentPackageId || '').toString() || null,
             shippingAddress: {
                 fullName: `${ptOrder.shipmentAddress.firstName} ${ptOrder.shipmentAddress.lastName}`,
                 address: ptOrder.shipmentAddress.fullAddress,
@@ -203,7 +203,7 @@ export class TrendyolService implements IMarketplaceService {
                 sku: line.merchantSku || line.sku,
                 quantity: line.quantity,
                 price: line.price,
-                taxRate: line.vatBaseAmount ? (line.amount / line.vatBaseAmount) * 100 : 0, // Tahmini
+                taxRate: line.vatRate || (line.vatBaseAmount ? (line.amount / line.vatBaseAmount) * 100 : 0),
                 discountAmount: line.discountAmount
             }))
         };
