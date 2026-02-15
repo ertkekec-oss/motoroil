@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
 import BankIntegrationOnboarding from './Banking/BankIntegrationOnboarding';
+import { apiFetch } from '@/lib/api-client';
 
 export default function IntegrationsContent() {
     const { showSuccess, showError } = useModal();
@@ -84,7 +85,7 @@ export default function IntegrationsContent() {
         setTestResults({ ...testResults, efatura: '⏳ Bağlantı test ediliyor...' });
 
         try {
-            const res = await fetch('/api/sales/formal-invoice-test', {
+            const res = await apiFetch('/api/sales/formal-invoice-test', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -122,7 +123,7 @@ export default function IntegrationsContent() {
 
         try {
             if (marketplace === 'custom') {
-                const response = await fetch('/api/integrations/ecommerce/sync', { method: 'POST' });
+                const response = await apiFetch('/api/integrations/ecommerce/sync', { method: 'POST' });
                 const data = await response.json();
                 if (data.success) {
                     setTestResults(prev => ({ ...prev, [marketplace]: `✅ Bağlantı başarılı! ${data.count} sipariş bulundu.` }));
@@ -131,7 +132,7 @@ export default function IntegrationsContent() {
                 }
             } else {
                 const config = (marketplaceSettings as any)[marketplace];
-                const response = await fetch('/api/integrations/marketplace/sync', {
+                const response = await apiFetch('/api/integrations/marketplace/sync', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ type: marketplace, config: config })
@@ -153,7 +154,7 @@ export default function IntegrationsContent() {
 
     const fetchStats = async () => {
         try {
-            const res = await fetch('/api/integrations/marketplace/stats');
+            const res = await apiFetch('/api/integrations/marketplace/stats');
             const data = await res.json();
             if (data.success) setStats(data.stats);
         } catch (e) { console.error('Stats error:', e); }
@@ -162,7 +163,7 @@ export default function IntegrationsContent() {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const res = await fetch('/api/integrations/settings/save');
+                const res = await apiFetch('/api/integrations/settings/save');
                 const data = await res.json();
                 if (data.success) {
                     if (data.eFaturaSettings) setEFaturaSettings(data.eFaturaSettings);
@@ -186,7 +187,7 @@ export default function IntegrationsContent() {
     const saveSettings = async () => {
         setIsSaving(true);
         try {
-            const response = await fetch('/api/integrations/settings/save', {
+            const response = await apiFetch('/api/integrations/settings/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ marketplaceSettings, eFaturaSettings, posSettings })

@@ -1,0 +1,151 @@
+[
+  {
+    "id": "cmlmnejfg001m12wi7ezsgj17",
+    "type": "trendyol",
+    "settings": {
+      "apiKey": "5H4Yezyq27uJBRVOacHD",
+      "enabled": true,
+      "autoSync": true,
+      "apiSecret": "0sSqWWGZDdPoaIfI3oDb",
+      "supplierId": "548512",
+      "syncInterval": 15
+    },
+    "isActive": true,
+    "lastSync": null,
+    "createdAt": "2026-02-14T18:26:44.573Z",
+    "updatedAt": "2026-02-15T08:35:47.605Z",
+    "companyId": "cmlmgrglc0004tt34n6aiz9l3",
+    "deletedAt": null,
+    "company": {
+      "id": "cmlmgrglc0004tt34n6aiz9l3",
+      "tenantId": "cmlmgrg030000tt34eaolutdj",
+      "name": "adasda",
+      "vkn": "9999999999",
+      "taxOffice": null,
+      "address": "",
+      "district": null,
+      "city": "",
+      "createdAt": "2026-02-14T15:20:50.112Z",
+      "updatedAt": "2026-02-14T15:20:50.112Z"
+    }
+  },
+  {
+    "id": "cmlmnejv3001o12wir24vfhxd",
+    "type": "amazon",
+    "settings": {
+      "enabled": false,
+      "autoSync": false,
+      "sellerId": "",
+      "accessKey": "",
+      "secretKey": "",
+      "mwsAuthToken": "",
+      "syncInterval": 30
+    },
+    "isActive": false,
+    "lastSync": null,
+    "createdAt": "2026-02-14T18:26:44.573Z",
+    "updatedAt": "2026-02-15T08:35:47.605Z",
+    "companyId": "cmlmgrglc0004tt34n6aiz9l3",
+    "deletedAt": null,
+    "company": {
+      "id": "cmlmgrglc0004tt34n6aiz9l3",
+      "tenantId": "cmlmgrg030000tt34eaolutdj",
+      "name": "adasda",
+      "vkn": "9999999999",
+      "taxOffice": null,
+      "address": "",
+      "district": null,
+      "city": "",
+      "createdAt": "2026-02-14T15:20:50.112Z",
+      "updatedAt": "2026-02-14T15:20:50.112Z"
+    }
+  },
+  {
+    "id": "cmlmnejve001s12wim7m4tc64",
+    "type": "hepsiburada",
+    "settings": {
+      "isTest": false,
+      "enabled": false,
+      "autoSync": false,
+      "password": "",
+      "username": "",
+      "merchantId": "",
+      "syncInterval": 15
+    },
+    "isActive": false,
+    "lastSync": null,
+    "createdAt": "2026-02-14T18:26:44.573Z",
+    "updatedAt": "2026-02-15T08:35:47.605Z",
+    "companyId": "cmlmgrglc0004tt34n6aiz9l3",
+    "deletedAt": null,
+    "company": {
+      "id": "cmlmgrglc0004tt34n6aiz9l3",
+      "tenantId": "cmlmgrg030000tt34eaolutdj",
+      "name": "adasda",
+      "vkn": "9999999999",
+      "taxOffice": null,
+      "address": "",
+      "district": null,
+      "city": "",
+      "createdAt": "2026-02-14T15:20:50.112Z",
+      "updatedAt": "2026-02-14T15:20:50.112Z"
+    }
+  },
+  {
+    "id": "cmlmnejvd001q12widx741jz4",
+    "type": "custom",
+    "settings": {
+      "url": "https://www.periodya.com.tr/xml.php?c=siparisler&xmlc=10a4cd8d5e",
+      "enabled": true,
+      "autoSync": false,
+      "syncInterval": 60
+    },
+    "isActive": true,
+    "lastSync": null,
+    "createdAt": "2026-02-14T18:26:44.573Z",
+    "updatedAt": "2026-02-15T08:35:47.605Z",
+    "companyId": "cmlmgrglc0004tt34n6aiz9l3",
+    "deletedAt": null,
+    "company": {
+      "id": "cmlmgrglc0004tt34n6aiz9l3",
+      "tenantId": "cmlmgrg030000tt34eaolutdj",
+      "name": "adasda",
+      "vkn": "9999999999",
+      "taxOffice": null,
+      "address": "",
+      "district": null,
+      "city": "",
+      "createdAt": "2026-02-14T15:20:50.112Z",
+      "updatedAt": "2026-02-14T15:20:50.112Z"
+    }
+  },
+  {
+    "id": "cmlmnejvm001u12wi3p01e2ln",
+    "type": "n11",
+    "settings": {
+      "apiKey": "",
+      "enabled": false,
+      "autoSync": false,
+      "apiSecret": "",
+      "syncInterval": 15
+    },
+    "isActive": false,
+    "lastSync": null,
+    "createdAt": "2026-02-14T18:26:44.573Z",
+    "updatedAt": "2026-02-15T08:35:47.605Z",
+    "companyId": "cmlmgrglc0004tt34n6aiz9l3",
+    "deletedAt": null,
+    "company": {
+      "id": "cmlmgrglc0004tt34n6aiz9l3",
+      "tenantId": "cmlmgrg030000tt34eaolutdj",
+      "name": "adasda",
+      "vkn": "9999999999",
+      "taxOffice": null,
+      "address": "",
+      "district": null,
+      "city": "",
+      "createdAt": "2026-02-14T15:20:50.112Z",
+      "updatedAt": "2026-02-14T15:20:50.112Z"
+    }
+  }
+]

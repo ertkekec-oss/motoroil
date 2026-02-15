@@ -5,7 +5,11 @@ import {
     MarketplaceActionProvider,
     MarketplaceActionResult,
 } from "../types";
-import { marketplaceQueue } from "../../../../lib/queue";
+import { MarketplaceServiceFactory } from "../../index";
+import { uploadLabel, generateLabelStorageKey } from "../../../../lib/s3";
+import { metrics, logger } from "../../../../lib/observability";
+import { createHash } from "crypto";
+import { TrendyolService } from "../../trendyol";
 
 export class TrendyolActionProvider implements MarketplaceActionProvider {
     async executeAction(input: MarketplaceActionInput): Promise<MarketplaceActionResult> {
@@ -13,85 +17,157 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
 
         // Correlation Context
         const ctx = `[ACTION:${actionKey}][IDEMP:${idempotencyKey}]`;
-        const LOCK_DURATION_MS = 60000; // 60 seconds
 
-        // 1) Find existing audit
-        const existing = await (prisma as any).marketplaceActionAudit.findUnique({
+        console.log(`${ctx} Processing SYNCHRONOUSLY (Queue Bypassed)`);
+
+        // 1) Upsert Audit Record (Set as PENDING initially)
+        const audit = await (prisma as any).marketplaceActionAudit.upsert({
             where: { idempotencyKey },
+            update: {
+                status: "PENDING",
+                errorMessage: null
+            },
+            create: {
+                companyId,
+                marketplace,
+                orderId,
+                actionKey,
+                idempotencyKey,
+                status: "PENDING",
+                requestPayload: payload ?? undefined,
+            },
         });
 
-        if (existing) {
-            if (existing.status === "SUCCESS") {
-                console.log(`${ctx} Idempotency hit: SUCCESS`);
-                return { status: "SUCCESS", auditId: existing.id, result: existing.responsePayload };
-            }
-
-            const now = new Date();
-            const isLockExpired = existing.lockExpiresAt && new Date(existing.lockExpiresAt) < now;
-
-            if (existing.status === "PENDING" && !isLockExpired) {
-                console.log(`${ctx} Idempotency hit: PENDING (Active Lock)`);
-                return { status: "PENDING", auditId: existing.id };
-            }
-
-            if (isLockExpired) {
-                console.log(`${ctx} Lock EXPIRED. Stealing/Resetting...`);
-                // We fall through to the update/upsert logic below to "steal" the lock
-            }
+        // If already success, return immediately
+        if (audit.status === "SUCCESS" && audit.responsePayload) {
+            console.log(`${ctx} Idempotency hit: SUCCESS`);
+            metrics.idempotencyHit(marketplace, actionKey);
+            return { status: "SUCCESS", auditId: audit.id, result: audit.responsePayload };
         }
 
-        // 2) Atomic Lock & Enqueue (Winner Takes All)
-        const lockExpiresAt = new Date(Date.now() + LOCK_DURATION_MS);
-
-        let audit: any;
         try {
-            // If expired or new, upsert to become the new winner
-            audit = await (prisma as any).marketplaceActionAudit.upsert({
-                where: { idempotencyKey },
-                update: {
-                    status: "PENDING",
-                    lockExpiresAt,
-                    errorMessage: null
-                },
-                create: {
-                    companyId,
-                    marketplace,
-                    orderId,
-                    actionKey,
-                    idempotencyKey,
-                    status: "PENDING",
-                    lockExpiresAt,
-                    requestPayload: payload ?? undefined,
-                },
+            // 2) Get Config & Initialize Service
+            const config = await (prisma as any).marketplaceConfig.findFirst({
+                where: { companyId, type: marketplace, deletedAt: null },
             });
+            if (!config) throw new Error('Yapılandırma bulunamadı');
 
-            console.log(`${ctx} Lock acquired. Enqueueing job...`);
+            const configData = typeof config.settings === 'string'
+                ? JSON.parse(config.settings)
+                : config.settings;
 
-            // 3) Enqueue Background Job
-            const job = await marketplaceQueue.add(`${marketplace}:${actionKey}`, input, {
-                jobId: idempotencyKey, // Ensure one job per idempotency key in the queue
-            });
+            const service = MarketplaceServiceFactory.createService(marketplace as any, configData) as TrendyolService;
+            let result: any = null;
 
-            // Update audit with jobId
+            // 3) Execute Logic Based on Action Key
+            if (actionKey === 'PRINT_LABEL_A4') {
+                const shipmentPackageId = payload?.labelShipmentPackageId;
+                if (!shipmentPackageId) throw new Error('shipmentPackageId gerekli');
+
+                const pdfBase64 = await service.getCommonLabel(shipmentPackageId);
+                if (!pdfBase64) throw new Error('Etiket Trendyol\'dan alınamadı (Boş yanıt)');
+
+                const pdfBuffer = Buffer.from(pdfBase64, 'base64');
+                const sha256 = createHash('sha256').update(pdfBuffer).digest('hex');
+                const size = pdfBuffer.length;
+                const storageKey = generateLabelStorageKey(companyId, marketplace, shipmentPackageId);
+
+                await uploadLabel(storageKey, pdfBuffer);
+
+                await (prisma as any).marketplaceLabel.upsert({
+                    where: {
+                        companyId_marketplace_shipmentPackageId: {
+                            companyId,
+                            marketplace,
+                            shipmentPackageId
+                        }
+                    },
+                    update: { storageKey, sha256, size },
+                    create: { companyId, marketplace, shipmentPackageId, storageKey, sha256, size }
+                });
+
+                metrics.labelStored(marketplace, size);
+                result = { shipmentPackageId, storageKey, sha256, format: 'A4', labelReady: true };
+            }
+            else if (actionKey === 'REFRESH_STATUS') {
+                const order = await prisma.order.findFirst({ where: { id: orderId, companyId } });
+                if (!order) throw new Error('Sipariş bulunamadı');
+                if (!order.orderNumber) throw new Error('Sipariş numarası eksik');
+
+                const updatedOrder = await service.getOrderByNumber(order.orderNumber);
+                if (!updatedOrder) throw new Error('Trendyol\'da sipariş bulunamadı');
+
+                await prisma.order.updateMany({
+                    where: { id: orderId, companyId },
+                    data: {
+                        status: updatedOrder.status,
+                        shipmentPackageId: updatedOrder.shipmentPackageId || order.shipmentPackageId, // Update if available
+                        cargoTrackingLink: updatedOrder.cargoTrackingLink,
+                        cargoTrackingNumber: updatedOrder.cargoTrackingNumber
+                    },
+                });
+
+                result = {
+                    previousStatus: order.status,
+                    currentStatus: updatedOrder.status,
+                    shipmentPackageId: updatedOrder.shipmentPackageId || order.shipmentPackageId,
+                    refreshedAt: new Date().toISOString()
+                };
+            }
+            else if (actionKey === 'CHANGE_CARGO') {
+                const shipmentPackageId = payload?.shipmentPackageId;
+                const cargoProviderCode = payload?.cargoProviderCode;
+
+                if (!shipmentPackageId || !cargoProviderCode) {
+                    throw new Error('shipmentPackageId ve cargoProviderCode gerekli');
+                }
+
+                const res = await service.updateCargoProvider(shipmentPackageId, cargoProviderCode);
+                if (!res.success) throw new Error(res.error || 'Kargo sağlayıcı güncellenemedi');
+
+                // Update Local Order
+                await prisma.order.updateMany({
+                    where: { shipmentPackageId, companyId },
+                    data: { cargoProvider: cargoProviderCode }
+                });
+
+                result = { shipmentPackageId, cargoProviderCode, updated: true };
+            }
+            else {
+                throw new Error(`Desteklenmeyen işlem: ${actionKey}`);
+            }
+
+            // 4) Success: Update Audit & Return
             await (prisma as any).marketplaceActionAudit.update({
                 where: { id: audit.id },
-                data: { jobId: job.id }
+                data: {
+                    status: 'SUCCESS',
+                    responsePayload: result,
+                    errorMessage: null
+                }
             });
 
-            return { status: "PENDING", auditId: audit.id };
+            metrics.externalCall(marketplace, actionKey, 'SUCCESS');
+            return { status: "SUCCESS", auditId: audit.id, result };
 
-        } catch (err: any) {
-            // Unique constraint fail (P2002) - Someone else just won the race
-            if (err.code === 'P2002') {
-                const winner = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
-                console.log(`${ctx} Race lost. Returning status: ${winner?.status}`);
-                return { status: winner?.status || "PENDING", auditId: winner?.id! };
-            }
-            console.error(`${ctx} Error:`, err.message);
+        } catch (error: any) {
+            console.error(`${ctx} Sync execution failed:`, error);
+            metrics.externalCall(marketplace, actionKey, 'FAILED');
+
+            // 5) Failure: Update Audit & Return
+            await (prisma as any).marketplaceActionAudit.update({
+                where: { id: audit.id },
+                data: {
+                    status: 'FAILED',
+                    errorMessage: error.message,
+                    errorCode: MarketplaceActionErrorCode.E_UNKNOWN
+                }
+            });
+
             return {
                 status: "FAILED",
-                auditId: audit?.id || 'unknown',
-                errorMessage: err.message,
+                auditId: audit.id,
+                errorMessage: error.message,
                 errorCode: MarketplaceActionErrorCode.E_UNKNOWN
             };
         }

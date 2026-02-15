@@ -12,6 +12,7 @@ import { useFinancials } from '@/contexts/FinancialContext';
 import { useCRM } from '@/contexts/CRMContext';
 import Pagination from '@/components/Pagination';
 import { MarketplaceActionButton } from '@/components/marketplaces/MarketplaceActionButton';
+import { apiFetch } from '@/lib/api-client';
 
 export default function SalesPage() {
     const { showSuccess, showError, showConfirm, showWarning, showQuotaExceeded, closeModal } = useModal();
@@ -44,14 +45,14 @@ export default function SalesPage() {
     const handleDeleteInvoice = async (id: string) => {
         showConfirm('Fatura Silinecek', 'Bu faturayı silmek istediğinize emin misiniz? Bu işlem bakiye ve stokları GERİ ALMAYABİLİR (Onaylanmış faturalar için manuel kontrol önerilir).', async () => {
             try {
-                const res = await fetch(`/api/sales/invoices/${id}`, { method: 'DELETE' });
+                const res = await apiFetch(`/api/sales/invoices/${id}`, { method: 'DELETE' });
                 const data = await res.json();
                 if (data.success) {
                     showSuccess('Başarılı', 'Fatura silindi.');
                     fetchInvoices();
                     if (activeTab === 'store') {
                         // Refresh store tab if we are there
-                        fetch('/api/sales/history?source=POS').then(r => r.json()).then(d => {
+                        apiFetch('/api/sales/history?source=POS').then(r => r.json()).then(d => {
                             if (d.success) setStoreOrders(d.orders);
                         });
                     }
@@ -67,12 +68,12 @@ export default function SalesPage() {
     const handleDeleteStoreSale = async (id: string) => {
         showConfirm('Satış Silinecek', 'Bu mağaza satışını (POS) tamamen silmek ve stok/kasa/cari hareketlerini GERİ ALMAK istediğinize emin misiniz?', async () => {
             try {
-                const res = await fetch(`/api/orders/${id}`, { method: 'DELETE' });
+                const res = await apiFetch(`/api/orders/${id}`, { method: 'DELETE' });
                 const data = await res.json();
                 if (data.success) {
                     showSuccess('Başarılı', 'Satış ve tüm etkileri geri alınarak silindi.');
                     // Refresh data
-                    const res2 = await fetch('/api/sales/history?source=POS');
+                    const res2 = await apiFetch('/api/sales/history?source=POS');
                     const data2 = await res2.json();
                     if (data2.success) setStoreOrders(data2.orders);
                 } else {
@@ -88,7 +89,7 @@ export default function SalesPage() {
     const fetchInvoices = async () => {
         setIsLoadingInvoices(true);
         try {
-            const res = await fetch('/api/sales/invoices');
+            const res = await apiFetch('/api/sales/invoices');
             const data = await res.json();
             if (data.success) setRealInvoices(data.invoices);
         } catch (err) { console.error(err); }
@@ -98,7 +99,7 @@ export default function SalesPage() {
     const fetchPurchaseInvoices = async () => {
         setIsLoadingPurchaseInvoices(true);
         try {
-            const res = await fetch('/api/purchasing/list');
+            const res = await apiFetch('/api/purchasing/list');
             const data = await res.json();
             if (data.success) {
                 // api/purchasing/list formatted the data already, but we might want raw or similar
@@ -112,8 +113,8 @@ export default function SalesPage() {
         setIsLoadingWayslips(true);
         try {
             const [salesRes, purRes] = await Promise.all([
-                fetch('/api/sales/invoices'),
-                fetch('/api/purchasing/list')
+                apiFetch('/api/sales/invoices'),
+                apiFetch('/api/purchasing/list')
             ]);
             const salesData = await salesRes.json();
             const purData = await purRes.json();
@@ -161,7 +162,7 @@ export default function SalesPage() {
         showConfirm('Onay', 'Bu faturayı onaylamak istiyor musunuz? Stoklar düşülecek ve cari bakiye güncellenecektir.', async () => {
             setIsApproving(id);
             try {
-                const res = await fetch(`/api/sales/invoices/${id}/approve`, { method: 'POST' });
+                const res = await apiFetch(`/api/sales/invoices/${id}/approve`, { method: 'POST' });
                 const data = await res.json();
                 if (data.success) {
                     showSuccess('Başarılı', '✅ Fatura onaylandı.');
@@ -174,7 +175,7 @@ export default function SalesPage() {
 
     const handleViewPDF = async (invoiceId: string) => {
         try {
-            const res = await fetch('/api/sales/invoices', {
+            const res = await apiFetch('/api/sales/invoices', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'get-pdf', invoiceId })
@@ -209,7 +210,7 @@ export default function SalesPage() {
         showConfirm(title, msg, async () => {
             setIsProcessingAction(invoiceId);
             try {
-                const res = await fetch('/api/sales/invoices', {
+                const res = await apiFetch('/api/sales/invoices', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -257,7 +258,7 @@ export default function SalesPage() {
         setIsSendingDespatch(true);
 
         try {
-            const res = await fetch('/api/sales/invoices', {
+            const res = await apiFetch('/api/sales/invoices', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -320,7 +321,7 @@ export default function SalesPage() {
 
         try {
             // Mock saving for now - in a real app this would call an API
-            const res = await fetch('/api/sales/wayslips', {
+            const res = await apiFetch('/api/sales/wayslips', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newWayslipData)
@@ -349,7 +350,7 @@ export default function SalesPage() {
         showConfirm('Kabul Et', 'Bu faturayı kabul etmek ve stoklara işlemek istediğinize emin misiniz?', async () => {
             setIsProcessingAction(id);
             try {
-                const res = await fetch(`/api/purchasing/${id}/approve`, { method: 'POST' });
+                const res = await apiFetch(`/api/purchasing/${id}/approve`, { method: 'POST' });
                 const data = await res.json();
                 if (data.success) {
                     showSuccess('Başarılı', '✅ Fatura kabul edildi ve stoklara işlendi.');
@@ -363,7 +364,7 @@ export default function SalesPage() {
     const handleRejectPurchaseInvoice = async (id: string) => {
         showConfirm('Reddet', 'Bu faturayı reddetmek istediğinize emin misiniz? Bu işlem geri alınamaz.', async () => {
             try {
-                const res = await fetch(`/api/purchasing/${id}/reject`, { method: 'POST' });
+                const res = await apiFetch(`/api/purchasing/${id}/reject`, { method: 'POST' });
                 const data = await res.json();
                 if (data.success) {
                     showSuccess('Başarılı', '❌ Fatura reddedildi.');
@@ -377,7 +378,7 @@ export default function SalesPage() {
     const fetchOnlineOrders = async () => {
         try {
             // Pazaryerinden gelen ve veritabanına kaydedilen siparişleri çek (status=Yeni vb.)
-            const res = await fetch('/api/orders/pending');
+            const res = await apiFetch('/api/orders/pending');
             const data = await res.json();
             if (data.success && Array.isArray(data.orders)) {
                 // API'den gelen veriyi güvenli hale getir
@@ -405,8 +406,8 @@ export default function SalesPage() {
             setIsLoadingStore(true);
 
             Promise.all([
-                fetch('/api/sales/history?source=POS').then(r => r.json()),
-                fetch('/api/sales/invoices').then(r => r.json())
+                apiFetch('/api/sales/history?source=POS').then(r => r.json()),
+                apiFetch('/api/sales/invoices').then(r => r.json())
             ]).then(([ordersData, invoicesData]) => {
                 let combined: any[] = [];
 
@@ -611,7 +612,7 @@ export default function SalesPage() {
                     name: i.name
                 }));
 
-                const res = await fetch('/api/integrations/marketplace/check-mapping', {
+                const res = await apiFetch('/api/integrations/marketplace/check-mapping', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -664,7 +665,7 @@ export default function SalesPage() {
             })).filter((m: any) => m.productId); // Only send mapped ones
 
             if (mappingPayload.length > 0) {
-                await fetch('/api/integrations/marketplace/save-mapping', {
+                await apiFetch('/api/integrations/marketplace/save-mapping', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -710,7 +711,7 @@ export default function SalesPage() {
         showConfirm('Tahsilat Onayı', 'Bu siparişin tahsilatını yapmak istediğinizden emin misiniz?', async () => {
             setIsCollecting(true);
             try {
-                const res = await fetch('/api/orders/collect', {
+                const res = await apiFetch('/api/orders/collect', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ orderIds: [orderId] })
@@ -720,7 +721,7 @@ export default function SalesPage() {
                 if (data.success) {
                     showSuccess('Başarılı', `✅ Tahsilat başarılı!\n\n${data.message}`);
                     // Siparişleri yenile
-                    const fetchRes = await fetch('/api/orders/pending');
+                    const fetchRes = await apiFetch('/api/orders/pending');
                     const fetchData = await fetchRes.json();
                     if (fetchData.success) {
                         setOnlineOrders(fetchData.orders);
@@ -750,7 +751,7 @@ export default function SalesPage() {
         showConfirm('Toplu Tahsilat', `${selectedOrders.length} adet siparişin toplu tahsilatını yapmak istediğinizden emin misiniz?`, async () => {
             setIsCollecting(true);
             try {
-                const res = await fetch('/api/orders/collect', {
+                const res = await apiFetch('/api/orders/collect', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ orderIds: selectedOrders })
@@ -761,7 +762,7 @@ export default function SalesPage() {
                     showSuccess('Başarılı', `✅ Toplu tahsilat başarılı!\n\n${data.message}`);
                     setSelectedOrders([]);
                     // Siparişleri yenile
-                    const fetchRes = await fetch('/api/orders/pending');
+                    const fetchRes = await apiFetch('/api/orders/pending');
                     const fetchData = await fetchRes.json();
                     if (fetchData.success) {
                         setOnlineOrders(fetchData.orders);

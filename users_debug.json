@@ -1,0 +1,131 @@
+[
+  {
+    "id": "cmlmgsr220006y3v2us5ugozn",
+    "email": "ertkekec@gmail.com",
+    "name": "ertug kekec",
+    "password": "$2b$10$g0aqIVUCtF.dgM/N0KBRT.kaiE5Yslu8Neq9/KNpWiI.tqKaZNcYO",
+    "role": "ADMIN",
+    "createdAt": "2026-02-14T15:21:50.330Z",
+    "updatedAt": "2026-02-14T15:21:50.330Z",
+    "lastActiveAt": null,
+    "tenantId": "cmlmgsqee0000y3v24emvltws",
+    "permissions": [
+      "pos_access",
+      "customer_view",
+      "customer_create",
+      "customer_edit",
+      "inventory_view",
+      "sales_archive",
+      "finance_view",
+      "settings_manage"
+    ],
+    "accessibleCompanies": [
+      {
+        "userId": "cmlmgsr220006y3v2us5ugozn",
+        "companyId": "cmlmgsqtx0004y3v2g75cpk8k",
+        "role": "ADMIN",
+        "company": {
+          "id": "cmlmgsqtx0004y3v2g75cpk8k",
+          "tenantId": "cmlmgsqee0000y3v24emvltws",
+          "name": "ertkekec@gmail.com",
+          "vkn": "9999999999",
+          "taxOffice": null,
+          "address": "",
+          "district": null,
+          "city": "",
+          "createdAt": "2026-02-14T15:21:50.037Z",
+          "updatedAt": "2026-02-14T15:21:50.037Z"
+        }
+      }
+    ]
+  },
+  {
+    "id": "cmlme9orw0003g8ntn1o9yy4j",
+    "email": "admin@kech.tr",
+    "name": "Admin User",
+    "password": "$2b$10$0RNhW2bvcTOQI8aO5GUHkOkUHZMaCm.ZwF2pi4Sxb.4LvPmHBpc6q",
+    "role": "SUPER_ADMIN",
+    "createdAt": "2026-02-14T14:11:01.676Z",
+    "updatedAt": "2026-02-14T15:28:38.290Z",
+    "lastActiveAt": null,
+    "tenantId": "demo-tenant",
+    "permissions": [
+      "ALL"
+    ],
+    "accessibleCompanies": [
+      {
+        "userId": "cmlme9orw0003g8ntn1o9yy4j",
+        "companyId": "cmlme9oc90001g8ntbe0xktu8",
+        "role": "ADMIN",
+        "company": {
+          "id": "cmlme9oc90001g8ntbe0xktu8",
+          "tenantId": "demo-tenant",
+          "name": "Merkez Şube",
+          "vkn": "1111111111",
+          "taxOffice": null,
+          "address": "Demo Adres",
+          "district": null,
+          "city": "Istanbul",
+          "createdAt": "2026-02-14T14:11:01.113Z",
+          "updatedAt": "2026-02-14T14:11:01.113Z"
+        }
+      }
+    ]
+  },
+  {
+    "id": "cmlmgrgtw0006tt34qn5jxqf6",
+    "email": "oilshoptr@gmail.com",
+    "name": "asdasd add",
+    "password": "$2b$10$ue9R586pqEA0Tf0S.nb7g.ifNTrpLiSKiuhpWNWyZ9tosTpQl0NEu",
+    "role": "ADMIN",
+    "createdAt": "2026-02-14T15:20:50.420Z",
+    "updatedAt": "2026-02-15T08:37:45.049Z",
+    "lastActiveAt": "2026-02-15T08:37:45.047Z",
+    "tenantId": "cmlmgrg030000tt34eaolutdj",
+    "permissions": [
+      "pos_access",
+      "customer_view",
+      "customer_create",
+      "customer_edit",
+      "inventory_view",
+      "sales_archive",
+      "finance_view",
+      "settings_manage"
+    ],
+    "accessibleCompanies": [
+      {
+        "userId": "cmlmgrgtw0006tt34qn5jxqf6",
+        "companyId": "cmlmgrglc0004tt34n6aiz9l3",
+        "role": "ADMIN",
+        "company": {
+          "id": "cmlmgrglc0004tt34n6aiz9l3",
+          "tenantId": "cmlmgrg030000tt34eaolutdj",
+          "name": "adasda",
+          "vkn": "9999999999",
+          "taxOffice": null,
+          "address": "",
+          "district": null,
+          "city": "",
+          "createdAt": "2026-02-14T15:20:50.112Z",
+          "updatedAt": "2026-02-14T15:20:50.112Z"
+        }
+      }
+    ]
+  },
+  {
+    "id": "cmlmh1jxp0005p13fp1gfs4ha",
+    "email": "ertugrul.kekec@periodya.com",
+    "name": "Ertugrul Kekec",
+    "password": "$2b$10$19.MHMH36PoICgGVWznyD.WegaJou4mBNU65aZNxIQ3TbbaDrCdvy",
+    "role": "SUPER_ADMIN",
+    "createdAt": "2026-02-14T15:28:41.005Z",
+    "updatedAt": "2026-02-15T08:45:08.632Z",
+    "lastActiveAt": "2026-02-15T08:45:08.629Z",
+    "tenantId": "PLATFORM_ADMIN",
+    "permissions": [
+      "ALL",
+      "SUPER_ADMIN"
+    ],
+    "accessibleCompanies": []
+  }
+]

@@ -10,12 +10,13 @@ export async function POST(request: Request) {
     const session = auth.user;
 
     try {
-        // Robust Company Resolution
-        let companyId = (session as any).companyId;
+        // Robust Company Resolution (Support Impersonation)
+        let companyId = session.impersonateTenantId ? null : (session as any).companyId;
 
         if (!companyId) {
+            const targetTenantId = session.impersonateTenantId || session.tenantId;
             const company = await prisma.company.findFirst({
-                where: { tenantId: session.tenantId }
+                where: { tenantId: targetTenantId }
             });
             companyId = company?.id;
         }

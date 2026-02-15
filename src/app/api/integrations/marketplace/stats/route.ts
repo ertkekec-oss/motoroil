@@ -8,8 +8,9 @@ export async function GET(request: Request) {
     const session = auth.user;
 
     try {
+        const targetTenantId = session.impersonateTenantId || session.tenantId;
         const company = await prisma.company.findFirst({
-            where: { tenantId: session.tenantId }
+            where: { tenantId: targetTenantId }
         });
         if (!company) return NextResponse.json({ error: 'Firma bulunamadı' }, { status: 404 });
         const companyId = company.id;

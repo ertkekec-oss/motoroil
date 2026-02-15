@@ -32,8 +32,9 @@ export async function POST(request: Request) {
             }, { status: 400 });
         }
 
-        const company = await prisma.company.findFirst({ where: { tenantId: session.tenantId } });
-        if (!company) throw new Error('Company not found');
+        const targetTenantId = session.impersonateTenantId || session.tenantId;
+        const company = await prisma.company.findFirst({ where: { tenantId: targetTenantId } });
+        if (!company) throw new Error('Company not found for tenant: ' + targetTenantId);
 
         // Şifreleri (Kişisel/Gizli Verileri) Şifrele
         const encryptedData: Record<string, string> = {};
@@ -101,8 +102,16 @@ export async function GET(request: Request) {
     if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     try {
+        const targetTenantId = (auth.user as any).impersonateTenantId || auth.user.tenantId;
+        const company = await prisma.company.findFirst({
+            where: { tenantId: targetTenantId }
+        });
+        if (!company) {
+            return NextResponse.json({ success: true, connections: [] });
+        }
+
         const connections = await (prisma as any).bankConnection.findMany({
-            where: { companyId: auth.user.companyId },
+            where: { companyId: company.id },
             select: {
                 id: true,
                 bankName: true,

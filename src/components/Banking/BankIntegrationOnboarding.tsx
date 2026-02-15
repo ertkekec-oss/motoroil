@@ -5,6 +5,7 @@ import { BANK_FORM_DEFINITIONS, BankDefinition } from '@/services/banking/bank-d
 import { useModal } from '@/contexts/ModalContext';
 import { jsPDF } from 'jspdf';
 import { BankConnectionStatus } from '@/services/banking/bank-connection-service';
+import { apiFetch } from '@/lib/api-client';
 
 export default function BankOnboardingHub() {
     const { showSuccess, showError } = useModal();
@@ -75,7 +76,7 @@ export default function BankOnboardingHub() {
         setIsTesting(true);
         setTestResults(null);
         try {
-            const res = await fetch('/api/fintech/banking/test-connection', {
+            const res = await apiFetch('/api/fintech/banking/test-connection', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -115,7 +116,7 @@ export default function BankOnboardingHub() {
 
         setIsSaving(true);
         try {
-            const res = await fetch('/api/fintech/banking/credentials', {
+            const res = await apiFetch('/api/fintech/banking/credentials', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -1,0 +1,206 @@
+DB Error Detail: 
+Invalid `prisma.order.create()` invocation in
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\scripts\debug_with_log.js:122:32
+
+  119 });
+  120 
+  121 if (!existingOrder) {
+→ 122     await prisma.order.create({
+            data: {
+              companyId: "cmlmgrglc0004tt34n6aiz9l3",
+              marketplace: "TRENDYOL",
+              marketplaceId: "3613280820",
+              orderNumber: "10967547692",
+              customerName: "Gökhan Songur",
+              totalAmount: 335,
+              currency: "TRY",
+              status: "Created",
+              orderDate: new Date("2026-02-15T16:36:06.786Z"),
+              items: [
+                {
+                  productName: "Egr Valf ve Enjektör Temizleyici 300 ml P30S6494, one size",
+                  sku: "merchantSku",
+                  quantity: 1,
+                  price: 335,
+                  taxRate: 1675
+                }
+              ],
+              shippingAddress: {
+                fullName: "Gökhan Songur",
+                address: "Burak Sokak Kübra Apt Altı no 17/1     Merkez Niğde",
+                city: "Niğde",
+                district: "Merkez",
+                phone: ""
+              },
+              invoiceAddress: {
+                fullName: "Gökhan Songur",
+                address: "Burak Sokak Kübra Apt Altı no 17/1     Merkez Niğde",
+                city: "Niğde",
+                district: "Merkez",
+                phone: ""
+              },
+              shipmentPackageId: 3613280820,
+                                 ~~~~~~~~~~
+              rawData: {
+                shipmentAddress: {
+                  id: 8457168634,
+                  firstName: "Gökhan",
+                  lastName: "Songur",
+                  company: "",
+                  address1: "Burak Sokak Kübra Apt Altı no 17/1",
+                  address2: "",
+                  city: "Niğde",
+                  cityCode: 51,
+                  district: "Merkez",
+                  districtId: 791,
+                  countyId: 0,
+                  countyName: "",
+                  shortAddress: "",
+                  stateName: "",
+                  addressLines: {
+                    addressLine1: "",
+                    addressLine2: ""
+                  },
+                  postalCode: "51000",
+                  countryCode: "TR",
+                  neighborhoodId: 59272,
+                  neighborhood: "Şahinali Mah",
+                  phone: null,
+                  fullAddress: "Burak Sokak Kübra Apt Altı no 17/1     Merkez Niğde",
+                  fullName: "Gökhan Songur"
+                },
+                orderNumber: "10967547692",
+                grossAmount: 335,
+                packageGrossAmount: 335,
+                totalDiscount: 0,
+                packageSellerDiscount: 0,
+                totalTyDiscount: 0,
+                packageTyDiscount: 0,
+                packageTotalDiscount: 0,
+                taxNumber: null,
+                invoiceAddress: {
+                  id: 8457168633,
+                  firstName: "Gökhan",
+                  lastName: "Songur",
+                  company: "",
+                  address1: "Burak Sokak Kübra Apt Altı no 17/1",
+                  address2: "",
+                  city: "Niğde",
+                  cityCode: 51,
+                  district: "Merkez",
+                  districtId: 791,
+                  countyId: 0,
+                  countyName: "",
+                  shortAddress: "",
+                  stateName: "",
+                  addressLines: {
+                    addressLine1: "",
+                    addressLine2: ""
+                  },
+                  postalCode: "51000",
+                  countryCode: "TR",
+                  neighborhoodId: 59272,
+                  neighborhood: "Şahinali Mah",
+                  phone: null,
+                  fullAddress: "Burak Sokak Kübra Apt Altı no 17/1     Merkez Niğde",
+                  fullName: "Gökhan Songur"
+                },
+                customerFirstName: "Gökhan",
+                customerEmail: "pf+nlxlv2q6@trendyolmail.com",
+                customerId: 27238572,
+                supplierId: 0,
+                customerLastName: "Songur",
+                id: 3613280820,
+                shipmentPackageId: 3613280820,
+                cargoTrackingNumber: 7280030399569911,
+                cargoProviderName: "DHL eCommerce Marketplace",
+                lines: [
+                  {
+                    quantity: 1,
+                    salesCampaignId: 61,
+                    productSize: "Tek Ebat",
+                    merchantSku: "merchantSku",
+                    sku: "3374650276083",
+                    stockCode: "merchantSku",
+                    productName: "Egr Valf ve Enjektör Temizleyici 300 ml P30S6494, one size",
+                    productCode: 59069599,
+                    contentId: 59069599,
+                    merchantId: 548512,
+                    sellerId: 548512,
+                    amount: 335,
+                    lineGrossAmount: 335,
+                    discount: 0,
+                    lineTotalDiscount: 0,
+                    lineSellerDiscount: 0,
+                    tyDiscount: 0,
+                    lineTyDiscount: 0,
+                    discountDetails: [
+                      {
+                        lineItemPrice: 335,
+                        lineItemDiscount: 0,
+                        lineItemSellerDiscount: 0,
+                        lineItemTyDiscount: 0
+                      }
+                    ],
+                    currencyCode: "TRY",
+                    id: 5174227395,
+                    lineId: 5174227395,
+                    vatBaseAmount: 20,
+                    vatRate: 20,
+                    barcode: "3374650276083",
+                    orderLineItemStatusName: "ReadyToShip",
+                    price: 335,
+                    lineUnitPrice: 335,
+                    fastDeliveryOptions: [
+                      {
+                        type: "FastDelivery"
+                      }
+                    ],
+                    productCategoryId: 1968,
+                    commission: null
+                  }
+                ],
+                orderDate: 1771173366786,
+                identityNumber: "11111111111",
+                currencyCode: "TRY",
+                packageHistories: [
+                  {
+                    createdDate: 1771162567837,
+                    status: "Awaiting"
+                  },
+                  {
+                    createdDate: 1771162570474,
+                    status: "Created"
+                  }
+                ],
+                shipmentPackageStatus: "ReadyToShip",
+                status: "Created",
+                deliveryType: "normal",
+                timeSlotId: 0,
+                estimatedDeliveryStartDate: 1771248966000,
+                estimatedDeliveryEndDate: 1771508166000,
+                totalPrice: 335,
+                packageTotalPrice: 335,
+                deliveryAddressType: "Shipment",
+                agreedDeliveryDate: 1771275540000,
+                fastDelivery: true,
+                originShipmentDate: 1771162567833,
+                lastModifiedDate: 1771162570474,
+                commercial: false,
+                fastDeliveryType: "FastDelivery",
+                deliveredByService: false,
+                warehouseId: 5575639,
+                micro: false,
+                giftBoxRequested: false,
+                3pByTrendyol: false,
+                containsDangerousProduct: false,
+                isCod: false,
+                createdBy: "order-creation",
+                originPackageIds: null
+              }
+            }
+          })
+
+Argument `shipmentPackageId`: Invalid value provided. Expected String or Null, provided Int.
+Code: undefined
+Meta: undefined

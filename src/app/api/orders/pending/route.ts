@@ -11,12 +11,13 @@ export async function GET() {
         const session = auth.user;
 
         // Robust Company Resolution: Prioritize session.companyId
-        let companyId = (session as any).companyId;
+        let companyId = session.impersonateTenantId ? null : (session as any).companyId;
 
         if (!companyId) {
+            const targetTenantId = session.impersonateTenantId || session.tenantId;
             // Fallback: Find first company for the tenant
             const company = await prisma.company.findFirst({
-                where: { tenantId: session.tenantId }
+                where: { tenantId: targetTenantId }
             });
             companyId = company?.id;
         }

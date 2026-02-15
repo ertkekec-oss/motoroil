@@ -8,9 +8,12 @@ export async function GET() {
     const { user } = auth;
 
     try {
-        // Get company for tenant isolation
+        // Get company for tenant isolation (Support Impersonation)
+        const targetTenantId = (user as any).impersonateTenantId || (user as any).tenantId;
+        console.log(`[Settings] Fetching for tenant: ${targetTenantId}`);
+
         const company = await prisma.company.findFirst({
-            where: { tenantId: (user as any).tenantId }
+            where: { tenantId: targetTenantId }
         });
 
         if (!company) {
@@ -57,9 +60,11 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { marketplaceSettings, eFaturaSettings, posSettings } = body;
 
-        // Get the company for this tenant
+        // Get the company for this tenant (Support Impersonation)
+        const targetTenantId = (user as any).impersonateTenantId || (user as any).tenantId;
+
         const company = await prisma.company.findFirst({
-            where: { tenantId: (user as any).tenantId }
+            where: { tenantId: targetTenantId }
         });
 
         if (!company) {
