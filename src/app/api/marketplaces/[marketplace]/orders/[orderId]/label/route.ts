@@ -61,17 +61,13 @@ export async function GET(
 
         if (existingAudit) {
             if (existingAudit.status === 'SUCCESS' && existingAudit.responsePayload?.storageKey) {
+                console.log(`[LABEL] Audit SUCCESS Hit. Redirecting.`);
                 const { getLabelSignedUrl } = await import("@/lib/s3");
                 const signedUrl = await getLabelSignedUrl(existingAudit.responsePayload.storageKey);
                 return Response.redirect(signedUrl, 302);
             }
-            if (existingAudit.status === 'PENDING') {
-                return new Response(JSON.stringify({
-                    status: "PENDING",
-                    message: "Etiket hazırlanıyor (Mevcut İşlem)...",
-                    auditId: existingAudit.id
-                }), { status: 202, headers: { "Content-Type": "application/json" } });
-            }
+            // If PENDING, we purposefully FALL THROUGH to executeAction
+            // This forces a re-check against Trendyol API instead of just returning stale DB status.
         }
 
         const provider = ActionProviderRegistry.getProvider(marketplace);
