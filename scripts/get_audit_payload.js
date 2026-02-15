@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function checkAudit() {
-    const auditId = 'cmlob15zn0029wlicgzrpoc9';
+    const auditId = 'cmlobspax0001i50d6woxcdob';
     const audit = await prisma.marketplaceActionAudit.findUnique({
         where: { id: auditId }
     });

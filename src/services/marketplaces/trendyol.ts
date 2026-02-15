@@ -77,23 +77,26 @@ export class TrendyolService implements IMarketplaceService {
         httpStatus?: number;
         raw?: any;
     }> {
-        // --- ATTEMPT 1: common-label (Standard) ---
-        const result1 = await this._fetchLabel(
-            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`
-        );
+        const attempts = [
+            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`,
+            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/label?format=PDF`,
+            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}` // Naked URL
+        ];
 
-        if (result1.status === 'SUCCESS' || result1.status === 'PENDING') return result1;
+        let lastResult: any = null;
 
-        // If 403 or 404, try ATTEMPT 2 (Alternative endpoint sometimes used in newer docs)
-        if (result1.httpStatus === 403 || result1.httpStatus === 404) {
-            console.log(`[TRENDYOL] Attempt 1 failed with ${result1.httpStatus}. Trying fallback endpoint...`);
-            const result2 = await this._fetchLabel(
-                `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/label?format=PDF`
-            );
-            return result2;
+        for (const url of attempts) {
+            const result = await this._fetchLabel(url);
+            lastResult = result;
+
+            if (result.status === 'SUCCESS' || result.status === 'PENDING') {
+                return result;
+            }
+
+            console.log(`[TRENDYOL] Attempt for ${url} failed with ${result.httpStatus}.`);
         }
 
-        return result1;
+        return lastResult;
     }
 
     private async _fetchLabel(url: string): Promise<{
