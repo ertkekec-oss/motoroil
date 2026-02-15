@@ -79,8 +79,8 @@ export async function GET(
 
         // Handle Async/Processing
         return new Response(JSON.stringify({
-            status: result.status,
-            message: "Label is being prepared. Please check back in a few seconds.",
+            status: "PENDING",
+            message: "Etiket hazırlanıyor...",
             auditId: result.auditId
         }), { status: 202, headers: { "Content-Type": "application/json" } });
 

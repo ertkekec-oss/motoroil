@@ -59,14 +59,27 @@ export function MarketplaceActionButton({
             if (isLabel && shipmentPackageId) {
                 const labelUrl = `/api/marketplaces/${encodeURIComponent(mplaceLower)}/orders/${encodeURIComponent(orderId)}/label?shipmentPackageId=${encodeURIComponent(shipmentPackageId)}`;
                 const res = await fetch(labelUrl);
+
                 if (res.status === 302 || (res.status === 200 && res.redirected)) {
                     window.open(res.url, "_blank");
-                    setStatus("IDLE");
+                    setStatus("SUCCESS");
                     toast.success("Etiket indiriliyor...");
+                    setTimeout(() => setStatus("IDLE"), 2000);
                     return;
                 }
+
                 if (res.status === 202) {
                     const data = await res.json();
+
+                    if (data.status === "PENDING") {
+                        toast.info("Etiket hazırlanıyor...", { description: "3 saniye sonra tekrar denenecek." });
+                        setTimeout(() => {
+                            setStatus("IDLE"); // Reset to allow retry
+                            handleAction();
+                        }, 3000);
+                        return;
+                    }
+
                     if (data.auditId) {
                         setAuditId(data.auditId);
                         setStatus("POLLING");
@@ -84,6 +97,7 @@ export function MarketplaceActionButton({
             });
 
             const data = await res.json();
+
             if (res.status === 202 || data.status === "PENDING") {
                 setAuditId(data.auditId);
                 setStatus("POLLING");
@@ -91,6 +105,13 @@ export function MarketplaceActionButton({
             } else if (data.status === "SUCCESS") {
                 setStatus("SUCCESS");
                 toast.success("İşlem anında tamamlandı");
+
+                // If this was a successful label generation (sync), open it
+                if (isLabel && data.result?.storageKey) {
+                    const labelUrl = `/api/marketplaces/${encodeURIComponent(mplaceLower)}/orders/${encodeURIComponent(orderId)}/label?shipmentPackageId=${encodeURIComponent(shipmentPackageId)}`;
+                    window.open(labelUrl, "_blank");
+                }
+
                 onSuccess?.();
             } else {
                 if (data.code === "SHIPMENT_PACKAGE_ID_MISSING") {
@@ -103,10 +124,9 @@ export function MarketplaceActionButton({
                 }
             }
         } catch (err: any) {
-            if (err.message !== "İşlem başlatılamadı") {
-                toast.error(err.message);
-            }
+            console.error(err);
             setStatus("FAILED");
+            toast.error(err.message || "İşlem başarısız");
         }
     };
 
