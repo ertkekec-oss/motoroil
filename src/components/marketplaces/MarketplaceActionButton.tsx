@@ -55,104 +55,16 @@ export function MarketplaceActionButton({
         console.log("🚀 EXECUTE ACTION:", { actionUrl, actionKey, idempotencyKey });
 
         try {
-            // For labels, we use a budgeted polling strategy with popup blocker fix
+            // For labels, we simply open the dedicated route in a new tab.
+            // The route itself handles the "PENDING" wait-page and eventual "SUCCESS" redirect to PDF.
             if (isLabel && shipmentPackageId) {
-                const labelUrl = `/api/marketplaces/${encodeURIComponent(mplaceLower)}/orders/${encodeURIComponent(orderId)}/label?shipmentPackageId=${encodeURIComponent(shipmentPackageId)}`;
+                const labelUrl = `/api/marketplaces/${encodeURIComponent(mplaceLower)}/orders/${encodeURIComponent(orderId)}/label?shipmentPackageId=${encodeURIComponent(shipmentPackageId)}&format=A4`;
 
-                // 1. Pre-open popup immediately on click to avoid blocker
-                const popup = window.open("about:blank", "_blank");
+                window.open(labelUrl, "_blank", "noopener,noreferrer");
 
-                const fetchLabelWithBudget = async (url: string) => {
-                    const TOTAL_BUDGET_MS = 65_000;
-                    const start = Date.now();
-                    let attempt = 0;
-                    let lastPendingMessage: string | null = null;
-                    const STEP_WAIT_MS = 3000;
-
-                    while (Date.now() - start < TOTAL_BUDGET_MS) {
-                        attempt++;
-                        try {
-                            const res = await fetch(url, { cache: "no-store" });
-                            const contentType = (res.headers.get("content-type") || "").toLowerCase();
-                            const isPdf = contentType.includes("application/pdf") || contentType.includes("pdf");
-
-                            // ✅ SUCCESS (PDF Content)
-                            if (isPdf) {
-                                const blob = await res.blob();
-                                const fileUrl = URL.createObjectURL(blob);
-                                if (popup) {
-                                    popup.location.href = fileUrl;
-                                } else {
-                                    window.open(fileUrl, "_blank");
-                                }
-                                setStatus("SUCCESS");
-                                toast.success("Etiket başarıyla alındı", { id: idempotencyKey });
-                                setTimeout(() => setStatus("IDLE"), 2000);
-                                return;
-                            }
-
-                            // ✅ REDIRECT
-                            if (res.status === 302 || res.redirected) {
-                                if (popup) {
-                                    popup.location.href = res.url;
-                                } else {
-                                    window.open(res.url, "_blank");
-                                }
-                                setStatus("SUCCESS");
-                                toast.success("Etiket indiriliyor...", { id: idempotencyKey });
-                                setTimeout(() => setStatus("IDLE"), 2000);
-                                return;
-                            }
-
-                            // 📦 CONSUME JSON ONCE
-                            const data = await res.json().catch(() => null);
-
-                            // ✅ PENDING (202 or Audit Status)
-                            if (res.status === 202 || data?.status === "PENDING") {
-                                lastPendingMessage = data?.message || "Etiket hazırlanıyor...";
-                                setStatus("POLLING");
-                                toast.info(`${lastPendingMessage} (${attempt})`, {
-                                    id: idempotencyKey,
-                                    duration: 4000
-                                });
-
-                                const retryAfterHint = Number(res.headers.get("retry-after") || 3);
-                                await new Promise(r => setTimeout(r, retryAfterHint * 1000));
-                                continue;
-                            }
-
-                            // ❌ ERROR
-                            if (!res.ok) {
-                                if (res.status >= 500 || res.status === 429) {
-                                    console.warn(`Transient error ${res.status}, retrying...`);
-                                    await new Promise(r => setTimeout(r, STEP_WAIT_MS));
-                                    continue;
-                                }
-                                throw new Error(data?.message || data?.error || `Sunucu hatası (HTTP ${res.status})`);
-                            }
-
-                        } catch (error: any) {
-                            if (error.name === 'AbortError' || error.message?.includes('stream closed')) {
-                                await new Promise(r => setTimeout(r, STEP_WAIT_MS));
-                                continue;
-                            }
-                            throw error;
-                        }
-                    }
-
-                    if (popup && popup.location.href.includes("about:blank")) popup.close();
-                    throw new Error(lastPendingMessage || "Etiket hazırlama süresi doldu. Lüttfen tekrar deneyin.");
-                };
-
-                // Start Process
-                toast.loading("Etiket kontrol ediliyor...", { id: idempotencyKey });
-                fetchLabelWithBudget(labelUrl).catch((err: any) => {
-                    console.error("LABEL_POLLING_FAILED", err);
-                    if (popup && popup.location.href.includes("about:blank")) popup.close();
-                    setStatus("FAILED");
-                    toast.error(err.message || "İşlem başarısız oldu", { id: idempotencyKey });
-                    setTimeout(() => setStatus("IDLE"), 4000);
-                });
+                setStatus("SUCCESS");
+                toast.success("Etiket yazdırma sekmesi açıldı");
+                setTimeout(() => setStatus("IDLE"), 2000);
                 return;
             }
 

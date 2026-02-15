@@ -95,6 +95,19 @@ export async function GET(
             }
         }
 
+        const retryAfterSec = 3;
+
+        if (isDocumentRequest(request)) {
+            return new Response(pendingHtml(retryAfterSec), {
+                status: 200,
+                headers: {
+                    "Content-Type": "text/html; charset=utf-8",
+                    "Cache-Control": "no-store",
+                    "Retry-After": String(retryAfterSec),
+                },
+            });
+        }
+
         return new Response(JSON.stringify({
             status: "PENDING",
             message: "Etiket hazırlanıyor...",
@@ -104,7 +117,7 @@ export async function GET(
             headers: {
                 "Content-Type": "application/json",
                 "Cache-Control": "no-store",
-                "Retry-After": "3"
+                "Retry-After": String(retryAfterSec)
             }
         });
 
@@ -121,4 +134,40 @@ export async function GET(
             },
         });
     }
+}
+
+// --- Helpers for UX-focused Label Generation ---
+
+function isDocumentRequest(req: Request) {
+    const accept = (req.headers.get("accept") || "").toLowerCase();
+    const dest = (req.headers.get("sec-fetch-dest") || "").toLowerCase();
+    return dest === "document" || accept.includes("text/html");
+}
+
+function pendingHtml(retryAfterSec: number) {
+    return `<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="refresh" content="${retryAfterSec}">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Etiket hazırlanıyor...</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto; padding: 0; margin: 0; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+    .card { max-width: 480px; padding: 2rem; border-radius: 1.5rem; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .loader { width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem; }
+    h2 { font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 600; }
+    .muted { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="loader"></div>
+    <h2>Etiket Hazırlanıyor…</h2>
+    <p class="muted">${retryAfterSec} saniye sonra sistem otomatik olarak kontrol edilecek.</p>
+    <p class="muted">PDF oluşturulduğunda bu sayfa otomatik olarak açılacaktır.<br/>Lütfen bu sekmeyi kapatmayın.</p>
+  </div>
+</body>
+</html>`;
 }
