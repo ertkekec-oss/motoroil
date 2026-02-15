@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -10,12 +10,18 @@ export async function GET() {
         if (!auth.authorized) return auth.response;
         const session = auth.user;
 
-        // Find current company for the tenant
-        const company = await prisma.company.findFirst({
-            where: { tenantId: session.tenantId }
-        });
+        // Robust Company Resolution: Prioritize session.companyId
+        let companyId = (session as any).companyId;
 
-        if (!company) {
+        if (!companyId) {
+            // Fallback: Find first company for the tenant
+            const company = await prisma.company.findFirst({
+                where: { tenantId: session.tenantId }
+            });
+            companyId = company?.id;
+        }
+
+        if (!companyId) {
             return NextResponse.json({ success: true, count: 0, orders: [] });
         }
 
@@ -24,7 +30,7 @@ export async function GET() {
         // Son siparişleri çek (Statü farketmeksizin hepsini getir ki entegrasyonu görelim)
         const pendingOrders = await prisma.order.findMany({
             where: {
-                companyId: company.id,
+                companyId: companyId,
                 marketplace: { not: 'POS' } // POS satışları 'Mağaza Satışları' sekmesinde, burası E-Ticaret
             },
             orderBy: {

@@ -111,8 +111,8 @@ export async function getSession() {
         };
 
         const session: any = {
-            user: sessionUser,
-            // Keep some top-level meta if needed by middleware, but logic should use session.user
+            ...sessionUser, // Flat access (tenantId, id, etc.)
+            user: sessionUser, // Nested access (.user.id)
             expiry: payload.exp
         };
 
@@ -162,7 +162,7 @@ export async function authorize() {
             response: Response.json({ success: false, error: 'Oturum gerekli.' }, { status: 401 })
         };
     }
-    return { authorized: true, user: session };
+    return { authorized: true, user: session.user || session };
 }
 
 export function verifyWriteAccess(session: any) {

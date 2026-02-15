@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -10,12 +10,17 @@ export async function POST(request: Request) {
     const session = auth.user;
 
     try {
-        // SECURITY: Tenant Isolation
-        const company = await prisma.company.findFirst({
-            where: { tenantId: session.tenantId }
-        });
+        // Robust Company Resolution
+        let companyId = (session as any).companyId;
 
-        if (!company) {
+        if (!companyId) {
+            const company = await prisma.company.findFirst({
+                where: { tenantId: session.tenantId }
+            });
+            companyId = company?.id;
+        }
+
+        if (!companyId) {
             return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
         }
 
@@ -34,7 +39,7 @@ export async function POST(request: Request) {
         let ecommerceKasa = await prisma.kasa.findFirst({
             where: {
                 name: 'E-ticaret',
-                companyId: company.id // Strict Isolation
+                companyId: companyId // Strict Isolation
             }
         });
 
@@ -42,7 +47,7 @@ export async function POST(request: Request) {
             console.log('📦 E-ticaret kasası bulunamadı, oluşturuluyor...');
             ecommerceKasa = await prisma.kasa.create({
                 data: {
-                    companyId: company.id, // Set Company ID
+                    companyId: companyId, // Set Company ID
                     name: 'E-ticaret',
                     type: 'Nakit',
                     balance: 0,
@@ -96,7 +101,7 @@ export async function POST(request: Request) {
                 }
 
                 // SECURITY: Verify Order Ownership
-                if (order.companyId !== company.id) {
+                if (order.companyId !== companyId) {
                     results.push({ orderId, success: false, error: 'Yetkisiz sipariş erişimi' });
                     continue;
                 }
@@ -104,7 +109,7 @@ export async function POST(request: Request) {
                 // Müşteriyi bul veya oluştur (Tenant Scoped)
                 let customer = await prisma.customer.findFirst({
                     where: {
-                        companyId: company.id, // Strict Isolation
+                        companyId: companyId, // Strict Isolation
                         OR: [
                             { name: order.customerName },
                             { email: order.customerEmail }
@@ -116,7 +121,7 @@ export async function POST(request: Request) {
                     console.log('👤 Müşteri bulunamadı, oluşturuluyor:', order.customerName);
                     customer = await prisma.customer.create({
                         data: {
-                            companyId: company.id, // Set Company ID
+                            companyId: companyId, // Set Company ID
                             name: order.customerName,
                             email: order.customerEmail || '',
                             phone: '',
@@ -151,7 +156,7 @@ export async function POST(request: Request) {
                 // Transaction kaydı oluştur
                 await prisma.transaction.create({
                     data: {
-                        companyId: company.id, // Set Company ID
+                        companyId: companyId, // Set Company ID
                         type: 'Tahsilat',
                         amount: amount,
                         description: `E-ticaret sipariş tahsilatı: ${order.orderNumber || order.id}`,
