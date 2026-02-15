@@ -20,9 +20,12 @@ export class TrendyolService implements IMarketplaceService {
     private getHeaders(extra: Record<string, string> = {}): Record<string, string> {
         return {
             'Authorization': this.getAuthHeader(),
-            'User-Agent': 'Trendyol-Client-Application',
+            // High-reputation real browser User-Agent
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
             'x-supplier-id': this.config.supplierId,
-            'Accept': 'application/json',
+            'Referer': 'https://partner.trendyol.com/',
             ...extra
         };
     }
@@ -74,56 +77,58 @@ export class TrendyolService implements IMarketplaceService {
         httpStatus?: number;
         raw?: any;
     }> {
-        try {
-            const url = `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`;
+        // --- ATTEMPT 1: common-label (Standard) ---
+        const result1 = await this._fetchLabel(
+            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`
+        );
 
+        if (result1.status === 'SUCCESS' || result1.status === 'PENDING') return result1;
+
+        // If 403 or 404, try ATTEMPT 2 (Alternative endpoint sometimes used in newer docs)
+        if (result1.httpStatus === 403 || result1.httpStatus === 404) {
+            console.log(`[TRENDYOL] Attempt 1 failed with ${result1.httpStatus}. Trying fallback endpoint...`);
+            const result2 = await this._fetchLabel(
+                `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/label?format=PDF`
+            );
+            return result2;
+        }
+
+        return result1;
+    }
+
+    private async _fetchLabel(url: string): Promise<{
+        status: 'SUCCESS' | 'PENDING' | 'FAILED';
+        pdfBase64?: string;
+        error?: string;
+        httpStatus?: number;
+        raw?: any;
+    }> {
+        try {
+            console.log(`[TRENDYOL] Fetching Label: ${url}`);
             const response = await fetch(url, {
                 headers: this.getHeaders()
             });
 
             const httpStatus = response.status;
-
-            // 🔥 CRITICAL: Body can only be read ONCE. 
-            // Read as text first, then parse JSON if possible.
             const responseText = await response.text();
             let raw: any = null;
             try {
                 raw = responseText ? JSON.parse(responseText) : null;
             } catch {
-                raw = responseText; // fallback to raw text if not JSON
+                raw = responseText;
             }
 
             if (!response.ok) {
-                return {
-                    status: 'FAILED',
-                    error: `Trendyol API Hatası: ${httpStatus}`,
-                    httpStatus,
-                    raw
-                };
+                return { status: 'FAILED', error: `Trendyol API Hatası: ${httpStatus}`, httpStatus, raw };
             }
 
             if (raw && raw.content && raw.content.length > 100) {
-                return {
-                    status: 'SUCCESS',
-                    pdfBase64: raw.content,
-                    httpStatus,
-                    raw
-                };
+                return { status: 'SUCCESS', pdfBase64: raw.content, httpStatus, raw };
             }
 
-            // If 200 OK but no content, it's actually PENDING in Trendyol terms
-            return {
-                status: 'PENDING',
-                httpStatus,
-                raw
-            };
-
+            return { status: 'PENDING', httpStatus, raw };
         } catch (error: any) {
-            return {
-                status: 'FAILED',
-                error: error.message || 'Bağlantı hatası',
-                raw: error
-            };
+            return { status: 'FAILED', error: error.message || 'Bağlantı hatası', raw: error };
         }
     }
 
