@@ -65,11 +65,19 @@ export async function GET(
             payload: { labelShipmentPackageId: shipmentPackageId },
         });
 
+        // Handle Synchronous Success
         if (result.status === "SUCCESS") {
-            // This might happen if audit trace exists but label record was missing (data drift)
-            return new Response(JSON.stringify({ status: "PROCESSING", message: "Label generated, please retry in a moment" }), { status: 202 });
+            const storageKey = result.result?.storageKey;
+
+            if (storageKey) {
+                console.log(`[LABEL] Sync Success. redirecting to ${storageKey}`);
+                const { getLabelSignedUrl } = await import("@/lib/s3");
+                const signedUrl = await getLabelSignedUrl(storageKey);
+                return Response.redirect(signedUrl, 302);
+            }
         }
 
+        // Handle Async/Processing
         return new Response(JSON.stringify({
             status: result.status,
             message: "Label is being prepared. Please check back in a few seconds.",
@@ -77,6 +85,7 @@ export async function GET(
         }), { status: 202, headers: { "Content-Type": "application/json" } });
 
     } catch (error: any) {
+        console.error(`[LABEL_ERROR] ${error.message}`, error);
         return new Response(JSON.stringify({ error: error?.message ?? "Unknown error" }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
