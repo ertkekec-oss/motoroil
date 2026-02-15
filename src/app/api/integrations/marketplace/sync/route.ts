@@ -24,31 +24,30 @@ export async function POST(request: Request) {
         }
 
         // 1. Company ID Resolution (Robust)
-        let companyId = (session as any).companyId;
+        let companyId = session.impersonateTenantId ? null : (session as any).companyId;
         let companyName = 'Unknown';
 
+        // If impersonating or missing companyId, try to find a valid company
         if (!companyId) {
-            console.warn(`[MARKETPLACE] Session missing companyId for user ${session.username}. Attempting DB fallback.`);
+            const searchTenantId = session.impersonateTenantId || session.tenantId;
+            console.log(`[MARKETPLACE] Resolving company for tenant: ${searchTenantId}`);
 
-            // Fallback: Fetch via User's accessible companies
-            const dbUser = await prisma.user.findUnique({
-                where: { id: session.id },
-                include: { accessibleCompanies: { take: 1, include: { company: true } } }
+            // Fallback: Tenant's first company
+            const company = await prisma.company.findFirst({
+                where: { tenantId: searchTenantId }
             });
 
-            if (dbUser?.accessibleCompanies?.[0]) {
-                companyId = dbUser.accessibleCompanies[0].companyId;
-                companyName = dbUser.accessibleCompanies[0].company.name;
-                console.log(`[MARKETPLACE] Recovered companyId from DB: ${companyId}`);
-            } else {
-                // Second Fallback: Tenant's first company (Admin fallback)
-                const company = await prisma.company.findFirst({
-                    where: { tenantId: session.tenantId }
-                });
-                if (company) {
-                    companyId = company.id;
-                    companyName = company.name;
-                    console.log(`[MARKETPLACE] Recovered companyId from Tenant: ${companyId}`);
+            if (company) {
+                companyId = company.id;
+                companyName = company.name;
+                console.log(`[MARKETPLACE] Resolved companyId: ${companyId} (${companyName})`);
+            } else if (session.role === 'SUPER_ADMIN' || session.tenantId === 'PLATFORM_ADMIN') {
+                // Platform Admin fallback for the entire system if no specific tenant selected/found
+                const fallbackCompany = await prisma.company.findFirst();
+                if (fallbackCompany) {
+                    companyId = fallbackCompany.id;
+                    companyName = fallbackCompany.name;
+                    console.log(`[MARKETPLACE] Platform Admin fallback to: ${companyId} (${companyName})`);
                 }
             }
         } else {
@@ -111,13 +110,15 @@ export async function POST(request: Request) {
             try {
                 // 1. Customer Sync
                 let customer;
+                const customerEmail = order.customerEmail || `guest-${order.orderNumber}@${type.toLowerCase()}.com`;
+
                 try {
                     customer = await prisma.customer.upsert({
-                        where: { email_companyId: { email: order.customerEmail || `guest-${order.orderNumber}@${type}.com`, companyId: companyId } },
+                        where: { email_companyId: { email: customerEmail, companyId: companyId } },
                         create: {
                             companyId: companyId,
                             name: order.customerName || 'Pazaryeri Müşterisi',
-                            email: order.customerEmail,
+                            email: customerEmail,
                             phone: order.invoiceAddress?.phone || '',
                             address: JSON.stringify(order.invoiceAddress),
                             categoryId: categoryId
