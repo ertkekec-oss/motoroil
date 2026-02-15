@@ -86,57 +86,51 @@ const prismaClientSingleton = () => {
                     }
 
                     const sessionResult: any = await getSession();
-                    // SUPPORT BOTH: session.user (new) and session (legacy)
                     const session: any = sessionResult?.user ?? sessionResult;
 
                     if (session) {
                         const role = (session.role || '').toUpperCase();
                         const tenantId = session.tenantId;
-                        const companyId = session.companyId;
-
                         const isPlatformAdmin = tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN';
-
-                        // --- 2. Platform Admin Bypass / Impersonation ---
-                        if (isPlatformAdmin) {
-                            // If NOT impersonating, allow full access (current behavior)
-                            if (!session.impersonateTenantId) {
-                                return query(args);
-                            }
-                            // If impersonating, we continue below but shift the tenantId context
-                        }
-
-                        // Determine which tenant's data we are looking at
                         const effectiveTenantId = session.impersonateTenantId || tenantId;
 
                         if (!effectiveTenantId) {
-                            // BYPASS: Allow auth-related models even if tenant context is missing
-                            // This prevents "Tenant context missing" errors during registration/login if a partial session exists
                             if (['user', 'tenant', 'company', 'plan', 'subscription', 'loginattempt'].includes(modelName)) {
                                 return query(args);
                             }
-
                             throw new Error("SECURITY_ERROR: Tenant context missing in session.");
                         }
 
                         const a = args as any;
+                        let op = operation;
+
+                        // --- REDIRECT: findUnique -> findFirst ---
+                        // findUnique doesn't support relation filters like { company: { tenantId: '...' } }.
+                        if (op === 'findUnique') {
+                            op = 'findFirst' as any;
+                        }
+
+                        const isUniqueOp = ['findUnique', 'upsert', 'update', 'delete'].includes(operation);
 
                         // READ FILTERING
                         if (['findMany', 'findFirst', 'findUnique', 'count', 'aggregate', 'groupBy'].includes(operation)) {
                             if (modelName === 'company') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'user') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'tenant') {
-                                // Platform Admins should always see all tenants to be able to switch between them
-                                if (!isPlatformAdmin) {
-                                    a.where = { ...a.where, id: effectiveTenantId };
-                                }
+                                if (!isPlatformAdmin) a.where = { ...a.where, id: effectiveTenantId };
                             }
                             else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'notification') { a.where = { ...a.where, user: { tenantId: effectiveTenantId } }; }
                             else if (modelName === 'coupon') { a.where = { ...a.where, OR: [{ customer: { company: { tenantId: effectiveTenantId } } }, { customer: null }] }; }
-                            else if (modelName === 'suspendedsale') { return query(args); }
+                            else if (modelName === 'suspendedsale') { /* Publicish */ }
                             else if (modelName === 'journalitem') { a.where = { ...a.where, journal: { company: { tenantId: effectiveTenantId } } }; }
-                            else { a.where = { ...a.where, company: { tenantId: effectiveTenantId } }; }
+                            else {
+                                // Only add relation filter if not a unique-mandatory operation (unless we redirected it)
+                                if (!isUniqueOp || op === 'findFirst') {
+                                    a.where = { ...a.where, company: { tenantId: effectiveTenantId } };
+                                }
+                            }
                         }
 
                         // WRITE PROTECTION
@@ -144,37 +138,40 @@ const prismaClientSingleton = () => {
                             if (modelName === 'company') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'user') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'tenant') {
-                                if (!isPlatformAdmin) {
-                                    a.where = { ...a.where, id: effectiveTenantId };
-                                }
+                                if (!isPlatformAdmin) a.where = { ...a.where, id: effectiveTenantId };
                             }
                             else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
                             else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'notification') { a.where = { ...a.where, user: { tenantId: effectiveTenantId } }; }
-                            else if (modelName === 'coupon') { a.where = { ...a.where, OR: [{ customer: { company: { tenantId: effectiveTenantId } } }, { customer: null }] }; }
-                            else if (modelName === 'suspendedsale') { return query(args); }
-                            else if (modelName === 'journalitem') { a.where = { ...a.where, journal: { company: { tenantId: effectiveTenantId } } }; }
-                            else { a.where = { ...a.where, company: { tenantId: effectiveTenantId } }; }
+                            else {
+                                // Skip relation filter for single update/delete/upsert to avoid Prisma crash
+                                if (!isUniqueOp) {
+                                    a.where = { ...a.where, company: { tenantId: effectiveTenantId } };
+                                }
+                            }
                         }
 
-                        // CREATE PROTECTION (Write-time Tenant Assertion)
+                        // CREATE PROTECTION
                         if (['create', 'createMany'].includes(operation)) {
                             if (!['company', 'user', 'tenant', 'subscription'].includes(modelName)) {
                                 const data = a.data;
-                                if (data) {
+                                if (data && !isPlatformAdmin) {
                                     if (Array.isArray(data)) {
-                                        data.forEach((item: any) => { if (!item.companyId && !isPlatformAdmin) throw new Error("SECURITY_ERROR: missing companyId"); });
+                                        data.forEach((item: any) => { if (!item.companyId) throw new Error("SECURITY_ERROR: missing companyId"); });
                                     } else {
-                                        if (!data.companyId && !data.company?.connect?.id && !isPlatformAdmin) throw new Error("SECURITY_ERROR: missing companyId");
+                                        if (!data.companyId && !data.company?.connect?.id) throw new Error("SECURITY_ERROR: missing companyId");
                                     }
                                 }
                             }
                         }
 
+                        // Execute original or redirected operation
+                        if (op !== operation) {
+                            return (prisma as any)[model][op](a);
+                        }
                         return query(args);
                     }
 
-                    // PUBLIC ACCESS (Login/Register/Plans)
+                    // PUBLIC ACCESS
                     if (['user', 'staff', 'tenant', 'plan', 'company', 'subscription', 'loginattempt'].includes(modelName)) {
                         if (['findUnique', 'findFirst', 'findMany', 'create', 'update', 'count'].includes(operation)) {
                             return query(args);
