@@ -15,12 +15,12 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     private getAuthHeader(): string {
-        // Hepsiburada OMS API basic auth needs API User and API Secret
         const username = (this.config.username || '').trim();
         const password = (this.config.password || '').trim();
         const merchantId = (this.config.merchantId || '').trim();
 
-        console.log(`[HB_AUTH] Authenticating as User: ${username} for Merchant: ${merchantId}`);
+        // Security: Log username for trace, but never log password in prod without guard
+        console.log(`[HB_AUTH_TRACE] User: ${username} | Merchant: ${merchantId}`);
 
         const token = Buffer.from(`${username}:${password}`).toString('base64');
         return `Basic ${token}`;
@@ -33,7 +33,8 @@ export class HepsiburadaService implements IMarketplaceService {
         const dy = pad(date.getDate());
         const hr = pad(date.getHours());
         const mi = pad(date.getMinutes());
-        return `${yr}-${mo}-${dy} ${hr}:${mi}`;
+        const sc = pad(date.getSeconds());
+        return `${yr}-${mo}-${dy} ${hr}:${mi}:${sc}`;
     }
 
     async validateConnection(): Promise<boolean> {
@@ -43,7 +44,7 @@ export class HepsiburadaService implements IMarketplaceService {
             const response = await fetch(url, {
                 headers: {
                     'Authorization': this.getAuthHeader(),
-                    'User-Agent': 'motoroil_dev'
+                    'User-Agent': 'Periodya_OMS_v1'
                 }
             });
             return response.ok;
@@ -54,89 +55,146 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
-        try {
-            const merchantId = (this.config.merchantId || '').trim();
-            const now = new Date();
-            let begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
-            let end = endDate || now;
+        const allOrders: MarketplaceOrder[] = [];
+        let offset = 0;
+        const limit = 50;
+        let hasMore = true;
 
-            // Date inversion guard
-            if (begin > end) {
-                console.warn(`[HB] Date inversion detected, swapping: ${begin.toISOString()} > ${end.toISOString()}`);
-                const tmp = begin;
-                begin = end;
-                end = tmp;
-            }
+        const merchantId = (this.config.merchantId || '').trim();
+        const now = new Date();
+        let begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
+        let end = endDate || now;
 
-            const bStr = this.hbDate(begin);
-            const eStr = this.hbDate(end);
-
-            // FATAL GUARD: Hepsiburada asla T veya Z kabul etmez. 
-            if (bStr.includes('T') || eStr.includes('T') || bStr.includes('Z') || eStr.includes('Z')) {
-                throw new Error(`CRITICAL_DATE_FORMAT_ERROR: Hepsiburada formatında 'T' veya 'Z' bulunamaz! (Gelen: ${bStr})`);
-            }
-
-            // Hepsiburada OMS expects lowercase param names and no seconds in dates
-            // Target template: ?offset=0&limit=50&begindate=yyyy-MM-dd HH:mm&enddate=yyyy-MM-dd HH:mm
-            const url = `${this.baseUrl}/orders/merchantid/${merchantId}?offset=0&limit=50&begindate=${encodeURIComponent(bStr)}&enddate=${encodeURIComponent(eStr)}`;
-            console.log(`[HB_DOKUMAN_UYUMLU_URL] ${url}`);
-
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': this.getAuthHeader(),
-                    'User-Agent': 'motoroil_dev',
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error(`[HB_ERROR] Status: ${response.status}, Body: ${errorText}`);
-                throw new Error(`Hepsiburada API Hatası: ${response.status} - ${errorText}`);
-            }
-
-            const data = await response.json();
-            const ordersRaw = Array.isArray(data) ? data : (data?.items || (data?.id ? [data] : []));
-
-            return ordersRaw.map((order: any) => this.mapOrder(order));
-        } catch (error) {
-            console.error('Hepsiburada getOrders error:', error);
-            throw error;
+        if (begin > end) {
+            const tmp = begin;
+            begin = end;
+            end = tmp;
         }
+
+        const bStr = this.hbDate(begin);
+        const eStr = this.hbDate(end);
+
+        console.log(`[HB_SYNC_PLAN] Merchant: ${merchantId} | Range: ${bStr} to ${eStr}`);
+
+        while (hasMore) {
+            try {
+                // Production-ready URL construction
+                const params = new URLSearchParams({
+                    offset: offset.toString(),
+                    limit: limit.toString(),
+                    begindate: bStr,
+                    enddate: eStr
+                });
+
+                const url = `${this.baseUrl}/orders/merchantid/${merchantId}?${params.toString()}`;
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': this.getAuthHeader(),
+                        'User-Agent': 'Periodya_OMS_v1',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    console.error(`[HB_REMOTE_ERROR] Status: ${response.status} | Body: ${errorBody} | URL: ${url}`);
+
+                    if (response.status === 401) {
+                        throw new Error(`UNAUTHORIZED: Hepsiburada API anahtarlarınız veya User/Pass bilgileriniz hatalı. (401)`);
+                    }
+                    throw new Error(`HEPSIBURADA_API_ERROR: ${response.status} - ${errorBody}`);
+                }
+
+                const data = await response.json();
+
+                // HB API check: orders list might be direct array or wrapped in { items: [] } or { data: [] }
+                const items = Array.isArray(data) ? data : (data.items || data.data || []);
+
+                if (items.length === 0) {
+                    console.log(`[HB_SYNC] No more data at offset ${offset}`);
+                    hasMore = false;
+                    break;
+                }
+
+                console.log(`[HB_SYNC] Fetched ${items.length} items at offset ${offset}`);
+
+                for (const item of items) {
+                    allOrders.push(this.mapOrder(item));
+                }
+
+                if (items.length < limit) {
+                    hasMore = false;
+                } else {
+                    offset += limit;
+                }
+
+                // Vercel / Cloud Run safety: if we fetched too many, break to avoid timeout
+                if (allOrders.length > 500) {
+                    console.warn(`[HB_SYNC] Reach safe limit (500), stopping pagination.`);
+                    hasMore = false;
+                }
+
+            } catch (error: any) {
+                console.error(`[HB_PAGINATION_FAIL] Offset: ${offset} | Error: ${error.message}`);
+                throw error;
+            }
+        }
+
+        return allOrders;
     }
 
     private mapOrder(hbOrder: any): MarketplaceOrder {
-        return {
-            id: hbOrder.id || hbOrder.orderNumber,
-            orderNumber: hbOrder.orderNumber,
-            customerName: hbOrder.customer?.name || 'Müşteri',
-            customerEmail: hbOrder.customer?.email || '',
-            orderDate: new Date(hbOrder.orderDate),
-            status: hbOrder.status,
-            totalAmount: hbOrder.totalPrice?.amount || 0,
-            currency: hbOrder.totalPrice?.currency || 'TRY',
-            shippingAddress: {
-                fullName: hbOrder.shippingAddress?.name || '',
-                address: `${hbOrder.shippingAddress?.address || ''} ${hbOrder.shippingAddress?.district || ''}`,
-                city: hbOrder.shippingAddress?.city || '',
-                district: hbOrder.shippingAddress?.town || '',
-                phone: hbOrder.shippingAddress?.phoneNumber || ''
-            },
-            invoiceAddress: {
-                fullName: hbOrder.billingAddress?.name || '',
-                address: hbOrder.billingAddress?.address || '',
-                city: hbOrder.billingAddress?.city || '',
-                district: hbOrder.billingAddress?.town || '',
-                phone: hbOrder.billingAddress?.phoneNumber || ''
-            },
-            items: (hbOrder.items || []).map((item: any) => ({
-                productName: item.productName || item.name,
-                sku: item.sku || item.merchantSku,
-                quantity: item.quantity,
-                price: item.price?.amount || 0,
-                taxRate: 20,
-                discountAmount: 0
-            }))
-        };
+        try {
+            return {
+                id: hbOrder.id || hbOrder.orderNumber,
+                orderNumber: hbOrder.orderNumber,
+                customerName: hbOrder.customer?.name || 'Müşteri',
+                customerEmail: hbOrder.customer?.email || '',
+                orderDate: new Date(hbOrder.orderDate || Date.now()),
+                status: hbOrder.status,
+                totalAmount: hbOrder.totalPrice?.amount || hbOrder.totalAmount || 0,
+                currency: hbOrder.totalPrice?.currency || 'TRY',
+                shipmentPackageId: hbOrder.packageNumber || hbOrder.shipmentPackageId,
+                shippingAddress: {
+                    fullName: hbOrder.shippingAddress?.name || hbOrder.shippingAddress?.fullName || '',
+                    address: hbOrder.shippingAddress?.address || '',
+                    city: hbOrder.shippingAddress?.city || '',
+                    district: hbOrder.shippingAddress?.town || hbOrder.shippingAddress?.district || '',
+                    phone: hbOrder.shippingAddress?.phoneNumber || ''
+                },
+                invoiceAddress: {
+                    fullName: hbOrder.billingAddress?.name || hbOrder.billingAddress?.fullName || '',
+                    address: hbOrder.billingAddress?.address || '',
+                    city: hbOrder.billingAddress?.city || '',
+                    district: hbOrder.billingAddress?.town || hbOrder.billingAddress?.district || '',
+                    phone: hbOrder.billingAddress?.phoneNumber || ''
+                },
+                items: (hbOrder.items || []).map((item: any) => ({
+                    productName: item.productName || item.name,
+                    sku: item.sku || item.merchantSku,
+                    quantity: item.quantity,
+                    price: item.price?.amount || item.price || 0,
+                    taxRate: item.taxRate || 20,
+                    discountAmount: 0
+                }))
+            };
+        } catch (err) {
+            console.error('[HB_MAP_ERROR] Failed to map order:', hbOrder.id, err);
+            // Return minimal fallback if one order fails to map
+            return {
+                id: hbOrder.id || 'err',
+                orderNumber: hbOrder.orderNumber || 'err',
+                customerName: 'Error Mapping',
+                customerEmail: '',
+                orderDate: new Date(),
+                status: 'MAPPING_ERROR',
+                totalAmount: 0,
+                currency: 'TRY',
+                shippingAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
+                invoiceAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
+                items: []
+            };
+        }
     }
 }

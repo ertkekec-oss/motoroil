@@ -83,9 +83,9 @@ export async function POST(request: Request) {
             // If already synced, just sync from last sync minus a buffer (1 hour)
             startDate = new Date(marketplaceConfig.lastSync.getTime() - (60 * 60 * 1000));
         } else {
-            // First time sync: 30 days back
-            startDate.setDate(startDate.getDate() - 30);
-            console.log(`[MARKETPLACE] Initial sync detected, going back 30 days.`);
+            // First time sync: 90 days back per user request for production-ready sync
+            startDate.setDate(startDate.getDate() - 90);
+            console.log(`[MARKETPLACE] Initial sync detected, going back 90 days.`);
         }
 
         const service = MarketplaceServiceFactory.createService(type as any, { ...config, branch: syncBranch });
