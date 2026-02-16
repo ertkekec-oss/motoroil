@@ -74,13 +74,13 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
         if (!file) return;
 
         if (file.size > 5 * 1024 * 1024) {
-            alert('Dosya boyutu 5MB\'dan küçük olmalıdır.');
+            showError('Hata', 'Dosya boyutu 5MB\'dan küçük olmalıdır.');
             return;
         }
 
         const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
         if (!validTypes.includes(file.type)) {
-            alert('Sadece PDF, PNG ve JPEG dosyaları yüklenebilir.');
+            showError('Hata', 'Sadece PDF, PNG ve JPEG dosyaları yüklenebilir.');
             return;
         }
 
@@ -102,13 +102,13 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 const data = await res.json();
                 if (data.success) {
                     await fetchDocuments();
-                    alert('Dosya yüklendi.');
+                    showSuccess('Başarılı', 'Dosya yüklendi.');
                 } else {
-                    alert('Yükleme hatası: ' + data.error);
+                    showError('Hata', 'Yükleme hatası: ' + data.error);
                 }
             } catch (err) {
                 console.error(err);
-                alert('Yükleme sırasında hata oluştu.');
+                showError('Hata', 'Yükleme sırasında hata oluştu.');
             } finally {
                 setUploading(false);
             }
@@ -117,13 +117,15 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     };
 
     const handleDeleteDoc = async (docId: string) => {
-        if (!confirm('Dosyayı silmek istediğinize emin misiniz?')) return;
-        try {
-            await fetch(`/api/documents/${docId}`, { method: 'DELETE' });
-            setDocuments(prev => prev.filter(d => d.id !== docId));
-        } catch (e) {
-            alert('Silinemedi.');
-        }
+        showConfirm('Dosyayı Sil', 'Dosyayı silmek istediğinize emin misiniz?', async () => {
+            try {
+                await fetch(`/api/documents/${docId}`, { method: 'DELETE' });
+                setDocuments(prev => prev.filter(d => d.id !== docId));
+                showSuccess('Başarılı', 'Dosya silindi.');
+            } catch (e) {
+                showError('Hata', 'Silinemedi.');
+            }
+        });
     };
 
     const handleViewDoc = async (docId: string, type: string) => {
@@ -286,7 +288,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
     const handleStartWarranty = async () => {
         if (!newWarranty.invoiceId || !newWarranty.productId || !newWarranty.serialNo) {
-            alert('Lütfen tüm alanları doldurunuz.');
+            showWarning('Eksik Bilgi', 'Lütfen tüm alanları doldurunuz.');
             return;
         }
 
@@ -338,11 +340,11 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     startDate: new Date().toISOString().split('T')[0]
                 });
             } else {
-                alert('Hata: ' + (savedWarranty.error || 'Garanti kaydedilemedi.'));
+                showError('Hata', 'Hata: ' + (savedWarranty.error || 'Garanti kaydedilemedi.'));
             }
         } catch (e) {
             console.error(e);
-            alert('Bir bağlantı hatası oluştu.');
+            showError('Hata', 'Bir bağlantı hatası oluştu.');
         }
     };
 

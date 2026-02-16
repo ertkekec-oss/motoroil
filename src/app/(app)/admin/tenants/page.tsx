@@ -3,8 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function TenantsPage() {
+    const { showSuccess, showError, showConfirm } = useModal();
     const [tenants, setTenants] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -57,20 +59,21 @@ export default function TenantsPage() {
     };
 
     const deleteTenant = async (id: string) => {
-        if (!window.confirm('BU MÜŞTERİYİ VE TÜM VERİLERİNİ SİLMEK İSTEDİĞİNİZE EMİN MİSİNİZ?\nBu işlem geri alınamaz!')) return;
-
-        try {
-            const res = await fetch(`/api/admin/tenants/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                fetchTenants(pagination.page);
-            } else {
-                const err = await res.json();
-                alert(err.error || 'Silme işlemi başarısız.');
+        showConfirm('MÜŞTERİYİ SİL', 'BU MÜŞTERİYİ VE TÜM VERİLERİNİ SİLMEK İSTEDİĞİNİZE EMİN MİSİNİZ?\nBu işlem geri alınamaz!', async () => {
+            try {
+                const res = await fetch(`/api/admin/tenants/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    showSuccess('Başarılı', 'Müşteri hesabı silindi.');
+                    fetchTenants(pagination.page);
+                } else {
+                    const err = await res.json();
+                    showError('Hata', err.error || 'Silme işlemi başarısız.');
+                }
+            } catch (err) {
+                console.error(err);
+                showError('Hata', 'Bağlantı hatası.');
             }
-        } catch (err) {
-            console.error(err);
-            alert('Bağlantı hatası.');
-        }
+        });
     };
 
     useEffect(() => {
@@ -169,7 +172,9 @@ export default function TenantsPage() {
                                 🔍 Dry Run (Simüle Et)
                             </button>
                             <button
-                                onClick={() => { if (window.confirm('TÜM SİSTEMİ TARIYORUM. Emin misiniz?')) runAutomation(); }}
+                                onClick={() => {
+                                    showConfirm('Otomasyonu Çalıştır', 'TÜM SİSTEMİ TARIYORUM. Emin misiniz?', () => runAutomation());
+                                }}
                                 disabled={automationRunning}
                                 className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-black rounded-lg text-sm font-black transition disabled:opacity-50 shadow-[0_0_15px_rgba(245,158,11,0.3)]"
                             >

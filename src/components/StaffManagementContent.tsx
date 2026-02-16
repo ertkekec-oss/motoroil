@@ -9,7 +9,7 @@ export default function StaffManagementContent() {
     const [activeTab, setActiveTab] = useState('list'); // list, roles, performance, shifts, leaves, payroll
     const { staff, currentUser, hasPermission, addNotification, refreshStaff, branches } = useApp();
     const { addFinancialTransaction, kasalar, setKasalar } = useFinancials();
-    const { showSuccess, showConfirm } = useModal();
+    const { showSuccess, showConfirm, showError } = useModal();
     const isSystemAdmin = currentUser === null || (currentUser.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
 
     const [selectedStaff, setSelectedStaff] = useState<any>(null);
@@ -246,7 +246,7 @@ export default function StaffManagementContent() {
         }
 
         if (!newStaff.branch) {
-            showSuccess('Hata', 'Lütfen personel için bir şube seçiniz.');
+            showError('Hata', 'Lütfen personel için bir şube seçiniz.');
             return;
         }
 
@@ -279,7 +279,7 @@ export default function StaffManagementContent() {
 
     const handleEditStaff = async () => {
         if (!editStaff.name || !editStaff.role || !editStaff.branch) {
-            showSuccess('Hata', 'Lütfen tüm zorunlu alanları doldurun.');
+            showError('Hata', 'Lütfen tüm zorunlu alanları doldurun.');
             return;
         }
 
@@ -320,7 +320,7 @@ export default function StaffManagementContent() {
         if (!file || !editStaff.id) return;
 
         if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            showSuccess("Hata", "Dosya boyutu 5MB'dan küçük olmalıdır.");
+            showError("Hata", "Dosya boyutu 5MB'dan küçük olmalıdır.");
             return;
         }
 
@@ -359,14 +359,20 @@ export default function StaffManagementContent() {
     };
 
     const handleDeleteDocument = async (docId: string) => {
-        if (!confirm("Belgeyi silmek istediğinize emin misiniz?")) return;
-        try {
-            const res = await fetch(`/api/staff/documents?id=${docId}`, { method: 'DELETE' });
-            if (res.ok) {
-                await fetchStaffDocuments(editStaff.id);
-                showSuccess("Silindi", "Belge başarıyla silindi.");
+        showConfirm("Belgeyi Sil", "Belgeyi silmek istediğinize emin misiniz?", async () => {
+            try {
+                const res = await fetch(`/api/staff/documents?id=${docId}`, { method: 'DELETE' });
+                if (res.ok) {
+                    await fetchStaffDocuments(editStaff.id);
+                    showSuccess("Silindi", "Belge başarıyla silindi.");
+                } else {
+                    showError("Hata", "Belge silinemedi.");
+                }
+            } catch (e) {
+                console.error(e);
+                showError("Hata", "Silme sırasında bir hata oluştu.");
             }
-        } catch (e) { console.error(e); }
+        });
     };
 
     // --- SHIFT CREATION LOGIC ---
@@ -607,7 +613,7 @@ export default function StaffManagementContent() {
 
     const handleSaveTarget = async () => {
         if (!newTarget.staffId || !newTarget.targetValue || !newTarget.startDate || !newTarget.endDate) {
-            showSuccess('Hata', 'Lütfen tüm alanları doldurun.');
+            showError('Hata', 'Lütfen tüm alanları doldurun.');
             return;
         }
         setIsProcessing(true);

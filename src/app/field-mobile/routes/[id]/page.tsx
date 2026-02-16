@@ -3,8 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function MobileRouteDetailPage() {
+    const { showError, showConfirm } = useModal();
     const router = useRouter();
     const params = useParams();
     const routeId = params.id as string;
@@ -43,85 +45,86 @@ export default function MobileRouteDetailPage() {
     };
 
     const handleCheckIn = async (stopId: string, customerId: string) => {
-        if (!confirm('Ziyareti başlatmak istiyor musunuz?')) return;
-        setActionLoading(true);
+        showConfirm('Giriş Yap', 'Ziyareti başlatmak istiyor musunuz?', async () => {
+            setActionLoading(true);
 
-        const performCheckIn = async (location: any = null) => {
-            try {
-                const res = await fetch('/api/field-sales/visits/start', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ routeStopId: stopId, customerId, location })
-                });
+            const performCheckIn = async (location: any = null) => {
+                try {
+                    const res = await fetch('/api/field-sales/visits/start', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ routeStopId: stopId, customerId, location })
+                    });
 
-                if (res.ok) {
-                    fetchData(); // Refresh active visit
-                } else {
-                    const err = await res.json();
-                    alert(err.error || 'Check-in başarısız.');
+                    if (res.ok) {
+                        fetchData(); // Refresh active visit
+                    } else {
+                        const err = await res.json();
+                        showError('Hata', err.error || 'Check-in başarısız.');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    showError('Hata', 'Bağlantı hatası.');
+                } finally {
+                    setActionLoading(false);
                 }
-            } catch (e) {
-                console.error(e);
-                alert('Bağlantı hatası.');
-            } finally {
-                setActionLoading(false);
-            }
-        };
+            };
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => performCheckIn({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                (err) => {
-                    console.warn("Geolocation warning:", err.message);
-                    performCheckIn(null); // Fallback
-                },
-                { timeout: 5000 }
-            );
-        } else {
-            performCheckIn(null);
-        }
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => performCheckIn({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                    (err) => {
+                        console.warn("Geolocation warning:", err.message);
+                        performCheckIn(null); // Fallback
+                    },
+                    { timeout: 5000 }
+                );
+            } else {
+                performCheckIn(null);
+            }
+        });
     };
 
     const handleCheckOut = async () => {
         if (!activeVisit) return;
-        if (!confirm('Ziyareti sonlandırmak istiyor musunuz?')) return;
+        showConfirm('Çıkış Yap', 'Ziyareti sonlandırmak istiyor musunuz?', async () => {
+            const visitId = activeVisit.id;
+            setActionLoading(true);
 
-        const visitId = activeVisit.id;
-        setActionLoading(true);
+            const performCheckOut = async (location: any = null) => {
+                try {
+                    const res = await fetch('/api/field-sales/visits/end', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ visitId, location, notes: '' })
+                    });
 
-        const performCheckOut = async (location: any = null) => {
-            try {
-                const res = await fetch('/api/field-sales/visits/end', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ visitId, location, notes: '' })
-                });
-
-                if (res.ok) {
-                    fetchData(); // Refresh stops status
-                } else {
-                    alert('Check-out başarısız.');
+                    if (res.ok) {
+                        fetchData(); // Refresh stops status
+                    } else {
+                        showError('Hata', 'Check-out başarısız.');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    showError('Hata', 'Bağlantı hatası.');
+                } finally {
+                    setActionLoading(false);
                 }
-            } catch (e) {
-                console.error(e);
-                alert('Bağlantı hatası.');
-            } finally {
-                setActionLoading(false);
-            }
-        };
+            };
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => performCheckOut({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                (err) => {
-                    console.warn("Geolocation warning:", err.message);
-                    performCheckOut(null); // Fallback
-                },
-                { timeout: 5000 }
-            );
-        } else {
-            performCheckOut(null);
-        }
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => performCheckOut({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                    (err) => {
+                        console.warn("Geolocation warning:", err.message);
+                        performCheckOut(null); // Fallback
+                    },
+                    { timeout: 5000 }
+                );
+            } else {
+                performCheckOut(null);
+            }
+        });
     };
 
     if (loading) return <div className="p-8 text-center text-white">Yükleniyor...</div>;

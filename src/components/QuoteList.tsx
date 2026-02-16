@@ -12,7 +12,7 @@ interface QuoteListProps {
 }
 
 export default function QuoteList({ onEdit, onPreview, initialQuotes, isLoading, searchTerm, statusFilter, refreshList }: QuoteListProps) {
-    const { showError, showSuccess } = useModal();
+    const { showError, showSuccess, showConfirm } = useModal();
 
     const filteredQuotes = useMemo(() => {
         return initialQuotes.filter(q => {
@@ -24,35 +24,36 @@ export default function QuoteList({ onEdit, onPreview, initialQuotes, isLoading,
     }, [initialQuotes, searchTerm, statusFilter]);
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Bu teklifi silmek istediğinize emin misiniz?')) return;
-        try {
-            const res = await fetch(`/api/quotes/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                showSuccess('Başarılı', 'Teklif silindi');
-                refreshList();
-            } else {
-                showError('Hata', 'Silinirken hata oluştu');
+        showConfirm('Teklifi Sil', 'Bu teklifi silmek istediğinize emin misiniz?', async () => {
+            try {
+                const res = await fetch(`/api/quotes/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    showSuccess('Başarılı', 'Teklif silindi');
+                    refreshList();
+                } else {
+                    showError('Hata', 'Silinirken hata oluştu');
+                }
+            } catch (error) {
+                showError('Hata', 'İşlem sırasında bir hata oluştu');
             }
-        } catch (error) {
-            showError('Hata', 'İşlem sırasında bir hata oluştu');
-        }
+        });
     };
 
     const handleConvert = async (quote: any) => {
-        if (!confirm('Bu teklifi satış faturasına dönüştürmek istediğinize emin misiniz? Stoklar düşülecek ve cari borçlandırılacak.')) return;
-
-        try {
-            const res = await fetch(`/api/quotes/${quote.id}/convert`, { method: 'POST' });
-            const data = await res.json();
-            if (data.success) {
-                showSuccess('Başarılı', 'Teklif başarıyla faturaya dönüştürüldü. Stok ve cari güncellendi.');
-                refreshList();
-            } else {
-                showError('Hata', data.error);
+        showConfirm('Faturaya Dönüştür', 'Bu teklifi satış faturasına dönüştürmek istediğinize emin misiniz? Stoklar düşülecek ve cari borçlandırılacak.', async () => {
+            try {
+                const res = await fetch(`/api/quotes/${quote.id}/convert`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    showSuccess('Başarılı', 'Teklif başarıyla faturaya dönüştürüldü. Stok ve cari güncellendi.');
+                    refreshList();
+                } else {
+                    showError('Hata', data.error);
+                }
+            } catch (error) {
+                showError('Hata', 'Dönüştürme sırasında hata oluştu.');
             }
-        } catch (error) {
-            showError('Hata', 'Dönüştürme sırasında hata oluştu.');
-        }
+        });
     };
 
     const getStatusBadge = (status: string) => {

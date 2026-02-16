@@ -16,7 +16,7 @@ export default function SuppliersPage() {
     const router = useRouter();
     const { currentUser, branches, hasPermission, activeBranchName } = useApp();
     const { suppliers, suppClasses: dbSuppClasses } = useCRM();
-    const { showSuccess, showError } = useModal();
+    const { showSuccess, showError, showConfirm } = useModal();
 
     // UI States
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -158,25 +158,23 @@ export default function SuppliersPage() {
     };
 
     const handleDeleteSupplier = async (supplier: any) => {
-        if (!confirm(`"${supplier.name}" tedarikçisini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`)) {
-            return;
-        }
-
-        try {
-            const res = await fetch(`/api/suppliers?id=${supplier.id}`, {
-                method: 'DELETE'
-            });
-            const data = await res.json();
-            if (data.success) {
-                showSuccess('Başarılı', 'Tedarikçi başarıyla silindi.');
-                window.location.reload();
-            } else {
-                showError('Hata', data.error || 'Silme işlemi başarısız.');
+        showConfirm('Tedarikçiyi Sil', `"${supplier.name}" tedarikçisini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, async () => {
+            try {
+                const res = await fetch(`/api/suppliers?id=${supplier.id}`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showSuccess('Başarılı', 'Tedarikçi başarıyla silindi.');
+                    window.location.reload();
+                } else {
+                    showError('Hata', data.error || 'Silme işlemi başarısız.');
+                }
+            } catch (error: any) {
+                console.error(error);
+                showError('Hata', 'Bir hata oluştu.');
             }
-        } catch (error: any) {
-            console.error(error);
-            showError('Hata', 'Bir hata oluştu.');
-        }
+        });
     };
 
     return (

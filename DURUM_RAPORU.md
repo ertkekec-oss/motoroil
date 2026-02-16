@@ -1,13 +1,13 @@
 # 🟢 PERIODYA GELİŞTİRME DURUM RAPORU (GÜNCEL)
 
-**Tarih:** 27 Ocak 2026 - 22:55
-**Son Durum:** ✅ E-Ticaret Stok Eşleştirme ve Şube Yönetimi Altyapısı tamamlandı.
+**Tarih:** 17 Şubat 2026 - 02:15
+**Son Durum:** ✅ POS Çoklu Fiyat Listesi (Toptan/Perakende) ve Otomatik Fiyat Çözümleme sistemi tamamlandı.
 
-## 🚀 Son 2 Saatte Tamamlananlar (Kritik)
-1.  **Pazaryeri ve E-Ticaret Stok Eşleştirme Modülü:**
-    *   **Akıllı Eşleştirme:** Pazaryerinden gelen "Motul 10w40" gibi ürünleri sistemdeki gerçek stok kartıyla eşleştirme sistemi kuruldu.
-    *   **Otomatik Stok Düşümü:** Satış faturalandırıldığında, eşleşen ürünler otomatik olarak envanterden düşüyor.
-    *   **Öğrenen Sistem:** Bir kez yapılan eşleştirmeyi sistem hafızasına alıyor ve bir sonraki satışta otomatik tanıyor.
+## 🚀 Son Tamamlananlar (Kritik)
+1.  **Dual Price List Management (Dual Fiyat Listesi):**
+    *   **Müşteri Bazlı Fiyatlandırma:** Müşteri seçildiğinde Toptan veya Perakende fiyat listesi otomatik olarak aktif olur.
+    *   **POS & Teklif Entegrasyonu:** POS ekranında sepet fiyatları müşteri değişimine göre anında güncellenir.
+    *   **Merkezi Yönetim:** Stok kartı detayından tüm fiyat listeleri manuel olarak yönetilebilir.
 
 2.  **Şube Yönetimi Altyapısı (Fix):**
     *   **Veritabanı Entegrasyonu:** Şube sistemi tarayıcı hafızasından kurtarılıp gerçek veritabanı tablosuna (`Branch`) taşındı.

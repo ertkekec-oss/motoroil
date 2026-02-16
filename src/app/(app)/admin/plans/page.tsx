@@ -2,8 +2,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function AdminPlans() {
+    const { showSuccess, showError, showConfirm } = useModal();
     const [plans, setPlans] = useState<any[]>([]);
     const [availableFeatures, setAvailableFeatures] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -67,10 +69,10 @@ export default function AdminPlans() {
                 resetForm();
             } else {
                 const err = await res.json();
-                alert(err.error || 'Hata oluştu');
+                showError('Hata', err.error || 'Hata oluştu');
             }
         } catch (e) {
-            alert('Bağlantı hatası');
+            showError('Hata', 'Bağlantı hatası');
         }
     };
 
@@ -118,18 +120,20 @@ export default function AdminPlans() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!window.confirm('Bu paketi silmek istediğinize emin misiniz?')) return;
-        try {
-            const res = await fetch(`/api/billing/plans/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                loadData();
-            } else {
-                const err = await res.json();
-                alert(err.error || 'Silme işlemi başarısız.');
+        showConfirm('Paketi Sil', 'Bu paketi silmek istediğinize emin misiniz?', async () => {
+            try {
+                const res = await fetch(`/api/billing/plans/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    showSuccess('Başarılı', 'Paket silindi.');
+                    loadData();
+                } else {
+                    const err = await res.json();
+                    showError('Hata', err.error || 'Silme işlemi başarısız.');
+                }
+            } catch (e) {
+                showError('Hata', 'Bağlantı hatası');
             }
-        } catch (e) {
-            alert('Bağlantı hatası');
-        }
+        });
     };
 
     const toggleFeature = (id: string) => {

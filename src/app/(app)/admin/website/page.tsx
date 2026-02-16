@@ -2,8 +2,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function WebsiteManagerPage() {
+    const { showSuccess, showError, showConfirm } = useModal();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<any>({ pages: [], settings: {}, menus: [] });
     const [activeTab, setActiveTab] = useState<'general' | 'pages' | 'menus'>('general');
@@ -52,14 +54,14 @@ export default function WebsiteManagerPage() {
                 };
                 img.onerror = () => {
                     setUploading(false);
-                    alert("Görsel işlenirken hata oluştu.");
+                    showError("Hata", "Görsel işlenirken hata oluştu.");
                 };
                 img.src = reader.result;
             }
         };
         reader.onerror = () => {
             setUploading(false);
-            alert("Dosya okuma hatası oluştu.");
+            showError("Hata", "Dosya okuma hatası oluştu.");
         };
 
         reader.readAsDataURL(file);
@@ -104,7 +106,7 @@ export default function WebsiteManagerPage() {
 
             if (json.error) {
                 console.error(json.error);
-                alert(json.error);
+                showError("Hata", json.error);
                 setLoading(false);
                 return;
             }
@@ -143,7 +145,7 @@ export default function WebsiteManagerPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings)
             });
-            if (res.ok) alert('Ayarlar kaydedildi!');
+            if (res.ok) showSuccess('Başarılı', 'Ayarlar kaydedildi!');
         } catch (error) {
             console.error(error);
         } finally {
@@ -159,7 +161,7 @@ export default function WebsiteManagerPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data.menus)
             });
-            if (res.ok) alert('Menüler kaydedildi!');
+            if (res.ok) showSuccess('Başarılı', 'Menüler kaydedildi!');
         } catch (error) {
             console.error(error);
         } finally {
@@ -191,19 +193,22 @@ export default function WebsiteManagerPage() {
     };
 
     const deletePage = async (id: string) => {
-        if (!confirm('Bu sayfayı silmek istediğinize emin misiniz?')) return;
-        setSaving(true);
-        try {
-            const res = await fetch(`/api/admin/website/pages/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                if (selectedPage?.id === id) setSelectedPage(null);
-                fetchCmsData();
+        showConfirm('Sayfayı Sil', 'Bu sayfayı silmek istediğinize emin misiniz?', async () => {
+            setSaving(true);
+            try {
+                const res = await fetch(`/api/admin/website/pages/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    if (selectedPage?.id === id) setSelectedPage(null);
+                    showSuccess('Başarılı', 'Sayfa silindi.');
+                    fetchCmsData();
+                }
+            } catch (error) {
+                console.error(error);
+                showError('Hata', 'Silme sırasında hata oluştu.');
+            } finally {
+                setSaving(false);
             }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setSaving(false);
-        }
+        });
     };
 
     const savePage = async () => {
@@ -224,7 +229,7 @@ export default function WebsiteManagerPage() {
             });
 
             if (res.ok) {
-                alert('Değişiklikler başarıyla kaydedildi!');
+                showSuccess('Başarılı', 'Değişiklikler başarıyla kaydedildi!');
                 fetchCmsData();
             }
         } catch (error) {

@@ -4,9 +4,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function AdminRoutesPage() {
     const { isAuthenticated, isLoading } = useAuth();
+    const { showError } = useModal();
     const router = useRouter();
     const [routes, setRoutes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -51,7 +53,7 @@ export default function AdminRoutesPage() {
 
     const sendWhatsApp = (staff: any) => {
         if (!staff?.phone) {
-            alert('Bu personelin telefon numarası sistemde kayıtlı değil. Lütfen personel yönetiminden ekleyin.');
+            showError('Hata', 'Bu personelin telefon numarası sistemde kayıtlı değil. Lütfen personel yönetiminden ekleyin.');
             return;
         }
 
@@ -81,7 +83,7 @@ export default function AdminRoutesPage() {
                 fetchData(); // Refresh list
             } else {
                 const errorData = await res.json();
-                alert(errorData.error || 'Rota oluşturulamadı.');
+                showError('Hata', errorData.error || 'Rota oluşturulamadı.');
             }
         } catch (error) {
             console.error("Create route error", error);

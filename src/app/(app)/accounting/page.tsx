@@ -8,6 +8,7 @@ import { useCRM } from "@/contexts/CRMContext"; // Added useCRM
 import { formatCurrency } from "@/lib/utils";
 
 import { useSearchParams } from "next/navigation";
+import { useModal } from "@/contexts/ModalContext";
 import AccountingModals from "./components/AccountingModals";
 
 export default function AccountingPage() {
@@ -15,6 +16,7 @@ export default function AccountingPage() {
     const initialTab = searchParams.get('tab') || 'receivables';
 
     const { user } = useAuth();
+    const { showSuccess, showError, showConfirm } = useModal();
     const {
         transactions,
         checks,
@@ -44,20 +46,23 @@ export default function AccountingPage() {
     };
 
     const handleMerge = async (duplicate: any) => {
-        if (!confirm('Bu manuel hesabı open banking bağlantısı ile birleştirmek istediğinize emin misiniz?')) return;
-        try {
-            const res = await fetch('/api/fintech/banking/merge', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ kasaId: duplicate.kasaId, connectionId: duplicate.connectionId })
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert('Hesaplar başarıyla birleştirildi.');
-                setDuplicates(prev => prev.filter(d => d.kasaId !== duplicate.kasaId));
-                refreshData();
-            }
-        } catch (e) { alert('Hata oluştu'); }
+        showConfirm('Hesapları Birleştir', 'Bu manuel hesabı open banking bağlantısı ile birleştirmek istediğinize emin misiniz?', async () => {
+            try {
+                const res = await fetch('/api/fintech/banking/merge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kasaId: duplicate.kasaId, connectionId: duplicate.connectionId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showSuccess('Başarılı', 'Hesaplar başarıyla birleştirildi.');
+                    setDuplicates(prev => prev.filter(d => d.kasaId !== duplicate.kasaId));
+                    refreshData();
+                } else {
+                    showError('Hata', data.error || 'İşlem başarısız.');
+                }
+            } catch (e) { showError('Hata', 'Bağlantı hatası oluştu'); }
+        });
     };
 
     const syncAccount = async (connectionId?: string) => {
@@ -564,10 +569,10 @@ export default function AccountingPage() {
                                                                 const message = json.mode === 'DRY_RUN'
                                                                     ? 'Simülasyon Tamamlandı (DRY_RUN): Kayıt atılmadı.'
                                                                     : 'İşlem Başarıyla Muhasebeleştirildi (LIVE).';
-                                                                alert(message);
+                                                                showSuccess('İşlem Tamamlandı', message);
                                                                 refreshData();
                                                             } else {
-                                                                alert('Hata: ' + json.error);
+                                                                showError('Hata', 'Hata: ' + json.error);
                                                             }
                                                         }}
                                                         className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-white"

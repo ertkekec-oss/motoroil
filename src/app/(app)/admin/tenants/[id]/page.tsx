@@ -3,9 +3,11 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function TenantDetailPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
     const params = use(paramsPromise);
+    const { showSuccess, showError, showConfirm } = useModal();
     const router = useRouter();
     const [tenant, setTenant] = useState<any>(null);
     const [usage, setUsage] = useState<any>(null);
@@ -58,13 +60,13 @@ export default function TenantDetailPage({ params: paramsPromise }: { params: Pr
             });
             const data = await res.json();
             if (res.status === 200) {
-                alert('İşlem Başarılı');
+                showSuccess('Başarılı', 'İşlem Başarılı');
                 window.location.reload();
             } else {
-                alert('Hata: ' + data.error);
+                showError('Hata', 'Hata: ' + data.error);
             }
         } catch (e: any) {
-            alert('Sistem Hatası: ' + e.message);
+            showError('Hata', 'Sistem Hatası: ' + e.message);
         } finally {
             setActionLoading(false);
             setShowModal(null);
