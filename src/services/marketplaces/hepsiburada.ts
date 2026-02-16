@@ -55,94 +55,89 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
-        const allOrders: MarketplaceOrder[] = [];
-        let offset = 0;
-        const limit = 50;
-        let hasMore = true;
+        const allOrdersMap = new Map<string, MarketplaceOrder>();
 
         const merchantId = (this.config.merchantId || '').trim();
         const now = new Date();
-        // Hepsiburada docs recommend 30 days for initial sync to avoid errors
-        let begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
-        let end = endDate || now;
-
-        if (begin > end) [begin, end] = [end, begin];
+        const begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
+        const end = endDate || now;
 
         const bStr = this.hbDate(begin);
         const eStr = this.hbDate(end);
 
-        console.log(`[HB_SYNC_START] Merchant: ${merchantId} | From: ${bStr} To: ${eStr}`);
+        // Hepsiburada OMS requires separate calls for different life-cycle segments
+        const syncTargets = [
+            { name: 'UNPACKED', urlPart: `orders/merchantid/${merchantId}` },
+            { name: 'SHIPPED', urlPart: `packages/merchantid/${merchantId}/shipped` },
+            { name: 'DELIVERED', urlPart: `packages/merchantid/${merchantId}/delivered` },
+            { name: 'CANCELLED', urlPart: `packages/merchantid/${merchantId}/cancelled` }
+        ];
 
-        while (hasMore) {
-            try {
-                // Manual construct to guarantee %20 instead of + for legacy HB systems
-                const url = `${this.baseUrl}/orders/merchantid/${merchantId}?offset=${offset}&limit=${limit}&begindate=${encodeURIComponent(bStr)}&enddate=${encodeURIComponent(eStr)}`;
+        console.log(`[HB_MULTI_SYNC] Starting sync for ${syncTargets.length} targets. Range: ${bStr} - ${eStr}`);
 
-                console.log(`[HB_CALL] HTTP GET ${url}`);
+        for (const target of syncTargets) {
+            let offset = 0;
+            const limit = 50;
+            let hasMore = true;
 
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': this.getAuthHeader(),
-                        'User-Agent': 'Periodya_OMS_v1',
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+            console.log(`[HB_SYNC_PHASE] Checking ${target.name}...`);
+
+            while (hasMore) {
+                try {
+                    const url = `${this.baseUrl}/${target.urlPart}?offset=${offset}&limit=${limit}&begindate=${encodeURIComponent(bStr)}&enddate=${encodeURIComponent(eStr)}`;
+
+                    const response = await fetch(url, {
+                        headers: {
+                            'Authorization': this.getAuthHeader(),
+                            'User-Agent': 'Periodya_OMS_v1',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        console.warn(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status}). Body: ${errText.substring(0, 100)}`);
+                        hasMore = false;
+                        break;
                     }
-                });
 
-                const totalCount = response.headers.get('x-total-count') || response.headers.get('totalcount') || '0';
-                const rateRemaining = response.headers.get('x-ratelimit-remaining') || 'unknown';
+                    const data = await response.json();
+                    let items: any[] = [];
+                    if (Array.isArray(data)) items = data;
+                    else if (data && typeof data === 'object') items = data.items || data.data || (data.id ? [data] : []);
 
-                console.log(`[HB_RESULT] Status: ${response.status} | Total: ${totalCount} | Rate: ${rateRemaining}`);
+                    if (items.length === 0) {
+                        hasMore = false;
+                        break;
+                    }
 
-                if (!response.ok) {
-                    const errorBody = await response.text();
-                    console.error(`[HB_API_ERROR] Status: ${response.status} | URL: ${url} | Body: ${errorBody}`);
+                    for (const item of items) {
+                        const mapped = this.mapOrder(item);
+                        // Use a composite key or id to deduplicate
+                        const key = mapped.id || mapped.orderNumber;
+                        if (key) allOrdersMap.set(key, mapped);
+                    }
 
-                    if (response.status === 401) throw new Error("Hepsiburada Yetkilendirme Hatası (401): API User/Pass yanlış.");
-                    if (response.status === 429) throw new Error("Hepsiburada Rate Limit (429): Çok fazla istek atıldı.");
-                    throw new Error(`HB_ERROR_${response.status}: ${errorBody.substring(0, 100)}`);
-                }
+                    if (items.length < limit) hasMore = false;
+                    else offset += limit;
 
-                const data = await response.json();
+                    // Safety throttle to avoid hitting 429 too fast between pages
+                    if (hasMore) await new Promise(r => setTimeout(r, 200));
 
-                // Flexible data extraction
-                let items: any[] = [];
-                if (Array.isArray(data)) {
-                    items = data;
-                } else if (data && typeof data === 'object') {
-                    items = data.items || data.data || (data.id ? [data] : []);
-                }
-
-                console.log(`[HB_DATA] Offset ${offset} yielded ${items.length} items.`);
-
-                if (items.length === 0) {
-                    hasMore = false;
-                    break;
-                }
-
-                for (const item of items) {
-                    allOrders.push(this.mapOrder(item));
-                }
-
-                if (items.length < limit || allOrders.length >= parseInt(totalCount)) {
-                    hasMore = false;
-                } else {
-                    offset += limit;
-                }
-
-                // Safety break for Vercel
-                if (allOrders.length > 300) {
-                    console.warn(`[HB_SAFETY] Batch limit reached (300).`);
+                } catch (err: any) {
+                    console.error(`[HB_PHASE_FATAL] ${target.name} error: ${err.message}`);
                     hasMore = false;
                 }
-
-            } catch (error: any) {
-                console.error(`[HB_FATAL] ${error.message}`);
-                throw error;
             }
+
+            // Short delay between different endpoint targets
+            await new Promise(r => setTimeout(r, 500));
         }
 
-        return allOrders;
+        const finalOrders = Array.from(allOrdersMap.values());
+        console.log(`[HB_SYNC_COMPLETE] Total unique orders fetched across all statuses: ${finalOrders.length}`);
+        return finalOrders;
     }
 
     private mapOrder(hbOrder: any): MarketplaceOrder {
