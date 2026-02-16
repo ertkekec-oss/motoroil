@@ -62,6 +62,7 @@ export class HepsiburadaService implements IMarketplaceService {
 
         const merchantId = (this.config.merchantId || '').trim();
         const now = new Date();
+        // Hepsiburada docs recommend 30 days for initial sync to avoid errors
         let begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
         let end = endDate || now;
 
@@ -96,12 +97,23 @@ export class HepsiburadaService implements IMarketplaceService {
                     }
                 });
 
+                // LOG HEADERS FOR DEBUGGING per USER REQUEST
+                const headersObj: any = {};
+                response.headers.forEach((val, key) => { headersObj[key] = val; });
+                const totalCount = response.headers.get('x-total-count') || response.headers.get('totalcount');
+                const rateLimit = response.headers.get('x-ratelimit-remaining');
+
+                console.log(`[HB_REMOTE_RESPONSE] Status: ${response.status} | TotalCount: ${totalCount} | RateRemaining: ${rateLimit}`);
+
                 if (!response.ok) {
                     const errorBody = await response.text();
                     console.error(`[HB_REMOTE_ERROR] Status: ${response.status} | Body: ${errorBody} | URL: ${url}`);
 
                     if (response.status === 401) {
-                        throw new Error(`UNAUTHORIZED: Hepsiburada API anahtarlarınız veya User/Pass bilgileriniz hatalı. (401)`);
+                        throw new Error(`UNAUTHORIZED: Hepsiburada API anahtarlarınız hatalı (401).`);
+                    }
+                    if (response.status === 429) {
+                        throw new Error(`RATE_LIMIT: Hepsiburada API limitine takıldınız. Lütfen biraz bekleyin. (429)`);
                     }
                     throw new Error(`HEPSIBURADA_API_ERROR: ${response.status} - ${errorBody}`);
                 }
@@ -111,13 +123,12 @@ export class HepsiburadaService implements IMarketplaceService {
                 // HB API check: orders list might be direct array or wrapped in { items: [] } or { data: [] }
                 const items = Array.isArray(data) ? data : (data.items || data.data || []);
 
+                console.log(`[HB_SYNC_DATA] Offset: ${offset} | Items in packet: ${items.length} | Total in DB: ${totalCount || 'unknown'}`);
+
                 if (items.length === 0) {
-                    console.log(`[HB_SYNC] No more data at offset ${offset}`);
                     hasMore = false;
                     break;
                 }
-
-                console.log(`[HB_SYNC] Fetched ${items.length} items at offset ${offset}`);
 
                 for (const item of items) {
                     allOrders.push(this.mapOrder(item));
@@ -131,7 +142,7 @@ export class HepsiburadaService implements IMarketplaceService {
 
                 // Vercel / Cloud Run safety: if we fetched too many, break to avoid timeout
                 if (allOrders.length > 500) {
-                    console.warn(`[HB_SYNC] Reach safe limit (500), stopping pagination.`);
+                    console.warn(`[HB_SYNC] Safe break (500 items).`);
                     hasMore = false;
                 }
 
