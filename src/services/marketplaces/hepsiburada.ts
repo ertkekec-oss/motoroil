@@ -66,64 +66,54 @@ export class HepsiburadaService implements IMarketplaceService {
         let begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
         let end = endDate || now;
 
-        if (begin > end) {
-            const tmp = begin;
-            begin = end;
-            end = tmp;
-        }
+        if (begin > end) [begin, end] = [end, begin];
 
         const bStr = this.hbDate(begin);
         const eStr = this.hbDate(end);
 
-        console.log(`[HB_SYNC_PLAN] Merchant: ${merchantId} | Range: ${bStr} to ${eStr}`);
+        console.log(`[HB_SYNC_START] Merchant: ${merchantId} | From: ${bStr} To: ${eStr}`);
 
         while (hasMore) {
             try {
-                // Production-ready URL construction
-                const params = new URLSearchParams({
-                    offset: offset.toString(),
-                    limit: limit.toString(),
-                    begindate: bStr,
-                    enddate: eStr
-                });
+                // Manual construct to guarantee %20 instead of + for legacy HB systems
+                const url = `${this.baseUrl}/orders/merchantid/${merchantId}?offset=${offset}&limit=${limit}&begindate=${encodeURIComponent(bStr)}&enddate=${encodeURIComponent(eStr)}`;
 
-                const url = `${this.baseUrl}/orders/merchantid/${merchantId}?${params.toString()}`;
+                console.log(`[HB_CALL] HTTP GET ${url}`);
 
                 const response = await fetch(url, {
                     headers: {
                         'Authorization': this.getAuthHeader(),
                         'User-Agent': 'Periodya_OMS_v1',
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     }
                 });
 
-                // LOG HEADERS FOR DEBUGGING per USER REQUEST
-                const headersObj: any = {};
-                response.headers.forEach((val, key) => { headersObj[key] = val; });
-                const totalCount = response.headers.get('x-total-count') || response.headers.get('totalcount');
-                const rateLimit = response.headers.get('x-ratelimit-remaining');
+                const totalCount = response.headers.get('x-total-count') || response.headers.get('totalcount') || '0';
+                const rateRemaining = response.headers.get('x-ratelimit-remaining') || 'unknown';
 
-                console.log(`[HB_REMOTE_RESPONSE] Status: ${response.status} | TotalCount: ${totalCount} | RateRemaining: ${rateLimit}`);
+                console.log(`[HB_RESULT] Status: ${response.status} | Total: ${totalCount} | Rate: ${rateRemaining}`);
 
                 if (!response.ok) {
                     const errorBody = await response.text();
-                    console.error(`[HB_REMOTE_ERROR] Status: ${response.status} | Body: ${errorBody} | URL: ${url}`);
+                    console.error(`[HB_API_ERROR] Status: ${response.status} | URL: ${url} | Body: ${errorBody}`);
 
-                    if (response.status === 401) {
-                        throw new Error(`UNAUTHORIZED: Hepsiburada API anahtarlarınız hatalı (401).`);
-                    }
-                    if (response.status === 429) {
-                        throw new Error(`RATE_LIMIT: Hepsiburada API limitine takıldınız. Lütfen biraz bekleyin. (429)`);
-                    }
-                    throw new Error(`HEPSIBURADA_API_ERROR: ${response.status} - ${errorBody}`);
+                    if (response.status === 401) throw new Error("Hepsiburada Yetkilendirme Hatası (401): API User/Pass yanlış.");
+                    if (response.status === 429) throw new Error("Hepsiburada Rate Limit (429): Çok fazla istek atıldı.");
+                    throw new Error(`HB_ERROR_${response.status}: ${errorBody.substring(0, 100)}`);
                 }
 
                 const data = await response.json();
 
-                // HB API check: orders list might be direct array or wrapped in { items: [] } or { data: [] }
-                const items = Array.isArray(data) ? data : (data.items || data.data || []);
+                // Flexible data extraction
+                let items: any[] = [];
+                if (Array.isArray(data)) {
+                    items = data;
+                } else if (data && typeof data === 'object') {
+                    items = data.items || data.data || (data.id ? [data] : []);
+                }
 
-                console.log(`[HB_SYNC_DATA] Offset: ${offset} | Items in packet: ${items.length} | Total in DB: ${totalCount || 'unknown'}`);
+                console.log(`[HB_DATA] Offset ${offset} yielded ${items.length} items.`);
 
                 if (items.length === 0) {
                     hasMore = false;
@@ -134,20 +124,20 @@ export class HepsiburadaService implements IMarketplaceService {
                     allOrders.push(this.mapOrder(item));
                 }
 
-                if (items.length < limit) {
+                if (items.length < limit || allOrders.length >= parseInt(totalCount)) {
                     hasMore = false;
                 } else {
                     offset += limit;
                 }
 
-                // Vercel / Cloud Run safety: if we fetched too many, break to avoid timeout
-                if (allOrders.length > 500) {
-                    console.warn(`[HB_SYNC] Safe break (500 items).`);
+                // Safety break for Vercel
+                if (allOrders.length > 300) {
+                    console.warn(`[HB_SAFETY] Batch limit reached (300).`);
                     hasMore = false;
                 }
 
             } catch (error: any) {
-                console.error(`[HB_PAGINATION_FAIL] Offset: ${offset} | Error: ${error.message}`);
+                console.error(`[HB_FATAL] ${error.message}`);
                 throw error;
             }
         }
