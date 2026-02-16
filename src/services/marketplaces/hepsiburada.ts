@@ -45,22 +45,28 @@ export class HepsiburadaService implements IMarketplaceService {
             const limit = 50;
 
             // Hepsiburada OMS API expects: YYYY-MM-DD HH:mm:ss (with space, no T/Z)
-            const formatDate = (date: Date) => {
+            const hbDate = (date: Date) => {
                 const pad = (n: number) => n.toString().padStart(2, '0');
-                return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+                const yr = date.getFullYear();
+                const mo = pad(date.getMonth() + 1);
+                const dy = pad(date.getDate());
+                const hr = pad(date.getHours());
+                const mi = pad(date.getMinutes());
+                const sc = pad(date.getSeconds());
+                return `${yr}-${mo}-${dy} ${hr}:${mi}:${sc}`;
             };
 
-            const startStr = startDate ? formatDate(startDate) : '';
-            const endStr = endDate ? formatDate(endDate) : '';
+            const startStr = startDate ? hbDate(startDate) : hbDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
+            const endStr = endDate ? hbDate(endDate) : hbDate(new Date());
 
-            // Hepsiburada usually requires status or date range. 
-            // We'll fetch multiple statuses if possible, or just use the date range.
+            console.log("HB SYNC RANGE:", { beginDate: startStr, endDate: endStr });
+
             let url = `${this.baseUrl}/orders/merchantid/${merchantId}?limit=${limit}`;
 
             if (startStr) url += `&beginDate=${encodeURIComponent(startStr)}`;
             if (endStr) url += `&endDate=${encodeURIComponent(endStr)}`;
 
-            console.log(`[Hepsiburada] Fetching: ${url}`);
+            console.log(`[Hepsiburada] Requesting URL: ${url}`);
 
             const response = await fetch(url, {
                 headers: {
