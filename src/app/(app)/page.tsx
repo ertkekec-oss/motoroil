@@ -60,6 +60,7 @@ function POSContent() {
   const [insightsData, setInsightsData] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [activePriceListId, setActivePriceListId] = useState<string | null>(null);
+  const [activePriceListName, setActivePriceListName] = useState<string | null>(null);
   const [priceMap, setPriceMap] = useState<Record<string, number>>({});
 
   const getPrice = useCallback((product: any) => {
@@ -114,7 +115,7 @@ function POSContent() {
     const resolvePriceList = async () => {
       if (!selectedCustomer) return;
       const cust = customers.find(c => c.name === selectedCustomer);
-      const customerId = cust?.id; // If not found (e.g. Retail default name), send null to resolve default list
+      const customerId = cust?.id;
 
       try {
         const res = await fetch('/api/pricing/resolve-customer', {
@@ -123,14 +124,24 @@ function POSContent() {
         });
         const data = await res.json();
         if (data.success && data.data?.priceList) {
-          const listId = data.data.priceList.id;
+          const { id: listId, name: listName } = data.data.priceList;
           if (listId !== activePriceListId) {
             setActivePriceListId(listId);
+            setActivePriceListName(listName);
             // Fetch prices for this list
             const pRes = await fetch(`/api/pricing/lists/${listId}/prices`);
             const pData = await pRes.json();
             if (pData.success) {
-              setPriceMap(pData.data.priceMap || {});
+              const newPriceMap = pData.data.priceMap || {};
+              setPriceMap(newPriceMap);
+
+              // 🔄 BUG FIX: Update existing cart items with new prices
+              setCart(prevCart => prevCart.map(item => {
+                if (newPriceMap[item.id] !== undefined) {
+                  return { ...item, price: newPriceMap[item.id] };
+                }
+                return item;
+              }));
             }
           }
         }
@@ -449,7 +460,14 @@ function POSContent() {
                 <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px]">{selectedCustomer.charAt(0)}</div>
                 <span className="font-bold text-sm truncate max-w-[200px]">{selectedCustomer}</span>
               </div>
-              <div className="text-[10px] text-primary font-bold">DEĞİŞTİR ▾</div>
+              <div className="flex flex-col items-end">
+                <div className="text-[10px] text-primary font-bold">DEĞİŞTİR ▾</div>
+                {activePriceListName && (
+                  <div className="text-[8px] opacity-70 mt-0.5 bg-primary/10 px-1 rounded border border-primary/20 uppercase">
+                    {activePriceListName}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

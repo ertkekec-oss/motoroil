@@ -14,6 +14,8 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
         items: [] as any[],
         status: 'Draft'
     });
+    const [resolvedPriceList, setResolvedPriceList] = useState<any>(null);
+    const [loadingPrice, setLoadingPrice] = useState(false);
 
     useEffect(() => {
         if (initialData) {
@@ -27,6 +29,29 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
             });
         }
     }, [initialData]);
+
+    // Resolve Price List when customer changes
+    useEffect(() => {
+        const resolve = async () => {
+            if (!formData.customerId) {
+                setResolvedPriceList(null);
+                return;
+            }
+            try {
+                const res = await fetch('/api/pricing/resolve-customer', {
+                    method: 'POST',
+                    body: JSON.stringify({ customerId: formData.customerId })
+                });
+                const d = await res.json();
+                if (d.success) {
+                    setResolvedPriceList(d.priceList);
+                }
+            } catch (error) {
+                console.error("Price list resolution failed", error);
+            }
+        };
+        resolve();
+    }, [formData.customerId]);
 
     const addItem = () => {
         setFormData(prev => ({
@@ -43,8 +68,26 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
             const product = products.find((p: any) => p.id === value || String(p.id) === String(value));
             if (product) {
                 newItems[index].name = product.name;
-                newItems[index].price = product.price;
+                newItems[index].price = product.price; // Default fallback
                 newItems[index].taxRate = product.salesVat || 20;
+
+                // If we have a resolved price list and it's not the default retail,
+                // we should check for a specific price
+                if (resolvedPriceList) {
+                    setLoadingPrice(true);
+                    fetch(`/api/pricing/products/${value}/prices`)
+                        .then(res => res.json())
+                        .then(d => {
+                            if (d.success && Array.isArray(d.data)) {
+                                const specific = d.data.find((p: any) => p.priceListId === resolvedPriceList.id);
+                                if (specific && Number(specific.price) > 0) {
+                                    newItems[index].price = Number(specific.price);
+                                    setFormData(prev => ({ ...prev, items: [...newItems] }));
+                                }
+                            }
+                        })
+                        .finally(() => setLoadingPrice(false));
+                }
             }
         }
 
@@ -108,6 +151,13 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                                 <option key={c.id} value={c.id}>{c.name}</option>
                             ))}
                         </select>
+                        {resolvedPriceList && (
+                            <div className="mt-1 flex items-center gap-1.5">
+                                <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-primary/20 text-primary border border-primary/30 uppercase">
+                                    {resolvedPriceList.name} LİSTESİ AKTİF
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     {/* Date */}

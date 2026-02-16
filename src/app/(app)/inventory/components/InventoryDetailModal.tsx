@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Product } from '@/contexts/InventoryContext';
+import { ProductPricesTab } from '@/components/pricing/ProductPricesTab';
 
 interface InventoryDetailModalProps {
     isOpen: boolean;
@@ -69,10 +70,18 @@ export default function InventoryDetailModal({
                             Genel Bilgiler
                         </button>
                         <button
+                            type="button"
                             onClick={() => setDetailTab('pricing')}
                             className={`px-4 py-2 text-sm font-bold rounded-t-lg transition-colors ${detailTab === 'pricing' ? 'bg-primary text-white' : 'text-muted hover:text-white'}`}
                         >
                             Fiyat & Vergi
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setDetailTab('multi-prices')}
+                            className={`px-4 py-2 text-sm font-bold rounded-t-lg transition-colors ${detailTab === 'multi-prices' ? 'bg-primary text-white' : 'text-muted hover:text-white'}`}
+                        >
+                            Çoklu Fiyat
                         </button>
                         {selectedProduct && selectedProduct.isParent && (
                             <button
@@ -363,6 +372,12 @@ export default function InventoryDetailModal({
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {detailTab === 'multi-prices' && (
+                            <div className="animate-fade-in p-4 bg-white/5 rounded-2xl border border-white/10">
+                                <ProductPricesTab productId={selectedProduct.id} />
                             </div>
                         )}
                     </form>
