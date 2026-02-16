@@ -692,7 +692,7 @@ export default function IntegrationsContent() {
 
                             {marketplaceSettings.hepsiburada.enabled && (
                                 <div className="pt-8 mt-8 border-t border-white/5 animate-in slide-in-from-top-2 duration-300">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">Merchant ID</label>
                                             <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#ff6000]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.hepsiburada.merchantId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, merchantId: e.target.value } })} placeholder="f225561c-..." />
@@ -700,10 +700,6 @@ export default function IntegrationsContent() {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">Secret Key</label>
                                             <input type="password" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#ff6000]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.hepsiburada.password} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, password: e.target.value } })} placeholder="DTSF5..." />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">API User (Opsiyonel)</label>
-                                            <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#ff6000]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.hepsiburada.username} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, username: e.target.value } })} placeholder="Genelde Merchant ID ile aynıdır" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
