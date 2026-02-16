@@ -103,9 +103,7 @@ export async function DELETE(req: NextRequest, { params: paramsPromise }: { para
         }
 
         const { id: tenantId } = await paramsPromise;
-        const fs = require('fs');
-        const logFile = 'deletion_debug.log';
-        const log = (msg: string) => fs.appendFileSync(logFile, `${new Date().toISOString()} ${msg}\n`);
+        const log = (msg: string) => console.log(`[DELETE_TENANT_DEBUG] ${new Date().toISOString()} ${msg}`);
 
         log(`Target Tenant ID: ${tenantId}`);
 
