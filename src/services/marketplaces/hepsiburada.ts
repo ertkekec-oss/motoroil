@@ -73,14 +73,10 @@ export class HepsiburadaService implements IMarketplaceService {
                 throw new Error(`CRITICAL_DATE_FORMAT_ERROR: Hepsiburada formatında 'T' veya 'Z' bulunamaz! (Gelen: ${bStr})`);
             }
 
-            const queryParams = new URLSearchParams({
-                limit: '50',
-                beginDate: bStr,
-                endDate: eStr
-            });
-
-            const url = `${this.baseUrl}/orders/merchantid/${merchantId}?${queryParams.toString()}`;
-            console.log(`[HB_FINAL_URL] ${url}`);
+            // Hepsiburada sometimes prefers %20 over + for spaces in dates.
+            // URLSearchParams uses + by default. Let's build manually for precision.
+            const url = `${this.baseUrl}/orders/merchantid/${merchantId}?limit=50&beginDate=${encodeURIComponent(bStr)}&endDate=${encodeURIComponent(eStr)}`;
+            console.log(`[HB_MANUAL_URL] ${url}`);
 
             const response = await fetch(url, {
                 headers: {
