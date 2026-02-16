@@ -555,13 +555,13 @@ export default function IntegrationsContent() {
                                             <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">İşlem Deposu</label>
                                             <select
                                                 className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-primary/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
-                                                value={marketplaceSettings.custom.branch || 'Merkez'}
+                                                value={marketplaceSettings.custom.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, branch: e.target.value } })}
                                             >
-                                                <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>
-                                                {branches.filter(b => b.name !== 'Merkez').map(b => (
+                                                {branches.map(b => (
                                                     <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
                                                 ))}
+                                                {branches.length === 0 && <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>}
                                             </select>
                                         </div>
                                     </div>
@@ -626,13 +626,13 @@ export default function IntegrationsContent() {
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
                                             <select
                                                 className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#f27a1a]/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
-                                                value={marketplaceSettings.trendyol.branch || 'Merkez'}
+                                                value={marketplaceSettings.trendyol.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, branch: e.target.value } })}
                                             >
-                                                <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>
-                                                {branches.filter(b => b.name !== 'Merkez').map(b => (
+                                                {branches.map(b => (
                                                     <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
                                                 ))}
+                                                {branches.length === 0 && <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>}
                                             </select>
                                         </div>
                                     </div>
@@ -709,13 +709,13 @@ export default function IntegrationsContent() {
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
                                             <select
                                                 className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#ff6000]/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
-                                                value={marketplaceSettings.hepsiburada.branch || 'Merkez'}
+                                                value={marketplaceSettings.hepsiburada.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, branch: e.target.value } })}
                                             >
-                                                <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>
-                                                {branches.filter(b => b.name !== 'Merkez').map(b => (
+                                                {branches.map(b => (
                                                     <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
                                                 ))}
+                                                {branches.length === 0 && <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>}
                                             </select>
                                         </div>
                                     </div>
@@ -780,13 +780,13 @@ export default function IntegrationsContent() {
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
                                             <select
                                                 className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#603996]/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
-                                                value={marketplaceSettings.n11.branch || 'Merkez'}
+                                                value={marketplaceSettings.n11.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, branch: e.target.value } })}
                                             >
-                                                <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>
-                                                {branches.filter(b => b.name !== 'Merkez').map(b => (
+                                                {branches.map(b => (
                                                     <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
                                                 ))}
+                                                {branches.length === 0 && <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>}
                                             </select>
                                         </div>
                                     </div>
@@ -859,13 +859,13 @@ export default function IntegrationsContent() {
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
                                             <select
                                                 className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-amber-500/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
-                                                value={marketplaceSettings.amazon.branch || 'Merkez'}
+                                                value={marketplaceSettings.amazon.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, branch: e.target.value } })}
                                             >
-                                                <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>
-                                                {branches.filter(b => b.name !== 'Merkez').map(b => (
+                                                {branches.map(b => (
                                                     <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
                                                 ))}
+                                                {branches.length === 0 && <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>}
                                             </select>
                                         </div>
                                     </div>
