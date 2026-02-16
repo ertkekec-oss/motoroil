@@ -15,9 +15,10 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     private getAuthHeader(): string {
-        const merchantId = (this.config.merchantId || '').trim();
-        const secretKey = (this.config.secretKey || this.config.password || '').trim();
-        const token = Buffer.from(`${merchantId}:${secretKey}`).toString('base64');
+        // Hepsiburada OMS API basic auth needs API User and API Secret
+        const username = (this.config.username || '').trim();
+        const password = (this.config.password || '').trim();
+        const token = Buffer.from(`${username}:${password}`).toString('base64');
         return `Basic ${token}`;
     }
 
@@ -53,8 +54,16 @@ export class HepsiburadaService implements IMarketplaceService {
         try {
             const merchantId = (this.config.merchantId || '').trim();
             const now = new Date();
-            const begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
-            const end = endDate || now;
+            let begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
+            let end = endDate || now;
+
+            // Date inversion guard
+            if (begin > end) {
+                console.warn(`[HB] Date inversion detected, swapping: ${begin.toISOString()} > ${end.toISOString()}`);
+                const tmp = begin;
+                begin = end;
+                end = tmp;
+            }
 
             const bStr = this.hbDate(begin);
             const eStr = this.hbDate(end);

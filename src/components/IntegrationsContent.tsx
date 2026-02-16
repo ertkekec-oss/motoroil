@@ -46,6 +46,7 @@ export default function IntegrationsContent() {
         hepsiburada: {
             enabled: false,
             merchantId: '',
+            username: '',
             password: '',
             autoSync: false,
             syncInterval: 15,
@@ -144,16 +145,7 @@ export default function IntegrationsContent() {
                     throw new Error(data.error || 'API Hatası');
                 }
             } else {
-                let config = { ...(marketplaceSettings as any)[marketplace] };
-
-                // Hepsiburada için özel temizlik: username kalıntılarını sil, şemayı düzelt
-                if (marketplace === 'hepsiburada') {
-                    const { username, password, ...rest } = config;
-                    config = {
-                        ...rest,
-                        secretKey: password // Backend'e secretKey olarak geçsin
-                    };
-                }
+                const config = { ...(marketplaceSettings as any)[marketplace] };
 
                 const response = await apiFetch('/api/integrations/marketplace/sync', {
                     method: 'POST',
@@ -212,18 +204,10 @@ export default function IntegrationsContent() {
     const saveSettings = async () => {
         setIsSaving(true);
         try {
-            const cleanedMarketplaceSettings = JSON.parse(JSON.stringify(marketplaceSettings));
-            if (cleanedMarketplaceSettings.hepsiburada) {
-                delete cleanedMarketplaceSettings.hepsiburada.username;
-                if (cleanedMarketplaceSettings.hepsiburada.password) {
-                    cleanedMarketplaceSettings.hepsiburada.secretKey = cleanedMarketplaceSettings.hepsiburada.password;
-                }
-            }
-
             const response = await apiFetch('/api/integrations/settings/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ marketplaceSettings: cleanedMarketplaceSettings, eFaturaSettings, posSettings })
+                body: JSON.stringify({ marketplaceSettings, eFaturaSettings, posSettings })
             });
             const data = await response.json();
             if (data.success) {
@@ -710,10 +694,14 @@ export default function IntegrationsContent() {
 
                             {marketplaceSettings.hepsiburada.enabled && (
                                 <div className="pt-8 mt-8 border-t border-white/5 animate-in slide-in-from-top-2 duration-300">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">Merchant ID</label>
                                             <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#ff6000]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.hepsiburada.merchantId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, merchantId: e.target.value } })} placeholder="f225561c-..." />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">API User</label>
+                                            <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#ff6000]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.hepsiburada.username || ''} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, username: e.target.value } })} placeholder="Hepsiburada API User" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">Secret Key</label>
