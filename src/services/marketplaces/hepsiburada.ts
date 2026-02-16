@@ -97,9 +97,18 @@ export class HepsiburadaService implements IMarketplaceService {
 
                     if (!response.ok) {
                         const errText = await response.text();
-                        console.warn(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status}). Body: ${errText.substring(0, 100)}`);
-                        hasMore = false;
-                        break;
+                        console.error(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status}). Body: ${errText.substring(0, 100)}`);
+
+                        // Critical Errors: Throw instead of swallow
+                        if (response.status === 401) {
+                            throw new Error(`HB_AUTH_ERROR: Hepsiburada Yetkilendirme Hatası (401). Lütfen API User ve Secret Key bilgilerini kontrol edin.`);
+                        }
+                        if (response.status === 429) {
+                            throw new Error(`HB_RATE_LIMIT: Hepsiburada API limitine takıldınız. (429)`);
+                        }
+
+                        // For other statuses, we might decide to continue or throw. Let's throw for now to be safe.
+                        throw new Error(`HB_API_ERROR: ${target.name} servisi ${response.status} hatası döndürdü: ${errText.substring(0, 100)}`);
                     }
 
                     const data = await response.json();
@@ -127,6 +136,8 @@ export class HepsiburadaService implements IMarketplaceService {
 
                 } catch (err: any) {
                     console.error(`[HB_PHASE_FATAL] ${target.name} error: ${err.message}`);
+                    // If it's one of our thrown errors, re-throw it to the caller
+                    if (err.message.includes('HB_')) throw err;
                     hasMore = false;
                 }
             }
