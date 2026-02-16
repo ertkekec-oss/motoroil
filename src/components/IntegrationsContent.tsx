@@ -144,12 +144,23 @@ export default function IntegrationsContent() {
                     throw new Error(data.error || 'API Hatası');
                 }
             } else {
-                const config = (marketplaceSettings as any)[marketplace];
+                let config = { ...(marketplaceSettings as any)[marketplace] };
+
+                // Hepsiburada için özel temizlik: username kalıntılarını sil, şemayı düzelt
+                if (marketplace === 'hepsiburada') {
+                    const { username, password, ...rest } = config;
+                    config = {
+                        ...rest,
+                        secretKey: password // Backend'e secretKey olarak geçsin
+                    };
+                }
+
                 const response = await apiFetch('/api/integrations/marketplace/sync', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ type: marketplace, config: config })
                 });
+
                 const data = await response.json();
                 if (data.success) {
                     let msg = `✅ ${data.message || 'Bağlantı ve senkronizasyon başarılı!'}`;
@@ -201,10 +212,18 @@ export default function IntegrationsContent() {
     const saveSettings = async () => {
         setIsSaving(true);
         try {
+            const cleanedMarketplaceSettings = JSON.parse(JSON.stringify(marketplaceSettings));
+            if (cleanedMarketplaceSettings.hepsiburada) {
+                delete cleanedMarketplaceSettings.hepsiburada.username;
+                if (cleanedMarketplaceSettings.hepsiburada.password) {
+                    cleanedMarketplaceSettings.hepsiburada.secretKey = cleanedMarketplaceSettings.hepsiburada.password;
+                }
+            }
+
             const response = await apiFetch('/api/integrations/settings/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ marketplaceSettings, eFaturaSettings, posSettings })
+                body: JSON.stringify({ marketplaceSettings: cleanedMarketplaceSettings, eFaturaSettings, posSettings })
             });
             const data = await response.json();
             if (data.success) {

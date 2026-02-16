@@ -42,8 +42,9 @@ export interface TrendyolConfig {
 
 export interface HepsiburadaConfig {
     merchantId: string;
-    username: string;
-    password: string; // Bazı endpointler için gerekli olabilir
+    username?: string;
+    password?: string;
+    secretKey?: string;
     isTest?: boolean;
 }
 

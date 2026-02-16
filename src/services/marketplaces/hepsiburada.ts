@@ -16,7 +16,7 @@ export class HepsiburadaService implements IMarketplaceService {
 
     private getAuthHeader(): string {
         const merchantId = (this.config.merchantId || '').trim();
-        const secretKey = (this.config.password || '').trim(); // Using password field as Secret Key
+        const secretKey = (this.config.secretKey || this.config.password || '').trim();
         const token = Buffer.from(`${merchantId}:${secretKey}`).toString('base64');
         return `Basic ${token}`;
     }
@@ -56,14 +56,22 @@ export class HepsiburadaService implements IMarketplaceService {
             const begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
             const end = endDate || now;
 
+            const bStr = this.hbDate(begin);
+            const eStr = this.hbDate(end);
+
+            // FATAL GUARD: Hepsiburada asla T veya Z kabul etmez. 
+            if (bStr.includes('T') || eStr.includes('T') || bStr.includes('Z') || eStr.includes('Z')) {
+                throw new Error(`CRITICAL_DATE_FORMAT_ERROR: Hepsiburada formatında 'T' veya 'Z' bulunamaz! (Gelen: ${bStr})`);
+            }
+
             const queryParams = new URLSearchParams({
                 limit: '50',
-                beginDate: this.hbDate(begin),
-                endDate: this.hbDate(end)
+                beginDate: bStr,
+                endDate: eStr
             });
 
             const url = `${this.baseUrl}/orders/merchantid/${merchantId}?${queryParams.toString()}`;
-            console.log(`[Hepsiburada] Fetching orders with URL: ${url}`);
+            console.log(`[HB_FINAL_URL] ${url}`);
 
             const response = await fetch(url, {
                 headers: {
