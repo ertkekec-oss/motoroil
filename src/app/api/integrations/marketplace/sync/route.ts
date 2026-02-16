@@ -61,21 +61,52 @@ export async function POST(request: Request) {
         }
 
         console.log(`[MARKETPLACE] Syncing for ${type} (Company: ${companyName}, ID: ${companyId})`);
-        const service = MarketplaceServiceFactory.createService(type as any, config);
 
-        // Fetch settings
+        // 2. Initial Date Logic (30 days fallback)
+        const marketplaceConfig = await prisma.marketplaceConfig.findUnique({
+            where: {
+                companyId_type: {
+                    companyId: companyId,
+                    type: type.toLowerCase().trim()
+                }
+            }
+        });
+
+        const syncBranch = config.branch || 'Merkez';
         const daysToSync = typeof config.days === 'number' ? config.days : 3;
         const processLimit = typeof config.limit === 'number' ? config.limit : 50;
-        const syncBranch = config.branch || 'Merkez';
 
         const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - daysToSync);
+        let startDate = new Date();
 
-        console.log(`[MARKETPLACE] Fetching orders from ${startDate.toISOString()}...`);
-        const t0 = Date.now();
-        const allOrders = await service.getOrders(startDate, endDate);
-        console.log(`[MARKETPLACE] Fetched ${allOrders.length} orders in ${Date.now() - t0}ms`);
+        if (marketplaceConfig?.lastSync) {
+            // If already synced, just sync from last sync minus a buffer (1 hour)
+            startDate = new Date(marketplaceConfig.lastSync.getTime() - (60 * 60 * 1000));
+        } else {
+            // First time sync: 30 days back
+            startDate.setDate(startDate.getDate() - 30);
+            console.log(`[MARKETPLACE] Initial sync detected, going back 30 days.`);
+        }
+
+        const service = MarketplaceServiceFactory.createService(type as any, { ...config, branch: syncBranch });
+
+        console.log(`[MARKETPLACE] Fetching orders from ${startDate.toISOString()} to ${endDate.toISOString()}...`);
+        let allOrders: any[] = [];
+        try {
+            const t0 = Date.now();
+            allOrders = await service.getOrders(startDate, endDate);
+            console.log(`[MARKETPLACE] Fetched ${allOrders.length} orders in ${Date.now() - t0}ms`);
+        } catch (remoteErr: any) {
+            console.error(`[MARKETPLACE_REMOTE_ERROR] ${type}:`, remoteErr.message);
+            // Return 400 with remote error details instead of 500
+            const statusCode = remoteErr.message.includes('400') ? 400 : (remoteErr.message.includes('401') ? 401 : 400);
+            return NextResponse.json({
+                success: false,
+                error: remoteErr.message,
+                remoteStatus: statusCode,
+                advice: "Lütfen API anahtarlarınızı ve Hepsiburada panelindeki OMS yetkilerini kontrol edin."
+            }, { status: statusCode });
+        }
 
         // Slice for Vercel timeout
         const orders = allOrders.slice(0, processLimit);
@@ -83,24 +114,13 @@ export async function POST(request: Request) {
         // SAFE UPSERT WRAPPER for Category
         let categoryId: string | null = null;
         try {
-            console.log(`[UPSERT_DEBUG] Upserting Category for Company: ${companyId}`);
-            // Schema update: CustomerCategory is now global (unique by name), no companyId
             const ecommerceCategory = await prisma.customerCategory.upsert({
-                where: {
-                    name: 'E-ticaret'
-                },
-                create: {
-                    name: 'E-ticaret',
-                    description: 'Web Satış Kanalı'
-                },
+                where: { name: 'E-ticaret' },
+                create: { name: 'E-ticaret', description: 'Web Satış Kanalı' },
                 update: {}
             });
             categoryId = ecommerceCategory.id;
-        } catch (catErr: any) {
-            console.error(`[UPSERT_ERROR] Failed to ensure category: ${catErr.message}`);
-            // Continue if possible, but customer creation might fail if category is required or logic depends on it.
-            // However, customer creation below uses categoryId. We'll handle it there.
-        }
+        } catch (catErr) { }
 
         let savedCount = 0;
         let updatedCount = 0;
@@ -113,22 +133,18 @@ export async function POST(request: Request) {
                 let customer;
                 const customerEmail = order.customerEmail || `guest-${order.orderNumber}@${type.toLowerCase()}.com`;
 
-                try {
-                    customer = await prisma.customer.upsert({
-                        where: { email_companyId: { email: customerEmail, companyId: companyId } },
-                        create: {
-                            companyId: companyId,
-                            name: order.customerName || 'Pazaryeri Müşterisi',
-                            email: customerEmail,
-                            phone: order.invoiceAddress?.phone || '',
-                            address: JSON.stringify(order.invoiceAddress),
-                            categoryId: categoryId
-                        },
-                        update: {}
-                    });
-                } catch (custErr: any) {
-                    throw new Error(`Müşteri kaydı hatası: ${custErr.message}`);
-                }
+                customer = await prisma.customer.upsert({
+                    where: { email_companyId: { email: customerEmail, companyId: companyId } },
+                    create: {
+                        companyId: companyId,
+                        name: order.customerName || 'Pazaryeri Müşterisi',
+                        email: customerEmail,
+                        phone: order.invoiceAddress?.phone || '',
+                        address: JSON.stringify(order.invoiceAddress),
+                        categoryId: categoryId
+                    },
+                    update: {}
+                });
 
                 // 2. Idempotency Guard
                 const existingOrder = await prisma.order.findFirst({
@@ -136,30 +152,25 @@ export async function POST(request: Request) {
                 });
 
                 if (!existingOrder) {
-                    let newOrder;
-                    try {
-                        newOrder = await prisma.order.create({
-                            data: {
-                                companyId,
-                                marketplace: type,
-                                marketplaceId: order.id,
-                                orderNumber: order.orderNumber,
-                                customerName: customer.name,
-                                totalAmount: order.totalAmount,
-                                currency: order.currency || 'TRY',
-                                status: order.status,
-                                orderDate: new Date(order.orderDate),
-                                items: order.items as any,
-                                shippingAddress: order.shippingAddress as any,
-                                invoiceAddress: order.invoiceAddress as any,
-                                shipmentPackageId: order.shipmentPackageId,
-                                branch: syncBranch,
-                                rawData: order as any
-                            }
-                        });
-                    } catch (orderErr: any) {
-                        throw new Error(`Sipariş oluşturma hatası: ${orderErr.message}`);
-                    }
+                    const newOrder = await prisma.order.create({
+                        data: {
+                            companyId,
+                            marketplace: type,
+                            marketplaceId: order.id,
+                            orderNumber: order.orderNumber,
+                            customerName: customer.name,
+                            totalAmount: order.totalAmount,
+                            currency: order.currency || 'TRY',
+                            status: order.status,
+                            orderDate: new Date(order.orderDate),
+                            items: order.items as any,
+                            shippingAddress: order.shippingAddress as any,
+                            invoiceAddress: order.invoiceAddress as any,
+                            shipmentPackageId: order.shipmentPackageId,
+                            branch: syncBranch,
+                            rawData: order as any
+                        }
+                    });
 
                     // TRIGGER REVENUE & FIFO
                     for (const item of (order.items || [])) {
@@ -184,10 +195,7 @@ export async function POST(request: Request) {
                                     branch: syncBranch
                                 }
                             });
-                        } catch (eventErr: any) {
-                            console.error(`[SYNC_EVENT_ERROR] Order ${order.orderNumber} item ${item.sku}:`, eventErr.message);
-                            // Event failure shouldn't rollback the order creation in this basic loop
-                        }
+                        } catch (eventErr) { }
                     }
 
                     savedCount++;
@@ -209,9 +217,16 @@ export async function POST(request: Request) {
                     }
                 }
             } catch (err: any) {
-                console.error(`[SYNC_ERROR] Order ${order.orderNumber}:`, err.message);
                 errors.push({ order: order.orderNumber, error: err.message });
             }
+        }
+
+        // 3. Update Last Sync Time
+        if (marketplaceConfig) {
+            await prisma.marketplaceConfig.update({
+                where: { id: marketplaceConfig.id },
+                data: { lastSync: new Date() }
+            });
         }
 
         return NextResponse.json({
