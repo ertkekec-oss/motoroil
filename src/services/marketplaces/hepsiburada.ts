@@ -18,6 +18,10 @@ export class HepsiburadaService implements IMarketplaceService {
         // Hepsiburada OMS API basic auth needs API User and API Secret
         const username = (this.config.username || '').trim();
         const password = (this.config.password || '').trim();
+        const merchantId = (this.config.merchantId || '').trim();
+
+        console.log(`[HB_AUTH] Authenticating as User: ${username} for Merchant: ${merchantId}`);
+
         const token = Buffer.from(`${username}:${password}`).toString('base64');
         return `Basic ${token}`;
     }

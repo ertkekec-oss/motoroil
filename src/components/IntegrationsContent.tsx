@@ -145,12 +145,24 @@ export default function IntegrationsContent() {
                     throw new Error(data.error || 'API Hatası');
                 }
             } else {
-                const config = { ...(marketplaceSettings as any)[marketplace] };
+                let config = { ...(marketplaceSettings as any)[marketplace] };
+
+                // Hepsiburada için payload güvenliği: UI'daki username'in merchantId ile ezilmediğinden emin olalım
+                if (marketplace === 'hepsiburada') {
+                    console.log('[HB_DEBUG] Sending credentials:', {
+                        merchantId: marketplaceSettings.hepsiburada.merchantId,
+                        apiUser: marketplaceSettings.hepsiburada.username,
+                        passwordExists: !!marketplaceSettings.hepsiburada.password
+                    });
+                }
 
                 const response = await apiFetch('/api/integrations/marketplace/sync', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: marketplace, config: config })
+                    body: JSON.stringify({
+                        type: marketplace,
+                        config: config
+                    })
                 });
 
                 const data = await response.json();
