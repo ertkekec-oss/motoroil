@@ -29,14 +29,13 @@ export class HepsiburadaService implements IMarketplaceService {
         const dy = pad(date.getDate());
         const hr = pad(date.getHours());
         const mi = pad(date.getMinutes());
-        const sc = pad(date.getSeconds());
-        return `${yr}-${mo}-${dy} ${hr}:${mi}:${sc}`;
+        return `${yr}-${mo}-${dy} ${hr}:${mi}`;
     }
 
     async validateConnection(): Promise<boolean> {
         try {
             const merchantId = (this.config.merchantId || '').trim();
-            const url = `${this.baseUrl}/orders/merchantid/${merchantId}?limit=1`;
+            const url = `${this.baseUrl}/orders/merchantid/${merchantId}?offset=0&limit=1`;
             const response = await fetch(url, {
                 headers: {
                     'Authorization': this.getAuthHeader(),
@@ -73,10 +72,10 @@ export class HepsiburadaService implements IMarketplaceService {
                 throw new Error(`CRITICAL_DATE_FORMAT_ERROR: Hepsiburada formatında 'T' veya 'Z' bulunamaz! (Gelen: ${bStr})`);
             }
 
-            // Hepsiburada sometimes prefers %20 over + for spaces in dates.
-            // URLSearchParams uses + by default. Let's build manually for precision.
-            const url = `${this.baseUrl}/orders/merchantid/${merchantId}?limit=50&beginDate=${encodeURIComponent(bStr)}&endDate=${encodeURIComponent(eStr)}`;
-            console.log(`[HB_MANUAL_URL] ${url}`);
+            // Hepsiburada OMS expects lowercase param names and no seconds in dates
+            // Target template: ?offset=0&limit=50&begindate=yyyy-MM-dd HH:mm&enddate=yyyy-MM-dd HH:mm
+            const url = `${this.baseUrl}/orders/merchantid/${merchantId}?offset=0&limit=50&begindate=${encodeURIComponent(bStr)}&enddate=${encodeURIComponent(eStr)}`;
+            console.log(`[HB_DOKUMAN_UYUMLU_URL] ${url}`);
 
             const response = await fetch(url, {
                 headers: {
