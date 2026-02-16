@@ -45,17 +45,21 @@ export class HepsiburadaService implements IMarketplaceService {
             const merchantId = this.config.merchantId?.trim() || '';
             const limit = 50;
 
-            // Hepsiburada OMS API uses ISO format or YYYY-MM-DD
-            // We use a safe ISO-like format that Hepsiburada accepts
-            const startStr = startDate ? startDate.toISOString().split('.')[0] + 'Z' : '';
-            const endStr = endDate ? endDate.toISOString().split('.')[0] + 'Z' : '';
+            // Hepsiburada OMS API expects: YYYY-MM-DD HH:mm:ss (with space, no T/Z)
+            const formatDate = (date: Date) => {
+                const pad = (n: number) => n.toString().padStart(2, '0');
+                return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+            };
+
+            const startStr = startDate ? formatDate(startDate) : '';
+            const endStr = endDate ? formatDate(endDate) : '';
 
             // Hepsiburada usually requires status or date range. 
             // We'll fetch multiple statuses if possible, or just use the date range.
             let url = `${this.baseUrl}/orders/merchantid/${merchantId}?limit=${limit}`;
 
-            if (startStr) url += `&beginDate=${startStr}`;
-            if (endStr) url += `&endDate=${endStr}`;
+            if (startStr) url += `&beginDate=${encodeURIComponent(startStr)}`;
+            if (endStr) url += `&endDate=${encodeURIComponent(endStr)}`;
 
             console.log(`[Hepsiburada] Fetching: ${url}`);
 
