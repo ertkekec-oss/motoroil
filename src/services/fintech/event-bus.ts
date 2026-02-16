@@ -38,13 +38,14 @@ export class EventBus {
             // FIFO Consumption for Sales
             if (event.eventType === 'SALE_COMPLETED') {
                 const { FIFOEngine } = require('./fifo-engine');
-                const { productId, quantity } = event.payload;
+                const { productId, quantity, branch } = event.payload;
                 if (productId && quantity > 0) {
                     await FIFOEngine.consume(tx, {
                         companyId: event.companyId,
                         productId,
                         quantity,
-                        eventId: recordedEvent.id
+                        eventId: recordedEvent.id,
+                        branch: branch
                     });
                 }
             }

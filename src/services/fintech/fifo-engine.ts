@@ -22,7 +22,7 @@ export class FIFOEngine {
     /**
      * Consumes stock layers using FIFO
      */
-    static async consume(tx: any, data: { companyId: string, productId: string, quantity: number, eventId: string }) {
+    static async consume(tx: any, data: { companyId: string, productId: string, quantity: number, eventId: string, branch?: string }) {
         let remainingToConsume = data.quantity;
 
         // Find available layers for this product, ordered by creation (FIFO)
@@ -30,14 +30,15 @@ export class FIFOEngine {
             where: {
                 companyId: data.companyId,
                 productId: data.productId,
-                quantityRemaining: { gt: 0 }
+                quantityRemaining: { gt: 0 },
+                branch: data.branch || 'Merkez'
             },
             orderBy: { createdAt: 'asc' }
         });
 
         const totalAvailable = layers.reduce((acc: number, l: any) => acc + Number(l.quantityRemaining), 0);
         if (totalAvailable < data.quantity) {
-            throw new Error(`Insufficient stock for product ${data.productId}. Required: ${data.quantity}, Available: ${totalAvailable}`);
+            throw new Error(`Insufficient stock for product ${data.productId} in branch ${data.branch || 'Merkez'}. Required: ${data.quantity}, Available: ${totalAvailable}`);
         }
 
         for (const layer of layers) {

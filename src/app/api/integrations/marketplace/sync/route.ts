@@ -66,6 +66,7 @@ export async function POST(request: Request) {
         // Fetch settings
         const daysToSync = typeof config.days === 'number' ? config.days : 3;
         const processLimit = typeof config.limit === 'number' ? config.limit : 50;
+        const syncBranch = config.branch || 'Merkez';
 
         const endDate = new Date();
         const startDate = new Date();
@@ -152,6 +153,7 @@ export async function POST(request: Request) {
                                 shippingAddress: order.shippingAddress as any,
                                 invoiceAddress: order.invoiceAddress as any,
                                 shipmentPackageId: order.shipmentPackageId,
+                                branch: syncBranch,
                                 rawData: order as any
                             }
                         });
@@ -178,7 +180,8 @@ export async function POST(request: Request) {
                                     quantity: item.quantity,
                                     taxRate: item.taxRate || 20,
                                     sku: item.sku,
-                                    orderNumber: order.orderNumber
+                                    orderNumber: order.orderNumber,
+                                    branch: syncBranch
                                 }
                             });
                         } catch (eventErr: any) {

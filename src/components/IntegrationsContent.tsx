@@ -40,7 +40,8 @@ export default function IntegrationsContent() {
             apiSecret: '',
             supplierId: '',
             autoSync: false,
-            syncInterval: 15 // minutes
+            syncInterval: 15, // minutes
+            branch: 'Merkez'
         },
         hepsiburada: {
             enabled: false,
@@ -49,14 +50,16 @@ export default function IntegrationsContent() {
             password: '',
             autoSync: false,
             syncInterval: 15,
-            isTest: false
+            isTest: false,
+            branch: 'Merkez'
         },
         n11: {
             enabled: false,
             apiKey: '',
             apiSecret: '',
             autoSync: false,
-            syncInterval: 15
+            syncInterval: 15,
+            branch: 'Merkez'
         },
         amazon: {
             enabled: false,
@@ -65,20 +68,31 @@ export default function IntegrationsContent() {
             accessKey: '',
             secretKey: '',
             autoSync: false,
-            syncInterval: 30
+            syncInterval: 30,
+            branch: 'Merkez'
         },
         custom: {
             enabled: true,
             url: 'https://www.periodya.com.tr/xml.php?c=siparisler&xmlc=10a4cd8d5e',
             autoSync: false,
-            syncInterval: 60
+            syncInterval: 60,
+            branch: 'Merkez'
         }
     });
 
     const [testResults, setTestResults] = useState<{ [key: string]: string }>({});
     const [stats, setStats] = useState<any>(null);
+    const [branches, setBranches] = useState<any[]>([]);
     const [isTesting, setIsTesting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+
+    const fetchBranches = async () => {
+        try {
+            const res = await apiFetch('/api/branches');
+            const data = await res.json();
+            if (data.success) setBranches(data.branches);
+        } catch (e) { console.error('Branches error:', e); }
+    };
 
     const testEFaturaConnection = async () => {
         setIsTesting(true);
@@ -181,6 +195,7 @@ export default function IntegrationsContent() {
             }
         };
         fetchSettings();
+        fetchBranches();
         if (activeTab === 'marketplace') fetchStats();
     }, [activeTab]);
 
@@ -531,9 +546,24 @@ export default function IntegrationsContent() {
                             </div>
                             {marketplaceSettings.custom.enabled && (
                                 <div className="pt-6 border-t border-white/5 space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">XML URL</label>
-                                        <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" placeholder="https://site.com/xml.php" value={marketplaceSettings.custom.url} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, url: e.target.value } })} />
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">XML URL</label>
+                                            <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono" placeholder="https://site.com/xml.php" value={marketplaceSettings.custom.url} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, url: e.target.value } })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">İşlem Deposu</label>
+                                            <select
+                                                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-primary/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
+                                                value={marketplaceSettings.custom.branch || 'Merkez'}
+                                                onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, branch: e.target.value } })}
+                                            >
+                                                <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>
+                                                {branches.filter(b => b.name !== 'Merkez').map(b => (
+                                                    <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </div>
                                     <label className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/5 cursor-pointer hover:bg-white/10 transition-all select-none">
                                         <input type="checkbox" className="accent-primary w-5 h-5" checked={marketplaceSettings.custom.autoSync} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, autoSync: e.target.checked } })} />
@@ -579,7 +609,7 @@ export default function IntegrationsContent() {
 
                             {marketplaceSettings.trendyol.enabled && (
                                 <div className="pt-8 mt-8 border-t border-white/5 animate-in slide-in-from-top-2 duration-300">
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">API Key</label>
                                             <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#f27a1a]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.trendyol.apiKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, apiKey: e.target.value } })} />
@@ -591,6 +621,19 @@ export default function IntegrationsContent() {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">Supplier ID</label>
                                             <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#f27a1a]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.trendyol.supplierId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, supplierId: e.target.value } })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
+                                            <select
+                                                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#f27a1a]/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
+                                                value={marketplaceSettings.trendyol.branch || 'Merkez'}
+                                                onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, branch: e.target.value } })}
+                                            >
+                                                <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>
+                                                {branches.filter(b => b.name !== 'Merkez').map(b => (
+                                                    <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
 
@@ -649,7 +692,7 @@ export default function IntegrationsContent() {
 
                             {marketplaceSettings.hepsiburada.enabled && (
                                 <div className="pt-8 mt-8 border-t border-white/5 animate-in slide-in-from-top-2 duration-300">
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">Merchant ID</label>
                                             <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#ff6000]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.hepsiburada.merchantId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, merchantId: e.target.value } })} />
@@ -661,6 +704,19 @@ export default function IntegrationsContent() {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">API Password</label>
                                             <input type="password" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#ff6000]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.hepsiburada.password} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, password: e.target.value } })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
+                                            <select
+                                                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#ff6000]/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
+                                                value={marketplaceSettings.hepsiburada.branch || 'Merkez'}
+                                                onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, branch: e.target.value } })}
+                                            >
+                                                <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>
+                                                {branches.filter(b => b.name !== 'Merkez').map(b => (
+                                                    <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
 
@@ -711,7 +767,7 @@ export default function IntegrationsContent() {
 
                             {marketplaceSettings.n11.enabled && (
                                 <div className="pt-8 mt-8 border-t border-white/5 animate-in slide-in-from-top-2 duration-300">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">API Application Key</label>
                                             <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#603996]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.n11.apiKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, apiKey: e.target.value } })} />
@@ -719,6 +775,19 @@ export default function IntegrationsContent() {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">API Secret</label>
                                             <input type="password" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#603996]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.n11.apiSecret} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, apiSecret: e.target.value } })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
+                                            <select
+                                                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#603996]/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
+                                                value={marketplaceSettings.n11.branch || 'Merkez'}
+                                                onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, branch: e.target.value } })}
+                                            >
+                                                <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>
+                                                {branches.filter(b => b.name !== 'Merkez').map(b => (
+                                                    <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
 
@@ -769,7 +838,7 @@ export default function IntegrationsContent() {
 
                             {marketplaceSettings.amazon.enabled && (
                                 <div className="pt-8 mt-8 border-t border-white/5 animate-in slide-in-from-top-2 duration-300">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">Seller ID</label>
                                             <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-amber-500/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.amazon.sellerId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, sellerId: e.target.value } })} />
@@ -785,6 +854,19 @@ export default function IntegrationsContent() {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">Secret Key</label>
                                             <input type="password" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-amber-500/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.amazon.secretKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, secretKey: e.target.value } })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
+                                            <select
+                                                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-amber-500/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
+                                                value={marketplaceSettings.amazon.branch || 'Merkez'}
+                                                onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, branch: e.target.value } })}
+                                            >
+                                                <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>
+                                                {branches.filter(b => b.name !== 'Merkez').map(b => (
+                                                    <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
 
