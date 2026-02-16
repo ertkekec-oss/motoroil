@@ -46,7 +46,6 @@ export default function IntegrationsContent() {
         hepsiburada: {
             enabled: false,
             merchantId: '',
-            username: '',
             password: '',
             autoSync: false,
             syncInterval: 15,
