@@ -42,10 +42,22 @@ export class HepsiburadaService implements IMarketplaceService {
 
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
         try {
-            // Hepsiburada'da tarih filtresi olmayabilir veya farklı parametrelerle olabilir
-            // Bu örnekte temel listeleme yapıyoruz
             const merchantId = this.config.merchantId?.trim() || '';
-            const url = `${this.baseUrl}/orders/merchantid/${merchantId}?limit=50`;
+            const limit = 50;
+
+            // Hepsiburada OMS API uses ISO format or YYYY-MM-DD
+            // We use a safe ISO-like format that Hepsiburada accepts
+            const startStr = startDate ? startDate.toISOString().split('.')[0] + 'Z' : '';
+            const endStr = endDate ? endDate.toISOString().split('.')[0] + 'Z' : '';
+
+            // Hepsiburada usually requires status or date range. 
+            // We'll fetch multiple statuses if possible, or just use the date range.
+            let url = `${this.baseUrl}/orders/merchantid/${merchantId}?limit=${limit}`;
+
+            if (startStr) url += `&beginDate=${startStr}`;
+            if (endStr) url += `&endDate=${endStr}`;
+
+            console.log(`[Hepsiburada] Fetching: ${url}`);
 
             const response = await fetch(url, {
                 headers: {
@@ -61,11 +73,18 @@ export class HepsiburadaService implements IMarketplaceService {
 
             const data = await response.json();
 
-            // Hepsiburada yanıt yapısı değişebilir, genel yapıyı varsayıyoruz
-            // Genellikle { items: [...] } döner
-            const orders = data.items || data || [];
+            // Hepsiburada can return { items: [] } or just []
+            let ordersRaw = [];
+            if (Array.isArray(data)) {
+                ordersRaw = data;
+            } else if (data && Array.isArray(data.items)) {
+                ordersRaw = data.items;
+            } else if (data && typeof data === 'object') {
+                // Sometimes it returns a single order object if only one exists or different structure
+                ordersRaw = data.id ? [data] : [];
+            }
 
-            return orders.map((order: any) => this.mapOrder(order));
+            return ordersRaw.map((order: any) => this.mapOrder(order));
         } catch (error) {
             console.error('Hepsiburada sipariş çekme hatası:', error);
             throw error;
