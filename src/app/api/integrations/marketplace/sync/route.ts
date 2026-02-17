@@ -80,8 +80,9 @@ export async function POST(request: Request) {
         let startDate = new Date();
 
         if (marketplaceConfig?.lastSync) {
-            // If already synced, just sync from last sync minus a buffer (1 hour)
-            startDate = new Date(marketplaceConfig.lastSync.getTime() - (60 * 60 * 1000));
+            // Aggressive lookback: Go back 14 days even if lastSync exists to ensure we catch anything missed
+            // due to IP/config issues
+            startDate = new Date(marketplaceConfig.lastSync.getTime() - (14 * 24 * 60 * 60 * 1000));
         } else {
             // First time sync: 90 days back per user request for production-ready sync
             startDate.setDate(startDate.getDate() - 90);
@@ -225,8 +226,10 @@ export async function POST(request: Request) {
             }
         }
 
-        // 3. Update Last Sync Time
-        if (marketplaceConfig) {
+        // 3. Update Last Sync Time (Only if we successfully processed data or it's a clear success)
+        // Prevent updating lastSync if we found 0 items, to ensure we verify again with the full window next time,
+        // or if there were critical errors.
+        if (marketplaceConfig && (savedCount > 0 || updatedCount > 0) && errors.length === 0) {
             await prisma.marketplaceConfig.update({
                 where: { id: marketplaceConfig.id },
                 data: { lastSync: new Date() }

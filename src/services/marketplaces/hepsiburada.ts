@@ -164,7 +164,16 @@ export class HepsiburadaService implements IMarketplaceService {
 
                 } catch (err: any) {
                     console.error(`[HB_PHASE_FATAL] ${target.name} error: ${err.message}`);
-                    if (err.message?.includes('HB_')) throw err;
+
+                    // Re-throw specific errors that should abort the sync
+                    if (err.message?.includes('HB_') ||
+                        err.message?.includes('fetch failed') ||
+                        err.message?.includes('ETIMEDOUT') ||
+                        err.message?.includes('ECONNREFUSED')) {
+                        throw err;
+                    }
+
+                    // Allow continuing to other targets if it's just a soft error for this phase
                     hasMore = false;
                 }
             }
