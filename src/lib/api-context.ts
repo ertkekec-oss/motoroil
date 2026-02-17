@@ -66,7 +66,7 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
         throw new ApiError("UNAUTHORIZED: Oturum bulunamadı.", 401, 'AUTH_REQUIRED');
     }
 
-    const companyId = req.headers.get('X-Company-Id');
+    const companyId = req.headers.get('X-Company-Id') || session.companyId;
 
     // 1. Önce SaaS kullanıcısı mı diye bak (Tenant bazlı işlemler için)
     // BYPASS TENANT GUARD: Use prismaBase to find user by ID regardless of context
