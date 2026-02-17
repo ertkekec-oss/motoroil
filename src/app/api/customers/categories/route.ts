@@ -7,8 +7,16 @@ export async function GET(req: NextRequest) {
         const ctx = await getRequestContext(req);
         const categories = await prisma.customerCategory.findMany({
             where: { companyId: ctx.companyId! },
-            include: { defaultPriceList: true },
-            orderBy: { name: 'asc' }
+            include: {
+                priceList: true,
+                _count: {
+                    select: { customers: true }
+                }
+            },
+            orderBy: [
+                { isDefault: 'desc' },
+                { name: 'asc' }
+            ]
         });
         return apiResponse(categories, { requestId: ctx.requestId });
     } catch (error: any) {
@@ -35,7 +43,11 @@ export async function POST(req: NextRequest) {
                 companyId: ctx.companyId!,
                 name: body.name,
                 description: body.description,
-                defaultPriceListId: body.defaultPriceListId
+                priceListId: body.priceListId,
+                isDefault: body.isDefault || false
+            },
+            include: {
+                priceList: true
             }
         });
 
