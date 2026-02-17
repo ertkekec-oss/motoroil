@@ -34,14 +34,19 @@ export async function GET(request: Request) {
             orderBy: { createdAt: 'desc' },
             include: {
                 stocks: true,
-                prices: {
+                productPrices: {
                     include: {
                         priceList: true
                     }
                 }
             }
         });
-        return NextResponse.json({ success: true, products });
+        const formattedProducts = products.map((p: any) => ({
+            ...p,
+            prices: p.productPrices || []
+        }));
+
+        return NextResponse.json({ success: true, products: formattedProducts });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
