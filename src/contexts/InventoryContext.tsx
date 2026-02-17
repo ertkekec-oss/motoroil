@@ -31,6 +31,10 @@ export interface Product {
     unit?: string;
     minStock?: number;
     stocks?: any[];
+    isParent?: boolean;
+    variantsData?: any[];
+    prices?: { priceListId: string; price: number; currency?: string; }[];
+    [key: string]: any;
 }
 
 export interface StockTransfer {

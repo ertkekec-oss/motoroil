@@ -156,10 +156,27 @@ export async function POST(request: Request) {
                         branch: targetBranch,
                         quantity: initialQty,
                         price: bPrice,
-                        type: 'ADJUSTMENT',
+                        type: 'ADJUSTMENT' as any,
                         referenceId: 'START'
                     }
                 });
+            }
+
+            // 3. Create Product Prices if provided
+            if (body.prices && Array.isArray(body.prices)) {
+                for (const p of body.prices) {
+                    if (p.priceListId && p.price !== undefined) {
+                        await tx.productPrice.create({
+                            data: {
+                                companyId: company.id,
+                                productId: mainProduct.id,
+                                priceListId: p.priceListId,
+                                price: parseFloat(p.price),
+                                isManualOverride: true // Always manual when set explicitly
+                            }
+                        });
+                    }
+                }
             }
 
             // Log activity

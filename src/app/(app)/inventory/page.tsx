@@ -82,6 +82,23 @@ function InventoryContent() {
         salesOiv: 0, salesOtv: 0, otvType: 'Ö.T.V yok', branch: activeBranchName || 'Merkez'
     });
 
+    // --- PRICING STATES ---
+    const [priceLists, setPriceLists] = useState<any[]>([]);
+    const [productPrices, setProductPrices] = useState<Record<string, number>>({});
+    const [showOtherPrices, setShowOtherPrices] = useState(false);
+
+    useEffect(() => {
+        // Fetch price lists
+        fetch('/api/pricing/lists')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && Array.isArray(data.data)) {
+                    setPriceLists(data.data);
+                }
+            })
+            .catch(err => console.error("Fiyat listeleri yüklenirken hata:", err));
+    }, []);
+
     useEffect(() => {
         if (activeBranchName && activeBranchName !== 'all' && activeBranchName !== 'Tümü' && activeBranchName !== 'Hepsi') {
             setNewProduct(prev => ({ ...prev, branch: activeBranchName }));
@@ -475,11 +492,16 @@ function InventoryContent() {
                 ...newProduct,
                 isParent: useVariants,
                 variantsData: useVariants ? generatedVariants : undefined,
-                status: (newProduct.stock <= 0 ? 'out' : (newProduct.stock <= 5 ? 'low' : 'ok')) as 'ok' | 'low' | 'out' | 'warning'
+                status: (newProduct.stock <= 0 ? 'out' : (newProduct.stock <= 5 ? 'low' : 'ok')) as 'ok' | 'low' | 'out' | 'warning',
+                prices: Object.entries(productPrices).map(([plId, price]) => ({
+                    priceListId: plId,
+                    price: price,
+                    currency: priceLists.find(pl => pl.id === plId)?.currency || 'TRY'
+                }))
             };
 
             if (!hasPermission('approve_products')) {
-                requestProductCreation(prodToAdd);
+                requestProductCreation(prodToAdd as any);
                 setShowAddModal(false);
                 resetNewProduct();
                 showSuccess('Ürün Talebi Oluşturuldu', 'Yönetici onayı bekleniyor.');
@@ -1377,6 +1399,38 @@ function InventoryContent() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* DIĞER FİYAT LİSTELERİ */}
+                            {priceLists.length > 0 && (
+                                <div className="mt-2 pt-4 border-t border-white/5">
+                                    <div
+                                        onClick={() => setShowOtherPrices(!showOtherPrices)}
+                                        className="flex items-center gap-2 mb-3 cursor-pointer select-none hover:bg-white/5 p-2 rounded-lg transition-colors"
+                                    >
+                                        <span className="text-[10px] font-black uppercase text-muted tracking-widest">📋 DİĞER FİYAT LİSTELERİ ({priceLists.length})</span>
+                                        <span className="text-xs opacity-50 ml-auto">{showOtherPrices ? '▼ Gizle' : '▶ Göster'}</span>
+                                    </div>
+                                    {showOtherPrices && (
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-2 p-2 rounded-xl bg-black/20 border border-white/5">
+                                            {priceLists.map((pl: any) => (
+                                                <div key={pl.id} className="relative group">
+                                                    <label className="text-[9px] font-bold text-muted uppercase mb-1 block truncate" title={pl.name}>{pl.name}</label>
+                                                    <div className="relative">
+                                                        <input
+                                                            type="number"
+                                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-2 pl-3 pr-8 text-xs focus:border-primary outline-none transition-colors group-hover:bg-white/5"
+                                                            placeholder="Liste Fiyatı"
+                                                            value={productPrices[pl.id] || ''}
+                                                            onChange={(e) => setProductPrices({ ...productPrices, [pl.id]: parseFloat(e.target.value) })}
+                                                        />
+                                                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold opacity-50">{pl.currency}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
