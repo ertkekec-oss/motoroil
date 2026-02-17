@@ -28,12 +28,23 @@ export interface RequestContext {
 
 export function apiResponse(data: any, options: { status?: number, ok?: boolean, code?: string, requestId?: string } = {}) {
     const { status = 200, ok = true, code = 'SUCCESS', requestId } = options;
-    return Response.json({
+
+    const responsePayload: any = {
         ok,
+        success: ok,
         code,
-        requestId,
-        ...data
-    }, { status });
+        requestId
+    };
+
+    if (data !== undefined) {
+        if (typeof data === 'object' && !Array.isArray(data) && data !== null) {
+            Object.assign(responsePayload, data);
+        } else {
+            responsePayload.data = data;
+        }
+    }
+
+    return Response.json(responsePayload, { status });
 }
 
 export function apiError(error: any, requestId?: string) {
@@ -49,6 +60,7 @@ export function apiError(error: any, requestId?: string) {
 
     return Response.json({
         ok: false,
+        success: false,
         code,
         requestId,
         error: message
