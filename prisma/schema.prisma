@@ -79,6 +79,8 @@ model Company {
   users              UserCompanyAccess[]
   priceLists         PriceList[]
   customerCategories CustomerCategory[]
+  coupons            Coupon[]
+  suspendedSales     SuspendedSale[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -726,6 +728,7 @@ model BranchDocument {
 
 model SuspendedSale {
   id        String   @id @default(cuid())
+  companyId String?
   label     String
   items     Json
   customer  Json?
@@ -733,6 +736,9 @@ model SuspendedSale {
   branch    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
 }
 
 model Staff {
@@ -987,6 +993,7 @@ model Campaign {
 
 model Coupon {
   id                 String    @id @default(cuid())
+  companyId          String?
   code               String    @unique
   type               String
   value              Float
@@ -1003,11 +1010,13 @@ model Coupon {
   startDate          DateTime  @default(now())
   usageLimit         Int       @default(1)
   usedCount          Int       @default(0)
+  company            Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customer           Customer? @relation(fields: [customerId], references: [id])
 
   @@index([code])
   @@index([customerId])
   @@index([isUsed])
+  @@index([companyId])
 }
 
 model PaymentPlan {

@@ -175,3 +175,23 @@ export function verifyWriteAccess(session: any) {
     }
     return { authorized: true };
 }
+
+/**
+ * Resolves the company context for a user.
+ * 1. Returns companyId from session if present
+ * 2. Otherwise finds the first accessible company from UserCompanyAccess
+ */
+export async function resolveCompanyId(user: any): Promise<string | undefined> {
+    if (user.companyId) return user.companyId;
+
+    // Use prismaBase to avoid circular middleware dependency 
+    // or just assume we need it for context resolution
+    const prisma = (await import('@/lib/prisma')).default;
+
+    const access = await prisma.userCompanyAccess.findFirst({
+        where: { userId: user.id },
+        select: { companyId: true }
+    });
+
+    return access?.companyId;
+}

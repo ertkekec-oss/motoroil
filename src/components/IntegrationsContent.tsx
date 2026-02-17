@@ -148,7 +148,7 @@ export default function IntegrationsContent() {
                 let config = { ...(marketplaceSettings as any)[marketplace] };
 
                 // Hepsiburada için payload güvenliği: UI'daki username'in merchantId ile ezilmediğinden emin olalım
-                if (marketplace === 'hepsiburada') {
+                if (marketplace === 'hepsiburada' && process.env.NODE_ENV !== 'production') {
                     console.log('[HB_DEBUG] Sending credentials:', {
                         merchantId: marketplaceSettings.hepsiburada.merchantId,
                         apiUser: marketplaceSettings.hepsiburada.username,

@@ -1,21 +1,31 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authorize, resolveCompanyId } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const user = auth.user;
+
     try {
+        const companyId = await resolveCompanyId(user);
+        if (!companyId) return NextResponse.json([], { status: 200 });
+
         const { searchParams } = new URL(request.url);
         const code = searchParams.get('code');
         const customerId = searchParams.get('customerId');
 
         if (code) {
             const coupon = await prisma.coupon.findUnique({
-                where: { code },
+                where: { code, companyId } as any, // Type cast for now
                 include: { customer: true }
             });
             return NextResponse.json(coupon);
         }
 
-        const where: any = {};
+        const where: any = { companyId };
         if (customerId) where.customerId = customerId;
 
         const coupons = await prisma.coupon.findMany({
@@ -25,12 +35,20 @@ export async function GET(request: Request) {
         });
         return NextResponse.json(coupons);
     } catch (error: any) {
+        console.error('[API_COUPONS_GET]', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const user = auth.user;
+
     try {
+        const companyId = await resolveCompanyId(user);
+        if (!companyId) throw new Error('Firma yetkisi bulunamadı.');
+
         const data = await request.json();
 
         // Multi-generate support
@@ -45,6 +63,7 @@ export async function POST(request: Request) {
 
                 coupons.push({
                     code,
+                    companyId,
                     campaignName: data.campaignName,
                     type: data.type,
                     value: data.value,
@@ -67,6 +86,7 @@ export async function POST(request: Request) {
 
         const coupon = await prisma.coupon.create({
             data: {
+                companyId,
                 code: data.code || Math.random().toString(36).substring(2, 8).toUpperCase(),
                 campaignName: data.campaignName,
                 type: data.type,
@@ -84,36 +104,55 @@ export async function POST(request: Request) {
         });
         return NextResponse.json(coupon);
     } catch (error: any) {
+        console.error('[API_COUPONS_POST]', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
 export async function PUT(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const user = auth.user;
+
     try {
+        const companyId = await resolveCompanyId(user);
+        if (!companyId) throw new Error('Firma yetkisi bulunamadı.');
+
         const data = await request.json();
         const { id, ...updateData } = data;
 
         if (updateData.expiryDate) updateData.expiryDate = new Date(updateData.expiryDate);
 
         const coupon = await prisma.coupon.update({
-            where: { id },
+            where: { id, companyId } as any, // Verify it belongs to company
             data: updateData
         });
         return NextResponse.json(coupon);
     } catch (error: any) {
+        console.error('[API_COUPONS_PUT]', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
 export async function DELETE(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const user = auth.user;
+
     try {
+        const companyId = await resolveCompanyId(user);
+        if (!companyId) throw new Error('Firma yetkisi bulunamadı.');
+
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
         if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
-        await prisma.coupon.delete({ where: { id } });
+        await prisma.coupon.delete({
+            where: { id, companyId } as any // Verify before delete
+        });
         return NextResponse.json({ success: true });
     } catch (error: any) {
+        console.error('[API_COUPONS_DELETE]', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
