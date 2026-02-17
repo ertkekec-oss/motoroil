@@ -9,7 +9,7 @@ const operationalModels = [
     'salesinvoice', 'purchaseinvoice', 'servicerecord', 'quote', 'paymentplan',
     'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
     'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'company', 'branch',
-    'notification', 'staff', 'user', 'tenant', 'subscription'
+    'notification', 'staff', 'user', 'tenant', 'subscription', 'warranty', 'securityevent'
 ];
 
 
@@ -86,24 +86,25 @@ const prismaClientSingleton = () => {
                         return query(args);
                     }
 
-                    const sessionResult: any = await getSession();
-                    const session: any = sessionResult?.user ?? sessionResult;
+                    // Avoid calling cookies() if we can skip it
+                    // But we need it for most operations in operationalModels
+                    const session: any = await getSession();
+                    const user = session?.user || session;
 
-                    if (session) {
-                        const role = (session.role || '').toUpperCase();
-                        const tenantId = session.tenantId;
+                    if (user) {
+                        const role = (user.role || '').toUpperCase();
+                        const tenantId = user.tenantId;
+                        const impersonateId = user.impersonateTenantId;
                         const isPlatformAdmin = tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN';
 
-                        // --- 1. Platform Admin Bypass ---
-                        // Super admins see everything unless they are impersonating a specific tenant
-                        // ADDED: Allow bypass if 'adminBypass' flag is present in args
-                        if (isPlatformAdmin && (!session.impersonateTenantId || (args as any).adminBypass)) {
-                            // Clear the bypass flag so Prisma doesn't complain
-                            if ((args as any).adminBypass) delete (args as any).adminBypass;
-                            return query(args);
+                        // 1. Platform Admin Bypass
+                        if (isPlatformAdmin && (!impersonateId || (args as any).adminBypass)) {
+                            const newArgs = { ...args };
+                            if ((newArgs as any).adminBypass) delete (newArgs as any).adminBypass;
+                            return query(newArgs);
                         }
 
-                        const effectiveTenantId = session.impersonateTenantId || tenantId;
+                        const effectiveTenantId = impersonateId || tenantId;
 
                         if (!effectiveTenantId) {
                             if (['user', 'tenant', 'company', 'plan', 'subscription', 'loginattempt'].includes(modelName)) {
@@ -112,59 +113,69 @@ const prismaClientSingleton = () => {
                             throw new Error("SECURITY_ERROR: Tenant context missing in session.");
                         }
 
-                        const a = args as any;
-                        const isUniqueOp = ['findUnique', 'upsert', 'update', 'delete'].includes(operation);
+                        const newArgs = { ...args };
+                        const isRead = ['findMany', 'findFirst', 'findUnique', 'count', 'aggregate', 'groupBy'].includes(operation);
+                        const isWrite = ['update', 'updateMany', 'delete', 'deleteMany', 'upsert'].includes(operation);
+                        const isUnique = ['findUnique', 'update', 'delete', 'upsert', 'findFirst'].includes(operation);
 
-                        // READ FILTERING
-                        if (['findMany', 'findFirst', 'findUnique', 'count', 'aggregate', 'groupBy'].includes(operation)) {
-                            if (modelName === 'company') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'user') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'tenant') { a.where = { ...a.where, id: effectiveTenantId }; }
-                            else if (modelName === 'subscription') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'staff') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'notification') { a.where = { ...a.where, user: { tenantId: effectiveTenantId } }; }
-                            else if (modelName === 'coupon') { a.where = { ...a.where, OR: [{ customer: { company: { tenantId: effectiveTenantId } } }, { customer: null }] }; }
-                            else if (modelName === 'suspendedsale') { /* Shared */ }
-                            else if (modelName === 'journalitem') { a.where = { ...a.where, journal: { company: { tenantId: effectiveTenantId } } }; }
-                            else {
-                                // Skip relation filter for findUnique to avoid Prisma "not a unique identifier" error
-                                if (operation !== 'findUnique') {
-                                    a.where = { ...a.where, company: { tenantId: effectiveTenantId } };
+                        if (isRead || isWrite) {
+                            if (!newArgs.where) newArgs.where = {};
+
+                            // Apply filters based on model type
+                            if (modelName === 'company') {
+                                newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
+                            } else if (modelName === 'user' || modelName === 'staff' || modelName === 'subscription') {
+                                newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
+                            } else if (modelName === 'tenant') {
+                                newArgs.where = { ...newArgs.where, id: effectiveTenantId };
+                            } else if (modelName === 'notification') {
+                                newArgs.where = { ...newArgs.where, user: { tenantId: effectiveTenantId } };
+                            } else if (modelName === 'journalitem') {
+                                // Nested filter through journal
+                                newArgs.where = { ...newArgs.where, journal: { company: { tenantId: effectiveTenantId } } };
+                            } else if (modelName === 'warranty') {
+                                // Nested through customer
+                                newArgs.where = { ...newArgs.where, customer: { company: { tenantId: effectiveTenantId } } };
+                            } else if (modelName === 'securityevent') {
+                                // Shared/System model
+                            } else {
+                                // Generic isolation through company relation
+                                // CRITICAL: Only apply to non-unique operations OR if the query already targets a non-unique field
+                                // For findUnique, Prisma ONLY allows filtering by Unique ID. 
+                                // Relation filters are forbidden in findUnique 'where'.
+                                if (!isUnique) {
+                                    newArgs.where = {
+                                        ...newArgs.where,
+                                        company: {
+                                            ...(newArgs.where.company || {}),
+                                            tenantId: effectiveTenantId
+                                        }
+                                    };
                                 }
                             }
                         }
 
-                        // WRITE PROTECTION
-                        if (['update', 'updateMany', 'delete', 'deleteMany', 'upsert'].includes(operation)) {
-                            if (modelName === 'company') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'user') { a.where = { ...a.where, tenantId: effectiveTenantId }; }
-                            else if (modelName === 'tenant') { a.where = { ...a.where, id: effectiveTenantId }; }
-                            else {
-                                // Skip relation filter for single unique operations to avoid Prisma crash
-                                if (!isUniqueOp) {
-                                    a.where = { ...a.where, company: { tenantId: effectiveTenantId } };
-                                }
-                            }
-                        }
-
-                        // CREATE PROTECTION
+                        // Mutation Protection (Ensure companyId matches tenant)
                         if (['create', 'createMany'].includes(operation)) {
                             if (!['company', 'user', 'tenant', 'subscription'].includes(modelName)) {
-                                const data = a.data;
+                                const data = (newArgs as any).data;
                                 if (data && !isPlatformAdmin) {
-                                    if (Array.isArray(data)) {
-                                        data.forEach((item: any) => { if (!item.companyId) throw new Error("SECURITY_ERROR: missing companyId"); });
-                                    } else {
-                                        if (!data.companyId && !data.company?.connect?.id) throw new Error("SECURITY_ERROR: missing companyId");
-                                    }
+                                    const validateItem = (item: any) => {
+                                        if (!item.companyId && !item.company?.connect?.id) {
+                                            throw new Error(`SECURITY_ERROR: Missing companyId in ${modelName} creation.`);
+                                        }
+                                    };
+
+                                    if (Array.isArray(data)) data.forEach(validateItem);
+                                    else validateItem(data);
                                 }
                             }
                         }
 
-                        return query(args);
+                        return query(newArgs);
                     }
 
-                    // PUBLIC ACCESS
+                    // PUBLIC ACCESS (No session)
                     if (['user', 'staff', 'tenant', 'plan', 'company', 'subscription', 'loginattempt'].includes(modelName)) {
                         if (['findUnique', 'findFirst', 'findMany', 'create', 'update', 'count'].includes(operation)) {
                             return query(args);

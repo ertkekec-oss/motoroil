@@ -1,14 +1,33 @@
 
 import { notFound } from 'next/navigation';
-import { prismaBase as prisma } from '@/lib/prismaBase';
+import prisma from '@/lib/prisma';
 import CustomerDetailClient from './CustomerDetailClient';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+// Deeply convert Prisma Decimals to Numbers for safe serialization to Client Components
+function serializeData(obj: any): any {
+    if (obj === null || obj === undefined) return obj;
+    if (typeof obj !== 'object') return obj;
+    if (obj instanceof Date) return obj.toISOString();
+    if (Array.isArray(obj)) return obj.map(serializeData);
+
+    // Prisma Decimal check (if it has d and s properties or is explicitly from @prisma/client/runtime)
+    if (obj.constructor && obj.constructor.name === 'Decimal') return Number(obj);
+
+    const newObj: any = {};
+    for (const key in obj) {
+        newObj[key] = serializeData(obj[key]);
+    }
+    return newObj;
+}
+
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    let customerId = "";
     try {
         const { id } = await params;
+        customerId = id;
 
         if (!id) {
             return (
@@ -24,11 +43,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 category: true,
                 transactions: {
                     where: { deletedAt: null },
-                    orderBy: { date: 'desc' }
+                    orderBy: { date: 'desc' },
+                    take: 50
                 },
                 invoices: {
                     where: { deletedAt: null },
-                    orderBy: { invoiceDate: 'desc' }
+                    orderBy: { invoiceDate: 'desc' },
+                    take: 50
                 },
                 warranties: {
                     orderBy: { createdAt: 'desc' }
@@ -40,7 +61,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         });
 
         if (!customer) {
-            notFound();
+            return notFound();
         }
 
         // Prepare history data on server to keep client component clean and fast
@@ -67,7 +88,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     rawDate: t.date,
                     type: typeLabel,
                     desc: displayDesc,
-                    amount: isCollection ? -(t.amount || 0) : (t.amount || 0),
+                    amount: isCollection ? -Number(t.amount || 0) : Number(t.amount || 0),
                     color: isCollection ? '#10b981' : (t.type === 'Payment' ? '#3b82f6' : (t.type === 'Sales' ? '#10b981' : '#ef4444')),
                     items: null,
                     orderId: orderId
@@ -88,7 +109,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 rawDate: inv.invoiceDate,
                 type: 'Fatura',
                 desc: `${inv.invoiceNo || 'Fatura'} - ${inv.isFormal ? 'Resmi' : 'Taslak'}`,
-                amount: (inv.totalAmount || 0),
+                amount: Number(inv.totalAmount || 0),
                 color: '#3b82f6',
                 items: safeItems
             };
@@ -116,14 +137,20 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             return (isNaN(tA) || isNaN(tB)) ? 0 : tB - tA;
         });
 
-        return <CustomerDetailClient customer={customer} historyList={historyList} />;
+        // Use deep serialization for safety
+        return <CustomerDetailClient customer={serializeData(customer)} historyList={serializeData(historyList)} />;
     } catch (err: any) {
+        // If notFound() was called, its error should bubble up to Next.js handled properly
+        if (err.digest === 'NEXT_NOT_FOUND' || err.message?.includes('NEXT_NOT_FOUND')) {
+            throw err;
+        }
+
         console.error("PAGE_CRASH_INFO:", err);
         return (
             <div style={{ padding: '40px', background: '#0f0f12', minHeight: '100vh', color: '#ff4444', fontFamily: 'sans-serif' }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                    <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>⚠️ Sunucu Hatası</h1>
-                    <p style={{ color: '#888', marginBottom: '20px' }}>Sayfa yüklenirken beklenmeyen bir sorun oluştu. Lütfen tekrar deneyin veya desteğe başvurun.</p>
+                    <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>⚠️ Sunucu Hatası (Render)</h1>
+                    <p style={{ color: '#888', marginBottom: '20px' }}>Müşteri verisi işlenirken bir hata oluştu. Lütfen teknik ekibe hata mesajını iletin.</p>
 
                     <div style={{
                         padding: '24px',
@@ -138,31 +165,12 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                             {err.message || "Bilinmeyen hata"}
                         </code>
 
-                        {err.digest && (
-                            <div style={{ marginTop: '16px', fontSize: '12px', opacity: 0.6 }}>
-                                <strong>Digest:</strong> {err.digest}
-                            </div>
-                        )}
+                        <div style={{ marginTop: '16px', fontSize: '11px', opacity: 0.4 }}>
+                            <strong>ID:</strong> {customerId} | <strong>Digest:</strong> {err.digest || 'N/A'}
+                        </div>
                     </div>
-
-                    <button
-                        onClick={() => window.location.reload()}
-                        style={{
-                            marginTop: '24px',
-                            padding: '12px 30px',
-                            background: '#3b82f6',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontWeight: '600'
-                        }}
-                    >
-                        Sayfayı Yenile
-                    </button>
                 </div>
             </div>
         );
     }
 }
-
