@@ -6,12 +6,12 @@ export const runtime = "nodejs";
 
 export async function GET(
     request: Request,
-    { params }: { params: { auditId: string } }
+    { params }: { params: Promise<{ auditId: string }> }
 ) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
 
-    const { auditId } = await (params as any);
+    const { auditId } = await params;
 
     try {
         const audit = await (prisma as any).marketplaceActionAudit.findUnique({

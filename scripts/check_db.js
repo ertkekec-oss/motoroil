@@ -1,32 +1,21 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function check() {
-    console.log("--- DB Health Check ---");
-    const orderCount = await prisma.order.count();
-    console.log("Total Orders in DB:", orderCount);
+async function checkData() {
+    const accounts = await prisma.account.count();
+    const staff = await prisma.staff.count();
+    const kasalar = await prisma.kasa.count();
+    const customers = await prisma.customer.count();
+    const branches = await prisma.branch.count();
 
-    const orders = await prisma.order.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        include: { company: true }
-    });
+    console.log('📊 Database Status:');
+    console.log(`   Accounts: ${accounts}`);
+    console.log(`   Staff: ${staff}`);
+    console.log(`   Kasalar: ${kasalar}`);
+    console.log(`   Customers: ${customers}`);
+    console.log(`   Branches: ${branches}`);
 
-    console.log("Last 5 Orders:");
-    orders.forEach(o => {
-        console.log(`- ID: ${o.id}, Number: ${o.orderNumber}, Marketplace: ${o.marketplace}, CompanyId: ${o.companyId}, TenantId: ${o.company?.tenantId}, Status: ${o.status}`);
-    });
-
-    const companies = await prisma.company.findMany();
-    console.log("Total Companies:", companies.length);
-    companies.forEach(c => {
-        console.log(`- Company: ${c.name}, ID: ${c.id}, TenantId: ${c.tenantId}`);
-    });
-
-    process.exit(0);
+    await prisma.$disconnect();
 }
 
-check().catch(err => {
-    console.error(err);
-    process.exit(1);
-});
+checkData();

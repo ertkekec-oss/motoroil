@@ -5,17 +5,41 @@ import { logActivity } from '@/lib/audit';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
+        // Get company for this tenant
+        const tenantId = (session as any).tenantId;
+        const companyId = session.companyId;
+
+        const whereClause: any = {
+            deletedAt: null
+        };
+
+        if (companyId) {
+            whereClause.companyId = companyId;
+        } else if (tenantId) {
+            const company = await prisma.company.findFirst({
+                where: { tenantId }
+            });
+            if (company) {
+                whereClause.companyId = company.id;
+            }
+        }
+
         const products = await prisma.product.findMany({
-            where: {
-                deletedAt: null
-            },
+            where: whereClause,
             orderBy: { createdAt: 'desc' },
-            include: { stocks: true }
+            include: {
+                stocks: true,
+                prices: {
+                    include: {
+                        priceList: true
+                    }
+                }
+            }
         });
         return NextResponse.json({ success: true, products });
     } catch (error: any) {

@@ -34,6 +34,24 @@ coverage
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+errors.txt
+build_*.txt
+lint_*.txt
+canary_output.txt
+
+# Kökteki scriptler (zaten scripts/ içindelerse buradan silinebilir)
+# Ama köktelerse ve ignored değilseler vercel'e giderler
+check_*.ts
+check_*.js
+fix_*.ts
+fix_*.js
+debug_*.ts
+debug_*.js
+add_*.js
+update_*.js
+seed_*.js
+list_*.js
+find_*.js
 
 # Deploy Notları
 *_DEPLOYMENT.md
@@ -43,3 +61,13 @@ yarn-error.log*
 
 # Diğer
 marketplace_section.txt
+*.xml
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!next.config.*
+!eslint.config.*
+!postcss.config.*
+!tailwind.config.*
+!*lint.json

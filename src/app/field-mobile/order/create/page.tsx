@@ -13,10 +13,18 @@ export default function MobileCreateOrderPage() {
     const customerId = searchParams.get('customerId');
     const customerName = searchParams.get('customerName');
 
+    const [customer, setCustomer] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [cart, setCart] = useState<{ productId: string, name: string, price: number, qty: number }[]>([]);
     const [showCart, setShowCart] = useState(false);
     const [saving, setSaving] = useState(false);
+
+    // Fetch customer to get their price list
+    useEffect(() => {
+        if (customerId) {
+            fieldDb.customers.get(customerId).then(setCustomer);
+        }
+    }, [customerId]);
 
     // Live query for products
     const products = useLiveQuery(
@@ -27,13 +35,22 @@ export default function MobileCreateOrderPage() {
         [searchTerm]
     );
 
+    const getPriceForProduct = (product: any) => {
+        if (customer?.priceListId && product.prices) {
+            const specificPrice = product.prices.find((p: any) => p.priceListId === customer.priceListId);
+            if (specificPrice) return specificPrice.price;
+        }
+        return product.price;
+    };
+
     const addToCart = (product: any) => {
+        const productPrice = getPriceForProduct(product);
         setCart(prev => {
             const existing = prev.find(p => p.productId === product.id);
             if (existing) {
                 return prev.map(p => p.productId === product.id ? { ...p, qty: p.qty + 1 } : p);
             }
-            return [...prev, { productId: product.id, name: product.name, price: product.price, qty: 1 }];
+            return [...prev, { productId: product.id, name: product.name, price: productPrice, qty: 1 }];
         });
     };
 
@@ -139,7 +156,12 @@ export default function MobileCreateOrderPage() {
                         <div>
                             <div className="font-bold">{product.name}</div>
                             <div className="text-xs text-gray-400">{product.category}</div>
-                            <div className="font-bold text-blue-400 mt-1">₺{product.price.toLocaleString()}</div>
+                            <div className="font-bold text-blue-400 mt-1">
+                                ₺{getPriceForProduct(product).toLocaleString()}
+                                {customer?.priceListId && product.prices?.some((p: any) => p.priceListId === customer.priceListId) && (
+                                    <span className="ml-2 text-[8px] bg-blue-500/20 px-1 py-0.5 rounded text-blue-300 uppercase font-black">Özel</span>
+                                )}
+                            </div>
                         </div>
                         <button
                             onClick={() => addToCart(product)}

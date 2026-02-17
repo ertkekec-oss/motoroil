@@ -19,7 +19,12 @@ export function useSyncMasterData() {
                     name: p.name,
                     price: Number(p.price),
                     stock: Number(p.stock),
-                    category: p.category || 'Genel'
+                    category: p.category || 'Genel',
+                    prices: (p.prices || []).map((pp: any) => ({
+                        priceListId: pp.priceListId,
+                        name: pp.priceList?.name || 'Bilinmeyen Liste',
+                        price: Number(pp.price)
+                    }))
                 }));
                 await fieldDb.products.clear();
                 await fieldDb.products.bulkPut(products);
@@ -34,6 +39,7 @@ export function useSyncMasterData() {
                     name: c.name,
                     balance: Number(c.balance),
                     address: c.address || '',
+                    priceListId: c.priceListId,
                     location: (c.latitude && c.longitude) ? { lat: c.latitude, lng: c.longitude } : undefined
                 }));
                 await fieldDb.customers.clear();

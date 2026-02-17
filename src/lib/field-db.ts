@@ -8,6 +8,7 @@ export interface Product {
     stock: number;
     category: string;
     image?: string;
+    prices?: { priceListId: string, name: string, price: number }[];
 }
 
 export interface Customer {
@@ -15,6 +16,7 @@ export interface Customer {
     name: string;
     balance: number;
     address: string;
+    priceListId?: string;
     location?: { lat: number, lng: number };
 }
 

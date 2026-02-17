@@ -9,13 +9,13 @@ export const runtime = "nodejs";
 
 export async function POST(
     request: Request,
-    { params }: { params: { marketplace: string; orderId: string } }
+    { params }: { params: Promise<{ marketplace: string; orderId: string }> }
 ) {
     try {
         const auth = await authorize();
         if (!auth.authorized) return auth.response;
 
-        const { marketplace, orderId } = await (params as any);
+        const { marketplace, orderId } = await params;
 
         // ============================================================================
         // 1. REDIS HEALTH CHECK (DISABLED)

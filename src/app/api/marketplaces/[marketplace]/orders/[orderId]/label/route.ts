@@ -8,13 +8,13 @@ export const dynamic = "force-dynamic";
 
 export async function GET(
     request: Request,
-    { params }: { params: { marketplace: string; orderId: string } }
+    { params }: { params: Promise<{ marketplace: string; orderId: string }> }
 ) {
     try {
         const auth = await authorize();
         if (!auth.authorized) return auth.response;
 
-        const { marketplace, orderId } = await (params as any);
+        const { marketplace, orderId } = await params;
 
         const url = new URL(request.url);
         const shipmentPackageId = url.searchParams.get("shipmentPackageId");

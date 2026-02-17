@@ -32,7 +32,7 @@ export async function GET() {
                 referralCode: true,
                 updatedAt: true,
                 category: {
-                    select: { name: true }
+                    select: { name: true, priceListId: true }
                 },
                 // Fetch open checks only (lighter query)
                 checks: {
@@ -53,6 +53,7 @@ export async function GET() {
             branch: c.branch || 'Merkez',
             balance: Number(c.balance || 0),
             category: c.category?.name || 'Genel',
+            priceListId: c.category?.priceListId || null,
             email: c.email || '',
             address: c.address || '',
             city: c.city || '',
