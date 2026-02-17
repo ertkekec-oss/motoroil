@@ -18,8 +18,8 @@ export async function GET(request: Request) {
         const customerId = searchParams.get('customerId');
 
         if (code) {
-            const coupon = await prisma.coupon.findUnique({
-                where: { code, companyId } as any, // Type cast for now
+            const coupon = await prisma.coupon.findFirst({
+                where: { code, companyId },
                 include: { customer: true }
             });
             return NextResponse.json(coupon);
@@ -123,8 +123,11 @@ export async function PUT(request: Request) {
 
         if (updateData.expiryDate) updateData.expiryDate = new Date(updateData.expiryDate);
 
+        const existing = await prisma.coupon.findFirst({ where: { id, companyId } });
+        if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
         const coupon = await prisma.coupon.update({
-            where: { id, companyId } as any, // Verify it belongs to company
+            where: { id },
             data: updateData
         });
         return NextResponse.json(coupon);
@@ -147,8 +150,12 @@ export async function DELETE(request: Request) {
         const id = searchParams.get('id');
         if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
+        // Verify ownership and delete
+        const existing = await prisma.coupon.findFirst({ where: { id, companyId } });
+        if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
         await prisma.coupon.delete({
-            where: { id, companyId } as any // Verify before delete
+            where: { id }
         });
         return NextResponse.json({ success: true });
     } catch (error: any) {

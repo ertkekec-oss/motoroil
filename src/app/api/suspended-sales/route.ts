@@ -71,8 +71,10 @@ export async function DELETE(request: Request) {
         const userName = user.name || 'Unknown';
 
         // Get details before delete for log
-        const sale = await prisma.suspendedSale.findUnique({
-            where: { id, companyId } as any // Type cast as companyId might not be in types yet
+        // Get details before delete for log
+        // Use findFirst instead of findUnique because (id, companyId) is not a unique constraint
+        const sale = await prisma.suspendedSale.findFirst({
+            where: { id, companyId }
         });
 
         if (!sale) {
