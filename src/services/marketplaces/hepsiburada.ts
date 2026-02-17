@@ -27,6 +27,8 @@ export class HepsiburadaService implements IMarketplaceService {
                 ? 'https://oms-external-sit.hepsiburada.com'
                 : 'https://oms-external.hepsiburada.com';
         }
+
+        console.log(`[HB_PROXY] baseUrl=${this.baseUrl}`);
     }
 
     private getAuthHeader(): string {
@@ -38,6 +40,11 @@ export class HepsiburadaService implements IMarketplaceService {
 
         const token = Buffer.from(`${username}:${password}`).toString('base64');
         return `Basic ${token}`;
+    }
+
+    private getProxyKeyHeader(): string {
+        // Nginx static-IP gateway lock (must match nginx config)
+        return (process.env.PERIODYA_PROXY_KEY || '').trim();
     }
 
     private hbDate(date: Date): string {
@@ -59,7 +66,8 @@ export class HepsiburadaService implements IMarketplaceService {
             const response = await fetch(url, {
                 headers: {
                     'Authorization': this.getAuthHeader(),
-                    'User-Agent': 'Periodya_OMS_v1'
+                    'User-Agent': 'Periodya_OMS_v1',
+                    'X-Periodya-Key': this.getProxyKeyHeader(),
                 }
             });
 
@@ -81,6 +89,7 @@ export class HepsiburadaService implements IMarketplaceService {
         const bStr = this.hbDate(begin);
         const eStr = this.hbDate(end);
 
+        // Hepsiburada OMS requires separate calls for different life-cycle segments
         const syncTargets = [
             { name: 'UNPACKED', urlPart: `orders/merchantid/${merchantId}` },
             { name: 'SHIPPED', urlPart: `packages/merchantid/${merchantId}/shipped` },
@@ -110,22 +119,23 @@ export class HepsiburadaService implements IMarketplaceService {
                             'Authorization': this.getAuthHeader(),
                             'User-Agent': 'Periodya_OMS_v1',
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-Periodya-Key': this.getProxyKeyHeader(),
                         }
                     });
 
                     if (!response.ok) {
                         const errText = await response.text();
-                        console.error(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status}). Body: ${errText.substring(0, 100)}`);
+                        console.error(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status}). Body: ${errText.substring(0, 200)}`);
 
                         if (response.status === 401) {
-                            throw new Error(`HB_AUTH_ERROR: Hepsiburada Yetkilendirme Hatası (401).`);
+                            throw new Error(`HB_AUTH_ERROR: Hepsiburada Yetkilendirme Hatası (401). Lütfen API User ve Secret Key bilgilerini kontrol edin.`);
                         }
                         if (response.status === 429) {
                             throw new Error(`HB_RATE_LIMIT: Hepsiburada API limitine takıldınız. (429)`);
                         }
 
-                        throw new Error(`HB_API_ERROR: ${target.name} servisi ${response.status} hatası döndürdü.`);
+                        throw new Error(`HB_API_ERROR: ${target.name} servisi ${response.status} hatası döndürdü: ${errText.substring(0, 200)}`);
                     }
 
                     const data = await response.json();
@@ -149,6 +159,7 @@ export class HepsiburadaService implements IMarketplaceService {
                     if (items.length < limit) hasMore = false;
                     else offset += limit;
 
+                    // Safety throttle between pages
                     if (hasMore) await new Promise(r => setTimeout(r, 200));
 
                 } catch (err: any) {
@@ -158,6 +169,7 @@ export class HepsiburadaService implements IMarketplaceService {
                 }
             }
 
+            // Short delay between different endpoint targets
             await new Promise(r => setTimeout(r, 500));
         }
 
