@@ -54,7 +54,7 @@ export class HepsiburadaService implements IMarketplaceService {
         const hr = pad(date.getHours());
         const mi = pad(date.getMinutes());
         const sc = pad(date.getSeconds());
-        return `${yr}-${mo}-${dy} ${hr}:${mi}:${sc}`;
+        return `${yr}-${mo}-${dy}`;
     }
 
     async validateConnection(): Promise<boolean> {
