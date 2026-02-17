@@ -66,7 +66,7 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
         throw new ApiError("UNAUTHORIZED: Oturum bulunamadı.", 401, 'AUTH_REQUIRED');
     }
 
-    const companyId = req.headers.get('X-Company-Id') || session.companyId;
+    let resolvedCompanyId = req.headers.get('X-Company-Id') || session.companyId;
 
     // 1. Önce SaaS kullanıcısı mı diye bak (Tenant bazlı işlemler için)
     // BYPASS TENANT GUARD: Use prismaBase to find user by ID regardless of context
@@ -103,6 +103,17 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
         throw new ApiError("FORBIDDEN: Kullanıcının Tenant bilgisi eksik.", 403, 'TENANT_MISSING');
     }
 
+    // If companyId is still missing, try to find it from UserCompanyAccess
+    if (!resolvedCompanyId && user.id) {
+        const access = await (prisma as any).userCompanyAccess.findFirst({
+            where: { userId: user.id },
+            select: { companyId: true }
+        });
+        if (access) {
+            resolvedCompanyId = access.companyId;
+        }
+    }
+
     // --- ACTIVITY TRACKING ---
     const now = new Date();
     if (!user.lastActiveAt || (now.getTime() - new Date(user.lastActiveAt).getTime() > 60000)) {
@@ -123,7 +134,7 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
         userId: user.id,
         username: session.username,
         tenantId: user.tenantId,
-        companyId: companyId,
+        companyId: resolvedCompanyId,
         role: user.role,
         requestId
     };

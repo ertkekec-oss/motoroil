@@ -19,10 +19,25 @@ export async function GET() {
             whereClause.companyId = companyId;
         }
 
-        const attributes = await prisma.variantAttribute.findMany({
-            where: whereClause,
-            include: { values: true }
-        });
+        let attributes;
+        try {
+            attributes = await prisma.variantAttribute.findMany({
+                where: whereClause,
+                include: { values: true }
+            });
+        } catch (primaError: any) {
+            // Fallback for schema mismatch (Unknown argument companyId)
+            if (primaError.message.includes('Unknown argument')) {
+                console.warn("Retrying attributes fetch without companyId filter");
+                delete whereClause.companyId;
+                attributes = await prisma.variantAttribute.findMany({
+                    where: whereClause,
+                    include: { values: true }
+                });
+            } else {
+                throw primaError;
+            }
+        }
 
         return NextResponse.json({ success: true, attributes });
     } catch (error: any) {
