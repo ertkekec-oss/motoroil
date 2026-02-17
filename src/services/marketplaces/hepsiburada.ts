@@ -57,6 +57,29 @@ export class HepsiburadaService implements IMarketplaceService {
         return `${yr}-${mo}-${dy}`;
     }
 
+    private hbDateYmdHi(d: Date) {
+        const pad = (n: number) => String(n).padStart(2, "0");
+        // Use local time components as Hepsiburada expects "YYYY-MM-DD HH:mm" without timezone
+        const yyyy = d.getFullYear();
+        const mm = pad(d.getMonth() + 1);
+        const dd = pad(d.getDate());
+        const hh = pad(d.getHours());
+        const mi = pad(d.getMinutes());
+        return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+    }
+
+    private startOfDay(d: Date) {
+        const x = new Date(d);
+        x.setHours(0, 0, 0, 0);
+        return x;
+    }
+
+    private endOfDay(d: Date) {
+        const x = new Date(d);
+        x.setHours(23, 59, 0, 0);
+        return x;
+    }
+
     async validateConnection(): Promise<boolean> {
         try {
             const merchantId = (this.config.merchantId || '').trim();
@@ -90,30 +113,33 @@ export class HepsiburadaService implements IMarketplaceService {
         const begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
         const end = endDate || now;
 
-        const bStr = begin.toISOString();
-        const eStr = end.toISOString();
+        // Use strict "YYYY-MM-DD HH:mm" format for dates, as expected by Hepsiburada OMS
+        const bStr = this.hbDateYmdHi(this.startOfDay(begin));
+        // Use end of day for the end date to cover full range
+        const eStr = this.hbDateYmdHi(this.endOfDay(end));
 
         // Hepsiburada OMS requires separate calls for different life-cycle segments with SPECIFIC query params
         const syncTargets = [
             {
                 name: 'UNPACKED',
                 urlPart: `orders/merchantid/${merchantId}`,
-                params: ['limit'] // Using limit only as per successful test result (offset caused 400)
+                // Verified: offset causes 400. limit is 200.
+                params: ['limit']
             },
             {
                 name: 'SHIPPED',
                 urlPart: `packages/merchantid/${merchantId}/shipped`,
-                params: ['beginDate', 'endDate']
+                params: ['begindate', 'enddate']
             },
             {
                 name: 'DELIVERED',
                 urlPart: `packages/merchantid/${merchantId}/delivered`,
-                params: ['beginDate', 'endDate']
+                params: ['begindate', 'enddate']
             },
             {
                 name: 'CANCELLED',
                 urlPart: `packages/merchantid/${merchantId}/cancelled`,
-                params: ['beginDate', 'endDate']
+                params: ['begindate', 'enddate']
             }
         ];
 
@@ -131,8 +157,8 @@ export class HepsiburadaService implements IMarketplaceService {
                     const qs = new URLSearchParams();
                     if (target.params.includes('limit')) qs.set('limit', String(limit));
                     if (target.params.includes('offset')) qs.set('offset', String(offset));
-                    if (target.params.includes('beginDate')) qs.set('beginDate', bStr);
-                    if (target.params.includes('endDate')) qs.set('endDate', eStr);
+                    if (target.params.includes('begindate')) qs.set('begindate', bStr);
+                    if (target.params.includes('enddate')) qs.set('enddate', eStr);
 
                     const url = `${this.baseUrl}/${target.urlPart}?${qs.toString()}`;
 
