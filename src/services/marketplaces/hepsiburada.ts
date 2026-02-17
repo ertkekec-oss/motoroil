@@ -114,6 +114,10 @@ export class HepsiburadaService implements IMarketplaceService {
                         `&begindate=${encodeURIComponent(bStr)}` +
                         `&enddate=${encodeURIComponent(eStr)}`;
 
+                    // LOGGING FOR DEBUGGING
+                    const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+                    console.log(`[HB_FETCH] URL: ${url} | Proxy Configured: ${!!effectiveProxy} | X-Periodya-Key: ${this.getProxyKeyHeader() ? 'YES' : 'NO'}`);
+
                     const response = await fetch(url, {
                         headers: {
                             'Authorization': this.getAuthHeader(),
@@ -123,6 +127,8 @@ export class HepsiburadaService implements IMarketplaceService {
                             'X-Periodya-Key': this.getProxyKeyHeader(),
                         }
                     });
+
+                    console.log(`[HB_RESPONSE] Status: ${response.status} ${response.statusText}`);
 
                     if (!response.ok) {
                         const errText = await response.text();
