@@ -90,30 +90,30 @@ export class HepsiburadaService implements IMarketplaceService {
         const begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
         const end = endDate || now;
 
-        const bStr = this.hbDate(begin);
-        const eStr = this.hbDate(end);
+        const bStr = begin.toISOString();
+        const eStr = end.toISOString();
 
-        // Hepsiburada OMS requires separate calls for different life-cycle segments
+        // Hepsiburada OMS requires separate calls for different life-cycle segments with SPECIFIC query params
         const syncTargets = [
             {
                 name: 'UNPACKED',
                 urlPart: `orders/merchantid/${merchantId}`,
-                config: { useOffset: false, useDate: false }
+                params: ['limit'] // Using limit only as per successful test result (offset caused 400)
             },
             {
                 name: 'SHIPPED',
                 urlPart: `packages/merchantid/${merchantId}/shipped`,
-                config: { useOffset: true, useDate: true }
+                params: ['beginDate', 'endDate']
             },
             {
                 name: 'DELIVERED',
                 urlPart: `packages/merchantid/${merchantId}/delivered`,
-                config: { useOffset: true, useDate: true }
+                params: ['beginDate', 'endDate']
             },
             {
                 name: 'CANCELLED',
                 urlPart: `packages/merchantid/${merchantId}/cancelled`,
-                config: { useOffset: true, useDate: true }
+                params: ['beginDate', 'endDate']
             }
         ];
 
@@ -128,15 +128,13 @@ export class HepsiburadaService implements IMarketplaceService {
 
             while (hasMore) {
                 try {
-                    let url = `${this.baseUrl}/${target.urlPart}?limit=${limit}`;
+                    const qs = new URLSearchParams();
+                    if (target.params.includes('limit')) qs.set('limit', String(limit));
+                    if (target.params.includes('offset')) qs.set('offset', String(offset));
+                    if (target.params.includes('beginDate')) qs.set('beginDate', bStr);
+                    if (target.params.includes('endDate')) qs.set('endDate', eStr);
 
-                    if (target.config.useOffset) {
-                        url += `&offset=${offset}`;
-                    }
-
-                    if (target.config.useDate) {
-                        url += `&beginDate=${encodeURIComponent(bStr)}&endDate=${encodeURIComponent(eStr)}`;
-                    }
+                    const url = `${this.baseUrl}/${target.urlPart}?${qs.toString()}`;
 
                     // LOGGING FOR DEBUGGING
                     const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
@@ -174,6 +172,11 @@ export class HepsiburadaService implements IMarketplaceService {
                             throw new Error(`HB_RATE_LIMIT: Hepsiburada API limitine takıldınız. (429)`);
                         }
 
+                        // For 400 Bad Request
+                        if (response.status === 400) {
+                            throw new Error(`HB_BAD_REQUEST: ${target.name} servisi 400 hatası döndürdü. Parametreleri kontrol edin.`);
+                        }
+
                         throw new Error(`HB_API_ERROR: ${target.name} servisi ${response.status} hatası döndürdü: ${errText.substring(0, 200)}`);
                     }
 
@@ -195,8 +198,12 @@ export class HepsiburadaService implements IMarketplaceService {
                         if (key) allOrdersMap.set(key, mapped);
                     }
 
-                    if (items.length < limit) hasMore = false;
-                    else offset += limit;
+                    // Update: Only paginate if offset is supported AND we might have more pages
+                    if (items.length < limit || !target.params.includes('offset')) {
+                        hasMore = false;
+                    } else {
+                        offset += limit;
+                    }
 
                     // Safety throttle between pages
                     if (hasMore) await new Promise(r => setTimeout(r, 200));
