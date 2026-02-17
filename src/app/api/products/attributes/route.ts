@@ -13,7 +13,7 @@ export async function GET() {
         const tenantId = session.tenantId;
 
         // 1) Find Company ID from Tenant ID directly (to be safe)
-        let resolvedCompanyId = session.companyId;
+        let resolvedCompanyId = session.companyId as string | undefined;
 
         // If we don't have a direct companyId but have a tenantId (standard SaaS user),
         // let's resolve the primary company for this tenant.
