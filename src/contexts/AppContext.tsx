@@ -206,7 +206,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         try {
             const res = await apiFetch('/api/staff', { cache: 'no-store' });
             const data = await res.json();
-            if (Array.isArray(data)) setStaff(data);
+            if (data.success && Array.isArray(data.staff)) {
+                setStaff(data.staff);
+            } else if (Array.isArray(data.data)) {
+                setStaff(data.data);
+            } else if (Array.isArray(data)) {
+                setStaff(data);
+            }
         } catch (err) { console.error('Staff refresh failed', err); }
     };
 
@@ -302,7 +308,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         try {
             const res = await apiFetch('/api/notifications');
             const data = await res.json();
-            if (Array.isArray(data)) setNotifications(data);
+            if (Array.isArray(data.data)) {
+                setNotifications(data.data);
+            } else if (Array.isArray(data)) {
+                setNotifications(data);
+            }
         } catch (err) { console.error('Notifications fetch failed', err); }
     };
 
@@ -337,7 +347,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         try {
             const res = await apiFetch('/api/security/events');
             const data = await res.json();
-            if (Array.isArray(data)) setSuspiciousEvents(data);
+            if (data.success && Array.isArray(data.events)) {
+                setSuspiciousEvents(data.events);
+            } else if (Array.isArray(data)) {
+                setSuspiciousEvents(data);
+            }
         } catch (err) { console.error('Security fetch failed', err); }
     };
 
