@@ -7,7 +7,7 @@ import { getSession } from './auth';
 const operationalModels = [
     'product', 'customer', 'supplier', 'transaction', 'kasa', 'check', 'order',
     'salesinvoice', 'purchaseinvoice', 'servicerecord', 'quote', 'paymentplan',
-    'stockmovement', 'variantattribute', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
+    'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
     'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'company', 'branch',
     'notification', 'staff', 'user', 'tenant', 'subscription'
 ];
