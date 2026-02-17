@@ -115,12 +115,14 @@ export async function POST(request: Request) {
         let categoryId: string | null = null;
         try {
             const ecommerceCategory = await prisma.customerCategory.upsert({
-                where: { name: 'E-ticaret' },
-                create: { name: 'E-ticaret', description: 'Web Satış Kanalı' },
+                where: { companyId_name: { companyId, name: 'E-ticaret' } },
+                create: { companyId, name: 'E-ticaret', description: 'Web Satış Kanalı' },
                 update: {}
             });
             categoryId = ecommerceCategory.id;
-        } catch (catErr) { }
+        } catch (catErr: any) {
+            console.error('[MARKETPLACE] Category Upsert Error:', catErr.message);
+        }
 
         let savedCount = 0;
         let updatedCount = 0;
@@ -143,7 +145,9 @@ export async function POST(request: Request) {
                         address: JSON.stringify(order.invoiceAddress),
                         categoryId: categoryId
                     },
-                    update: {}
+                    update: {
+                        categoryId: categoryId // Force update category if it's an e-commerce customer
+                    }
                 });
 
                 // 2. Idempotency Guard
