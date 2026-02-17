@@ -10,38 +10,56 @@ export async function GET() {
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
         const branch = (session.branch as string) || 'Merkez';
-        const companyId = session.companyId;
+        const tenantId = session.tenantId;
 
-        // console.log("Fetching attributes for:", { branch, companyId });
+        // 1) Find Company ID from Tenant ID directly (to be safe)
+        let resolvedCompanyId = session.companyId;
 
+        // If we don't have a direct companyId but have a tenantId (standard SaaS user),
+        // let's resolve the primary company for this tenant.
+        if (!resolvedCompanyId && tenantId) {
+            const company = await prisma.company.findFirst({
+                where: { tenantId },
+                select: { id: true }
+            });
+            if (company) {
+                resolvedCompanyId = company.id;
+            }
+        }
+
+        // 2) Build Where Clause
         const whereClause: any = { branch };
-        if (companyId) {
-            whereClause.companyId = companyId;
+
+        // Only fetch company-specific attributes if we successfully resolved a companyId
+        if (resolvedCompanyId) {
+            whereClause.companyId = resolvedCompanyId;
         }
 
         let attributes;
         try {
+            // First attempt: Try to get attributes for this specific company + branch
             attributes = await prisma.variantAttribute.findMany({
                 where: whereClause,
                 include: { values: true }
             });
         } catch (primaError: any) {
-            // Fallback for schema mismatch (Unknown argument companyId)
-            if (primaError.message.includes('Unknown argument')) {
-                console.warn("Retrying attributes fetch without companyId filter");
-                delete whereClause.companyId;
-                attributes = await prisma.variantAttribute.findMany({
-                    where: whereClause,
-                    include: { values: true }
-                });
-            } else {
-                throw primaError;
-            }
+            // Fallback: If schema doesn't support companyId or query fails
+            console.warn("Retrying attributes fetch without companyId filter. Error:", primaError.message);
+
+            // 3) CRITICAL: Remove ALL potential company-related filters
+            delete whereClause.company;
+            delete whereClause.companyId;
+
+            // Retry search globally for the branch
+            attributes = await prisma.variantAttribute.findMany({
+                where: whereClause,
+                include: { values: true }
+            });
         }
 
         return NextResponse.json({ success: true, attributes });
     } catch (error: any) {
-        console.error("Attributes Fetch Error:", error);
+        console.error("Attributes Fetch Fatal Error:", error);
         return NextResponse.json({ success: false, error: error.message, details: error.toString() }, { status: 500 });
     }
 }
