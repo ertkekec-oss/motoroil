@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, Fragment, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useRouter } from 'next/navigation';
@@ -456,10 +458,9 @@ export default function SalesPage() {
     const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
     const [isCollecting, setIsCollecting] = useState(false);
 
-    const { products: inventoryProducts } = useInventory();
     const { processSale } = useSales();
-    const { customers } = useCRM();
-    const { suppliers } = useFinancials();
+    // const { suppliers } = useFinancials(); // Removed duplicate/conflict
+
 
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [mappedItems, setMappedItems] = useState<{ [key: string]: number }>({}); // orderItemName -> inventoryId
@@ -658,31 +659,7 @@ export default function SalesPage() {
         });
     };
 
-    const toggleOrderSelection = (orderId: string) => {
-        setSelectedOrders(prev =>
-            prev.includes(orderId)
-                ? prev.filter(id => id !== orderId)
-                : [...prev, orderId]
-        );
-    };
 
-    const toggleSelectAll = () => {
-        if (selectedOrders.length === paginatedOrders.length) {
-            setSelectedOrders([]);
-        } else {
-            setSelectedOrders(paginatedOrders.map(o => o.id));
-        }
-    };
-
-    const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
-
-    const toggleExpand = (id: string) => {
-        if (expandedOrderId === id) {
-            setExpandedOrderId(null);
-        } else {
-            setExpandedOrderId(id);
-        }
-    };
 
 
     // Kargo özellikleri kaldırıldı - sadece faturalandırma kaldı
