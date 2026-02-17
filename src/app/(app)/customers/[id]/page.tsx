@@ -1,20 +1,33 @@
 
 import { notFound } from 'next/navigation';
-import prisma from '@/lib/prisma';
+import { prismaBase as prisma } from '@/lib/prismaBase';
 import CustomerDetailClient from './CustomerDetailClient';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
+
+        if (!id) {
+            return (
+                <div style={{ padding: '40px', background: '#0f0f12', height: '100vh', color: '#ff4444' }}>
+                    <h1>Hata: Müşteri Kimliği Eksik</h1>
+                </div>
+            );
+        }
 
         const customer = await prisma.customer.findUnique({
             where: { id },
             include: {
                 category: true,
                 transactions: {
+                    where: { deletedAt: null },
                     orderBy: { date: 'desc' }
                 },
                 invoices: {
+                    where: { deletedAt: null },
                     orderBy: { invoiceDate: 'desc' }
                 },
                 warranties: {
@@ -32,7 +45,6 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
         // Prepare history data on server to keep client component clean and fast
         const txs = (customer.transactions || [])
-            .filter((t: any) => t.type !== 'SalesInvoice') // Fatura listesinde zaten var, mükerrer gösterme
             .map((t: any) => {
                 const isCollection = (t.type === 'income' || t.type === 'Collection');
                 const typeLabel = isCollection ? 'Tahsilat' :
@@ -43,7 +55,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 // Extract Order REF and clean description
                 let orderId = null;
                 let displayDesc = t.description || '';
-                if (displayDesc.includes('| REF:')) {
+                if (displayDesc && displayDesc.includes('| REF:')) {
                     const parts = displayDesc.split('| REF:');
                     displayDesc = parts[0].trim();
                     orderId = parts[1]?.trim();
@@ -65,7 +77,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         const invs = (customer.invoices || []).map((inv: any) => {
             let safeItems = [];
             try {
-                safeItems = typeof inv.items === 'string' ? JSON.parse(inv.items) : (Array.isArray(inv.items) ? inv.items : []);
+                if (inv.items) {
+                    safeItems = typeof inv.items === 'string' ? JSON.parse(inv.items) : (Array.isArray(inv.items) ? inv.items : []);
+                }
             } catch { safeItems = []; }
 
             return {
@@ -73,7 +87,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 date: new Date(inv.invoiceDate).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
                 rawDate: inv.invoiceDate,
                 type: 'Fatura',
-                desc: `${inv.invoiceNo} - ${inv.isFormal ? 'Resmi' : 'Taslak'}`,
+                desc: `${inv.invoiceNo || 'Fatura'} - ${inv.isFormal ? 'Resmi' : 'Taslak'}`,
                 amount: (inv.totalAmount || 0),
                 color: '#3b82f6',
                 items: safeItems
@@ -81,24 +95,24 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         });
 
         const chkList = (customer.checks || []).map((c: any) => {
-            const isReceivable = c.type.includes('Alınan');
+            const isReceivable = (c.type || '').includes('Alınan');
             return {
                 id: c.id,
                 date: new Date(c.createdAt).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
                 rawDate: c.createdAt,
-                type: isReceivable ? 'Tahsilat' : 'Ödeme', // Map to standard types for filter compatibility
-                desc: `${isReceivable ? 'Çek Alındı' : 'Çek Verildi'}: ${c.bank} - ${c.number} (${c.status})`,
-                amount: isReceivable ? -Number(c.amount) : Number(c.amount), // Receivables reduce balance (Credit), Payables increase (Debit) of supplier... wait.
+                type: isReceivable ? 'Tahsilat' : 'Ödeme',
+                desc: `${isReceivable ? 'Çek Alındı' : 'Çek Verildi'}: ${c.bank || '-'} - ${c.number || '-'} (${c.status || '-'})`,
+                amount: isReceivable ? -Number(c.amount || 0) : Number(c.amount || 0),
                 color: isReceivable ? '#10b981' : '#ef4444',
                 items: null,
                 orderId: null,
-                isCheck: true // Flag to identify if needed
+                isCheck: true
             };
         });
 
         const historyList = [...txs, ...invs, ...chkList].sort((a: any, b: any) => {
-            const tA = new Date(a.rawDate).getTime();
-            const tB = new Date(b.rawDate).getTime();
+            const tA = a.rawDate ? new Date(a.rawDate).getTime() : 0;
+            const tB = b.rawDate ? new Date(b.rawDate).getTime() : 0;
             return (isNaN(tA) || isNaN(tB)) ? 0 : tB - tA;
         });
 
@@ -106,16 +120,47 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
     } catch (err: any) {
         console.error("PAGE_CRASH_INFO:", err);
         return (
-            <div style={{ padding: '40px', background: '#0f0f12', height: '100vh', color: '#ff4444', fontFamily: 'monospace' }}>
-                <h1 style={{ fontSize: '24px' }}>⚠️ Server Component Error</h1>
-                <p style={{ color: '#888', marginBottom: '20px' }}>An error occurred while rendering the customer detail page.</p>
-                <div style={{ padding: '20px', background: 'rgba(255,b,0,0.05)', border: '1px solid rgba(255,0,0,0.2)', borderRadius: '8px' }}>
-                    <strong>Message:</strong> {err.message} <br />
-                    <strong>Digest:</strong> {err.digest}
+            <div style={{ padding: '40px', background: '#0f0f12', minHeight: '100vh', color: '#ff4444', fontFamily: 'sans-serif' }}>
+                <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                    <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>⚠️ Sunucu Hatası</h1>
+                    <p style={{ color: '#888', marginBottom: '20px' }}>Sayfa yüklenirken beklenmeyen bir sorun oluştu. Lütfen tekrar deneyin veya desteğe başvurun.</p>
+
+                    <div style={{
+                        padding: '24px',
+                        background: 'rgba(255,0,0,0.05)',
+                        border: '1px solid rgba(255,0,0,0.2)',
+                        borderRadius: '12px',
+                        fontSize: '14px',
+                        lineHeight: '1.6'
+                    }}>
+                        <strong style={{ color: '#fff' }}>Hata Mesajı:</strong><br />
+                        <code style={{ background: 'rgba(0,0,0,0.3)', padding: '4px 8px', borderRadius: '4px', display: 'block', marginTop: '8px' }}>
+                            {err.message || "Bilinmeyen hata"}
+                        </code>
+
+                        {err.digest && (
+                            <div style={{ marginTop: '16px', fontSize: '12px', opacity: 0.6 }}>
+                                <strong>Digest:</strong> {err.digest}
+                            </div>
+                        )}
+                    </div>
+
+                    <button
+                        onClick={() => window.location.reload()}
+                        style={{
+                            marginTop: '24px',
+                            padding: '12px 30px',
+                            background: '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: '600'
+                        }}
+                    >
+                        Sayfayı Yenile
+                    </button>
                 </div>
-                <button onClick={() => window.location.reload()} style={{ marginTop: '20px', padding: '10px 20px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                    Retry
-                </button>
             </div>
         );
     }
