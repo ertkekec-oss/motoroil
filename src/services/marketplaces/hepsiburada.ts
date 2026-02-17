@@ -95,10 +95,26 @@ export class HepsiburadaService implements IMarketplaceService {
 
         // Hepsiburada OMS requires separate calls for different life-cycle segments
         const syncTargets = [
-            { name: 'UNPACKED', urlPart: `orders/merchantid/${merchantId}` },
-            { name: 'SHIPPED', urlPart: `packages/merchantid/${merchantId}/shipped` },
-            { name: 'DELIVERED', urlPart: `packages/merchantid/${merchantId}/delivered` },
-            { name: 'CANCELLED', urlPart: `packages/merchantid/${merchantId}/cancelled` }
+            {
+                name: 'UNPACKED',
+                urlPart: `orders/merchantid/${merchantId}`,
+                config: { useOffset: false, useDate: false }
+            },
+            {
+                name: 'SHIPPED',
+                urlPart: `packages/merchantid/${merchantId}/shipped`,
+                config: { useOffset: true, useDate: true }
+            },
+            {
+                name: 'DELIVERED',
+                urlPart: `packages/merchantid/${merchantId}/delivered`,
+                config: { useOffset: true, useDate: true }
+            },
+            {
+                name: 'CANCELLED',
+                urlPart: `packages/merchantid/${merchantId}/cancelled`,
+                config: { useOffset: true, useDate: true }
+            }
         ];
 
         console.log(`[HB_MULTI_SYNC] Starting sync for ${syncTargets.length} targets. Range: ${bStr} - ${eStr}`);
@@ -112,11 +128,15 @@ export class HepsiburadaService implements IMarketplaceService {
 
             while (hasMore) {
                 try {
-                    const url =
-                        `${this.baseUrl}/${target.urlPart}` +
-                        `?offset=${offset}&limit=${limit}` +
-                        `&beginDate=${encodeURIComponent(bStr)}` +
-                        `&endDate=${encodeURIComponent(eStr)}`;
+                    let url = `${this.baseUrl}/${target.urlPart}?limit=${limit}`;
+
+                    if (target.config.useOffset) {
+                        url += `&offset=${offset}`;
+                    }
+
+                    if (target.config.useDate) {
+                        url += `&beginDate=${encodeURIComponent(bStr)}&endDate=${encodeURIComponent(eStr)}`;
+                    }
 
                     // LOGGING FOR DEBUGGING
                     const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
