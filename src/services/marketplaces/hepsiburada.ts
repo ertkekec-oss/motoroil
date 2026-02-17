@@ -115,8 +115,8 @@ export class HepsiburadaService implements IMarketplaceService {
                     const url =
                         `${this.baseUrl}/${target.urlPart}` +
                         `?offset=${offset}&limit=${limit}` +
-                        `&begindate=${encodeURIComponent(bStr)}` +
-                        `&enddate=${encodeURIComponent(eStr)}`;
+                        `&beginDate=${encodeURIComponent(bStr)}` +
+                        `&endDate=${encodeURIComponent(eStr)}`;
 
                     // LOGGING FOR DEBUGGING
                     const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
