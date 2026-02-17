@@ -32,13 +32,12 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     private getAuthHeader(): string {
-        const username = (this.config.username || '').trim();
-        const password = (this.config.password || '').trim();
         const merchantId = (this.config.merchantId || '').trim();
+        const password = (this.config.password || '').trim();
 
-        console.log(`[HB_AUTH_TRACE] User: ${username} | Merchant: ${merchantId}`);
+        console.log(`[HB_AUTH_TRACE] Merchant: ${merchantId}`);
 
-        const token = Buffer.from(`${username}:${password}`).toString('base64');
+        const token = Buffer.from(`${merchantId}:${password}`).toString('base64');
         return `Basic ${token}`;
     }
 
@@ -66,7 +65,7 @@ export class HepsiburadaService implements IMarketplaceService {
             const response = await fetch(url, {
                 headers: {
                     'Authorization': this.getAuthHeader(),
-                    'User-Agent': 'Periodya_OMS_v1',
+                    'User-Agent': (this.config.username || 'motoroil_dev').trim(),
                     'X-Periodya-Key': this.getProxyKeyHeader(),
                 }
             });
@@ -121,7 +120,7 @@ export class HepsiburadaService implements IMarketplaceService {
                     const response = await fetch(url, {
                         headers: {
                             'Authorization': this.getAuthHeader(),
-                            'User-Agent': 'Periodya_OMS_v1',
+                            'User-Agent': (this.config.username || 'motoroil_dev').trim(),
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
                             'X-Periodya-Key': this.getProxyKeyHeader(),
