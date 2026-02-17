@@ -32,8 +32,8 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     private getAuthHeader(): string {
-        const merchantId = (this.config.merchantId || '').trim();
         const password = (this.config.password || '').trim();
+        const merchantId = (this.config.merchantId || '').trim();
 
         console.log(`[HB_AUTH_TRACE] Merchant: ${merchantId}`);
 
