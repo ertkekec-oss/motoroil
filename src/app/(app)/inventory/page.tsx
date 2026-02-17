@@ -1400,8 +1400,8 @@ function InventoryContent() {
                                 </div>
                             </div>
 
-                            {/* DIĞER FİYAT LİSTELERİ */}
-                            {priceLists.length > 0 && (
+                            {/* DİĞER FİYAT LİSTELERİ */}
+                            {priceLists.length > 0 ? (
                                 <div className="mt-2 pt-4 border-t border-white/5">
                                     <div
                                         onClick={() => setShowOtherPrices(!showOtherPrices)}
@@ -1429,6 +1429,40 @@ function InventoryContent() {
                                             ))}
                                         </div>
                                     )}
+                                </div>
+                            ) : (
+                                <div className="mt-2 pt-4 border-t border-white/5">
+                                    <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500">⚠️</div>
+                                            <div>
+                                                <div className="text-xs font-bold text-amber-200">Fiyat Listesi Tanımlı Değil</div>
+                                                <div className="text-[10px] text-amber-200/60">Toptan ve diğer fiyatlar için liste oluşturun.</div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={async (e) => {
+                                                e.preventDefault();
+                                                try {
+                                                    const res = await fetch('/api/pricing/initialize', { method: 'POST' });
+                                                    const data = await res.json();
+                                                    if (data.success || data.priceLists) {
+                                                        const listRes = await fetch('/api/pricing/lists');
+                                                        const listData = await listRes.json();
+                                                        if (listData.success) {
+                                                            setPriceLists(listData.data);
+                                                            showSuccess('Başarılı', 'Fiyat listeleri oluşturuldu.');
+                                                        }
+                                                    }
+                                                } catch (err) {
+                                                    console.error(err);
+                                                }
+                                            }}
+                                            className="px-3 py-1.5 rounded-lg bg-amber-500 text-black text-[10px] font-black hover:bg-amber-400 transition-colors"
+                                        >
+                                            OLUŞTUR
+                                        </button>
+                                    </div>
                                 </div>
                             )}
 
