@@ -29,7 +29,7 @@ export function ProductPricesTab({ productId }: ProductPricesTabProps) {
             const existingPrices = priceData.data || [];
 
             // Merge
-            const merged = allLists.map((l: any) => {
+            const merged = allLists.filter((l: any) => ['Perakende', 'Toptan'].includes(l.name)).map((l: any) => {
                 const p = existingPrices.find((ep: any) => ep.priceListId === l.id);
                 return {
                     priceListId: l.id,

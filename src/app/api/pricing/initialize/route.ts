@@ -50,16 +50,7 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        const ecommercePriceList = await prisma.priceList.create({
-            data: {
-                companyId,
-                name: 'E-ticaret',
-                description: 'E-ticaret platformları için fiyat listesi',
-                currency: 'TRY',
-                isDefault: false,
-                isActive: true
-            }
-        });
+
 
         // Create default categories
         const retailCategory = await prisma.customerCategory.upsert({
@@ -91,19 +82,7 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        const ecommerceCategory = await prisma.customerCategory.upsert({
-            where: { companyId_name: { companyId, name: 'E-ticaret' } },
-            create: {
-                companyId,
-                name: 'E-ticaret',
-                description: 'E-ticaret müşterileri',
-                priceListId: ecommercePriceList.id,
-                isDefault: false
-            },
-            update: {
-                priceListId: ecommercePriceList.id
-            }
-        });
+
 
         const uncategorizedCategory = await prisma.customerCategory.upsert({
             where: { companyId_name: { companyId, name: 'Kategorisiz' } },
@@ -117,19 +96,7 @@ export async function POST(req: NextRequest) {
             update: {}
         });
 
-        // Auto-assign e-commerce customers to e-commerce category
-        await prisma.customer.updateMany({
-            where: {
-                companyId,
-                email: {
-                    contains: '@marketplace'
-                },
-                categoryId: null
-            },
-            data: {
-                categoryId: ecommerceCategory.id
-            }
-        });
+
 
         // Assign uncategorized customers to default category
         await prisma.customer.updateMany({
@@ -144,8 +111,8 @@ export async function POST(req: NextRequest) {
 
         return apiResponse({
             message: 'Price lists and categories initialized successfully',
-            priceLists: [retailPriceList, wholesalePriceList, ecommercePriceList],
-            categories: [retailCategory, wholesaleCategory, ecommerceCategory, uncategorizedCategory]
+            priceLists: [retailPriceList, wholesalePriceList],
+            categories: [retailCategory, wholesaleCategory, uncategorizedCategory]
         }, { requestId: ctx.requestId });
 
     } catch (error: any) {

@@ -1401,18 +1401,18 @@ function InventoryContent() {
                             </div>
 
                             {/* DİĞER FİYAT LİSTELERİ */}
-                            {priceLists.length > 0 ? (
+                            {priceLists.filter(pl => ['Perakende', 'Toptan'].includes(pl.name)).length > 0 ? (
                                 <div className="mt-2 pt-4 border-t border-white/5">
                                     <div
                                         onClick={() => setShowOtherPrices(!showOtherPrices)}
                                         className="flex items-center gap-2 mb-3 cursor-pointer select-none hover:bg-white/5 p-2 rounded-lg transition-colors"
                                     >
-                                        <span className="text-[10px] font-black uppercase text-muted tracking-widest">📋 DİĞER FİYAT LİSTELERİ ({priceLists.length})</span>
+                                        <span className="text-[10px] font-black uppercase text-muted tracking-widest">📋 DİĞER FİYAT LİSTELERİ ({priceLists.filter(pl => ['Perakende', 'Toptan'].includes(pl.name)).length})</span>
                                         <span className="text-xs opacity-50 ml-auto">{showOtherPrices ? '▼ Gizle' : '▶ Göster'}</span>
                                     </div>
                                     {showOtherPrices && (
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-2 p-2 rounded-xl bg-black/20 border border-white/5">
-                                            {priceLists.map((pl: any) => (
+                                            {priceLists.filter(pl => ['Perakende', 'Toptan'].includes(pl.name)).map((pl: any) => (
                                                 <div key={pl.id} className="relative group">
                                                     <label className="text-[9px] font-bold text-muted uppercase mb-1 block truncate" title={pl.name}>{pl.name}</label>
                                                     <div className="relative">
