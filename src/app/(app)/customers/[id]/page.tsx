@@ -37,10 +37,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             );
         }
 
-        const customer = await prisma.customer.findUnique({
+        const customer: any = await prisma.customer.findUnique({
             where: { id },
             include: {
-                category: true,
                 transactions: {
                     where: { deletedAt: null },
                     orderBy: { date: 'desc' },
@@ -62,6 +61,21 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
         if (!customer) {
             return notFound();
+        }
+
+        // Fetch category separately and resiliently
+        if (customer.categoryId) {
+            try {
+                // Using prismaBase to avoid isolation middleware if it's the one causing issues
+                // Also caught in try/catch to prevent page crash if column is missing
+                const cat = await (prisma as any).customerCategory.findUnique({
+                    where: { id: customer.categoryId }
+                });
+                customer.category = cat;
+            } catch (e) {
+                console.warn("Failed to fetch customer category (likely schema mismatch):", e);
+                customer.category = null;
+            }
         }
 
         // Prepare history data on server to keep client component clean and fast

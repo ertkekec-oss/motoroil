@@ -6,11 +6,26 @@ export class HepsiburadaService implements IMarketplaceService {
 
     constructor(config: HepsiburadaConfig) {
         this.config = config;
-        // Test/Prod base URL selection
-        if (this.config.isTest || this.config.merchantId === '18c17301-9348-4937-b5c0-6912f54eb142') {
-            this.baseUrl = 'https://oms-external-sit.hepsiburada.com';
+
+        // ===== PROXY AWARE BASE URL =====
+        // If MARKETPLACE_PROXY_URL exists (Vercel Production),
+        // all traffic goes through Contabo static IP.
+        const proxy = (process.env.MARKETPLACE_PROXY_URL || '').trim().replace(/\/$/, '');
+
+        const isTest =
+            this.config.isTest ||
+            this.config.merchantId === '18c17301-9348-4937-b5c0-6912f54eb142';
+
+        if (proxy) {
+            // Production via proxy (static IP)
+            this.baseUrl = isTest
+                ? `${proxy}/hepsiburada-sit`
+                : `${proxy}/hepsiburada`;
         } else {
-            this.baseUrl = 'https://oms-external.hepsiburada.com';
+            // Local / dev fallback (direct)
+            this.baseUrl = isTest
+                ? 'https://oms-external-sit.hepsiburada.com'
+                : 'https://oms-external.hepsiburada.com';
         }
     }
 
@@ -19,7 +34,6 @@ export class HepsiburadaService implements IMarketplaceService {
         const password = (this.config.password || '').trim();
         const merchantId = (this.config.merchantId || '').trim();
 
-        // Security: Log username for trace, but never log password in prod without guard
         console.log(`[HB_AUTH_TRACE] User: ${username} | Merchant: ${merchantId}`);
 
         const token = Buffer.from(`${username}:${password}`).toString('base64');
@@ -41,12 +55,14 @@ export class HepsiburadaService implements IMarketplaceService {
         try {
             const merchantId = (this.config.merchantId || '').trim();
             const url = `${this.baseUrl}/orders/merchantid/${merchantId}?offset=0&limit=1`;
+
             const response = await fetch(url, {
                 headers: {
                     'Authorization': this.getAuthHeader(),
                     'User-Agent': 'Periodya_OMS_v1'
                 }
             });
+
             return response.ok;
         } catch (error) {
             console.error('Hepsiburada connection validation error:', error);
@@ -65,7 +81,6 @@ export class HepsiburadaService implements IMarketplaceService {
         const bStr = this.hbDate(begin);
         const eStr = this.hbDate(end);
 
-        // Hepsiburada OMS requires separate calls for different life-cycle segments
         const syncTargets = [
             { name: 'UNPACKED', urlPart: `orders/merchantid/${merchantId}` },
             { name: 'SHIPPED', urlPart: `packages/merchantid/${merchantId}/shipped` },
@@ -84,7 +99,11 @@ export class HepsiburadaService implements IMarketplaceService {
 
             while (hasMore) {
                 try {
-                    const url = `${this.baseUrl}/${target.urlPart}?offset=${offset}&limit=${limit}&begindate=${encodeURIComponent(bStr)}&enddate=${encodeURIComponent(eStr)}`;
+                    const url =
+                        `${this.baseUrl}/${target.urlPart}` +
+                        `?offset=${offset}&limit=${limit}` +
+                        `&begindate=${encodeURIComponent(bStr)}` +
+                        `&enddate=${encodeURIComponent(eStr)}`;
 
                     const response = await fetch(url, {
                         headers: {
@@ -99,22 +118,22 @@ export class HepsiburadaService implements IMarketplaceService {
                         const errText = await response.text();
                         console.error(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status}). Body: ${errText.substring(0, 100)}`);
 
-                        // Critical Errors: Throw instead of swallow
                         if (response.status === 401) {
-                            throw new Error(`HB_AUTH_ERROR: Hepsiburada Yetkilendirme Hatası (401). Lütfen API User ve Secret Key bilgilerini kontrol edin.`);
+                            throw new Error(`HB_AUTH_ERROR: Hepsiburada Yetkilendirme Hatası (401).`);
                         }
                         if (response.status === 429) {
                             throw new Error(`HB_RATE_LIMIT: Hepsiburada API limitine takıldınız. (429)`);
                         }
 
-                        // For other statuses, we might decide to continue or throw. Let's throw for now to be safe.
-                        throw new Error(`HB_API_ERROR: ${target.name} servisi ${response.status} hatası döndürdü: ${errText.substring(0, 100)}`);
+                        throw new Error(`HB_API_ERROR: ${target.name} servisi ${response.status} hatası döndürdü.`);
                     }
 
                     const data = await response.json();
                     let items: any[] = [];
+
                     if (Array.isArray(data)) items = data;
-                    else if (data && typeof data === 'object') items = data.items || data.data || (data.id ? [data] : []);
+                    else if (data && typeof data === 'object')
+                        items = data.items || data.data || (data.id ? [data] : []);
 
                     if (items.length === 0) {
                         hasMore = false;
@@ -123,7 +142,6 @@ export class HepsiburadaService implements IMarketplaceService {
 
                     for (const item of items) {
                         const mapped = this.mapOrder(item);
-                        // Use a composite key or id to deduplicate
                         const key = mapped.id || mapped.orderNumber;
                         if (key) allOrdersMap.set(key, mapped);
                     }
@@ -131,18 +149,15 @@ export class HepsiburadaService implements IMarketplaceService {
                     if (items.length < limit) hasMore = false;
                     else offset += limit;
 
-                    // Safety throttle to avoid hitting 429 too fast between pages
                     if (hasMore) await new Promise(r => setTimeout(r, 200));
 
                 } catch (err: any) {
                     console.error(`[HB_PHASE_FATAL] ${target.name} error: ${err.message}`);
-                    // If it's one of our thrown errors, re-throw it to the caller
-                    if (err.message.includes('HB_')) throw err;
+                    if (err.message?.includes('HB_')) throw err;
                     hasMore = false;
                 }
             }
 
-            // Short delay between different endpoint targets
             await new Promise(r => setTimeout(r, 500));
         }
 
@@ -187,11 +202,10 @@ export class HepsiburadaService implements IMarketplaceService {
                 }))
             };
         } catch (err) {
-            console.error('[HB_MAP_ERROR] Failed to map order:', hbOrder.id, err);
-            // Return minimal fallback if one order fails to map
+            console.error('[HB_MAP_ERROR] Failed to map order:', hbOrder?.id, err);
             return {
-                id: hbOrder.id || 'err',
-                orderNumber: hbOrder.orderNumber || 'err',
+                id: hbOrder?.id || 'err',
+                orderNumber: hbOrder?.orderNumber || 'err',
                 customerName: 'Error Mapping',
                 customerEmail: '',
                 orderDate: new Date(),

@@ -9,7 +9,8 @@ const operationalModels = [
     'salesinvoice', 'purchaseinvoice', 'servicerecord', 'quote', 'paymentplan',
     'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
     'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'company', 'branch',
-    'notification', 'staff', 'user', 'tenant', 'subscription', 'warranty', 'securityevent'
+    'notification', 'staff', 'user', 'tenant', 'subscription', 'warranty', 'securityevent',
+    'customercategory', 'pricelist', 'productprice'
 ];
 
 
