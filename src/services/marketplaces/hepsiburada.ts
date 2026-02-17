@@ -35,7 +35,7 @@ export class HepsiburadaService implements IMarketplaceService {
         const password = (this.config.password || '').trim();
         const merchantId = (this.config.merchantId || '').trim();
 
-        console.log(`[HB_AUTH_TRACE] Merchant: ${merchantId}`);
+        console.log(`[HB_AUTH_TRACE] UserAgentUser: ${this.config.username} | Merchant: ${merchantId}`);
 
         const token = Buffer.from(`${merchantId}:${password}`).toString('base64');
         return `Basic ${token}`;
@@ -62,13 +62,18 @@ export class HepsiburadaService implements IMarketplaceService {
             const merchantId = (this.config.merchantId || '').trim();
             const url = `${this.baseUrl}/orders/merchantid/${merchantId}?offset=0&limit=1`;
 
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': this.getAuthHeader(),
-                    'User-Agent': (this.config.username || 'motoroil_dev').trim(),
-                    'X-Periodya-Key': this.getProxyKeyHeader(),
-                }
-            });
+            const headers: any = {
+                'Authorization': this.getAuthHeader(),
+                'User-Agent': (this.config.username || '').trim(),
+                'Accept': 'application/json'
+            };
+
+            const proxyKey = this.getProxyKeyHeader();
+            if (proxyKey) {
+                headers['X-Periodya-Key'] = proxyKey;
+            }
+
+            const response = await fetch(url, { headers });
 
             return response.ok;
         } catch (error) {
@@ -115,26 +120,35 @@ export class HepsiburadaService implements IMarketplaceService {
 
                     // LOGGING FOR DEBUGGING
                     const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
-                    console.log(`[HB_FETCH] URL: ${url} | Proxy Configured: ${!!effectiveProxy} | X-Periodya-Key: ${this.getProxyKeyHeader() ? 'YES' : 'NO'}`);
+                    const userAgent = (this.config.username || '').trim();
+                    const proxyKey = this.getProxyKeyHeader();
 
-                    const response = await fetch(url, {
-                        headers: {
-                            'Authorization': this.getAuthHeader(),
-                            'User-Agent': (this.config.username || 'motoroil_dev').trim(),
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-Periodya-Key': this.getProxyKeyHeader(),
-                        }
-                    });
+                    console.log(`[HB_FETCH] URL: ${url} | Proxy: ${!!effectiveProxy} | UA: ${userAgent}`);
+
+                    const headers: any = {
+                        'Authorization': this.getAuthHeader(),
+                        'User-Agent': userAgent,
+                        'Accept': 'application/json'
+                    };
+
+                    if (proxyKey) {
+                        headers['X-Periodya-Key'] = proxyKey;
+                    }
+
+                    const response = await fetch(url, { headers });
 
                     console.log(`[HB_RESPONSE] Status: ${response.status} ${response.statusText}`);
 
                     if (!response.ok) {
                         const errText = await response.text();
-                        console.error(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status}). Body: ${errText.substring(0, 200)}`);
+                        const logBody = errText ? `. Body: ${errText.substring(0, 200)}` : '';
+                        console.error(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status})${logBody}`);
 
-                        if (response.status === 401) {
-                            throw new Error(`HB_AUTH_ERROR: Hepsiburada Yetkilendirme Hatası (401). Lütfen API User ve Secret Key bilgilerini kontrol edin.`);
+                        if (response.status === 401 || response.status === 403) {
+                            throw new Error(`HB_AUTH_ERROR: Hepsiburada Yetkilendirme Hatası (${response.status}). Header formatını ve User-Agent kontrol edin.`);
+                        }
+                        if (response.status === 426) {
+                            throw new Error(`HB_UPGRADE_REQ: Hepsiburada 426 (Upgrade Required) döndürdü. İstek header'larını ve protokolü kontrol edin.`);
                         }
                         if (response.status === 429) {
                             throw new Error(`HB_RATE_LIMIT: Hepsiburada API limitine takıldınız. (429)`);
