@@ -15,6 +15,7 @@ const operationalModels = [
 
 // Prisma Decimal to Number Transformer
 const prismaClientSingleton = () => {
+    console.log('[Prisma] Initializing PrismaClientSingleton');
     return new PrismaClient().$extends({
         result: {
             product: {

@@ -41,6 +41,12 @@ export function apiError(error: any, requestId?: string) {
     const code = error.code || 'INTERNAL_ERROR';
     const message = error.message || 'Bir hata oluştu.';
 
+    // Log unexpected internal errors
+    if (status >= 500) {
+        console.error('[API_ERROR] Internal Server Error:', error);
+    }
+
+
     return Response.json({
         ok: false,
         code,
