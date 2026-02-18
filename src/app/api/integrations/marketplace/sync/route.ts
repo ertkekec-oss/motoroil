@@ -27,7 +27,21 @@ export async function POST(request: Request) {
         let companyId = session.impersonateTenantId ? null : (session as any).companyId;
         let companyName = 'Unknown';
 
-        // If impersonating or missing companyId, try to find a valid company
+        // VERIFY existence of companyId in current DB (handles stale sessions after DB reset)
+        if (companyId) {
+            const companyExists = await prisma.company.findUnique({
+                where: { id: companyId },
+                select: { id: true, name: true }
+            });
+            if (!companyExists) {
+                console.warn(`[MARKETPLACE] Session companyId ${companyId} NOT FOUND in DB. Attempting fallback...`);
+                companyId = null;
+            } else {
+                companyName = companyExists.name;
+            }
+        }
+
+        // If impersonating or missing/invalid companyId, try to find a valid company
         if (!companyId) {
             const searchTenantId = session.impersonateTenantId || session.tenantId;
             console.log(`[MARKETPLACE] Resolving company for tenant: ${searchTenantId}`);
@@ -50,8 +64,6 @@ export async function POST(request: Request) {
                     console.log(`[MARKETPLACE] Platform Admin fallback to: ${companyId} (${companyName})`);
                 }
             }
-        } else {
-            companyName = 'SessionCompany';
         }
 
         // CRITICAL GUARD
