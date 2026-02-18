@@ -89,37 +89,66 @@ export class TrendyolService implements IMarketplaceService {
         httpStatus?: number;
         raw?: any;
     }> {
-        // OFFICIAL METHOD: Standart PDF (getLabels) - Universally available for all sellers.
-        // Endpoint: GET /integration/sellers/{sellerId}/labels?shipmentPackageIds={shipmentPackageId}
-        const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
-
-        console.log(`[TRENDYOL-LABEL] Fetching standard PDF: ${url}`);
-
         try {
-            const response = await fetch(url, {
+            // STEP 0: Status Check (Fix for 556)
+            // Trendyol returns 556 if status is 'Created'. It must be 'Picking' or further.
+            console.log(`[TRENDYOL-LABEL] Checking status for package ${shipmentPackageId}...`);
+            const pkg = await this.getShipmentPackageDetails(shipmentPackageId);
+            const pkgStatus = pkg.shipmentPackageStatus;
+            console.log(`[TRENDYOL-LABEL] Package Status: ${pkgStatus}`);
+
+            if (pkgStatus === 'Created') {
+                return {
+                    status: 'FAILED',
+                    error: 'Paket henüz hazırlık aşamasında (Created). Lütfen Trendyol panelinden "Toplanacak" (Picking) statüsüne geçirin, ardından tekrar deneyin.',
+                    raw: pkg
+                };
+            }
+
+            // STEP 1: Attempt Standard v2 PDF (getLabels)
+            const v2Url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
+            console.log(`[TRENDYOL-LABEL] ATTEMPT 1 (v2): ${v2Url}`);
+
+            let response = await fetch(v2Url, {
                 method: 'GET',
                 headers: this.getHeaders({
                     'Accept': 'application/pdf',
-                    'User-Agent': 'Periodya-Integration/1.0' // Specific header for server recognition
+                    'User-Agent': 'Periodya-Integration/1.0'
                 })
             });
 
+            // STEP 2: Hybrid Fallback (v1/Alt Path)
+            // If v2 fails with 556/400, try the direct path which sometimes works better for single packages
             if (!response.ok) {
                 const errText = await response.text();
-                // 556 or 400 usually mean not ready or permission, we fail fast to avoid timeout
-                console.error(`[TRENDYOL-LABEL] API Error ${response.status}: ${errText}`);
+                console.warn(`[TRENDYOL-LABEL] v2 Failed (${response.status}): ${errText.substring(0, 100)}. Trying Fallback...`);
+
+                const altUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels/${shipmentPackageId}`;
+                console.log(`[TRENDYOL-LABEL] ATTEMPT 2 (Alt): ${altUrl}`);
+                response = await fetch(altUrl, {
+                    method: 'GET',
+                    headers: this.getHeaders({
+                        'Accept': 'application/pdf',
+                        'User-Agent': 'Periodya-Integration/1.0'
+                    })
+                });
+            }
+
+            if (!response.ok) {
+                const finalErr = await response.text();
+                console.error(`[TRENDYOL-LABEL] All label fetch attempts failed. Status: ${response.status}`);
                 return {
                     status: 'FAILED',
                     error: `Trendyol PDF Hatası: ${response.status}`,
                     httpStatus: response.status,
-                    raw: errText
+                    raw: finalErr
                 };
             }
 
             const ab = await response.arrayBuffer();
             const buf = Buffer.from(ab);
 
-            // Verify it's actually a PDF binary (%PDF- header)
+            // Verify PDF Magic Number (%PDF-)
             if (buf.subarray(0, 4).toString() === '%PDF') {
                 console.log(`[TRENDYOL-LABEL] SUCCESS. Received PDF (${buf.length} bytes).`);
                 return {
@@ -129,14 +158,13 @@ export class TrendyolService implements IMarketplaceService {
                 };
             }
 
-            // Fallback for unexpected response bodies
-            const text = buf.toString('utf-8').trim();
-            console.warn(`[TRENDYOL-LABEL] Non-PDF response received: ${text.substring(0, 50)}`);
-            return { status: 'PENDING', raw: text };
+            const diagnostic = buf.toString('utf-8').trim();
+            console.warn(`[TRENDYOL-LABEL] Unexpected content (non-PDF): ${diagnostic.substring(0, 50)}`);
+            return { status: 'PENDING', raw: diagnostic };
 
         } catch (error: any) {
-            console.error(`[TRENDYOL-LABEL] Connection Error:`, error);
-            return { status: 'FAILED', error: error.message || 'Bağlantı hatası' };
+            console.error(`[TRENDYOL-LABEL] Fatal Exception:`, error);
+            return { status: 'FAILED', error: `Sistem Hatası: ${error.message}` };
         }
     }
 
