@@ -103,7 +103,8 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                     create: { companyId, marketplace, shipmentPackageId, storageKey, sha256, size: pdfBuffer.length }
                 });
 
-                result = { shipmentPackageId, storageKey, sha256, format: 'A4', labelReady: true };
+                console.info(`${ctx} SUCCESS: Label generated. Storage: ${storageKey}, Size: ${pdfBuffer.length} bytes, SHA256: ${sha256.substring(0, 8)}...`);
+                result = { shipmentPackageId, storageKey, sha256, format: 'A4', labelReady: true, size: pdfBuffer.length };
             } else if (actionKey === 'REFRESH_STATUS') {
                 const order = await prisma.order.findFirst({ where: { id: orderId, companyId } });
                 if (!order || !order.orderNumber) throw new Error('Sipariş verisi eksik');

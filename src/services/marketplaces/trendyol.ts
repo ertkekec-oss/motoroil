@@ -159,6 +159,7 @@ export class TrendyolService implements IMarketplaceService {
                         if (res.ok) {
                             const body = await res.text();
                             const trimmedBody = body.trim();
+                            console.info(`[TRENDYOL-DIAG] Strategy A (Common) result: status=${res.status}, type=${res.headers.get('content-type')}, len=${trimmedBody.length}`);
 
                             // Multi-Signal 1: Plain text "OK"
                             if (trimmedBody === 'OK') {
@@ -193,10 +194,12 @@ export class TrendyolService implements IMarketplaceService {
                 headers: this.getHeaders({ 'Accept': 'application/pdf, application/json' })
             });
 
+            let buf: Buffer | null = null;
             if (response.ok) {
                 const ab = await response.arrayBuffer();
-                const buf = Buffer.from(ab);
+                buf = Buffer.from(ab);
                 const bodyText = buf.toString('utf-8').trim();
+                console.info(`[TRENDYOL-DIAG] Strategy B (v2) result: status=${response.status}, type=${response.headers.get('content-type')}, len=${buf.length}`);
 
                 if (bodyText === 'OK') {
                     console.info(`[TRENDYOL-LABEL] Strategy B (v2) returned PENDING (OK body). Trying next strategy...`);
@@ -227,6 +230,7 @@ export class TrendyolService implements IMarketplaceService {
                 if (altRes.ok) {
                     const altAb = await altRes.arrayBuffer();
                     const altBuf = Buffer.from(altAb);
+                    console.info(`[TRENDYOL-DIAG] Strategy C (v1) result: status=${altRes.status}, type=${altRes.headers.get('content-type')}, len=${altBuf.length}`);
                     if (altBuf.subarray(0, 4).toString() === '%PDF') {
                         return { status: 'SUCCESS', pdfBase64: altBuf.toString('base64'), httpStatus: 200 };
                     }
@@ -243,7 +247,7 @@ export class TrendyolService implements IMarketplaceService {
             // Check for unexpected HTML (Gateway errors)
             const ct = (response.headers.get("content-type") || "").toLowerCase();
             if (ct.includes("text/html")) {
-                console.warn(`[TRENDYOL-LABEL] Received unexpected HTML (len ${buf.length}). Treating as transient PENDING.`);
+                console.warn(`[TRENDYOL-LABEL] Received unexpected HTML (len ${buf?.length ?? 0}). Treating as transient PENDING.`);
                 return { status: 'PENDING', error: 'Bağlantı ara katmanı meşgul.', httpStatus: 202 };
             }
 
