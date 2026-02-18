@@ -70,43 +70,6 @@ export async function GET(
             return respondWithSuccess(existingAudit.responsePayload.storageKey);
         }
 
-        // 1.5) Redis Lock Check to prevent duplicate processing
-        const lockKey = `lock:action:${idempotencyKey}`;
-        // Try to acquire a lock. NX = Not Exists, EX = Expire in 60 seconds.
-        const acquired = await redisConnection.set(lockKey, 'BUSY', 'NX', 'EX', 60);
-
-        console.log(`${ctx} Redis lock acquired: ${!!acquired}`);
-
-        if (!acquired) {
-            // If lock exists, another process is already handling this.
-            // Return PENDING, client should retry.
-            console.log(`${ctx} Busy (Lock exists). Returning PENDING.`);
-            const retryAfterSec = 3;
-            const msg = existingAudit?.errorMessage || "İşlem devam ediyor...";
-
-            if (isDocumentRequest(request)) {
-                return new Response(pendingHtml(retryAfterSec, msg), {
-                    status: 202,
-                    headers: {
-                        "Content-Type": "text/html; charset=utf-8",
-                        "Retry-After": String(retryAfterSec),
-                    },
-                });
-            }
-
-            return new Response(JSON.stringify({
-                status: "PENDING",
-                message: msg,
-                auditId: existingAudit?.id
-            }), {
-                status: 202,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Retry-After": String(retryAfterSec)
-                }
-            });
-        }
-
         // 2) Execute Action ONCE (Remove server-side polling for Vercel stability)
         const provider = ActionProviderRegistry.getProvider(marketplace);
         const result = await provider.executeAction({
