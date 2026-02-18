@@ -82,7 +82,7 @@ export class TrendyolService implements IMarketplaceService {
         }
     }
 
-    async getCommonLabel(shipmentPackageId: string, _cargoTrackingNumber?: string): Promise<{
+    async getCommonLabel(shipmentPackageId: string, cargoTrackingNumber?: string): Promise<{
         status: 'SUCCESS' | 'PENDING' | 'FAILED';
         pdfBase64?: string;
         error?: string;
@@ -92,7 +92,35 @@ export class TrendyolService implements IMarketplaceService {
         try {
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
 
-            // STEP 0: Status Check (Fix for 556)
+            // STEP 0: Optional Trigger (Fix for Common Label Carriers like TEX/Aras)
+            // If we have a tracking number, we MUST trigger the label generation first (createCommonLabel)
+            if (cargoTrackingNumber) {
+                try {
+                    const triggerUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/${cargoTrackingNumber}`;
+                    const fetchTriggerUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(triggerUrl)}` : triggerUrl;
+
+                    console.log(`[TRENDYOL-LABEL] Triggering Common Label (POST): ${triggerUrl}`);
+                    const triggerRes = await fetch(fetchTriggerUrl, {
+                        method: 'POST',
+                        headers: this.getHeaders({
+                            'Content-Type': 'application/json',
+                            'Accept-Language': 'tr-TR'
+                        }),
+                        body: JSON.stringify({ format: 'PDF' }) // Trigger with PDF format preference
+                    });
+
+                    if (triggerRes.ok) {
+                        console.log(`[TRENDYOL-LABEL] Trigger Accepted (OK).`);
+                    } else {
+                        const err = await triggerRes.text();
+                        console.warn(`[TRENDYOL-LABEL] Trigger skipped or failed (${triggerRes.status}): ${err.substring(0, 50)}`);
+                    }
+                } catch (e: any) {
+                    console.warn(`[TRENDYOL-LABEL] Trigger fatal error (ignoring): ${e.message}`);
+                }
+            }
+
+            // STEP 1: Status Check (Fix for 556)
             let pkgStatus = 'Unknown';
             try {
                 console.log(`[TRENDYOL-LABEL] Checking status for package ${shipmentPackageId}...`);
@@ -111,7 +139,7 @@ export class TrendyolService implements IMarketplaceService {
                 console.warn(`[TRENDYOL-LABEL] Status check error (continuing anyway): ${e.message}`);
             }
 
-            // STEP 1: Attempt Standard v2 PDF (getLabels)
+            // STEP 2: Attempt Standard v2 PDF (getLabels)
             const v2Url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
             const fetchV2Url = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(v2Url)}` : v2Url;
 
@@ -125,7 +153,7 @@ export class TrendyolService implements IMarketplaceService {
                 })
             });
 
-            // STEP 2: Hybrid Fallback (v1/Alt Path)
+            // STEP 3: Hybrid Fallback (v1/Alt Path)
             if (!response.ok) {
                 const errText = await response.text();
                 const status = response.status;
