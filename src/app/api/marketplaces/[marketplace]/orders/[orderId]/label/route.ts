@@ -3,7 +3,7 @@ import { authorize } from "@/lib/auth";
 import { ActionProviderRegistry } from "@/services/marketplaces/actions/registry";
 
 export const runtime = "nodejs";
-export const maxDuration = 60; // Allow up to 60 seconds for slow Trendyol responses
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 export async function GET(
@@ -23,9 +23,6 @@ export async function GET(
         if (!shipmentPackageId) {
             return new Response(JSON.stringify({ error: "shipmentPackageId gerekli" }), { status: 400 });
         }
-        if (format !== "A4") {
-            return new Response(JSON.stringify({ error: "Şimdilik sadece A4 destekleniyor" }), { status: 400 });
-        }
 
         // ✅ companyId resolve
         const company = await prisma.company.findFirst({
@@ -34,50 +31,42 @@ export async function GET(
         });
         if (!company) return new Response(JSON.stringify({ error: "Firma bulunamadı" }), { status: 403 });
 
-        // 1) Check if label already exists in DB
-        const existingLabel = await (prisma as any).marketplaceLabel.findUnique({
-            where: {
-                companyId_marketplace_shipmentPackageId: {
-                    companyId: company.id,
-                    marketplace,
-                    shipmentPackageId
-                }
-            }
-        });
-
-        if (existingLabel) {
-            console.log(`[LABEL] DB Hit for ${shipmentPackageId}. Generating signed URL.`);
-            const { getLabelSignedUrl } = await import("@/lib/s3");
-            const signedUrl = await getLabelSignedUrl(existingLabel.storageKey);
-
-            return Response.redirect(signedUrl, 302);
-        }
-
-        // 2) If not exists, check if there's an in-progress action or start one
         const idempotencyKey = `LABEL_${format}:${company.id}:${marketplace}:${shipmentPackageId}`;
 
-        // Check active audit
-        const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({
-            where: { idempotencyKey }
-        });
+        // Helper: Respond based on Accept header
+        const respondWithSuccess = async (storageKey: string) => {
+            const { getLabelSignedUrl } = await import("@/lib/s3");
+            const signedUrl = await getLabelSignedUrl(storageKey);
 
-        if (existingAudit) {
-            if (existingAudit.status === 'SUCCESS' && existingAudit.responsePayload?.storageKey) {
-                console.log(`[LABEL] Audit SUCCESS Hit. Redirecting.`);
-                const { getLabelSignedUrl } = await import("@/lib/s3");
-                const signedUrl = await getLabelSignedUrl(existingAudit.responsePayload.storageKey);
-                return Response.redirect(signedUrl, 302);
+            if (isDocumentRequest(request)) {
+                // Browser context: Redirect to S3
+                return Response.redirect(signedUrl, 303); // See Other is cleaner for GET results
             }
-            // If PENDING, we purposefully FALL THROUGH to executeAction
-            // This forces a re-check against Trendyol API instead of just returning stale DB status.
+
+            // API context: Return JSON URL
+            return new Response(JSON.stringify({
+                status: "READY",
+                url: signedUrl
+            }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" }
+            });
+        };
+
+        // 1) Fast Path: Check existing state
+        const existingLabel = await (prisma as any).marketplaceLabel.findUnique({
+            where: { companyId_marketplace_shipmentPackageId: { companyId: company.id, marketplace, shipmentPackageId } }
+        });
+        if (existingLabel) return respondWithSuccess(existingLabel.storageKey);
+
+        const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
+        if (existingAudit?.status === 'SUCCESS' && existingAudit.responsePayload?.storageKey) {
+            return respondWithSuccess(existingAudit.responsePayload.storageKey);
         }
 
-        // Action Key resolve
-        const actionKey = `PRINT_LABEL_${format}`;
-
-        // --- STEP 3: Time-Budgeted Synchronous Polling Loop ---
+        // 2) Synchronous Polling Loop (Time-Budgeted)
         const provider = ActionProviderRegistry.getProvider(marketplace);
-        const deadline = Date.now() + 55_000;
+        const deadline = Date.now() + 50_000; // 50s budget
         let lastResult: any = null;
         let attempt = 0;
 
@@ -87,59 +76,45 @@ export async function GET(
                 companyId: company.id,
                 marketplace: marketplace as any,
                 orderId,
-                actionKey: actionKey as any,
+                actionKey: `PRINT_LABEL_${format}` as any,
                 idempotencyKey,
                 payload: { labelShipmentPackageId: shipmentPackageId },
             });
 
             lastResult = result;
 
-            // ✅ SUCCESS: PDF is ready and stored
-            if (result.status === "SUCCESS") {
-                const storageKey = result.result?.storageKey;
-                if (storageKey) {
-                    console.log(`[LABEL] Success on attempt ${attempt}. Redirecting.`);
-                    const { getLabelSignedUrl } = await import("@/lib/s3");
-                    const signedUrl = await getLabelSignedUrl(storageKey);
-                    return Response.redirect(signedUrl, 302);
-                }
+            if (result.status === "SUCCESS" && result.result?.storageKey) {
+                return respondWithSuccess(result.result.storageKey);
             }
 
-            // ❌ FAILED: Fatal error (401, 404, etc.)
             if (result.status === "FAILED") {
-                console.error(`[LABEL] Fatal failure on attempt ${attempt}:`, result.errorMessage);
                 return new Response(JSON.stringify({
                     error: result.errorMessage || "Etiket alınamadı",
                     status: "FAILED",
                     auditId: result.auditId
                 }), {
                     status: 502,
-                    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
+                    headers: { "Content-Type": "application/json" }
                 });
             }
 
-            // ⏳ PENDING: Wait and retry if time allows
             if (result.status === "PENDING") {
-                // Adaptive sleep: If Trendyol is busy (556), wait longer (6s instead of 3s)
-                const isBusy = result.httpStatus === 556 || result.httpStatus === 429;
-                const sleepMs = isBusy ? 6000 : 3000;
-
-                console.log(`[LABEL] Pending (HTTP ${result.httpStatus || 202}). Sleeping ${sleepMs / 1000}s...`);
+                const sleepMs = (result.httpStatus === 556 || result.httpStatus === 429) ? 6000 : 3000;
+                console.log(`[LABEL] Polling ${shipmentPackageId} (attempt ${attempt})...`);
                 await new Promise(r => setTimeout(r, sleepMs));
                 continue;
             }
         }
 
-        // --- STEP 4: Fallback to async wait-page if timeout reached ---
+        // 3) Final Fallback (Timeout reached)
         const retryAfterSec = 3;
         const lastMsg = lastResult?.errorMessage || "Etiket hazırlanıyor...";
 
         if (isDocumentRequest(request)) {
             return new Response(pendingHtml(retryAfterSec, lastMsg), {
-                status: 200,
+                status: 202,
                 headers: {
                     "Content-Type": "text/html; charset=utf-8",
-                    "Cache-Control": "no-store",
                     "Retry-After": String(retryAfterSec),
                 },
             });
@@ -153,22 +128,15 @@ export async function GET(
             status: 202,
             headers: {
                 "Content-Type": "application/json",
-                "Cache-Control": "no-store",
                 "Retry-After": String(retryAfterSec)
             }
         });
 
     } catch (error: any) {
         console.error(`[LABEL_CRITICAL_ERROR]`, error);
-        return new Response(JSON.stringify({
-            error: error?.message ?? "Unknown error",
-            stack: error?.stack
-        }), {
+        return new Response(JSON.stringify({ error: error?.message ?? "Sistem Hatası" }), {
             status: 500,
-            headers: {
-                "Content-Type": "application/json",
-                "Cache-Control": "no-store"
-            },
+            headers: { "Content-Type": "application/json" }
         });
     }
 }

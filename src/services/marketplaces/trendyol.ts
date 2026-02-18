@@ -112,16 +112,19 @@ export class TrendyolService implements IMarketplaceService {
                     };
                 }
             } catch (e: any) {
-                console.warn(`[TRENDYOL-LABEL] Status check error (proceeding anyway): ${e.message}`);
+                if (e.message.includes("Proxy returned OK")) {
+                    console.info(`[TRENDYOL-LABEL] Proxy indicative of async processing (OK body). Treating as PENDING.`);
+                    return { status: 'PENDING', error: 'Bağlantı hazırlanıyor...', httpStatus: 202 };
+                }
+                console.warn(`[TRENDYOL-LABEL] Status check warning (transient): ${e.message}`);
             }
 
             // --- STRATEGY A: Trigger & Fetch via /common-label (For TEX/Aras) ---
-            // This is the modern 'Ortak Etiket' flow.
             if (cargoTrackingNumber || carrier.includes('express') || carrier.includes('tex')) {
-                console.log(`[TRENDYOL-LABEL] Starting Common-Label flow...`);
+                console.info(`[TRENDYOL-LABEL] Starting Common-Label flow for ${carrier}...`);
 
                 // Step A1: Multiple Trigger Attempts
-                // 1. Trigger by Tracking Number (POST /common-label/{tracking})
+                // 1. Trigger by Tracking Number
                 if (cargoTrackingNumber) {
                     try {
                         const triggerUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label/${cargoTrackingNumber}`;
@@ -134,7 +137,7 @@ export class TrendyolService implements IMarketplaceService {
                     } catch (e) { }
                 }
 
-                // 2. Trigger by Package IDs (POST /common-label)
+                // 2. Trigger by Package IDs
                 try {
                     const triggerArrayUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label`;
                     const fetchTriggerArrayUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(triggerArrayUrl)}` : triggerArrayUrl;
@@ -154,15 +157,20 @@ export class TrendyolService implements IMarketplaceService {
 
                         if (res.ok) {
                             const body = await res.text();
-                            if (body.trim() !== 'OK') {
-                                const json = JSON.parse(body);
+                            const trimmedBody = body.trim();
+
+                            // Multi-Signal 1: Plain text "OK"
+                            if (trimmedBody === 'OK') {
+                                console.info(`[TRENDYOL-LABEL] Common-Label GET returned OK (PENDING).`);
+                            } else {
+                                const json = JSON.parse(trimmedBody);
                                 const labelData = json.data?.[0];
                                 if (labelData?.label) {
                                     if (labelData.format === 'PDF') {
                                         return { status: 'SUCCESS', pdfBase64: labelData.label, httpStatus: 200 };
                                     }
                                     if (labelData.format === 'ZPL') {
-                                        console.log(`[TRENDYOL-LABEL] Converting ZPL from Common-Label...`);
+                                        console.info(`[TRENDYOL-LABEL] Converting ZPL from Common-Label...`);
                                         const pdfBuf = await this.convertZplToPdf(labelData.label);
                                         if (pdfBuf) return { status: 'SUCCESS', pdfBase64: pdfBuf.toString('base64'), httpStatus: 200 };
                                     }
@@ -177,7 +185,7 @@ export class TrendyolService implements IMarketplaceService {
             const standardUrl = `${this.baseUrl}/integration/sellers/${supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
             const fetchStandardUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(standardUrl)}` : standardUrl;
 
-            console.log(`[TRENDYOL-LABEL] Fetching Standard v2 Labels...`);
+            console.info(`[TRENDYOL-LABEL] Attempting Standard v2 Labels...`);
             const response = await fetch(fetchStandardUrl, {
                 headers: this.getHeaders({ 'Accept': 'application/pdf, application/json' })
             });
@@ -188,16 +196,14 @@ export class TrendyolService implements IMarketplaceService {
                 const bodyText = buf.toString('utf-8').trim();
 
                 if (bodyText === 'OK') {
-                    console.log(`[TRENDYOL-LABEL] Standard API returned PENDING (OK).`);
+                    console.info(`[TRENDYOL-LABEL] Standard API returned PENDING (OK body).`);
                     return { status: 'PENDING', httpStatus: 202, raw: 'OK' };
                 }
 
-                // Check for PDF binary (%PDF)
                 if (buf.subarray(0, 4).toString() === '%PDF') {
                     return { status: 'SUCCESS', pdfBase64: buf.toString('base64'), httpStatus: 200 };
                 }
 
-                // Check for JSON response { label: "...", format: "..." }
                 try {
                     const json = JSON.parse(bodyText);
                     const label = json.data?.[0]?.label || json.label;
@@ -213,9 +219,9 @@ export class TrendyolService implements IMarketplaceService {
             }
 
             // --- STRATEGY C: Standard v1/Alt Path ---
-            const altUrl = `${this.baseUrl}/integration/sellers/${supplierId}/labels/${shipmentPackageId}`;
-            const fetchAltUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(altUrl)}` : altUrl;
             try {
+                const altUrl = `${this.baseUrl}/integration/sellers/${supplierId}/labels/${shipmentPackageId}`;
+                const fetchAltUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(altUrl)}` : altUrl;
                 const altRes = await fetch(fetchAltUrl, { headers: this.getHeaders({ 'Accept': 'application/pdf' }) });
                 if (altRes.ok) {
                     const altAb = await altRes.arrayBuffer();
@@ -226,13 +232,21 @@ export class TrendyolService implements IMarketplaceService {
                 }
             } catch { }
 
-            // Final check on status
+            // Final fallback logic
             const status = response.status;
-            if (status === 556 || status === 503 || status === 504 || status === 429) {
-                return { status: 'PENDING', error: 'Trendyol servisi meşgul. Lütfen bekleyin...', httpStatus: status };
+            if (status === 202 || status === 429 || status === 556 || (status >= 500 && status <= 504)) {
+                console.info(`[TRENDYOL-LABEL] HTTP ${status} signal for async/busy. Returning PENDING.`);
+                return { status: 'PENDING', error: 'Trendyol servisi meşgul veya hazırlanıyor.', httpStatus: status };
             }
 
-            return { status: 'PENDING', error: 'Etiket hazırlanıyor, lütfen bekleyin...' };
+            // Check for unexpected HTML (Gateway errors)
+            const ct = (response.headers.get("content-type") || "").toLowerCase();
+            if (ct.includes("text/html")) {
+                console.warn(`[TRENDYOL-LABEL] Received unexpected HTML (len ${buf.length}). Treating as transient PENDING.`);
+                return { status: 'PENDING', error: 'Bağlantı ara katmanı meşgul.', httpStatus: 202 };
+            }
+
+            return { status: 'PENDING', error: 'Etiket hazırlanıyor (Son aşama)...', httpStatus: 200 };
 
         } catch (error: any) {
             console.error(`[TRENDYOL-LABEL] Fatal Error:`, error);
