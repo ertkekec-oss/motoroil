@@ -339,14 +339,17 @@ model Stock {
 
 model MarketplaceProductMap {
   id              String   @id @default(cuid())
+  companyId       String
   marketplace     String
   marketplaceCode String
   productId       String
   createdAt       DateTime @default(now())
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@unique([marketplace, marketplaceCode])
+  @@unique([companyId, marketplace, marketplaceCode])
   @@index([productId])
+  @@index([companyId])
 }
 
 model Supplier {
@@ -934,9 +937,14 @@ model InventoryAudit {
 
 model AppSettings {
   id        String   @id @default(cuid())
-  key       String   @unique
+  companyId String
+  key       String
   value     Json
   updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, key])
+  @@index([companyId])
 }
 
 model Warranty {
@@ -1178,6 +1186,7 @@ model MarketplaceConfig {
 
 model ExternalRequest {
   id              String   @id @default(cuid())
+  companyId       String?
   provider        String
   idempotencyKey  String
   entityType      String
@@ -1186,10 +1195,12 @@ model ExternalRequest {
   responsePayload Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  company         Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([provider, idempotencyKey])
   @@index([entityId])
   @@index([status])
+  @@index([companyId])
 }
 
 model GrowthEvent {

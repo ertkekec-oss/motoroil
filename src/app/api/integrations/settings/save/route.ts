@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { authorize } from '@/lib/auth';
+import { authorize, resolveCompanyId } from '@/lib/auth';
 
 export async function GET() {
     const auth = await authorize();
@@ -8,24 +8,17 @@ export async function GET() {
     const { user } = auth;
 
     try {
-        // Get company for tenant isolation (Support Impersonation)
-        const targetTenantId = (user as any).impersonateTenantId || (user as any).tenantId;
-        console.log(`[Settings] Fetching for tenant: ${targetTenantId}`);
-
-        const company = await prisma.company.findFirst({
-            where: { tenantId: targetTenantId }
-        });
-
-        if (!company) {
-            return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
-        }
+        // Resolve company context
+        const companyId = await resolveCompanyId(user);
+        if (!companyId) return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
 
         const marketplaces = await prisma.marketplaceConfig.findMany({
-            where: { companyId: company.id }
+            where: { companyId }
         });
 
         const settings = await prisma.appSettings.findMany({
             where: {
+                companyId,
                 key: { in: ['eFaturaSettings', 'posSettings'] }
             }
         });
@@ -60,37 +53,21 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { marketplaceSettings, eFaturaSettings, posSettings } = body;
 
-        // Get the company for this tenant (Support Impersonation)
-        const targetTenantId = (user as any).impersonateTenantId || (user as any).tenantId;
-
-        const company = await prisma.company.findFirst({
-            where: { tenantId: targetTenantId }
-        });
-
-        if (!company) {
-            return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 400 });
-        }
-
-        const companyId = company.id;
+        // Resolve company context
+        const companyId = await resolveCompanyId(user);
+        if (!companyId) return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 400 });
 
         // 1. Marketplace Settings (Dedicated Table)
         if (marketplaceSettings) {
             const promises = Object.keys(marketplaceSettings).map(async (key) => {
                 const config = marketplaceSettings[key];
-
-                // 1. Validate & Normalize Type
                 const normalizedType = key.toLowerCase().trim();
                 const allowedTypes = ['trendyol', 'hepsiburada', 'n11', 'amazon', 'custom'];
 
-                if (!allowedTypes.includes(normalizedType)) {
-                    console.warn(`[Marketplace Save] Skipped invalid provider type: ${key}`);
-                    return null;
-                }
+                if (!allowedTypes.includes(normalizedType)) return null;
 
-                // 2. Strict Boolean & Validation
                 const isActive = Boolean(config?.enabled);
 
-                // 3. Upsert with Normalized Type
                 return prisma.marketplaceConfig.upsert({
                     where: {
                         companyId_type: {
@@ -114,30 +91,21 @@ export async function POST(request: Request) {
             await Promise.all(promises);
         }
 
-        // 2. E-Fatura Settings (General Table)
+        // 2. E-Fatura Settings (Scoped to Company)
         if (eFaturaSettings) {
-            // Ideally appSettings should also be company scoped, but the current schema for appSettings might be global or different.
-            // Looking at the findMany in GET, it seems global or tenant-agnostic in the current code, which is risky.
-            // However, to fix the specific error asked, I will focus on marketplaceConfig.
-            // If appSettings needs companyId, it should be added, but based on the existing code
-            // creating 'key' unique constraint, it might be shared or simply key-based.
-            // Let's assume for now appSettings logic remains as is or requires a schema check.
-            // Wait, if appSettings is key-based only, it's global.
-            // Retaining existing logic for appSettings for now to minimize side effects, 
-            // but strongly advising to scope it to company if schema supports it.
             await prisma.appSettings.upsert({
-                where: { key: 'eFaturaSettings' },
+                where: { companyId_key: { companyId, key: 'eFaturaSettings' } },
                 update: { value: eFaturaSettings as any },
-                create: { key: 'eFaturaSettings', value: eFaturaSettings as any }
+                create: { companyId, key: 'eFaturaSettings', value: eFaturaSettings as any }
             });
         }
 
-        // 3. POS Settings (General Table)
+        // 3. POS Settings (Scoped to Company)
         if (posSettings) {
             await prisma.appSettings.upsert({
-                where: { key: 'posSettings' },
+                where: { companyId_key: { companyId, key: 'posSettings' } },
                 update: { value: posSettings as any },
-                create: { key: 'posSettings', value: posSettings as any }
+                create: { companyId, key: 'posSettings', value: posSettings as any }
             });
         }
 

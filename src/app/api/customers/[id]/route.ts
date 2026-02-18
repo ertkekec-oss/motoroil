@@ -10,18 +10,14 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const session: any = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
         const { id } = await params;
-        const customerId = id;
+        const companyId = session.companyId;
 
-        if (!customerId) {
-            return NextResponse.json({ success: false, error: 'Invalid ID' }, { status: 400 });
-        }
-
-        const customer = await prisma.customer.findUnique({
-            where: { id: customerId, deletedAt: null },
+        const customer = await prisma.customer.findFirst({
+            where: { id, companyId, deletedAt: null },
             include: {
                 transactions: {
                     where: { deletedAt: null },
@@ -35,27 +31,22 @@ export async function GET(
         });
 
         if (!customer) {
-            return NextResponse.json({ success: false, error: 'Customer not found' }, { status: 404 });
+            return NextResponse.json({ success: false, error: 'Müşteri bulunamadı' }, { status: 404 });
         }
 
-        // Log the view action
         await logActivity({
             tenantId: session.tenantId as string,
             userId: session.id as string,
             userName: session.username as string,
             action: 'VIEW_CUSTOMER',
             entity: 'Customer',
-            entityId: customerId,
+            entityId: id,
             details: `${customer.name} detayı görüntülendi.`,
-            branch: session.branch as string,
-            userAgent: request.headers.get('user-agent') || undefined,
-            ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
+            branch: session.branch as string
         });
 
         return NextResponse.json({ success: true, customer });
-
     } catch (error: any) {
-        console.error('Customer Detail API Error:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
@@ -72,10 +63,14 @@ export async function PUT(
         if (!writeCheck.authorized) return writeCheck.response;
 
         const { id } = await params;
+        const companyId = session.companyId;
         const body = await request.json();
 
-        // Fetch old data for audit log
-        const oldCustomer = await prisma.customer.findUnique({ where: { id } });
+        // Verify ownership
+        const oldCustomer = await prisma.customer.findFirst({
+            where: { id, companyId }
+        });
+        if (!oldCustomer) return NextResponse.json({ success: false, error: 'Müşteri bulunamadı' }, { status: 404 });
 
         const updatedCustomer = await prisma.customer.update({
             where: { id },
@@ -97,7 +92,6 @@ export async function PUT(
             }
         });
 
-        // Log the update action
         await logActivity({
             tenantId: session.tenantId as string,
             userId: session.id as string,
@@ -108,14 +102,11 @@ export async function PUT(
             before: oldCustomer,
             after: updatedCustomer,
             details: `${updatedCustomer.name} bilgileri güncellendi.`,
-            branch: session.branch as string,
-            userAgent: request.headers.get('user-agent') || undefined,
-            ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
+            branch: session.branch as string
         });
 
         return NextResponse.json({ success: true, customer: updatedCustomer });
     } catch (error: any) {
-        console.error('Customer Update API Error:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
@@ -131,23 +122,24 @@ export async function DELETE(
         const writeCheck = verifyWriteAccess(session);
         if (!writeCheck.authorized) return writeCheck.response;
 
-        // CRITICAL: Check server-side permission
         if (!hasPermission(session, 'delete_records')) {
             return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
         }
 
         const { id } = await params;
+        const companyId = session.companyId;
 
-        // Fetch old data for audit log
-        const oldCustomer = await prisma.customer.findUnique({ where: { id } });
+        // Verify ownership
+        const oldCustomer = await prisma.customer.findFirst({
+            where: { id, companyId }
+        });
+        if (!oldCustomer) return NextResponse.json({ success: false, error: 'Müşteri bulunamadı' }, { status: 404 });
 
-        // SOFT DELETE
         await prisma.customer.update({
             where: { id },
             data: { deletedAt: new Date() }
         });
 
-        // Log the delete action
         await logActivity({
             tenantId: session.tenantId as string,
             userId: session.id as string,
@@ -157,14 +149,11 @@ export async function DELETE(
             entityId: id,
             before: oldCustomer,
             details: `${oldCustomer?.name} silindi (Soft Delete).`,
-            branch: session.branch as string,
-            userAgent: request.headers.get('user-agent') || undefined,
-            ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
+            branch: session.branch as string
         });
 
         return NextResponse.json({ success: true });
     } catch (error: any) {
-        console.error('Customer Delete API Error:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

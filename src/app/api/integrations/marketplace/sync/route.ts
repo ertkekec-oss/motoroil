@@ -181,7 +181,13 @@ export async function POST(request: Request) {
                     for (const item of (order.items || [])) {
                         try {
                             const productMap = await prisma.marketplaceProductMap.findUnique({
-                                where: { marketplace_marketplaceCode: { marketplace: type, marketplaceCode: item.sku } }
+                                where: {
+                                    companyId_marketplace_marketplaceCode: {
+                                        companyId,
+                                        marketplace: type,
+                                        marketplaceCode: item.sku
+                                    }
+                                }
                             });
 
                             await EventBus.emit({

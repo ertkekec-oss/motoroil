@@ -1,18 +1,20 @@
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { authorize, verifyWriteAccess } from '@/lib/auth';
 
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+
         const { id } = await params;
-        const invoice = await prisma.salesInvoice.findUnique({
-            where: { id },
+        const invoice = await prisma.salesInvoice.findFirst({
+            where: { id, companyId: auth.user.companyId },
             include: {
                 customer: true,
-                branch: true
             }
         });
 
@@ -31,9 +33,21 @@ export async function PUT(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+
+        const writeCheck = verifyWriteAccess(auth.user);
+        if (!writeCheck.authorized) return writeCheck.response;
+
         const { id } = await params;
         const body = await request.json();
         const { invoiceNo, invoiceDate, items, totalAmount, status } = body;
+
+        // Ensure ownership
+        const existing = await prisma.salesInvoice.findFirst({
+            where: { id, companyId: auth.user.companyId }
+        });
+        if (!existing) return NextResponse.json({ success: false, error: 'Fatura bulunamadı' }, { status: 404 });
 
         const updatedInvoice = await prisma.salesInvoice.update({
             where: { id },
@@ -57,15 +71,21 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+
+        const writeCheck = verifyWriteAccess(auth.user);
+        if (!writeCheck.authorized) return writeCheck.response;
+
         const { id } = await params;
 
-        const invoice = await prisma.salesInvoice.findUnique({ where: { id } });
+        // Ensure ownership
+        const invoice = await prisma.salesInvoice.findFirst({
+            where: { id, companyId: auth.user.companyId }
+        });
         if (!invoice) {
             return NextResponse.json({ success: false, error: 'Fatura zaten silinmiş veya bulunamadı' }, { status: 404 });
         }
-
-        // If formal/approved, maybe we shouldn't allow simple delete?
-        // For now, let's allow it but warn in UI.
 
         await prisma.salesInvoice.delete({
             where: { id }

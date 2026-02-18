@@ -11,7 +11,8 @@ export async function PUT(
 ) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const session = auth.user;
+    const session: any = auth.user;
+    const companyId = session.companyId;
 
     try {
         const params = await props.params;
@@ -19,8 +20,11 @@ export async function PUT(
         const body = await request.json();
         const { name, type, branch } = body;
 
-        // Fetch old data for audit
-        const oldKasa = await prisma.kasa.findUnique({ where: { id } });
+        // Verify ownership
+        const oldKasa = await prisma.kasa.findFirst({
+            where: { id, companyId }
+        });
+        if (!oldKasa) return NextResponse.json({ success: false, error: 'Kasa bulunamadı' }, { status: 404 });
 
         const updatedKasa = await prisma.kasa.update({
             where: { id },
@@ -31,9 +35,11 @@ export async function PUT(
             }
         });
 
-        // Sync with Accounting: Update Account Name
+        // Sync with Accounting: Update Account Name (Scoped by companyId via kasaId relation implicit verification)
         try {
-            const acc = await prisma.account.findUnique({ where: { kasaId: id } });
+            const acc = await prisma.account.findFirst({
+                where: { kasaId: id, companyId }
+            });
             if (acc) {
                 await prisma.account.update({
                     where: { id: acc.id },
@@ -43,19 +49,17 @@ export async function PUT(
         } catch (e) { console.error('Accounting Update Error:', e); }
 
         // AUDIT LOG
-        if (oldKasa) {
-            await logActivity({
-                userId: session.id as string,
-                userName: session.username as string,
-                action: 'UPDATE',
-                entity: 'Kasa',
-                entityId: id,
-                oldData: oldKasa,
-                newData: updatedKasa,
-                branch: updatedKasa.branch || 'Merkez',
-                details: `Kasa güncellendi: ${name}`
-            });
-        }
+        await logActivity({
+            userId: session.id as string,
+            userName: session.username as string,
+            action: 'UPDATE',
+            entity: 'Kasa',
+            entityId: id,
+            oldData: oldKasa,
+            newData: updatedKasa,
+            branch: updatedKasa.branch || 'Merkez',
+            details: `Kasa güncellendi: ${name}`
+        });
 
         revalidatePath('/accounting');
         return NextResponse.json({ success: true, kasa: updatedKasa });
@@ -70,31 +74,32 @@ export async function DELETE(
 ) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const session = auth.user;
+    const session: any = auth.user;
+    const companyId = session.companyId;
 
     try {
         const params = await props.params;
         const { id } = params;
 
-        // 1. Get the Kasa to know its name
-        const kasa = await prisma.kasa.findUnique({
-            where: { id }
+        // Verify ownership
+        const kasa = await prisma.kasa.findFirst({
+            where: { id, companyId }
         });
 
         if (!kasa) {
             return NextResponse.json({ success: false, error: 'Kasa bulunamadı' }, { status: 404 });
         }
 
-        // 2. Check transactions
+        // Check transactions (already scoped to this Kasa ID)
         const transactionCount = await prisma.transaction.count({
-            where: { kasaId: id }
+            where: { kasaId: id, companyId }
         });
 
         if (transactionCount === 0) {
             // HARD DELETE
             try {
                 await prisma.account.updateMany({
-                    where: { kasaId: id },
+                    where: { kasaId: id, companyId },
                     data: { kasaId: null, isActive: false }
                 });
             } catch (e) { }
@@ -131,7 +136,7 @@ export async function DELETE(
             // Deactivate account in accounting
             try {
                 await prisma.account.updateMany({
-                    where: { kasaId: id },
+                    where: { kasaId: id, companyId },
                     data: { isActive: false }
                 });
             } catch (e) { }
@@ -140,7 +145,7 @@ export async function DELETE(
             await logActivity({
                 userId: session.id as string,
                 userName: session.username as string,
-                action: 'UPDATE', // Technically an update (soft delete)
+                action: 'UPDATE',
                 entity: 'Kasa',
                 entityId: id,
                 oldData: kasa,
