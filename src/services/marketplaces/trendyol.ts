@@ -17,24 +17,39 @@ export class TrendyolService implements IMarketplaceService {
         return `Basic ${Buffer.from(authString).toString('base64')}`;
     }
 
+    private getProxyKeyHeader(): string {
+        return (process.env.PERIODYA_PROXY_KEY || '').trim();
+    }
+
     private getHeaders(extra: Record<string, string> = {}): Record<string, string> {
-        return {
+        const headers: any = {
             'Authorization': this.getAuthHeader(),
-            // CRITICAL: Trendyol requires "SupplierId - AppName" format to avoid 403 Forbidden
-            'User-Agent': `${this.config.supplierId} - Periodya`,
+            // OFFICIAL: "SellerId - SelfIntegration" is standard for self-developed apps to avoid 403
+            'User-Agent': `${this.config.supplierId} - SelfIntegration`,
             'Accept': 'application/json, text/plain, */*',
             'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
             'x-supplier-id': this.config.supplierId,
+            'x-seller-id': this.config.supplierId,
             'Referer': 'https://partner.trendyol.com/',
+            'Content-Type': 'application/json',
             ...extra
         };
+
+        const proxyKey = this.getProxyKeyHeader();
+        if (proxyKey) {
+            headers['X-Periodya-Key'] = proxyKey;
+        }
+
+        return headers;
     }
 
     async validateConnection(): Promise<boolean> {
         try {
-            // Basit bir istek ile bağlantıyı doğrula (örneğin siparişleri limit 1 ile çek)
-            // Trendyol'da sırf doğrulama için özel bir endpoint yok, orders'ı test ediyoruz
-            const response = await fetch(`${this.baseUrl}/${this.config.supplierId}/orders?size=1`, {
+            const url = `${this.baseUrl}/${this.config.supplierId}/orders?size=1`;
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+
+            const response = await fetch(fetchUrl, {
                 headers: this.getHeaders()
             });
 
@@ -47,10 +62,11 @@ export class TrendyolService implements IMarketplaceService {
 
     async updateCargoProvider(shipmentPackageId: string, cargoProviderCode: string): Promise<{ success: boolean; error?: string }> {
         try {
-            // Doğru endpoint: /carriages (Trendyol resmi dokümantasyonuna göre)
             const url = `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/carriages`;
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
-            const response = await fetch(url, {
+            const response = await fetch(fetchUrl, {
                 method: 'PUT',
                 headers: this.getHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
@@ -70,21 +86,23 @@ export class TrendyolService implements IMarketplaceService {
         }
     }
 
-    async getCommonLabel(shipmentPackageId: string): Promise<{
+    async getCommonLabel(shipmentPackageId: string, cargoTrackingNumber?: string): Promise<{
         status: 'SUCCESS' | 'PENDING' | 'FAILED';
         pdfBase64?: string;
         error?: string;
         httpStatus?: number;
         raw?: any;
     }> {
-        // According to Trendyol Docs, query parameter based common-label endpoint is the most reliable
+        // High-fidelity attempt list based on official developer patterns
         const attempts = [
+            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/common-label?shipmentPackageIds=${shipmentPackageId}&format=A4`,
             `${this.baseUrl}/${this.config.supplierId}/common-label?shipmentPackageIds=${shipmentPackageId}&format=A4`,
             `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/common-label?format=A4`,
-            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}`,
             `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=A4`,
-            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/label?format=PDF`
+            // If cargoTrackingNumber is provided, try the tracking based endpoint
+            ...(cargoTrackingNumber ? [`https://api.trendyol.com/sapigw/suppliers/${this.config.supplierId}/common-label/query?id=${cargoTrackingNumber}`] : [])
         ];
+
 
         let lastResult: any = null;
 
@@ -110,10 +128,14 @@ export class TrendyolService implements IMarketplaceService {
         raw?: any;
     }> {
         try {
-            console.log(`[TRENDYOL] Fetching Label: ${url}`);
-            const response = await fetch(url, {
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+
+            console.log(`[TRENDYOL] Fetching Label: ${url} (Proxy: ${!!effectiveProxy})`);
+            const response = await fetch(fetchUrl, {
                 headers: this.getHeaders()
             });
+
 
             const httpStatus = response.status;
             const responseText = await response.text();
@@ -160,10 +182,12 @@ export class TrendyolService implements IMarketplaceService {
             }
 
             const url = `${this.baseUrl}/${this.config.supplierId}/orders?${queryParams.toString()}`;
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
-            console.log('Trendyol Fetching:', url);
+            console.log('Trendyol Fetching:', url, `(Proxy: ${!!effectiveProxy})`);
 
-            const response = await fetch(url, {
+            const response = await fetch(fetchUrl, {
                 headers: this.getHeaders()
             });
 

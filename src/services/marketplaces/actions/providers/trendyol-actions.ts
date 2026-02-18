@@ -64,7 +64,13 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 const shipmentPackageId = payload?.shipmentPackageId || payload?.labelShipmentPackageId;
                 if (!shipmentPackageId) throw new Error('shipmentPackageId gerekli');
 
-                const labelResult = await service.getCommonLabel(shipmentPackageId);
+                // Get tracking number from local DB to support more endpoint patterns
+                const order = await prisma.order.findFirst({
+                    where: { id: orderId, companyId },
+                    select: { cargoTrackingNo: true }
+                });
+
+                const labelResult = await service.getCommonLabel(shipmentPackageId, order?.cargoTrackingNo || undefined);
 
                 // Track raw response for debugging
                 await (prisma as any).marketplaceActionAudit.update({
