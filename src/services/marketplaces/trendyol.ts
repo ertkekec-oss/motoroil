@@ -91,37 +91,45 @@ export class TrendyolService implements IMarketplaceService {
         httpStatus?: number;
         raw?: any;
     }> {
-        // High-fidelity attempt list based on official developer patterns
+        // High-fidelity attempt list based on newest Trendyol patterns
         const attempts = [
-            // 1. Integration GW (Often most reliable for direct PDF)
+            // 1. Integration API (Singular) - Usually returns PDF stream directly
             `https://api.trendyol.com/integration/sellers/${this.config.supplierId}/common-label/${shipmentPackageId}?format=A4`,
-            // 2. SAPIGW Plural (Standard)
+            // 2. Integration API (Singular v2) - Newer variant
+            `https://api.trendyol.com/integration/sellers/${this.config.supplierId}/common-label/v2/${shipmentPackageId}?format=A4`,
+            // 3. SAPIGW (Plural) - Often returns "OK" if not ready or bad param
             `${this.baseUrl}/${this.config.supplierId}/shipment-packages/common-label?shipmentPackageIds=${shipmentPackageId}&format=A4`,
-            // 3. SAPIGW Singular (Fallback)
+            // 4. SAPIGW (Singular)
             `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/common-label?format=A4`,
-            // 4. Tracking Number based
+            // 5. Tracking Number based queries
             ...(cargoTrackingNumber ? [
-                `${this.baseUrl}/${this.config.supplierId}/common-label/query?id=${cargoTrackingNumber}`,
-                `https://api.trendyol.com/integration/sellers/${this.config.supplierId}/common-label/query?id=${cargoTrackingNumber}`
+                `https://api.trendyol.com/integration/sellers/${this.config.supplierId}/common-label/query?id=${cargoTrackingNumber}`,
+                `${this.baseUrl}/${this.config.supplierId}/common-label/query?id=${cargoTrackingNumber}`
             ] : []),
         ];
 
+        console.log(`[NEW-DEBUG] Full Attempt List (${attempts.length} URLs):`, JSON.stringify(attempts, null, 2));
 
-        let lastResult: any = null;
+        let lastResult: any = { status: 'PENDING' };
 
-        for (const url of attempts) {
+        for (let i = 0; i < attempts.length; i++) {
+            const url = attempts[i];
+            console.log(`[NEW-DEBUG] Trying URL ${i + 1}/${attempts.length}: ${url}`);
             const result = await this._fetchLabel(url);
-            lastResult = result;
 
             if (result.status === 'SUCCESS') {
+                console.log(`[NEW-DEBUG] SUCCESS on URL ${i + 1}`);
                 return result;
             }
 
-            console.log(`[NEW-DEBUG] Attempt for ${url} was not successful (Status: ${result.status}). Trying next...`);
+            // If we get PENDING (like "OK") or FAILED (like 403), we SAVE it as fallback
+            // but we MUST continue to the next URL in the same loop.
+            lastResult = result;
+            console.log(`[NEW-DEBUG] URL ${i + 1} result: ${result.status} (Code: ${result.httpStatus}). Continuing to next URL...`);
         }
 
-        // If we reached here, no endpoint gave a SUCCESS PDF.
-        // Return the lastResult (might be PENDING) to the controller to wait for retry.
+        // Only return PENDING or FAILED if ALL endpoints in the list have been tried and none gave SUCCESS.
+        console.log(`[NEW-DEBUG] All URLs exhausted. Final result for this retry: ${lastResult.status}`);
         return lastResult;
     }
 
