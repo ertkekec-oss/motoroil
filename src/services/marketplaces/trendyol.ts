@@ -196,29 +196,27 @@ export class TrendyolService implements IMarketplaceService {
                 const bodyText = buf.toString('utf-8').trim();
 
                 if (bodyText === 'OK') {
-                    console.info(`[TRENDYOL-LABEL] Standard API returned PENDING (OK body).`);
-                    return { status: 'PENDING', httpStatus: 202, raw: 'OK' };
-                }
-
-                if (buf.subarray(0, 4).toString() === '%PDF') {
+                    console.info(`[TRENDYOL-LABEL] Strategy B (v2) returned PENDING (OK body). Trying next strategy...`);
+                } else if (buf.subarray(0, 4).toString() === '%PDF') {
                     return { status: 'SUCCESS', pdfBase64: buf.toString('base64'), httpStatus: 200 };
-                }
-
-                try {
-                    const json = JSON.parse(bodyText);
-                    const label = json.data?.[0]?.label || json.label;
-                    const format = json.data?.[0]?.format || json.format;
-                    if (label) {
-                        if (format === 'PDF') return { status: 'SUCCESS', pdfBase64: label, httpStatus: 200 };
-                        if (format === 'ZPL') {
-                            const pdfBuf = await this.convertZplToPdf(label);
-                            if (pdfBuf) return { status: 'SUCCESS', pdfBase64: pdfBuf.toString('base64'), httpStatus: 200 };
+                } else {
+                    try {
+                        const json = JSON.parse(bodyText);
+                        const label = json.data?.[0]?.label || json.label;
+                        const format = json.data?.[0]?.format || json.format;
+                        if (label) {
+                            if (format === 'PDF') return { status: 'SUCCESS', pdfBase64: label, httpStatus: 200 };
+                            if (format === 'ZPL') {
+                                const pdfBuf = await this.convertZplToPdf(label);
+                                if (pdfBuf) return { status: 'SUCCESS', pdfBase64: pdfBuf.toString('base64'), httpStatus: 200 };
+                            }
                         }
-                    }
-                } catch { }
+                    } catch { }
+                }
             }
 
             // --- STRATEGY C: Standard v1/Alt Path ---
+            console.info(`[TRENDYOL-LABEL] Attempting Strategy C (v1/Alt)...`);
             try {
                 const altUrl = `${this.baseUrl}/integration/sellers/${supplierId}/labels/${shipmentPackageId}`;
                 const fetchAltUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(altUrl)}` : altUrl;
