@@ -92,17 +92,23 @@ export class TrendyolService implements IMarketplaceService {
         try {
             // STEP 0: Status Check (Fix for 556)
             // Trendyol returns 556 if status is 'Created'. It must be 'Picking' or further.
-            console.log(`[TRENDYOL-LABEL] Checking status for package ${shipmentPackageId}...`);
-            const pkg = await this.getShipmentPackageDetails(shipmentPackageId);
-            const pkgStatus = pkg.shipmentPackageStatus;
-            console.log(`[TRENDYOL-LABEL] Package Status: ${pkgStatus}`);
+            let pkgStatus = 'Unknown';
+            try {
+                console.log(`[TRENDYOL-LABEL] Checking status for package ${shipmentPackageId}...`);
+                const pkg = await this.getShipmentPackageDetails(shipmentPackageId);
+                pkgStatus = pkg.shipmentPackageStatus;
+                console.log(`[TRENDYOL-LABEL] Package Status: ${pkgStatus}`);
 
-            if (pkgStatus === 'Created') {
-                return {
-                    status: 'FAILED',
-                    error: 'Paket henüz hazırlık aşamasında (Created). Lütfen Trendyol panelinden "Toplanacak" (Picking) statüsüne geçirin, ardından tekrar deneyin.',
-                    raw: pkg
-                };
+                if (pkgStatus === 'Created') {
+                    return {
+                        status: 'FAILED',
+                        error: 'Paket henüz hazırlık aşamasında (Created). Lütfen Trendyol panelinden "Toplanacak" (Picking) statüsüne geçirin, ardından tekrar deneyin.',
+                        raw: pkg
+                    };
+                }
+            } catch (e: any) {
+                // Resilience: If status check fails (e.g. 556), we don't crash, we proceed to try the label fetch.
+                console.warn(`[TRENDYOL-LABEL] Status check error (continuing anyway): ${e.message}`);
             }
 
             // STEP 1: Attempt Standard v2 PDF (getLabels)
@@ -121,7 +127,8 @@ export class TrendyolService implements IMarketplaceService {
             // If v2 fails with 556/400, try the direct path which sometimes works better for single packages
             if (!response.ok) {
                 const errText = await response.text();
-                console.warn(`[TRENDYOL-LABEL] v2 Failed (${response.status}): ${errText.substring(0, 100)}. Trying Fallback...`);
+                const status = response.status;
+                console.warn(`[TRENDYOL-LABEL] v2 Failed (${status}): ${errText.substring(0, 100)}. Trying Fallback...`);
 
                 const altUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels/${shipmentPackageId}`;
                 console.log(`[TRENDYOL-LABEL] ATTEMPT 2 (Alt): ${altUrl}`);
@@ -136,11 +143,23 @@ export class TrendyolService implements IMarketplaceService {
 
             if (!response.ok) {
                 const finalErr = await response.text();
-                console.error(`[TRENDYOL-LABEL] All label fetch attempts failed. Status: ${response.status}`);
+                const status = response.status;
+                console.error(`[TRENDYOL-LABEL] All label fetch attempts failed. Status: ${status}`);
+
+                // CRITICAL: Convert 556/503/504 to PENDING to allow UI to retry naturally
+                if (status === 556 || status === 503 || status === 504 || status === 429) {
+                    return {
+                        status: 'PENDING',
+                        error: 'Trendyol servisi geçici olarak meşgul (556). Birazdan tekrar denenecek...',
+                        httpStatus: status,
+                        raw: finalErr
+                    };
+                }
+
                 return {
                     status: 'FAILED',
-                    error: `Trendyol PDF Hatası: ${response.status}`,
-                    httpStatus: response.status,
+                    error: `Trendyol PDF Hatası: ${status}`,
+                    httpStatus: status,
                     raw: finalErr
                 };
             }
@@ -171,7 +190,13 @@ export class TrendyolService implements IMarketplaceService {
     private async getShipmentPackageDetails(shipmentPackageId: string): Promise<any> {
         const url = `${this.baseUrl}/sapigw/suppliers/${this.config.supplierId}/shipment-packages/${shipmentPackageId}`;
         const response = await fetch(url, { headers: this.getHeaders() });
-        if (!response.ok) throw new Error(`Status ${response.status}`);
+        if (!response.ok) {
+            if (response.status === 556) {
+                console.warn(`[TRENDYOL-LABEL] SAPIGW 556 - Service Unavailable for package details`);
+                throw new Error(`Status 556`);
+            }
+            throw new Error(`Status ${response.status}`);
+        }
         return await response.json();
     }
 
