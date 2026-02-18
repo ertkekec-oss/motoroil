@@ -78,9 +78,10 @@ export class TrendyolService implements IMarketplaceService {
         raw?: any;
     }> {
         const attempts = [
-            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=PDF`,
+            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/common-label?format=A4`,
+            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=A4`,
             `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/label?format=PDF`,
-            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}` // Naked URL
+            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}`
         ];
 
         let lastResult: any = null;
