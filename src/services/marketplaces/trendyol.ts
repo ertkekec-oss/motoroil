@@ -135,15 +135,17 @@ export class TrendyolService implements IMarketplaceService {
         raw?: any;
     }> {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout per attempt
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
 
         try {
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
-            console.log(`[TRENDYOL] Fetching: ${url}`);
+            console.log(`[NEW-DEBUG] Fetching: ${url}`);
+
+            // Try with headers (including Accept)
             const response = await fetch(fetchUrl, {
-                headers: this.getHeaders(),
+                headers: this.getHeaders(), // Already has Accept: application/pdf
                 signal: controller.signal
             });
 
@@ -151,31 +153,25 @@ export class TrendyolService implements IMarketplaceService {
             const httpStatus = response.status;
             const ct = response.headers.get("content-type") || "";
 
-            // 1) Handle "Not Ready" statuses
             if (httpStatus === 404 || httpStatus === 409) {
                 return { status: 'PENDING', httpStatus };
             }
 
             if (!response.ok) {
                 const errText = await response.text();
-                console.log(`[TRENDYOL] Failed: ${httpStatus} | ${errText.substring(0, 100)}`);
+                console.log(`[NEW-DEBUG] HTTP ${httpStatus} | ${errText.substring(0, 50)}`);
                 return { status: 'FAILED', error: `Trendyol API Hatası: ${httpStatus}`, httpStatus, raw: errText };
             }
 
-            // 2) Read as binary
             const ab = await response.arrayBuffer();
             const buf = Buffer.from(ab);
 
-            // --- USER REQUESTED DEBUG LOGS ---
-            console.log("[TRENDYOL] status", httpStatus, "ct", ct, "len", buf.length);
-            console.log("[TRENDYOL] head", buf.subarray(0, 32).toString("hex"));
-            console.log("[TRENDYOL] head-ascii", buf.subarray(0, 16).toString('utf-8').replace(/[^\x20-\x7E]/g, '.'));
-            // ---------------------------------
+            console.log("[NEW-DEBUG] status", httpStatus, "ct", ct, "len", buf.length);
+            console.log("[NEW-DEBUG] hex", buf.subarray(0, 32).toString("hex"));
+            console.log("[NEW-DEBUG] ascii", buf.subarray(0, 16).toString('utf-8').replace(/[^\x20-\x7E]/g, '.'));
 
-            // 3) SUCCESS: If we got a 200 OK with content, let's treat it as success for inspection.
-            // Even if it's small or unknown, we want to see it in S3 / browser.
-            if (buf.length > 5) { // Any significant content
-                console.log(`[TRENDYOL] Treating 200 OK as SUCCESS for inspection. Size: ${buf.length}`);
+            if (buf.length > 5) {
+                console.log(`[NEW-DEBUG] SUCCESS detected. Binary data length: ${buf.length}`);
                 return {
                     status: 'SUCCESS',
                     pdfBase64: buf.toString('base64'),
@@ -184,16 +180,12 @@ export class TrendyolService implements IMarketplaceService {
             }
 
             const text = buf.toString('utf-8');
-            console.log(`[TRENDYOL] Body too small/empty: ${text}`);
-
+            console.log(`[NEW-DEBUG] Body too small: ${text}`);
             return { status: 'PENDING', httpStatus, raw: text };
 
         } catch (error: any) {
             clearTimeout(timeoutId);
-            if (error.name === 'AbortError') {
-                return { status: 'FAILED', error: 'Trendyol API Timeout (15s)', httpStatus: 408 };
-            }
-            console.error(`[TRENDYOL] Fetch Error:`, error);
+            console.error(`[NEW-DEBUG] Global Error:`, error);
             return { status: 'FAILED', error: error.message || 'Bağlantı hatası', raw: error };
         }
     }
