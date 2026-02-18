@@ -79,11 +79,21 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 });
 
                 if (labelResult.status === 'PENDING') {
-                    return { status: "PENDING", auditId: audit.id };
+                    return {
+                        status: "PENDING",
+                        auditId: audit.id,
+                        httpStatus: labelResult.httpStatus,
+                        errorMessage: labelResult.error
+                    };
                 }
 
                 if (labelResult.status === 'FAILED') {
-                    throw new Error(labelResult.error || 'Etiket Trendyol\'dan alınamadı');
+                    return {
+                        status: "FAILED",
+                        auditId: audit.id,
+                        httpStatus: labelResult.httpStatus,
+                        errorMessage: labelResult.error || 'Etiket Trendyol\'dan alınamadı'
+                    };
                 }
 
                 // SUCCESS branch

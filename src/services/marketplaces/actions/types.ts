@@ -18,6 +18,7 @@ export interface MarketplaceActionResult {
     result?: any;
     errorMessage?: string;
     errorCode?: MarketplaceActionErrorCode;
+    httpStatus?: number;
 }
 
 export interface MarketplaceActionInput {

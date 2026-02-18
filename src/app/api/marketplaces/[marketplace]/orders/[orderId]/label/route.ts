@@ -120,18 +120,22 @@ export async function GET(
 
             // ⏳ PENDING: Wait and retry if time allows
             if (result.status === "PENDING") {
-                console.log(`[LABEL] Pending on attempt ${attempt}. Sleeping 3s...`);
-                // Wait 3 seconds before next poll
-                await new Promise(r => setTimeout(r, 3000));
+                // Adaptive sleep: If Trendyol is busy (556), wait longer (6s instead of 3s)
+                const isBusy = result.httpStatus === 556 || result.httpStatus === 429;
+                const sleepMs = isBusy ? 6000 : 3000;
+
+                console.log(`[LABEL] Pending (HTTP ${result.httpStatus || 202}). Sleeping ${sleepMs / 1000}s...`);
+                await new Promise(r => setTimeout(r, sleepMs));
                 continue;
             }
         }
 
         // --- STEP 4: Fallback to async wait-page if timeout reached ---
         const retryAfterSec = 3;
+        const lastMsg = lastResult?.errorMessage || "Etiket hazırlanıyor...";
 
         if (isDocumentRequest(request)) {
-            return new Response(pendingHtml(retryAfterSec), {
+            return new Response(pendingHtml(retryAfterSec, lastMsg), {
                 status: 200,
                 headers: {
                     "Content-Type": "text/html; charset=utf-8",
@@ -143,7 +147,7 @@ export async function GET(
 
         return new Response(JSON.stringify({
             status: "PENDING",
-            message: "Etiket hazırlanıyor...",
+            message: lastMsg,
             auditId: lastResult?.auditId
         }), {
             status: 202,
@@ -177,7 +181,7 @@ function isDocumentRequest(req: Request) {
     return accept.includes("text/html");
 }
 
-function pendingHtml(retryAfterSec: number) {
+function pendingHtml(retryAfterSec: number, message: string) {
     return `<!doctype html>
 <html lang="tr">
 <head>
@@ -191,6 +195,7 @@ function pendingHtml(retryAfterSec: number) {
     .loader { width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem; }
     h2 { font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 600; }
     .muted { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; }
+    .status-badge { display: inline-block; padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 2rem; font-size: 0.85rem; margin-top: 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -199,7 +204,8 @@ function pendingHtml(retryAfterSec: number) {
     <div class="loader"></div>
     <h2>Etiket Hazırlanıyor…</h2>
     <p class="muted">${retryAfterSec} saniye sonra sistem otomatik olarak kontrol edilecek.</p>
-    <p class="muted">PDF oluşturulduğunda bu sayfa otomatik olarak açılacaktır.<br/>Lütfen bu sekmeyi kapatmayın.</p>
+    <div class="status-badge">${message}</div>
+    <p class="muted" style="margin-top: 1rem; font-size: 0.8rem;">PDF oluşturulduğunda bu sayfa otomatik olarak açılacaktır.<br/>Lütfen bu sekmeyi kapatmayın.</p>
   </div>
 </body>
 </html>`;
