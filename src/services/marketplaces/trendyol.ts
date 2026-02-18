@@ -159,7 +159,9 @@ export class TrendyolService implements IMarketplaceService {
                         if (res.ok) {
                             const body = await res.text();
                             const trimmedBody = body.trim();
-                            console.info(`[TRENDYOL-DIAG] Strategy A (Common) result: status=${res.status}, type=${res.headers.get('content-type')}, len=${trimmedBody.length}`);
+                            let keys = '';
+                            try { const json = JSON.parse(trimmedBody); keys = Object.keys(json).join(','); } catch { }
+                            console.info(`[TRENDYOL-DIAG] Strategy A (Common) result: status=${res.status}, type=${res.headers.get('content-type')}, len=${trimmedBody.length}, keys=[${keys}], snippet="${trimmedBody.substring(0, 200).replace(/\n/g, ' ')}"`);
 
                             // Multi-Signal 1: Plain text "OK"
                             if (trimmedBody === 'OK') {
@@ -199,7 +201,9 @@ export class TrendyolService implements IMarketplaceService {
                 const ab = await response.arrayBuffer();
                 buf = Buffer.from(ab);
                 const bodyText = buf.toString('utf-8').trim();
-                console.info(`[TRENDYOL-DIAG] Strategy B (v2) result: status=${response.status}, type=${response.headers.get('content-type')}, len=${buf.length}`);
+                let keys = '';
+                try { if (bodyText.startsWith('{')) { const json = JSON.parse(bodyText); keys = Object.keys(json).join(','); } } catch { }
+                console.info(`[TRENDYOL-DIAG] Strategy B (v2) result: status=${response.status}, type=${response.headers.get('content-type')}, len=${buf.length}, keys=[${keys}], snippet="${bodyText.substring(0, 200).replace(/\n/g, ' ')}"`);
 
                 if (bodyText === 'OK') {
                     console.info(`[TRENDYOL-LABEL] Strategy B (v2) returned PENDING (OK body). Trying next strategy...`);
@@ -230,7 +234,8 @@ export class TrendyolService implements IMarketplaceService {
                 if (altRes.ok) {
                     const altAb = await altRes.arrayBuffer();
                     const altBuf = Buffer.from(altAb);
-                    console.info(`[TRENDYOL-DIAG] Strategy C (v1) result: status=${altRes.status}, type=${altRes.headers.get('content-type')}, len=${altBuf.length}`);
+                    const altText = altBuf.toString('utf-8').substring(0, 200).replace(/\n/g, ' ');
+                    console.info(`[TRENDYOL-DIAG] Strategy C (v1) result: status=${altRes.status}, type=${altRes.headers.get('content-type')}, len=${altBuf.length}, snippet="${altText}"`);
                     if (altBuf.subarray(0, 4).toString() === '%PDF') {
                         return { status: 'SUCCESS', pdfBase64: altBuf.toString('base64'), httpStatus: 200 };
                     }
