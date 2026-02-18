@@ -19,17 +19,20 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
 
         // 1) Redis Lock Check
         const lockKey = `lock:action:${idempotencyKey}`;
-        const acquired = await redisConnection.set(lockKey, 'BUSY', 'NX', 'EX', 60);
+        // TTL: 90s to ensure a single producer window.
+        const acquired = await redisConnection.set(lockKey, 'BUSY', 'NX', 'EX', 90);
 
         console.log(`${ctx} Redis lock acquired: ${!!acquired}`);
 
         if (!acquired) {
-            console.log(`${ctx} Busy (Lock exists). returning PENDING.`);
+            console.log(`${ctx} Busy (Lock exists). returning PENDING without re-execution.`);
             const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
-            return { status: "PENDING", auditId: existingAudit?.id, errorMessage: "İşlem devam ediyor..." };
+            return { status: "PENDING", auditId: existingAudit?.id, errorMessage: "İşlem devam ediyor (Kilitli)..." };
         }
 
+        let terminalState = false;
         try {
+            // ... (rest of the logic)
             // 2) Audit Record Management
             const audit = await (prisma as any).marketplaceActionAudit.upsert({
                 where: { idempotencyKey },
@@ -136,6 +139,7 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
             });
 
             metrics.externalCall(marketplace, actionKey, 'SUCCESS');
+            terminalState = true;
             return { status: "SUCCESS", auditId: audit.id, result };
 
         } catch (error: any) {
@@ -150,10 +154,13 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 data: { status: 'FAILED', errorMessage: error.message }
             });
 
+            terminalState = true;
             return { status: "FAILED", errorMessage: error.message, errorCode: MarketplaceActionErrorCode.E_UNKNOWN };
 
         } finally {
-            await redisConnection.del(lockKey);
+            if (terminalState) {
+                await redisConnection.del(lockKey);
+            }
         }
     }
 }

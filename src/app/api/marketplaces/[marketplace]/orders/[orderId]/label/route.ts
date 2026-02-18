@@ -25,6 +25,8 @@ export async function GET(
             return new Response(JSON.stringify({ error: "shipmentPackageId gerekli" }), { status: 400 });
         }
 
+        console.info(`[LABEL_START] ${marketplace} orderId=${orderId} shipmentPackageId=${shipmentPackageId}`);
+
         // ✅ companyId resolve
         const company = await prisma.company.findFirst({
             where: { tenantId: auth.user.tenantId },

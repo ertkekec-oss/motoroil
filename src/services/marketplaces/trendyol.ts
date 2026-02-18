@@ -95,8 +95,8 @@ export class TrendyolService implements IMarketplaceService {
 
             // --- STEP 0: Status & Carrier Check ---
             // If the package is in 'Created' state, label is never ready.
-            let pkgStatus = 'Unknown';
-            let carrier = 'Unknown';
+            let pkgStatus = '';
+            let carrier = '';
             try {
                 console.log(`[TRENDYOL-LABEL] Checking status for package ${shipmentPackageId}...`);
                 const pkg = await this.getShipmentPackageDetails(shipmentPackageId);
@@ -122,7 +122,7 @@ export class TrendyolService implements IMarketplaceService {
             // --- STRATEGY A: Trigger & Fetch via /common-label (For TEX/Aras) ---
             const supportsCommonLabel = carrier.includes('express') || carrier.includes('tex');
             if (cargoTrackingNumber || supportsCommonLabel) {
-                console.info(`[TRENDYOL-LABEL] Strategy A (Common) for carrier: ${carrier || 'Determined by TrackingNo'}`);
+                console.info(`[TRENDYOL-LABEL] Strategy A (Common) for carrier: ${carrier || 'Targeted'}`);
 
                 // Step A1: Multiple Trigger Attempts
                 // 1. Trigger by Tracking Number
@@ -180,6 +180,8 @@ export class TrendyolService implements IMarketplaceService {
                         }
                     } catch (e) { }
                 }
+            } else {
+                console.info(`[TRENDYOL-LABEL] Strategy A skipped: carrier/tracking missing.`);
             }
 
             // --- STRATEGY B: Standard v2 Labels (Universal Fallback) ---
