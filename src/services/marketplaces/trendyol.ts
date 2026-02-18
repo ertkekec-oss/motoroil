@@ -92,159 +92,153 @@ export class TrendyolService implements IMarketplaceService {
         try {
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
 
-            // STEP 0: Optional Trigger (Fix for Common Label Carriers like TEX/Aras)
-            // If we have a tracking number, we MUST trigger the label generation first (createCommonLabel)
+            // --- STRATEGY A: Official Common Label Flow (For TEX/Aras) ---
             if (cargoTrackingNumber) {
+                console.log(`[TRENDYOL-LABEL] Starting Common-Label flow for tracking: ${cargoTrackingNumber}`);
+
+                // Step 1: Mandatory Trigger (POST)
                 try {
                     const triggerUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/${cargoTrackingNumber}`;
                     const fetchTriggerUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(triggerUrl)}` : triggerUrl;
 
-                    console.log(`[TRENDYOL-LABEL] Triggering Common Label (POST): ${triggerUrl}`);
                     const triggerRes = await fetch(fetchTriggerUrl, {
                         method: 'POST',
-                        headers: this.getHeaders({
-                            'Content-Type': 'application/json',
-                            'Accept-Language': 'tr-TR'
-                        }),
-                        body: JSON.stringify({ format: 'PDF' }) // Trigger with PDF format preference
+                        headers: this.getHeaders({ 'Content-Type': 'application/json', 'Accept-Language': 'tr-TR' }),
+                        body: JSON.stringify({ format: 'ZPL' }) // Doc suggests ZPL for trigger request
                     });
 
                     if (triggerRes.ok) {
-                        console.log(`[TRENDYOL-LABEL] Trigger Accepted (OK).`);
-                    } else {
-                        const err = await triggerRes.text();
-                        console.warn(`[TRENDYOL-LABEL] Trigger skipped or failed (${triggerRes.status}): ${err.substring(0, 50)}`);
+                        const triggerBody = await triggerRes.text();
+                        console.log(`[TRENDYOL-LABEL] Trigger Accepted. Body: ${triggerBody.substring(0, 50)}`);
                     }
                 } catch (e: any) {
-                    console.warn(`[TRENDYOL-LABEL] Trigger fatal error (ignoring): ${e.message}`);
+                    console.warn(`[TRENDYOL-LABEL] Trigger failed: ${e.message}`);
                 }
 
-                // ATTEMPT 0: Common Label GET (Direct retrieval for TEX/Aras)
+                // Step 2: Retrieval (GET) from Common-Label specialized endpoint
                 try {
                     const getUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/${cargoTrackingNumber}`;
                     const fetchGetUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(getUrl)}` : getUrl;
 
-                    console.log(`[TRENDYOL-LABEL] ATTEMPT 0 (CommonLabel GET): ${getUrl}`);
                     const res = await fetch(fetchGetUrl, {
-                        headers: this.getHeaders({
-                            'Accept': 'application/json',
-                            'Accept-Language': 'tr-TR'
-                        })
+                        headers: this.getHeaders({ 'Accept': 'application/json', 'Accept-Language': 'tr-TR' })
                     });
 
                     if (res.ok) {
                         const body = await res.text();
-                        if (body.trim() !== 'OK') {
-                            const json = JSON.parse(body);
-                            const labelItem = json.data?.[0];
-                            if (labelItem && labelItem.label && labelItem.format === 'PDF') {
-                                console.log(`[TRENDYOL-LABEL] SUCCESS via CommonLabel GET (PDF).`);
-                                return {
-                                    status: 'SUCCESS',
-                                    pdfBase64: labelItem.label,
-                                    httpStatus: 200
-                                };
+                        if (body.trim() === 'OK') {
+                            console.log(`[TRENDYOL-LABEL] System said OK (Processing). Returning PENDING.`);
+                            return { status: 'PENDING', httpStatus: 202, raw: 'OK' };
+                        }
+
+                        const json = JSON.parse(body);
+                        const labelData = json.data?.[0]; // Usually returned in data array
+
+                        if (labelData && labelData.label) {
+                            // If it's already PDF (base64)
+                            if (labelData.format === 'PDF') {
+                                console.log(`[TRENDYOL-LABEL] Received PDF via common-label GET.`);
+                                return { status: 'SUCCESS', pdfBase64: labelData.label, httpStatus: 200 };
+                            }
+
+                            // If it's ZPL, we MUST convert to PDF (Common for TEX)
+                            if (labelData.format === 'ZPL') {
+                                console.log(`[TRENDYOL-LABEL] Received ZPL. Converting to PDF via Labelary...`);
+                                try {
+                                    const pdfBuf = await this.convertZplToPdf(labelData.label);
+                                    if (pdfBuf) {
+                                        return { status: 'SUCCESS', pdfBase64: pdfBuf.toString('base64'), httpStatus: 200 };
+                                    }
+                                } catch (convErr: any) {
+                                    console.error(`[TRENDYOL-LABEL] ZPL Conversion Error: ${convErr.message}`);
+                                }
                             }
                         }
+                    } else {
+                        console.warn(`[TRENDYOL-LABEL] Common-Label GET fail (${res.status}). Proceeding to Fallback...`);
                     }
                 } catch (e: any) {
-                    console.warn(`[TRENDYOL-LABEL] CommonLabel GET error (skipping): ${e.message}`);
+                    console.warn(`[TRENDYOL-LABEL] Common-Label fetch error: ${e.message}`);
                 }
             }
 
-            // STEP 1: Status Check (Fix for 556)
-            let pkgStatus = 'Unknown';
-            try {
-                console.log(`[TRENDYOL-LABEL] Checking status for package ${shipmentPackageId}...`);
-                const pkg = await this.getShipmentPackageDetails(shipmentPackageId);
-                pkgStatus = pkg.shipmentPackageStatus;
-                console.log(`[TRENDYOL-LABEL] Package Status: ${pkgStatus}`);
+            // --- STRATEGY B: Standard v2 Labels Fallback (For all carriers) ---
+            const labelsUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
+            const fetchLabelsUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(labelsUrl)}` : labelsUrl;
 
-                if (pkgStatus === 'Created') {
-                    return {
-                        status: 'FAILED',
-                        error: 'Paket henüz hazırlık aşamasında (Created). Lütfen Trendyol panelinden "Toplanacak" (Picking) statüsüne geçirin, ardından tekrar deneyin.',
-                        raw: pkg
-                    };
-                }
-            } catch (e: any) {
-                console.warn(`[TRENDYOL-LABEL] Status check error (continuing anyway): ${e.message}`);
-            }
-
-            // STEP 2: Attempt Standard v2 PDF (getLabels)
-            const v2Url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
-            const fetchV2Url = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(v2Url)}` : v2Url;
-
-            console.log(`[TRENDYOL-LABEL] ATTEMPT 1 (v2): ${v2Url} (Proxy: ${!!effectiveProxy})`);
-
-            let response = await fetch(fetchV2Url, {
+            console.log(`[TRENDYOL-LABEL] Attempting Standard v2 Labels: ${labelsUrl}`);
+            const response = await fetch(fetchLabelsUrl, {
                 method: 'GET',
-                headers: this.getHeaders({
-                    'Accept': 'application/pdf',
-                    'Accept-Language': 'tr-TR'
-                })
+                headers: this.getHeaders({ 'Accept': 'application/pdf', 'Accept-Language': 'tr-TR' })
             });
 
-            // STEP 3: Hybrid Fallback (v1/Alt Path)
-            if (!response.ok) {
-                const errText = await response.text();
-                const status = response.status;
-                console.warn(`[TRENDYOL-LABEL] v2 Failed (${status}): ${errText.substring(0, 100)}. Trying Fallback...`);
+            if (response.ok) {
+                const ab = await response.arrayBuffer();
+                const buf = Buffer.from(ab);
+                const bodyText = buf.toString('utf-8').trim();
 
-                const altUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels/${shipmentPackageId}`;
-                const fetchAltUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(altUrl)}` : altUrl;
+                if (bodyText === 'OK') {
+                    return { status: 'PENDING', httpStatus: 202, raw: 'OK' };
+                }
 
-                console.log(`[TRENDYOL-LABEL] ATTEMPT 2 (Alt): ${altUrl}`);
-                response = await fetch(fetchAltUrl, {
-                    method: 'GET',
-                    headers: this.getHeaders({
-                        'Accept': 'application/pdf',
-                        'Accept-Language': 'tr-TR'
-                    })
-                });
-            }
-
-            if (!response.ok) {
-                const finalErr = await response.text();
-                const status = response.status;
-                console.error(`[TRENDYOL-LABEL] All label fetch attempts failed. Status: ${status}`);
-
-                if (status === 556 || status === 503 || status === 504 || status === 429) {
+                // Check for PDF signature
+                if (buf.subarray(0, 4).toString() === '%PDF') {
+                    console.log(`[TRENDYOL-LABEL] SUCCESS. Received Binary PDF.`);
                     return {
-                        status: 'PENDING',
-                        error: 'Trendyol servisi geçici olarak meşgul (556). Birazdan tekrar denenecek...',
-                        httpStatus: status,
-                        raw: finalErr
+                        status: 'SUCCESS',
+                        pdfBase64: buf.toString('base64'),
+                        httpStatus: 200
                     };
                 }
 
+                // If it's JSON instead of PDF
+                try {
+                    const json = JSON.parse(bodyText);
+                    if (json.data?.[0]?.label && json.data[0].format === 'PDF') {
+                        return { status: 'SUCCESS', pdfBase64: json.data[0].label, httpStatus: 200 };
+                    }
+                    return { status: 'PENDING', raw: json };
+                } catch {
+                    console.warn(`[TRENDYOL-LABEL] Non-PDF binary/text response: ${bodyText.substring(0, 50)}`);
+                    return { status: 'PENDING', raw: bodyText };
+                }
+            }
+
+            // Final Error Handling (Timeouts/Server Load)
+            const status = response.status;
+            if (status === 556 || status === 503 || status === 504 || status === 429) {
                 return {
-                    status: 'FAILED',
-                    error: `Trendyol PDF Hatası: ${status}`,
-                    httpStatus: status,
-                    raw: finalErr
+                    status: 'PENDING',
+                    error: 'Trendyol servisi meşgul (556). Lütfen bekleyin...',
+                    httpStatus: status
                 };
             }
 
-            const ab = await response.arrayBuffer();
-            const buf = Buffer.from(ab);
-
-            if (buf.subarray(0, 4).toString() === '%PDF') {
-                console.log(`[TRENDYOL-LABEL] SUCCESS. Received PDF (${buf.length} bytes).`);
-                return {
-                    status: 'SUCCESS',
-                    pdfBase64: buf.toString('base64'),
-                    httpStatus: 200
-                };
-            }
-
-            const diagnostic = buf.toString('utf-8').trim();
-            console.warn(`[TRENDYOL-LABEL] Unexpected content (non-PDF): ${diagnostic.substring(0, 50)}`);
-            return { status: 'PENDING', raw: diagnostic };
+            return { status: 'FAILED', error: `Trendyol Hatası: ${status}`, httpStatus: status };
 
         } catch (error: any) {
-            console.error(`[TRENDYOL-LABEL] Fatal Exception:`, error);
+            console.error(`[TRENDYOL-LABEL] Unexpected Error:`, error);
             return { status: 'FAILED', error: `Sistem Hatası: ${error.message}` };
+        }
+    }
+
+    private async convertZplToPdf(zpl: string): Promise<Buffer | null> {
+        try {
+            // Labelary API (Open / No-key for low volume)
+            const url = 'https://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/';
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Accept': 'application/pdf' },
+                body: zpl
+            });
+            if (res.ok) {
+                const ab = await res.arrayBuffer();
+                return Buffer.from(ab);
+            }
+            return null;
+        } catch (e) {
+            console.error('Labelary conversion failed:', e);
+            return null;
         }
     }
 
