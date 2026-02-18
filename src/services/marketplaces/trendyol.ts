@@ -89,8 +89,7 @@ export class TrendyolService implements IMarketplaceService {
         httpStatus?: number;
         raw?: any;
     }> {
-        // OFFICIAL FIX: Using standard PDF endpoint (getLabels) instead of restricted common-label (ZPL)
-        // This is the universally available method used by BizimHesap and others.
+        // OFFICIAL METHOD: Standart PDF (getLabels) - Universally available for all sellers.
         // Endpoint: GET /integration/sellers/{sellerId}/labels?shipmentPackageIds={shipmentPackageId}
         const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
 
@@ -99,15 +98,19 @@ export class TrendyolService implements IMarketplaceService {
         try {
             const response = await fetch(url, {
                 method: 'GET',
-                headers: this.getHeaders({ 'Accept': 'application/pdf' })
+                headers: this.getHeaders({
+                    'Accept': 'application/pdf',
+                    'User-Agent': 'Periodya-Integration/1.0' // Specific header for server recognition
+                })
             });
 
             if (!response.ok) {
                 const errText = await response.text();
-                console.error(`[TRENDYOL-LABEL] Error ${response.status}: ${errText}`);
+                // 556 or 400 usually mean not ready or permission, we fail fast to avoid timeout
+                console.error(`[TRENDYOL-LABEL] API Error ${response.status}: ${errText}`);
                 return {
                     status: 'FAILED',
-                    error: `Trendyol API Hatası: ${response.status}`,
+                    error: `Trendyol PDF Hatası: ${response.status}`,
                     httpStatus: response.status,
                     raw: errText
                 };
@@ -128,7 +131,7 @@ export class TrendyolService implements IMarketplaceService {
 
             // Fallback for unexpected response bodies
             const text = buf.toString('utf-8').trim();
-            console.log(`[TRENDYOL-LABEL] Unexpected response content: ${text.substring(0, 100)}`);
+            console.warn(`[TRENDYOL-LABEL] Non-PDF response received: ${text.substring(0, 50)}`);
             return { status: 'PENDING', raw: text };
 
         } catch (error: any) {
