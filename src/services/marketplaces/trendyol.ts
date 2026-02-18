@@ -93,21 +93,17 @@ export class TrendyolService implements IMarketplaceService {
     }> {
         // High-fidelity attempt list based on official developer patterns
         const attempts = [
-            // 1. SAPIGW Plural (Standard for common-label)
-            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/common-label?shipmentPackageIds=${shipmentPackageId}&format=A4`,
-            // 2. SAPIGW Singular (Some docs show singular shipmentPackageId)
-            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/common-label?shipmentPackageId=${shipmentPackageId}&format=A4`,
-            // 3. SAPIGW Path-based
-            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/common-label?format=A4`,
-            // 4. Integration GW Singular (Used by many integrators)
+            // 1. Integration GW (Often most reliable for direct PDF)
             `https://api.trendyol.com/integration/sellers/${this.config.supplierId}/common-label/${shipmentPackageId}?format=A4`,
-            // 5. Tracking Number based (Query endpoint)
+            // 2. SAPIGW Plural (Standard)
+            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/common-label?shipmentPackageIds=${shipmentPackageId}&format=A4`,
+            // 3. SAPIGW Singular (Fallback)
+            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/common-label?format=A4`,
+            // 4. Tracking Number based
             ...(cargoTrackingNumber ? [
                 `${this.baseUrl}/${this.config.supplierId}/common-label/query?id=${cargoTrackingNumber}`,
                 `https://api.trendyol.com/integration/sellers/${this.config.supplierId}/common-label/query?id=${cargoTrackingNumber}`
             ] : []),
-            // 6. Direct path fallback
-            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=A4`
         ];
 
 
@@ -117,13 +113,15 @@ export class TrendyolService implements IMarketplaceService {
             const result = await this._fetchLabel(url);
             lastResult = result;
 
-            if (result.status === 'SUCCESS' || result.status === 'PENDING') {
+            if (result.status === 'SUCCESS') {
                 return result;
             }
 
-            console.log(`[TRENDYOL] Attempt for ${url} failed with ${result.httpStatus}.`);
+            console.log(`[NEW-DEBUG] Attempt for ${url} was not successful (Status: ${result.status}). Trying next...`);
         }
 
+        // If we reached here, no endpoint gave a SUCCESS PDF.
+        // Return the lastResult (might be PENDING) to the controller to wait for retry.
         return lastResult;
     }
 

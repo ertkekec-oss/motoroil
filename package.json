@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "prisma generate && prisma migrate deploy && next build",
     "postinstall": "prisma generate",
-    "vercel-build": "rm -rf node_modules/.prisma && prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "backup": "node scripts/create-backup.js",
