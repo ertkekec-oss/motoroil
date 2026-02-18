@@ -90,8 +90,9 @@ export class TrendyolService implements IMarketplaceService {
         raw?: any;
     }> {
         try {
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+
             // STEP 0: Status Check (Fix for 556)
-            // Trendyol returns 556 if status is 'Created'. It must be 'Picking' or further.
             let pkgStatus = 'Unknown';
             try {
                 console.log(`[TRENDYOL-LABEL] Checking status for package ${shipmentPackageId}...`);
@@ -107,36 +108,38 @@ export class TrendyolService implements IMarketplaceService {
                     };
                 }
             } catch (e: any) {
-                // Resilience: If status check fails (e.g. 556), we don't crash, we proceed to try the label fetch.
                 console.warn(`[TRENDYOL-LABEL] Status check error (continuing anyway): ${e.message}`);
             }
 
             // STEP 1: Attempt Standard v2 PDF (getLabels)
             const v2Url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
-            console.log(`[TRENDYOL-LABEL] ATTEMPT 1 (v2): ${v2Url}`);
+            const fetchV2Url = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(v2Url)}` : v2Url;
 
-            let response = await fetch(v2Url, {
+            console.log(`[TRENDYOL-LABEL] ATTEMPT 1 (v2): ${v2Url} (Proxy: ${!!effectiveProxy})`);
+
+            let response = await fetch(fetchV2Url, {
                 method: 'GET',
                 headers: this.getHeaders({
                     'Accept': 'application/pdf',
-                    'User-Agent': 'Periodya-Integration/1.0'
+                    'Accept-Language': 'tr-TR'
                 })
             });
 
             // STEP 2: Hybrid Fallback (v1/Alt Path)
-            // If v2 fails with 556/400, try the direct path which sometimes works better for single packages
             if (!response.ok) {
                 const errText = await response.text();
                 const status = response.status;
                 console.warn(`[TRENDYOL-LABEL] v2 Failed (${status}): ${errText.substring(0, 100)}. Trying Fallback...`);
 
                 const altUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels/${shipmentPackageId}`;
+                const fetchAltUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(altUrl)}` : altUrl;
+
                 console.log(`[TRENDYOL-LABEL] ATTEMPT 2 (Alt): ${altUrl}`);
-                response = await fetch(altUrl, {
+                response = await fetch(fetchAltUrl, {
                     method: 'GET',
                     headers: this.getHeaders({
                         'Accept': 'application/pdf',
-                        'User-Agent': 'Periodya-Integration/1.0'
+                        'Accept-Language': 'tr-TR'
                     })
                 });
             }
@@ -146,7 +149,6 @@ export class TrendyolService implements IMarketplaceService {
                 const status = response.status;
                 console.error(`[TRENDYOL-LABEL] All label fetch attempts failed. Status: ${status}`);
 
-                // CRITICAL: Convert 556/503/504 to PENDING to allow UI to retry naturally
                 if (status === 556 || status === 503 || status === 504 || status === 429) {
                     return {
                         status: 'PENDING',
@@ -167,7 +169,6 @@ export class TrendyolService implements IMarketplaceService {
             const ab = await response.arrayBuffer();
             const buf = Buffer.from(ab);
 
-            // Verify PDF Magic Number (%PDF-)
             if (buf.subarray(0, 4).toString() === '%PDF') {
                 console.log(`[TRENDYOL-LABEL] SUCCESS. Received PDF (${buf.length} bytes).`);
                 return {
@@ -189,10 +190,16 @@ export class TrendyolService implements IMarketplaceService {
 
     private async getShipmentPackageDetails(shipmentPackageId: string): Promise<any> {
         const url = `${this.baseUrl}/sapigw/suppliers/${this.config.supplierId}/shipment-packages/${shipmentPackageId}`;
-        const response = await fetch(url, { headers: this.getHeaders() });
+        const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+        const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+
+        const response = await fetch(fetchUrl, {
+            headers: this.getHeaders({ 'Accept-Language': 'tr-TR' })
+        });
+
         if (!response.ok) {
             if (response.status === 556) {
-                console.warn(`[TRENDYOL-LABEL] SAPIGW 556 - Service Unavailable for package details`);
+                console.warn(`[TRENDYOL-LABEL] SAPIGW 556 - Service Unavailable for package details (Proxy: ${!!effectiveProxy})`);
                 throw new Error(`Status 556`);
             }
             throw new Error(`Status ${response.status}`);
