@@ -86,7 +86,11 @@ export async function GET(
                     status: 202, headers: { "Content-Type": "text/html; charset=utf-8", "Retry-After": String(retryAfterSec) }
                 }));
             }
-            return respondWith(new Response(JSON.stringify({ status: "PENDING", message: "Hazırlanıyor..." }), {
+            return respondWith(new Response(JSON.stringify({
+                status: "PENDING",
+                message: "Hazırlanıyor...",
+                attempt: currentAttempt
+            }), {
                 status: 202, headers: { "Content-Type": "application/json", "Retry-After": String(retryAfterSec) }
             }));
         }
@@ -127,7 +131,12 @@ export async function GET(
             }));
         }
 
-        return respondWith(new Response(JSON.stringify({ status: "PENDING", message: msg, auditId: result.auditId }), {
+        return respondWith(new Response(JSON.stringify({
+            status: "PENDING",
+            message: msg,
+            auditId: result.auditId,
+            attempt: currentAttempt
+        }), {
             status: 202,
             headers: { "Content-Type": "application/json", "Retry-After": String(retryAfterSec) }
         }));
