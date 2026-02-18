@@ -118,6 +118,38 @@ export class TrendyolService implements IMarketplaceService {
                 } catch (e: any) {
                     console.warn(`[TRENDYOL-LABEL] Trigger fatal error (ignoring): ${e.message}`);
                 }
+
+                // ATTEMPT 0: Common Label GET (Direct retrieval for TEX/Aras)
+                try {
+                    const getUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/${cargoTrackingNumber}`;
+                    const fetchGetUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(getUrl)}` : getUrl;
+
+                    console.log(`[TRENDYOL-LABEL] ATTEMPT 0 (CommonLabel GET): ${getUrl}`);
+                    const res = await fetch(fetchGetUrl, {
+                        headers: this.getHeaders({
+                            'Accept': 'application/json',
+                            'Accept-Language': 'tr-TR'
+                        })
+                    });
+
+                    if (res.ok) {
+                        const body = await res.text();
+                        if (body.trim() !== 'OK') {
+                            const json = JSON.parse(body);
+                            const labelItem = json.data?.[0];
+                            if (labelItem && labelItem.label && labelItem.format === 'PDF') {
+                                console.log(`[TRENDYOL-LABEL] SUCCESS via CommonLabel GET (PDF).`);
+                                return {
+                                    status: 'SUCCESS',
+                                    pdfBase64: labelItem.label,
+                                    httpStatus: 200
+                                };
+                            }
+                        }
+                    }
+                } catch (e: any) {
+                    console.warn(`[TRENDYOL-LABEL] CommonLabel GET error (skipping): ${e.message}`);
+                }
             }
 
             // STEP 1: Status Check (Fix for 556)
