@@ -24,13 +24,11 @@ export class TrendyolService implements IMarketplaceService {
     private getHeaders(extra: Record<string, string> = {}): Record<string, string> {
         const headers: any = {
             'Authorization': this.getAuthHeader(),
-            // OFFICIAL: "SellerId - SelfIntegration" is standard for self-developed apps to avoid 403
+            // OFFICIAL: "SellerId - SelfIntegration" is standard for self-developed apps
             'User-Agent': `${this.config.supplierId} - SelfIntegration`,
-            'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Accept': 'application/pdf',
             'x-supplier-id': this.config.supplierId,
             'x-seller-id': this.config.supplierId,
-            'Referer': 'https://partner.trendyol.com/',
             'Content-Type': 'application/json',
             ...extra
         };
@@ -95,12 +93,21 @@ export class TrendyolService implements IMarketplaceService {
     }> {
         // High-fidelity attempt list based on official developer patterns
         const attempts = [
+            // 1. SAPIGW Plural (Standard for common-label)
             `${this.baseUrl}/${this.config.supplierId}/shipment-packages/common-label?shipmentPackageIds=${shipmentPackageId}&format=A4`,
-            `${this.baseUrl}/${this.config.supplierId}/common-label?shipmentPackageIds=${shipmentPackageId}&format=A4`,
+            // 2. SAPIGW Singular (Some docs show singular shipmentPackageId)
+            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/common-label?shipmentPackageId=${shipmentPackageId}&format=A4`,
+            // 3. SAPIGW Path-based
             `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/common-label?format=A4`,
-            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=A4`,
-            // If cargoTrackingNumber is provided, try the tracking based endpoint
-            ...(cargoTrackingNumber ? [`https://api.trendyol.com/sapigw/suppliers/${this.config.supplierId}/common-label/query?id=${cargoTrackingNumber}`] : [])
+            // 4. Integration GW Singular (Used by many integrators)
+            `https://api.trendyol.com/integration/sellers/${this.config.supplierId}/common-label/${shipmentPackageId}?format=A4`,
+            // 5. Tracking Number based (Query endpoint)
+            ...(cargoTrackingNumber ? [
+                `${this.baseUrl}/${this.config.supplierId}/common-label/query?id=${cargoTrackingNumber}`,
+                `https://api.trendyol.com/integration/sellers/${this.config.supplierId}/common-label/query?id=${cargoTrackingNumber}`
+            ] : []),
+            // 6. Direct path fallback
+            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=A4`
         ];
 
 
@@ -127,35 +134,66 @@ export class TrendyolService implements IMarketplaceService {
         httpStatus?: number;
         raw?: any;
     }> {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout per attempt
+
         try {
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
-            console.log(`[TRENDYOL] Fetching Label: ${url} (Proxy: ${!!effectiveProxy})`);
+            console.log(`[TRENDYOL] Fetching: ${url}`);
             const response = await fetch(fetchUrl, {
-                headers: this.getHeaders()
+                headers: this.getHeaders(),
+                signal: controller.signal
             });
 
-
+            clearTimeout(timeoutId);
             const httpStatus = response.status;
-            const responseText = await response.text();
-            let raw: any = null;
-            try {
-                raw = responseText ? JSON.parse(responseText) : null;
-            } catch {
-                raw = responseText;
+            const ct = response.headers.get("content-type") || "";
+
+            // 1) Handle "Not Ready" statuses
+            if (httpStatus === 404 || httpStatus === 409) {
+                return { status: 'PENDING', httpStatus };
             }
 
             if (!response.ok) {
-                return { status: 'FAILED', error: `Trendyol API Hatası: ${httpStatus}`, httpStatus, raw };
+                const errText = await response.text();
+                console.log(`[TRENDYOL] Failed: ${httpStatus} | ${errText.substring(0, 100)}`);
+                return { status: 'FAILED', error: `Trendyol API Hatası: ${httpStatus}`, httpStatus, raw: errText };
             }
 
-            if (raw && raw.content && raw.content.length > 100) {
-                return { status: 'SUCCESS', pdfBase64: raw.content, httpStatus, raw };
+            // 2) Read as binary
+            const ab = await response.arrayBuffer();
+            const buf = Buffer.from(ab);
+
+            // --- USER REQUESTED DEBUG LOGS ---
+            console.log("[TRENDYOL] status", httpStatus, "ct", ct, "len", buf.length);
+            console.log("[TRENDYOL] head", buf.subarray(0, 32).toString("hex"));
+            console.log("[TRENDYOL] head-ascii", buf.subarray(0, 16).toString('utf-8').replace(/[^\x20-\x7E]/g, '.'));
+            // ---------------------------------
+
+            // 3) SUCCESS: If we got a 200 OK with content, let's treat it as success for inspection.
+            // Even if it's small or unknown, we want to see it in S3 / browser.
+            if (buf.length > 5) { // Any significant content
+                console.log(`[TRENDYOL] Treating 200 OK as SUCCESS for inspection. Size: ${buf.length}`);
+                return {
+                    status: 'SUCCESS',
+                    pdfBase64: buf.toString('base64'),
+                    httpStatus
+                };
             }
 
-            return { status: 'PENDING', httpStatus, raw };
+            const text = buf.toString('utf-8');
+            console.log(`[TRENDYOL] Body too small/empty: ${text}`);
+
+            return { status: 'PENDING', httpStatus, raw: text };
+
         } catch (error: any) {
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                return { status: 'FAILED', error: 'Trendyol API Timeout (15s)', httpStatus: 408 };
+            }
+            console.error(`[TRENDYOL] Fetch Error:`, error);
             return { status: 'FAILED', error: error.message || 'Bağlantı hatası', raw: error };
         }
     }
