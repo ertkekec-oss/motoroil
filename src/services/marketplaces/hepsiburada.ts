@@ -123,7 +123,6 @@ export class HepsiburadaService implements IMarketplaceService {
             {
                 name: 'UNPACKED',
                 urlPart: `orders/merchantid/${merchantId}`,
-                // Verified: offset causes 400. limit is 200.
                 params: ['limit']
             },
             {
@@ -138,7 +137,7 @@ export class HepsiburadaService implements IMarketplaceService {
             },
             {
                 name: 'CANCELLED',
-                urlPart: `packages/merchantid/${merchantId}/cancelled`,
+                urlPart: `orders/merchantid/${merchantId}/cancelled`,
                 params: ['begindate', 'enddate']
             }
         ];
@@ -162,7 +161,6 @@ export class HepsiburadaService implements IMarketplaceService {
 
                     const url = `${this.baseUrl}/${target.urlPart}?${qs.toString()}`;
 
-                    // LOGGING FOR DEBUGGING
                     const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
                     const userAgent = (this.config.username || '').trim();
                     const proxyKey = this.getProxyKeyHeader();
@@ -185,25 +183,27 @@ export class HepsiburadaService implements IMarketplaceService {
 
                     if (!response.ok) {
                         const errText = await response.text();
-                        const logBody = errText ? `. Body: ${errText.substring(0, 200)}` : '';
-                        console.error(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status})${logBody}`);
+                        console.error(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status})`);
 
+                        // 1. FATAL AUTH ERROR: Abort entire sync
                         if (response.status === 401 || response.status === 403) {
-                            throw new Error(`HB_AUTH_ERROR: Hepsiburada Yetkilendirme Hatası (${response.status}). Header formatını ve User-Agent kontrol edin.`);
+                            throw new Error(`HB_AUTH_ERROR: Hepsiburada Yetkilendirme Hatası (${response.status}). Nginx Authorization forward ve Host header kontrol edilmeli.`);
                         }
-                        if (response.status === 426) {
-                            throw new Error(`HB_UPGRADE_REQ: Hepsiburada 426 (Upgrade Required) döndürdü. İstek header'larını ve protokolü kontrol edin.`);
+
+                        // 2. SOFT MISSING ENDPOINT: Skip this target (Environment/Config mismatch)
+                        if (response.status === 404 || response.status === 405) {
+                            console.warn(`[HB_SYNC_SKIP] ${target.name} endpoint bulunamadı (404/405). Bu segment atlanıyor.`);
+                            hasMore = false;
+                            break;
                         }
+
+                        // 3. RETRYABLE RATE LIMIT
                         if (response.status === 429) {
                             throw new Error(`HB_RATE_LIMIT: Hepsiburada API limitine takıldınız. (429)`);
                         }
 
-                        // For 400 Bad Request
-                        if (response.status === 400) {
-                            throw new Error(`HB_BAD_REQUEST: ${target.name} servisi 400 hatası döndürdü. Parametreleri kontrol edin.`);
-                        }
-
-                        throw new Error(`HB_API_ERROR: ${target.name} servisi ${response.status} hatası döndürdü: ${errText.substring(0, 200)}`);
+                        // 4. OTHER API ERRORS
+                        throw new Error(`HB_API_ERROR: ${target.name} servisi ${response.status} hatası döndürdü.`);
                     }
 
                     const data = await response.json();
