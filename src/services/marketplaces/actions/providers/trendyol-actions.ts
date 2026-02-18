@@ -19,19 +19,18 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
 
         // 1) Redis Lock Check
         const lockKey = `lock:action:${idempotencyKey}`;
-        // TTL: 90s to ensure a single producer window.
-        const acquired = await redisConnection.set(lockKey, 'BUSY', 'NX', 'EX', 90);
+        const acquired = await redisConnection.set(lockKey, 'BUSY', 'NX', 'EX', 60);
 
         console.log(`${ctx} Redis lock acquired: ${!!acquired}`);
 
         if (!acquired) {
-            console.log(`${ctx} Busy (Lock exists). returning PENDING without re-execution.`);
+            console.log(`${ctx} Busy (Parallel process running). returning PENDING.`);
             const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
-            return { status: "PENDING", auditId: existingAudit?.id, errorMessage: "İşlem devam ediyor (Kilitli)..." };
+            return { status: "PENDING", auditId: existingAudit?.id, errorMessage: "İşlem devam ediyor..." };
         }
 
-        let terminalState = false;
         try {
+            // ... (rest of the logic)
             // ... (rest of the logic)
             // 2) Audit Record Management
             const audit = await (prisma as any).marketplaceActionAudit.upsert({
@@ -139,7 +138,6 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
             });
 
             metrics.externalCall(marketplace, actionKey, 'SUCCESS');
-            terminalState = true;
             return { status: "SUCCESS", auditId: audit.id, result };
 
         } catch (error: any) {
@@ -154,13 +152,10 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                 data: { status: 'FAILED', errorMessage: error.message }
             });
 
-            terminalState = true;
             return { status: "FAILED", errorMessage: error.message, errorCode: MarketplaceActionErrorCode.E_UNKNOWN };
 
         } finally {
-            if (terminalState) {
-                await redisConnection.del(lockKey);
-            }
+            await redisConnection.del(lockKey);
         }
     }
 }
