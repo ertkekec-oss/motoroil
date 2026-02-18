@@ -33,6 +33,7 @@ export async function GET(
         if (!company) return new Response(JSON.stringify({ error: "Firma bulunamadı" }), { status: 403 });
 
         const idempotencyKey = `LABEL_${format}:${company.id}:${marketplace}:${shipmentPackageId}`;
+        const ctx = `[LABEL:${marketplace}][IDEMP:${idempotencyKey}]`;
 
         // Helper: Respond based on Accept header
         const respondWithSuccess = async (storageKey: string) => {
