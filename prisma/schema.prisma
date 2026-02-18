@@ -81,6 +81,9 @@ model Company {
   customerCategories CustomerCategory[]
   coupons            Coupon[]
   suspendedSales     SuspendedSale[]
+  appSettings        AppSettings[]
+  productMaps        MarketplaceProductMap[]
+  externalRequests   ExternalRequest[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
