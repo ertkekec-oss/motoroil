@@ -44,7 +44,10 @@ export function MarketplaceActionButton({
         }
 
         if (isLabel && shipmentPackageId) {
-            payload = { labelShipmentPackageId: shipmentPackageId };
+            payload = {
+                labelShipmentPackageId: shipmentPackageId,
+                shipmentPackageId: shipmentPackageId
+            };
         }
 
         setStatus("PENDING");

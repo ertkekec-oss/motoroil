@@ -61,7 +61,7 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
 
             // 3) Execute Logic Based on Action Key
             if (actionKey === 'PRINT_LABEL_A4') {
-                const shipmentPackageId = payload?.labelShipmentPackageId;
+                const shipmentPackageId = payload?.shipmentPackageId || payload?.labelShipmentPackageId;
                 if (!shipmentPackageId) throw new Error('shipmentPackageId gerekli');
 
                 const labelResult = await service.getCommonLabel(shipmentPackageId);
