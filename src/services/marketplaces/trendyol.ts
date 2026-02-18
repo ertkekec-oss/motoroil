@@ -113,10 +113,10 @@ export class TrendyolService implements IMarketplaceService {
                 }
             } catch (e: any) {
                 if (e.message.includes("Proxy returned OK")) {
-                    console.info(`[TRENDYOL-LABEL] Proxy indicative of async processing (OK body). Treating as PENDING.`);
-                    return { status: 'PENDING', error: 'Bağlantı hazırlanıyor...', httpStatus: 202 };
+                    console.info(`[TRENDYOL-LABEL] Status check is PENDING (Proxy OK). Proceeding to fetching strategies anyway...`);
+                } else {
+                    console.warn(`[TRENDYOL-LABEL] Status check error (proceeding anyway): ${e.message}`);
                 }
-                console.warn(`[TRENDYOL-LABEL] Status check warning (transient): ${e.message}`);
             }
 
             // --- STRATEGY A: Trigger & Fetch via /common-label (For TEX/Aras) ---
