@@ -82,73 +82,58 @@ export class TrendyolService implements IMarketplaceService {
         }
     }
 
-    async getCommonLabel(shipmentPackageId: string, cargoTrackingNumber?: string): Promise<{
+    async getCommonLabel(shipmentPackageId: string, _cargoTrackingNumber?: string): Promise<{
         status: 'SUCCESS' | 'PENDING' | 'FAILED';
         pdfBase64?: string;
         error?: string;
         httpStatus?: number;
         raw?: any;
     }> {
-        // Step 1: Ensure we have a barcode
-        let barcode = cargoTrackingNumber;
-        if (!barcode) {
-            console.log(`[TRENDYOL-ZPL] Missing barcode. Fetching for ${shipmentPackageId}...`);
-            try {
-                const packageDetails = await this.getShipmentPackageDetails(shipmentPackageId);
-                barcode = packageDetails.cargoTrackingNumber;
-            } catch (e) {
-                console.error(`[TRENDYOL-ZPL] Failed to fetch barcode:`, e);
-                return { status: 'FAILED', error: 'Barkod bilgisi alınamadı' };
-            }
-        }
+        // OFFICIAL FIX: Using standard PDF endpoint (getLabels) instead of restricted common-label (ZPL)
+        // This is the universally available method used by BizimHesap and others.
+        // Endpoint: GET /integration/sellers/{sellerId}/labels?shipmentPackageIds={shipmentPackageId}
+        const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
 
-        if (!barcode) return { status: 'FAILED', error: 'Barkod bulunamadı' };
-        console.log(`[TRENDYOL-ZPL] Starting Official Flow for Barcode: ${barcode}`);
+        console.log(`[TRENDYOL-LABEL] Fetching standard PDF: ${url}`);
 
-        // Step 2: Trigger Creation (POST)
-        const trigger = await this.createCommonLabelPost(barcode);
-        if (!trigger.success) {
-            console.error(`[TRENDYOL-ZPL] Trigger failed: ${trigger.error}`);
-            return { status: 'FAILED', error: `Etiket Tetikleme Hatası: ${trigger.error}` };
-        }
-
-        // Step 3: Fetch ZPL (GET) - Try both Query (v3) and Path (v2) styles
-        let zpl: string | null = null;
-        for (let i = 0; i < 2; i++) {
-            console.log(`[TRENDYOL-ZPL] Fetching ZPL (Attempt ${i + 1}/2)...`);
-
-            // Try v3 Query endpoint
-            zpl = await this.getZplFromQuery(barcode);
-
-            // If v3 fails, try v2 Path endpoint
-            if (!zpl) {
-                zpl = await this.getZplFromPath(barcode);
-            }
-
-            if (zpl) break;
-
-            if (i === 0) {
-                console.log(`[TRENDYOL-ZPL] Not ready, waiting 3s before retry...`);
-                await new Promise(r => setTimeout(r, 3000));
-            }
-        }
-
-        if (!zpl) {
-            console.log(`[TRENDYOL-ZPL] ZPL not ready after short retry logic.`);
-            return { status: 'PENDING', raw: 'ZPL_NOT_READY' };
-        }
-
-        // Step 4: Convert ZPL to PDF via Labelary
         try {
-            const pdfBuffer = await this.convertZplToPdf(zpl);
-            return {
-                status: 'SUCCESS',
-                pdfBase64: pdfBuffer.toString('base64'),
-                httpStatus: 200
-            };
-        } catch (err: any) {
-            console.error(`[TRENDYOL-ZPL] Labelary Error:`, err);
-            return { status: 'FAILED', error: `PDF Dönüştürme Hatası: ${err.message}` };
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: this.getHeaders({ 'Accept': 'application/pdf' })
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                console.error(`[TRENDYOL-LABEL] Error ${response.status}: ${errText}`);
+                return {
+                    status: 'FAILED',
+                    error: `Trendyol API Hatası: ${response.status}`,
+                    httpStatus: response.status,
+                    raw: errText
+                };
+            }
+
+            const ab = await response.arrayBuffer();
+            const buf = Buffer.from(ab);
+
+            // Verify it's actually a PDF binary (%PDF- header)
+            if (buf.subarray(0, 4).toString() === '%PDF') {
+                console.log(`[TRENDYOL-LABEL] SUCCESS. Received PDF (${buf.length} bytes).`);
+                return {
+                    status: 'SUCCESS',
+                    pdfBase64: buf.toString('base64'),
+                    httpStatus: 200
+                };
+            }
+
+            // Fallback for unexpected response bodies
+            const text = buf.toString('utf-8').trim();
+            console.log(`[TRENDYOL-LABEL] Unexpected response content: ${text.substring(0, 100)}`);
+            return { status: 'PENDING', raw: text };
+
+        } catch (error: any) {
+            console.error(`[TRENDYOL-LABEL] Connection Error:`, error);
+            return { status: 'FAILED', error: error.message || 'Bağlantı hatası' };
         }
     }
 
@@ -159,64 +144,6 @@ export class TrendyolService implements IMarketplaceService {
         return await response.json();
     }
 
-    async createCommonLabelPost(barcode: string): Promise<{ success: boolean; error?: string }> {
-        // OFFICIAL FIX: Remove ?format=ZPL from URL, must be in BODY only
-        const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/${barcode}`;
-        console.log(`[TRENDYOL-ZPL] Step 1 POST: ${url}`);
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: this.getHeaders({ 'Content-Type': 'application/json' }),
-            body: JSON.stringify({ format: 'ZPL' })
-        });
-
-        if (!response.ok) {
-            const errText = await response.text();
-            return { success: false, error: `${response.status} ${errText}` };
-        }
-
-        console.log(`[TRENDYOL-ZPL] POST SUCCESS (OK ack received)`);
-        return { success: true };
-    }
-
-    async getZplFromQuery(barcode: string): Promise<string | null> {
-        const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/query?id=${barcode}`;
-        const response = await fetch(url, { headers: this.getHeaders() });
-
-        if (!response.ok) return null;
-        const json = await response.json();
-
-        const labelData = json.data?.[0]?.label || json.label;
-        if (labelData && typeof labelData === 'string' && labelData.includes('^XA')) {
-            return labelData;
-        }
-        return null;
-    }
-
-    async getZplFromPath(barcode: string): Promise<string | null> {
-        const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/${barcode}?format=ZPL`;
-        console.log(`[TRENDYOL-ZPL] GET Path Fallback: ${url}`);
-        const response = await fetch(url, { headers: this.getHeaders() });
-        if (!response.ok) return null;
-        const text = await response.text();
-        return (text.startsWith('^XA') && text.includes('^XZ')) ? text : null;
-    }
-
-    async convertZplToPdf(zpl: string): Promise<Buffer> {
-        console.log(`[TRENDYOL-ZPL] Step 3: Labelary PDF Conversion...`);
-        const response = await fetch('https://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/', {
-            method: 'POST',
-            headers: { 'Accept': 'application/pdf' },
-            body: zpl
-        });
-
-        if (!response.ok) {
-            throw new Error(`Labelary API failed (${response.status})`);
-        }
-
-        const ab = await response.arrayBuffer();
-        return Buffer.from(ab);
-    }
 
     private async _fetchLabel(url: string, method: 'GET' | 'POST' = 'GET'): Promise<{
         status: 'SUCCESS' | 'PENDING' | 'FAILED';
