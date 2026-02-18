@@ -120,46 +120,40 @@ export class TrendyolService implements IMarketplaceService {
                     const getUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/${cargoTrackingNumber}`;
                     const fetchGetUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(getUrl)}` : getUrl;
 
+                    console.log(`[TRENDYOL-LABEL] ATTEMPT 0 (Common-Label GET): ${getUrl}`);
                     const res = await fetch(fetchGetUrl, {
                         headers: this.getHeaders({ 'Accept': 'application/json', 'Accept-Language': 'tr-TR' })
                     });
 
                     if (res.ok) {
                         const body = await res.text();
-                        if (body.trim() === 'OK') {
-                            console.log(`[TRENDYOL-LABEL] System said OK (Processing). Returning PENDING.`);
-                            return { status: 'PENDING', httpStatus: 202, raw: 'OK' };
-                        }
+                        if (body.trim() !== 'OK') {
+                            const json = JSON.parse(body);
+                            const labelData = json.data?.[0];
 
-                        const json = JSON.parse(body);
-                        const labelData = json.data?.[0]; // Usually returned in data array
-
-                        if (labelData && labelData.label) {
-                            // If it's already PDF (base64)
-                            if (labelData.format === 'PDF') {
-                                console.log(`[TRENDYOL-LABEL] Received PDF via common-label GET.`);
-                                return { status: 'SUCCESS', pdfBase64: labelData.label, httpStatus: 200 };
-                            }
-
-                            // If it's ZPL, we MUST convert to PDF (Common for TEX)
-                            if (labelData.format === 'ZPL') {
-                                console.log(`[TRENDYOL-LABEL] Received ZPL. Converting to PDF via Labelary...`);
-                                try {
+                            if (labelData && labelData.label) {
+                                if (labelData.format === 'PDF') {
+                                    console.log(`[TRENDYOL-LABEL] SUCCESS via common-label GET (PDF).`);
+                                    return { status: 'SUCCESS', pdfBase64: labelData.label, httpStatus: 200 };
+                                }
+                                if (labelData.format === 'ZPL') {
+                                    console.log(`[TRENDYOL-LABEL] Received ZPL. Converting...`);
                                     const pdfBuf = await this.convertZplToPdf(labelData.label);
                                     if (pdfBuf) {
                                         return { status: 'SUCCESS', pdfBase64: pdfBuf.toString('base64'), httpStatus: 200 };
                                     }
-                                } catch (convErr: any) {
-                                    console.error(`[TRENDYOL-LABEL] ZPL Conversion Error: ${convErr.message}`);
                                 }
                             }
+                        } else {
+                            console.log(`[TRENDYOL-LABEL] Common-Label GET returned "OK" (not ready yet).`);
                         }
                     } else {
-                        console.warn(`[TRENDYOL-LABEL] Common-Label GET fail (${res.status}). Proceeding to Fallback...`);
+                        console.warn(`[TRENDYOL-LABEL] Common-Label GET failed (${res.status}).`);
                     }
                 } catch (e: any) {
-                    console.warn(`[TRENDYOL-LABEL] Common-Label fetch error: ${e.message}`);
+                    console.warn(`[TRENDYOL-LABEL] Common-Label Strategy A failed: ${e.message}`);
                 }
+                // FALL THROUGH: Even if Strategy A didn't give a label, we proceed to Strategy B (Standard v2)
             }
 
             // --- STRATEGY B: Standard v2 Labels Fallback (For all carriers) ---
