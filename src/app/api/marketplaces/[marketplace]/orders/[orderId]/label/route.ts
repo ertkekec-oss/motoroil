@@ -57,61 +57,91 @@ export async function GET(
         const existingLabel = await (prisma as any).marketplaceLabel.findUnique({
             where: { companyId_marketplace_shipmentPackageId: { companyId: company.id, marketplace, shipmentPackageId } }
         });
-        if (existingLabel) return respondWithSuccess(existingLabel.storageKey);
+        if (existingLabel) {
+            console.log(`${ctx} Found existing label in DB. Responding with success.`);
+            return respondWithSuccess(existingLabel.storageKey);
+        }
 
         const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
         if (existingAudit?.status === 'SUCCESS' && existingAudit.responsePayload?.storageKey) {
+            console.log(`${ctx} Found existing successful audit. Responding with success.`);
             return respondWithSuccess(existingAudit.responsePayload.storageKey);
         }
 
-        // 2) Synchronous Polling Loop (Time-Budgeted)
-        const provider = ActionProviderRegistry.getProvider(marketplace);
-        const deadline = Date.now() + 50_000; // 50s budget
-        let lastResult: any = null;
-        let attempt = 0;
+        // 1.5) Redis Lock Check to prevent duplicate processing
+        const lockKey = `lock:action:${idempotencyKey}`;
+        // Try to acquire a lock. NX = Not Exists, EX = Expire in 60 seconds.
+        const acquired = await redisConnection.set(lockKey, 'BUSY', 'NX', 'EX', 60);
 
-        while (Date.now() < deadline) {
-            attempt++;
-            const result = await provider.executeAction({
-                companyId: company.id,
-                marketplace: marketplace as any,
-                orderId,
-                actionKey: `PRINT_LABEL_${format}` as any,
-                idempotencyKey,
-                payload: { labelShipmentPackageId: shipmentPackageId },
-            });
+        console.log(`${ctx} Redis lock acquired: ${!!acquired}`);
 
-            lastResult = result;
+        if (!acquired) {
+            // If lock exists, another process is already handling this.
+            // Return PENDING, client should retry.
+            console.log(`${ctx} Busy (Lock exists). Returning PENDING.`);
+            const retryAfterSec = 3;
+            const msg = existingAudit?.errorMessage || "İşlem devam ediyor...";
 
-            if (result.status === "SUCCESS" && result.result?.storageKey) {
-                return respondWithSuccess(result.result.storageKey);
-            }
-
-            if (result.status === "FAILED") {
-                return new Response(JSON.stringify({
-                    error: result.errorMessage || "Etiket alınamadı",
-                    status: "FAILED",
-                    auditId: result.auditId
-                }), {
-                    status: 502,
-                    headers: { "Content-Type": "application/json" }
+            if (isDocumentRequest(request)) {
+                return new Response(pendingHtml(retryAfterSec, msg), {
+                    status: 202,
+                    headers: {
+                        "Content-Type": "text/html; charset=utf-8",
+                        "Retry-After": String(retryAfterSec),
+                    },
                 });
             }
 
-            if (result.status === "PENDING") {
-                const sleepMs = (result.httpStatus === 556 || result.httpStatus === 429) ? 6000 : 3000;
-                console.log(`[LABEL] Polling ${shipmentPackageId} (attempt ${attempt})...`);
-                await new Promise(r => setTimeout(r, sleepMs));
-                continue;
-            }
+            return new Response(JSON.stringify({
+                status: "PENDING",
+                message: msg,
+                auditId: existingAudit?.id
+            }), {
+                status: 202,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Retry-After": String(retryAfterSec)
+                }
+            });
         }
 
-        // 3) Final Fallback (Timeout reached)
+        // 2) Execute Action ONCE (Remove server-side polling for Vercel stability)
+        const provider = ActionProviderRegistry.getProvider(marketplace);
+        const result = await provider.executeAction({
+            companyId: company.id,
+            marketplace: marketplace as any,
+            orderId,
+            actionKey: `PRINT_LABEL_${format}` as any,
+            idempotencyKey,
+            payload: { labelShipmentPackageId: shipmentPackageId },
+        });
+
+        // 3) Handle Result
+        if (result.status === "SUCCESS" && result.result?.storageKey) {
+            console.log(`[LABEL] Result: SUCCESS. Responding with 303/200.`);
+            return respondWithSuccess(result.result.storageKey);
+        }
+
+        if (result.status === "FAILED") {
+            console.error(`[LABEL] Result: FAILED.`, result.errorMessage);
+            return new Response(JSON.stringify({
+                error: result.errorMessage || "Etiket alınamadı",
+                status: "FAILED",
+                auditId: result.auditId
+            }), {
+                status: 502,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        // ⏳ PENDING or TIMEOUT: Always return 202 Accepted
         const retryAfterSec = 3;
-        const lastMsg = lastResult?.errorMessage || "Etiket hazırlanıyor...";
+        const msg = result.errorMessage || "Etiket hazırlanıyor...";
+
+        console.log(`[LABEL] Result: PENDING. Responding with 202 Accepted.`);
 
         if (isDocumentRequest(request)) {
-            return new Response(pendingHtml(retryAfterSec, lastMsg), {
+            return new Response(pendingHtml(retryAfterSec, msg), {
                 status: 202,
                 headers: {
                     "Content-Type": "text/html; charset=utf-8",
@@ -122,8 +152,8 @@ export async function GET(
 
         return new Response(JSON.stringify({
             status: "PENDING",
-            message: lastMsg,
-            auditId: lastResult?.auditId
+            message: msg,
+            auditId: result.auditId
         }), {
             status: 202,
             headers: {

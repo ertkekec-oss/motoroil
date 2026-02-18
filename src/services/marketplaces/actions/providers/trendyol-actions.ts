@@ -21,6 +21,8 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
         const lockKey = `lock:action:${idempotencyKey}`;
         const acquired = await redisConnection.set(lockKey, 'BUSY', 'NX', 'EX', 60);
 
+        console.log(`${ctx} Redis lock acquired: ${!!acquired}`);
+
         if (!acquired) {
             console.log(`${ctx} Busy (Lock exists). returning PENDING.`);
             const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
