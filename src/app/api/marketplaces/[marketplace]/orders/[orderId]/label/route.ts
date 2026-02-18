@@ -34,25 +34,24 @@ export async function GET(
 
         const idempotencyKey = `LABEL_${format}:${company.id}:${marketplace}:${shipmentPackageId}`;
         const ctx = `[LABEL:${marketplace}][IDEMP:${idempotencyKey}]`;
+        // Helper: Respond and Log
+        const respondWith = (res: Response) => {
+            console.info(`${ctx} responding status=${res.status}`);
+            return res;
+        };
 
-        // Helper: Respond based on Accept header
         const respondWithSuccess = async (storageKey: string) => {
             const { getLabelSignedUrl } = await import("@/lib/s3");
             const signedUrl = await getLabelSignedUrl(storageKey);
 
             if (isDocumentRequest(request)) {
-                // Browser context: Redirect to S3
-                return Response.redirect(signedUrl, 303); // See Other is cleaner for GET results
+                return respondWith(Response.redirect(signedUrl, 303));
             }
 
-            // API context: Return JSON URL
-            return new Response(JSON.stringify({
-                status: "READY",
-                url: signedUrl
-            }), {
+            return respondWith(new Response(JSON.stringify({ status: "READY", url: signedUrl }), {
                 status: 200,
                 headers: { "Content-Type": "application/json" }
-            });
+            }));
         };
 
         // 1) Fast Path: Check existing state
@@ -70,7 +69,27 @@ export async function GET(
             return respondWithSuccess(existingAudit.responsePayload.storageKey);
         }
 
-        // 2) Execute Action ONCE (Remove server-side polling for Vercel stability)
+        // 2) Attempt Tracking (Throttle expensive calls)
+        const attemptKey = `attempts:label:${idempotencyKey}`;
+        const currentAttempt = await redisConnection.incr(attemptKey);
+        await redisConnection.expire(attemptKey, 300); // 5 min TTL
+
+        const shouldSkipHeavy = currentAttempt > 1 && currentAttempt % 3 !== 0;
+        // If it's not the 1st, 3rd, 6th... attempt, and we know it was pending, we can just return 202 quickly.
+        if (shouldSkipHeavy && existingAudit?.status === 'PENDING') {
+            console.log(`${ctx} Throttling (Attempt ${currentAttempt}). Returning 202 without re-execution.`);
+            const retryAfterSec = 3;
+            if (isDocumentRequest(request)) {
+                return respondWith(new Response(pendingHtml(retryAfterSec, existingAudit.errorMessage || "Hazırlanıyor..."), {
+                    status: 202, headers: { "Content-Type": "text/html; charset=utf-8", "Retry-After": String(retryAfterSec) }
+                }));
+            }
+            return respondWith(new Response(JSON.stringify({ status: "PENDING", message: "Hazırlanıyor..." }), {
+                status: 202, headers: { "Content-Type": "application/json", "Retry-After": String(retryAfterSec) }
+            }));
+        }
+
+        // 3) Execute Action ONCE
         const provider = ActionProviderRegistry.getProvider(marketplace);
         const result = await provider.executeAction({
             companyId: company.id,
@@ -81,51 +100,35 @@ export async function GET(
             payload: { labelShipmentPackageId: shipmentPackageId },
         });
 
-        // 3) Handle Result
+        // 4) Handle Result
         if (result.status === "SUCCESS" && result.result?.storageKey) {
-            console.log(`[LABEL] Result: SUCCESS. Responding with 303/200.`);
+            console.log(`${ctx} Execution SUCCESS. Responding with success.`);
             return respondWithSuccess(result.result.storageKey);
         }
 
         if (result.status === "FAILED") {
-            console.error(`[LABEL] Result: FAILED.`, result.errorMessage);
-            return new Response(JSON.stringify({
-                error: result.errorMessage || "Etiket alınamadı",
-                status: "FAILED",
-                auditId: result.auditId
-            }), {
-                status: 502,
-                headers: { "Content-Type": "application/json" }
-            });
+            console.error(`${ctx} Execution FAILED:`, result.errorMessage);
+            return respondWith(new Response(JSON.stringify({ error: result.errorMessage || "Etiket alınamadı", status: "FAILED", auditId: result.auditId }), {
+                status: 502, headers: { "Content-Type": "application/json" }
+            }));
         }
 
-        // ⏳ PENDING or TIMEOUT: Always return 202 Accepted
+        // ⏳ PENDING: Return 202 Accepted
         const retryAfterSec = 3;
         const msg = result.errorMessage || "Etiket hazırlanıyor...";
-
-        console.log(`[LABEL] Result: PENDING. Responding with 202 Accepted.`);
+        console.log(`${ctx} Execution PENDING. Responding with 202.`);
 
         if (isDocumentRequest(request)) {
-            return new Response(pendingHtml(retryAfterSec, msg), {
+            return respondWith(new Response(pendingHtml(retryAfterSec, msg), {
                 status: 202,
-                headers: {
-                    "Content-Type": "text/html; charset=utf-8",
-                    "Retry-After": String(retryAfterSec),
-                },
-            });
+                headers: { "Content-Type": "text/html; charset=utf-8", "Retry-After": String(retryAfterSec) }
+            }));
         }
 
-        return new Response(JSON.stringify({
-            status: "PENDING",
-            message: msg,
-            auditId: result.auditId
-        }), {
+        return respondWith(new Response(JSON.stringify({ status: "PENDING", message: msg, auditId: result.auditId }), {
             status: 202,
-            headers: {
-                "Content-Type": "application/json",
-                "Retry-After": String(retryAfterSec)
-            }
-        });
+            headers: { "Content-Type": "application/json", "Retry-After": String(retryAfterSec) }
+        }));
 
     } catch (error: any) {
         console.error(`[LABEL_CRITICAL_ERROR]`, error);

@@ -120,8 +120,9 @@ export class TrendyolService implements IMarketplaceService {
             }
 
             // --- STRATEGY A: Trigger & Fetch via /common-label (For TEX/Aras) ---
-            if (cargoTrackingNumber || carrier.includes('express') || carrier.includes('tex')) {
-                console.info(`[TRENDYOL-LABEL] Starting Common-Label flow for ${carrier}...`);
+            const supportsCommonLabel = carrier.includes('express') || carrier.includes('tex');
+            if (cargoTrackingNumber || supportsCommonLabel) {
+                console.info(`[TRENDYOL-LABEL] Strategy A (Common) for carrier: ${carrier || 'Determined by TrackingNo'}`);
 
                 // Step A1: Multiple Trigger Attempts
                 // 1. Trigger by Tracking Number
