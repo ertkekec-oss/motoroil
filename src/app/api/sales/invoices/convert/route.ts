@@ -95,7 +95,14 @@ export async function POST(request: Request) {
                     });
 
                     if (!existingComm) {
-                        const settingsRes = await tx.appSettings.findUnique({ where: { key: 'salesExpenses' } });
+                        const settingsRes = await tx.appSettings.findUnique({
+                            where: {
+                                companyId_key: {
+                                    companyId: order.companyId,
+                                    key: 'salesExpenses'
+                                }
+                            }
+                        });
                         const salesExpenses = settingsRes?.value as any;
 
                         if (salesExpenses?.posCommissions) {

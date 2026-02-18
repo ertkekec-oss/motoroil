@@ -236,7 +236,14 @@ export async function POST(request: Request) {
             // Awaiting commission logic to prevent serverless timeout race conditions
             try {
                 console.log(`[Commission] Starting calculation for total: ${finalTotal}, Mode: ${effectivePaymentMode}`);
-                const settingsRes = await prisma.appSettings.findUnique({ where: { key: 'salesExpenses' } });
+                const settingsRes = await prisma.appSettings.findUnique({
+                    where: {
+                        companyId_key: {
+                            companyId: companyId,
+                            key: 'salesExpenses'
+                        }
+                    }
+                });
                 const salesExpenses = settingsRes?.value as any;
 
                 if (Array.isArray(salesExpenses?.posCommissions)) {

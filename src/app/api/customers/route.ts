@@ -125,7 +125,12 @@ export async function POST(request: Request) {
         // Genel kategori otomatik seçilsin mi? Eğer categoryId gönderilmezse:
         let targetCategoryId = categoryId;
         if (!targetCategoryId) {
-            const generalCat = await prisma.customerCategory.findFirst({ where: { name: 'Genel' } });
+            const generalCat = await prisma.customerCategory.findFirst({
+                where: {
+                    name: 'Genel',
+                    companyId: targetCompanyId
+                }
+            });
             if (generalCat) targetCategoryId = generalCat.id;
         }
 
@@ -150,7 +155,14 @@ export async function POST(request: Request) {
                 const referrer = await tx.customer.findUnique({ where: { referralCode: searchCode } });
 
                 if (referrer) {
-                    const settings = await tx.appSettings.findUnique({ where: { key: 'referralSettings' } });
+                    const settings = await tx.appSettings.findUnique({
+                        where: {
+                            companyId_key: {
+                                companyId: targetCompanyId,
+                                key: 'referralSettings'
+                            }
+                        }
+                    });
                     const s = (settings?.value as any) || { referrerDiscount: 10, refereeGift: 50 };
 
                     await tx.coupon.create({

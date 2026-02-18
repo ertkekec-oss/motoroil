@@ -83,7 +83,14 @@ export async function POST(request: Request) {
                 createdItems.kasa = kasa;
 
                 // Initialize Cash Payment Method in settings
-                const currentSettings = await tx.appSettings.findUnique({ where: { key: 'paymentMethods' } });
+                const currentSettings = await tx.appSettings.findUnique({
+                    where: {
+                        companyId_key: {
+                            companyId: company.id,
+                            key: 'paymentMethods'
+                        }
+                    }
+                });
                 let pMethods = Array.isArray(currentSettings?.value) ? currentSettings.value : [
                     { id: 'cash', label: 'Nakit', type: 'cash', icon: '💵' },
                     { id: 'card', label: 'Kredi Kartı', type: 'card', icon: '💳' },
@@ -94,9 +101,18 @@ export async function POST(request: Request) {
                 pMethods = pMethods.map((pm: any) => pm.type === 'cash' ? { ...pm, linkedKasaId: kasa.id } : pm);
 
                 await tx.appSettings.upsert({
-                    where: { key: 'paymentMethods' },
+                    where: {
+                        companyId_key: {
+                            companyId: company.id,
+                            key: 'paymentMethods'
+                        }
+                    },
                     update: { value: pMethods },
-                    create: { key: 'paymentMethods', value: pMethods }
+                    create: {
+                        companyId: company.id,
+                        key: 'paymentMethods',
+                        value: pMethods
+                    }
                 });
             }
 
@@ -115,12 +131,24 @@ export async function POST(request: Request) {
                 createdItems.bank = bank;
 
                 // Update transfer method to link to this bank
-                const currentSettings = await tx.appSettings.findUnique({ where: { key: 'paymentMethods' } });
+                const currentSettings = await tx.appSettings.findUnique({
+                    where: {
+                        companyId_key: {
+                            companyId: company.id,
+                            key: 'paymentMethods'
+                        }
+                    }
+                });
                 let pMethods = Array.isArray(currentSettings?.value) ? currentSettings.value : [];
                 if (pMethods.length > 0) {
                     pMethods = pMethods.map((pm: any) => pm.type === 'transfer' ? { ...pm, linkedKasaId: bank.id } : pm);
                     await tx.appSettings.update({
-                        where: { key: 'paymentMethods' },
+                        where: {
+                            companyId_key: {
+                                companyId: company.id,
+                                key: 'paymentMethods'
+                            }
+                        },
                         data: { value: pMethods }
                     });
                 }

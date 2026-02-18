@@ -118,7 +118,14 @@ export async function POST(request: Request) {
 
             if (validKasa.type.match(/POS|Kredi|Banka/) && isCollection) {
                 try {
-                    const settingsRes = await tx.appSettings.findUnique({ where: { key: 'salesExpenses' } });
+                    const settingsRes = await tx.appSettings.findUnique({
+                        where: {
+                            companyId_key: {
+                                companyId: company.id,
+                                key: 'salesExpenses'
+                            }
+                        }
+                    });
                     const salesExpenses = settingsRes?.value as any;
 
                     if (salesExpenses?.posCommissions) {

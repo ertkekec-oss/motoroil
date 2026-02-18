@@ -1,13 +1,21 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { NilveraInvoiceService } from '@/services/nilveraService';
+import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+        const companyId = session.user?.companyId || session.companyId;
+
+        if (!companyId) return NextResponse.json({ error: 'Firma ID bulunamadı' }, { status: 400 });
+
         // 1. Get Local Invoices
         const localInvoices = await prisma.purchaseInvoice.findMany({
+            where: { companyId },
             include: { supplier: true },
             orderBy: { invoiceDate: 'desc' }
         });
@@ -15,7 +23,14 @@ export async function GET() {
         // 2. Try to fetch from Nilvera
         let nilveraInvoices: any[] = [];
         try {
-            const settingsRecord = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
+            const settingsRecord = await prisma.appSettings.findUnique({
+                where: {
+                    companyId_key: {
+                        companyId,
+                        key: 'eFaturaSettings'
+                    }
+                }
+            });
             const rawConfig = settingsRecord?.value as any;
 
             // Supporting both flat and nested config structures

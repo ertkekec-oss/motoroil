@@ -25,7 +25,14 @@ export async function POST(req: NextRequest) {
 
         if (!invoice) return NextResponse.json({ success: false, error: 'Fatura bulunamadı' }, { status: 404 });
 
-        const settingsRecord = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
+        const settingsRecord = await prisma.appSettings.findUnique({
+            where: {
+                companyId_key: {
+                    companyId: invoice.companyId,
+                    key: 'eFaturaSettings'
+                }
+            }
+        });
         const rawConfig = settingsRecord?.value as any;
         const config = rawConfig?.apiKey ? rawConfig : (rawConfig?.nilvera || {});
 

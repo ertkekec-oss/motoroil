@@ -1,11 +1,23 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
 export async function GET() {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const companyId = auth.user.companyId;
+
+    if (!companyId) return NextResponse.json({ error: 'Firma ID bulunamadı' }, { status: 400 });
+
     try {
         const settings = await prisma.appSettings.findUnique({
-            where: { key: 'smtp_settings' }
+            where: {
+                companyId_key: {
+                    companyId,
+                    key: 'smtp_settings'
+                }
+            }
         });
         return NextResponse.json(settings?.value || {});
     } catch (error: any) {
@@ -14,13 +26,25 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const companyId = auth.user.companyId;
+
+    if (!companyId) return NextResponse.json({ error: 'Firma ID bulunamadı' }, { status: 400 });
+
     try {
         const data = await request.json();
 
         // data format: { email, password }
         const settings = await prisma.appSettings.upsert({
-            where: { key: 'smtp_settings' },
+            where: {
+                companyId_key: {
+                    companyId,
+                    key: 'smtp_settings'
+                }
+            },
             create: {
+                companyId,
                 key: 'smtp_settings',
                 value: data
             },
