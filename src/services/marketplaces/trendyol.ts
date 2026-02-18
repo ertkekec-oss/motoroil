@@ -20,8 +20,8 @@ export class TrendyolService implements IMarketplaceService {
     private getHeaders(extra: Record<string, string> = {}): Record<string, string> {
         return {
             'Authorization': this.getAuthHeader(),
-            // High-reputation real browser User-Agent
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            // CRITICAL: Trendyol requires "SupplierId - AppName" format to avoid 403 Forbidden
+            'User-Agent': `${this.config.supplierId} - Periodya`,
             'Accept': 'application/json, text/plain, */*',
             'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
             'x-supplier-id': this.config.supplierId,
@@ -77,12 +77,13 @@ export class TrendyolService implements IMarketplaceService {
         httpStatus?: number;
         raw?: any;
     }> {
+        // According to Trendyol Docs, query parameter based common-label endpoint is the most reliable
         const attempts = [
-            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}`,
+            `${this.baseUrl}/${this.config.supplierId}/common-label?shipmentPackageIds=${shipmentPackageId}&format=A4`,
             `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/common-label?format=A4`,
+            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}`,
             `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}?format=A4`,
-            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/label?format=PDF`,
-            `${this.baseUrl}/${this.config.supplierId}/common-label/${shipmentPackageId}`
+            `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/label?format=PDF`
         ];
 
         let lastResult: any = null;
