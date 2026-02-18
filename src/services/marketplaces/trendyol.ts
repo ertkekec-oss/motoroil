@@ -302,6 +302,11 @@ export class TrendyolService implements IMarketplaceService {
         }
 
         const bodyText = await response.text();
+        const ct = response.headers.get('content-type') || "";
+        let keys = '';
+        try { if (bodyText.trim().startsWith('{')) { const json = JSON.parse(bodyText); keys = Object.keys(json).join(','); } } catch { }
+        console.info(`[TRENDYOL-DIAG] Status-Check result: status=${response.status}, type=${ct}, len=${bodyText.length}, keys=[${keys}], snippet="${bodyText.substring(0, 200).replace(/\n/g, ' ')}"`);
+
         if (bodyText.trim() === 'OK') {
             // If proxy returns OK but we expected JSON, it's a proxy pending state.
             // We retry once after a small delay.
