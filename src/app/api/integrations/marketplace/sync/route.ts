@@ -228,6 +228,7 @@ export async function POST(request: Request) {
                     }
                 }
             } catch (err: any) {
+                console.error(`[SYNC_ORDER_ERROR] Order: ${order.orderNumber}, Error:`, err);
                 errors.push({ order: order.orderNumber, error: err.message });
             }
         }
