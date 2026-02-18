@@ -204,7 +204,18 @@ export class TrendyolService implements IMarketplaceService {
             }
             throw new Error(`Status ${response.status}`);
         }
-        return await response.json();
+
+        const bodyText = await response.text();
+        if (bodyText.trim() === 'OK') {
+            throw new Error(`Proxy returned OK (Pending)`);
+        }
+
+        try {
+            return JSON.parse(bodyText);
+        } catch (e) {
+            console.warn(`[TRENDYOL-LABEL] JSON Parse Error for details: ${bodyText.substring(0, 50)}`);
+            throw new Error(`Invalid JSON response`);
+        }
     }
 
 
