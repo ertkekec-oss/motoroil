@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { authorize } from "@/lib/auth";
 import { ActionProviderRegistry } from "@/services/marketplaces/actions/registry";
+import { redisConnection } from "@/lib/queue/redis";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
