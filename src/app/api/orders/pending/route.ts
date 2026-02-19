@@ -4,7 +4,7 @@ import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
         const auth = await authorize();
         if (!auth.authorized) return auth.response;
@@ -29,16 +29,21 @@ export async function GET() {
         // Son 24 saatteki "Yeni" veya "Hazırlanıyor" statüsündeki siparişleri çek
         // Not: Pazaryerine göre statü isimleri değişebilir (Created, Picking vb.)
         // Son siparişleri çek (Statü farketmeksizin hepsini getir ki entegrasyonu görelim)
-        // Debug: Get raw count for this tenant
-        const totalTenantOrders = await prisma.order.count({
-            where: { company: { tenantId: session.tenantId } }
-        });
+        const { searchParams } = new URL(request.url);
+        const marketplaceParam = searchParams.get('marketplace');
+
+        let whereClause: any = {
+            companyId: companyId
+        };
+
+        if (marketplaceParam) {
+            whereClause.marketplace = marketplaceParam;
+        } else {
+            whereClause.marketplace = { not: 'POS' }; // POS satışları 'Mağaza Satışları' sekmesinde, burası E-Ticaret
+        }
 
         const pendingOrders = await prisma.order.findMany({
-            where: {
-                companyId: companyId,
-                marketplace: { not: 'POS' } // POS satışları 'Mağaza Satışları' sekmesinde, burası E-Ticaret
-            },
+            where: whereClause,
             orderBy: {
                 orderDate: 'desc'
             },
