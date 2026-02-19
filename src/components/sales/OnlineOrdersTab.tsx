@@ -80,7 +80,8 @@ export function OnlineOrdersTab({
                 return d >= start && d <= end;
             }
             return false;
-        }).reduce((acc, curr) => acc + (parseFloat(curr.totalAmount) || 0), 0);
+        }).filter(o => !['Cancelled', 'CANCELLED', 'İptal Edildi', 'İptal'].includes(o.status))
+            .reduce((acc, curr) => acc + (parseFloat(curr.totalAmount) || 0), 0);
     };
 
     const getTurnoverTitle = () => {
@@ -99,7 +100,8 @@ export function OnlineOrdersTab({
         if (statusFilter !== 'ALL') {
             if (statusFilter === 'NEW') statusMatch = ['Yeni', 'Created', 'Picking', 'WaitingForApproval', 'Preparing', 'ReadyToShip', 'Unpaid'].includes(order.status);
             else if (statusFilter === 'SHIPPED') statusMatch = ['Kargolandı', 'Shipped', 'Hazırlanıyor', 'Invoiced'].includes(order.status);
-            else if (statusFilter === 'COMPLETED') statusMatch = ['Tamamlandı', 'Delivered', 'Cancelled', 'Faturalandırıldı', 'Returned'].includes(order.status);
+            else if (statusFilter === 'COMPLETED') statusMatch = ['Tamamlandı', 'Delivered', 'Faturalandırıldı', 'Returned'].includes(order.status);
+            else if (statusFilter === 'CANCELLED') statusMatch = ['Cancelled', 'CANCELLED', 'İptal Edildi', 'İptal'].includes(order.status);
         }
 
         // Tarih Filtresi
@@ -217,6 +219,7 @@ export function OnlineOrdersTab({
                         <button onClick={() => setStatusFilter('NEW')} style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: statusFilter === 'NEW' ? 'var(--primary)' : 'transparent', color: 'white', fontSize: '12px', cursor: 'pointer' }}>Yeni</button>
                         <button onClick={() => setStatusFilter('SHIPPED')} style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: statusFilter === 'SHIPPED' ? '#F59E0B' : 'transparent', color: 'white', fontSize: '12px', cursor: 'pointer' }}>Kargolandı</button>
                         <button onClick={() => setStatusFilter('COMPLETED')} style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: statusFilter === 'COMPLETED' ? 'var(--success)' : 'transparent', color: 'white', fontSize: '12px', cursor: 'pointer' }}>Tamamlandı</button>
+                        <button onClick={() => setStatusFilter('CANCELLED')} style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: statusFilter === 'CANCELLED' ? '#EF4444' : 'transparent', color: 'white', fontSize: '12px', cursor: 'pointer' }}>İptal</button>
                     </div>
 
                     {/* Date Filters */}
@@ -298,7 +301,7 @@ export function OnlineOrdersTab({
                                         <td>
                                             <span style={{
                                                 padding: '4px 8px', borderRadius: '4px', fontSize: '12px',
-                                                background: ['Yeni', 'Created'].includes(o.status) ? 'var(--primary)' : ['Hazırlanıyor', 'Picking', 'Shipped', 'Kargolandı'].includes(o.status) ? '#F59E0B' : ['Faturalandırıldı', 'Tamamlandı'].includes(o.status) ? 'var(--success)' : 'var(--bg-hover)',
+                                                background: ['Yeni', 'Created'].includes(o.status) ? 'var(--primary)' : ['Hazırlanıyor', 'Picking', 'Shipped', 'Kargolandı'].includes(o.status) ? '#F59E0B' : ['Faturalandırıldı', 'Tamamlandı'].includes(o.status) ? 'var(--success)' : ['Cancelled', 'CANCELLED'].includes(o.status) ? '#EF4444' : 'var(--bg-hover)',
                                                 color: 'white'
                                             }}>
                                                 {o.status}
