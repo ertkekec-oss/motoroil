@@ -33,10 +33,11 @@ export class PazaramaService implements IMarketplaceService {
         try {
             const authString = Buffer.from(`${this.config.apiKey}:${this.config.apiSecret}`).toString('base64');
 
-            const effectiveProxy = process.env.MARKETPLACE_PROXY_URL?.trim();
-            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(this.authUrl)}` : this.authUrl;
+            // BYPASS PROXY for Auth: OAuth2 servers usually don't have IP whitelists.
+            // The proxy at .156 seems to return "OK" for POST requests instead of forwarding them.
+            const fetchUrl = this.authUrl;
 
-            console.log(`[PAZARAMA_AUTH] Fetching token from: ${fetchUrl} (Direct: ${this.authUrl})`);
+            console.log(`[PAZARAMA_AUTH] Fetching token directly from: ${fetchUrl}`);
 
             const response = await fetch(fetchUrl, {
                 method: 'POST',
