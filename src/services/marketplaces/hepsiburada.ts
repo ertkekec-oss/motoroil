@@ -230,16 +230,21 @@ export class HepsiburadaService implements IMarketplaceService {
                     console.log(`[HB_SYNC_DATA] Target ${target.name} found ${items.length} records.`);
 
                     for (const item of items) {
-                        const mapped = this.mapOrder(item, target.name);
+                        let mapped = this.mapOrder(item, target.name);
                         const key = mapped.id || mapped.orderNumber;
 
-                        // Deduplication: If we already found this order (possibly from another status target),
-                        // only overwrite IF the new version has more data (e.g. has items vs doesn't).
+                        if (mapped.items.length === 0 && mapped.orderNumber && mapped.orderNumber !== 'unknown') {
+                            try {
+                                const fullDetail = await this.getOrderDetail(mapped.orderNumber);
+                                if (fullDetail && fullDetail.items.length > 0) {
+                                    mapped = { ...fullDetail, status: mapped.status };
+                                }
+                            } catch (detailErr) { }
+                        }
+
                         if (allOrdersMap.has(key)) {
                             const existing = allOrdersMap.get(key)!;
-                            if (existing.items.length > 0 && mapped.items.length === 0) {
-                                continue;
-                            }
+                            if (existing.items.length > 0 && mapped.items.length === 0) continue;
                         }
 
                         if (key && key !== 'unknown') {
@@ -282,6 +287,31 @@ export class HepsiburadaService implements IMarketplaceService {
         return finalOrders;
     }
 
+    async getOrderDetail(orderNumber: string): Promise<MarketplaceOrder | null> {
+        try {
+            const merchantId = (this.config.merchantId || '').trim();
+            const url = `${this.baseUrl}/orders/merchantid/${merchantId}/ordernumber/${orderNumber}`;
+
+            const headers: any = {
+                'Authorization': this.getAuthHeader(),
+                'User-Agent': (this.config.username || '').trim(),
+                'Accept': 'application/json'
+            };
+
+            const proxyKey = this.getProxyKeyHeader();
+            if (proxyKey) headers['X-Periodya-Key'] = proxyKey;
+
+            const response = await fetch(url, { headers });
+            if (!response.ok) return null;
+
+            const data = await response.json();
+            return this.mapOrder(data, 'UNKNOWN');
+        } catch (err) {
+            console.error(`[HB_GET_DETAIL_ERR] Order: ${orderNumber}`, err);
+            return null;
+        }
+    }
+
     private mapOrder(hbOrder: any, fallbackStatus: string): MarketplaceOrder {
         try {
             // Hepsiburada status can be in multiple fields depending on endpoint
@@ -295,11 +325,14 @@ export class HepsiburadaService implements IMarketplaceService {
                 rawLines = hbOrder.data.items || hbOrder.data.lines || hbOrder.data.packageItems || [];
             }
 
+            // Fallback for packages: sometimes order number is inside an array called OrderNumbers
+            const orderNo = hbOrder.orderNumber || (Array.isArray(hbOrder.OrderNumbers) ? hbOrder.OrderNumbers[0] : null) || hbOrder.packageNumber || hbOrder.id || 'unknown';
+
             const orderItems = Array.isArray(rawLines) ? rawLines : [];
 
             return {
-                id: (hbOrder.id || hbOrder.orderNumber || hbOrder.packageNumber || 'unknown').toString(),
-                orderNumber: (hbOrder.orderNumber || hbOrder.packageNumber || hbOrder.id || 'unknown').toString(),
+                id: (hbOrder.id || orderNo || 'unknown').toString(),
+                orderNumber: orderNo.toString(),
                 customerName: hbOrder.customer?.name || hbOrder.customerName || hbOrder.billingAddress?.fullName || hbOrder.shippingAddress?.fullName || hbOrder.customer?.fullName || 'Müşteri',
                 customerEmail: hbOrder.customer?.email || hbOrder.customerEmail || '',
                 orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || hbOrder.createdAt || Date.now()),
@@ -325,7 +358,7 @@ export class HepsiburadaService implements IMarketplaceService {
                     productName: item.productName || item.name || item.skuDescription || item.description || 'Ürün',
                     sku: item.sku || item.merchantSku || item.hbSku || item.productCode || 'SKU',
                     quantity: Number(item.quantity || item.qty || 1),
-                    price: Number(item.price?.amount || item.price || item.unitPrice || item.totalPrice || 0),
+                    price: Number(item.totalPrice?.amount || item.unitPrice?.amount || item.price?.amount || item.price || item.unitPrice || item.totalPrice || 0),
                     taxRate: Number(item.taxRate || item.vatRate || 20),
                     discountAmount: Number(item.discountAmount || 0)
                 })),
