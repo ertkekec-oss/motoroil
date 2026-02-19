@@ -24,11 +24,17 @@ export class PazaramaService implements IMarketplaceService {
         try {
             const authString = Buffer.from(`${this.config.apiKey}:${this.config.apiSecret}`).toString('base64');
 
-            const response = await fetch(this.authUrl, {
+            const effectiveProxy = process.env.MARKETPLACE_PROXY_URL?.trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(this.authUrl)}` : this.authUrl;
+
+            console.log(`[PAZARAMA_AUTH] Fetching token from: ${fetchUrl} (Direct: ${this.authUrl})`);
+
+            const response = await fetch(fetchUrl, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Basic ${authString}`,
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json'
                 },
                 body: 'grant_type=client_credentials'
             });
@@ -38,7 +44,14 @@ export class PazaramaService implements IMarketplaceService {
                 throw new Error(`Pazarama Auth Error: ${response.status} - ${err}`);
             }
 
-            const data = await response.json();
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e: any) {
+                throw new Error(`Pazarama Auth JSON Parse Error: ${e.message}. Body: ${text.substring(0, 100)}`);
+            }
+
             this.accessToken = data.access_token;
             // Set expiry with a small buffer (5 mins)
             this.tokenExpiry = Date.now() + (data.expires_in * 1000) - 300000;
@@ -100,7 +113,15 @@ export class PazaramaService implements IMarketplaceService {
                 throw new Error(`Pazarama GetOrders Error: ${response.status} - ${err}`);
             }
 
-            const result = await response.json();
+            const text = await response.text();
+            let result;
+            try {
+                result = JSON.parse(text);
+            } catch (e: any) {
+                console.error(`Pazarama JSON parse hatası. İçerik: "${text.substring(0, 500)}"`);
+                throw new Error(`Pazarama geçersiz yanıt (JSON bekleniyor): ${text.substring(0, 50)}`);
+            }
+
             if (!result.isSuccess || !result.data) {
                 return [];
             }
