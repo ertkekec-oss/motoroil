@@ -49,18 +49,20 @@ export async function POST(request: Request) {
             }
         });
 
-        if (!mpConfig || !mpConfig.config) {
+        const actualConfig = mpConfig.settings || (mpConfig as any).config;
+
+        if (!mpConfig || !actualConfig) {
             console.error(`[HYDRATE] Config not found for ${internalMpType} (Company: ${existingOrder.companyId})`);
             return NextResponse.json({
                 success: false,
-                error: `Marketplace config not found for ${internalMpType}. Lütfen entegrasyon ayarlarını kontrol edin.`
+                error: `Marketplace config settings not found for ${internalMpType}. Lütfen entegrasyon ayarlarını kontrol edin.`
             }, { status: 400 });
         }
 
         // 4. Initialize Marketplace Service
         const service = MarketplaceServiceFactory.createService(
             mpConfig.type as any,
-            mpConfig.config as any
+            actualConfig as any
         );
 
         // 4. Fetch Details from Marketplace
