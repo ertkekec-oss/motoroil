@@ -169,10 +169,11 @@ export async function POST(request: Request) {
                 });
 
                 if (!existingOrder) {
+                    const normalizedMarketplace = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
                     const newOrder = await prisma.order.create({
                         data: {
                             companyId,
-                            marketplace: type,
+                            marketplace: normalizedMarketplace,
                             marketplaceId: order.id,
                             orderNumber: order.orderNumber,
                             customerName: customer.name,
@@ -209,7 +210,7 @@ export async function POST(request: Request) {
                                 aggregateId: newOrder.id,
                                 payload: {
                                     productId: productMap?.productId,
-                                    marketplace: type,
+                                    marketplace: normalizedMarketplace,
                                     saleAmount: item.price * item.quantity,
                                     quantity: item.quantity,
                                     taxRate: item.taxRate || 20,
@@ -224,13 +225,21 @@ export async function POST(request: Request) {
                     savedCount++;
                     details.push({ order: order.orderNumber, action: 'Created' });
                 } else {
-                    const needsUpdate = existingOrder.status !== order.status || (order.shipmentPackageId && !existingOrder.shipmentPackageId);
+                    const dbItems = Array.isArray(existingOrder.items) ? existingOrder.items : [];
+                    const needsUpdate = existingOrder.status !== order.status ||
+                        (order.shipmentPackageId && !existingOrder.shipmentPackageId) ||
+                        (dbItems.length === 0 && (order.items?.length || 0) > 0);
 
                     if (needsUpdate) {
+                        const normalizedMarketplace = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
                         await prisma.order.update({
                             where: { id: existingOrder.id },
                             data: {
                                 status: order.status,
+                                marketplace: normalizedMarketplace,
+                                totalAmount: order.totalAmount,
+                                items: order.items as any,
+                                rawData: order as any,
                                 shipmentPackageId: order.shipmentPackageId || existingOrder.shipmentPackageId
                             }
                         });

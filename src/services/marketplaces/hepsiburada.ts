@@ -126,6 +126,11 @@ export class HepsiburadaService implements IMarketplaceService {
                 params: ['limit']
             },
             {
+                name: 'PACKED',
+                urlPart: `packages/merchantid/${merchantId}/packed`,
+                params: ['limit']
+            },
+            {
                 name: 'SHIPPED',
                 urlPart: `packages/merchantid/${merchantId}/shipped`,
                 params: ['begindate', 'enddate']
@@ -264,14 +269,21 @@ export class HepsiburadaService implements IMarketplaceService {
             // Hepsiburada status can be in multiple fields depending on endpoint
             const rawStatus = hbOrder.status || hbOrder.orderStatus || hbOrder.cargoStatus || fallbackStatus;
 
+            // Debug: Log if order has no items to help diagnose empty details
+            const orderItems = hbOrder.items || hbOrder.orderLines || hbOrder.lines || hbOrder.packageItems || [];
+
+            if (!Array.isArray(orderItems) || orderItems.length === 0) {
+                console.warn(`[HB_MAP_WARN] Order ${hbOrder.orderNumber || hbOrder.id} has no items in raw data. Keys:`, Object.keys(hbOrder));
+            }
+
             return {
                 id: (hbOrder.id || hbOrder.orderNumber || hbOrder.packageNumber || 'unknown').toString(),
                 orderNumber: (hbOrder.orderNumber || hbOrder.packageNumber || 'unknown').toString(),
-                customerName: hbOrder.customer?.name || hbOrder.customerName || 'Müşteri',
+                customerName: hbOrder.customer?.name || hbOrder.customerName || hbOrder.billingAddress?.fullName || hbOrder.shippingAddress?.fullName || 'Müşteri',
                 customerEmail: hbOrder.customer?.email || hbOrder.customerEmail || '',
                 orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || Date.now()),
                 status: rawStatus.toString(),
-                totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.totalAmount || hbOrder.payableAmount || 0),
+                totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.totalAmount || hbOrder.payableAmount || hbOrder.totalPrice || 0),
                 currency: hbOrder.totalPrice?.currency || hbOrder.currency || 'TRY',
                 shipmentPackageId: (hbOrder.packageNumber || hbOrder.shipmentPackageId || hbOrder.id)?.toString(),
                 shippingAddress: {
@@ -288,14 +300,16 @@ export class HepsiburadaService implements IMarketplaceService {
                     district: hbOrder.billingAddress?.town || hbOrder.billingAddress?.district || '',
                     phone: hbOrder.billingAddress?.phoneNumber || hbOrder.billingAddress?.phone || ''
                 },
-                items: (hbOrder.items || hbOrder.orderLines || []).map((item: any) => ({
-                    productName: item.productName || item.name || 'Ürün',
-                    sku: item.sku || item.merchantSku || 'SKU',
-                    quantity: Number(item.quantity || 1),
-                    price: Number(item.price?.amount || item.price || item.unitPrice || 0),
+                items: (Array.isArray(orderItems) ? orderItems : []).map((item: any) => ({
+                    productName: item.productName || item.name || item.skuDescription || 'Ürün',
+                    sku: item.sku || item.merchantSku || item.hbSku || 'SKU',
+                    quantity: Number(item.quantity || item.qty || 1),
+                    price: Number(item.price?.amount || item.price || item.unitPrice || item.totalPrice || 0),
                     taxRate: Number(item.taxRate || item.vatRate || 20),
-                    discountAmount: 0
-                }))
+                    discountAmount: Number(item.discountAmount || 0)
+                })),
+                // @ts-ignore - Internal raw data for debugging
+                _raw: hbOrder
             };
         } catch (err) {
             console.error('[HB_MAP_ERROR] Failed to map order:', hbOrder?.id, err);
@@ -310,7 +324,9 @@ export class HepsiburadaService implements IMarketplaceService {
                 currency: 'TRY',
                 shippingAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
                 invoiceAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
-                items: []
+                items: [],
+                // @ts-ignore
+                _raw: hbOrder
             };
         }
     }
