@@ -272,37 +272,49 @@ export class PazaramaService implements IMarketplaceService {
     }
 
     private mapOrder(pzOrder: any): MarketplaceOrder {
+        // Diagnostic: If items are missing, log keys for first occurrence
+        const items = pzOrder.items || pzOrder.orderItems || pzOrder.orderItemDetails || [];
+        const totalAmount = pzOrder.totalPrice || pzOrder.totalAmount || pzOrder.grossAmount || 0;
+
+        if (items.length === 0) {
+            console.warn(`[PAZARAMA_MAP_WARN] Order ${pzOrder.orderNumber} has no items. Keys: ${Object.keys(pzOrder).join(',')}`);
+        }
+
+        const firstName = pzOrder.customerFirstName || pzOrder.recipientFirstName || '';
+        const lastName = pzOrder.customerLastName || pzOrder.recipientLastName || '';
+        const customerName = `${firstName} ${lastName}`.trim() || pzOrder.recipientName || 'Müşteri';
+
         return {
-            id: pzOrder.orderNumber,
-            orderNumber: pzOrder.orderNumber,
-            customerName: `${pzOrder.customerFirstName || ''} ${pzOrder.customerLastName || ''}`.trim() || 'Müşteri',
+            id: String(pzOrder.orderNumber),
+            orderNumber: String(pzOrder.orderNumber),
+            customerName,
             customerEmail: pzOrder.customerEmail || '',
             orderDate: new Date(pzOrder.orderDate),
             status: this.mapStatus(pzOrder.orderStatus),
-            totalAmount: Number(pzOrder.totalPrice || 0),
+            totalAmount: Number(totalAmount),
             currency: 'TRY',
             cargoTrackingNumber: pzOrder.cargoTrackingNumber,
             cargoProvider: pzOrder.cargoProviderName,
-            shipmentPackageId: pzOrder.orderNumber, // Pazarama usually uses orderNumber as reference
+            shipmentPackageId: String(pzOrder.orderNumber),
             shippingAddress: {
-                fullName: `${pzOrder.shippingAddress?.firstName || ''} ${pzOrder.shippingAddress?.lastName || ''}`.trim(),
+                fullName: `${pzOrder.shippingAddress?.firstName || ''} ${pzOrder.shippingAddress?.lastName || ''}`.trim() || pzOrder.shippingAddress?.fullName || '',
                 address: pzOrder.shippingAddress?.fullAddress || '',
                 city: pzOrder.shippingAddress?.city || '',
                 district: pzOrder.shippingAddress?.district || '',
                 phone: pzOrder.shippingAddress?.phone || ''
             },
             invoiceAddress: {
-                fullName: `${pzOrder.billingAddress?.firstName || ''} ${pzOrder.billingAddress?.lastName || ''}`.trim(),
+                fullName: `${pzOrder.billingAddress?.firstName || ''} ${pzOrder.billingAddress?.lastName || ''}`.trim() || pzOrder.billingAddress?.fullName || '',
                 address: pzOrder.billingAddress?.fullAddress || '',
                 city: pzOrder.billingAddress?.city || '',
                 district: pzOrder.billingAddress?.district || '',
                 phone: pzOrder.billingAddress?.phone || ''
             },
-            items: (pzOrder.orderItems || []).map((item: any) => ({
-                productName: item.productName,
-                sku: item.sku || item.merchantSku,
+            items: items.map((item: any) => ({
+                productName: item.productName || item.itemName || item.name || 'Ürün',
+                sku: item.sku || item.merchantSku || item.productSku || item.barcode,
                 quantity: Number(item.quantity || 1),
-                price: Number(item.price || 0),
+                price: Number(item.price || item.unitPrice || 0),
                 taxRate: Number(item.taxRate || 20),
                 discountAmount: Number(item.discountAmount || 0)
             }))
