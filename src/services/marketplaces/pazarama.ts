@@ -66,6 +66,8 @@ export class PazaramaService implements IMarketplaceService {
             // Set expiry with a small buffer (5 mins)
             this.tokenExpiry = Date.now() + (data.expires_in * 1000) - 300000;
 
+            console.log(`[PAZARAMA_AUTH] Token received successfully. Length: ${this.accessToken?.length}`);
+
             return this.accessToken!;
         } catch (error) {
             console.error('Pazarama Access Token Error:', error);
@@ -111,8 +113,12 @@ export class PazaramaService implements IMarketplaceService {
             queryParams.append('Size', '100');
 
             const url = `${this.baseUrl}/order/get-orders?${queryParams.toString()}`;
-            const effectiveProxy = process.env.MARKETPLACE_PROXY_URL?.trim();
-            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+
+            // Try DIRECT first (Bypass proxy)
+            // The proxy at .156 seems to return "OK" for Pazarama, likely due to misconfiguration.
+            const fetchUrl = url;
+
+            console.log(`[PAZARAMA_GET_ORDERS] Fetching from: ${fetchUrl}`);
 
             const response = await fetch(fetchUrl, {
                 headers: await this.getHeaders()
@@ -167,8 +173,7 @@ export class PazaramaService implements IMarketplaceService {
     async getCargoLabel(orderNumber: string): Promise<{ pdfBase64?: string; error?: string }> {
         try {
             const url = `${this.baseUrl}/order/get-cargo-label?orderNumber=${orderNumber}`;
-            const effectiveProxy = process.env.MARKETPLACE_PROXY_URL?.trim();
-            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+            const fetchUrl = url; // Direct connection
 
             const response = await fetch(fetchUrl, {
                 headers: await this.getHeaders()
