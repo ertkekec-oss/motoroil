@@ -1,5 +1,4 @@
 import { IMarketplaceService, MarketplaceOrder, N11Config } from './types';
-import { XMLParser } from 'fast-xml-parser';
 
 export class N11Service implements IMarketplaceService {
     private config: N11Config;
@@ -7,81 +6,44 @@ export class N11Service implements IMarketplaceService {
 
     constructor(config: N11Config) {
         this.config = config;
-        this.baseUrl = 'https://api.n11.com/ws/OrderService';
+        this.baseUrl = 'https://api.n11.com/rest/delivery/v1';
     }
 
-    private getSoapEnvelope(body: string): string {
-        return `
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://www.n11.com/ws/schemas">
-            <soapenv:Header/>
-            <soapenv:Body>
-                ${body}
-            </soapenv:Body>
-        </soapenv:Envelope>`;
-    }
-
-    private async makeRequest(action: string, bodyContent: string): Promise<any> {
-        const xml = this.getSoapEnvelope(`
-            <sch:${action}>
-                <auth>
-                    <appKey>${this.config.apiKey}</appKey>
-                    <appSecret>${this.config.apiSecret}</appSecret>
-                </auth>
-                ${bodyContent}
-            </sch:${action}>
-        `);
+    private async makeRequest(path: string, params: Record<string, string> = {}): Promise<any> {
+        const query = new URLSearchParams(params).toString();
+        const url = `${this.baseUrl}/${path}${query ? `?${query}` : ''}`;
 
         try {
-            const response = await fetch(this.baseUrl, {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: 'GET',
                 headers: {
-                    'Content-Type': 'text/xml; charset=utf-8',
-                    'SOAPAction': `http://www.n11.com/ws/OrderService/${action}`
-                },
-                body: xml
+                    'appkey': this.config.apiKey,
+                    'appsecret': this.config.apiSecret,
+                    'Accept': 'application/json'
+                }
             });
 
-            const text = await response.text();
-
-            // Parse XML response
-            const parser = new XMLParser({
-                ignoreAttributes: true,
-                removeNSPrefix: true
-            });
-            const result = parser.parse(text);
-
-            // Check for SOAP Fault
-            if (result?.Envelope?.Body?.Fault) {
-                const fault = result.Envelope.Body.Fault;
-                throw new Error(`N11 API Hatası: ${fault.faultstring}`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`N11 REST API Hatası (${response.status}): ${errorText}`);
             }
 
-            return result?.Envelope?.Body?.[`${action}Response`];
+            return await response.json();
         } catch (error) {
-            console.error(`N11 ${action} Hatası:`, error);
+            console.error(`N11 REST Request Hatası [${path}]:`, error);
             throw error;
         }
     }
 
     async validateConnection(): Promise<boolean> {
         try {
-            // DetailedOrderListRequest ile basit bir sorgu atarak bağlantıyı test et
-            const result = await this.makeRequest('DetailedOrderListRequest', `
-                <searchData>
-                    <status>New</status>
-                    <period>
-                        <startDate>01/01/2026</startDate>
-                        <endDate>02/01/2026</endDate>
-                    </period>
-                </searchData>
-                <pagingData>
-                    <currentPage>0</currentPage>
-                    <pageSize>1</pageSize>
-                </pagingData>
-            `);
-
-            // Eğer result dönerse ve result içinde orderList veya result (işlem sonucu) varsa başarılıdır
-            return !!result?.result?.status;
+            // Simple request to fetch a few created orders to check credentials
+            const result = await this.makeRequest('shipmentPackages', {
+                page: '0',
+                size: '1',
+                status: 'Created'
+            });
+            return result !== undefined;
         } catch (error) {
             console.error('N11 bağlantı doğrulama hatası:', error);
             return false;
@@ -90,93 +52,109 @@ export class N11Service implements IMarketplaceService {
 
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
         try {
-            // Tarih formatı dd/MM/yyyy olmalı
-            const formatDate = (date: Date) => {
-                const d = date.getDate().toString().padStart(2, '0');
-                const m = (date.getMonth() + 1).toString().padStart(2, '0');
-                const y = date.getFullYear();
-                return `${d}/${m}/${y}`;
+            // Statuses to fetch (REST API expects one status per request)
+            const statuses = ['Created', 'Picking', 'Shipped', 'Cancelled', 'Delivered', 'UnPacked', 'UnSupplied'];
+
+            const params: Record<string, string> = {
+                page: '0',
+                size: '100',
+                orderByDirection: 'DESC'
             };
 
-            const startStr = startDate ? formatDate(startDate) : formatDate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
-            const endStr = endDate ? formatDate(endDate) : formatDate(new Date());
+            if (startDate) {
+                params.startDate = startDate.getTime().toString();
+            }
+            if (endDate) {
+                params.endDate = endDate.getTime().toString();
+            }
 
-            const result = await this.makeRequest('DetailedOrderListRequest', `
-                <searchData>
-                    <period>
-                        <startDate>${startStr}</startDate>
-                        <endDate>${endStr}</endDate>
-                    </period>
-                </searchData>
-                <pagingData>
-                    <currentPage>0</currentPage>
-                    <pageSize>50</pageSize>
-                </pagingData>
-            `);
+            const allOrders: MarketplaceOrder[] = [];
 
-            const orderList = result?.orderList?.order || [];
-            // orderList tek bir obje de olabilir, array de
-            const orders = Array.isArray(orderList) ? orderList : [orderList];
+            for (const status of statuses) {
+                try {
+                    const statusParams = { ...params, status };
+                    const result = await this.makeRequest('shipmentPackages', statusParams);
 
-            return orders.map((order: any) => this.mapOrder(order)).filter((o: any) => o !== null);
+                    if (result?.content && Array.isArray(result.content)) {
+                        const mapped = result.content.map((pkg: any) => this.mapOrder(pkg));
+                        allOrders.push(...mapped);
+                    }
+                } catch (statusErr) {
+                    console.warn(`N11 status fetch error for [${status}]:`, statusErr);
+                    // Continue with other statuses
+                }
+            }
+
+            // Deduplicate (since an order might technically change status between calls, though unlikely in a single run)
+            const uniqueOrders = Array.from(new Map(allOrders.map(o => [o.id, o])).values());
+
+            return uniqueOrders.sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime());
         } catch (error) {
             console.error('N11 sipariş çekme hatası:', error);
             throw error;
         }
     }
 
-    private mapOrder(n11Order: any): MarketplaceOrder { // Returns MarketplaceOrder
-        if (!n11Order || !n11Order.id) return null as any;
+    private mapOrder(n11Pkg: any): MarketplaceOrder {
+        if (!n11Pkg || !n11Pkg.id) return null as any;
 
-        // Ürün listesi tek veya çok olabilir
-        const itemList = n11Order.itemList?.item || [];
-        const items = Array.isArray(itemList) ? itemList : [itemList];
+        const lines = Array.isArray(n11Pkg.lines) ? n11Pkg.lines : [];
+
+        // Find creation date from history if available, else fallback
+        let orderDate = new Date(n11Pkg.lastModifiedDate || Date.now());
+        if (n11Pkg.packageHistories && Array.isArray(n11Pkg.packageHistories)) {
+            const created = n11Pkg.packageHistories.find((h: any) => h.status === 'Created');
+            if (created) orderDate = new Date(created.createdDate);
+        }
 
         return {
-            id: n11Order.id.toString(),
-            orderNumber: n11Order.orderNumber,
-            customerName: n11Order.billingAddress?.fullName || 'Misafir',
-            customerEmail: n11Order.buyer?.email || '', // N11 e-posta vermeyebilir
-            orderDate: new Date(n11Order.createDate), // DFormatı kontrol edilmeli, genelde çalışır
-            status: this.mapStatus(n11Order.status),
-            totalAmount: parseFloat(n11Order.billingTemplate?.totalPrice || '0'),
+            id: n11Pkg.id.toString(),
+            orderNumber: n11Pkg.orderNumber,
+            customerName: n11Pkg.customerfullName || n11Pkg.billingAddress?.fullName || 'Misafir',
+            customerEmail: n11Pkg.customerEmail || '',
+            orderDate: orderDate,
+            status: this.mapStatus(n11Pkg.shipmentPackageStatus),
+            totalAmount: Number(n11Pkg.totalAmount || 0),
             currency: 'TRY',
-            cargoTrackingNumber: n11Order.shipmentInfo?.trackingNumber,
-            cargoProvider: n11Order.shipmentInfo?.campaignNumber ? 'Kampanyalı' : (n11Order.shipmentCompany?.name || 'Diğer'),
+            cargoTrackingNumber: n11Pkg.cargoTrackingNumber || n11Pkg.cargoSenderNumber,
+            cargoTrackingLink: n11Pkg.cargoTrackingLink,
+            cargoProvider: n11Pkg.cargoProviderName || 'N11 Lojistik',
             shippingAddress: {
-                fullName: n11Order.shippingAddress?.fullName || '',
-                address: n11Order.shippingAddress?.address || '',
-                city: n11Order.shippingAddress?.city || '',
-                district: n11Order.shippingAddress?.district || '',
-                phone: n11Order.shippingAddress?.gsm || ''
+                fullName: n11Pkg.shippingAddress?.fullName || '',
+                address: n11Pkg.shippingAddress?.address || '',
+                city: n11Pkg.shippingAddress?.city || '',
+                district: n11Pkg.shippingAddress?.district || '',
+                phone: n11Pkg.shippingAddress?.gsm || ''
             },
             invoiceAddress: {
-                fullName: n11Order.billingAddress?.fullName || '',
-                address: n11Order.billingAddress?.address || '',
-                city: n11Order.billingAddress?.city || '',
-                district: n11Order.billingAddress?.district || '',
-                phone: n11Order.billingAddress?.gsm || ''
+                fullName: n11Pkg.billingAddress?.fullName || '',
+                address: n11Pkg.billingAddress?.address || '',
+                city: n11Pkg.billingAddress?.city || '',
+                district: n11Pkg.billingAddress?.district || '',
+                phone: n11Pkg.billingAddress?.gsm || ''
             },
-            items: items.map((item: any) => ({
-                productName: item.productName,
-                sku: item.sellerStockCode || item.productId, // Merchant SKU is better
-                quantity: parseInt(item.quantity || '1'),
-                price: parseFloat(item.price || '0'), // Birim fiyat (N11 sellerInvoiceAmount verebilir)
-                taxRate: 0, // API'den gelmeyebilir
-                discountAmount: parseFloat(item.discountAmount || '0')
+            items: lines.map((line: any) => ({
+                productName: line.productName,
+                sku: line.stockCode || line.productId.toString(),
+                quantity: Number(line.quantity || 1),
+                price: Number(line.price || 0),
+                taxRate: Number(line.vatRate || 20),
+                discountAmount: Number(line.totalSellerDiscountPrice || 0)
             }))
         };
     }
 
     private mapStatus(n11Status: string): string {
         const statuses: { [key: string]: string } = {
-            'New': 'Yeni Sipariş',
-            'Approved': 'Onaylandı',
-            'Rejected': 'İptal Edildi',
+            'Created': 'Yeni Sipariş',
+            'Picking': 'Hazırlanıyor',
             'Shipped': 'Kargolandı',
             'Delivered': 'Teslim Edildi',
-            'Completed': 'Tamamlandı'
+            'Cancelled': 'İptal Edildi',
+            'UnPacked': 'Paketlenmedi',
+            'UnSupplied': 'Tedarik Edilemedi'
         };
         return statuses[n11Status] || n11Status;
     }
 }
+
