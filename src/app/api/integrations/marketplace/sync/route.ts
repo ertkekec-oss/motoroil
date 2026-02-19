@@ -118,6 +118,7 @@ export async function POST(request: Request) {
                 advice = "Lütfen API anahtarlarınızı ve Trendyol Satıcı Paneli -> Hesap Bilgileri -> Entegrasyon Bilgileri alanını kontrol edin.";
             }
 
+            const statusCode = remoteErr.statusCode || remoteErr.status || 500;
             return NextResponse.json({
                 success: false,
                 error: remoteErr.message,
