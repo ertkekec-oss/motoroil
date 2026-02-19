@@ -71,13 +71,19 @@ export async function POST(request: Request) {
             // Adapt User object to look like Staff for the rest of logic if needed
             if (targetUser) {
                 if (!targetUser.username) targetUser.username = (targetUser as any).email;
-                (targetUser as any).setupState = (targetUser as any).tenant?.setupState || 'PENDING';
-                if ((targetUser as any).accessibleCompanies?.length > 0) {
+                (targetUser as any).setupState = (targetUser as any).tenant?.setupState || 'COMPLETED'; // Default to COMPLETED for existing/admin users
+
+                const hasCompanies = (targetUser as any).accessibleCompanies?.length > 0;
+                const isSuperAdmin = (targetUser as any).role === 'SUPER_ADMIN';
+
+                if (hasCompanies) {
                     (targetUser as any).companyId = (targetUser as any).accessibleCompanies[0].companyId;
-                    // Dont degrade SUPER_ADMIN role
-                    if ((targetUser as any).role !== 'SUPER_ADMIN') {
+                    if (!isSuperAdmin) {
                         (targetUser as any).role = (targetUser as any).accessibleCompanies[0].role;
                     }
+                } else if (isSuperAdmin) {
+                    // Super Admin might not have a company record yet, use a placeholder or handle in createSession
+                    (targetUser as any).companyId = undefined;
                 }
             }
         }
