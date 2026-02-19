@@ -18,30 +18,58 @@ export class TrendyolService implements IMarketplaceService {
     }
 
     private async safeFetchJson(url: string, options: any = {}): Promise<{ data: any; status: number }> {
-        const res = await fetch(url, options);
-        const text = await res.text();
-        const trimmed = text.trim();
+        const maxAttempts = 5;
+        const baseDelayMs = 2000;
 
-        if (!res.ok) {
-            throw new Error(`Trendyol API Hatası: ${res.status} - ${trimmed.substring(0, 500)}`);
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            let res: Response;
+            try {
+                // Timeout logic wrapper
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 25000);
+                res = await fetch(url, { ...options, signal: controller.signal });
+                clearTimeout(timeoutId);
+            } catch (err: any) {
+                // Network/Timeout error handling
+                if (attempt < maxAttempts) {
+                    const delay = baseDelayMs * Math.pow(1.5, attempt - 1);
+                    console.log(`[TRENDYOL_PROXY] Network error (attempt ${attempt}/${maxAttempts}), retrying in ${Math.round(delay)}ms...`);
+                    await new Promise(r => setTimeout(r, delay));
+                    continue;
+                }
+                throw new Error(`Trendyol fetch failed (network): ${err.message}`);
+            }
+
+            const text = await res.text();
+            const trimmed = text.trim();
+
+            // 1. Handle Proxy "OK" (Busy/Pending) Signal
+            if (trimmed === 'OK') {
+                if (attempt < maxAttempts) {
+                    const delay = baseDelayMs * Math.pow(1.5, attempt - 1);
+                    console.log(`[TRENDYOL_PROXY] Received 'OK' busy signal (attempt ${attempt}/${maxAttempts}), retrying in ${Math.round(delay)}ms...`);
+                    await new Promise(r => setTimeout(r, delay));
+                    continue;
+                }
+                throw new Error(`Trendyol Proxy meşgul (Sürekli 'OK' dönüyor). Lütfen daha sonra tekrar deneyin.`);
+            }
+
+            // 2. Handle HTTP Errors
+            if (!res.ok) {
+                // Use a standard error object, avoiding 'statusCode' reference errors
+                throw new Error(`Trendyol API Hatası: ${res.status} - ${trimmed.substring(0, 300)}`);
+            }
+
+            // 3. Handle JSON Parsing
+            try {
+                return { data: JSON.parse(trimmed), status: res.status };
+            } catch (e) {
+                // If it's not JSON (e.g. HTML error page from proxy/gateway)
+                throw new Error(`Trendyol yanıtı okunamadı (JSON bekleniyordu). İlk 100 karakter: ${trimmed.substring(0, 100)}`);
+            }
         }
 
-        if (trimmed === 'OK') {
-            console.log(`[TRENDYOL_PROXY] Received OK signal from proxy, retrying in 2s...`);
-            await new Promise(r => setTimeout(r, 2000));
-            const res2 = await fetch(url, options);
-            const text2 = await res2.text();
-            if (!res2.ok) throw new Error(`Trendyol API Hatası (Retry): ${res2.status}`);
-            if (text2.trim() === 'OK') throw new Error(`Trendyol Proxy meşgul (OK dönüyor). Lütfen birazdan tekrar deneyin.`);
-            return { data: JSON.parse(text2), status: res2.status };
-        }
-
-        try {
-            return { data: JSON.parse(trimmed), status: res.status };
-        } catch (e) {
-            console.error(`[TRENDYOL_JSON_PARSE_ERROR]: Response was not JSON. Body snippet: ${trimmed.substring(0, 100)}`);
-            throw new Error(`Trendyol yanıtı okunamadı (JSON bekleniyordu).`);
-        }
+        throw new Error('Trendyol fetch failed (Unknown logic error)');
     }
 
     private getProxyKeyHeader(): string {
@@ -422,10 +450,10 @@ export class TrendyolService implements IMarketplaceService {
                 queryParams.append('endDate', endDate.getTime().toString());
             }
 
-            // Varsayılan olarak son 1 hafta
+            // Varsayılan olarak son 2 güne indirdik (Initial load azaltmak için)
             if (!startDate && !endDate) {
                 const oneWeekAgo = new Date();
-                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 2);
                 queryParams.append('startDate', oneWeekAgo.getTime().toString());
             }
 

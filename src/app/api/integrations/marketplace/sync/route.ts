@@ -92,13 +92,12 @@ export async function POST(request: Request) {
         let startDate = new Date();
 
         if (marketplaceConfig?.lastSync) {
-            // Aggressive lookback: Go back 14 days even if lastSync exists to ensure we catch anything missed
-            // due to IP/config issues
-            startDate = new Date(marketplaceConfig.lastSync.getTime() - (14 * 24 * 60 * 60 * 1000));
+            // Aggressive lookback: Go back 3 days (was 14) to catch delayed orders/cancellations without overloading
+            startDate = new Date(marketplaceConfig.lastSync.getTime() - (3 * 24 * 60 * 60 * 1000));
         } else {
-            // First time sync: 90 days back per user request for production-ready sync
-            startDate.setDate(startDate.getDate() - 90);
-            console.log(`[MARKETPLACE] Initial sync detected, going back 90 days.`);
+            // First time sync: 14 days back (was 90) to prevent timeouts
+            startDate.setDate(startDate.getDate() - 14);
+            console.log(`[MARKETPLACE] Initial sync detected, going back 14 days.`);
         }
 
         const service = MarketplaceServiceFactory.createService(type as any, { ...config, branch: syncBranch });
