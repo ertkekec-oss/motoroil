@@ -139,12 +139,14 @@ export async function POST(request: Request) {
 
         let savedCount = 0;
         let updatedCount = 0;
-        let details: any[] = [];
-        let errors: any[] = [];
+        const details: any[] = [];
+        const errors: any[] = [];
+        const asStringOrNull = (v: any) => (v === undefined || v === null || v === "") ? null : String(v);
 
         for (const order of orders) {
-            const orderNumber = String(order.orderNumber || order.id || '');
-            const marketplaceId = order.id ? String(order.id) : orderNumber;
+            const orderNumber = asStringOrNull(order.orderNumber || order.id);
+            const marketplaceId = asStringOrNull(order.id) || orderNumber;
+            const shipmentPackageId = asStringOrNull(order.shipmentPackageId);
             const normalizedMarketplace = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
 
             try {
@@ -186,14 +188,14 @@ export async function POST(request: Request) {
                             marketplaceId: marketplaceId,
                             orderNumber: orderNumber,
                             customerName: customer.name,
-                            totalAmount: order.totalAmount,
+                            totalAmount: Number(order.totalAmount || 0),
                             currency: order.currency || 'TRY',
                             status: order.status,
                             orderDate: new Date(order.orderDate),
                             items: order.items as any,
                             shippingAddress: order.shippingAddress as any,
                             invoiceAddress: order.invoiceAddress as any,
-                            shipmentPackageId: order.shipmentPackageId,
+                            shipmentPackageId: shipmentPackageId,
                             branch: syncBranch,
                             rawData: order as any
                         }
@@ -235,10 +237,11 @@ export async function POST(request: Request) {
                     details.push({ order: orderNumber, action: 'Created' });
                 } else {
                     const dbItems = Array.isArray(existingOrder.items) ? existingOrder.items : [];
+                    const normalizedTotal = Number(order.totalAmount || 0);
                     const needsUpdate = existingOrder.status !== order.status ||
-                        (order.shipmentPackageId && !existingOrder.shipmentPackageId) ||
+                        (shipmentPackageId && !existingOrder.shipmentPackageId) ||
                         (dbItems.length === 0 && (order.items?.length || 0) > 0) ||
-                        (Number(existingOrder.totalAmount || 0) === 0 && (order.totalAmount || 0) > 0);
+                        (Number(existingOrder.totalAmount || 0) === 0 && normalizedTotal > 0);
 
                     if (needsUpdate) {
                         await prisma.order.update({
@@ -246,10 +249,10 @@ export async function POST(request: Request) {
                             data: {
                                 status: order.status,
                                 marketplace: normalizedMarketplace,
-                                totalAmount: order.totalAmount,
+                                totalAmount: Number(order.totalAmount || 0),
                                 items: order.items as any,
                                 rawData: order as any,
-                                shipmentPackageId: order.shipmentPackageId || existingOrder.shipmentPackageId
+                                shipmentPackageId: shipmentPackageId || existingOrder.shipmentPackageId
                             }
                         });
 
