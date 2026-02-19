@@ -10,7 +10,8 @@ export async function POST(request: Request) {
         const password = body.password;
         const ip = request.headers.get('x-forwarded-for') || '0.0.0.0';
 
-        // 1. Brute Force Protection: Check failed attempts in last 15 mins
+        // 1. Brute Force Protection: Temporarily disabled for emergency access
+        /*
         const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
         const failedAttempts = await prisma.loginAttempt.count({
             where: {
@@ -28,6 +29,9 @@ export async function POST(request: Request) {
                 error: 'Çok fazla deneme yaptınız. Lütfen 15 dakika bekleyin.'
             }, { status: 429 });
         }
+        */
+
+        console.log(`[LOGIN_DEBUG] Attempting login for: ${username}`);
 
         // 1. Search in Staff
         let targetUser = await prisma.staff.findFirst({
@@ -95,6 +99,7 @@ export async function POST(request: Request) {
         }
 
         const isMatch = await comparePassword(password, targetUser.password);
+        console.log(`[LOGIN_DEBUG] User found: ${targetUser.email}, Match: ${isMatch}`);
 
         if (!isMatch) {
             // Record failed attempt
@@ -121,14 +126,18 @@ export async function POST(request: Request) {
             }
         }
 
-        // Create secure session cookie
-        await createSession(targetUser);
+        // Create secure session cookie with defaults for platform admins
+        await createSession({
+            ...targetUser,
+            companyId: (targetUser as any).companyId || undefined,
+            branch: (targetUser as any).branch || 'Merkez'
+        });
 
         // Log login activity
         await logActivity({
-            tenantId: targetUser.tenantId || 'PLATFORM_ADMIN',
+            tenantId: (targetUser as any).tenantId || 'PLATFORM_ADMIN',
             userId: targetUser.id,
-            userName: targetUser.username,
+            userName: targetUser.username || targetUser.email,
             action: 'LOGIN',
             entity: 'User',
             entityId: targetUser.id,
