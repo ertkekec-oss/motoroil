@@ -41,11 +41,13 @@ export async function POST(request: Request) {
 
         const internalMpType = mpMap[marketplace] || marketplace.toLowerCase();
 
-        // 3. Get Marketplace Config
-        const mpConfig = await prisma.marketplaceConfig.findFirst({
+        // 3. Get Marketplace Config (Using findUnique to bypass any potential middleware issues)
+        const mpConfig = await prisma.marketplaceConfig.findUnique({
             where: {
-                companyId: existingOrder.companyId,
-                type: internalMpType
+                companyId_type: {
+                    companyId: existingOrder.companyId,
+                    type: internalMpType
+                }
             }
         });
 

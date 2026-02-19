@@ -212,31 +212,41 @@ export class PazaramaService implements IMarketplaceService {
     }
 
     async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
+        return this.getOrderDetail(orderNumber);
+    }
+
+    private async getOrderDetail(orderNumber: string): Promise<MarketplaceOrder | null> {
         try {
-            // Using a more specific detail endpoint as the list endpoint often omits items.
-            const url = `${this.baseUrl}/order/getOrderDetailForApi?orderNumber=${orderNumber}`;
+            // Trying POST as many Pazarama endpoints prefer it
+            const url = `${this.baseUrl}/order/getOrderDetailForApi`;
+            const body = { orderNumber };
 
             const response = await fetch(url, {
-                method: 'GET',
-                headers: await this.getHeaders()
+                method: 'POST',
+                headers: await this.getHeaders(),
+                body: JSON.stringify(body)
             });
 
             if (!response.ok) {
-                console.error(`[PAZARAMA_DETAIL_ERR] Status: ${response.status}`);
-                return null;
+                // Try GET as fallback
+                const getUrl = `${url}?orderNumber=${orderNumber}`;
+                const getRes = await fetch(getUrl, { headers: await this.getHeaders() });
+                if (!getRes.ok) return this.searchInList(orderNumber);
+                const result = await getRes.json();
+                if (!result.success || !result.data) return this.searchInList(orderNumber);
+                return this.mapOrder(result.data);
             }
 
             const result = await response.json();
 
             if (!result.success || !result.data) {
-                // Fallback to list search if detail fails
                 return this.searchInList(orderNumber);
             }
 
             return this.mapOrder(result.data);
         } catch (error) {
             console.error('Pazarama sipariş detay çekme hatası:', error);
-            return null;
+            return this.searchInList(orderNumber);
         }
     }
 
@@ -287,16 +297,16 @@ export class PazaramaService implements IMarketplaceService {
 
     private mapOrder(pzOrder: any): MarketplaceOrder {
         // Diagnostic: If items are missing, log keys for first occurrence
-        const items = pzOrder.items || pzOrder.orderItems || pzOrder.orderItemDetails || [];
-        const totalAmount = pzOrder.totalPrice || pzOrder.totalAmount || pzOrder.grossAmount || 0;
+        const items = pzOrder.items || pzOrder.orderItems || pzOrder.orderItemDetails || pzOrder.orderItemList || pzOrder.orderItemListDetails || [];
+        const totalAmount = pzOrder.totalPrice || pzOrder.totalAmount || pzOrder.grossAmount || pzOrder.totalGrossAmount || pzOrder.payableAmount || 0;
 
         if (items.length === 0) {
             console.warn(`[PAZARAMA_MAP_WARN] Order ${pzOrder.orderNumber} has no items. Keys: ${Object.keys(pzOrder).join(',')}`);
         }
 
-        const firstName = pzOrder.customerFirstName || pzOrder.recipientFirstName || '';
-        const lastName = pzOrder.customerLastName || pzOrder.recipientLastName || '';
-        const customerName = `${firstName} ${lastName}`.trim() || pzOrder.recipientName || 'Müşteri';
+        const firstName = pzOrder.customerFirstName || pzOrder.recipientFirstName || pzOrder.shippingAddress?.firstName || '';
+        const lastName = pzOrder.customerLastName || pzOrder.recipientLastName || pzOrder.shippingAddress?.lastName || '';
+        const customerName = `${firstName} ${lastName}`.trim() || pzOrder.recipientName || pzOrder.customerName || 'Müşteri';
 
         return {
             id: String(pzOrder.orderNumber),
