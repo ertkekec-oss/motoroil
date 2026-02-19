@@ -144,9 +144,12 @@ export async function POST(request: Request) {
 
         for (const order of orders) {
             try {
+                const orderNumber = String(order.orderNumber);
+                const marketplaceId = order.id ? String(order.id) : orderNumber;
+
                 // 1. Customer Sync
                 let customer;
-                const customerEmail = order.customerEmail || `guest-${order.orderNumber}@${type.toLowerCase()}.com`;
+                const customerEmail = order.customerEmail || `guest-${orderNumber}@${type.toLowerCase()}.com`;
 
                 customer = await prisma.customer.upsert({
                     where: { email_companyId: { email: customerEmail, companyId: companyId } },
@@ -165,7 +168,7 @@ export async function POST(request: Request) {
 
                 // 2. Idempotency Guard
                 const existingOrder = await prisma.order.findFirst({
-                    where: { companyId, orderNumber: order.orderNumber }
+                    where: { companyId, orderNumber: orderNumber }
                 });
 
                 if (!existingOrder) {
@@ -174,8 +177,8 @@ export async function POST(request: Request) {
                         data: {
                             companyId,
                             marketplace: normalizedMarketplace,
-                            marketplaceId: order.id,
-                            orderNumber: order.orderNumber,
+                            marketplaceId: marketplaceId,
+                            orderNumber: orderNumber,
                             customerName: customer.name,
                             totalAmount: order.totalAmount,
                             currency: order.currency || 'TRY',
@@ -215,7 +218,7 @@ export async function POST(request: Request) {
                                     quantity: item.quantity,
                                     taxRate: item.taxRate || 20,
                                     sku: item.sku,
-                                    orderNumber: order.orderNumber,
+                                    orderNumber: orderNumber,
                                     branch: syncBranch
                                 }
                             });
@@ -223,7 +226,7 @@ export async function POST(request: Request) {
                     }
 
                     savedCount++;
-                    details.push({ order: order.orderNumber, action: 'Created' });
+                    details.push({ order: orderNumber, action: 'Created' });
                 } else {
                     const dbItems = Array.isArray(existingOrder.items) ? existingOrder.items : [];
                     const needsUpdate = existingOrder.status !== order.status ||
@@ -246,12 +249,12 @@ export async function POST(request: Request) {
                         });
 
                         updatedCount++;
-                        details.push({ order: order.orderNumber, action: 'StatusUpdate', status: order.status });
+                        details.push({ order: orderNumber, action: 'StatusUpdate', status: order.status });
                     }
                 }
             } catch (err: any) {
-                console.error(`[SYNC_ORDER_ERROR] Order: ${order.orderNumber}, Error:`, err);
-                errors.push({ order: order.orderNumber, error: err.message });
+                console.error(`[SYNC_ORDER_ERROR] Order: ${orderNumber}, Error:`, err);
+                errors.push({ order: orderNumber, error: err.message });
             }
         }
 
