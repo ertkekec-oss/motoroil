@@ -119,27 +119,29 @@ export class PazaramaService implements IMarketplaceService {
 
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
         try {
-            const queryParams = new URLSearchParams();
-
             const start = startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
             const end = endDate || new Date();
 
-            queryParams.append('StartDate', start.toISOString().split('T')[0]);
-            queryParams.append('EndDate', end.toISOString().split('T')[0]);
-            queryParams.append('Page', '1');
-            queryParams.append('Size', '100');
+            const startDateStr = start.toISOString().split('T')[0];
+            const endDateStr = end.toISOString().split('T')[0];
 
-            // Pazarama PascalCase endpoints: Order/GetOrderList
-            const url = `${this.baseUrl}/Order/GetOrderList?${queryParams.toString()}`;
+            // Official Merchant API Endpoint: POST /order/getOrdersForApi
+            const url = `${this.baseUrl}/order/getOrdersForApi`;
+            const fetchUrl = url; // Direct connection
 
-            // Try DIRECT first (Bypass proxy)
-            // The proxy at .156 seems to return "OK" for Pazarama, likely due to misconfiguration.
-            const fetchUrl = url;
+            const body = {
+                pageSize: 100,
+                pageNumber: 1,
+                startDate: startDateStr,
+                endDate: endDateStr
+            };
 
-            console.log(`[PAZARAMA_GET_ORDERS] Fetching from: ${fetchUrl}`);
+            console.log(`[PAZARAMA_GET_ORDERS] POST to: ${fetchUrl}`, body);
 
             const response = await fetch(fetchUrl, {
-                headers: await this.getHeaders()
+                method: 'POST',
+                headers: await this.getHeaders(),
+                body: JSON.stringify(body)
             });
 
             if (!response.ok) {
@@ -169,9 +171,19 @@ export class PazaramaService implements IMarketplaceService {
 
     async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
         try {
-            const url = `${this.baseUrl}/Order/GetOrderList?orderNumber=${encodeURIComponent(orderNumber)}`;
+            // Using the same POST endpoint with orderNumber filter if supported, 
+            // or searching in a small window.
+            const url = `${this.baseUrl}/order/getOrdersForApi`;
+            const body = {
+                pageSize: 10,
+                pageNumber: 1,
+                orderNumber: orderNumber
+            };
+
             const response = await fetch(url, {
+                method: 'POST',
                 headers: await this.getHeaders(),
+                body: JSON.stringify(body)
             });
 
             if (!response.ok) return null;
@@ -190,8 +202,9 @@ export class PazaramaService implements IMarketplaceService {
 
     async getCargoLabel(orderNumber: string): Promise<{ pdfBase64?: string; error?: string }> {
         try {
-            const url = `${this.baseUrl}/Order/GetCargoLabel?orderNumber=${orderNumber}`;
-            const fetchUrl = url; // Direct connection
+            // Updated to potential partner API naming convention if Order/GetCargoLabel fails
+            const url = `${this.baseUrl}/order/getLabelForApi?orderNumber=${orderNumber}`;
+            const fetchUrl = url;
 
             const response = await fetch(fetchUrl, {
                 headers: await this.getHeaders()
