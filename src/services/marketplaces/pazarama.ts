@@ -144,21 +144,25 @@ export class PazaramaService implements IMarketplaceService {
                 body: JSON.stringify(body)
             });
 
-            if (!response.ok) {
-                const err = await response.text();
-                throw new Error(`Pazarama GetOrders Error: ${response.status} - ${err}`);
-            }
+            console.log(`[PAZARAMA_RESPONSE] Status: ${response.status}`);
 
             const text = await response.text();
+            console.log(`[PAZARAMA_RESPONSE_TEXT]: ${text.slice(0, 500)}`);
+
+            if (!response.ok) {
+                throw new Error(`Pazarama GetOrders Error: ${response.status} - ${text.substring(0, 200)}`);
+            }
+
             let result;
             try {
                 result = JSON.parse(text);
+                console.log(`[PAZARAMA_RESPONSE_JSON] totalCount: ${result.totalCount || result.TotalCount}, dataLength: ${result.data?.length}`);
             } catch (e: any) {
                 console.error(`Pazarama JSON parse hatası. İçerik: "${text.substring(0, 500)}"`);
                 throw new Error(`Pazarama geçersiz yanıt (JSON bekleniyor): ${text.substring(0, 50)}`);
             }
 
-            if (!result.isSuccess || !result.data) {
+            if (!result.data || !Array.isArray(result.data)) {
                 return [];
             }
 
