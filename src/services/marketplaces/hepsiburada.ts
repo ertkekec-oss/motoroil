@@ -96,12 +96,38 @@ export class HepsiburadaService implements IMarketplaceService {
                 headers['X-Periodya-Key'] = proxyKey;
             }
 
-            const response = await fetch(url, { headers });
-
-            return response.ok;
+            const response = await this.safeFetchJson(url, { headers });
+            return !!response.data;
         } catch (error) {
             console.error('Hepsiburada connection validation error:', error);
             return false;
+        }
+    }
+
+    private async safeFetchJson(url: string, options: any = {}): Promise<{ data: any; status: number }> {
+        const res = await fetch(url, options);
+        const text = await res.text();
+        const trimmed = text.trim();
+
+        if (!res.ok) {
+            throw new Error(`HB API Hatası: ${res.status} - ${trimmed.substring(0, 500)}`);
+        }
+
+        if (trimmed === 'OK') {
+            console.log(`[HB_PROXY] Received OK signal from proxy, retrying in 2s...`);
+            await new Promise(r => setTimeout(r, 2000));
+            const res2 = await fetch(url, options);
+            const text2 = await res2.text();
+            if (!res2.ok) throw new Error(`HB API Hatası (Retry): ${res2.status}`);
+            if (text2.trim() === 'OK') throw new Error(`HB Proxy meşgul (OK dönüyor). Lütfen birazdan tekrar deneyin.`);
+            return { data: JSON.parse(text2), status: res2.status };
+        }
+
+        try {
+            return { data: JSON.parse(trimmed), status: res.status };
+        } catch (e) {
+            console.error(`[HB_JSON_PARSE_ERROR]: Response was not JSON. Body snippet: ${trimmed.substring(0, 100)}`);
+            throw new Error(`HB yanıtı okunamadı (JSON bekleniyordu).`);
         }
     }
 
@@ -182,36 +208,8 @@ export class HepsiburadaService implements IMarketplaceService {
                         headers['X-Periodya-Key'] = proxyKey;
                     }
 
-                    const response = await fetch(url, { headers });
-
-                    console.log(`[HB_RESPONSE] Status: ${response.status} ${response.statusText}`);
-
-                    if (!response.ok) {
-                        const errText = await response.text();
-                        console.error(`[HB_TARGET_ERR] ${target.name} failed (Status: ${response.status})`);
-
-                        // 1. FATAL AUTH ERROR: Abort entire sync
-                        if (response.status === 401 || response.status === 403) {
-                            throw new Error(`HB_AUTH_ERROR: Hepsiburada Yetkilendirme Hatası (${response.status}). Nginx Authorization forward ve Host header kontrol edilmeli.`);
-                        }
-
-                        // 2. SOFT MISSING ENDPOINT: Skip this target (Environment/Config mismatch)
-                        if (response.status === 404 || response.status === 405) {
-                            console.warn(`[HB_SYNC_SKIP] ${target.name} endpoint bulunamadı (404/405). Bu segment atlanıyor.`);
-                            hasMore = false;
-                            break;
-                        }
-
-                        // 3. RETRYABLE RATE LIMIT
-                        if (response.status === 429) {
-                            throw new Error(`HB_RATE_LIMIT: Hepsiburada API limitine takıldınız. (429)`);
-                        }
-
-                        // 4. OTHER API ERRORS
-                        throw new Error(`HB_API_ERROR: ${target.name} servisi ${response.status} hatası döndürdü.`);
-                    }
-
-                    const data = await response.json();
+                    const response = await this.safeFetchJson(url, { headers });
+                    const data = response.data;
                     let items: any[] = [];
 
                     if (Array.isArray(data)) {
@@ -235,7 +233,7 @@ export class HepsiburadaService implements IMarketplaceService {
 
                         if (mapped.items.length === 0 && mapped.orderNumber && mapped.orderNumber !== 'unknown') {
                             try {
-                                const fullDetail = await this.getOrderDetail(mapped.orderNumber);
+                                const fullDetail = await this.getOrderByNumber(mapped.orderNumber);
                                 if (fullDetail && fullDetail.items.length > 0) {
                                     mapped = { ...fullDetail, status: mapped.status };
                                 }
@@ -287,7 +285,7 @@ export class HepsiburadaService implements IMarketplaceService {
         return finalOrders;
     }
 
-    async getOrderDetail(orderNumber: string): Promise<MarketplaceOrder | null> {
+    async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
         try {
             const merchantId = (this.config.merchantId || '').trim();
             const url = `${this.baseUrl}/orders/merchantid/${merchantId}/ordernumber/${orderNumber}`;
@@ -301,10 +299,8 @@ export class HepsiburadaService implements IMarketplaceService {
             const proxyKey = this.getProxyKeyHeader();
             if (proxyKey) headers['X-Periodya-Key'] = proxyKey;
 
-            const response = await fetch(url, { headers });
-            if (!response.ok) return null;
-
-            const data = await response.json();
+            const response = await this.safeFetchJson(url, { headers });
+            const data = response.data;
             return this.mapOrder(data, 'UNKNOWN');
         } catch (err) {
             console.error(`[HB_GET_DETAIL_ERR] Order: ${orderNumber}`, err);

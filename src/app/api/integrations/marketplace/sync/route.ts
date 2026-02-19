@@ -112,12 +112,18 @@ export async function POST(request: Request) {
         } catch (remoteErr: any) {
             console.error(`[MARKETPLACE_REMOTE_ERROR] ${type}:`, remoteErr.message);
             // Return 400 with remote error details instead of 500
-            const statusCode = remoteErr.message.includes('400') ? 400 : (remoteErr.message.includes('401') ? 401 : 400);
+            let advice = "Lütfen API anahtarlarınızı ve entegrasyon ayarlarınızı kontrol edin.";
+            if (type.toLowerCase() === 'hepsiburada') {
+                advice = "Lütfen API anahtarlarınızı ve Hepsiburada panelindeki OMS yetkilerini kontrol edin.";
+            } else if (type.toLowerCase() === 'trendyol') {
+                advice = "Lütfen API anahtarlarınızı ve Trendyol Satıcı Paneli -> Hesap Bilgileri -> Entegrasyon Bilgileri alanını kontrol edin.";
+            }
+
             return NextResponse.json({
                 success: false,
                 error: remoteErr.message,
                 remoteStatus: statusCode,
-                advice: "Lütfen API anahtarlarınızı ve Hepsiburada panelindeki OMS yetkilerini kontrol edin."
+                advice
             }, { status: statusCode });
         }
 

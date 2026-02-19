@@ -17,6 +17,33 @@ export class TrendyolService implements IMarketplaceService {
         return `Basic ${Buffer.from(authString).toString('base64')}`;
     }
 
+    private async safeFetchJson(url: string, options: any = {}): Promise<{ data: any; status: number }> {
+        const res = await fetch(url, options);
+        const text = await res.text();
+        const trimmed = text.trim();
+
+        if (!res.ok) {
+            throw new Error(`Trendyol API Hatası: ${res.status} - ${trimmed.substring(0, 500)}`);
+        }
+
+        if (trimmed === 'OK') {
+            console.log(`[TRENDYOL_PROXY] Received OK signal from proxy, retrying in 2s...`);
+            await new Promise(r => setTimeout(r, 2000));
+            const res2 = await fetch(url, options);
+            const text2 = await res2.text();
+            if (!res2.ok) throw new Error(`Trendyol API Hatası (Retry): ${res2.status}`);
+            if (text2.trim() === 'OK') throw new Error(`Trendyol Proxy meşgul (OK dönüyor). Lütfen birazdan tekrar deneyin.`);
+            return { data: JSON.parse(text2), status: res2.status };
+        }
+
+        try {
+            return { data: JSON.parse(trimmed), status: res.status };
+        } catch (e) {
+            console.error(`[TRENDYOL_JSON_PARSE_ERROR]: Response was not JSON. Body snippet: ${trimmed.substring(0, 100)}`);
+            throw new Error(`Trendyol yanıtı okunamadı (JSON bekleniyordu).`);
+        }
+    }
+
     private getProxyKeyHeader(): string {
         return (process.env.PERIODYA_PROXY_KEY || '').trim();
     }
@@ -45,11 +72,11 @@ export class TrendyolService implements IMarketplaceService {
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
-            const response = await fetch(fetchUrl, {
+            const response = await this.safeFetchJson(fetchUrl, {
                 headers: this.getHeaders()
             });
 
-            return response.ok;
+            return !!response.data;
         } catch (error) {
             console.error('Trendyol bağlantı hatası:', error);
             return false;
@@ -289,42 +316,11 @@ export class TrendyolService implements IMarketplaceService {
         const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
         const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
-        const response = await fetch(fetchUrl, {
+        const response = await this.safeFetchJson(fetchUrl, {
             headers: this.getHeaders({ 'Accept-Language': 'tr-TR' })
         });
 
-        if (!response.ok) {
-            if (response.status === 556) {
-                console.warn(`[TRENDYOL-LABEL] SAPIGW 556 - Service Unavailable for package details (Proxy: ${!!effectiveProxy})`);
-                throw new Error(`Status 556`);
-            }
-            throw new Error(`Status ${response.status}`);
-        }
-
-        const bodyText = await response.text();
-        const ct = response.headers.get('content-type') || "";
-        let keys = '';
-        try { if (bodyText.trim().startsWith('{')) { const json = JSON.parse(bodyText); keys = Object.keys(json).join(','); } } catch { }
-        console.info(`[TRENDYOL-DIAG] Status-Check result: status=${response.status}, type=${ct}, len=${bodyText.length}, keys=[${keys}], snippet="${bodyText.substring(0, 200).replace(/\n/g, ' ')}"`);
-
-        if (bodyText.trim() === 'OK') {
-            // If proxy returns OK but we expected JSON, it's a proxy pending state.
-            // We retry once after a small delay.
-            await new Promise(r => setTimeout(r, 2000));
-            const retryRes = await fetch(fetchUrl, { headers: this.getHeaders({ 'Accept-Language': 'tr-TR' }) });
-            if (retryRes.ok) {
-                const retryBody = await retryRes.text();
-                if (retryBody.trim() !== 'OK') return JSON.parse(retryBody);
-            }
-            throw new Error(`Proxy returned OK (Pending)`);
-        }
-
-        try {
-            return JSON.parse(bodyText);
-        } catch (e) {
-            console.warn(`[TRENDYOL-LABEL] JSON Parse Error for details: ${bodyText.substring(0, 50)}`);
-            throw new Error(`Invalid JSON response`);
-        }
+        return response.data;
     }
 
 
@@ -439,16 +435,11 @@ export class TrendyolService implements IMarketplaceService {
 
             console.log('Trendyol Fetching:', url, `(Proxy: ${!!effectiveProxy})`);
 
-            const response = await fetch(fetchUrl, {
+            const response = await this.safeFetchJson(fetchUrl, {
                 headers: this.getHeaders()
             });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Trendyol API Hatası: ${response.status} - ${errorText}`);
-            }
-
-            const data = await response.json();
+            const data = response.data;
 
             if (!data || !data.content) {
                 return [];
@@ -464,11 +455,10 @@ export class TrendyolService implements IMarketplaceService {
     async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
         try {
             const url = `${this.baseUrl}/${this.config.supplierId}/orders?orderNumber=${encodeURIComponent(orderNumber)}`;
-            const response = await fetch(url, {
+            const response = await this.safeFetchJson(url, {
                 headers: this.getHeaders(),
             });
-            if (!response.ok) return null;
-            const data = await response.json();
+            const data = response.data;
             return data.content?.[0] ? this.mapOrder(data.content[0]) : null;
         } catch {
             return null;
