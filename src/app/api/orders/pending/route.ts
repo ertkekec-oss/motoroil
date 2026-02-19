@@ -32,12 +32,30 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const marketplaceParam = searchParams.get('marketplace');
 
+        const KEY_TO_DISPLAY: Record<string, string> = {
+            trendyol: "Trendyol",
+            hepsiburada: "Hepsiburada",
+            n11: "N11",
+            pazarama: "Pazarama",
+            amazon: "Amazon",
+            pos: "POS",
+        };
+
+        function normalizeMarketplaceFilter(mp: string) {
+            const trimmed = mp.trim();
+            if (!trimmed) return trimmed;
+            const key = trimmed.toLowerCase();
+            if (KEY_TO_DISPLAY[key]) return KEY_TO_DISPLAY[key];
+            if (trimmed.toUpperCase() === "POS") return "POS";
+            return trimmed;
+        }
+
         let whereClause: any = {
             companyId: companyId
         };
 
         if (marketplaceParam) {
-            whereClause.marketplace = marketplaceParam;
+            whereClause.marketplace = normalizeMarketplaceFilter(marketplaceParam);
         } else {
             whereClause.marketplace = { not: 'POS' }; // POS satışları 'Mağaza Satışları' sekmesinde, burası E-Ticaret
         }

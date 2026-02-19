@@ -143,11 +143,18 @@ export async function POST(request: Request) {
         const errors: any[] = [];
         const asStringOrNull = (v: any) => (v === undefined || v === null || v === "") ? null : String(v);
 
+        const typeToDisplay = (t: string) => {
+            const k = t.toLowerCase();
+            if (k === "n11") return "N11";
+            if (k === "pos") return "POS";
+            return k.charAt(0).toUpperCase() + k.slice(1).toLowerCase();
+        };
+
         for (const order of orders) {
             const orderNumber = asStringOrNull(order.orderNumber || order.id);
             const marketplaceId = asStringOrNull(order.id) || orderNumber;
             const shipmentPackageId = asStringOrNull(order.shipmentPackageId);
-            const normalizedMarketplace = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+            const normalizedMarketplace = typeToDisplay(type);
 
             try {
                 if (!orderNumber) throw new Error("Sipariş numarası bulunamadı (orderNumber/id eksik)");
