@@ -296,17 +296,15 @@ export class PazaramaService implements IMarketplaceService {
     }
 
     private mapOrder(pzOrder: any): MarketplaceOrder {
-        // Diagnostic: If items are missing, log keys for first occurrence
-        const items = pzOrder.items || pzOrder.orderItems || pzOrder.orderItemDetails || pzOrder.orderItemList || pzOrder.orderItemListDetails || [];
-        const totalAmount = pzOrder.totalPrice || pzOrder.totalAmount || pzOrder.grossAmount || pzOrder.totalGrossAmount || pzOrder.payableAmount || 0;
+        const items = pzOrder.items || pzOrder.orderItems || pzOrder.orderItemDetails || pzOrder.orderItemList || [];
+        const totalAmount = pzOrder.orderAmount || pzOrder.totalPrice || pzOrder.totalAmount || pzOrder.grossAmount || pzOrder.totalGrossAmount || pzOrder.payableAmount || 0;
 
-        if (items.length === 0) {
-            console.warn(`[PAZARAMA_MAP_WARN] Order ${pzOrder.orderNumber} has no items. Keys: ${Object.keys(pzOrder).join(',')}`);
-        }
+        const firstName = pzOrder.customerFirstName || pzOrder.recipientFirstName || pzOrder.shipmentAddress?.nameSurname?.split(' ')[0] || '';
+        const lastName = pzOrder.customerLastName || pzOrder.recipientLastName || pzOrder.shipmentAddress?.nameSurname?.split(' ').slice(1).join(' ') || '';
+        const customerName = pzOrder.customerName || `${firstName} ${lastName}`.trim() || pzOrder.recipientName || 'Müşteri';
 
-        const firstName = pzOrder.customerFirstName || pzOrder.recipientFirstName || pzOrder.shippingAddress?.firstName || '';
-        const lastName = pzOrder.customerLastName || pzOrder.recipientLastName || pzOrder.shippingAddress?.lastName || '';
-        const customerName = `${firstName} ${lastName}`.trim() || pzOrder.recipientName || pzOrder.customerName || 'Müşteri';
+        const shippingAddr = pzOrder.shipmentAddress || pzOrder.shippingAddress || {};
+        const billingAddr = pzOrder.billingAddress || {};
 
         return {
             id: String(pzOrder.orderNumber),
@@ -315,33 +313,36 @@ export class PazaramaService implements IMarketplaceService {
             customerEmail: pzOrder.customerEmail || '',
             orderDate: new Date(pzOrder.orderDate),
             status: this.mapStatus(pzOrder.orderStatus),
-            totalAmount: Number(totalAmount),
-            currency: 'TRY',
-            cargoTrackingNumber: pzOrder.cargoTrackingNumber,
-            cargoProvider: pzOrder.cargoProviderName,
+            totalAmount: typeof totalAmount === 'object' ? (totalAmount.value || 0) : Number(totalAmount),
+            currency: pzOrder.currency || 'TRY',
+            cargoTrackingNumber: pzOrder.cargoTrackingNumber || pzOrder.items?.[0]?.cargo?.trackingNumber,
+            cargoProvider: pzOrder.cargoProviderName || pzOrder.items?.[0]?.cargo?.companyName,
             shipmentPackageId: String(pzOrder.orderNumber),
             shippingAddress: {
-                fullName: `${pzOrder.shippingAddress?.firstName || ''} ${pzOrder.shippingAddress?.lastName || ''}`.trim() || pzOrder.shippingAddress?.fullName || '',
-                address: pzOrder.shippingAddress?.fullAddress || '',
-                city: pzOrder.shippingAddress?.city || '',
-                district: pzOrder.shippingAddress?.district || '',
-                phone: pzOrder.shippingAddress?.phone || ''
+                fullName: shippingAddr.nameSurname || shippingAddr.fullName || '',
+                address: shippingAddr.displayAddressText || shippingAddr.addressDetail || shippingAddr.fullAddress || '',
+                city: shippingAddr.cityName || shippingAddr.city || '',
+                district: shippingAddr.districtName || shippingAddr.district || '',
+                phone: shippingAddr.phoneNumber || shippingAddr.phone || ''
             },
             invoiceAddress: {
-                fullName: `${pzOrder.billingAddress?.firstName || ''} ${pzOrder.billingAddress?.lastName || ''}`.trim() || pzOrder.billingAddress?.fullName || '',
-                address: pzOrder.billingAddress?.fullAddress || '',
-                city: pzOrder.billingAddress?.city || '',
-                district: pzOrder.billingAddress?.district || '',
-                phone: pzOrder.billingAddress?.phone || ''
+                fullName: billingAddr.nameSurname || billingAddr.fullName || '',
+                address: billingAddr.displayAddressText || billingAddr.addressDetail || billingAddr.fullAddress || '',
+                city: billingAddr.cityName || billingAddr.city || '',
+                district: billingAddr.districtName || billingAddr.district || '',
+                phone: billingAddr.phoneNumber || billingAddr.phone || ''
             },
-            items: items.map((item: any) => ({
-                productName: item.productName || item.itemName || item.name || '',
-                sku: item.sku || item.merchantSku || item.productSku || item.barcode,
-                quantity: Number(item.quantity || 1),
-                price: Number(item.price || item.unitPrice || 0),
-                taxRate: Number(item.taxRate || 20),
-                discountAmount: Number(item.discountAmount || 0)
-            }))
+            items: items.map((item: any) => {
+                const priceVal = item.totalPrice?.value || item.salePrice?.value || item.price || item.unitPrice || 0;
+                return {
+                    productName: item.product?.name || item.productName || item.itemName || item.name || '',
+                    sku: item.product?.stockCode || item.product?.code || item.sku || item.merchantSku || item.productSku || item.barcode,
+                    quantity: Number(item.quantity || 1),
+                    price: Number(priceVal),
+                    taxRate: Number(item.product?.vatRate || item.taxRate || 20),
+                    discountAmount: Number(item.discountAmount?.value || item.discountAmount || 0)
+                };
+            })
         };
     }
 
