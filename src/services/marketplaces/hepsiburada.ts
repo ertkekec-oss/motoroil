@@ -214,19 +214,37 @@ export class HepsiburadaService implements IMarketplaceService {
                     const data = await response.json();
                     let items: any[] = [];
 
-                    if (Array.isArray(data)) items = data;
-                    else if (data && typeof data === 'object')
-                        items = data.items || data.data || (data.id ? [data] : []);
+                    if (Array.isArray(data)) {
+                        items = data;
+                    } else if (data && typeof data === 'object') {
+                        // Hepsiburada API can return data in various fields depending on the endpoint version
+                        items = data.items || data.data || data.packages || data.orders || (data.id || data.orderNumber || data.packageNumber ? [data] : []);
+                    }
 
                     if (items.length === 0) {
+                        console.log(`[HB_SYNC_EMPTY] Target ${target.name} returned 0 items. URL: ${url}`);
                         hasMore = false;
                         break;
                     }
 
+                    console.log(`[HB_SYNC_DATA] Target ${target.name} found ${items.length} records.`);
+
                     for (const item of items) {
                         const mapped = this.mapOrder(item, target.name);
                         const key = mapped.id || mapped.orderNumber;
-                        if (key) allOrdersMap.set(key, mapped);
+
+                        // Deduplication: If we already found this order (possibly from another status target),
+                        // only overwrite IF the new version has more data (e.g. has items vs doesn't).
+                        if (allOrdersMap.has(key)) {
+                            const existing = allOrdersMap.get(key)!;
+                            if (existing.items.length > 0 && mapped.items.length === 0) {
+                                continue;
+                            }
+                        }
+
+                        if (key && key !== 'unknown') {
+                            allOrdersMap.set(key, mapped);
+                        }
                     }
 
                     // Update: Only paginate if offset is supported AND we might have more pages
@@ -269,40 +287,43 @@ export class HepsiburadaService implements IMarketplaceService {
             // Hepsiburada status can be in multiple fields depending on endpoint
             const rawStatus = hbOrder.status || hbOrder.orderStatus || hbOrder.cargoStatus || fallbackStatus;
 
-            // Debug: Log if order has no items to help diagnose empty details
-            const orderItems = hbOrder.items || hbOrder.orderLines || hbOrder.lines || hbOrder.packageItems || [];
+            // Search for items in multiple possible locations
+            let rawLines = hbOrder.items || hbOrder.orderLines || hbOrder.lines || hbOrder.packageItems || [];
 
-            if (!Array.isArray(orderItems) || orderItems.length === 0) {
-                console.warn(`[HB_MAP_WARN] Order ${hbOrder.orderNumber || hbOrder.id} has no items in raw data. Keys:`, Object.keys(hbOrder));
+            // If still empty but there is a 'data' object, check inside it (some API versions nest data)
+            if ((!Array.isArray(rawLines) || rawLines.length === 0) && hbOrder.data) {
+                rawLines = hbOrder.data.items || hbOrder.data.lines || hbOrder.data.packageItems || [];
             }
+
+            const orderItems = Array.isArray(rawLines) ? rawLines : [];
 
             return {
                 id: (hbOrder.id || hbOrder.orderNumber || hbOrder.packageNumber || 'unknown').toString(),
-                orderNumber: (hbOrder.orderNumber || hbOrder.packageNumber || 'unknown').toString(),
-                customerName: hbOrder.customer?.name || hbOrder.customerName || hbOrder.billingAddress?.fullName || hbOrder.shippingAddress?.fullName || 'Müşteri',
+                orderNumber: (hbOrder.orderNumber || hbOrder.packageNumber || hbOrder.id || 'unknown').toString(),
+                customerName: hbOrder.customer?.name || hbOrder.customerName || hbOrder.billingAddress?.fullName || hbOrder.shippingAddress?.fullName || hbOrder.customer?.fullName || 'Müşteri',
                 customerEmail: hbOrder.customer?.email || hbOrder.customerEmail || '',
-                orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || Date.now()),
-                status: rawStatus.toString(),
+                orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || hbOrder.createdAt || Date.now()),
+                status: rawStatus.toString().toUpperCase(),
                 totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.totalAmount || hbOrder.payableAmount || hbOrder.totalPrice || 0),
                 currency: hbOrder.totalPrice?.currency || hbOrder.currency || 'TRY',
                 shipmentPackageId: (hbOrder.packageNumber || hbOrder.shipmentPackageId || hbOrder.id)?.toString(),
                 shippingAddress: {
-                    fullName: hbOrder.shippingAddress?.name || hbOrder.shippingAddress?.fullName || hbOrder.customer?.name || '',
+                    fullName: hbOrder.shippingAddress?.name || hbOrder.shippingAddress?.fullName || hbOrder.customer?.name || hbOrder.customerName || '',
                     address: hbOrder.shippingAddress?.address || '',
                     city: hbOrder.shippingAddress?.city || '',
                     district: hbOrder.shippingAddress?.town || hbOrder.shippingAddress?.district || '',
                     phone: hbOrder.shippingAddress?.phoneNumber || hbOrder.shippingAddress?.phone || ''
                 },
                 invoiceAddress: {
-                    fullName: hbOrder.billingAddress?.name || hbOrder.billingAddress?.fullName || hbOrder.customer?.name || '',
+                    fullName: hbOrder.billingAddress?.name || hbOrder.billingAddress?.fullName || hbOrder.customer?.name || hbOrder.customerName || '',
                     address: hbOrder.billingAddress?.address || '',
                     city: hbOrder.billingAddress?.city || '',
                     district: hbOrder.billingAddress?.town || hbOrder.billingAddress?.district || '',
                     phone: hbOrder.billingAddress?.phoneNumber || hbOrder.billingAddress?.phone || ''
                 },
-                items: (Array.isArray(orderItems) ? orderItems : []).map((item: any) => ({
-                    productName: item.productName || item.name || item.skuDescription || 'Ürün',
-                    sku: item.sku || item.merchantSku || item.hbSku || 'SKU',
+                items: orderItems.map((item: any) => ({
+                    productName: item.productName || item.name || item.skuDescription || item.description || 'Ürün',
+                    sku: item.sku || item.merchantSku || item.hbSku || item.productCode || 'SKU',
                     quantity: Number(item.quantity || item.qty || 1),
                     price: Number(item.price?.amount || item.price || item.unitPrice || item.totalPrice || 0),
                     taxRate: Number(item.taxRate || item.vatRate || 20),

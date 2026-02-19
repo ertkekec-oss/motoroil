@@ -228,7 +228,8 @@ export async function POST(request: Request) {
                     const dbItems = Array.isArray(existingOrder.items) ? existingOrder.items : [];
                     const needsUpdate = existingOrder.status !== order.status ||
                         (order.shipmentPackageId && !existingOrder.shipmentPackageId) ||
-                        (dbItems.length === 0 && (order.items?.length || 0) > 0);
+                        (dbItems.length === 0 && (order.items?.length || 0) > 0) ||
+                        (Number(existingOrder.totalAmount || 0) === 0 && (order.totalAmount || 0) > 0);
 
                     if (needsUpdate) {
                         const normalizedMarketplace = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
