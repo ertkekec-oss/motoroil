@@ -51,7 +51,7 @@ export function OnlineOrdersTab({
         const isExpanding = expandedOrderId !== id;
         setExpandedOrderId(isExpanding ? id : null);
 
-        if (isExpanding && order && order.marketplace === 'Pazarama' && (!order.items || order.items.length === 0)) {
+        if (isExpanding && order && order.marketplace === 'Pazarama' && !order.detailsFetchedAt) {
             // Automatic Hydration for Pazarama
             try {
                 const res = await fetch('/api/integrations/marketplace/hydrate', {

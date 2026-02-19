@@ -325,7 +325,7 @@ export class PazaramaService implements IMarketplaceService {
                 phone: pzOrder.billingAddress?.phone || ''
             },
             items: items.map((item: any) => ({
-                productName: item.productName || item.itemName || item.name || 'Ürün',
+                productName: item.productName || item.itemName || item.name || '',
                 sku: item.sku || item.merchantSku || item.productSku || item.barcode,
                 quantity: Number(item.quantity || 1),
                 price: Number(item.price || item.unitPrice || 0),

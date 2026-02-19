@@ -64,6 +64,8 @@ export async function POST(request: Request) {
                 shippingAddress: remoteOrder.shippingAddress as any,
                 invoiceAddress: remoteOrder.invoiceAddress as any,
                 totalAmount: remoteOrder.totalAmount,
+                customerName: remoteOrder.customerName,
+                customerEmail: remoteOrder.customerEmail,
                 status: remoteOrder.status, // Update status too
                 rawData: remoteOrder as any, // Update raw data with full details
                 detailsFetchedAt: new Date()
