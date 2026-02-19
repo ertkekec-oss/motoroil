@@ -62,16 +62,25 @@ export class PazaramaService implements IMarketplaceService {
                 throw new Error(`Pazarama Auth JSON Parse Error: ${e.message}. Body: ${text.substring(0, 100)}`);
             }
 
+            // Pazarama sometimes wraps the token response in a standard result object
+            // keys: [ 'success', 'messageCode', 'message', 'userMessage', 'data' ]
+            let tokenSource = data;
+            if (data.data && typeof data.data === 'object' && !Array.isArray(data.data)) {
+                tokenSource = data.data;
+            }
+
             // Pazarama sometimes uses access_token (standard) or AccessToken (pascal)
-            this.accessToken = data.access_token || data.AccessToken || data.accessToken;
+            this.accessToken = tokenSource.access_token || tokenSource.AccessToken || tokenSource.accessToken;
 
             if (!this.accessToken) {
                 console.error('[PAZARAMA_AUTH_FAIL] Received keys:', Object.keys(data));
-                throw new Error('Pazarama Auth Error: No token found in response');
+                const errorDetail = data.userMessage || data.message || 'No token found in response';
+                console.error('[PAZARAMA_AUTH_MSG]:', errorDetail);
+                throw new Error(`Pazarama Auth Error: ${errorDetail}`);
             }
 
             // Set expiry with a small buffer (5 mins)
-            const expiresIn = Number(data.expires_in || data.ExpiresIn || 3600);
+            const expiresIn = Number(tokenSource.expires_in || tokenSource.ExpiresIn || tokenSource.expiresIn || 3600);
             this.tokenExpiry = Date.now() + (expiresIn * 1000) - 300000;
 
             console.log(`[PAZARAMA_AUTH] Token received successfully. Length: ${this.accessToken.length}`);
