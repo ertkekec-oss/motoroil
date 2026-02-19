@@ -6,6 +6,9 @@ import { PazaramaService } from './pazarama';
 
 export class MarketplaceServiceFactory {
     static createService(marketplaceType: 'trendyol' | 'hepsiburada' | 'n11' | 'amazon' | 'pazarama', config: any): IMarketplaceService {
+        if (!config) {
+            throw new Error(`Marketplace config missing for type=${marketplaceType}`);
+        }
         switch (marketplaceType) {
             case 'trendyol':
                 return new TrendyolService(config as TrendyolConfig);

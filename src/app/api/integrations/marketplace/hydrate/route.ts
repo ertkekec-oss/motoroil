@@ -30,22 +30,37 @@ export async function POST(request: Request) {
             }
         }
 
-        // 2. Get Marketplace Config
-        const config = await prisma.marketplaceConfig.findFirst({
+        // 2. Resolve internal marketplace type
+        const mpMap: Record<string, string> = {
+            'Pazarama': 'pazarama',
+            'Trendyol': 'trendyol',
+            'Hepsiburada': 'hepsiburada',
+            'N11': 'n11',
+            'Amazon': 'amazon'
+        };
+
+        const internalMpType = mpMap[marketplace] || marketplace.toLowerCase();
+
+        // 3. Get Marketplace Config
+        const mpConfig = await prisma.marketplaceConfig.findFirst({
             where: {
                 companyId: existingOrder.companyId,
-                type: marketplace.toLowerCase()
+                type: internalMpType
             }
         });
 
-        if (!config) {
-            return NextResponse.json({ success: false, error: 'Marketplace config not found' }, { status: 404 });
+        if (!mpConfig || !mpConfig.config) {
+            console.error(`[HYDRATE] Config not found for ${internalMpType} (Company: ${existingOrder.companyId})`);
+            return NextResponse.json({
+                success: false,
+                error: `Marketplace config not found for ${internalMpType}. Lütfen entegrasyon ayarlarını kontrol edin.`
+            }, { status: 400 });
         }
 
-        // 3. Initialize Marketplace Service
+        // 4. Initialize Marketplace Service
         const service = MarketplaceServiceFactory.createService(
-            config.type as any,
-            config.config as any
+            mpConfig.type as any,
+            mpConfig.config as any
         );
 
         // 4. Fetch Details from Marketplace
