@@ -68,6 +68,10 @@ export async function GET(request: Request) {
             take: 50
         });
 
+        const totalTenantOrders = await prisma.order.count({
+            where: { company: { tenantId: session.tenantId } }
+        });
+
         // Bildirim için sayı ve özet bilgi dön
         return NextResponse.json({
             success: true,
