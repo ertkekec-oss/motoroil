@@ -64,5 +64,6 @@ export type MarketplaceConfig = TrendyolConfig | HepsiburadaConfig | N11Config |
 
 export interface IMarketplaceService {
     getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]>;
+    getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null>;
     validateConnection(): Promise<boolean>;
 }

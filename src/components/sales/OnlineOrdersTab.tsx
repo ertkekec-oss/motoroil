@@ -47,8 +47,34 @@ export function OnlineOrdersTab({
 
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
-    const toggleExpand = (id: string) => {
-        setExpandedOrderId(expandedOrderId === id ? null : id);
+    const toggleExpand = async (id: string, order?: any) => {
+        const isExpanding = expandedOrderId !== id;
+        setExpandedOrderId(isExpanding ? id : null);
+
+        if (isExpanding && order && order.marketplace === 'Pazarama' && (!order.items || order.items.length === 0)) {
+            // Automatic Hydration for Pazarama
+            try {
+                const res = await fetch('/api/integrations/marketplace/hydrate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: id, marketplace: 'Pazarama' })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.order) {
+                        // Update the order in the local list so the UI reflects the new items
+                        const updatedOrders = onlineOrders.map(o => o.id === id ? { ...o, ...data.order } : o);
+                        // Since OnlineOrdersTab receives onlineOrders as prop, we should ideally call fetchOnlineOrders 
+                        // or have a way to update the parent state. 
+                        // Given the props, fetchOnlineOrders is the intended way.
+                        await fetchOnlineOrders();
+                    }
+                }
+            } catch (err) {
+                console.error('Hydration failed:', err);
+            }
+        }
     };
 
     const toggleOrderSelection = (orderId: string) => {
@@ -287,7 +313,7 @@ export function OnlineOrdersTab({
                             const isExpanded = expandedOrderId === o.id;
                             return (
                                 <Fragment key={o.id}>
-                                    <tr style={{ borderTop: isExpanded ? 'none' : '1px solid var(--border-light)', cursor: 'pointer', background: isExpanded ? 'var(--bg-hover)' : 'transparent' }} onClick={() => toggleExpand(o.id)}>
+                                    <tr style={{ borderTop: isExpanded ? 'none' : '1px solid var(--border-light)', cursor: 'pointer', background: isExpanded ? 'var(--bg-hover)' : 'transparent' }} onClick={() => toggleExpand(o.id, o)}>
                                         <td style={{ padding: '16px' }} onClick={(e) => e.stopPropagation()}>
                                             <input
                                                 type="checkbox"

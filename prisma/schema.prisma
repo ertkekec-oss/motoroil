@@ -213,6 +213,7 @@ model Order {
   branch            String?   @default("Merkez")
   companyId         String
   shipmentPackageId String?
+  detailsFetchedAt  DateTime? // Tracking for hydration logic
   company           Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, orderNumber])

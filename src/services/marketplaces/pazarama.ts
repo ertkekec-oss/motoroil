@@ -213,33 +213,47 @@ export class PazaramaService implements IMarketplaceService {
 
     async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
         try {
-            // Using the same POST endpoint with orderNumber filter if supported, 
-            // or searching in a small window.
-            const url = `${this.baseUrl}/order/getOrdersForApi`;
-            const body = {
-                pageSize: 10,
-                pageNumber: 1,
-                orderNumber: orderNumber
-            };
+            // Using a more specific detail endpoint as the list endpoint often omits items.
+            const url = `${this.baseUrl}/order/getOrderDetailForApi?orderNumber=${orderNumber}`;
 
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: await this.getHeaders()
+            });
+
+            if (!response.ok) {
+                console.error(`[PAZARAMA_DETAIL_ERR] Status: ${response.status}`);
+                return null;
+            }
+
+            const result = await response.json();
+
+            if (!result.success || !result.data) {
+                // Fallback to list search if detail fails
+                return this.searchInList(orderNumber);
+            }
+
+            return this.mapOrder(result.data);
+        } catch (error) {
+            console.error('Pazarama sipariş detay çekme hatası:', error);
+            return null;
+        }
+    }
+
+    private async searchInList(orderNumber: string): Promise<MarketplaceOrder | null> {
+        try {
+            const url = `${this.baseUrl}/order/getOrdersForApi`;
+            const body = { pageSize: 10, pageNumber: 1, orderNumber };
             const response = await fetch(url, {
                 method: 'POST',
                 headers: await this.getHeaders(),
                 body: JSON.stringify(body)
             });
-
             if (!response.ok) return null;
             const result = await response.json();
-
-            if (!result.isSuccess || !result.data || result.data.length === 0) {
-                return null;
-            }
-
+            if (!result.success || !result.data || result.data.length === 0) return null;
             return this.mapOrder(result.data[0]);
-        } catch (error) {
-            console.error('Pazarama tek sipariş çekme hatası:', error);
-            return null;
-        }
+        } catch { return null; }
     }
 
     async getCargoLabel(orderNumber: string): Promise<{ pdfBase64?: string; error?: string }> {
