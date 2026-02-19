@@ -118,27 +118,51 @@ export class PazaramaService implements IMarketplaceService {
     }
 
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
-        try {
-            const start = startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-            const end = endDate || new Date();
+        const allOrders: MarketplaceOrder[] = [];
+        const start = startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const end = endDate || new Date();
 
-            const startDateStr = start.toISOString().split('T')[0];
-            const endDateStr = end.toISOString().split('T')[0];
+        // Pazarama limits date range to 30 days. We chunk it.
+        const CHUNK_DAYS = 30;
+        let currentStart = new Date(start);
 
-            // Official Merchant API Endpoint: POST /order/getOrdersForApi
-            const url = `${this.baseUrl}/order/getOrdersForApi`;
-            const fetchUrl = url; // Direct connection
+        while (currentStart < end) {
+            let currentEnd = new Date(currentStart);
+            currentEnd.setDate(currentEnd.getDate() + CHUNK_DAYS);
+            if (currentEnd > end) currentEnd = new Date(end);
 
+            const chunkOrders = await this.fetchOrdersInRange(currentStart, currentEnd);
+            allOrders.push(...chunkOrders);
+
+            // Move to next chunk (next day after currentEnd)
+            currentStart = new Date(currentEnd);
+            currentStart.setDate(currentStart.getDate() + 1);
+        }
+
+        return allOrders;
+    }
+
+    private async fetchOrdersInRange(start: Date, end: Date): Promise<MarketplaceOrder[]> {
+        const rangeOrders: MarketplaceOrder[] = [];
+        const startDateStr = start.toISOString().split('T')[0];
+        const endDateStr = end.toISOString().split('T')[0];
+        const url = `${this.baseUrl}/order/getOrdersForApi`;
+
+        let pageNumber = 1;
+        const pageSize = 100;
+        let hasMore = true;
+
+        while (hasMore) {
             const body = {
-                pageSize: 100,
-                pageNumber: 1,
+                pageSize,
+                pageNumber,
                 startDate: startDateStr,
                 endDate: endDateStr
             };
 
-            console.log(`[PAZARAMA_GET_ORDERS] POST to: ${fetchUrl}`, body);
+            console.log(`[PAZARAMA_GET_ORDERS] POST to: ${url}`, body);
 
-            const response = await fetch(fetchUrl, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: await this.getHeaders(),
                 body: JSON.stringify(body)
@@ -147,30 +171,44 @@ export class PazaramaService implements IMarketplaceService {
             console.log(`[PAZARAMA_RESPONSE] Status: ${response.status}`);
 
             const text = await response.text();
-            console.log(`[PAZARAMA_RESPONSE_TEXT]: ${text.slice(0, 500)}`);
-
             if (!response.ok) {
-                throw new Error(`Pazarama GetOrders Error: ${response.status} - ${text.substring(0, 200)}`);
+                console.error(`[PAZARAMA_ERROR_TEXT]: ${text.slice(0, 1000)}`);
+                throw new Error(`Pazarama HTTP Error: ${response.status}`);
             }
 
             let result;
             try {
                 result = JSON.parse(text);
-                console.log(`[PAZARAMA_RESPONSE_JSON] totalCount: ${result.totalCount || result.TotalCount}, dataLength: ${result.data?.length}`);
             } catch (e: any) {
                 console.error(`Pazarama JSON parse hatası. İçerik: "${text.substring(0, 500)}"`);
-                throw new Error(`Pazarama geçersiz yanıt (JSON bekleniyor): ${text.substring(0, 50)}`);
+                throw new Error(`Pazarama geçersiz yanıt (JSON bekleniyor)`);
             }
 
-            if (!result.data || !Array.isArray(result.data)) {
-                return [];
+            // SUCCESS CHECK (CRITICAL)
+            if (result.success === false) {
+                const errorDetail = result.userMessage || result.message || 'API rejected request';
+                console.error(`[PAZARAMA_API_REJECTED] ${result.messageCode}: ${errorDetail}`);
+                throw new Error(`Pazarama API Hatası: ${errorDetail}`);
             }
 
-            return result.data.map((order: any) => this.mapOrder(order));
-        } catch (error) {
-            console.error('Pazarama sipariş çekme hatası:', error);
-            throw error;
+            const data = Array.isArray(result.data) ? result.data : [];
+            console.log(`[PAZARAMA_RANGE_RESULT] Page ${pageNumber}, items: ${data.length}, total: ${result.totalCount || '?'}`);
+
+            rangeOrders.push(...data.map((order: any) => this.mapOrder(order)));
+
+            // Pagination logic: if we got a full page and there's a next page flag
+            // Pazarama docs/behavior might use hasNextPage or totalCount
+            const totalCount = Number(result.totalCount || 0);
+            const loadedSoFar = (pageNumber - 1) * pageSize + data.length;
+
+            if (result.hasNextPage === true || (totalCount > loadedSoFar && data.length > 0)) {
+                pageNumber++;
+            } else {
+                hasMore = false;
+            }
         }
+
+        return rangeOrders;
     }
 
     async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
