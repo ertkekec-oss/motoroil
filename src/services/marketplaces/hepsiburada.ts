@@ -219,7 +219,7 @@ export class HepsiburadaService implements IMarketplaceService {
                     }
 
                     for (const item of items) {
-                        const mapped = this.mapOrder(item);
+                        const mapped = this.mapOrder(item, target.name);
                         const key = mapped.id || mapped.orderNumber;
                         if (key) allOrdersMap.set(key, mapped);
                     }
@@ -259,38 +259,41 @@ export class HepsiburadaService implements IMarketplaceService {
         return finalOrders;
     }
 
-    private mapOrder(hbOrder: any): MarketplaceOrder {
+    private mapOrder(hbOrder: any, fallbackStatus: string): MarketplaceOrder {
         try {
+            // Hepsiburada status can be in multiple fields depending on endpoint
+            const rawStatus = hbOrder.status || hbOrder.orderStatus || hbOrder.cargoStatus || fallbackStatus;
+
             return {
-                id: hbOrder.id || hbOrder.orderNumber,
-                orderNumber: hbOrder.orderNumber,
-                customerName: hbOrder.customer?.name || 'Müşteri',
-                customerEmail: hbOrder.customer?.email || '',
-                orderDate: new Date(hbOrder.orderDate || Date.now()),
-                status: hbOrder.status,
-                totalAmount: hbOrder.totalPrice?.amount || hbOrder.totalAmount || 0,
-                currency: hbOrder.totalPrice?.currency || 'TRY',
-                shipmentPackageId: hbOrder.packageNumber || hbOrder.shipmentPackageId,
+                id: (hbOrder.id || hbOrder.orderNumber || hbOrder.packageNumber || 'unknown').toString(),
+                orderNumber: (hbOrder.orderNumber || hbOrder.packageNumber || 'unknown').toString(),
+                customerName: hbOrder.customer?.name || hbOrder.customerName || 'Müşteri',
+                customerEmail: hbOrder.customer?.email || hbOrder.customerEmail || '',
+                orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || Date.now()),
+                status: rawStatus.toString(),
+                totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.totalAmount || hbOrder.payableAmount || 0),
+                currency: hbOrder.totalPrice?.currency || hbOrder.currency || 'TRY',
+                shipmentPackageId: (hbOrder.packageNumber || hbOrder.shipmentPackageId || hbOrder.id)?.toString(),
                 shippingAddress: {
-                    fullName: hbOrder.shippingAddress?.name || hbOrder.shippingAddress?.fullName || '',
+                    fullName: hbOrder.shippingAddress?.name || hbOrder.shippingAddress?.fullName || hbOrder.customer?.name || '',
                     address: hbOrder.shippingAddress?.address || '',
                     city: hbOrder.shippingAddress?.city || '',
                     district: hbOrder.shippingAddress?.town || hbOrder.shippingAddress?.district || '',
-                    phone: hbOrder.shippingAddress?.phoneNumber || ''
+                    phone: hbOrder.shippingAddress?.phoneNumber || hbOrder.shippingAddress?.phone || ''
                 },
                 invoiceAddress: {
-                    fullName: hbOrder.billingAddress?.name || hbOrder.billingAddress?.fullName || '',
+                    fullName: hbOrder.billingAddress?.name || hbOrder.billingAddress?.fullName || hbOrder.customer?.name || '',
                     address: hbOrder.billingAddress?.address || '',
                     city: hbOrder.billingAddress?.city || '',
                     district: hbOrder.billingAddress?.town || hbOrder.billingAddress?.district || '',
-                    phone: hbOrder.billingAddress?.phoneNumber || ''
+                    phone: hbOrder.billingAddress?.phoneNumber || hbOrder.billingAddress?.phone || ''
                 },
-                items: (hbOrder.items || []).map((item: any) => ({
-                    productName: item.productName || item.name,
-                    sku: item.sku || item.merchantSku,
-                    quantity: item.quantity,
-                    price: item.price?.amount || item.price || 0,
-                    taxRate: item.taxRate || 20,
+                items: (hbOrder.items || hbOrder.orderLines || []).map((item: any) => ({
+                    productName: item.productName || item.name || 'Ürün',
+                    sku: item.sku || item.merchantSku || 'SKU',
+                    quantity: Number(item.quantity || 1),
+                    price: Number(item.price?.amount || item.price || item.unitPrice || 0),
+                    taxRate: Number(item.taxRate || item.vatRate || 20),
                     discountAmount: 0
                 }))
             };
