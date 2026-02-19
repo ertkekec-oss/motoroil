@@ -71,6 +71,15 @@ export default function IntegrationsContent() {
             syncInterval: 30,
             branch: 'Merkez'
         },
+        pazarama: {
+            enabled: false,
+            apiKey: '',
+            apiSecret: '',
+            isTest: false,
+            autoSync: false,
+            syncInterval: 15,
+            branch: 'Merkez'
+        },
         custom: {
             enabled: true,
             url: 'https://www.periodya.com.tr/xml.php?c=siparisler&xmlc=10a4cd8d5e',
@@ -520,7 +529,7 @@ export default function IntegrationsContent() {
                                 { label: 'Açık Alacaklar', val: `₺${stats?.financials?.openReceivables.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}`, sub: 'Tahsilat Bekleyen Brüt', color: 'primary', trend: '↑' },
                                 { label: 'Askıda Settlement', val: `${stats?.financials?.pendingSettlements || 0} İşlem`, sub: 'Muhasebe bekleyenler', color: 'amber-500', trend: '⏳' },
                                 { label: '24 Saatlik Sipariş', val: `${stats?.orders?.last24h || 0} Adet`, sub: 'Gerçek Zamanlı Akış', color: 'blue-500', trend: '📦' },
-                                { label: 'Son Sync Status', val: stats?.configs?.find((c: any) => c.type === 'trendyol')?.lastSync ? new Date(stats.configs.find((c: any) => c.type === 'trendyol').lastSync).toLocaleTimeString('tr-TR') : 'Beklemede', sub: 'Bağlantı Aktif ✅', color: 'emerald-500', trend: '🔄' }
+                                { label: 'Son Sync Status', val: stats?.configs?.some((c: any) => c.lastSync) ? new Date(Math.max(...stats.configs.filter((c: any) => c.lastSync).map((c: any) => new Date(c.lastSync).getTime()))).toLocaleTimeString('tr-TR') : 'Beklemede', sub: 'Bağlantı Aktif ✅', color: 'emerald-500', trend: '🔄' }
                             ].map((s, i) => (
                                 <div key={i} className={`card glass p-6 border-l-4 border-l-${s.color} hover:translate-y-[-4px] transition-all cursor-default group relative overflow-hidden`}>
                                     <div className="absolute right-[-10%] top-[-10%] text-6xl opacity-5 group-hover:scale-110 transition-transform">{s.trend}</div>
@@ -906,7 +915,85 @@ export default function IntegrationsContent() {
                                     )}
                                 </div>
                             )}
-                            {/* Banking Tab */}
+                        </div>
+
+                        <div className="card glass p-8 relative overflow-hidden group border border-white/10">
+                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#006BFF]/5 rounded-full blur-3xl pointer-events-none" />
+                            <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+                                <div className="flex items-center gap-5">
+                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#006BFF]/20 to-transparent flex items-center justify-center text-3xl shadow-inner border border-[#006BFF]/10">
+                                        🔵
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-black text-white">Pazarama</h3>
+                                        <p className="text-xs text-white/40 mt-1 font-medium tracking-wide">İş Bankası iştiraki pazaryeri platformu</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    {marketplaceSettings.pazarama.enabled && (
+                                        <label className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg cursor-pointer">
+                                            <input type="checkbox" className="accent-blue-500 w-3.5 h-3.5" checked={marketplaceSettings.pazarama.isTest} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, isTest: e.target.checked } })} />
+                                            <span className="text-[10px] font-black text-blue-500">SANDBOX</span>
+                                        </label>
+                                    )}
+                                    <label className="flex items-center gap-3 px-4 py-2 bg-white/5 rounded-xl border border-white/10 cursor-pointer hover:bg-white/10 transition-all">
+                                        <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.pazarama.enabled ? 'bg-emerald-500' : 'bg-white/10'}`}>
+                                            <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.pazarama.enabled ? 'left-5.5' : 'left-0.5'}`} />
+                                        </div>
+                                        <input type="checkbox" className="hidden" checked={marketplaceSettings.pazarama.enabled} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, enabled: e.target.checked } })} />
+                                        <span className="font-black text-[10px] text-white/60 uppercase tracking-widest">{marketplaceSettings.pazarama.enabled ? 'AKTİF' : 'PASİF'}</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {marketplaceSettings.pazarama.enabled && (
+                                <div className="pt-8 mt-8 border-t border-white/5 animate-in slide-in-from-top-2 duration-300">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">App Key</label>
+                                            <input type="text" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#006BFF]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.pazarama.apiKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, apiKey: e.target.value } })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">App Secret</label>
+                                            <input type="password" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#006BFF]/50 outline-none font-mono transition-all focus:bg-white/[0.08]" value={marketplaceSettings.pazarama.apiSecret} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, apiSecret: e.target.value } })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
+                                            <select
+                                                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs text-white focus:border-[#006BFF]/50 outline-none transition-all focus:bg-white/[0.08] appearance-none"
+                                                value={marketplaceSettings.pazarama.branch || (branches[0]?.name || 'Merkez')}
+                                                onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, branch: e.target.value } })}
+                                            >
+                                                {branches.map(b => (
+                                                    <option key={b.id} value={b.name} className="bg-[#1a1a1a]">{b.name}</option>
+                                                ))}
+                                                {branches.length === 0 && <option value="Merkez" className="bg-[#1a1a1a]">Merkez</option>}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-white/[0.02] rounded-2xl border border-white/5">
+                                        <label className="flex items-center gap-4 cursor-pointer select-none">
+                                            <div className={`w-11 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.pazarama.autoSync ? 'bg-primary' : 'bg-white/10'}`}>
+                                                <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.pazarama.autoSync ? 'left-6.5' : 'left-0.5'}`} />
+                                            </div>
+                                            <input type="checkbox" className="hidden" checked={marketplaceSettings.pazarama.autoSync} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, autoSync: e.target.checked } })} />
+                                            <span className="text-xs font-black text-white/60 tracking-tighter">OTOMATİK SENKRONİZASYON</span>
+                                        </label>
+
+                                        <button onClick={() => testMarketplaceConnection('pazarama')} disabled={isTesting} className="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-black text-[10px] tracking-widest transition-all flex items-center gap-3 active:scale-95 disabled:opacity-50">
+                                            {isTesting ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span>🔍</span>}
+                                            BAĞLANTIYI TEST ET
+                                        </button>
+                                    </div>
+
+                                    {testResults.pazarama && (
+                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.pazarama.includes('✅') ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                                            <span className="text-sm font-bold tracking-tight">{testResults.pazarama}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

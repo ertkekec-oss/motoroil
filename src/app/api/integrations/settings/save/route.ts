@@ -62,7 +62,7 @@ export async function POST(request: Request) {
             const promises = Object.keys(marketplaceSettings).map(async (key) => {
                 const config = marketplaceSettings[key];
                 const normalizedType = key.toLowerCase().trim();
-                const allowedTypes = ['trendyol', 'hepsiburada', 'n11', 'amazon', 'custom'];
+                const allowedTypes = ['trendyol', 'hepsiburada', 'n11', 'amazon', 'pazarama', 'custom'];
 
                 if (!allowedTypes.includes(normalizedType)) return null;
 
