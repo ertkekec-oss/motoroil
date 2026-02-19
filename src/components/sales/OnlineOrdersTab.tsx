@@ -77,6 +77,35 @@ export function OnlineOrdersTab({
         }
     };
 
+    useEffect(() => {
+        // Her sayfa açıldığında veya sipariş listesi değiştiğinde, 
+        // detayları eksik olan Pazarama siparişlerini arka planda sırayla doldurur.
+        // İptal edilmiş siparişleri atlarız.
+        const pazaramaMissingDetails = onlineOrders.filter(o =>
+            o.marketplace === 'Pazarama' &&
+            (!o.detailsFetchedAt || !o.items || o.items.length === 0 || Number(o.totalAmount) === 0)
+        ).filter(o => !['Cancelled', 'CANCELLED', 'İptal Edildi', 'İptal'].includes(o.status));
+
+        if (pazaramaMissingDetails.length > 0) {
+            const timer = setTimeout(async () => {
+                const order = pazaramaMissingDetails[0];
+                try {
+                    const res = await fetch('/api/integrations/marketplace/hydrate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ orderId: order.id, marketplace: 'Pazarama' })
+                    });
+                    if (res.ok) {
+                        await fetchOnlineOrders();
+                    }
+                } catch (err) {
+                    console.error('[AUTO-HYDRATE] Background hydration failed:', err);
+                }
+            }, 3000); // API limitlerine takılmamak için 3 sn bekleyerek sırayla yapar
+            return () => clearTimeout(timer);
+        }
+    }, [onlineOrders, fetchOnlineOrders]);
+
     const toggleOrderSelection = (orderId: string) => {
         setSelectedOrders(prev =>
             prev.includes(orderId)
