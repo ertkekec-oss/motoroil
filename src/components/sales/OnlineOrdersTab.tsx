@@ -33,7 +33,7 @@ export function OnlineOrdersTab({
     showError
 }: OnlineOrdersTabProps) {
     const [statusFilter, setStatusFilter] = useState('ALL'); // ALL, NEW, SHIPPED, COMPLETED
-    const [marketplaceFilter, setMarketplaceFilter] = useState('ALL'); // ALL, Trendyol, Hepsiburada, N11
+    const [marketplaceFilter, setMarketplaceFilter] = useState('ALL'); // ALL, Trendyol, Hepsiburada, N11, Pazarama
     const [dateFilter, setDateFilter] = useState('ALL'); // ALL, TODAY, WEEK, MONTH, 3MONTHS, CUSTOM
     const [customStartDate, setCustomStartDate] = useState('');
     const [customEndDate, setCustomEndDate] = useState('');
@@ -226,6 +226,7 @@ export function OnlineOrdersTab({
                         <button onClick={() => setMarketplaceFilter('Trendyol')} style={{ padding: '4px 10px', borderRadius: '6px', border: 'none', background: marketplaceFilter === 'Trendyol' ? 'rgba(242, 122, 26, 0.1)' : 'transparent', borderBottom: marketplaceFilter === 'Trendyol' ? '2px solid #F27A1A' : 'none', color: '#F27A1A', fontSize: '11px', cursor: 'pointer' }}>Trendyol</button>
                         <button onClick={() => setMarketplaceFilter('Hepsiburada')} style={{ padding: '4px 10px', borderRadius: '6px', border: 'none', background: marketplaceFilter === 'Hepsiburada' ? 'rgba(255, 96, 0, 0.1)' : 'transparent', borderBottom: marketplaceFilter === 'Hepsiburada' ? '2px solid #FF6000' : 'none', color: '#FF6000', fontSize: '11px', cursor: 'pointer' }}>Hepsiburada</button>
                         <button onClick={() => setMarketplaceFilter('N11')} style={{ padding: '4px 10px', borderRadius: '6px', border: 'none', background: marketplaceFilter === 'N11' ? 'rgba(94, 23, 235, 0.1)' : 'transparent', borderBottom: marketplaceFilter === 'N11' ? '2px solid #5E17EB' : 'none', color: '#5E17EB', fontSize: '11px', cursor: 'pointer' }}>N11</button>
+                        <button onClick={() => setMarketplaceFilter('Pazarama')} style={{ padding: '4px 10px', borderRadius: '6px', border: 'none', background: marketplaceFilter === 'Pazarama' ? 'rgba(0, 107, 255, 0.1)' : 'transparent', borderBottom: marketplaceFilter === 'Pazarama' ? '2px solid #006BFF' : 'none', color: '#006BFF', fontSize: '11px', cursor: 'pointer' }}>Pazarama</button>
                     </div>
 
                     {/* Status Filters */}
@@ -300,12 +301,12 @@ export function OnlineOrdersTab({
                                             <span style={{
                                                 fontSize: '11px', padding: '2px 6px', borderRadius: '4px',
                                                 border: '1px solid var(--border-light)',
-                                                color: o.marketplace === 'Trendyol' ? '#F27A1A' :
-                                                    o.marketplace === 'N11' ? '#5E17EB' :
-                                                        o.marketplace === 'Hepsiburada' ? '#FF6000' :
-                                                            'var(--secondary)'
                                             }}>
-                                                {o.marketplace}
+                                                {o.marketplace === 'Trendyol' && <span style={{ color: '#F27A1A' }}>Trendyol</span>}
+                                                {o.marketplace === 'Hepsiburada' && <span style={{ color: '#FF6000' }}>Hepsiburada</span>}
+                                                {o.marketplace === 'N11' && <span style={{ color: '#5E17EB' }}>N11</span>}
+                                                {o.marketplace === 'Pazarama' && <span style={{ color: '#006BFF' }}>Pazarama</span>}
+                                                {!['Trendyol', 'Hepsiburada', 'N11', 'Pazarama'].includes(o.marketplace) && <span style={{ color: 'var(--secondary)' }}>{o.marketplace}</span>}
                                             </span>
                                         </td>
                                         <td>

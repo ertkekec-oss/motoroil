@@ -54,7 +54,13 @@ export interface N11Config {
     isTest?: boolean;
 }
 
-export type MarketplaceConfig = TrendyolConfig | HepsiburadaConfig | N11Config;
+export interface PazaramaConfig {
+    apiKey: string;
+    apiSecret: string;
+    isTest?: boolean;
+}
+
+export type MarketplaceConfig = TrendyolConfig | HepsiburadaConfig | N11Config | PazaramaConfig;
 
 export interface IMarketplaceService {
     getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]>;
