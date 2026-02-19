@@ -55,20 +55,28 @@ export class PazaramaService implements IMarketplaceService {
             }
 
             const text = await response.text();
-            let data;
+            let data: any;
             try {
                 data = JSON.parse(text);
             } catch (e: any) {
                 throw new Error(`Pazarama Auth JSON Parse Error: ${e.message}. Body: ${text.substring(0, 100)}`);
             }
 
-            this.accessToken = data.access_token;
+            // Pazarama sometimes uses access_token (standard) or AccessToken (pascal)
+            this.accessToken = data.access_token || data.AccessToken || data.accessToken;
+
+            if (!this.accessToken) {
+                console.error('[PAZARAMA_AUTH_FAIL] Received keys:', Object.keys(data));
+                throw new Error('Pazarama Auth Error: No token found in response');
+            }
+
             // Set expiry with a small buffer (5 mins)
-            this.tokenExpiry = Date.now() + (data.expires_in * 1000) - 300000;
+            const expiresIn = Number(data.expires_in || data.ExpiresIn || 3600);
+            this.tokenExpiry = Date.now() + (expiresIn * 1000) - 300000;
 
-            console.log(`[PAZARAMA_AUTH] Token received successfully. Length: ${this.accessToken?.length}`);
+            console.log(`[PAZARAMA_AUTH] Token received successfully. Length: ${this.accessToken.length}`);
 
-            return this.accessToken!;
+            return this.accessToken;
         } catch (error) {
             console.error('Pazarama Access Token Error:', error);
             throw error;
@@ -112,7 +120,8 @@ export class PazaramaService implements IMarketplaceService {
             queryParams.append('Page', '1');
             queryParams.append('Size', '100');
 
-            const url = `${this.baseUrl}/order/get-orders?${queryParams.toString()}`;
+            // Pazarama PascalCase endpoints: Order/GetOrderList
+            const url = `${this.baseUrl}/Order/GetOrderList?${queryParams.toString()}`;
 
             // Try DIRECT first (Bypass proxy)
             // The proxy at .156 seems to return "OK" for Pazarama, likely due to misconfiguration.
@@ -151,7 +160,7 @@ export class PazaramaService implements IMarketplaceService {
 
     async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
         try {
-            const url = `${this.baseUrl}/order/get-orders?orderNumber=${encodeURIComponent(orderNumber)}`;
+            const url = `${this.baseUrl}/Order/GetOrderList?orderNumber=${encodeURIComponent(orderNumber)}`;
             const response = await fetch(url, {
                 headers: await this.getHeaders(),
             });
@@ -172,7 +181,7 @@ export class PazaramaService implements IMarketplaceService {
 
     async getCargoLabel(orderNumber: string): Promise<{ pdfBase64?: string; error?: string }> {
         try {
-            const url = `${this.baseUrl}/order/get-cargo-label?orderNumber=${orderNumber}`;
+            const url = `${this.baseUrl}/Order/GetCargoLabel?orderNumber=${orderNumber}`;
             const fetchUrl = url; // Direct connection
 
             const response = await fetch(fetchUrl, {
