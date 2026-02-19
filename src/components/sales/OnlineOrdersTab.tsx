@@ -33,6 +33,7 @@ export function OnlineOrdersTab({
     showError
 }: OnlineOrdersTabProps) {
     const [statusFilter, setStatusFilter] = useState('ALL'); // ALL, NEW, SHIPPED, COMPLETED
+    const [marketplaceFilter, setMarketplaceFilter] = useState('ALL'); // ALL, Trendyol, Hepsiburada, N11
     const [dateFilter, setDateFilter] = useState('ALL'); // ALL, TODAY, WEEK, MONTH, 3MONTHS, CUSTOM
     const [customStartDate, setCustomStartDate] = useState('');
     const [customEndDate, setCustomEndDate] = useState('');
@@ -133,7 +134,13 @@ export function OnlineOrdersTab({
             }
         }
 
-        return statusMatch && dateMatch;
+        // Pazaryeri Filtresi
+        let marketplaceMatch = true;
+        if (marketplaceFilter !== 'ALL') {
+            marketplaceMatch = order.marketplace === marketplaceFilter;
+        }
+
+        return marketplaceMatch && statusMatch && dateMatch;
     });
 
     const totalPages = Math.ceil(filteredOnlineOrders.length / ordersPerPage);
@@ -149,7 +156,7 @@ export function OnlineOrdersTab({
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [statusFilter, dateFilter, customStartDate, customEndDate]);
+    }, [statusFilter, marketplaceFilter, dateFilter, customStartDate, customEndDate]);
 
     return (
         <div>
@@ -213,6 +220,14 @@ export function OnlineOrdersTab({
                 </div>
 
                 <div className="flex-col gap-2" style={{ alignItems: 'flex-end' }}>
+                    {/* Marketplace Filters */}
+                    <div className="flex-center gap-2" style={{ background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '8px' }}>
+                        <button onClick={() => setMarketplaceFilter('ALL')} style={{ padding: '4px 10px', borderRadius: '6px', border: 'none', background: marketplaceFilter === 'ALL' ? 'var(--bg-hover)' : 'transparent', borderBottom: marketplaceFilter === 'ALL' ? '2px solid var(--primary)' : 'none', color: 'white', fontSize: '11px', cursor: 'pointer' }}>Hepsi</button>
+                        <button onClick={() => setMarketplaceFilter('Trendyol')} style={{ padding: '4px 10px', borderRadius: '6px', border: 'none', background: marketplaceFilter === 'Trendyol' ? 'rgba(242, 122, 26, 0.1)' : 'transparent', borderBottom: marketplaceFilter === 'Trendyol' ? '2px solid #F27A1A' : 'none', color: '#F27A1A', fontSize: '11px', cursor: 'pointer' }}>Trendyol</button>
+                        <button onClick={() => setMarketplaceFilter('Hepsiburada')} style={{ padding: '4px 10px', borderRadius: '6px', border: 'none', background: marketplaceFilter === 'Hepsiburada' ? 'rgba(255, 96, 0, 0.1)' : 'transparent', borderBottom: marketplaceFilter === 'Hepsiburada' ? '2px solid #FF6000' : 'none', color: '#FF6000', fontSize: '11px', cursor: 'pointer' }}>Hepsiburada</button>
+                        <button onClick={() => setMarketplaceFilter('N11')} style={{ padding: '4px 10px', borderRadius: '6px', border: 'none', background: marketplaceFilter === 'N11' ? 'rgba(94, 23, 235, 0.1)' : 'transparent', borderBottom: marketplaceFilter === 'N11' ? '2px solid #5E17EB' : 'none', color: '#5E17EB', fontSize: '11px', cursor: 'pointer' }}>N11</button>
+                    </div>
+
                     {/* Status Filters */}
                     <div className="flex-center gap-2" style={{ background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '8px' }}>
                         <button onClick={() => setStatusFilter('ALL')} style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: statusFilter === 'ALL' ? 'var(--primary)' : 'transparent', color: 'white', fontSize: '12px', cursor: 'pointer' }}>Tümü</button>
