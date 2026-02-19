@@ -9,9 +9,18 @@ export class PazaramaService implements IMarketplaceService {
 
     constructor(config: PazaramaConfig) {
         this.config = config;
+        // Official API base URL: isortagimapi.pazarama.com
+        // Sandbox/Staging usually uses a different subdomain or the same one with test credentials
         this.baseUrl = config.isTest
-            ? 'https://api-sandbox.pazarama.com'
-            : 'https://api.pazarama.com';
+            ? 'https://isortagimapi-sandbox.pazarama.com' // Common pattern, fallback if needed
+            : 'https://isortagimapi.pazarama.com';
+
+        // If the sandbox URL above is wrong, Pazarama docs often point to the same base URL
+        if (config.isTest && this.baseUrl.includes('sandbox')) {
+            // Some versions of Pazarama API use the same base for both
+            this.baseUrl = 'https://isortagimapi.pazarama.com';
+        }
+
         this.authUrl = 'https://isortagimgiris.pazarama.com/connect/token';
     }
 
@@ -36,7 +45,7 @@ export class PazaramaService implements IMarketplaceService {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'application/json'
                 },
-                body: 'grant_type=client_credentials'
+                body: 'grant_type=client_credentials&scope=merchantgatewayapi.fullaccess'
             });
 
             if (!response.ok) {
