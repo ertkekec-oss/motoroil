@@ -143,9 +143,12 @@ export async function POST(request: Request) {
         let errors: any[] = [];
 
         for (const order of orders) {
+            const orderNumber = String(order.orderNumber || order.id || '');
+            const marketplaceId = order.id ? String(order.id) : orderNumber;
+            const normalizedMarketplace = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+
             try {
-                const orderNumber = String(order.orderNumber);
-                const marketplaceId = order.id ? String(order.id) : orderNumber;
+                if (!orderNumber) throw new Error("Sipariş numarası bulunamadı (orderNumber/id eksik)");
 
                 // 1. Customer Sync
                 let customer;
@@ -162,17 +165,20 @@ export async function POST(request: Request) {
                         categoryId: categoryId
                     },
                     update: {
-                        categoryId: categoryId // Force update category if it's an e-commerce customer
+                        categoryId: categoryId
                     }
                 });
 
-                // 2. Idempotency Guard
+                // 2. Idempotency Guard (Company + Marketplace + OrderNumber)
                 const existingOrder = await prisma.order.findFirst({
-                    where: { companyId, orderNumber: orderNumber }
+                    where: {
+                        companyId,
+                        orderNumber: orderNumber,
+                        marketplace: normalizedMarketplace
+                    }
                 });
 
                 if (!existingOrder) {
-                    const normalizedMarketplace = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
                     const newOrder = await prisma.order.create({
                         data: {
                             companyId,
@@ -235,7 +241,6 @@ export async function POST(request: Request) {
                         (Number(existingOrder.totalAmount || 0) === 0 && (order.totalAmount || 0) > 0);
 
                     if (needsUpdate) {
-                        const normalizedMarketplace = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
                         await prisma.order.update({
                             where: { id: existingOrder.id },
                             data: {
@@ -249,7 +254,7 @@ export async function POST(request: Request) {
                         });
 
                         updatedCount++;
-                        details.push({ order: orderNumber, action: 'StatusUpdate', status: order.status });
+                        details.push({ order: orderNumber, action: 'StatusUpdate', status: order.status, prevStatus: existingOrder.status });
                     }
                 }
             } catch (err: any) {
