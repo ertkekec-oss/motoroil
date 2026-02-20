@@ -150,6 +150,11 @@ export class NilveraInvoiceService {
 
         const type = isEInvoiceUser ? 'EFATURA' : 'EARSIV';
 
+        // 1.5 Fix for Nilvera "Name Surname Space" validation rule (e.g for TCKN entries without a surname)
+        if (!params.customer.Name.includes(' ') && params.customer.TaxNumber?.length === 11) {
+            params.customer.Name = `${params.customer.Name.trim()} Müşteri`;
+        }
+
         // 2. Doğru seriyi çek
         const series = await this.getDefaultSeries(type);
 
@@ -320,6 +325,11 @@ export class NilveraInvoiceService {
         driverId?: string
     }) {
         const { isDespatchUser, alias } = await this.checkDespatchTaxpayer(params.customer.TaxNumber);
+
+        // 1.5 Fix for Nilvera "Name Surname Space" validation rule (e.g for TCKN entries without a surname)
+        if (!params.customer.Name.includes(' ') && params.customer.TaxNumber?.length === 11) {
+            params.customer.Name = `${params.customer.Name.trim()} Müşteri`;
+        }
 
         // E-İrsaliye sadece mükelleflere gönderilebilir
         if (!isDespatchUser) {
