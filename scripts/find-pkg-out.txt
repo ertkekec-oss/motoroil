@@ -1,0 +1,197 @@
+﻿TRYING: https://oms-external.hepsiburada.com/orders/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4402306136
+Status: 200
+{
+  "orderId": "696d1c8e-8e52-5527-b45c-293306060606",
+  "orderNumber": "4402306136",
+  "paymentStatus": "Received",
+  "orderDate": "2026-01-18T20:46:54",
+  "createdDate": "2026-01-18T20:46:54.912",
+  "customer": {
+    "customerId": "44d6d477-3194-49d4-a522-15f277d1f841",
+    "name": "─░SMA─░L EROL"
+  },
+  "invoice": {
+    "turkishIdentityNumber": "11111111111",
+    "taxNumber": "",
+    "taxOffice": null,
+    "address": {
+      "addressId": "4a0573ca-8c78-478e-beb8-d5bb1b30ee00",
+      "address": "├£nsal Mahallesi Mustafa Ha┼şmet Caddesi 5092 Sokak No 4 HabibeAdem apartman─▒ daire 7 ├£NSAL KEPEZ Antalya",
+      "name": "─░smail Erol",
+      "email": "4402306136_5437154754@hepsifatura.com",
+      "countryCode": "TR",
+      "phoneNumber": "",
+      "alternatePhoneNumber": "",
+      "district": "├£NSAL",
+      "city": "Antalya",
+      "town": "KEPEZ",
+      "directions": "",
+      "postalCode": "07220"
+    }
+  },
+  "deliveryAddress": {
+    "addressId": "61c7a12b-1544-44ba-b5fa-5a56213b745b",
+    "address": "├£nsal Mahallesi Mustafa Ha┼şmet Caddesi 5092 Sokak No 4 HabibeAdem Apartman─▒ Kat 3 Daire 7 ├£NSAL KEPEZ Antalya",
+    "name": "─░SMA─░L EROL",
+    "email": "4402306136_5437154754@hepsifatura.com",
+    "countryCode": "TR",
+    "phoneNumber": "",
+    "alternatePhoneNumber": "",
+    "district": "├£NSAL",
+    "city": "Antalya",
+    "town": "KEPEZ",
+    "directions": "",
+    "postalCode": "07220"
+  },
+  "orderNote": {},
+  "items": [
+    {
+      "dueDate": "2026-01-19T18:00:00",
+      "lastStatusUpdateDate": "2026-01-21T15:03:50.462",
+      "id": "696d1c8e-8e52-5527-b45c-293106060606",
+      "name": "Liqui Moly Radyat├Âr Antifrizi Kfs 13 1 lt K─▒rm─▒z─▒",
+      "sku": "HBV000012PUFK",
+      "orderId": "696d1c8e-8e52-5527-b45c-293306060606",
+      "orderNumber": "4402306136",
+      "orderDate": "2026-01-18T20:46:54",
+      "quantity": 4,
+      "merchantId": "f225561c-5ae7-4208-9eb4-3541340b7229",
+      "totalPrice": {
+        "currency": "TRY",
+        "amount": 1900
+      },
+      "unitPrice": {
+        "currency": "TRY",
+        "amount": 475
+      },
+      "hbDiscount": {
+        "totalPrice": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "unitPrice": {
+          "currency": "TRY",
+          "amount": 0
+        }
+      },
+      "merchantDiscount": {
+        "totalPrice": {
+          "currency": "TRY",
+          "amount": 0
+        },
+        "unitPrice": {
+          "currency": "TRY",
+          "amount": 0
+        }
+      },
+      "vat": 316.67,
+      "vatRate": 20,
+      "customerName": "─░SMA─░L EROL",
+      "customerId": "44d6d477-3194-49d4-a522-15f277d1f841",
+      "status": "Delivered",
+      "shippingAddress": {
+        "addressId": "61c7a12b-1544-44ba-b5fa-5a56213b745b",
+        "address": "├£nsal Mahallesi Mustafa Ha┼şmet Caddesi 5092 Sokak No 4 HabibeAdem Apartman─▒ Kat 3 Daire 7 ├£NSAL KEPEZ Antalya",
+        "name": "─░SMA─░L EROL",
+        "email": "4402306136_5437154754@hepsifatura.com",
+        "countryCode": "TR",
+        "phoneNumber": "",
+        "alternatePhoneNumber": "",
+        "district": "├£NSAL",
+        "city": "Antalya",
+        "town": "KEPEZ",
+        "directions": "",
+        "postalCode": "07220"
+      },
+      "invoice": {
+        "turkishIdentityNumber": "11111111111",
+        "taxNumber": "",
+        "taxOffice": null,
+        "address": {
+          "addressId": "4a0573ca-8c78-478e-beb8-d5bb1b30ee00",
+          "address": "├£nsal Mahallesi Mustafa Ha┼şmet Caddesi 5092 Sokak No 4 HabibeAdem apartman─▒ daire 7 ├£NSAL KEPEZ Antalya",
+          "name": "─░smail Erol",
+          "email": "4402306136_5437154754@hepsifatura.com",
+          "countryCode": "TR",
+          "phoneNumber": "",
+          "alternatePhoneNumber": "",
+          "district": "├£NSAL",
+          "city": "Antalya",
+          "town": "KEPEZ",
+          "directions": "",
+          "postalCode": "07220"
+        }
+      },
+      "sapNumber": "000010",
+      "dispatchTime": 0,
+      "commission": {
+        "currency": "TRY",
+        "amount": 57
+      },
+      "commissionRate": 12,
+      "paymentTermInDays": 24,
+      "commissionType": 0,
+      "cargoCompanyModel": {
+        "id": 21,
+        "name": "hepsiJET",
+        "shortName": "HX",
+        "logoUrl": "https://images.hepsiburada.net/assets/cargo-logo/hepsijet.svg",
+        "trackingUrl": null
+      },
+      "cargoCompany": "hepsiJET",
+      "customizedText01": "",
+      "customizedText02": "",
+      "customizedText03": "",
+      "customizedText04": "",
+      "customizedTextX": "",
+      "creditCardHolderName": null,
+      "isCustomized": false,
+      "canCreatePackage": true,
+      "isCancellable": false,
+      "isCancellableByHbAdmin": false,
+      "deliveryType": "StandardDelivery",
+      "deliveryOptionId": 1,
+      "slot": null,
+      "pickUpTime": null,
+      "discountInfo": [],
+      "merchantSKU": "KFS13",
+      "purchasePrice": {
+        "currency": "TRY",
+        "amount": 0
+      },
+      "deliveryNote": {},
+      "isCargoChangable": true,
+      "warehouse": {
+        "shippingModel": "Standard",
+        "shippingAddressLabel": "BIRINCIL"
+      },
+      "deptorDifferenceAmount": 0,
+      "isJetDelivery": false,
+      "isSundayDelivery": false,
+      "properties": [],
+      "discountToBeBilledToHB": 0,
+      "bnplCommissionAmount": {
+        "currency": "TRY",
+        "amount": 0
+      },
+      "unitLaborCost": {
+        "currency": "TRY",
+        "amount": 0
+      },
+      "productBarcode": "4102113939211",
+      "creationReason": "OrderCreated",
+      "packageNumber": "5437154754",
+      "barcode": "62754371547540",
+      "isMicroExport": false,
+      "releatedLineIndexesWithCampaign": [],
+      "parentItemIndex": -1,
+      "productImageUrlFormat": "https://productimages.hepsiburada.net/s/48/{size}/10970323583026.jpg"
+    }
+  ]
+}
+---
+TRYING: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/ordernumber/4402306136
+Status: 404
+{"message":"Not Found"}
+
+---

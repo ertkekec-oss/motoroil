@@ -372,8 +372,8 @@ export class HepsiburadaService implements IMarketplaceService {
     async getPackageByOrderNumber(orderNumber: string): Promise<any> {
         try {
             const merchantId = (this.config.merchantId || '').trim();
-            // Hepsiburada API: GET /packages/merchantid/{merchantid}/ordernumber/{orderNumber}
-            const url = `${this.baseUrl}/packages/merchantid/${merchantId}/ordernumber/${orderNumber}`;
+            // Hepsiburada OMS: To get package details for an order, we use the order detail endpoint
+            const url = `${this.baseUrl}/orders/merchantid/${merchantId}/ordernumber/${orderNumber}`;
 
             const headers: any = {
                 'Authorization': this.getAuthHeader(),
@@ -406,13 +406,21 @@ export class HepsiburadaService implements IMarketplaceService {
                 rawLines = dataObj.items || dataObj.Items || dataObj.lines || dataObj.Lines || dataObj.packageItems || dataObj.PackageItems || [];
             }
 
-            // Fallback for packages: Handle both orderNumber and OrderNumber, packageNumber and PackageNumber
             const orderNo = hbOrder.orderNumber || hbOrder.OrderNumber || (Array.isArray(hbOrder.OrderNumbers) ? hbOrder.OrderNumbers[0] : null) || (Array.isArray(hbOrder.orderNumbers) ? hbOrder.orderNumbers[0] : null) || hbOrder.packageNumber || hbOrder.PackageNumber || hbOrder.id || hbOrder.Id || 'unknown';
 
             const orderItems = Array.isArray(rawLines) ? rawLines : [];
 
+            // Extract shipmentPackageId - Try root first, then items
+            let shipmentPackageId = (hbOrder.packageNumber || hbOrder.PackageNumber || hbOrder.shipmentPackageId || hbOrder.ShipmentPackageId || hbOrder.id || hbOrder.Id)?.toString();
+            if (!shipmentPackageId || shipmentPackageId === orderNo.toString()) {
+                const firstWithPkg = orderItems.find(i => i.packageNumber || i.PackageNumber);
+                if (firstWithPkg) {
+                    shipmentPackageId = (firstWithPkg.packageNumber || firstWithPkg.PackageNumber).toString();
+                }
+            }
+
             return {
-                id: (hbOrder.id || orderNo || 'unknown').toString(),
+                id: (hbOrder.id || hbOrder.Id || orderNo || 'unknown').toString(),
                 orderNumber: orderNo.toString(),
                 customerName: hbOrder.customer?.name || hbOrder.customerName || hbOrder.billingAddress?.fullName || hbOrder.shippingAddress?.fullName || hbOrder.customer?.fullName || 'Müşteri',
                 customerEmail: hbOrder.customer?.email || hbOrder.customerEmail || '',
@@ -420,7 +428,7 @@ export class HepsiburadaService implements IMarketplaceService {
                 status: rawStatus.toString().toUpperCase(),
                 totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.TotalPrice?.Amount || hbOrder.totalAmount || hbOrder.TotalAmount || hbOrder.payableAmount || hbOrder.PayableAmount || hbOrder.totalPrice || hbOrder.TotalPrice || 0),
                 currency: hbOrder.totalPrice?.currency || hbOrder.TotalPrice?.Currency || hbOrder.currency || hbOrder.Currency || 'TRY',
-                shipmentPackageId: (hbOrder.packageNumber || hbOrder.PackageNumber || hbOrder.shipmentPackageId || hbOrder.ShipmentPackageId || hbOrder.id || hbOrder.Id)?.toString(),
+                shipmentPackageId: shipmentPackageId,
                 shippingAddress: {
                     fullName: hbOrder.shippingAddress?.name || hbOrder.shippingAddress?.fullName || hbOrder.customer?.name || hbOrder.customerName || '',
                     address: hbOrder.shippingAddress?.address || '',
