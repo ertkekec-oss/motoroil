@@ -468,7 +468,7 @@ export function OnlineOrdersTab({
                                                                     orderId={o.id}
                                                                     marketplace={o.marketplace}
                                                                     actionKey="PRINT_LABEL_A4"
-                                                                    shipmentPackageId={o.shipmentPackageId}
+                                                                    shipmentPackageId={o.shipmentPackageId || (['hepsiburada', 'pazarama'].includes(o.marketplace?.toLowerCase() || '') ? o.orderNumber : undefined)}
                                                                 />
                                                             )}
                                                             {o.marketplace?.toLowerCase() === 'trendyol' && (
