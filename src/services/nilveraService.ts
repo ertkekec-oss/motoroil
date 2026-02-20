@@ -216,9 +216,9 @@ export class NilveraInvoiceService {
             invoiceInfo.GeneralKDV10Total = Number(kdvTotals[10].toFixed(2));
             invoiceInfo.GeneralKDV18Total = Number(kdvTotals[18].toFixed(2));
             invoiceInfo.GeneralKDV20Total = Number(kdvTotals[20].toFixed(2));
-            
+
             invoiceInfo.KdvTotal = Number(params.amounts.tax.toFixed(2));
-            invoiceInfo.ISDespatch = true; // İrsaliye yerine geçer ibaresi
+            invoiceInfo.IsDespatch = true; // İrsaliye yerine geçer ibaresi
 
             if (params.isInternetSale) {
                 // E-ARSIV Ozel: INTERNET SATISI
