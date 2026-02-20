@@ -15,7 +15,7 @@ import { redisConnection } from "../../../../lib/queue/redis";
 export class HepsiburadaActionProvider implements MarketplaceActionProvider {
     async executeAction(input: MarketplaceActionInput): Promise<MarketplaceActionResult> {
         const { companyId, marketplace, orderId, actionKey, idempotencyKey, payload } = input;
-        const ctx = `[HEPSIBURADA-ACTION:${actionKey}][IDEMP:${idempotencyKey}]`;
+        const ctx = `[HB-ACTION:${actionKey}][IDEMP:${idempotencyKey}]`;
 
         const lockKey = `lock:action:${idempotencyKey}`;
         const acquired = await redisConnection.set(lockKey, 'BUSY', 'EX', 60, 'NX');
@@ -60,50 +60,50 @@ export class HepsiburadaActionProvider implements MarketplaceActionProvider {
                 });
                 if (!order) throw new Error('Sipariş bulunamadı');
 
-                // Fallback sequence
-                let shipmentPackageId = payload?.shipmentPackageId || payload?.labelShipmentPackageId || order.shipmentPackageId || order.orderNumber;
-                if (!shipmentPackageId) throw new Error('Paket numarası veya Sipariş numarası bulunamadı');
+                let packageIdToFetch = payload?.shipmentPackageId || payload?.labelShipmentPackageId || order.shipmentPackageId || order.orderNumber;
+                if (!packageIdToFetch) throw new Error('Paket numarası veya Sipariş numarası bulunamadı');
 
-                let labelResult = await service.getCargoLabel(shipmentPackageId);
+                console.log(`${ctx} Attempting label fetch for: ${packageIdToFetch}`);
+                let labelResult = await service.getCargoLabel(packageIdToFetch);
 
-                // If 404 or error, and we suspect shipmentPackageId might be an orderNumber, try to resolve real packageNumber
+                // Fallback attempt: Only if first try failed AND we haven't already tried to resolve via order number
                 if ((labelResult.error || !labelResult.pdfBase64)) {
-                    console.log(`${ctx} Label fetch failed for ${shipmentPackageId}. Attempting to resolve package via orderNumber...`);
-                    const pkgData = await service.getPackageByOrderNumber(order.orderNumber || shipmentPackageId);
+                    // If we suspect the ID we just used might be an orderNumber instead of a packageNumber
+                    // (e.g. if it's the exact same as orderNumber and we got 404)
+                    const orderNo = order.orderNumber || packageIdToFetch;
+                    console.log(`${ctx} Primary fetch failed (Status: ${labelResult.status}). Trying to resolve real package number from order: ${orderNo}`);
 
+                    const pkgData = await service.getPackageByOrderNumber(orderNo);
                     if (pkgData) {
-                        // Hepsiburada can return an array, a single object, or wrapped in a data/items field
                         const pkg = Array.isArray(pkgData) ? pkgData[0] : (pkgData.items?.[0] || pkgData.data?.[0] || pkgData);
+                        const realPkgNo = pkg?.packageNumber || pkg?.PackageNumber || pkg?.id || pkg?.Id;
 
-                        // Extract PackageNumber (handle both casing)
-                        const realPkgNo = pkg?.PackageNumber || pkg?.packageNumber || pkg?.id || pkg?.Id || pkg?.packageNo;
-
-                        if (realPkgNo && String(realPkgNo) !== String(shipmentPackageId)) {
-                            console.log(`${ctx} Resolved real package number from order: ${realPkgNo}`);
-                            shipmentPackageId = String(realPkgNo);
-                            labelResult = await service.getCargoLabel(shipmentPackageId);
-                        } else if (!realPkgNo) {
-                            console.log(`${ctx} Could not find real package number in resolved data. Raw: ${JSON.stringify(pkgData).substring(0, 200)}`);
+                        if (realPkgNo && String(realPkgNo) !== String(packageIdToFetch)) {
+                            console.log(`${ctx} Resolved real package number: ${realPkgNo}. Fetching label again...`);
+                            packageIdToFetch = String(realPkgNo);
+                            labelResult = await service.getCargoLabel(packageIdToFetch);
                         }
                     }
                 }
 
-                if (labelResult.error) throw new Error(labelResult.error);
+                if (labelResult.error) {
+                    throw new Error(`Hepsiburada API Hatası: ${labelResult.error} (Status: ${labelResult.status})`);
+                }
                 if (!labelResult.pdfBase64) throw new Error('Etiket verisi boş');
 
                 const pdfBuffer = Buffer.from(labelResult.pdfBase64, 'base64');
                 const sha256 = createHash('sha256').update(pdfBuffer).digest('hex');
-                const storageKey = generateLabelStorageKey(companyId, marketplace, shipmentPackageId);
+                const storageKey = generateLabelStorageKey(companyId, marketplace, packageIdToFetch);
 
                 await uploadLabel(storageKey, pdfBuffer);
 
                 await (prisma as any).marketplaceLabel.upsert({
-                    where: { companyId_marketplace_shipmentPackageId: { companyId, marketplace, shipmentPackageId } },
+                    where: { companyId_marketplace_shipmentPackageId: { companyId, marketplace, shipmentPackageId: packageIdToFetch } },
                     update: { storageKey, sha256, size: pdfBuffer.length },
-                    create: { companyId, marketplace, shipmentPackageId, storageKey, sha256, size: pdfBuffer.length }
+                    create: { companyId, marketplace, shipmentPackageId: packageIdToFetch, storageKey, sha256, size: pdfBuffer.length }
                 });
 
-                result = { shipmentPackageId, storageKey, sha256, format: 'A4', labelReady: true, size: pdfBuffer.length };
+                result = { shipmentPackageId: packageIdToFetch, storageKey, sha256, format: 'A4', labelReady: true, size: pdfBuffer.length };
             } else if (actionKey === 'REFRESH_STATUS') {
                 const order = await prisma.order.findFirst({ where: { id: orderId, companyId } });
                 if (!order || !order.orderNumber) throw new Error('Sipariş verisi eksik');

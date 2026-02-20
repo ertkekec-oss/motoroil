@@ -7,11 +7,6 @@ export class HepsiburadaService implements IMarketplaceService {
     constructor(config: HepsiburadaConfig) {
         this.config = config;
 
-        // ===== PROXY AWARE BASE URL =====
-        // If MARKETPLACE_PROXY_URL exists (Vercel Production),
-        // all traffic goes through Contabo static IP.
-        const proxy = (process.env.MARKETPLACE_PROXY_URL || '').trim().replace(/\/$/, '');
-
         const isTest =
             this.config.isTest ||
             this.config.merchantId === '18c17301-9348-4937-b5c0-6912f54eb142';
@@ -32,32 +27,136 @@ export class HepsiburadaService implements IMarketplaceService {
     private getAuthHeader(): string {
         const password = (this.config.password || '').trim();
         const merchantId = (this.config.merchantId || '').trim();
-
-        console.log(`[HB_AUTH_TRACE] UserAgentUser: ${this.config.username} | Merchant: ${merchantId}`);
-
         const token = Buffer.from(`${merchantId}:${password}`).toString('base64');
         return `Basic ${token}`;
     }
 
     private getProxyKeyHeader(): string {
-        // Nginx static-IP gateway lock (must match nginx config)
         return (process.env.PERIODYA_PROXY_KEY || '').trim();
     }
 
-    private hbDate(date: Date): string {
-        const pad = (n: number) => n.toString().padStart(2, '0');
-        const yr = date.getFullYear();
-        const mo = pad(date.getMonth() + 1);
-        const dy = pad(date.getDate());
-        const hr = pad(date.getHours());
-        const mi = pad(date.getMinutes());
-        const sc = pad(date.getSeconds());
-        return `${yr}-${mo}-${dy}`;
+    private getHeaders(extra: Record<string, string> = {}): Record<string, string> {
+        const urlObj = new URL(this.baseUrl);
+        const headers: any = {
+            'Authorization': this.getAuthHeader(),
+            'User-Agent': (this.config.username || 'Periodya-Integration').trim(),
+            'Accept': 'application/json',
+            'Host': urlObj.host, // CRITICAL: Explicitly set Host to avoid 403 Forbidden host
+            ...extra
+        };
+
+        const proxyKey = this.getProxyKeyHeader();
+        if (proxyKey) {
+            headers['X-Periodya-Key'] = proxyKey;
+        }
+
+        return headers;
+    }
+
+    async validateConnection(): Promise<boolean> {
+        try {
+            const merchantId = (this.config.merchantId || '').trim();
+            const url = `${this.baseUrl}/orders/merchantid/${merchantId}?offset=0&limit=1`;
+            const headers = this.getHeaders();
+            const response = await this.safeFetchJson(url, { headers });
+            return !!response.data;
+        } catch (error) {
+            console.error('[HB_VAL_CONN_ERR]', error);
+            return false;
+        }
+    }
+
+    private async safeFetchJson(url: string, options: any = {}): Promise<{ data: any; status: number }> {
+        const fetchUrl = this.getFetchUrl(url);
+        console.log(`[HB_FETCH_REQ] URL: ${url} | Proxy: ${fetchUrl.substring(0, 100)}...`);
+
+        const res = await fetch(fetchUrl, options);
+        const status = res.status;
+        const text = await res.text();
+        const trimmed = text.trim();
+
+        if (!res.ok) {
+            console.error(`[HB_FETCH_ERR] Status: ${status} | URL: ${url} | Res: ${trimmed.substring(0, 200)}`);
+            throw new Error(`HB API Hatası: ${status} - ${trimmed.substring(0, 500)}`);
+        }
+
+        if (trimmed === 'OK') {
+            console.log(`[HB_PROXY] Received OK signal from proxy, retrying in 2s...`);
+            await new Promise(r => setTimeout(r, 2000));
+            const res2 = await fetch(fetchUrl, options);
+            const text2 = await res2.text();
+            if (!res2.ok) throw new Error(`HB API Hatası (Retry): ${res2.status}`);
+            if (text2.trim() === 'OK') throw new Error(`HB Proxy meşgul (OK dönüyor). Lütfen birazdan tekrar deneyin.`);
+            return { data: JSON.parse(text2), status: res2.status };
+        }
+
+        try {
+            return { data: JSON.parse(trimmed), status };
+        } catch (e: any) {
+            console.error(`[HB_JSON_PARSE_ERR] Status: ${status} | URL: ${url} | Body: ${trimmed.substring(0, 100)}`);
+            throw new Error(`HB yanıtı okunamadı (JSON bekleniyordu).`);
+        }
+    }
+
+    async getCargoLabel(packageNumber: string): Promise<{ pdfBase64?: string; error?: string; status?: number }> {
+        try {
+            const merchantId = (this.config.merchantId || '').trim();
+            const url = `${this.baseUrl}/packages/merchantid/${merchantId}/packagenumber/${packageNumber}/labels?format=PDF`;
+
+            const headers = this.getHeaders({
+                'Accept': '*/*, application/pdf, application/json'
+            });
+
+            console.log(`[HB_LABEL_REQ] URL: ${url}`);
+
+            const fetchUrl = this.getFetchUrl(url);
+            const res = await fetch(fetchUrl, { headers });
+
+            const status = res.status;
+            const contentType = (res.headers.get('content-type') || '').toLowerCase();
+            const contentLength = res.headers.get('content-length');
+
+            console.log(`[HB_LABEL_RES] Status: ${status} | Type: ${contentType} | Length: ${contentLength}`);
+
+            if (res.ok) {
+                if (contentType.includes('pdf') || contentType === 'application/octet-stream') {
+                    const arrayBuffer = await res.arrayBuffer();
+                    const pdfBase64 = Buffer.from(arrayBuffer).toString('base64');
+                    return { pdfBase64, status };
+                } else if (contentType.includes('json')) {
+                    const data = await res.json();
+                    console.log(`[HB_LABEL_JSON] Snippet: ${JSON.stringify(data).substring(0, 200)}`);
+
+                    if (data?.pdfData) return { pdfBase64: data.pdfData, status };
+                    if (data?.base64) return { pdfBase64: data.base64, status };
+                    if (typeof data?.data === 'string' && data.data.length > 100) return { pdfBase64: data.data, status };
+                    if (data?.data?.base64) return { pdfBase64: data.data.base64, status };
+                    if (Array.isArray(data) && data[0]?.pdf) return { pdfBase64: data[0].pdf, status };
+                    if (data?.labels?.[0]?.pdf) return { pdfBase64: data.labels[0].pdf, status };
+
+                    return { error: 'HB JSON döndürdü fakat etiket verisi bulunamadı.', status };
+                }
+
+                const buffer = await res.arrayBuffer();
+                const text = Buffer.from(buffer).toString('utf8');
+                if (text.substring(0, 4) === '%PDF') {
+                    return { pdfBase64: Buffer.from(buffer).toString('base64'), status };
+                }
+
+                return { error: `Desteklenmeyen içerik: ${contentType} - ${text.substring(0, 100)}`, status };
+            } else {
+                const text = await res.text();
+                console.error(`[HB_LABEL_FAIL] Status: ${status} | URL: ${url} | Body: ${text.substring(0, 200)}`);
+                return { error: `Hepsiburada Etiket API Hatası (${status}): ${text.substring(0, 100)}`, status };
+            }
+        } catch (err: any) {
+            console.error(`[HB_LABEL_ERR] pkg: ${packageNumber}`, err);
+            return { error: err.message || 'Hepsiburada etiket bağlantı hatası' };
+        }
     }
 
     private hbDateYmdHi(d: Date) {
         const pad = (n: number) => String(n).padStart(2, "0");
-        // Use local time components as Hepsiburada expects "YYYY-MM-DD HH:mm" without timezone
         const yyyy = d.getFullYear();
         const mm = pad(d.getMonth() + 1);
         const dd = pad(d.getDate());
@@ -74,174 +173,31 @@ export class HepsiburadaService implements IMarketplaceService {
 
     private endOfDay(d: Date) {
         const x = new Date(d);
-        x.setHours(23, 59, 0, 0);
+        x.setHours(23, 59, 59, 999);
         return x;
-    }
-
-    async validateConnection(): Promise<boolean> {
-        try {
-            const merchantId = (this.config.merchantId || '').trim();
-            const url = `${this.baseUrl}/orders/merchantid/${merchantId}?offset=0&limit=1`;
-
-            const headers: any = {
-                'Authorization': this.getAuthHeader(),
-                'User-Agent': (this.config.username || '').trim(),
-                'Accept': 'application/json'
-            };
-
-            const proxyKey = this.getProxyKeyHeader();
-            if (proxyKey) {
-                headers['X-Periodya-Key'] = proxyKey;
-            }
-
-            const response = await this.safeFetchJson(url, { headers });
-            return !!response.data;
-        } catch (error) {
-            console.error('Hepsiburada connection validation error:', error);
-            return false;
-        }
-    }
-
-    private async safeFetchJson(url: string, options: any = {}): Promise<{ data: any; status: number }> {
-        const fetchUrl = this.getFetchUrl(url);
-        const res = await fetch(fetchUrl, options);
-        const text = await res.text();
-        const trimmed = text.trim();
-
-        if (!res.ok) {
-            throw new Error(`HB API Hatası: ${res.status} - ${trimmed.substring(0, 500)}`);
-        }
-
-        if (trimmed === 'OK') {
-            console.log(`[HB_PROXY] Received OK signal from proxy, retrying in 2s...`);
-            await new Promise(r => setTimeout(r, 2000));
-            const res2 = await fetch(fetchUrl, options);
-            const text2 = await res2.text();
-            if (!res2.ok) throw new Error(`HB API Hatası (Retry): ${res2.status}`);
-            if (text2.trim() === 'OK') throw new Error(`HB Proxy meşgul (OK dönüyor). Lütfen birazdan tekrar deneyin.`);
-            return { data: JSON.parse(text2), status: res2.status };
-        }
-
-        try {
-            return { data: JSON.parse(trimmed), status: res.status };
-        } catch (e) {
-            console.error(`[HB_JSON_PARSE_ERROR]: Response was not JSON. Body snippet: ${trimmed.substring(0, 100)}`);
-            throw new Error(`HB yanıtı okunamadı (JSON bekleniyordu).`);
-        }
-    }
-
-    async getCargoLabel(packageNumber: string): Promise<{ pdfBase64?: string; error?: string }> {
-        try {
-            const merchantId = (this.config.merchantId || '').trim();
-            // Referencing Hepsiburada API: /packages/merchantid/{merchantId}/packagenumber/{packagenumber}/labels?format=PDF
-            const url = `${this.baseUrl}/packages/merchantid/${merchantId}/packagenumber/${packageNumber}/labels?format=PDF`;
-
-            const headers: any = {
-                'Authorization': this.getAuthHeader(),
-                'User-Agent': (this.config.username || '').trim(),
-                'Accept': '*/*, application/pdf, application/json'
-            };
-
-            const proxyKey = this.getProxyKeyHeader();
-            if (proxyKey) {
-                headers['X-Periodya-Key'] = proxyKey;
-            }
-
-            console.log(`[HB_LABEL_FETCH] URL: ${url}`);
-
-            const fetchUrl = this.getFetchUrl(url);
-            const res = await fetch(fetchUrl, { headers });
-
-            if (res.ok) {
-                const contentType = res.headers.get('content-type') || '';
-
-                if (contentType.toLowerCase().includes('pdf') || contentType === 'application/octet-stream') {
-                    const arrayBuffer = await res.arrayBuffer();
-                    const pdfBase64 = Buffer.from(arrayBuffer).toString('base64');
-                    return { pdfBase64 };
-                } else if (contentType.includes('json')) {
-                    const data = await res.json();
-
-                    // Possible properties if Hepsiburada wraps it in JSON
-                    if (data?.pdfData) return { pdfBase64: data.pdfData };
-                    if (data?.base64) return { pdfBase64: data.base64 };
-                    if (typeof data?.data === 'string' && data.data.length > 100) return { pdfBase64: data.data };
-                    if (data?.data?.base64) return { pdfBase64: data.data.base64 };
-                    if (Array.isArray(data) && data[0]?.pdf) return { pdfBase64: data[0].pdf };
-                    if (data?.labels?.[0]?.pdf) return { pdfBase64: data.labels[0].pdf };
-
-                    return { error: 'Hepsiburada API JSON döndürdü fakat beklenen etiket verisi bulunamadı.' };
-                }
-
-                const buffer = await res.arrayBuffer();
-                const text = Buffer.from(buffer).toString('utf8');
-
-                // Fallback check if it's actually PDF binary stream without content-type
-                if (text.substring(0, 4) === '%PDF') {
-                    return { pdfBase64: Buffer.from(buffer).toString('base64') };
-                }
-
-                return { error: `Desteklenmeyen içerik tipi: ${contentType} - ${text.substring(0, 100)}` };
-            } else {
-                const text = await res.text();
-                return { error: `Hepsiburada Etiket API Hatası (${res.status}): ${text.substring(0, 200)}` };
-            }
-        } catch (err: any) {
-            console.error(`[HB_GET_LABEL_ERR] packageNumber: ${packageNumber}`, err);
-            return { error: err.message || 'Hepsiburada etiket bağlantısı sırasında bilinmeyen hata' };
-        }
     }
 
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
         const allOrdersMap = new Map<string, MarketplaceOrder>();
-
         const merchantId = (this.config.merchantId || '').trim();
-        const now = new Date();
-        const begin = startDate || new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30);
-        const end = endDate || now;
+        const begin = startDate || new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
+        const end = endDate || new Date();
 
-        // Use strict "YYYY-MM-DD HH:mm" format for dates, as expected by Hepsiburada OMS
         const bStr = this.hbDateYmdHi(this.startOfDay(begin));
-        // Use end of day for the end date to cover full range
         const eStr = this.hbDateYmdHi(this.endOfDay(end));
 
-        // Hepsiburada OMS requires separate calls for different life-cycle segments with SPECIFIC query params
         const syncTargets = [
-            {
-                name: 'UNPACKED',
-                urlPart: `orders/merchantid/${merchantId}`,
-                params: ['limit']
-            },
-            {
-                name: 'PACKED',
-                urlPart: `packages/merchantid/${merchantId}/packed`,
-                params: ['limit']
-            },
-            {
-                name: 'SHIPPED',
-                urlPart: `packages/merchantid/${merchantId}/shipped`,
-                params: ['begindate', 'enddate']
-            },
-            {
-                name: 'DELIVERED',
-                urlPart: `packages/merchantid/${merchantId}/delivered`,
-                params: ['begindate', 'enddate']
-            },
-            {
-                name: 'CANCELLED',
-                urlPart: `orders/merchantid/${merchantId}/cancelled`,
-                params: ['begindate', 'enddate']
-            }
+            { name: 'UNPACKED', urlPart: `orders/merchantid/${merchantId}`, params: ['limit'] },
+            { name: 'PACKED', urlPart: `packages/merchantid/${merchantId}/packed`, params: ['limit'] },
+            { name: 'SHIPPED', urlPart: `packages/merchantid/${merchantId}/shipped`, params: ['begindate', 'enddate'] },
+            { name: 'DELIVERED', urlPart: `packages/merchantid/${merchantId}/delivered`, params: ['begindate', 'enddate'] },
+            { name: 'CANCELLED', urlPart: `orders/merchantid/${merchantId}/cancelled`, params: ['begindate', 'enddate'] }
         ];
-
-        console.log(`[HB_MULTI_SYNC] Starting sync for ${syncTargets.length} targets. Range: ${bStr} - ${eStr}`);
 
         for (const target of syncTargets) {
             let offset = 0;
             const limit = 50;
             let hasMore = true;
-
-            console.log(`[HB_SYNC_PHASE] Checking ${target.name}...`);
 
             while (hasMore) {
                 try {
@@ -252,119 +208,48 @@ export class HepsiburadaService implements IMarketplaceService {
                     if (target.params.includes('enddate')) qs.set('enddate', eStr);
 
                     const url = `${this.baseUrl}/${target.urlPart}?${qs.toString()}`;
-
-                    const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
-                    const userAgent = (this.config.username || '').trim();
-                    const proxyKey = this.getProxyKeyHeader();
-
-                    console.log(`[HB_FETCH] URL: ${url} | Proxy: ${!!effectiveProxy} | UA: ${userAgent}`);
-
-                    const headers: any = {
-                        'Authorization': this.getAuthHeader(),
-                        'User-Agent': userAgent,
-                        'Accept': 'application/json'
-                    };
-
-                    if (proxyKey) {
-                        headers['X-Periodya-Key'] = proxyKey;
-                    }
-
-                    const response = await this.safeFetchJson(url, { headers });
+                    const response = await this.safeFetchJson(url, { headers: this.getHeaders() });
                     const data = response.data;
                     let items: any[] = [];
 
-                    if (Array.isArray(data)) {
-                        items = data;
-                    } else if (data && typeof data === 'object') {
-                        // Hepsiburada API can return data in various fields depending on the endpoint version
-                        items = data.items || data.data || data.packages || data.orders || (data.id || data.orderNumber || data.packageNumber ? [data] : []);
+                    if (Array.isArray(data)) items = data;
+                    else if (data && typeof data === 'object') {
+                        items = data.items || data.data || data.packages || data.orders || (data.id || data.orderNumber ? [data] : []);
                     }
 
                     if (items.length === 0) {
-                        console.log(`[HB_SYNC_EMPTY] Target ${target.name} returned 0 items. URL: ${url}`);
                         hasMore = false;
                         break;
                     }
 
-                    console.log(`[HB_SYNC_DATA] Target ${target.name} found ${items.length} records.`);
-
                     for (const item of items) {
-                        let mapped = this.mapOrder(item, target.name);
+                        const mapped = this.mapOrder(item, target.name);
                         const key = mapped.id || mapped.orderNumber;
-
-                        if (mapped.items.length === 0 && mapped.orderNumber && mapped.orderNumber !== 'unknown') {
-                            try {
-                                const fullDetail = await this.getOrderByNumber(mapped.orderNumber);
-                                if (fullDetail && fullDetail.items.length > 0) {
-                                    mapped = { ...fullDetail, status: mapped.status };
-                                }
-                            } catch (detailErr) { }
-                        }
-
-                        if (allOrdersMap.has(key)) {
-                            const existing = allOrdersMap.get(key)!;
-                            if (existing.items.length > 0 && mapped.items.length === 0) continue;
-                        }
-
-                        if (key && key !== 'unknown') {
-                            allOrdersMap.set(key, mapped);
-                        }
+                        if (key && key !== 'unknown') allOrdersMap.set(key, mapped);
                     }
 
-                    // Update: Only paginate if offset is supported AND we might have more pages
-                    if (items.length < limit || !target.params.includes('offset')) {
-                        hasMore = false;
-                    } else {
-                        offset += limit;
-                    }
+                    if (items.length < limit || !target.params.includes('offset')) hasMore = false;
+                    else offset += limit;
 
-                    // Safety throttle between pages
                     if (hasMore) await new Promise(r => setTimeout(r, 200));
-
                 } catch (err: any) {
-                    console.error(`[HB_PHASE_FATAL] ${target.name} error: ${err.message}`);
-
-                    // Re-throw specific errors that should abort the sync
-                    if (err.message?.includes('HB_') ||
-                        err.message?.includes('fetch failed') ||
-                        err.message?.includes('ETIMEDOUT') ||
-                        err.message?.includes('ECONNREFUSED')) {
-                        throw err;
-                    }
-
-                    // Allow continuing to other targets if it's just a soft error for this phase
+                    console.error(`[HB_SYNC_ERR] ${target.name}: ${err.message}`);
                     hasMore = false;
                 }
             }
-
-            // Short delay between different endpoint targets
-            await new Promise(r => setTimeout(r, 500));
         }
 
-        const finalOrders = Array.from(allOrdersMap.values());
-        console.log(`[HB_SYNC_COMPLETE] Total unique orders fetched across all statuses: ${finalOrders.length}`);
-        return finalOrders;
+        return Array.from(allOrdersMap.values());
     }
 
     async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
         try {
             const merchantId = (this.config.merchantId || '').trim();
             const url = `${this.baseUrl}/orders/merchantid/${merchantId}/ordernumber/${orderNumber}`;
-
-            const headers: any = {
-                'Authorization': this.getAuthHeader(),
-                'User-Agent': (this.config.username || '').trim(),
-                'Accept': 'application/json'
-            };
-
-            const proxyKey = this.getProxyKeyHeader();
-            if (proxyKey) headers['X-Periodya-Key'] = proxyKey;
-
-            const response = await this.safeFetchJson(url, { headers });
-            const data = response.data;
-            return this.mapOrder(data, 'UNKNOWN');
+            const response = await this.safeFetchJson(url, { headers: this.getHeaders() });
+            return this.mapOrder(response.data, 'UNKNOWN');
         } catch (err) {
-            console.error(`[HB_GET_DETAIL_ERR] Order: ${orderNumber}`, err);
+            console.error(`[HB_ORDER_ERR] ${orderNumber}:`, err);
             return null;
         }
     }
@@ -372,104 +257,75 @@ export class HepsiburadaService implements IMarketplaceService {
     async getPackageByOrderNumber(orderNumber: string): Promise<any> {
         try {
             const merchantId = (this.config.merchantId || '').trim();
-            // Hepsiburada OMS: Get package associated with this order number
             const url = `${this.baseUrl}/packages/merchantid/${merchantId}/ordernumber/${orderNumber}`;
-
-            const headers: any = {
-                'Authorization': this.getAuthHeader(),
-                'User-Agent': (this.config.username || '').trim(),
-                'Accept': 'application/json'
-            };
-
-            const proxyKey = this.getProxyKeyHeader();
-            if (proxyKey) headers['X-Periodya-Key'] = proxyKey;
-
-            const response = await this.safeFetchJson(url, { headers });
+            console.log(`[HB_PKG_BY_ORDER_REQ] Order: ${orderNumber} | URL: ${url}`);
+            const response = await this.safeFetchJson(url, { headers: this.getHeaders() });
             return response.data;
         } catch (err) {
-            console.error(`[HB_GET_PACKAGE_ERR] Order: ${orderNumber}`, err);
+            console.error(`[HB_PKG_BY_ORDER_ERR] Order: ${orderNumber}:`, err);
             return null;
         }
     }
 
     private mapOrder(hbOrder: any, fallbackStatus: string): MarketplaceOrder {
         try {
-            // Hepsiburada status can be in multiple fields depending on endpoint
             const rawStatus = hbOrder.status || hbOrder.orderStatus || hbOrder.cargoStatus || fallbackStatus;
+            let rawLines = hbOrder.items || hbOrder.PackageItems || hbOrder.orderLines || hbOrder.lines || hbOrder.packageItems || [];
 
-            // Search for items in multiple possible locations - Handling both camelCase and TitleCase
-            let rawLines = hbOrder.items || hbOrder.PackageItems || hbOrder.orderLines || hbOrder.OrderLines || hbOrder.lines || hbOrder.Lines || hbOrder.packageItems || [];
-
-            // If still empty but there is a 'data' object, check inside it
-            if ((!Array.isArray(rawLines) || rawLines.length === 0) && (hbOrder.data || hbOrder.Data)) {
-                const dataObj = hbOrder.data || hbOrder.Data;
-                rawLines = dataObj.items || dataObj.Items || dataObj.lines || dataObj.Lines || dataObj.packageItems || dataObj.PackageItems || [];
+            if ((!Array.isArray(rawLines) || rawLines.length === 0) && (hbOrder.data)) {
+                rawLines = hbOrder.data.items || hbOrder.data.lines || hbOrder.data.packageItems || [];
             }
 
-            const orderNo = hbOrder.orderNumber || hbOrder.OrderNumber || (Array.isArray(hbOrder.OrderNumbers) ? hbOrder.OrderNumbers[0] : null) || (Array.isArray(hbOrder.orderNumbers) ? hbOrder.orderNumbers[0] : null) || hbOrder.packageNumber || hbOrder.PackageNumber || hbOrder.id || hbOrder.Id || 'unknown';
-
+            const orderNo = hbOrder.orderNumber || hbOrder.OrderNumber || (Array.isArray(hbOrder.OrderNumbers) ? hbOrder.OrderNumbers[0] : null) || hbOrder.packageNumber || hbOrder.id || 'unknown';
             const orderItems = Array.isArray(rawLines) ? rawLines : [];
 
-            // Extract shipmentPackageId - Try root first, then items
-            let shipmentPackageId = (hbOrder.packageNumber || hbOrder.PackageNumber || hbOrder.shipmentPackageId || hbOrder.ShipmentPackageId || hbOrder.id || hbOrder.Id)?.toString();
+            let shipmentPackageId = (hbOrder.packageNumber || hbOrder.shipmentPackageId || hbOrder.id)?.toString();
             if (!shipmentPackageId || shipmentPackageId === orderNo.toString()) {
                 const firstWithPkg = orderItems.find(i => i.packageNumber || i.PackageNumber);
-                if (firstWithPkg) {
-                    shipmentPackageId = (firstWithPkg.packageNumber || firstWithPkg.PackageNumber).toString();
-                }
+                if (firstWithPkg) shipmentPackageId = (firstWithPkg.packageNumber || firstWithPkg.PackageNumber).toString();
             }
 
             return {
-                id: (hbOrder.id || hbOrder.Id || orderNo || 'unknown').toString(),
+                id: (hbOrder.id || orderNo || 'unknown').toString(),
                 orderNumber: orderNo.toString(),
-                customerName: hbOrder.customer?.name || hbOrder.customerName || hbOrder.billingAddress?.fullName || hbOrder.shippingAddress?.fullName || hbOrder.customer?.fullName || 'Müşteri',
-                customerEmail: hbOrder.customer?.email || hbOrder.customerEmail || '',
-                orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || hbOrder.createdAt || Date.now()),
+                customerName: hbOrder.customer?.name || hbOrder.customerName || hbOrder.billingAddress?.fullName || 'Müşteri',
+                customerEmail: hbOrder.customer?.email || '',
+                orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || Date.now()),
                 status: rawStatus.toString().toUpperCase(),
-                totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.TotalPrice?.Amount || hbOrder.totalAmount || hbOrder.TotalAmount || hbOrder.payableAmount || hbOrder.PayableAmount || hbOrder.totalPrice || hbOrder.TotalPrice || 0),
-                currency: hbOrder.totalPrice?.currency || hbOrder.TotalPrice?.Currency || hbOrder.currency || hbOrder.Currency || 'TRY',
+                totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.totalAmount || 0),
+                currency: hbOrder.totalPrice?.currency || hbOrder.currency || 'TRY',
                 shipmentPackageId: shipmentPackageId,
                 shippingAddress: {
-                    fullName: hbOrder.shippingAddress?.name || hbOrder.shippingAddress?.fullName || hbOrder.customer?.name || hbOrder.customerName || '',
+                    fullName: hbOrder.shippingAddress?.fullName || hbOrder.customerName || '',
                     address: hbOrder.shippingAddress?.address || '',
                     city: hbOrder.shippingAddress?.city || '',
-                    district: hbOrder.shippingAddress?.town || hbOrder.shippingAddress?.district || '',
-                    phone: hbOrder.shippingAddress?.phoneNumber || hbOrder.shippingAddress?.phone || ''
+                    district: hbOrder.shippingAddress?.town || '',
+                    phone: hbOrder.shippingAddress?.phoneNumber || ''
                 },
                 invoiceAddress: {
-                    fullName: hbOrder.billingAddress?.name || hbOrder.billingAddress?.fullName || hbOrder.customer?.name || hbOrder.customerName || '',
+                    fullName: hbOrder.billingAddress?.fullName || hbOrder.customerName || '',
                     address: hbOrder.billingAddress?.address || '',
                     city: hbOrder.billingAddress?.city || '',
-                    district: hbOrder.billingAddress?.town || hbOrder.billingAddress?.district || '',
-                    phone: hbOrder.billingAddress?.phoneNumber || hbOrder.billingAddress?.phone || ''
+                    district: hbOrder.billingAddress?.town || '',
+                    phone: hbOrder.billingAddress?.phoneNumber || ''
                 },
                 items: orderItems.map((item: any) => ({
-                    productName: item.productName || item.ProductName || item.name || item.Name || item.skuDescription || item.SkuDescription || item.description || item.Description || 'Ürün',
-                    sku: item.sku || item.Sku || item.merchantSku || item.MerchantSku || item.hbSku || item.HbSku || item.productCode || item.ProductCode || 'SKU',
-                    quantity: Number(item.quantity || item.Quantity || item.qty || item.Qty || 1),
-                    price: Number(item.totalPrice?.amount || item.TotalPrice?.Amount || item.unitPrice?.amount || item.UnitPrice?.Amount || item.price?.amount || item.Price?.Amount || item.price || item.Price || item.unitPrice || item.UnitPrice || item.totalPrice || item.TotalPrice || 0),
-                    taxRate: Number(item.taxRate || item.TaxRate || item.vatRate || item.VatRate || 20),
-                    discountAmount: Number(item.discountAmount || item.DiscountAmount || 0)
-                })),
-                // @ts-ignore - Internal raw data for debugging
-                _raw: hbOrder
+                    productName: item.productName || item.name || item.skuDescription || 'Ürün',
+                    sku: item.sku || item.merchantSku || 'SKU',
+                    quantity: Number(item.quantity || 1),
+                    price: Number(item.totalPrice?.amount || item.unitPrice?.amount || item.price || 0),
+                    taxRate: Number(item.taxRate || 20),
+                    discountAmount: Number(item.discountAmount || 0)
+                }))
             };
         } catch (err) {
-            console.error('[HB_MAP_ERROR] Failed to map order:', hbOrder?.id, err);
+            console.error('[HB_MAP_ERR]', hbOrder?.id, err);
             return {
-                id: hbOrder?.id || 'err',
-                orderNumber: hbOrder?.orderNumber || 'err',
-                customerName: 'Error Mapping',
-                customerEmail: '',
-                orderDate: new Date(),
-                status: 'MAPPING_ERROR',
-                totalAmount: 0,
-                currency: 'TRY',
+                id: 'err', orderNumber: 'err', customerName: 'Error', customerEmail: '', orderDate: new Date(),
+                status: 'MAPPING_ERROR', totalAmount: 0, currency: 'TRY',
                 shippingAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
                 invoiceAddress: { fullName: '', address: '', city: '', district: '', phone: '' },
-                items: [],
-                // @ts-ignore
-                _raw: hbOrder
+                items: []
             };
         }
     }
