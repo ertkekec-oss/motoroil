@@ -130,15 +130,37 @@ export async function POST(request: Request) {
                     baseUrl: (config.environment?.toLowerCase() === 'production') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com'
                 });
 
-                // Prepare Data
+                // Prepare Data with precise rounding to prevent report generation errors
                 const items = (invoice.items as any[]) || [];
-                const invoiceLines = items.map(i => ({
-                    Name: i.name || "URUN",
-                    Quantity: parseFloat(i.qty?.toString() || "0"),
-                    UnitType: "C62",
-                    Price: parseFloat(i.price?.toString() || "0"),
-                    VatRate: parseFloat(i.vat?.toString() || "20")
-                }));
+                const invoiceLines = items.map(i => {
+                    const qty = parseFloat(i.qty?.toString() || "1");
+                    const price = parseFloat(i.price?.toString() || "0");
+                    const vatRate = parseFloat(i.vat?.toString() || "20");
+                    const otvRate = parseFloat(i.otv?.toString() || "0");
+
+                    const lineNet = Number((qty * price).toFixed(2));
+                    const lineOtv = Number((lineNet * (otvRate / 100)).toFixed(2));
+                    const lineVatBase = lineNet + lineOtv;
+                    const lineVat = Number((lineVatBase * (vatRate / 100)).toFixed(2));
+
+                    return {
+                        Name: i.name || "URUN",
+                        Quantity: qty,
+                        UnitType: "C62",
+                        Price: price,
+                        VatRate: vatRate,
+                        OtvRate: otvRate,
+                        LineNet: lineNet,
+                        LineVat: lineVat,
+                        LineOtv: lineOtv,
+                        Total: Number((lineVatBase + lineVat).toFixed(2))
+                    };
+                });
+
+                const totalNet = invoiceLines.reduce((sum, l) => sum + l.LineNet, 0);
+                const totalVat = invoiceLines.reduce((sum, l) => sum + l.LineVat, 0);
+                const totalOtv = invoiceLines.reduce((sum, l) => sum + l.LineOtv, 0);
+                const grandTotal = invoiceLines.reduce((sum, l) => sum + l.Total, 0);
 
                 let sendResult;
 
@@ -164,7 +186,13 @@ export async function POST(request: Request) {
                             Country: "TR",
                             TaxOffice: config.portalTaxOffice || "KADIKOY"
                         },
-                        lines: invoiceLines,
+                        lines: invoiceLines.map(l => ({
+                            Name: l.Name,
+                            Quantity: l.Quantity,
+                            UnitType: l.UnitType,
+                            Price: l.Price,
+                            VatRate: l.VatRate
+                        })),
                         description: invoice.description || "İrsaliye",
                         shipmentDate,
                         shipmentTime,
@@ -174,9 +202,6 @@ export async function POST(request: Request) {
                         driverId
                     });
                 } else {
-                    const totalNet = invoiceLines.reduce((sum, l) => sum + (l.Quantity * l.Price), 0);
-                    const totalTax = invoiceLines.reduce((sum, l) => sum + (l.Quantity * l.Price * (l.VatRate / 100)), 0);
-
                     sendResult = await nilveraService.processAndSend({
                         customer: {
                             TaxNumber: (invoice.customer.taxNumber || invoice.customer.identityNumber || "11111111111").trim(),
@@ -198,11 +223,17 @@ export async function POST(request: Request) {
                             Country: "TR",
                             TaxOffice: config.portalTaxOffice || "KADIKOY"
                         },
-                        lines: invoiceLines,
+                        lines: invoiceLines.map(l => ({
+                            Name: l.Name,
+                            Quantity: l.Quantity,
+                            UnitType: l.UnitType,
+                            Price: l.Price,
+                            VatRate: l.VatRate
+                        })),
                         amounts: {
                             base: Number(totalNet.toFixed(2)),
-                            tax: Number(totalTax.toFixed(2)),
-                            total: Number((totalNet + totalTax).toFixed(2))
+                            tax: Number((totalVat + totalOtv).toFixed(2)),
+                            total: Number(grandTotal.toFixed(2))
                         },
                         isInternetSale: false,
                         internetInfo: {

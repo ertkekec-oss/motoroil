@@ -200,7 +200,6 @@ export class NilveraInvoiceService {
         }
 
         if (!isEInvoiceUser) {
-            invoiceInfo.GeneralKDV20Total = Number(params.amounts.tax.toFixed(2));
             invoiceInfo.KdvTotal = Number(params.amounts.tax.toFixed(2));
             invoiceInfo.ISDespatch = true; // İrsaliye yerine geçer ibaresi
 
