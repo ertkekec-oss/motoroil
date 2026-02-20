@@ -1,0 +1,25 @@
+﻿Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-billowing-glade-agt0zp7m-pooler.c-2.eu-central-1.aws.neon.tech"
+
+16 migrations found in prisma/migrations
+Following migrations have not yet been applied:
+20260201183618_add_target_kasa_id
+20260207231603_add_district_to_branch
+20260211203308_add_fintech_autonomy
+20260211205946_sync_kasa_to_bank_connection
+20260211215148_add_iban_to_kasa
+20260212160254_add_customer_unique
+20260212213444_marketplace_action_audit
+20260212215400_add_lock_and_job_to_audit
+20260212221532_add_retries_to_audit
+20260213150351_marketplace_config_company_required
+20260213151515_add_soft_delete_to_marketplace_config
+20260213210434_sync_cms_and_audit_fixes
+20260217000622_add_price_list_system
+20260217000914_update_product_price_schema
+20260217205134_fix_tenant_isolation_optional_fields
+20260218223548_add_tenant_isolation_fields
+
+To apply migrations in development run prisma migrate dev.
+To apply migrations in production run prisma migrate deploy.
