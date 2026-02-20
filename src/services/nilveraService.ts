@@ -429,10 +429,10 @@ export class NilveraInvoiceService {
             const startDate = threeMonthsAgo.toISOString().split('T')[0];
             const endDate = now.toISOString().split('T')[0];
 
-            console.log(`[NilveraService] Fetching Incoming: url=${this.config.baseUrl}/EInvoice/Incoming, page=${page}, range=${startDate}-${endDate}`);
+            console.log(`[NilveraService] Fetching Incoming: url=${this.config.baseUrl}/einvoice/Purchase, page=${page}, range=${startDate}-${endDate}`);
 
             const res = await axios.get(
-                `${this.config.baseUrl}/EInvoice/Incoming?PageIndex=${page}&PageSize=${pageSize}&StartDate=${startDate}&EndDate=${endDate}`,
+                `${this.config.baseUrl}/einvoice/Purchase?Page=${page}&PageSize=${pageSize}&StartDate=${startDate}&EndDate=${endDate}`,
                 { headers: this.getHeaders() }
             );
 
