@@ -115,17 +115,14 @@ export class TrendyolService implements IMarketplaceService {
 
     async updateCargoProvider(shipmentPackageId: string, cargoProviderCode: string): Promise<{ success: boolean; error?: string }> {
         try {
-            // Updated to V2 endpoint: /integration/order/sellers/{sellerId}/shipment-packages/{packageId}/cargo-providers
             const url = `${this.baseUrl}/integration/order/sellers/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/cargo-providers`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
             const response = await fetch(fetchUrl, {
                 method: 'PUT',
-                headers: this.getHeaders({ 'Content-Type': 'application/json' }),
-                body: JSON.stringify({
-                    cargoProvider: cargoProviderCode
-                })
+                headers: this.getHeaders(),
+                body: JSON.stringify({ cargoProvider: cargoProviderCode })
             });
 
             if (!response.ok) {
@@ -140,201 +137,145 @@ export class TrendyolService implements IMarketplaceService {
         }
     }
 
+    async updateShipmentPackageStatus(shipmentPackageId: string, status: 'Picking' | 'Invoiced'): Promise<{ success: boolean; error?: string }> {
+        try {
+            const url = `${this.baseUrl}/integration/order/sellers/${this.config.supplierId}/shipment-packages/${shipmentPackageId}`;
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+
+            const response = await fetch(fetchUrl, {
+                method: 'PUT',
+                headers: this.getHeaders(),
+                body: JSON.stringify({ status })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                return { success: false, error: errorText };
+            }
+
+            return { success: true };
+        } catch (error: any) {
+            console.error('Trendyol paket statü güncelleme hatası:', error);
+            return { success: false, error: error.message || 'Bağlantı hatası' };
+        }
+    }
+
+    async createCommonLabelRequest(shipmentPackageId: string, format: 'ZPL' | 'PDF' = 'ZPL'): Promise<{ success: boolean; error?: string }> {
+        try {
+            const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label`;
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+
+            const response = await fetch(fetchUrl, {
+                method: 'POST',
+                headers: this.getHeaders(),
+                body: JSON.stringify({
+                    shipmentPackageIds: [parseInt(shipmentPackageId)],
+                    format
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                return { success: false, error: errorText };
+            }
+
+            return { success: true };
+        } catch (error: any) {
+            console.error('Trendyol common-label request error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
     async getCommonLabel(shipmentPackageId: string, cargoTrackingNumber?: string): Promise<{
-        status: 'SUCCESS' | 'PENDING' | 'FAILED';
+        status: 'SUCCESS' | 'PENDING' | 'FAILED' | 'REDIRECT_REQUIRED';
         pdfBase64?: string;
         error?: string;
+        redirectUrl?: string;
+        message?: string;
         httpStatus?: number;
         raw?: any;
     }> {
         try {
-            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const supplierId = this.config.supplierId;
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
 
-            // --- STEP 0: Status & Carrier Check ---
-            // If the package is in 'Created' state, label is never ready.
-            let pkgStatus = '';
-            let carrier = '';
-            try {
-                console.log(`[TRENDYOL-LABEL] Checking status for package ${shipmentPackageId}...`);
-                const pkg = await this.getShipmentPackageDetails(shipmentPackageId);
-                pkgStatus = pkg.shipmentPackageStatus;
-                carrier = (pkg.cargoProviderName || '').toLowerCase();
-                console.log(`[TRENDYOL-LABEL] Package Status: ${pkgStatus}, Carrier: ${carrier}`);
+            const pkg = await this.getShipmentPackageDetails(shipmentPackageId);
+            const provider = (pkg.cargoProviderName || '').toLowerCase();
+            const status = pkg.shipmentPackageStatus;
+            const deliveryModel = pkg.deliveryModel;
 
-                if (pkgStatus === 'Created') {
-                    return {
-                        status: 'FAILED',
-                        error: 'Paket henüz "Hazırlanıyor" (Created) aşamasında. Trendyol panelinden "Toplanacak" (Picking) statüsüne geçirin, ardından tekrar deneyin.',
-                        raw: pkg
-                    };
-                }
-            } catch (e: any) {
-                if (e.message.includes("Proxy returned OK")) {
-                    console.info(`[TRENDYOL-LABEL] Status check is PENDING (Proxy OK). Proceeding to fetching strategies anyway...`);
-                } else {
-                    console.warn(`[TRENDYOL-LABEL] Status check error (proceeding anyway): ${e.message}`);
-                }
+            console.log(`[TRENDYOL-STRATEGY] pkg=${shipmentPackageId}, status=${status}, carrier=${provider}, model=${deliveryModel}`);
+
+            // 1. Trendyol Express Strategy
+            if (provider.includes('trendyol express')) {
+                return {
+                    status: 'REDIRECT_REQUIRED',
+                    message: "Trendyol Express (TEX) etiketleri güvenlik politikaları gereği API üzerinden alınamaz.",
+                    redirectUrl: `https://partner.trendyol.com/orders/all?orderNumber=${pkg.orderNumber}`
+                };
             }
 
-            // --- STRATEGY A: Trigger & Fetch via /common-label (For TEX/Aras) ---
-            const supportsCommonLabel = carrier.includes('express') || carrier.includes('tex');
-            if (cargoTrackingNumber || supportsCommonLabel) {
-                console.info(`[TRENDYOL-LABEL] Strategy A (Common) for carrier: ${carrier || 'Targeted'}`);
+            // 2. Common Label Eligibility (TEX/Aras + Trendyol Öder)
+            const isEligibleCarrier = provider.includes('tex') || provider.includes('aras');
+            const isTrendyolPaid = deliveryModel === 'Trendyol-Paid';
 
-                // Step A1: Multiple Trigger Attempts
-                // 1. Trigger by Tracking Number
-                if (cargoTrackingNumber) {
-                    try {
-                        const triggerUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label/${cargoTrackingNumber}?format=PDF`;
-                        const fetchTriggerUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(triggerUrl)}` : triggerUrl;
-                        await fetch(fetchTriggerUrl, {
-                            method: 'POST',
-                            headers: this.getHeaders({ 'Content-Type': 'application/json' }),
-                            body: JSON.stringify({ format: 'PDF' })
-                        });
-                    } catch (e) { }
-                }
-
-                // 2. Trigger by Package IDs
-                try {
-                    const triggerArrayUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label`;
-                    const fetchTriggerArrayUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(triggerArrayUrl)}` : triggerArrayUrl;
-                    await fetch(fetchTriggerArrayUrl, {
-                        method: 'POST',
-                        headers: this.getHeaders({ 'Content-Type': 'application/json' }),
-                        body: JSON.stringify({ shipmentPackageIds: [parseInt(shipmentPackageId)], format: 'PDF' })
-                    });
-                } catch (e) { }
-
-                // Step A2: Retrieval (GET)
-                if (cargoTrackingNumber) {
-                    try {
-                        const getUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label/${cargoTrackingNumber}`;
-                        const fetchGetUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(getUrl)}` : getUrl;
-                        const res = await fetch(fetchGetUrl, { headers: this.getHeaders({ 'Accept': 'application/json' }) });
-
-                        const body = await res.text();
-                        const trimmedBody = body.trim();
-
-                        if (!res.ok) {
-                            console.warn(`[TRENDYOL-LABEL] Strategy A (Common) Failed: ${res.status} ${trimmedBody}`);
-                            let jsonError;
-                            try { jsonError = JSON.parse(trimmedBody); } catch { }
-                            if (jsonError?.error?.errors?.[0]?.type === 'COMMON_LABEL_NOT_ALLOWED') {
-                                return {
-                                    status: 'FAILED',
-                                    error: `Trendyol Yetki Hatası (Ortak Etiket): ${jsonError.error.errors[0].title || 'Yetkiniz bulunmamaktadır.'}`,
-                                    httpStatus: res.status
-                                };
-                            }
-                        } else {
-                            let keys = '';
-                            try { const json = JSON.parse(trimmedBody); keys = Object.keys(json).join(','); } catch { }
-                            console.info(`[TRENDYOL-DIAG] Strategy A (Common) result: status=${res.status}, type=${res.headers.get('content-type')}, len=${trimmedBody.length}, keys=[${keys}], snippet="${trimmedBody.substring(0, 200).replace(/\n/g, ' ')}"`);
-
-                            // Multi-Signal 1: Plain text "OK"
-                            if (trimmedBody === 'OK') {
-                                console.info(`[TRENDYOL-LABEL] Common-Label GET returned OK (PENDING).`);
-                            } else {
-                                const json = JSON.parse(trimmedBody);
-                                const labelData = json.data?.[0];
-                                if (labelData?.label) {
-                                    if (labelData.format === 'PDF') {
-                                        return { status: 'SUCCESS', pdfBase64: labelData.label, httpStatus: 200 };
-                                    }
-                                    if (labelData.format === 'ZPL') {
-                                        console.info(`[TRENDYOL-LABEL] Converting ZPL from Common-Label...`);
-                                        const pdfBuf = await this.convertZplToPdf(labelData.label);
-                                        if (pdfBuf) return { status: 'SUCCESS', pdfBase64: pdfBuf.toString('base64'), httpStatus: 200 };
-                                    }
-                                }
-                            }
-                        }
-                    } catch (e) { }
-                }
-            } else {
-                console.info(`[TRENDYOL-LABEL] Strategy A skipped: carrier/tracking missing.`);
+            if (!isEligibleCarrier || !isTrendyolPaid) {
+                return {
+                    status: 'FAILED',
+                    error: "Bu gönderi tipi (Carrier: " + provider + ", Model: " + deliveryModel + ") etiket API'sini desteklemiyor. Lütfen Trendyol panelini kullanın."
+                };
             }
 
-            // --- STRATEGY B: Standard v2 Labels (Universal Fallback) ---
-            const standardUrl = `${this.baseUrl}/integration/sellers/${supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
-            const fetchStandardUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(standardUrl)}` : standardUrl;
-
-            console.info(`[TRENDYOL-LABEL] Attempting Standard v2 Labels...`);
-            const response = await fetch(fetchStandardUrl, {
-                headers: this.getHeaders({ 'Accept': 'application/pdf, application/json' })
-            });
-
-            let buf: Buffer | null = null;
-            if (response.ok) {
-                const ab = await response.arrayBuffer();
-                buf = Buffer.from(ab);
-                const bodyText = buf.toString('utf-8').trim();
-                let keys = '';
-                try { if (bodyText.startsWith('{')) { const json = JSON.parse(bodyText); keys = Object.keys(json).join(','); } } catch { }
-                console.info(`[TRENDYOL-DIAG] Strategy B (v2) result: status=${response.status}, type=${response.headers.get('content-type')}, len=${buf.length}, keys=[${keys}], snippet="${bodyText.substring(0, 200).replace(/\n/g, ' ')}"`);
-
-                if (bodyText === 'OK') {
-                    console.info(`[TRENDYOL-LABEL] Strategy B (v2) returned PENDING (OK body). Trying next strategy...`);
-                } else if (buf.subarray(0, 4).toString() === '%PDF') {
-                    return { status: 'SUCCESS', pdfBase64: buf.toString('base64'), httpStatus: 200 };
-                } else {
-                    try {
-                        const json = JSON.parse(bodyText);
-                        const label = json.data?.[0]?.label || json.label;
-                        const format = json.data?.[0]?.format || json.format;
-                        if (label) {
-                            if (format === 'PDF') return { status: 'SUCCESS', pdfBase64: label, httpStatus: 200 };
-                            if (format === 'ZPL') {
-                                const pdfBuf = await this.convertZplToPdf(label);
-                                if (pdfBuf) return { status: 'SUCCESS', pdfBase64: pdfBuf.toString('base64'), httpStatus: 200 };
-                            }
-                        }
-                    } catch { }
-                }
+            // 3. Common Label Flow
+            // a) Ensure Status
+            if (status === 'Created') {
+                console.log(`[TRENDYOL-STRATEGY] Updating status from Created to Picking...`);
+                await this.updateShipmentPackageStatus(shipmentPackageId, 'Picking');
+                // Give it a moment
+                await new Promise(r => setTimeout(r, 1000));
             }
 
-            // --- STRATEGY C: Standard v1/Alt Path ---
-            console.info(`[TRENDYOL-LABEL] Attempting Strategy C (v1/Alt)...`);
-            try {
-                const altUrl = `${this.baseUrl}/integration/sellers/${supplierId}/labels/${shipmentPackageId}`;
-                const fetchAltUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(altUrl)}` : altUrl;
-                const altRes = await fetch(fetchAltUrl, { headers: this.getHeaders({ 'Accept': 'application/pdf' }) });
-                if (altRes.ok) {
-                    const altAb = await altRes.arrayBuffer();
-                    const altBuf = Buffer.from(altAb);
-                    const altText = altBuf.toString('utf-8').substring(0, 200).replace(/\n/g, ' ');
-                    console.info(`[TRENDYOL-DIAG] Strategy C (v1) result: status=${altRes.status}, type=${altRes.headers.get('content-type')}, len=${altBuf.length}, snippet="${altText}"`);
-                    if (altBuf.subarray(0, 4).toString() === '%PDF') {
-                        return { status: 'SUCCESS', pdfBase64: altBuf.toString('base64'), httpStatus: 200 };
+            // b) Trigger Label (ZPL)
+            console.log(`[TRENDYOL-STRATEGY] Triggering common label request...`);
+            await this.createCommonLabelRequest(shipmentPackageId, 'ZPL');
+
+            // c) Polling GET
+            const getUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label/${pkg.cargoTrackingNumber || cargoTrackingNumber}`;
+            const fetchGetUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(getUrl)}` : getUrl;
+
+            const res = await fetch(fetchGetUrl, { headers: this.getHeaders({ 'Accept': 'application/json' }) });
+            const body = await res.text();
+
+            if (res.ok && body.trim() !== 'OK') {
+                const json = JSON.parse(body);
+                const labelData = json.data?.[0];
+                if (labelData?.label) {
+                    if (labelData.format === 'ZPL') {
+                        console.log(`[TRENDYOL-STRATEGY] Converting ZPL to PDF...`);
+                        const pdfBuf = await this.convertZplToPdf(labelData.label);
+                        if (pdfBuf) return { status: 'SUCCESS', pdfBase64: pdfBuf.toString('base64'), httpStatus: 200 };
+                    } else if (labelData.format === 'PDF') {
+                        return { status: 'SUCCESS', pdfBase64: labelData.label, httpStatus: 200 };
                     }
                 }
-            } catch { }
-
-            // Final fallback logic
-            const status = response.status;
-            if (status === 202 || status === 429 || (status >= 500 && status <= 504)) {
-                console.info(`[TRENDYOL-LABEL] HTTP ${status} signal for async/busy. Returning PENDING.`);
-                return { status: 'PENDING', error: 'Trendyol servisi meşgul veya hazırlanıyor.', httpStatus: status };
-            }
-            if (status === 556 || status === 404 || status === 401) {
-                console.warn(`[TRENDYOL-LABEL] HTTP ${status} signal explicitly failing. API removed or unauthorized.`);
-                return { status: 'FAILED', error: 'Etiket API servisine ulaşılamıyor (Deprecated / Service Unavailable). Lütfen satıcı panelinden indirmeyi deneyin.', httpStatus: status };
             }
 
-            // Check for unexpected HTML (Gateway errors)
-            const ct = (response.headers.get("content-type") || "").toLowerCase();
-            if (ct.includes("text/html")) {
-                console.warn(`[TRENDYOL-LABEL] Received unexpected HTML (len ${buf?.length ?? 0}). Treating as transient PENDING.`);
-                return { status: 'PENDING', error: 'Bağlantı ara katmanı meşgul.', httpStatus: 202 };
+            // d) Handle 400 COMMON_LABEL_NOT_ALLOWED
+            if (res.status === 400 && body.includes('COMMON_LABEL_NOT_ALLOWED')) {
+                return {
+                    status: 'REDIRECT_REQUIRED',
+                    message: "Bu paket ortak barkod (Common Label) sürecine dahil değil. Lütfen panel üzerinden yazdırın.",
+                    redirectUrl: `https://partner.trendyol.com/orders/all?orderNumber=${pkg.orderNumber}`
+                };
             }
 
-            return { status: 'PENDING', error: 'Etiket hazırlanıyor (Son aşama)...', httpStatus: 200 };
+            return { status: 'PENDING', message: "Etiket Trendyol tarafından hazırlanıyor...", httpStatus: res.status, raw: body };
 
         } catch (error: any) {
-            console.error(`[TRENDYOL-LABEL] Fatal Error:`, error);
-            return { status: 'FAILED', error: `Sistem Hatası: ${error.message}` };
+            console.error(`[TRENDYOL-STRATEGY-ERR]`, error);
+            return { status: 'FAILED', error: error.message };
         }
     }
 
@@ -358,8 +299,8 @@ export class TrendyolService implements IMarketplaceService {
         }
     }
 
-    private async getShipmentPackageDetails(shipmentPackageId: string): Promise<any> {
-        // Updated to V2 style filtering via /orders
+    async getShipmentPackageDetails(shipmentPackageId: string): Promise<any> {
+        // Use v2 style filtering via /orders to get delivery model and package info
         const url = `${this.baseUrl}/integration/order/sellers/${this.config.supplierId}/orders?shipmentPackageIds=${shipmentPackageId}`;
         const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
         const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
