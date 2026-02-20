@@ -42,7 +42,56 @@
   --noise-opacity: 0.02;
 
   --gradient-text: linear-gradient(135deg, white 0%, #CBD5E1 100%);
+  /* POS Scoped Variables - Default (Dark) */
+  --bg-pos: var(--bg-deep);
+  --card-pos: var(--bg-card);
+  --text-pos: var(--text-main);
+  --text-muted-pos: var(--text-muted);
+  --border-pos: var(--border-light);
+  --shadow-pos: var(--shadow-premium);
 }
+
+/* POS ONLY COOL TECH LIGHT THEME */
+[data-pos-theme="light"] {
+  --bg-pos: #F8FAFC;
+  --card-pos: rgba(255, 255, 255, 0.9);
+  --text-pos: #020617;
+  --text-muted-pos: #64748B;
+  --border-pos: #CBD5E1;
+  --shadow-pos: 0 12px 32px rgba(15, 23, 42, 0.12);
+  --glass-border: 1px solid rgba(15, 23, 42, 0.08);
+
+  background-color: var(--bg-pos) !important;
+  color: var(--text-pos) !important;
+}
+
+[data-pos-theme="light"] .card, 
+[data-pos-theme="light"] .glass {
+  background: var(--card-pos) !important;
+  border-color: var(--border-pos) !important;
+  box-shadow: var(--shadow-pos) !important;
+  color: var(--text-pos) !important;
+}
+
+[data-pos-theme="light"] .text-muted,
+[data-pos-theme="light"] .text-xs.opacity-50,
+[data-pos-theme="light"] .text-\[10px\].opacity-60 {
+  color: var(--text-muted-pos) !important;
+  opacity: 1 !important;
+}
+
+[data-pos-theme="light"] input {
+  background: white !important;
+  border-color: var(--border-pos) !important;
+  color: var(--text-pos) !important;
+}
+
+[data-pos-theme="light"] .bg-black\/20,
+[data-pos-theme="light"] .bg-white\/5 {
+  background: rgba(15, 23, 42, 0.04) !important;
+  border-color: var(--border-pos) !important;
+}
+
 
 /* Light Mode Theme */
 [data-theme="light"] {

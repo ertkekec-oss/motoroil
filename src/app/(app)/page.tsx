@@ -62,6 +62,7 @@ function POSContent() {
   const [activePriceListId, setActivePriceListId] = useState<string | null>(null);
   const [activePriceListName, setActivePriceListName] = useState<string | null>(null);
   const [priceMap, setPriceMap] = useState<Record<string, number>>({});
+  const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
 
   const getPrice = useCallback((product: any) => {
     if (priceMap[product.id] !== undefined) return priceMap[product.id];
@@ -89,6 +90,18 @@ function POSContent() {
     };
     fetchInsights();
   }, [isAuthenticated]);
+
+  // Handle POS Theme persistence
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('pos-theme') as 'dark' | 'light';
+    if (savedTheme) setPosTheme(savedTheme);
+  }, []);
+
+  const togglePosTheme = () => {
+    const newTheme = posTheme === 'dark' ? 'light' : 'dark';
+    setPosTheme(newTheme);
+    localStorage.setItem('pos-theme', newTheme);
+  };
 
   // Auto Focus
   useEffect(() => { inputRef.current?.focus(); }, []);
@@ -312,22 +325,31 @@ function POSContent() {
 
 
   return (
-    <div className="flex flex-mobile-col w-full min-h-screen gap-4 p-4 text-white bg-[var(--bg-main)]">
+    <div data-pos-theme={posTheme} className="flex flex-mobile-col w-full min-h-screen gap-4 p-4 text-pos bg-pos transition-colors duration-300">
 
       {/* LEFT MAIN AREA */}
       <div className="flex-1 flex flex-col gap-4 min-w-0">
 
         {/* ROW 1: USER WELCOME */}
         <div className="space-y-4">
-          <div>
-            <h2 className="text-2xl font-black mb-1">Hoş geldin, <span className="text-primary">{currentUser?.name?.split(' ')[0]}</span> 👋</h2>
-            <p className="text-xs opacity-50">Sistemdeki genel durumun ve sana özel ipuçları aşağıda.</p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-2xl font-black mb-1">Hoş geldin, <span className="text-primary">{currentUser?.name?.split(' ')[0]}</span> 👋</h2>
+              <p className="text-xs opacity-50">Sistemdeki genel durumun ve sana özel ipuçları aşağıda.</p>
+            </div>
+            <button
+              onClick={togglePosTheme}
+              className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all text-xl shadow-pos"
+              title={posTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}
+            >
+              {posTheme === 'dark' ? '☀️' : '🌙'}
+            </button>
           </div>
         </div>
 
         {/* ROW 2: CHARTS & NOTIFICATIONS */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full md:h-auto">
-          <div className="lg:col-span-6 bg-[var(--bg-card)] border border-[var(--border-light)] rounded-2xl p-4 shadow-lg min-h-[160px]">
+          <div className="lg:col-span-6 bg-card-pos border border-border-pos rounded-2xl p-4 shadow-pos min-h-[160px]">
             <div className="flex justify-between items-center mb-2">
               <div className="flex items-center gap-2"><span className="text-lg">📈</span><span className="text-xs font-bold opacity-70">HAFTALIK TREND</span></div>
             </div>
@@ -336,7 +358,7 @@ function POSContent() {
             ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri yükleniyor...</div>}
           </div>
 
-          <div className="lg:col-span-3 bg-[var(--bg-card)] border border-[var(--border-light)] rounded-2xl p-4 shadow-lg min-h-[160px]">
+          <div className="lg:col-span-3 bg-card-pos border border-border-pos rounded-2xl p-4 shadow-pos min-h-[160px]">
             <div className="flex items-center gap-2 mb-2"><span className="text-lg">🍰</span><span className="text-xs font-bold opacity-70">DAĞILIM</span></div>
             {insightsData?.stats?.categoryAnalysis ? (
               <ResponsiveContainer width="100%" height={100}><PieChart><Pie data={insightsData.stats.categoryAnalysis} innerRadius={25} outerRadius={35} dataKey="value"><Cell fill="#FF5500" /></Pie></PieChart></ResponsiveContainer>
@@ -364,7 +386,7 @@ function POSContent() {
 
             {/* DYNAMIC PRODUCT LIST */}
             {filteredProducts.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--bg-card)] border border-[var(--border-light)] rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[300px] overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-card-pos border border-border-pos rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[300px] overflow-y-auto">
                 {filteredProducts.map(p => (
                   <div key={p.id} onClick={() => addToCart(p)} className="p-3 border-b border-white/5 flex justify-between hover:bg-white/10 cursor-pointer">
                     <div><div className="font-bold text-sm">{p.name}</div><div className="text-[10px] opacity-50">{p.barcode}</div></div>
@@ -390,7 +412,7 @@ function POSContent() {
         </div>
 
         {/* CART */}
-        <div className="flex-1 bg-[var(--bg-card)] rounded-xl border border-[var(--border-light)] p-2 overflow-y-auto min-h-[300px]">
+        <div className="flex-1 bg-card-pos rounded-xl border border-border-pos p-2 overflow-y-auto min-h-[300px] shadow-pos">
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center opacity-20"><span className="text-6xl mb-4">🛒</span><span className="text-sm font-bold">Sepet Boş</span></div>
           ) : (
@@ -447,7 +469,7 @@ function POSContent() {
       </div>
 
       {/* RIGHT PANEL (Payment) */}
-      <div className="w-[380px] bg-[var(--bg-card)] border border-[var(--border-light)] rounded-2xl p-6 flex flex-col shadow-xl sticky top-4 h-[calc(100vh-2rem)] overflow-hidden">
+      <div className="w-[380px] bg-card-pos border border-border-pos rounded-2xl p-6 flex flex-col shadow-pos sticky top-4 h-[calc(100vh-2rem)] overflow-hidden">
         <h2 className="text-xs font-bold opacity-50 mb-6 tracking-widest text-center shrink-0">SATIŞ ÖZETİ</h2>
 
         {/* Scrollable Middle Section (Scrollbar hidden) */}
@@ -578,7 +600,7 @@ function POSContent() {
         </div>
 
         {/* Action Buttons at the Bottom */}
-        <div className="pt-4 mt-4 border-t border-white/10 space-y-3 shrink-0">
+        <div className="pt-4 mt-4 border-t border-border-pos space-y-3 shrink-0">
           <button
             disabled={cart.length === 0}
             onClick={() => setShowSuspendModal(true)}
