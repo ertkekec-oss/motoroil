@@ -106,9 +106,25 @@ body:has([data-pos-theme="light"]) {
 
 [data-pos-theme="light"] input,
 [data-pos-theme="light"] select {
-  background: white !important;
-  border: 1px solid var(--border-pos) !important;
+  background: white;
+  border: 1px solid var(--border-pos);
   color: var(--text-pos) !important;
+}
+
+/* Fix for transparent/borderless inputs (like search bar) */
+[data-pos-theme="light"] input.border-none,
+[data-pos-theme="light"] .border-none {
+  border: none !important;
+}
+
+[data-pos-theme="light"] input.bg-transparent,
+[data-pos-theme="light"] .bg-transparent {
+  background: transparent !important;
+}
+
+[data-pos-theme="light"] input:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Payment Buttons & Smaller Chips */
