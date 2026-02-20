@@ -200,6 +200,23 @@ export class NilveraInvoiceService {
         }
 
         if (!isEInvoiceUser) {
+            // E-Archive specific: Header must contain KDV breakdown for specific rates
+            const kdvTotals: Record<number, number> = { 1: 0, 8: 0, 10: 0, 18: 0, 20: 0 };
+            params.lines.forEach(l => {
+                const rate = Math.round(l.VatRate);
+                const lineNet = Number((l.Quantity * l.Price).toFixed(2));
+                const lineVat = Number((lineNet * (l.VatRate / 100)).toFixed(2));
+                if (kdvTotals[rate] !== undefined) {
+                    kdvTotals[rate] += lineVat;
+                }
+            });
+
+            invoiceInfo.GeneralKDV1Total = Number(kdvTotals[1].toFixed(2));
+            invoiceInfo.GeneralKDV8Total = Number(kdvTotals[8].toFixed(2));
+            invoiceInfo.GeneralKDV10Total = Number(kdvTotals[10].toFixed(2));
+            invoiceInfo.GeneralKDV18Total = Number(kdvTotals[18].toFixed(2));
+            invoiceInfo.GeneralKDV20Total = Number(kdvTotals[20].toFixed(2));
+            
             invoiceInfo.KdvTotal = Number(params.amounts.tax.toFixed(2));
             invoiceInfo.ISDespatch = true; // İrsaliye yerine geçer ibaresi
 

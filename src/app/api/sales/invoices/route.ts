@@ -17,57 +17,128 @@ function generateGIBInvoiceNo(prefix: string) {
     return `${prefix}${year}${serialPart}`;
 }
 
+// --- REUSABLE PDF PROXY HANDLER ---
+async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
+    try {
+        let invoice = await (prisma as any).salesInvoice.findUnique({ where: { id: invoiceId } });
+        let isIncoming = false;
+
+        if (!invoice) {
+            // Check if it's a purchase invoice in local DB
+            const purchaseInv = await (prisma as any).purchaseInvoice.findUnique({ where: { id: invoiceId } });
+            if (purchaseInv) {
+                invoice = purchaseInv;
+                isIncoming = true;
+            }
+        }
+
+        const effectiveCompanyId = invoice?.companyId || sessionCompanyId;
+        if (!effectiveCompanyId) {
+            return NextResponse.json({ success: false, error: 'Firma oturumu bulunamadı.' }, { status: 400 });
+        }
+
+        const settingsRecord = await prisma.appSettings.findUnique({
+            where: { companyId_key: { companyId: effectiveCompanyId, key: 'eFaturaSettings' } }
+        });
+
+        const rawSettings = (settingsRecord?.value as any) || {};
+        const apiKey = (rawSettings.apiKey || rawSettings.nilvera?.apiKey || rawSettings.ApiKey || '').trim();
+        const environment = rawSettings.environment || rawSettings.nilvera?.environment || 'test';
+
+        if (!apiKey) {
+            return NextResponse.json({ success: false, error: 'Nilvera API anahtarı bulunamadı.' }, { status: 500 });
+        }
+
+        const baseUrl = (environment.toLowerCase() === 'production') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
+
+        // If invoice record found, use its formalUuid. Otherwise, assume invoiceId IS the UUID (for incoming/ephemeral)
+        const uuid = invoice?.formalUuid || (invoiceId.length > 20 ? invoiceId : null);
+
+        if (!uuid) {
+            return NextResponse.json({ success: false, error: 'Geçersiz Fatura UUID.' }, { status: 400 });
+        }
+
+        const endpointsToTry = [];
+        const formalType = invoice?.formalType;
+
+        if (isIncoming) {
+            // Primary for incoming
+            endpointsToTry.push(`${baseUrl}/einvoice/Purchase/${uuid}/pdf`);
+        } else if (formalType === 'EFATURA') {
+            endpointsToTry.push(`${baseUrl}/einvoice/Sale/${uuid}/pdf`);
+        } else if (formalType === 'EARSIV') {
+            endpointsToTry.push(`${baseUrl}/earchive/Invoices/${uuid}/pdf`);
+            endpointsToTry.push(`${baseUrl}/earchive/Sale/${uuid}/pdf`);
+        } else if (formalType === 'EIRSALIYE') {
+            endpointsToTry.push(`${baseUrl}/edespatch/Despatch/${uuid}/pdf`);
+        }
+
+        // UNIVERSAL FALLBACKS (if above fails or type unknown)
+        // Order: Outgoing Sale -> Incoming Purchase -> E-Archive
+        const fallbacks = [
+            `${baseUrl}/einvoice/Sale/${uuid}/pdf`,
+            `${baseUrl}/einvoice/Purchase/${uuid}/pdf`,
+            `${baseUrl}/earchive/Invoices/${uuid}/pdf`,
+            `${baseUrl}/earchive/Sale/${uuid}/pdf`,
+            `${baseUrl}/edespatch/Despatch/${uuid}/pdf`
+        ];
+
+        for (const f of fallbacks) {
+            if (!endpointsToTry.includes(f)) endpointsToTry.push(f);
+        }
+
+        let lastStatus = 404;
+        let lastErrorData = '';
+
+        for (const url of endpointsToTry) {
+            try {
+                const pdfResponse = await axios.get(url, {
+                    headers: { 'Authorization': `Bearer ${apiKey}` },
+                    responseType: 'arraybuffer',
+                    timeout: 10000,
+                    validateStatus: () => true
+                });
+
+                if (pdfResponse.status === 200) {
+                    return new NextResponse(pdfResponse.data, {
+                        headers: {
+                            'Content-Type': 'application/pdf',
+                            'Content-Disposition': `inline; filename="Fatura-${uuid}.pdf"`,
+                            'Cache-Control': 'public, max-age=3600'
+                        }
+                    });
+                }
+                lastStatus = pdfResponse.status;
+                if (pdfResponse.data && pdfResponse.data.length < 500) lastErrorData = pdfResponse.data.toString();
+            } catch (err: any) {
+                console.warn(`[PDF Proxy] Attempt failed for ${url}:`, err.message);
+            }
+        }
+
+        return NextResponse.json({
+            success: false,
+            error: 'Fatura PDF dosyası Nilvera sunucularından alınamadı.',
+            details: `Nilvera Status: ${lastStatus}. UUID: ${uuid}. ${lastErrorData}`
+        }, { status: lastStatus });
+
+    } catch (error: any) {
+        console.error("[PDF Proxy Critical Error]:", error);
+        return NextResponse.json({ success: false, error: 'PDF sunucusuyla iletişim hatası.' }, { status: 500 });
+    }
+}
+
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const action = searchParams.get('action');
         const invoiceId = searchParams.get('invoiceId');
 
-        // --- PDF GÖRÜNTÜLEME PROXY (Public access for sharing) ---
+        const session = await getSession();
+
         if (action === 'get-pdf' && invoiceId) {
-            try {
-                const invoice = await (prisma as any).salesInvoice.findUnique({ where: { id: invoiceId } });
-                if (!invoice || !invoice.formalUuid) return NextResponse.json({ error: 'Fatura bulunamadı' }, { status: 404 });
-
-                const settingsRecord = await prisma.appSettings.findUnique({
-                    where: {
-                        companyId_key: { companyId: invoice.companyId, key: 'eFaturaSettings' }
-                    }
-                });
-                const config = (settingsRecord?.value as any) || {};
-
-                const formalType = invoice.formalType;
-                let module = 'EArchive';
-                if (formalType === 'EFATURA') module = 'EInvoice';
-                if (formalType === 'EIRSALIYE') module = 'EDespatch';
-
-                const baseUrl = (config.environment?.toLowerCase() === 'production') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
-                const endpoint = `${baseUrl}/${module}/Download/${invoice.formalUuid}/PDF`;
-
-                const pdfResponse = await axios.get(endpoint, {
-                    headers: { 'Authorization': `Bearer ${config.apiKey}` },
-                    responseType: 'arraybuffer',
-                    validateStatus: () => true
-                });
-
-                if (pdfResponse.status >= 400) {
-                    console.error("[PDF Proxy Error]:", pdfResponse.status, pdfResponse.data?.toString());
-                    return NextResponse.json({ success: false, error: 'Fatura henüz hazırlanıyor veya bulunamadı.' }, { status: pdfResponse.status });
-                }
-
-                return new NextResponse(pdfResponse.data, {
-                    headers: {
-                        'Content-Type': 'application/pdf',
-                        'Content-Disposition': `inline; filename="Fatura-${invoice.formalUuid}.pdf"`
-                    }
-                });
-            } catch (err: any) {
-                console.error("CRITICAL PDF Fetch Error:", err.message);
-                return NextResponse.json({ success: false, error: 'PDF sunucusuyla bağlantı hatası.' }, { status: 500 });
-            }
+            return await handlePdfProxy(invoiceId, (session as any)?.companyId);
         }
 
-        const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
         const branch = searchParams.get('branch');
@@ -96,11 +167,17 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     try {
-        const session = await getSession();
-        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
-
         const body = await request.json();
         const { action, invoiceId } = body;
+
+        // Support for PDF fetch via POST (legacy/component support)
+        if (action === 'get-pdf' && invoiceId) {
+            const session = await getSession();
+            return await handlePdfProxy(invoiceId, (session as any)?.companyId);
+        }
+
+        const session = await getSession();
+        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
         // HIJACKING FOR PROXY BYPASS: Send Formal Invoice / Despatch
         if (action === 'formal-send' && invoiceId) {

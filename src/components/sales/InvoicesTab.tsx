@@ -341,7 +341,7 @@ export function InvoicesTab({
                                                         <button onClick={() => handleRejectPurchaseInvoice(inv.id)} className="btn btn-outline" style={{ fontSize: '11px', color: '#ff4444', borderColor: '#ff4444' }}>Reddet</button>
                                                     </>
                                                 )}
-                                                <button className="btn btn-ghost" style={{ fontSize: '11px' }}>📄 Detay</button>
+                                                <button onClick={() => handleViewPDF(inv.id)} className="btn btn-ghost" style={{ fontSize: '11px' }}>📄 PDF Görüntüle</button>
                                             </div>
                                         </td>
                                     </tr>
