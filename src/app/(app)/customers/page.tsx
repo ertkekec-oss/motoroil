@@ -164,7 +164,7 @@ export default function CustomersPage() {
 
         setIsProcessing(true);
         try {
-            const res = await fetch('/api/customers', {
+            const res = await fetch(`/api/customers/${editCustomer.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editCustomer)
