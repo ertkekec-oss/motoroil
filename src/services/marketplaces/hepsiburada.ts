@@ -18,8 +18,9 @@ export class HepsiburadaService implements IMarketplaceService {
 
         if (proxy) {
             // Option B: Reverse Proxy Mode (Path-based)
-            // This expects Nginx to handle SNI and Host properly for the path /proxy/hepsiburada
-            this.baseUrl = isTest ? `${proxy}/proxy/hepsiburada-sit` : `${proxy}/proxy/hepsiburada`;
+            // Normalize: remove trailing /proxy if it exists to avoid double /proxy/proxy
+            const baseHost = proxy.replace(/\/proxy$/, '');
+            this.baseUrl = isTest ? `${baseHost}/proxy/hepsiburada-sit` : `${baseHost}/proxy/hepsiburada`;
         } else {
             // Option A: Direct Mode
             this.baseUrl = `https://${this.targetHost}`;
