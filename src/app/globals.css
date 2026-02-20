@@ -163,6 +163,33 @@ body:has([data-pos-theme="light"]) {
   border-color: var(--border-pos) !important;
 }
 
+/* Primary Action Buttons (Orange) */
+[data-pos-theme="light"] .bg-primary,
+[data-pos-theme="light"] .bg-gradient-to-r.from-orange-600 {
+  background: #FF5500 !important;
+  color: white !important;
+  opacity: 1 !important;
+  box-shadow: 0 4px 12px rgba(255, 85, 0, 0.2) !important;
+}
+
+/* Secondary Action Buttons (Amber - Suspend) */
+[data-pos-theme="light"] .bg-amber-500\/10 {
+  background: #F59E0B !important;
+  color: white !important;
+  border-color: #D97706 !important;
+  opacity: 1 !important;
+}
+
+[data-pos-theme="light"] .bg-amber-500\/10:hover {
+  background: #D97706 !important;
+}
+
+[data-pos-theme="light"] .bg-white\/10.border-white\/5.text-white\/30 {
+  background: #F1F5F9 !important;
+  color: #94A3B8 !important;
+  border-color: var(--border-pos) !important;
+}
+
 
 /* Light Mode Theme */
 [data-theme="light"] {
