@@ -102,9 +102,10 @@ export class HepsiburadaService implements IMarketplaceService {
         const status = res.status;
         const text = await res.text();
         const trimmed = text.trim();
+        const proxyTrace = res.headers.get('x-proxy-route');
 
         if (!res.ok) {
-            console.error(`[HB_FETCH_ERR] Status: ${status} | URL: ${url} | Res: ${trimmed.substring(0, 200)}`);
+            console.error(`[HB_FETCH_ERR] Status: ${status} | Trace: ${proxyTrace || 'no-hit'} | URL: ${url}`);
             this.handleInsecureResponse(status, trimmed, url);
         }
 
@@ -139,8 +140,9 @@ export class HepsiburadaService implements IMarketplaceService {
             const res = await fetch(url, { headers });
             const status = res.status;
             const contentType = (res.headers.get('content-type') || '').toLowerCase();
+            const proxyTrace = res.headers.get('x-proxy-route');
 
-            console.log(`[HB_LABEL_RES] Status: ${status} | Type: ${contentType}`);
+            console.log(`[HB_LABEL_RES] Status: ${status} | Type: ${contentType} | Trace: ${proxyTrace || 'no-hit'}`);
 
             if (res.ok) {
                 if (contentType.includes('pdf') || contentType === 'application/octet-stream') {
