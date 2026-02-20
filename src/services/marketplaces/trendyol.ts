@@ -161,9 +161,10 @@ export class TrendyolService implements IMarketplaceService {
         }
     }
 
-    async createCommonLabelRequest(shipmentPackageId: string, format: 'ZPL' | 'PDF' = 'ZPL'): Promise<{ success: boolean; error?: string }> {
+    async createCommonLabelRequest(shipmentPackageId: string, cargoTrackingNumber: string, format: 'ZPL' | 'PDF' = 'ZPL'): Promise<{ success: boolean; error?: string }> {
         try {
-            const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label`;
+            // OFFICIAL: POST /integration/sellers/{sellerId}/common-label/{cargoTrackingNumber}
+            const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/${cargoTrackingNumber}`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
@@ -171,8 +172,8 @@ export class TrendyolService implements IMarketplaceService {
                 method: 'POST',
                 headers: this.getHeaders(),
                 body: JSON.stringify({
-                    shipmentPackageIds: [parseInt(shipmentPackageId)],
-                    format
+                    format,
+                    boxQuantity: 1
                 })
             });
 
@@ -205,51 +206,53 @@ export class TrendyolService implements IMarketplaceService {
             const provider = (pkg.cargoProviderName || '').toLowerCase();
             const status = pkg.shipmentPackageStatus;
             let deliveryModel = pkg.deliveryModel;
+            const trackingNo = pkg.cargoTrackingNumber || cargoTrackingNumber;
 
             // FALLBACK: Trendyol API sometimes omits deliveryModel in order list.
-            // If the provider name includes 'marketplace' (e.g. "Aras Kargo Marketplace"), it is a Trendyol-Paid model.
             if (!deliveryModel && provider.includes('marketplace')) {
-                console.info(`[TRENDYOL-STRATEGY] deliveryModel is missing, inferred 'Trendyol-Paid' from carrier name: ${provider}`);
                 deliveryModel = 'Trendyol-Paid';
             }
 
-            console.log(`[TRENDYOL-STRATEGY] pkg=${shipmentPackageId}, status=${status}, carrier=${provider}, model=${deliveryModel}`);
+            console.log(`[TRENDYOL-STRATEGY] pkg=${shipmentPackageId}, trk=${trackingNo}, carrier=${provider}, model=${deliveryModel}`);
 
-            // 1. Trendyol Express Strategy
-            if (provider.includes('trendyol express')) {
-                return {
-                    status: 'REDIRECT_REQUIRED',
-                    message: "Trendyol Express (TEX) etiketleri güvenlik politikaları gereği API üzerinden alınamaz.",
-                    redirectUrl: `https://partner.trendyol.com/orders/all?orderNumber=${pkg.orderNumber}`
-                };
+            if (!trackingNo) {
+                return { status: 'FAILED', error: "Kargo takip numarası henüz oluşmamış. Lütfen önce siparişi onaylayıp kargo numarası oluşmasını bekleyin." };
             }
 
-            // 2. Common Label Eligibility (TEX/Aras + Trendyol Öder)
-            const isEligibleCarrier = provider.includes('tex') || provider.includes('aras');
+            // 1. Common Label Eligibility (TEX/Aras + Trendyol Öder)
+            // Doc says: TEX and Aras support Common Label if model is Trendyol-Paid.
+            const isEligibleCarrier = provider.includes('tex') || provider.includes('trendyol express') || provider.includes('aras');
             const isTrendyolPaid = deliveryModel === 'Trendyol-Paid';
 
             if (!isEligibleCarrier || !isTrendyolPaid) {
+                // If TEX but NOT Paid, redirect to panel.
+                if (provider.includes('tex') || provider.includes('trendyol express')) {
+                    return {
+                        status: 'REDIRECT_REQUIRED',
+                        message: "Bu Trendyol Express siparişi sistem tarafından API ile etiketlenemiyor. Lütfen panelden yazdırın.",
+                        redirectUrl: `https://partner.trendyol.com/orders/all?orderNumber=${pkg.orderNumber}`
+                    };
+                }
                 return {
                     status: 'FAILED',
-                    error: "Bu gönderi tipi (Carrier: " + provider + ", Model: " + deliveryModel + ") etiket API'sini desteklemiyor. Lütfen Trendyol panelini kullanın."
+                    error: "Bu gönderi tipi (Model: " + deliveryModel + ") etiket API'sini desteklemiyor. Lütfen Trendyol panelini kullanın."
                 };
             }
 
-            // 3. Common Label Flow
-            // a) Ensure Status
+            // 2. Common Label Flow
+            // a) Ensure Status (Recommended: Picking or Invoiced)
             if (status === 'Created') {
-                console.log(`[TRENDYOL-STRATEGY] Updating status from Created to Picking...`);
+                console.log(`[TRENDYOL-STRATEGY] Updating status to Picking...`);
                 await this.updateShipmentPackageStatus(shipmentPackageId, 'Picking');
-                // Give it a moment
                 await new Promise(r => setTimeout(r, 1000));
             }
 
-            // b) Trigger Label (ZPL)
-            console.log(`[TRENDYOL-STRATEGY] Triggering common label request...`);
-            await this.createCommonLabelRequest(shipmentPackageId, 'ZPL');
+            // b) Trigger Label (ZPL) - DOC: Use Tracking Number in URL
+            console.log(`[TRENDYOL-STRATEGY] Triggering common label for tracking: ${trackingNo}`);
+            await this.createCommonLabelRequest(shipmentPackageId, trackingNo, 'ZPL');
 
-            // c) Polling GET
-            const getUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label/${pkg.cargoTrackingNumber || cargoTrackingNumber}`;
+            // c) Polling GET - DOC: Use Tracking Number in URL
+            const getUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label/${trackingNo}`;
             const fetchGetUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(getUrl)}` : getUrl;
 
             const res = await fetch(fetchGetUrl, { headers: this.getHeaders({ 'Accept': 'application/json' }) });
