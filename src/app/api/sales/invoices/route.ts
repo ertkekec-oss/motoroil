@@ -70,7 +70,11 @@ export async function POST(request: Request) {
 
                 if (!invoice) return NextResponse.json({ success: false, error: 'Fatura bulunamadı' }, { status: 200 });
 
-                const settingsRecord = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
+                const settingsRecord = await prisma.appSettings.findUnique({
+                    where: {
+                        companyId_key: { companyId: invoice.companyId, key: 'eFaturaSettings' }
+                    }
+                });
                 const config = (settingsRecord?.value as any) || {};
 
                 // Initialize the new professional service
@@ -209,7 +213,11 @@ export async function POST(request: Request) {
                 const invoice = await (prisma as any).salesInvoice.findUnique({ where: { id: invoiceId } });
                 if (!invoice || !invoice.formalUuid) return NextResponse.json({ error: 'Fatura bulunamadı' }, { status: 404 });
 
-                const settingsRecord = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
+                const settingsRecord = await prisma.appSettings.findUnique({
+                    where: {
+                        companyId_key: { companyId: invoice.companyId, key: 'eFaturaSettings' }
+                    }
+                });
                 const config = (settingsRecord?.value as any) || {};
 
                 const formalType = invoice.formalType;
