@@ -161,6 +161,10 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [isConverting, setIsConverting] = useState(false);
 
+    // Invoice Share State
+    const [shareModalOpen, setShareModalOpen] = useState(false);
+    const [lastInvoice, setLastInvoice] = useState<any>(null);
+
     // Check Collection State
     const [showCheckCollectModal, setShowCheckCollectModal] = useState(false);
     const [activeCheck, setActiveCheck] = useState<any>(null);
@@ -459,8 +463,34 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             });
             const data = await res.json();
             if (data.success) {
-                showSuccess("Başarılı", "Resmi fatura başarıyla oluşturuldu.");
-                setInvoiceModalOpen(false);
+                // If it's formal, we need to call the "formal-send" action
+                if (invoiceData.isFormal) {
+                    try {
+                        const formalRes = await fetch('/api/sales/invoices', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'formal-send',
+                                invoiceId: data.invoice.id
+                            })
+                        });
+                        const formalData = await formalRes.json();
+                        if (formalData.success) {
+                            setLastInvoice({ ...data.invoice, ...formalData });
+                            setShareModalOpen(true);
+                            setInvoiceModalOpen(false);
+                            showSuccess("Başarılı", "Resmi fatura oluşturuldu ve GİB sistemine gönderildi.");
+                        } else {
+                            showError("Hata", "Fatura oluşturuldu ancak gönderilemedi: " + formalData.error);
+                        }
+                    } catch (err) {
+                        showError("Hata", "Gönderim sırasında hata oluştu.");
+                    }
+                } else {
+                    showSuccess("Başarılı", "Fatura başarıyla oluşturuldu.");
+                    setInvoiceModalOpen(false);
+                }
+
                 router.refresh();
                 // Refresh data
                 await Promise.all([refreshCustomers(), refreshTransactions()]);
@@ -1403,6 +1433,53 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </div>
                 )
             }
+
+
+            {/* INVOICE SUCCESS & SHARE MODAL */}
+            {shareModalOpen && lastInvoice && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(20px)' }}>
+                    <div className="card glass animate-in" style={{ width: '450px', padding: '40px', borderRadius: '32px', textAlign: 'center', border: '1px solid rgba(16, 185, 129, 0.4)', boxShadow: '0 0 50px rgba(16, 185, 129, 0.2)' }}>
+                        <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '50px', margin: '0 auto 24px' }}>✅</div>
+                        <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#fff', marginBottom: '8px' }}>Fatura Hazır!</h2>
+                        <p style={{ color: '#888', fontSize: '14px', marginBottom: '32px' }}>Resmi faturanız başarıyla oluşturuldu ve GİB sistemine iletildi.</p>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <button
+                                onClick={() => {
+                                    const msg = `Sayın ${customer.name}, ${lastInvoice.invoiceNo} numaralı faturanızı bu bağlantıdan görüntüleyebilirsiniz: https://www.kech.tr/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
+                                    window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
+                                }}
+                                className="btn btn-primary"
+                                style={{ background: '#25D366', border: 'none', height: '56px', borderRadius: '16px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                            >
+                                <span style={{ fontSize: '18px' }}>💬</span> WhatsApp ile Gönder
+                            </button>
+                            <button
+                                onClick={() => {
+                                    window.location.href = `mailto:${customer.email || ''}?subject=Faturanız Hazır - ${lastInvoice.invoiceNo}&body=Sayın ${customer.name}, %0D%0A%0D%0A${lastInvoice.invoiceNo} numaralı faturanız ekte yer almaktadır. %0D%0A%0D%0AFaturayı görüntülemek için tıkla: https://www.kech.tr/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
+                                }}
+                                className="btn btn-outline"
+                                style={{ height: '56px', borderRadius: '16px', fontWeight: 'bold', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                            >
+                                <span style={{ fontSize: '18px' }}>📧</span> E-Posta ile Gönder
+                            </button>
+                            <button
+                                onClick={() => window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`, '_blank')}
+                                style={{ marginTop: '12px', background: 'none', border: 'none', color: '#3b82f6', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', textDecoration: 'underline' }}
+                            >
+                                Faturayı PDF olarak Görüntüle
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={() => setShareModalOpen(false)}
+                            style={{ marginTop: '40px', width: '100%', padding: '16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}
+                        >
+                            Bilgilendirmeyi Kapat
+                        </button>
+                    </div>
+                </div>
+            )}
 
 
             {/* ADDITIONAL TAX MODAL */}
