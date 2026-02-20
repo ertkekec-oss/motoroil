@@ -1,6 +1,7 @@
 import { MarketplaceActionProvider } from "./types";
 import { TrendyolActionProvider } from "./providers/trendyol-actions";
 import { PazaramaActionProvider } from "./providers/pazarama-actions";
+import { HepsiburadaActionProvider } from "./providers/hepsiburada-actions";
 
 export class ActionProviderRegistry {
     static getProvider(marketplace: string): MarketplaceActionProvider {
@@ -11,6 +12,8 @@ export class ActionProviderRegistry {
                 return new TrendyolActionProvider();
             case "pazarama":
                 return new PazaramaActionProvider();
+            case "hepsiburada":
+                return new HepsiburadaActionProvider();
             default:
                 throw new Error(`Marketplace provider not found for: ${marketplace}`);
         }

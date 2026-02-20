@@ -186,7 +186,7 @@ export class TrendyolService implements IMarketplaceService {
                 // 1. Trigger by Tracking Number
                 if (cargoTrackingNumber) {
                     try {
-                        const triggerUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label/${cargoTrackingNumber}`;
+                        const triggerUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label/${cargoTrackingNumber}?format=PDF`;
                         const fetchTriggerUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(triggerUrl)}` : triggerUrl;
                         await fetch(fetchTriggerUrl, {
                             method: 'POST',
@@ -214,9 +214,21 @@ export class TrendyolService implements IMarketplaceService {
                         const fetchGetUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(getUrl)}` : getUrl;
                         const res = await fetch(fetchGetUrl, { headers: this.getHeaders({ 'Accept': 'application/json' }) });
 
-                        if (res.ok) {
-                            const body = await res.text();
-                            const trimmedBody = body.trim();
+                        const body = await res.text();
+                        const trimmedBody = body.trim();
+
+                        if (!res.ok) {
+                            console.warn(`[TRENDYOL-LABEL] Strategy A (Common) Failed: ${res.status} ${trimmedBody}`);
+                            let jsonError;
+                            try { jsonError = JSON.parse(trimmedBody); } catch { }
+                            if (jsonError?.error?.errors?.[0]?.type === 'COMMON_LABEL_NOT_ALLOWED') {
+                                return {
+                                    status: 'FAILED',
+                                    error: `Trendyol Yetki Hatası (Ortak Etiket): ${jsonError.error.errors[0].title || 'Yetkiniz bulunmamaktadır.'}`,
+                                    httpStatus: res.status
+                                };
+                            }
+                        } else {
                             let keys = '';
                             try { const json = JSON.parse(trimmedBody); keys = Object.keys(json).join(','); } catch { }
                             console.info(`[TRENDYOL-DIAG] Strategy A (Common) result: status=${res.status}, type=${res.headers.get('content-type')}, len=${trimmedBody.length}, keys=[${keys}], snippet="${trimmedBody.substring(0, 200).replace(/\n/g, ' ')}"`);
@@ -302,9 +314,13 @@ export class TrendyolService implements IMarketplaceService {
 
             // Final fallback logic
             const status = response.status;
-            if (status === 202 || status === 429 || status === 556 || (status >= 500 && status <= 504)) {
+            if (status === 202 || status === 429 || (status >= 500 && status <= 504)) {
                 console.info(`[TRENDYOL-LABEL] HTTP ${status} signal for async/busy. Returning PENDING.`);
                 return { status: 'PENDING', error: 'Trendyol servisi meşgul veya hazırlanıyor.', httpStatus: status };
+            }
+            if (status === 556 || status === 404 || status === 401) {
+                console.warn(`[TRENDYOL-LABEL] HTTP ${status} signal explicitly failing. API removed or unauthorized.`);
+                return { status: 'FAILED', error: 'Etiket API servisine ulaşılamıyor (Deprecated / Service Unavailable). Lütfen satıcı panelinden indirmeyi deneyin.', httpStatus: status };
             }
 
             // Check for unexpected HTML (Gateway errors)
@@ -355,7 +371,7 @@ export class TrendyolService implements IMarketplaceService {
         if (response.data && response.data.content && response.data.content.length > 0) {
             return response.data.content[0];
         }
-        
+
         throw new Error('Paket detayları Trendyol\'dan alınamadı.');
     }
 

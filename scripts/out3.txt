@@ -1,0 +1,24 @@
+
+--- GET (via Proxy) https://apigw.trendyol.com/integration/sellers/548512/labels/3625495794
+Status: 403
+Type: text/html
+BODY: <html>
+<head><title>403 Forbidden</title></head>
+<body>
+<center><h1>403 Forbidden</h1></center>
+<hr><center>nginx/1.24.0 (Ubuntu)</center>
+</body>
+</html>
+
+
+--- GET (via Proxy) https://apigw.trendyol.com/integration/sellers/548512/labels?shipmentPackageIds=3625495794
+Status: 403
+Type: text/html
+BODY: <html>
+<head><title>403 Forbidden</title></head>
+<body>
+<center><h1>403 Forbidden</h1></center>
+<hr><center>nginx/1.24.0 (Ubuntu)</center>
+</body>
+</html>
+

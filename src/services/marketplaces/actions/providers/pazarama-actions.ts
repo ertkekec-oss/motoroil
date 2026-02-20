@@ -18,7 +18,7 @@ export class PazaramaActionProvider implements MarketplaceActionProvider {
         const ctx = `[PAZARAMA-ACTION:${actionKey}][IDEMP:${idempotencyKey}]`;
 
         const lockKey = `lock:action:${idempotencyKey}`;
-        const acquired = await redisConnection.set(lockKey, 'BUSY', 'NX', 'EX', 60);
+        const acquired = await redisConnection.set(lockKey, 'BUSY', 'EX', 60, 'NX');
 
         if (!acquired) {
             const existingAudit = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
@@ -115,7 +115,8 @@ export class PazaramaActionProvider implements MarketplaceActionProvider {
                 data: { status: 'FAILED', errorMessage: error.message }
             });
 
-            return { status: "FAILED", errorMessage: error.message, errorCode: MarketplaceActionErrorCode.E_UNKNOWN };
+            const auditFailed = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
+            return { status: "FAILED", errorMessage: error.message, errorCode: MarketplaceActionErrorCode.E_UNKNOWN, auditId: auditFailed?.id };
         } finally {
             await redisConnection.del(lockKey);
         }

@@ -1,0 +1,4 @@
+
+GET https://apigw.trendyol.com/integration/sellers/548512/common-label/query?id=3625495794
+Status: 404 application/json
+BODY: {"error":{"status":404,"errors":[{"code":404,"type":"EXTERNAL_SERVICE_RETURNED_ERROR","title":"Shipment not found with documentId: 3,625,495,794"}]}}

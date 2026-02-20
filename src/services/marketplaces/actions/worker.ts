@@ -52,7 +52,7 @@ export const marketplaceWorker = new Worker(
             const service = MarketplaceServiceFactory.createService(
                 marketplace,
                 configData
-            ) as TrendyolService;
+            ) as any;
 
             let result: any = null;
 
@@ -81,7 +81,17 @@ export const marketplaceWorker = new Worker(
                 const shipmentPackageId = payload?.labelShipmentPackageId;
                 if (!shipmentPackageId) throw new Error('shipmentPackageId gerekli');
 
-                const pdfBase64 = await service.getCommonLabel(shipmentPackageId);
+                let pdfBase64: string | undefined;
+                if (marketplace === 'trendyol') {
+                    const labelRes = await service.getCommonLabel(shipmentPackageId);
+                    if (labelRes.status !== 'SUCCESS' || !labelRes.pdfBase64) throw new Error(labelRes.error || 'Etiket alınamadı');
+                    pdfBase64 = labelRes.pdfBase64;
+                } else {
+                    const labelRes = await service.getCargoLabel(shipmentPackageId);
+                    if (labelRes.error || !labelRes.pdfBase64) throw new Error(labelRes.error || 'Etiket alınamadı');
+                    pdfBase64 = labelRes.pdfBase64;
+                }
+
                 if (!pdfBase64) throw new Error('Etiket alınamadı');
 
                 const pdfBuffer = Buffer.from(pdfBase64, 'base64');

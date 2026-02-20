@@ -1,0 +1,10 @@
+
+--- GET https://apigw.trendyol.com/integration/order/sellers/548512/labels/3625495794
+Status: 401
+Type: null
+BODY: 
+
+--- GET https://apigw.trendyol.com/integration/order/sellers/548512/labels?shipmentPackageIds=3625495794
+Status: 401
+Type: null
+BODY: 

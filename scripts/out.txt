@@ -1,0 +1,10 @@
+Cargo Provider: Trendyol Express Marketplace
+Status: Shipped
+Tracking No: 7330030522861046
+
+Common Label Trigger: 556
+{"message":"Service Unavailable"}
+Common Label Get by Trek: 400
+{"error":{"status":400,"errors":[{"code":400,"type":"COMMON_LABEL_NOT_ALLOWED","title":"Bu servisi kullanmak için yetkiniz bulunmamaktadır. Kategori sorumlunuz ile iletişime geçiniz."}]}}
+Common Label Get by Pkg: 556
+{"message":"Service Unavailable"}

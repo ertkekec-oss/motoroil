@@ -131,6 +131,67 @@ export class HepsiburadaService implements IMarketplaceService {
         }
     }
 
+    async getCargoLabel(packageNumber: string): Promise<{ pdfBase64?: string; error?: string }> {
+        try {
+            const merchantId = (this.config.merchantId || '').trim();
+            // Referencing Hepsiburada API: /packages/merchantid/{merchantId}/packagenumber/{packagenumber}/labels?format=PDF
+            const url = `${this.baseUrl}/packages/merchantid/${merchantId}/packagenumber/${packageNumber}/labels?format=PDF`;
+
+            const headers: any = {
+                'Authorization': this.getAuthHeader(),
+                'User-Agent': (this.config.username || '').trim(),
+                'Accept': '*/*, application/pdf, application/json'
+            };
+
+            const proxyKey = this.getProxyKeyHeader();
+            if (proxyKey) {
+                headers['X-Periodya-Key'] = proxyKey;
+            }
+
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+
+            const res = await fetch(fetchUrl, { headers });
+
+            if (res.ok) {
+                const contentType = res.headers.get('content-type') || '';
+
+                if (contentType.toLowerCase().includes('pdf') || contentType === 'application/octet-stream') {
+                    const arrayBuffer = await res.arrayBuffer();
+                    const pdfBase64 = Buffer.from(arrayBuffer).toString('base64');
+                    return { pdfBase64 };
+                } else if (contentType.includes('json')) {
+                    const data = await res.json();
+
+                    // Possible properties if Hepsiburada wraps it in JSON
+                    if (data?.pdfData) return { pdfBase64: data.pdfData };
+                    if (data?.base64) return { pdfBase64: data.base64 };
+                    if (data?.data?.base64) return { pdfBase64: data.data.base64 };
+                    if (Array.isArray(data) && data[0]?.pdf) return { pdfBase64: data[0].pdf };
+                    if (data?.labels?.[0]?.pdf) return { pdfBase64: data.labels[0].pdf };
+
+                    return { error: 'Hepsiburada API JSON döndürdü fakat beklenen etiket verisi bulunamadı.' };
+                }
+
+                const buffer = await res.arrayBuffer();
+                const text = Buffer.from(buffer).toString('utf8');
+
+                // Fallback check if it's actually PDF binary stream without content-type
+                if (text.substring(0, 4) === '%PDF') {
+                    return { pdfBase64: Buffer.from(buffer).toString('base64') };
+                }
+
+                return { error: `Desteklenmeyen içerik tipi: ${contentType} - ${text.substring(0, 100)}` };
+            } else {
+                const text = await res.text();
+                return { error: `Hepsiburada Etiket API Hatası (${res.status}): ${text.substring(0, 200)}` };
+            }
+        } catch (err: any) {
+            console.error(`[HB_GET_LABEL_ERR] packageNumber: ${packageNumber}`, err);
+            return { error: err.message || 'Hepsiburada etiket bağlantısı sırasında bilinmeyen hata' };
+        }
+    }
+
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
         const allOrdersMap = new Map<string, MarketplaceOrder>();
 
