@@ -3,25 +3,29 @@ import { IMarketplaceService, MarketplaceOrder, HepsiburadaConfig } from './type
 export class HepsiburadaService implements IMarketplaceService {
     private config: HepsiburadaConfig;
     private baseUrl: string;
+    private targetHost: string;
 
     constructor(config: HepsiburadaConfig) {
         this.config = config;
-
+        const proxy = (process.env.MARKETPLACE_PROXY_URL || '').trim().replace(/\/$/, '');
         const isTest =
             this.config.isTest ||
             this.config.merchantId === '18c17301-9348-4937-b5c0-6912f54eb142';
 
-        this.baseUrl = isTest
-            ? 'https://oms-external-sit.hepsiburada.com'
-            : 'https://oms-external.hepsiburada.com';
+        this.targetHost = isTest
+            ? 'oms-external-sit.hepsiburada.com'
+            : 'oms-external.hepsiburada.com';
 
-        console.log(`[HB_INIT] baseUrl=${this.baseUrl}`);
-    }
+        if (proxy) {
+            // Option B: Reverse Proxy Mode (Path-based)
+            // This expects Nginx to handle SNI and Host properly for the path /hepsiburada
+            this.baseUrl = isTest ? `${proxy}/hepsiburada-sit` : `${proxy}/hepsiburada`;
+        } else {
+            // Option A: Direct Mode
+            this.baseUrl = `https://${this.targetHost}`;
+        }
 
-    private getFetchUrl(url: string): string {
-        const proxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
-        if (!proxy) return url;
-        return `${proxy.replace(/\/$/, '')}?url=${encodeURIComponent(url)}`;
+        console.log(`[HB_INIT] baseUrl=${this.baseUrl} | Target: ${this.targetHost}`);
     }
 
     private getAuthHeader(): string {
@@ -36,12 +40,11 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     private getHeaders(extra: Record<string, string> = {}): Record<string, string> {
-        const urlObj = new URL(this.baseUrl);
         const headers: any = {
             'Authorization': this.getAuthHeader(),
             'User-Agent': (this.config.username || 'Periodya-Integration').trim(),
             'Accept': 'application/json',
-            'Host': urlObj.host, // CRITICAL: Explicitly set Host to avoid 403 Forbidden host
+            'Host': this.targetHost, // CRITICAL: Explicitly set target Host
             ...extra
         };
 
@@ -66,27 +69,25 @@ export class HepsiburadaService implements IMarketplaceService {
         }
     }
 
-    private async safeFetchJson(url: string, options: any = {}): Promise<{ data: any; status: number }> {
-        const fetchUrl = this.getFetchUrl(url);
-        console.log(`[HB_FETCH_REQ] URL: ${url} | Proxy: ${fetchUrl.substring(0, 100)}...`);
+    private async safeFetchJson(url: string, options: any = {}): Promise<{ data: any; status: number; raw?: string }> {
+        console.log(`[HB_FETCH_REQ] URL: ${url}`);
 
-        const res = await fetch(fetchUrl, options);
+        const res = await fetch(url, options);
         const status = res.status;
         const text = await res.text();
         const trimmed = text.trim();
 
         if (!res.ok) {
             console.error(`[HB_FETCH_ERR] Status: ${status} | URL: ${url} | Res: ${trimmed.substring(0, 200)}`);
-            throw new Error(`HB API Hatası: ${status} - ${trimmed.substring(0, 500)}`);
+            return { data: null, status, raw: trimmed };
         }
 
         if (trimmed === 'OK') {
-            console.log(`[HB_PROXY] Received OK signal from proxy, retrying in 2s...`);
+            console.log(`[HB_PROXY] Received OK busy signal, retrying in 2s...`);
             await new Promise(r => setTimeout(r, 2000));
-            const res2 = await fetch(fetchUrl, options);
+            const res2 = await fetch(url, options);
             const text2 = await res2.text();
-            if (!res2.ok) throw new Error(`HB API Hatası (Retry): ${res2.status}`);
-            if (text2.trim() === 'OK') throw new Error(`HB Proxy meşgul (OK dönüyor). Lütfen birazdan tekrar deneyin.`);
+            if (!res2.ok) return { data: null, status: res2.status, raw: text2 };
             return { data: JSON.parse(text2), status: res2.status };
         }
 
@@ -94,7 +95,7 @@ export class HepsiburadaService implements IMarketplaceService {
             return { data: JSON.parse(trimmed), status };
         } catch (e: any) {
             console.error(`[HB_JSON_PARSE_ERR] Status: ${status} | URL: ${url} | Body: ${trimmed.substring(0, 100)}`);
-            throw new Error(`HB yanıtı okunamadı (JSON bekleniyordu).`);
+            return { data: null, status, raw: trimmed };
         }
     }
 
@@ -109,14 +110,11 @@ export class HepsiburadaService implements IMarketplaceService {
 
             console.log(`[HB_LABEL_REQ] URL: ${url}`);
 
-            const fetchUrl = this.getFetchUrl(url);
-            const res = await fetch(fetchUrl, { headers });
-
+            const res = await fetch(url, { headers });
             const status = res.status;
             const contentType = (res.headers.get('content-type') || '').toLowerCase();
-            const contentLength = res.headers.get('content-length');
 
-            console.log(`[HB_LABEL_RES] Status: ${status} | Type: ${contentType} | Length: ${contentLength}`);
+            console.log(`[HB_LABEL_RES] Status: ${status} | Type: ${contentType}`);
 
             if (res.ok) {
                 if (contentType.includes('pdf') || contentType === 'application/octet-stream') {
@@ -125,16 +123,10 @@ export class HepsiburadaService implements IMarketplaceService {
                     return { pdfBase64, status };
                 } else if (contentType.includes('json')) {
                     const data = await res.json();
-                    console.log(`[HB_LABEL_JSON] Snippet: ${JSON.stringify(data).substring(0, 200)}`);
-
                     if (data?.pdfData) return { pdfBase64: data.pdfData, status };
                     if (data?.base64) return { pdfBase64: data.base64, status };
-                    if (typeof data?.data === 'string' && data.data.length > 100) return { pdfBase64: data.data, status };
-                    if (data?.data?.base64) return { pdfBase64: data.data.base64, status };
-                    if (Array.isArray(data) && data[0]?.pdf) return { pdfBase64: data[0].pdf, status };
-                    if (data?.labels?.[0]?.pdf) return { pdfBase64: data.labels[0].pdf, status };
-
-                    return { error: 'HB JSON döndürdü fakat etiket verisi bulunamadı.', status };
+                    if (typeof data?.data === 'string' && data.data.length > 500) return { pdfBase64: data.data, status };
+                    return { error: 'HB JSON döndürdü fakat etiket bulunamadı.', status };
                 }
 
                 const buffer = await res.arrayBuffer();
@@ -142,12 +134,11 @@ export class HepsiburadaService implements IMarketplaceService {
                 if (text.substring(0, 4) === '%PDF') {
                     return { pdfBase64: Buffer.from(buffer).toString('base64'), status };
                 }
-
-                return { error: `Desteklenmeyen içerik: ${contentType} - ${text.substring(0, 100)}`, status };
+                return { error: `Desteklenmeyen içerik: ${contentType}`, status };
             } else {
                 const text = await res.text();
                 console.error(`[HB_LABEL_FAIL] Status: ${status} | URL: ${url} | Body: ${text.substring(0, 200)}`);
-                return { error: `Hepsiburada Etiket API Hatası (${status}): ${text.substring(0, 100)}`, status };
+                return { error: `HB API Hatası (${status}): ${text.substring(0, 100)}`, status };
             }
         } catch (err: any) {
             console.error(`[HB_LABEL_ERR] pkg: ${packageNumber}`, err);
@@ -209,9 +200,13 @@ export class HepsiburadaService implements IMarketplaceService {
 
                     const url = `${this.baseUrl}/${target.urlPart}?${qs.toString()}`;
                     const response = await this.safeFetchJson(url, { headers: this.getHeaders() });
+                    if (!response.data) {
+                        hasMore = false;
+                        break;
+                    }
+
                     const data = response.data;
                     let items: any[] = [];
-
                     if (Array.isArray(data)) items = data;
                     else if (data && typeof data === 'object') {
                         items = data.items || data.data || data.packages || data.orders || (data.id || data.orderNumber ? [data] : []);
@@ -247,6 +242,7 @@ export class HepsiburadaService implements IMarketplaceService {
             const merchantId = (this.config.merchantId || '').trim();
             const url = `${this.baseUrl}/orders/merchantid/${merchantId}/ordernumber/${orderNumber}`;
             const response = await this.safeFetchJson(url, { headers: this.getHeaders() });
+            if (!response.data) return null;
             return this.mapOrder(response.data, 'UNKNOWN');
         } catch (err) {
             console.error(`[HB_ORDER_ERR] ${orderNumber}:`, err);

@@ -66,28 +66,37 @@ export class HepsiburadaActionProvider implements MarketplaceActionProvider {
                 console.log(`${ctx} Attempting label fetch for: ${packageIdToFetch}`);
                 let labelResult = await service.getCargoLabel(packageIdToFetch);
 
-                // Fallback attempt: Only if first try failed AND we haven't already tried to resolve via order number
-                if ((labelResult.error || !labelResult.pdfBase64)) {
-                    // If we suspect the ID we just used might be an orderNumber instead of a packageNumber
-                    // (e.g. if it's the exact same as orderNumber and we got 404)
-                    const orderNo = order.orderNumber || packageIdToFetch;
-                    console.log(`${ctx} Primary fetch failed (Status: ${labelResult.status}). Trying to resolve real package number from order: ${orderNo}`);
+                // --- SMART FALLBACK LOGIC ---
+                // 1) If 403 Forbidden Host: Skip fallback, it's a proxy/SNI config issue.
+                if (labelResult.status === 403) {
+                    throw new Error(`Hepsiburada API 403 (Forbidden Host) hatası döndürdü. Lütfen sistem proxy Ayarlarını kontrol edin.`);
+                }
 
-                    const pkgData = await service.getPackageByOrderNumber(orderNo);
-                    if (pkgData) {
-                        const pkg = Array.isArray(pkgData) ? pkgData[0] : (pkgData.items?.[0] || pkgData.data?.[0] || pkgData);
-                        const realPkgNo = pkg?.packageNumber || pkg?.PackageNumber || pkg?.id || pkg?.Id;
+                // 2) If 404/400 or other data error: Try to resolve real package number from order number.
+                if (labelResult.error || !labelResult.pdfBase64) {
+                    const status = labelResult.status;
+                    const canResolve = status === 404 || status === 400 || !status;
 
-                        if (realPkgNo && String(realPkgNo) !== String(packageIdToFetch)) {
-                            console.log(`${ctx} Resolved real package number: ${realPkgNo}. Fetching label again...`);
-                            packageIdToFetch = String(realPkgNo);
-                            labelResult = await service.getCargoLabel(packageIdToFetch);
+                    if (canResolve) {
+                        const orderNo = order.orderNumber || packageIdToFetch;
+                        console.log(`${ctx} fetch failed (Status: ${status}). Attempting to resolve via order: ${orderNo}`);
+
+                        const pkgData = await service.getPackageByOrderNumber(orderNo);
+                        if (pkgData) {
+                            const pkg = Array.isArray(pkgData) ? pkgData[0] : (pkgData.items?.[0] || pkgData.data?.[0] || pkgData);
+                            const realPkgNo = pkg?.packageNumber || pkg?.PackageNumber || pkg?.id || pkg?.Id;
+
+                            if (realPkgNo && String(realPkgNo) !== String(packageIdToFetch)) {
+                                console.log(`${ctx} Resolved real package number: ${realPkgNo}. Fetching again...`);
+                                packageIdToFetch = String(realPkgNo);
+                                labelResult = await service.getCargoLabel(packageIdToFetch);
+                            }
                         }
                     }
                 }
 
                 if (labelResult.error) {
-                    throw new Error(`Hepsiburada API Hatası: ${labelResult.error} (Status: ${labelResult.status})`);
+                    throw new Error(`HB API Hatası (HTTP ${labelResult.status || '??'}): ${labelResult.error}`);
                 }
                 if (!labelResult.pdfBase64) throw new Error('Etiket verisi boş');
 
