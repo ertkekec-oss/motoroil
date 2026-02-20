@@ -148,10 +148,9 @@ export class HepsiburadaService implements IMarketplaceService {
                 headers['X-Periodya-Key'] = proxyKey;
             }
 
-            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
-            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+            console.log(`[HB_LABEL_FETCH] URL: ${url}`);
 
-            const res = await fetch(fetchUrl, { headers });
+            const res = await fetch(url, { headers });
 
             if (res.ok) {
                 const contentType = res.headers.get('content-type') || '';
