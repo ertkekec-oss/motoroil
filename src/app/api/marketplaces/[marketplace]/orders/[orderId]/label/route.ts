@@ -106,18 +106,6 @@ export async function GET(
             payload: { labelShipmentPackageId: shipmentPackageId },
         });
 
-        if (result.status === "SUCCESS" && result.result?.status === "REDIRECT_REQUIRED") {
-            console.log(`${ctx} Execution REDIRECT_REQUIRED. Responding with redirect UI.`);
-            if (isDocumentRequest(request)) {
-                return respondWith(new Response(redirectHtml(result.result.message, result.result.redirectUrl), {
-                    status: 200, headers: { "Content-Type": "text/html; charset=utf-8" }
-                }));
-            }
-            return respondWith(new Response(JSON.stringify(result.result), {
-                status: 200, headers: { "Content-Type": "application/json" }
-            }));
-        }
-
         // 4) Handle Result
         if (result.status === "SUCCESS" && result.result?.storageKey) {
             console.log(`${ctx} Execution SUCCESS. Responding with success.`);
@@ -194,36 +182,7 @@ function pendingHtml(retryAfterSec: number, message: string) {
     <h2>Etiket Hazırlanıyor…</h2>
     <p class="muted">${retryAfterSec} saniye sonra sistem otomatik olarak kontrol edilecek.</p>
     <div class="status-badge">${message}</div>
-    <p class="muted" style="margin-top: 1rem; font-size: 0.8rem;">PDF oluşturulduğunda bu sayfa otomatik olarak açılacaktır.<br/>Lütfen bu sekmeyi kapatmayın.</p>
-  </div>
-</body>
-</html>`;
-}
-
-function redirectHtml(message: string, url: string) {
-    return `<!doctype html>
-<html lang="tr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Panel'e Yönlendiriliyor...</title>
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto; padding: 0; margin: 0; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
-    .card { max-width: 480px; padding: 2.5rem; border-radius: 1.5rem; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-    .icon { font-size: 3rem; margin-bottom: 1.5rem; }
-    h2 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 600; color: #f8fafc; }
-    p { color: #94a3b8; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem; }
-    .btn { display: inline-block; padding: 0.8rem 1.5rem; background: #ea580c; color: white; text-decoration: none; border-radius: 0.75rem; font-weight: 600; transition: all 0.2s; box-shadow: 0 10px 15px -3px rgba(234, 88, 12, 0.3); }
-    .btn:hover { background: #f97316; transform: translateY(-2px); }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="icon">📦</div>
-    <h2>Etiket Yazdırma</h2>
-    <p>${message}</p>
-    <a href="${url}" target="_blank" class="btn">Trendyol Panelinde Aç</a>
-    <p style="margin-top: 1.5rem; font-size: 0.8rem; color: #64748b;">Güvenlik nedeniyle bazı kargo etiketleri sadece Trendyol panelinden yazdırılabilir.</p>
+    <p class="muted" style="margin-top: 1.5rem; font-size: 0.8rem;">PDF oluşturulduğunda bu sayfa otomatik olarak açılacaktır.<br/>Lütfen bu sekmeyi kapatmayın.</p>
   </div>
 </body>
 </html>`;

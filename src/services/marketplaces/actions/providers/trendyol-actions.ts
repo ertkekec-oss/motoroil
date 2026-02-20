@@ -86,22 +86,6 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                     return { status: "PENDING", auditId: audit.id, httpStatus: labelResult.httpStatus, errorMessage: labelResult.error };
                 }
 
-                if (labelResult.status === 'REDIRECT_REQUIRED') {
-                    console.info(`${ctx} Strategy: REDIRECT_REQUIRED. Msg: ${labelResult.message}`);
-                    result = {
-                        status: 'REDIRECT_REQUIRED',
-                        message: labelResult.message,
-                        redirectUrl: labelResult.redirectUrl,
-                        shipmentPackageId
-                    };
-                    // Update and return early
-                    await (prisma as any).marketplaceActionAudit.update({
-                        where: { id: audit.id },
-                        data: { status: 'SUCCESS', responsePayload: result, errorMessage: null }
-                    });
-                    metrics.externalCall(marketplace, actionKey, 'SUCCESS');
-                    return { status: "SUCCESS", auditId: audit.id, result };
-                }
 
                 if (labelResult.status === 'FAILED') {
                     throw new Error(labelResult.error || 'Etiket alınamadı');
