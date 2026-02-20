@@ -37,9 +37,9 @@ export async function GET(request: Request) {
                 const config = (settingsRecord?.value as any) || {};
 
                 const formalType = invoice.formalType;
-                let module = 'earchive';
-                if (formalType === 'EFATURA') module = 'einvoice';
-                if (formalType === 'EIRSALIYE') module = 'edespatch';
+                let module = 'EArchive';
+                if (formalType === 'EFATURA') module = 'EInvoice';
+                if (formalType === 'EIRSALIYE') module = 'EDespatch';
 
                 const baseUrl = (config.environment?.toLowerCase() === 'production') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
                 const endpoint = `${baseUrl}/${module}/Download/${invoice.formalUuid}/PDF`;
@@ -215,7 +215,32 @@ export async function POST(request: Request) {
                 }
 
                 if (sendResult.success) {
-                    const formalId = sendResult.data?.UUID || sendResult.data?.formalId || sendResult.data?.Id || sendResult.data?.DespatchNumber;
+                    const rawData = sendResult.data;
+                    console.log('[Formal Send] Success Data:', JSON.stringify(rawData));
+
+                    // Smart ID Extraction (Nilvera responses can vary)
+                    let formalId = null;
+
+                    // If it's an array, take the first element
+                    const dataObj = Array.isArray(rawData) ? rawData[0] : rawData;
+
+                    // Check various potential ID fields
+                    formalId = dataObj?.UUID ||
+                        dataObj?.formalId ||
+                        dataObj?.Id ||
+                        dataObj?.DespatchNumber ||
+                        dataObj?.InvoiceNumber ||
+                        dataObj?.Content?.UUID ||
+                        dataObj?.Content?.InvoiceNumber;
+
+                    if (!formalId) {
+                        console.error('[Formal Send] Could not extract ID from response:', rawData);
+                        return NextResponse.json({
+                            success: false,
+                            error: "Fatura gönderildi ancak sistem ID'si alınamadı. Lütfen entegrasyon panelinden kontrol edin.",
+                            details: JSON.stringify(rawData)
+                        });
+                    }
 
                     await (prisma as any).salesInvoice.update({
                         where: { id: invoiceId },
@@ -231,7 +256,8 @@ export async function POST(request: Request) {
                         success: true,
                         message: `${sendResult.type === 'EIRSALIYE' ? 'İrsaliye' : 'Fatura'} başarıyla gönderildi.`,
                         formalId: formalId,
-                        type: sendResult.type
+                        type: sendResult.type,
+                        invoice: { id: invoiceId, invoiceNo: invoice.invoiceNo } // Return enough info for the share link
                     });
                 }
 
