@@ -478,15 +478,15 @@ export class NilveraInvoiceService {
     async createArchiveReport(uuid: string) {
         try {
             console.log(`[NilveraService] Creating E-Archive Report for UUID: ${uuid}`);
-            const res = await axios.post(`${this.config.baseUrl}/EArchive/Send/Report`, {
-                Invoices: [uuid]
+            const res = await axios.post(`${this.config.baseUrl}/EArchive/Report/Create`, {
+                invoiceUuids: [uuid]
             }, {
                 headers: this.getHeaders(),
                 validateStatus: () => true
             });
 
             if (res.status >= 400) {
-                console.warn("[NilveraService] Report Creation Failed/Queued:", res.data);
+                console.warn("[NilveraService] Report Creation Response:", res.status, res.data);
                 return { success: false, status: res.status, error: JSON.stringify(res.data) };
             }
 
