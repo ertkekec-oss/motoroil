@@ -177,7 +177,7 @@ const prismaClientSingleton = () => {
                     }
 
                     // PUBLIC ACCESS (No session)
-                    if (['user', 'staff', 'tenant', 'plan', 'company', 'subscription', 'loginattempt'].includes(modelName)) {
+                    if (['user', 'staff', 'tenant', 'plan', 'company', 'subscription', 'loginattempt', 'salesinvoice'].includes(modelName)) {
                         if (['findUnique', 'findFirst', 'findMany', 'create', 'update', 'count'].includes(operation)) {
                             return query(args);
                         }
