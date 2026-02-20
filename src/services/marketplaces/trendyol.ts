@@ -204,7 +204,14 @@ export class TrendyolService implements IMarketplaceService {
             const pkg = await this.getShipmentPackageDetails(shipmentPackageId);
             const provider = (pkg.cargoProviderName || '').toLowerCase();
             const status = pkg.shipmentPackageStatus;
-            const deliveryModel = pkg.deliveryModel;
+            let deliveryModel = pkg.deliveryModel;
+
+            // FALLBACK: Trendyol API sometimes omits deliveryModel in order list.
+            // If the provider name includes 'marketplace' (e.g. "Aras Kargo Marketplace"), it is a Trendyol-Paid model.
+            if (!deliveryModel && provider.includes('marketplace')) {
+                console.info(`[TRENDYOL-STRATEGY] deliveryModel is missing, inferred 'Trendyol-Paid' from carrier name: ${provider}`);
+                deliveryModel = 'Trendyol-Paid';
+            }
 
             console.log(`[TRENDYOL-STRATEGY] pkg=${shipmentPackageId}, status=${status}, carrier=${provider}, model=${deliveryModel}`);
 
