@@ -43,6 +43,7 @@ export async function POST(request: Request) {
 
             const invoice = await tx.salesInvoice.create({
                 data: {
+                    companyId: order.companyId,
                     invoiceNo: invoiceNo || `INV-${Date.now()}`,
                     customerId: customerId,
                     amount: subtotal - discAmount,
@@ -124,6 +125,7 @@ export async function POST(request: Request) {
                                 // 1. Create Expense Transaction
                                 await tx.transaction.create({
                                     data: {
+                                        companyId: order.companyId,
                                         type: 'Expense',
                                         amount: commissionAmount,
                                         description: `Banka POS Komisyon Gideri (${commissionConfig.installment}) - Sipariş (Fatura): ${order.orderNumber}`,
