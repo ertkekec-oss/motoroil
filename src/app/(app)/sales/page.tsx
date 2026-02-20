@@ -671,8 +671,8 @@ export default function SalesPage() {
         setIsLoadingLabel(orderId);
 
         try {
-            if (marketplace !== 'Trendyol') {
-                showError('Hata', `❌ Hata: Şu anda sadece Trendyol etiketleri destekleniyor.\n\nPlatform: ${marketplace}`);
+            if (!['Trendyol', 'N11'].includes(marketplace)) {
+                showError('Hata', `❌ Hata: Şu anda sadece Trendyol ve N11 etiketleri destekleniyor.\n\nPlatform: ${marketplace}`);
                 setIsLoadingLabel(null);
                 return;
             }

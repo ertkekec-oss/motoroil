@@ -463,12 +463,12 @@ export function OnlineOrdersTab({
                                                                 actionKey="REFRESH_STATUS"
                                                                 onSuccess={fetchOnlineOrders}
                                                             />
-                                                            {['trendyol', 'hepsiburada', 'pazarama'].includes(o.marketplace?.toLowerCase() || '') && (
+                                                            {['trendyol', 'hepsiburada', 'pazarama', 'n11'].includes(o.marketplace?.toLowerCase() || '') && (
                                                                 <MarketplaceActionButton
                                                                     orderId={o.id}
                                                                     marketplace={o.marketplace}
                                                                     actionKey="PRINT_LABEL_A4"
-                                                                    shipmentPackageId={o.shipmentPackageId || (['hepsiburada', 'pazarama'].includes(o.marketplace?.toLowerCase() || '') ? o.orderNumber : undefined)}
+                                                                    shipmentPackageId={o.shipmentPackageId || (['hepsiburada', 'pazarama', 'n11'].includes(o.marketplace?.toLowerCase() || '') ? o.orderNumber : undefined)}
                                                                 />
                                                             )}
                                                             {o.marketplace?.toLowerCase() === 'trendyol' && (

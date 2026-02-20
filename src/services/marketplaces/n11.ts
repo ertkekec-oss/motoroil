@@ -95,6 +95,55 @@ export class N11Service implements IMarketplaceService {
         }
     }
 
+    async getCargoLabel(packageId: string): Promise<{ pdfBase64?: string; error?: string; status?: number }> {
+        const url = `${this.baseUrl}/shipmentPackages/${packageId}/label`;
+        try {
+            console.log(`[N11_LABEL_REQ] URL: ${url}`);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'appkey': this.config.apiKey,
+                    'appsecret': this.config.apiSecret,
+                    'Accept': 'application/pdf'
+                }
+            });
+
+            const status = response.status;
+            if (!response.ok) {
+                const text = await response.text();
+                console.error(`[N11_LABEL_ERR] Status: ${status} | URL: ${url} | Res: ${text.substring(0, 200)}`);
+                return { error: `N11 Etiket Hatası (${status}): ${text}`, status };
+            }
+
+            const buffer = await response.arrayBuffer();
+            const pdfBase64 = Buffer.from(buffer).toString('base64');
+            console.log(`[N11_LABEL_SUCCESS] pkg: ${packageId} | buffer: ${buffer.byteLength} bytes`);
+            return { pdfBase64, status };
+        } catch (error: any) {
+            console.error(`[N11_LABEL_CRITICAL_ERR] pkg: ${packageId}:`, error);
+            return { error: error.message || 'N11 etiket bağlantı hatası' };
+        }
+    }
+
+    async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
+        try {
+            // N11 REST API lets we query by orderNumber in shipmentPackages
+            const result = await this.makeRequest('shipmentPackages', {
+                orderNumber: orderNumber,
+                page: '0',
+                size: '1'
+            });
+
+            if (result?.content && Array.isArray(result.content) && result.content.length > 0) {
+                return this.mapOrder(result.content[0]);
+            }
+            return null;
+        } catch (error) {
+            console.error(`N11 getOrderByNumber error [${orderNumber}]:`, error);
+            return null;
+        }
+    }
+
     private mapOrder(n11Pkg: any): MarketplaceOrder {
         if (!n11Pkg || !n11Pkg.id) return null as any;
 
@@ -110,6 +159,7 @@ export class N11Service implements IMarketplaceService {
         return {
             id: n11Pkg.id.toString(),
             orderNumber: n11Pkg.orderNumber,
+            shipmentPackageId: n11Pkg.id.toString(), // CRITICAL: Mapping to n11Pkg.id
             customerName: n11Pkg.customerfullName || n11Pkg.billingAddress?.fullName || 'Misafir',
             customerEmail: n11Pkg.customerEmail || '',
             orderDate: orderDate,

@@ -23,7 +23,7 @@ export interface MarketplaceActionResult {
 
 export interface MarketplaceActionInput {
     companyId: string;
-    marketplace: "trendyol" | "hepsiburada" | "n11";
+    marketplace: "trendyol" | "hepsiburada" | "n11" | "pazarama";
     orderId: string;
     actionKey: MarketplaceActionKey;
     idempotencyKey: string;
