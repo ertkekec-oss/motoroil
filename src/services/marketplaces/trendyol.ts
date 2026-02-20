@@ -161,28 +161,29 @@ export class TrendyolService implements IMarketplaceService {
         }
     }
 
-    async createCommonLabelRequest(shipmentPackageId: string, cargoTrackingNumber: string, format: 'ZPL' | 'PDF' = 'ZPL'): Promise<{ success: boolean; error?: string }> {
+    async createCommonLabelRequest(shipmentPackageId: string, cargoTrackingNumber: string, format: 'ZPL' | 'PDF' = 'ZPL'): Promise<{ success: boolean; status?: number; body?: string; error?: string }> {
         try {
-            // OFFICIAL: POST /integration/sellers/{sellerId}/common-label/{cargoTrackingNumber}
             const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/${cargoTrackingNumber}`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+            const body = JSON.stringify({ format, boxQuantity: 1 });
+
+            console.log(`[TRENDYOL-DEBUG] POST Request: ${url} | Body: ${body}`);
 
             const response = await fetch(fetchUrl, {
                 method: 'POST',
                 headers: this.getHeaders(),
-                body: JSON.stringify({
-                    format,
-                    boxQuantity: 1
-                })
+                body
             });
 
+            const responseText = await response.text();
+            console.log(`[TRENDYOL-DEBUG] POST Response: ${response.status} | Body Snippet: ${responseText.substring(0, 200)}`);
+
             if (!response.ok) {
-                const errorText = await response.text();
-                return { success: false, error: errorText };
+                return { success: false, status: response.status, body: responseText, error: responseText };
             }
 
-            return { success: true };
+            return { success: true, status: response.status, body: responseText };
         } catch (error: any) {
             console.error('Trendyol common-label request error:', error);
             return { success: false, error: error.message };
@@ -208,71 +209,77 @@ export class TrendyolService implements IMarketplaceService {
             let deliveryModel = pkg.deliveryModel;
             const trackingNo = pkg.cargoTrackingNumber || cargoTrackingNumber;
 
-            // FALLBACK: Trendyol API sometimes omits deliveryModel in order list.
-            if (!deliveryModel && provider.includes('marketplace')) {
-                deliveryModel = 'Trendyol-Paid';
-            }
-
-            console.log(`[TRENDYOL-STRATEGY] pkg=${shipmentPackageId}, trk=${trackingNo}, carrier=${provider}, model=${deliveryModel}`);
+            // Debug initial state
+            console.log(`[TRENDYOL-STRATEGY] pkg=${shipmentPackageId}, trk=${trackingNo}, carrier="${provider}", model="${deliveryModel || 'unknown'}", status="${status}"`);
 
             if (!trackingNo) {
                 return { status: 'FAILED', error: "Kargo takip numarası henüz oluşmamış. Lütfen önce siparişi onaylayıp kargo numarası oluşmasını bekleyin." };
             }
 
-            // 1. Common Label Eligibility (TEX/Aras + Trendyol Öder)
-            // Doc says: TEX and Aras support Common Label if model is Trendyol-Paid.
-            const isEligibleCarrier = provider.includes('tex') || provider.includes('trendyol express') || provider.includes('aras');
-            const isTrendyolPaid = deliveryModel === 'Trendyol-Paid';
+            // Decision Grid (Based on Doc)
+            const isTEX = provider.includes('tex') || provider.includes('trendyol express');
+            const isAras = provider.includes('aras');
+            // If model is missing but carrier contains "marketplace", it is VERY likely Trendyol-Paid
+            const isLikelyPaid = deliveryModel === 'Trendyol-Paid' || (provider.includes('marketplace') && !deliveryModel);
 
-            if (!isEligibleCarrier || !isTrendyolPaid) {
-                // If TEX but NOT Paid, redirect to panel.
-                if (provider.includes('tex') || provider.includes('trendyol express')) {
-                    return {
-                        status: 'REDIRECT_REQUIRED',
-                        message: "Bu Trendyol Express siparişi sistem tarafından API ile etiketlenemiyor. Lütfen panelden yazdırın.",
-                        redirectUrl: `https://partner.trendyol.com/orders/all?orderNumber=${pkg.orderNumber}`
-                    };
-                }
+            // If carrier is not eligible OR it is explicitly "Satıcı Öder", fallback to Panel
+            if ((!isTEX && !isAras) || (deliveryModel && deliveryModel !== 'Trendyol-Paid')) {
                 return {
-                    status: 'FAILED',
-                    error: "Bu gönderi tipi (Model: " + deliveryModel + ") etiket API'sini desteklemiyor. Lütfen Trendyol panelini kullanın."
+                    status: 'REDIRECT_REQUIRED',
+                    message: `Bu gönderi tipi (Kargo: ${provider}, Model: ${deliveryModel || 'Harici'}) sistem üzerinden etiketlenemiyor. Lütfen panelden yazdırın.`,
+                    redirectUrl: `https://partner.trendyol.com/orders/all?orderNumber=${pkg.orderNumber}`
                 };
             }
 
-            // 2. Common Label Flow
-            // a) Ensure Status (Recommended: Picking or Invoiced)
+            // --- COMMON LABEL FLOW ---
+
+            // a) Ensure Status (Recommended: Picking)
             if (status === 'Created') {
-                console.log(`[TRENDYOL-STRATEGY] Updating status to Picking...`);
+                console.log(`[TRENDYOL-STRATEGY] Promoting status to Picking...`);
                 await this.updateShipmentPackageStatus(shipmentPackageId, 'Picking');
-                await new Promise(r => setTimeout(r, 1000));
             }
 
-            // b) Trigger Label (ZPL) - DOC: Use Tracking Number in URL
-            console.log(`[TRENDYOL-STRATEGY] Triggering common label for tracking: ${trackingNo}`);
-            await this.createCommonLabelRequest(shipmentPackageId, trackingNo, 'ZPL');
+            // b) Trigger Label (POST)
+            const triggerRes = await this.createCommonLabelRequest(shipmentPackageId, trackingNo, 'ZPL');
 
-            // c) Polling GET - DOC: Use Tracking Number in URL
+            // If POST fails with 400 NOT_ALLOWED, redirect immediately
+            if (!triggerRes.success && triggerRes.status === 400 && triggerRes.body?.includes('COMMON_LABEL_NOT_ALLOWED')) {
+                console.log(`[TRENDYOL-STRATEGY] POST returned NOT_ALLOWED. Redirecting...`);
+                return {
+                    status: 'REDIRECT_REQUIRED',
+                    message: "Bu paket ortak barkod sürecine dahil değil. Lütfen panel üzerinden yazdırın.",
+                    redirectUrl: `https://partner.trendyol.com/orders/all?orderNumber=${pkg.orderNumber}`
+                };
+            }
+
+            // c) Retrieval (GET)
             const getUrl = `${this.baseUrl}/integration/sellers/${supplierId}/common-label/${trackingNo}`;
             const fetchGetUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(getUrl)}` : getUrl;
 
+            console.log(`[TRENDYOL-DEBUG] GET Request: ${getUrl}`);
             const res = await fetch(fetchGetUrl, { headers: this.getHeaders({ 'Accept': 'application/json' }) });
             const body = await res.text();
+            console.log(`[TRENDYOL-DEBUG] GET Response: ${res.status} | Body Snippet: ${body.substring(0, 100)}`);
 
             if (res.ok && body.trim() !== 'OK') {
-                const json = JSON.parse(body);
-                const labelData = json.data?.[0];
-                if (labelData?.label) {
-                    if (labelData.format === 'ZPL') {
-                        console.log(`[TRENDYOL-STRATEGY] Converting ZPL to PDF...`);
-                        const pdfBuf = await this.convertZplToPdf(labelData.label);
-                        if (pdfBuf) return { status: 'SUCCESS', pdfBase64: pdfBuf.toString('base64'), httpStatus: 200 };
-                    } else if (labelData.format === 'PDF') {
-                        return { status: 'SUCCESS', pdfBase64: labelData.label, httpStatus: 200 };
+                try {
+                    const json = JSON.parse(body);
+                    const labelData = json.data?.[0];
+                    if (labelData?.label) {
+                        if (labelData.format === 'ZPL') {
+                            console.log(`[TRENDYOL-STRATEGY] Converting ZPL to PDF...`);
+                            const pdfBuf = await this.convertZplToPdf(labelData.label);
+                            if (pdfBuf) return { status: 'SUCCESS', pdfBase64: pdfBuf.toString('base64'), httpStatus: 200 };
+                        } else if (labelData.format === 'PDF') {
+                            return { status: 'SUCCESS', pdfBase64: labelData.label, httpStatus: 200 };
+                        }
                     }
+                } catch (e) {
+                    console.error("[TRENDYOL-LABEL-PARSE-ERR]", e);
                 }
             }
 
-            // d) Handle 400 COMMON_LABEL_NOT_ALLOWED
+            // d) Handle 400 COMMON_LABEL_NOT_ALLOWED in GET
             if (res.status === 400 && body.includes('COMMON_LABEL_NOT_ALLOWED')) {
                 return {
                     status: 'REDIRECT_REQUIRED',
@@ -281,7 +288,12 @@ export class TrendyolService implements IMarketplaceService {
                 };
             }
 
-            return { status: 'PENDING', message: "Etiket Trendyol tarafından hazırlanıyor...", httpStatus: res.status, raw: body };
+            return {
+                status: 'PENDING',
+                message: "Etiket Trendyol tarafından hazırlanıyor... (Yaklaşık 15 dk sürebilir)",
+                httpStatus: res.status,
+                raw: body
+            };
 
         } catch (error: any) {
             console.error(`[TRENDYOL-STRATEGY-ERR]`, error);
