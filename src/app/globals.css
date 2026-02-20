@@ -172,7 +172,7 @@ body:has([data-pos-theme="light"]) {
   box-shadow: 0 4px 12px rgba(255, 85, 0, 0.2) !important;
 }
 
-/* Secondary Action Buttons (Amber - Suspend) */
+/* Secondary Action Buttons (Amber - Suspend / Waiting) */
 [data-pos-theme="light"] .bg-amber-500\/10 {
   background: #F59E0B !important;
   color: white !important;
@@ -180,8 +180,21 @@ body:has([data-pos-theme="light"]) {
   opacity: 1 !important;
 }
 
+[data-pos-theme="light"] .bg-amber-500\/10 div,
+[data-pos-theme="light"] .bg-amber-500\/10 span {
+  color: white !important;
+  opacity: 1 !important;
+}
+
 [data-pos-theme="light"] .bg-amber-500\/10:hover {
   background: #D97706 !important;
+}
+
+/* Ensure other status badges (Critical/Transit) follow suit for consistency if needed */
+[data-pos-theme="light"] .bg-red-500\/10,
+[data-pos-theme="light"] .bg-blue-500\/10 {
+  background: white !important;
+  border-color: var(--border-pos) !important;
 }
 
 [data-pos-theme="light"] .bg-white\/10.border-white\/5.text-white\/30 {
