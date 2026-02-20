@@ -41,7 +41,7 @@ export async function GET(request: Request) {
                 if (formalType === 'EFATURA') module = 'einvoice';
                 if (formalType === 'EIRSALIYE') module = 'edespatch';
 
-                const baseUrl = config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
+                const baseUrl = (config.environment?.toLowerCase() === 'production') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
                 const endpoint = `${baseUrl}/${module}/Download/${invoice.formalUuid}/PDF`;
 
                 const pdfResponse = await axios.get(endpoint, {
@@ -127,7 +127,7 @@ export async function POST(request: Request) {
                 // Initialize the new professional service
                 const nilveraService = new NilveraInvoiceService({
                     apiKey: config.apiKey,
-                    baseUrl: config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com'
+                    baseUrl: (config.environment?.toLowerCase() === 'production') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com'
                 });
 
                 // Prepare Data
