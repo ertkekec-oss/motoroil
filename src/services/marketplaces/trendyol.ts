@@ -7,8 +7,9 @@ export class TrendyolService implements IMarketplaceService {
     constructor(config: TrendyolConfig) {
         this.config = config;
         // OFFICIAL: Using apigw.trendyol.com per developer docs
+        // Recommendation: Use stageapigw for test
         this.baseUrl = config.isTest
-            ? 'https://stageapi.trendyol.com'
+            ? 'https://stageapigw.trendyol.com'
             : 'https://apigw.trendyol.com';
     }
 
@@ -80,6 +81,7 @@ export class TrendyolService implements IMarketplaceService {
         const headers: any = {
             'Authorization': this.getAuthHeader(),
             'User-Agent': `${this.config.supplierId} - SelfIntegration`,
+            'x-agentname': `${this.config.supplierId} - SelfIntegration`, // Mandatory per some Trendyol docs
             'Accept': 'application/json, application/pdf', // Default to both
             'Content-Type': 'application/json',
             ...extra
@@ -95,8 +97,8 @@ export class TrendyolService implements IMarketplaceService {
 
     async validateConnection(): Promise<boolean> {
         try {
-            // Updated to apigw structure
-            const url = `${this.baseUrl}/sapigw/suppliers/${this.config.supplierId}/orders?size=1`;
+            // Updated to recommended V2 endpoint
+            const url = `${this.baseUrl}/integration/order/sellers/${this.config.supplierId}/orders?size=1`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
@@ -113,7 +115,8 @@ export class TrendyolService implements IMarketplaceService {
 
     async updateCargoProvider(shipmentPackageId: string, cargoProviderCode: string): Promise<{ success: boolean; error?: string }> {
         try {
-            const url = `${this.baseUrl}/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/carriages`;
+            // Updated to V2 endpoint: /integration/order/sellers/{sellerId}/shipment-packages/{packageId}/cargo-providers
+            const url = `${this.baseUrl}/integration/order/sellers/${this.config.supplierId}/shipment-packages/${shipmentPackageId}/cargo-providers`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
@@ -340,7 +343,8 @@ export class TrendyolService implements IMarketplaceService {
     }
 
     private async getShipmentPackageDetails(shipmentPackageId: string): Promise<any> {
-        const url = `${this.baseUrl}/sapigw/suppliers/${this.config.supplierId}/shipment-packages/${shipmentPackageId}`;
+        // Updated to V2 style filtering via /orders
+        const url = `${this.baseUrl}/integration/order/sellers/${this.config.supplierId}/orders?shipmentPackageIds=${shipmentPackageId}`;
         const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
         const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
@@ -348,7 +352,11 @@ export class TrendyolService implements IMarketplaceService {
             headers: this.getHeaders({ 'Accept-Language': 'tr-TR' })
         });
 
-        return response.data;
+        if (response.data && response.data.content && response.data.content.length > 0) {
+            return response.data.content[0];
+        }
+        
+        throw new Error('Paket detayları Trendyol\'dan alınamadı.');
     }
 
 
@@ -439,8 +447,8 @@ export class TrendyolService implements IMarketplaceService {
     async getOrders(startDate?: Date, endDate?: Date): Promise<MarketplaceOrder[]> {
         try {
             const queryParams = new URLSearchParams();
-            queryParams.append('orderBy', 'CreatedDate');
-            queryParams.append('order', 'DESC');
+            queryParams.append('orderByField', 'PackageLastModifiedDate'); // Recommended field
+            queryParams.append('orderByDirection', 'DESC');
             queryParams.append('size', '50'); // Son 50 sipariş
 
             if (startDate) {
@@ -457,7 +465,8 @@ export class TrendyolService implements IMarketplaceService {
                 queryParams.append('startDate', oneWeekAgo.getTime().toString());
             }
 
-            const url = `${this.baseUrl}/${this.config.supplierId}/orders?${queryParams.toString()}`;
+            // Fix: Added /integration/order/sellers/ prefix
+            const url = `${this.baseUrl}/integration/order/sellers/${this.config.supplierId}/orders?${queryParams.toString()}`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
 
@@ -482,8 +491,12 @@ export class TrendyolService implements IMarketplaceService {
 
     async getOrderByNumber(orderNumber: string): Promise<MarketplaceOrder | null> {
         try {
-            const url = `${this.baseUrl}/${this.config.supplierId}/orders?orderNumber=${encodeURIComponent(orderNumber)}`;
-            const response = await this.safeFetchJson(url, {
+            // Fix: Added /integration/order/sellers/ prefix
+            const url = `${this.baseUrl}/integration/order/sellers/${this.config.supplierId}/orders?orderNumber=${encodeURIComponent(orderNumber)}`;
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+
+            const response = await this.safeFetchJson(fetchUrl, {
                 headers: this.getHeaders(),
             });
             const data = response.data;

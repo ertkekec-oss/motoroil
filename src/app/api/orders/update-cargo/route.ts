@@ -39,23 +39,23 @@ export async function POST(request: Request) {
             isTest: settings.isTest || false
         });
 
-        // Trendyol Kargo Kodları Mapping
+        // Trendyol Kargo Kodları Mapping (Updated to Marketplace codes per docs)
         const cargoCodes: Record<string, string> = {
-            'Yurtiçi Kargo': 'Yurtici',
-            'Aras Kargo': 'Aras',
-            'MNG Kargo': 'MNG',
-            'Sürat Kargo': 'Surat',
-            'PTT Kargo': 'PTT',
-            'Trendyol Express': 'TrendyolExpress',
-            'UPS Kargo': 'UPS',
-            'Horoz Lojistik': 'Horoz',
-            'Ceva Lojistik': 'Ceva',
-            'Sendeo': 'Sendeo',
-            'Hepsijet': 'Hepsijet',
-            'Kolay Gelsin': 'KolayGelsin'
+            'Yurtiçi Kargo': 'YKMP',
+            'Aras Kargo': 'ARASMP',
+            'MNG Kargo': 'MNGMP',
+            'Sürat Kargo': 'SURATMP',
+            'PTT Kargo': 'PTTMP',
+            'Trendyol Express': 'TEXMP',
+            'UPS Kargo': 'UPSMP',
+            'Horoz Lojistik': 'HOROZMP',
+            'Ceva Lojistik': 'CEVAMP',
+            'Sendeo': 'SENDEOMP',
+            'Hepsijet': 'HEPSIJETMP',
+            'Kolay Gelsin': 'KOLAYGELSINMP'
         };
 
-        const cargoCode = cargoCodes[cargoCompany] || 'DIGER';
+        const cargoCode = cargoCodes[cargoCompany] || cargoCompany; // Use company name if not found in list
 
         // orderId genellikle veritabanımızdaki ID'dir. Pazaryerindeki ID'yi bulmamız gerekebilir.
         // Ancak bu API'ye gelen `orderId` verisi SalesPage'de `o.id` olarak geçiyor.
