@@ -74,7 +74,7 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                     select: { cargoTrackingNo: true }
                 });
 
-                const labelResult = await service.getCommonLabel(shipmentPackageId, order?.cargoTrackingNo || undefined);
+                const labelResult = await service.getCommonLabel(shipmentPackageId);
 
                 // Update audit with raw response for visibility
                 await (prisma as any).marketplaceActionAudit.update({

@@ -146,69 +146,101 @@ export class TrendyolService implements IMarketplaceService {
         const ctx = `[TRENDYOL-LABEL][pkg:${shipmentPackageId}]`;
         try {
             const pkg = await this.getShipmentPackageDetails(shipmentPackageId);
-            const provider = (pkg.cargoProviderName || '').toLowerCase();
+            const cargoProvider = (pkg.cargoProviderName || '').toLowerCase();
             const status = pkg.shipmentPackageStatus;
-            const deliveryModel = pkg.deliveryModel;
-            const trackingNo = pkg.cargoTrackingNumber;
+            // Casting to string is critical as API can return it as Number
+            const trackingNo = pkg.cargoTrackingNumber ? String(pkg.cargoTrackingNumber) : null;
 
-            console.info(`${ctx} Eligibility Check: carrier="${provider}", model="${deliveryModel || 'null'}", status="${status}", trk="${trackingNo}"`);
+            console.info(`${ctx} Internal Check: carrier="${cargoProvider}", status="${status}", trk="${trackingNo}"`);
 
-            const isEligibleCarrier = provider.includes('tex') || provider.includes('trendyol express') || provider.includes('aras');
-            const isTrendyolPaid = deliveryModel === 'Trendyol-Paid';
+            // 1) Detect Carrier & Marketplace Paid Status (Trendyol Öder)
+            // Carrier: Aras or Trendyol Express (TEX)
+            const isAras = cargoProvider.includes('aras');
+            const isTex = cargoProvider.includes('trendyol') && cargoProvider.includes('express');
 
-            if (!isEligibleCarrier || !isTrendyolPaid) {
-                const reason = !isTrendyolPaid ? "Delivery model is not Trendyol-Paid" : "Carrier is not TEX or Aras";
-                return { status: 'FAILED', error: `Ortak Barkod kriterlerine uygun değil: ${reason}` };
+            // "Trendyol Öder" detected via "marketplace" keyword in provider name (V2 API standard)
+            const isMarketplacePaid = cargoProvider.includes('marketplace');
+
+            if (!isAras && !isTex) {
+                return { status: 'FAILED', error: `Bu kargo firması (${pkg.cargoProviderName}) Ortak Barkod sürecine dahil değil. Sadece TEX ve Aras Kargo desteklenir.` };
             }
 
-            if (!trackingNo) return { status: 'FAILED', error: "Kargo takip numarası bulunamadı." };
+            if (!isMarketplacePaid) {
+                return { status: 'FAILED', error: "Bu paket 'Trendyol Öder' (Marketplace) kapsamında değil. Ortak Barkod sadece Trendyol ödemeli gönderilerde kullanılabilir." };
+            }
 
+            if (!trackingNo) {
+                return { status: 'FAILED', error: "Kargo takip numarası henüz oluşmamış. Lütfen paket onaylanana kadar bekleyin." };
+            }
+
+            // 2) Status Handling (Soft check, promote if Created)
             if (status === 'Created') {
-                console.info(`${ctx} Promoting to 'Picking'...`);
-                const update = await this.updateShipmentPackageStatus(shipmentPackageId, 'Picking');
-                if (!update.success) return { status: 'FAILED', error: "Statü güncellenemedi." };
+                console.info(`${ctx} Promoting status to 'Picking'...`);
+                await this.updateShipmentPackageStatus(shipmentPackageId, 'Picking');
+            } else if (status === 'Shipped') {
+                console.warn(`${ctx} Warning: Package is already 'Shipped'. labelary might return previously generated label.`);
             }
 
+            // 3) POST .../common-label/{trk} (Trigger)
             const postResult = await this.createCommonLabelRequest(shipmentPackageId, trackingNo, 'ZPL');
             if (!postResult.success) {
                 if (postResult.status === 400 && postResult.body?.includes('COMMON_LABEL_NOT_ALLOWED')) {
-                    return { status: 'FAILED', error: "Trendyol: COMMON_LABEL_NOT_ALLOWED" };
+                    return { status: 'FAILED', error: "Trendyol: Bu paket Ortak Barkod sürecine dahil edilmemiş (COMMON_LABEL_NOT_ALLOWED). Koşulların sağlandığından emin olun." };
                 }
-                return { status: 'FAILED', error: `POST Hatası: ${postResult.status}` };
+                return { status: 'FAILED', error: `Trendyol API Talebi başarısız (HTTP ${postResult.status}): ${postResult.body}`, httpStatus: postResult.status };
             }
 
+            // 4) GET .../common-label/{trk} with Polling
             const schedule = [1000, 2000, 3000, 5000, 8000, 10000];
             let labels: string[] = [];
+
             const getUrl = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/common-label/${trackingNo}`;
             const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
             const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(getUrl)}` : getUrl;
 
             for (let i = 0; i < schedule.length; i++) {
                 await new Promise(r => setTimeout(r, schedule[i]));
-                console.log(`${ctx} Poll Attempt ${i + 1}...`);
+                console.log(`${ctx} Poll Attempt ${i + 1}/${schedule.length}...`);
+
                 const response = await fetch(fetchUrl, { headers: this.getHeaders({ 'Accept': 'application/json' }) });
                 const bodyText = await response.text();
+
                 if (response.ok && bodyText !== 'OK') {
                     try {
                         const json = JSON.parse(bodyText);
-                        if (json.data?.[0]?.label) {
+                        if (json.data && Array.isArray(json.data) && json.data.length > 0) {
                             labels = json.data.filter((d: any) => d.format === 'ZPL').map((d: any) => d.label);
                             if (labels.length > 0) break;
                         }
                     } catch { }
                 }
-                if (response.status === 400 && bodyText.includes('COMMON_LABEL_NOT_ALLOWED')) break;
+
+                if (response.status === 400 && bodyText.includes('COMMON_LABEL_NOT_ALLOWED')) {
+                    return { status: 'FAILED', error: "Trendyol: Ortak barkod alınamadı (NOT_ALLOWED)." };
+                }
             }
 
-            if (labels.length === 0) return { status: 'PENDING', error: "Barkod hazır değil." };
+            if (labels.length === 0) {
+                return { status: 'PENDING', error: "Barkod henüz Trendyol tarafında oluşmadı. Lütfen birkaç dakika sonra tekrar deneyin." };
+            }
 
+            // 5) Convert ZPL -> PDF
+            console.info(`${ctx} SUCCESS. Converting ${labels.length} label(s) to PDF...`);
             const combinedZpl = labels.join('\n');
             const pdfBuffer = await this.convertZplToPdf(combinedZpl);
-            if (!pdfBuffer) return { status: 'FAILED', error: "PDF dönüşüm hatası." };
 
-            return { status: 'SUCCESS', pdfBase64: pdfBuffer.toString('base64'), httpStatus: 200 };
+            if (!pdfBuffer) {
+                return { status: 'FAILED', error: "ZPL içeriği PDF formatına dönüştürülemedi." };
+            }
+
+            return {
+                status: 'SUCCESS',
+                pdfBase64: pdfBuffer.toString('base64'),
+                httpStatus: 200
+            };
         } catch (error: any) {
-            return { status: 'FAILED', error: error.message };
+            console.error(`${ctx} Error:`, error);
+            return { status: 'FAILED', error: error.message || 'Beklenmedik bir hata oluştu.' };
         }
     }
 
