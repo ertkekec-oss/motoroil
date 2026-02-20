@@ -349,7 +349,7 @@ function POSContent() {
 
         {/* ROW 2: CHARTS & NOTIFICATIONS */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full md:h-auto">
-          <div className="lg:col-span-6 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]">
+          <div className="lg:col-span-6 bg-card-pos border border-border-pos rounded-2xl p-4 shadow-pos min-h-[160px]">
             <div className="flex justify-between items-center mb-2">
               <div className="flex items-center gap-2"><span className="text-lg">📈</span><span className="text-xs font-bold opacity-70">HAFTALIK TREND</span></div>
             </div>
@@ -358,7 +358,7 @@ function POSContent() {
             ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri yükleniyor...</div>}
           </div>
 
-          <div className="lg:col-span-3 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]">
+          <div className="lg:col-span-3 bg-card-pos border border-border-pos rounded-2xl p-4 shadow-pos min-h-[160px]">
             <div className="flex items-center gap-2 mb-2"><span className="text-lg">🍰</span><span className="text-xs font-bold opacity-70">DAĞILIM</span></div>
             {insightsData?.stats?.categoryAnalysis ? (
               <ResponsiveContainer width="100%" height={100}><PieChart><Pie data={insightsData.stats.categoryAnalysis} innerRadius={25} outerRadius={35} dataKey="value"><Cell fill="#FF5500" /></Pie></PieChart></ResponsiveContainer>
@@ -386,7 +386,7 @@ function POSContent() {
 
             {/* DYNAMIC PRODUCT LIST */}
             {filteredProducts.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-[#0f111a] border border-white/5 rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[300px] overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-card-pos border border-border-pos rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[300px] overflow-y-auto">
                 {filteredProducts.map(p => (
                   <div key={p.id} onClick={() => addToCart(p)} className="p-3 border-b border-white/5 flex justify-between hover:bg-white/10 cursor-pointer">
                     <div><div className="font-bold text-sm">{p.name}</div><div className="text-[10px] opacity-50">{p.barcode}</div></div>
@@ -412,7 +412,7 @@ function POSContent() {
         </div>
 
         {/* CART */}
-        <div className="flex-1 bg-[#0f111a] rounded-xl border border-white/5 p-2 overflow-y-auto min-h-[300px] shadow-2xl">
+        <div className="flex-1 bg-card-pos rounded-xl border border-border-pos p-2 overflow-y-auto min-h-[300px] shadow-pos">
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center opacity-20"><span className="text-6xl mb-4">🛒</span><span className="text-sm font-bold">Sepet Boş</span></div>
           ) : (
@@ -457,19 +457,19 @@ function POSContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-gradient-to-br from-indigo-900 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden">
-            <div><div className="text-[10px] font-bold text-primary mb-1 uppercase">GELECEK HAFTA</div><div className="text-2xl font-black">₺{insightsData?.stats?.forecast?.nextWeekRevenue?.toLocaleString() || '0'}</div></div>
+            <div><div className="text-[10px] font-bold text-indigo-400 mb-1">GELECEK HAFTA</div><div className="text-2xl font-black">₺{insightsData?.stats?.forecast?.nextWeekRevenue?.toLocaleString() || '0'}</div></div>
             <div className="text-right"><div className="text-[10px] opacity-50">Güven Skoru</div><div className="text-xs font-bold text-white">%{insightsData?.stats?.forecast?.confidence || 0}</div></div>
           </div>
 
           <div className="bg-gradient-to-br from-emerald-900 to-slate-900 border border-emerald-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden">
-            <div><div className="text-[10px] font-bold text-success mb-1 uppercase">BÜYÜME HIZI</div><div className="text-2xl font-black">%{insightsData?.stats?.docGrowth || 0}</div></div>
+            <div><div className="text-[10px] font-bold text-emerald-400 mb-1">BÜYÜME HIZI</div><div className="text-2xl font-black">%{insightsData?.stats?.docGrowth || 0}</div></div>
             <div className="text-right"><div className="text-[10px] opacity-50">Fatura Artışı</div><div className="text-xs font-bold text-white">{insightsData?.stats?.thisMonthDocs || 0} Adet</div></div>
           </div>
         </div>
       </div>
 
       {/* RIGHT PANEL (Payment) */}
-      <div className="w-[380px] bg-[#0f111a] border border-white/5 rounded-2xl p-6 flex flex-col shadow-2xl sticky top-4 h-[calc(100vh-2rem)] overflow-hidden">
+      <div className="w-[380px] bg-card-pos border border-border-pos rounded-2xl p-6 flex flex-col shadow-pos sticky top-4 h-[calc(100vh-2rem)] overflow-hidden">
         <h2 className="text-xs font-bold opacity-50 mb-6 tracking-widest text-center shrink-0">SATIŞ ÖZETİ</h2>
 
         {/* Scrollable Middle Section (Scrollbar hidden) */}
