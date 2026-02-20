@@ -60,11 +60,27 @@ export class HepsiburadaActionProvider implements MarketplaceActionProvider {
                 });
                 if (!order) throw new Error('Sipariş bulunamadı');
 
-                // Fallback to payload shipmentPackageId, then order.shipmentPackageId, then order.orderNumber
-                const shipmentPackageId = payload?.shipmentPackageId || payload?.labelShipmentPackageId || order.shipmentPackageId || order.orderNumber;
+                // Fallback sequence
+                let shipmentPackageId = payload?.shipmentPackageId || payload?.labelShipmentPackageId || order.shipmentPackageId || order.orderNumber;
                 if (!shipmentPackageId) throw new Error('Paket numarası veya Sipariş numarası bulunamadı');
 
-                const labelResult = await service.getCargoLabel(shipmentPackageId);
+                let labelResult = await service.getCargoLabel(shipmentPackageId);
+
+                // If 404 or error, and we suspect shipmentPackageId might be an orderNumber, try to resolve real packageNumber
+                if ((labelResult.error || !labelResult.pdfBase64)) {
+                    console.log(`${ctx} Label fetch failed for ${shipmentPackageId}. Attempting to resolve package via orderNumber...`);
+                    const pkgData = await service.getPackageByOrderNumber(order.orderNumber || shipmentPackageId);
+
+                    if (pkgData) {
+                        // Extract PackageNumber (handle both casing)
+                        const realPkgNo = pkgData.PackageNumber || pkgData.packageNumber || pkgData.id || pkgData.Id;
+                        if (realPkgNo && realPkgNo !== shipmentPackageId) {
+                            console.log(`${ctx} Resolved real package number: ${realPkgNo}`);
+                            shipmentPackageId = realPkgNo;
+                            labelResult = await service.getCargoLabel(shipmentPackageId);
+                        }
+                    }
+                }
 
                 if (labelResult.error) throw new Error(labelResult.error);
                 if (!labelResult.pdfBase64) throw new Error('Etiket verisi boş');

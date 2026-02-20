@@ -165,6 +165,7 @@ export class HepsiburadaService implements IMarketplaceService {
                     // Possible properties if Hepsiburada wraps it in JSON
                     if (data?.pdfData) return { pdfBase64: data.pdfData };
                     if (data?.base64) return { pdfBase64: data.base64 };
+                    if (typeof data?.data === 'string' && data.data.length > 100) return { pdfBase64: data.data };
                     if (data?.data?.base64) return { pdfBase64: data.data.base64 };
                     if (Array.isArray(data) && data[0]?.pdf) return { pdfBase64: data[0].pdf };
                     if (data?.labels?.[0]?.pdf) return { pdfBase64: data.labels[0].pdf };
@@ -368,21 +369,45 @@ export class HepsiburadaService implements IMarketplaceService {
         }
     }
 
+    async getPackageByOrderNumber(orderNumber: string): Promise<any> {
+        try {
+            const merchantId = (this.config.merchantId || '').trim();
+            // Hepsiburada API: GET /packages/merchantid/{merchantid}/ordernumber/{orderNumber}
+            const url = `${this.baseUrl}/packages/merchantid/${merchantId}/ordernumber/${orderNumber}`;
+
+            const headers: any = {
+                'Authorization': this.getAuthHeader(),
+                'User-Agent': (this.config.username || '').trim(),
+                'Accept': 'application/json'
+            };
+
+            const proxyKey = this.getProxyKeyHeader();
+            if (proxyKey) headers['X-Periodya-Key'] = proxyKey;
+
+            const response = await this.safeFetchJson(url, { headers });
+            return response.data;
+        } catch (err) {
+            console.error(`[HB_GET_PACKAGE_ERR] Order: ${orderNumber}`, err);
+            return null;
+        }
+    }
+
     private mapOrder(hbOrder: any, fallbackStatus: string): MarketplaceOrder {
         try {
             // Hepsiburada status can be in multiple fields depending on endpoint
             const rawStatus = hbOrder.status || hbOrder.orderStatus || hbOrder.cargoStatus || fallbackStatus;
 
-            // Search for items in multiple possible locations
-            let rawLines = hbOrder.items || hbOrder.orderLines || hbOrder.lines || hbOrder.packageItems || [];
+            // Search for items in multiple possible locations - Handling both camelCase and TitleCase
+            let rawLines = hbOrder.items || hbOrder.PackageItems || hbOrder.orderLines || hbOrder.OrderLines || hbOrder.lines || hbOrder.Lines || hbOrder.packageItems || [];
 
-            // If still empty but there is a 'data' object, check inside it (some API versions nest data)
-            if ((!Array.isArray(rawLines) || rawLines.length === 0) && hbOrder.data) {
-                rawLines = hbOrder.data.items || hbOrder.data.lines || hbOrder.data.packageItems || [];
+            // If still empty but there is a 'data' object, check inside it
+            if ((!Array.isArray(rawLines) || rawLines.length === 0) && (hbOrder.data || hbOrder.Data)) {
+                const dataObj = hbOrder.data || hbOrder.Data;
+                rawLines = dataObj.items || dataObj.Items || dataObj.lines || dataObj.Lines || dataObj.packageItems || dataObj.PackageItems || [];
             }
 
-            // Fallback for packages: sometimes order number is inside an array called OrderNumbers
-            const orderNo = hbOrder.orderNumber || (Array.isArray(hbOrder.OrderNumbers) ? hbOrder.OrderNumbers[0] : null) || hbOrder.packageNumber || hbOrder.id || 'unknown';
+            // Fallback for packages: Handle both orderNumber and OrderNumber, packageNumber and PackageNumber
+            const orderNo = hbOrder.orderNumber || hbOrder.OrderNumber || (Array.isArray(hbOrder.OrderNumbers) ? hbOrder.OrderNumbers[0] : null) || (Array.isArray(hbOrder.orderNumbers) ? hbOrder.orderNumbers[0] : null) || hbOrder.packageNumber || hbOrder.PackageNumber || hbOrder.id || hbOrder.Id || 'unknown';
 
             const orderItems = Array.isArray(rawLines) ? rawLines : [];
 
@@ -393,9 +418,9 @@ export class HepsiburadaService implements IMarketplaceService {
                 customerEmail: hbOrder.customer?.email || hbOrder.customerEmail || '',
                 orderDate: new Date(hbOrder.orderDate || hbOrder.issueDate || hbOrder.createdAt || Date.now()),
                 status: rawStatus.toString().toUpperCase(),
-                totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.totalAmount || hbOrder.payableAmount || hbOrder.totalPrice || 0),
-                currency: hbOrder.totalPrice?.currency || hbOrder.currency || 'TRY',
-                shipmentPackageId: (hbOrder.packageNumber || hbOrder.shipmentPackageId || hbOrder.id)?.toString(),
+                totalAmount: Number(hbOrder.totalPrice?.amount || hbOrder.TotalPrice?.Amount || hbOrder.totalAmount || hbOrder.TotalAmount || hbOrder.payableAmount || hbOrder.PayableAmount || hbOrder.totalPrice || hbOrder.TotalPrice || 0),
+                currency: hbOrder.totalPrice?.currency || hbOrder.TotalPrice?.Currency || hbOrder.currency || hbOrder.Currency || 'TRY',
+                shipmentPackageId: (hbOrder.packageNumber || hbOrder.PackageNumber || hbOrder.shipmentPackageId || hbOrder.ShipmentPackageId || hbOrder.id || hbOrder.Id)?.toString(),
                 shippingAddress: {
                     fullName: hbOrder.shippingAddress?.name || hbOrder.shippingAddress?.fullName || hbOrder.customer?.name || hbOrder.customerName || '',
                     address: hbOrder.shippingAddress?.address || '',
@@ -411,12 +436,12 @@ export class HepsiburadaService implements IMarketplaceService {
                     phone: hbOrder.billingAddress?.phoneNumber || hbOrder.billingAddress?.phone || ''
                 },
                 items: orderItems.map((item: any) => ({
-                    productName: item.productName || item.name || item.skuDescription || item.description || 'Ürün',
-                    sku: item.sku || item.merchantSku || item.hbSku || item.productCode || 'SKU',
-                    quantity: Number(item.quantity || item.qty || 1),
-                    price: Number(item.totalPrice?.amount || item.unitPrice?.amount || item.price?.amount || item.price || item.unitPrice || item.totalPrice || 0),
-                    taxRate: Number(item.taxRate || item.vatRate || 20),
-                    discountAmount: Number(item.discountAmount || 0)
+                    productName: item.productName || item.ProductName || item.name || item.Name || item.skuDescription || item.SkuDescription || item.description || item.Description || 'Ürün',
+                    sku: item.sku || item.Sku || item.merchantSku || item.MerchantSku || item.hbSku || item.HbSku || item.productCode || item.ProductCode || 'SKU',
+                    quantity: Number(item.quantity || item.Quantity || item.qty || item.Qty || 1),
+                    price: Number(item.totalPrice?.amount || item.TotalPrice?.Amount || item.unitPrice?.amount || item.UnitPrice?.Amount || item.price?.amount || item.Price?.Amount || item.price || item.Price || item.unitPrice || item.UnitPrice || item.totalPrice || item.TotalPrice || 0),
+                    taxRate: Number(item.taxRate || item.TaxRate || item.vatRate || item.VatRate || 20),
+                    discountAmount: Number(item.discountAmount || item.DiscountAmount || 0)
                 })),
                 // @ts-ignore - Internal raw data for debugging
                 _raw: hbOrder

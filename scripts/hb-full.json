@@ -1,0 +1,19 @@
+﻿{
+  "totalCount": 59,
+  "limit": 1,
+  "offset": 0,
+  "pageCount": 59,
+  "items": [
+    {
+      "Id": "696d1c8f-9a0e-34a7-3a93-2a8106060606",
+      "Barcode": "62754371547540",
+      "PackageNumber": "5437154754",
+      "OrderNumber": "4402306136",
+      "OrderNumbers": [
+        "4402306136"
+      ],
+      "MerchantId": "f225561c-5ae7-4208-9eb4-3541340b7229",
+      "DeliveredDate": "2026-01-21T15:03:48"
+    }
+  ]
+}

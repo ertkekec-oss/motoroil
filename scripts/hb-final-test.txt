@@ -1,0 +1,13 @@
+Testing with Package: 5437154754
+
+TRYING: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/packagenumber/5437154754/labels?format=PDF
+Status: 200
+ContentType: application/json; charset=UTF-8
+SUCCESS! Body length: 270916
+-------------------
+TRYING: https://oms-external.hepsiburada.com/packages/merchantid/f225561c-5ae7-4208-9eb4-3541340b7229/labels?packageNumber=5437154754&format=PDF
+Status: 404
+ContentType: application/json; charset=UTF-8
+FAILED: {"message":"Not Found"}
+
+-------------------
