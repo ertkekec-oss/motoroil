@@ -45,6 +45,11 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // Special case: Allow public invoice PDF downloads for sharing
+    if (pathname === '/api/sales/invoices' && request.nextUrl.searchParams.get('action') === 'get-pdf') {
+        return NextResponse.next();
+    }
+
     // 3. Protected Paths - Verify Session
     const sessionToken = request.cookies.get('session')?.value;
 
