@@ -16,19 +16,17 @@ export class HepsiburadaService implements IMarketplaceService {
             this.config.isTest ||
             this.config.merchantId === '18c17301-9348-4937-b5c0-6912f54eb142';
 
-        if (proxy) {
-            // Production via proxy (static IP)
-            this.baseUrl = isTest
-                ? `${proxy}/hepsiburada-sit`
-                : `${proxy}/hepsiburada`;
-        } else {
-            // Local / dev fallback (direct)
-            this.baseUrl = isTest
-                ? 'https://oms-external-sit.hepsiburada.com'
-                : 'https://oms-external.hepsiburada.com';
-        }
+        this.baseUrl = isTest
+            ? 'https://oms-external-sit.hepsiburada.com'
+            : 'https://oms-external.hepsiburada.com';
 
-        console.log(`[HB_PROXY] baseUrl=${this.baseUrl}`);
+        console.log(`[HB_INIT] baseUrl=${this.baseUrl}`);
+    }
+
+    private getFetchUrl(url: string): string {
+        const proxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+        if (!proxy) return url;
+        return `${proxy.replace(/\/$/, '')}?url=${encodeURIComponent(url)}`;
     }
 
     private getAuthHeader(): string {
@@ -105,7 +103,8 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     private async safeFetchJson(url: string, options: any = {}): Promise<{ data: any; status: number }> {
-        const res = await fetch(url, options);
+        const fetchUrl = this.getFetchUrl(url);
+        const res = await fetch(fetchUrl, options);
         const text = await res.text();
         const trimmed = text.trim();
 
@@ -116,7 +115,7 @@ export class HepsiburadaService implements IMarketplaceService {
         if (trimmed === 'OK') {
             console.log(`[HB_PROXY] Received OK signal from proxy, retrying in 2s...`);
             await new Promise(r => setTimeout(r, 2000));
-            const res2 = await fetch(url, options);
+            const res2 = await fetch(fetchUrl, options);
             const text2 = await res2.text();
             if (!res2.ok) throw new Error(`HB API Hatası (Retry): ${res2.status}`);
             if (text2.trim() === 'OK') throw new Error(`HB Proxy meşgul (OK dönüyor). Lütfen birazdan tekrar deneyin.`);
@@ -150,7 +149,8 @@ export class HepsiburadaService implements IMarketplaceService {
 
             console.log(`[HB_LABEL_FETCH] URL: ${url}`);
 
-            const res = await fetch(url, { headers });
+            const fetchUrl = this.getFetchUrl(url);
+            const res = await fetch(fetchUrl, { headers });
 
             if (res.ok) {
                 const contentType = res.headers.get('content-type') || '';
@@ -372,8 +372,8 @@ export class HepsiburadaService implements IMarketplaceService {
     async getPackageByOrderNumber(orderNumber: string): Promise<any> {
         try {
             const merchantId = (this.config.merchantId || '').trim();
-            // Hepsiburada OMS: To get package details for an order, we use the order detail endpoint
-            const url = `${this.baseUrl}/orders/merchantid/${merchantId}/ordernumber/${orderNumber}`;
+            // Hepsiburada OMS: Get package associated with this order number
+            const url = `${this.baseUrl}/packages/merchantid/${merchantId}/ordernumber/${orderNumber}`;
 
             const headers: any = {
                 'Authorization': this.getAuthHeader(),

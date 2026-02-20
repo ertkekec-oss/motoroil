@@ -72,12 +72,18 @@ export class HepsiburadaActionProvider implements MarketplaceActionProvider {
                     const pkgData = await service.getPackageByOrderNumber(order.orderNumber || shipmentPackageId);
 
                     if (pkgData) {
+                        // Hepsiburada can return an array, a single object, or wrapped in a data/items field
+                        const pkg = Array.isArray(pkgData) ? pkgData[0] : (pkgData.items?.[0] || pkgData.data?.[0] || pkgData);
+
                         // Extract PackageNumber (handle both casing)
-                        const realPkgNo = pkgData.PackageNumber || pkgData.packageNumber || pkgData.id || pkgData.Id;
-                        if (realPkgNo && realPkgNo !== shipmentPackageId) {
-                            console.log(`${ctx} Resolved real package number: ${realPkgNo}`);
-                            shipmentPackageId = realPkgNo;
+                        const realPkgNo = pkg?.PackageNumber || pkg?.packageNumber || pkg?.id || pkg?.Id || pkg?.packageNo;
+
+                        if (realPkgNo && String(realPkgNo) !== String(shipmentPackageId)) {
+                            console.log(`${ctx} Resolved real package number from order: ${realPkgNo}`);
+                            shipmentPackageId = String(realPkgNo);
                             labelResult = await service.getCargoLabel(shipmentPackageId);
+                        } else if (!realPkgNo) {
+                            console.log(`${ctx} Could not find real package number in resolved data. Raw: ${JSON.stringify(pkgData).substring(0, 200)}`);
                         }
                     }
                 }
