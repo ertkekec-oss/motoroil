@@ -471,4 +471,29 @@ export class NilveraInvoiceService {
             return { success: false, error: typeof detail === 'object' ? JSON.stringify(detail) : detail };
         }
     }
+
+    /**
+     * e-Arşiv Raporu Oluşturma (GİB'e iletim için kritik ikinci adım)
+     */
+    async createArchiveReport(uuid: string) {
+        try {
+            console.log(`[NilveraService] Creating E-Archive Report for UUID: ${uuid}`);
+            const res = await axios.post(`${this.config.baseUrl}/EArchive/Send/Report`, {
+                Invoices: [uuid]
+            }, {
+                headers: this.getHeaders(),
+                validateStatus: () => true
+            });
+
+            if (res.status >= 400) {
+                console.warn("[NilveraService] Report Creation Failed/Queued:", res.data);
+                return { success: false, status: res.status, error: JSON.stringify(res.data) };
+            }
+
+            return { success: true, data: res.data };
+        } catch (error: any) {
+            console.error("[NilveraService] Report Exception:", error.message);
+            return { success: false, error: error.message };
+        }
+    }
 }

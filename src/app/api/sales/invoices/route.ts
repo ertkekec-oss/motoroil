@@ -360,6 +360,16 @@ export async function POST(request: Request) {
                         }
                     });
 
+                    // SECOND STEP: Create E-Archive Report (Mandatory for immediate portal/GİB visibility)
+                    if (sendResult.type === 'EARSIV') {
+                        try {
+                            console.log('[Formal Send] Triggering immediate report creation for e-Archive...');
+                            await nilveraService.createArchiveReport(formalId);
+                        } catch (reportErr: any) {
+                            console.warn('[Formal Send] Background report creation warning:', reportErr.message);
+                        }
+                    }
+
                     return NextResponse.json({
                         success: true,
                         message: `${sendResult.type === 'EIRSALIYE' ? 'İrsaliye' : 'Fatura'} başarıyla gönderildi.`,
