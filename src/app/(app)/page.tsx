@@ -71,12 +71,23 @@ function POSContent() {
 
   // --- EFFECTS ---
 
-  // CSS Fix
+  // CSS Fix & Theme Sync
   useEffect(() => {
-    document.body.style.background = 'var(--bg-deep)';
+    if (posTheme === 'light') {
+      document.body.style.background = '#F8FAFC'; // Light mode explicit body bg
+      document.body.style.color = '#020617';
+    } else {
+      document.body.style.background = 'var(--bg-deep)';
+      document.body.style.color = 'var(--text-main)';
+    }
     document.body.style.fontFamily = "'Outfit', 'Inter', sans-serif";
-    document.body.style.color = 'var(--text-main)';
-  }, []);
+
+    // Cleanup ensures we don't leak light mode background to other dark pages
+    return () => {
+      document.body.style.background = 'var(--bg-deep)';
+      document.body.style.color = 'var(--text-main)';
+    };
+  }, [posTheme]);
 
   // Fetch Insights
   useEffect(() => {
