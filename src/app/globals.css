@@ -52,43 +52,98 @@
 }
 
 /* POS ONLY COOL TECH LIGHT THEME */
+/* POS ONLY COOL TECH LIGHT THEME */
 [data-pos-theme="light"] {
   --bg-pos: #F8FAFC;
-  --card-pos: rgba(255, 255, 255, 0.9);
+  --card-pos: #FFFFFF;
   --text-pos: #020617;
   --text-muted-pos: #64748B;
   --border-pos: #CBD5E1;
   --shadow-pos: 0 12px 32px rgba(15, 23, 42, 0.12);
-  --glass-border: 1px solid rgba(15, 23, 42, 0.08);
+  --glass-border: 1px solid #CBD5E1;
 
   background-color: var(--bg-pos) !important;
   color: var(--text-pos) !important;
 }
 
-[data-pos-theme="light"] .card, 
-[data-pos-theme="light"] .glass {
+/* Ensure parent containers also respect the background if they contain the light theme */
+html:has([data-pos-theme="light"]),
+body:has([data-pos-theme="light"]) {
+  background-color: #F8FAFC !important;
+}
+
+[data-pos-theme="light"] .card,
+[data-pos-theme="light"] .glass,
+[data-pos-theme="light"] .bg-\[\#0f111a\],
+[data-pos-theme="light"] .bg-gradient-to-br,
+[data-pos-theme="light"] .bg-slate-900,
+[data-pos-theme="light"] .bg-indigo-900,
+[data-pos-theme="light"] .bg-emerald-900 {
   background: var(--card-pos) !important;
-  border-color: var(--border-pos) !important;
+  border: 1px solid var(--border-pos) !important;
   box-shadow: var(--shadow-pos) !important;
+  color: var(--text-pos) !important;
+  backdrop-filter: blur(20px);
+}
+
+[data-pos-theme="light"] .text-white,
+[data-pos-theme="light"] .text-white\/50,
+[data-pos-theme="light"] .text-white\/30,
+[data-pos-theme="light"] .text-indigo-400,
+[data-pos-theme="light"] .text-emerald-400 {
   color: var(--text-pos) !important;
 }
 
 [data-pos-theme="light"] .text-muted,
 [data-pos-theme="light"] .text-xs.opacity-50,
-[data-pos-theme="light"] .text-\[10px\].opacity-60 {
+[data-pos-theme="light"] .text-\[10px\].opacity-60,
+[data-pos-theme="light"] .opacity-50,
+[data-pos-theme="light"] .opacity-60,
+[data-pos-theme="light"] .opacity-40 {
   color: var(--text-muted-pos) !important;
   opacity: 1 !important;
 }
 
-[data-pos-theme="light"] input {
+[data-pos-theme="light"] input,
+[data-pos-theme="light"] select {
   background: white !important;
-  border-color: var(--border-pos) !important;
+  border: 1px solid var(--border-pos) !important;
   color: var(--text-pos) !important;
 }
 
+/* Payment Buttons & Smaller Chips */
 [data-pos-theme="light"] .bg-black\/20,
-[data-pos-theme="light"] .bg-white\/5 {
-  background: rgba(15, 23, 42, 0.04) !important;
+[data-pos-theme="light"] .bg-white\/5,
+[data-pos-theme="light"] .bg-white\/10 {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-pos) !important;
+  color: var(--text-pos) !important;
+  box-shadow: 0 4px 6px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* Specific fix for Payment Method Icons Visibility */
+[data-pos-theme="light"] .bg-black\/20 span {
+  color: var(--text-pos) !important;
+}
+
+[data-pos-theme="light"] .text-white\/50 {
+  color: var(--text-muted-pos) !important;
+}
+
+[data-pos-theme="light"] .hover-bg:hover,
+[data-pos-theme="light"] .sidebar-link:hover {
+  background-color: #F1F5F9 !important;
+}
+
+[data-pos-theme="light"] .bg-primary\/10 {
+  background: rgba(255, 85, 0, 0.1) !important;
+  color: #FF5500 !important;
+}
+
+[data-pos-theme="light"] .border-white\/10,
+[data-pos-theme="light"] .border-white\/5,
+[data-pos-theme="light"] .border-indigo-500\/30,
+[data-pos-theme="light"] .border-emerald-500\/30 {
   border-color: var(--border-pos) !important;
 }
 
@@ -707,6 +762,7 @@ select option {
   white-space: nowrap;
   border-width: 0;
 }
+
 /* Premium UI Utilities */
 .grad-text {
   background: linear-gradient(135deg, var(--primary) 0%, #E64A00 100%);
@@ -716,23 +772,49 @@ select option {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideInFromLeft {
-  from { transform: translateX(-30px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(-30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slideInFromBottom {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes zoomIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .animate-in {
@@ -741,10 +823,26 @@ select option {
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.fade-in { animation-name: fadeIn; }
-.slide-in-from-left-8 { animation-name: slideInFromLeft; }
-.slide-in-from-bottom-8 { animation-name: slideInFromBottom; }
-.zoom-in { animation-name: zoomIn; }
+.fade-in {
+  animation-name: fadeIn;
+}
 
-.duration-700 { animation-duration: 0.7s; }
-.duration-300 { animation-duration: 0.3s; }
+.slide-in-from-left-8 {
+  animation-name: slideInFromLeft;
+}
+
+.slide-in-from-bottom-8 {
+  animation-name: slideInFromBottom;
+}
+
+.zoom-in {
+  animation-name: zoomIn;
+}
+
+.duration-700 {
+  animation-duration: 0.7s;
+}
+
+.duration-300 {
+  animation-duration: 0.3s;
+}

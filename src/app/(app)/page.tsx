@@ -438,7 +438,7 @@ function POSContent() {
 
         {/* ROW 5: INSIGHTS & FORECAST (Moved below cart) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group hover:border-white/10 transition-all cursor-pointer">
+          <div className="bg-card-pos border border-border-pos p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group hover:border-pos transition-all cursor-pointer">
             <div className="text-3xl">📄</div>
             <div>
               <div className="font-bold text-sm mb-1">E-Fatura'ya Geçin</div>
@@ -446,7 +446,7 @@ function POSContent() {
               <div className="text-[10px] text-primary font-bold mt-2 group-hover:underline">Entegrasyonu Tamamla ➔</div>
             </div>
           </div>
-          <div className="bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden">
+          <div className="bg-card-pos border border-border-pos p-4 rounded-xl flex items-center gap-4 relative overflow-hidden">
             <div className="text-3xl">💡</div>
             <div>
               <div className="font-bold text-sm mb-1">Verimlilik Saati</div>
@@ -456,13 +456,13 @@ function POSContent() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-indigo-900 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden">
-            <div><div className="text-[10px] font-bold text-indigo-400 mb-1">GELECEK HAFTA</div><div className="text-2xl font-black">₺{insightsData?.stats?.forecast?.nextWeekRevenue?.toLocaleString() || '0'}</div></div>
+          <div className="bg-card-pos border border-border-pos p-4 rounded-xl flex justify-between items-center relative overflow-hidden">
+            <div><div className="text-[10px] font-bold text-primary mb-1 uppercase">GELECEK HAFTA</div><div className="text-2xl font-black">₺{insightsData?.stats?.forecast?.nextWeekRevenue?.toLocaleString() || '0'}</div></div>
             <div className="text-right"><div className="text-[10px] opacity-50">Güven Skoru</div><div className="text-xs font-bold text-white">%{insightsData?.stats?.forecast?.confidence || 0}</div></div>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-900 to-slate-900 border border-emerald-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden">
-            <div><div className="text-[10px] font-bold text-emerald-400 mb-1">BÜYÜME HIZI</div><div className="text-2xl font-black">%{insightsData?.stats?.docGrowth || 0}</div></div>
+          <div className="bg-card-pos border border-border-pos p-4 rounded-xl flex justify-between items-center relative overflow-hidden">
+            <div><div className="text-[10px] font-bold text-success mb-1 uppercase">BÜYÜME HIZI</div><div className="text-2xl font-black">%{insightsData?.stats?.docGrowth || 0}</div></div>
             <div className="text-right"><div className="text-[10px] opacity-50">Fatura Artışı</div><div className="text-xs font-bold text-white">{insightsData?.stats?.thisMonthDocs || 0} Adet</div></div>
           </div>
         </div>
