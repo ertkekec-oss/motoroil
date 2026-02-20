@@ -69,15 +69,27 @@ export class HepsiburadaActionProvider implements MarketplaceActionProvider {
                 // --- SMART FALLBACK LOGIC ---
                 // 1) If 403 Forbidden Host: Skip fallback, it's a proxy/SNI config issue.
                 if (labelResult.status === 403) {
-                    throw new Error(`Hepsiburada API 403 (Forbidden Host) hatası döndürdü. Lütfen sistem proxy Ayarlarını kontrol edin.`);
+                    const err = new Error(`Hepsiburada API 403 (Forbidden Host) hatası döndürdü. Lütfen sistem proxy Ayarlarını kontrol edin.`);
+                    (err as any).httpStatus = 403;
+                    throw err;
                 }
 
                 // 2) If 404/400 or other data error: Try to resolve real package number from order number.
                 if (labelResult.error || !labelResult.pdfBase64) {
                     const status = labelResult.status;
+                    const rawBody = labelResult.rawBody || '';
+                    const isJson = rawBody.trim().startsWith('{') || rawBody.trim().startsWith('[');
+
+                    // If it's a 404 and NOT JSON, it's almost certainly a Proxy/Nginx routing error
+                    if (status === 404 && !isJson) {
+                        const err = new Error(`Hepsiburada Proxy Yönlendirme Hatası (404 Not Found). Nginx yapılandırmasını kontrol edin (Slash ve Path kuralları).`);
+                        (err as any).httpStatus = 404;
+                        throw err;
+                    }
+
                     const canResolve = status === 404 || status === 400 || !status;
 
-                    if (canResolve) {
+                    if (canResolve && isJson) {
                         const orderNo = order.orderNumber || packageIdToFetch;
                         console.log(`${ctx} fetch failed (Status: ${status}). Attempting to resolve via order: ${orderNo}`);
 
@@ -146,13 +158,26 @@ export class HepsiburadaActionProvider implements MarketplaceActionProvider {
             console.error(`${ctx} Failed:`, error.message);
             metrics.externalCall(marketplace, actionKey, 'FAILED');
 
+            const httpStatus = error.httpStatus || (error.message?.includes('403') ? 403 : error.message?.includes('404') ? 404 : 502);
+
             await (prisma as any).marketplaceActionAudit.updateMany({
                 where: { idempotencyKey },
-                data: { status: 'FAILED', errorMessage: error.message }
+                data: {
+                    status: 'FAILED',
+                    errorMessage: error.message,
+                    // If your schema supports httpStatus in audit, add it here. 
+                    // For now we just return it in the result.
+                }
             });
 
             const auditFailed = await (prisma as any).marketplaceActionAudit.findUnique({ where: { idempotencyKey } });
-            return { status: "FAILED", errorMessage: error.message, errorCode: MarketplaceActionErrorCode.E_UNKNOWN, auditId: auditFailed?.id };
+            return {
+                status: "FAILED",
+                errorMessage: error.message,
+                errorCode: MarketplaceActionErrorCode.E_REMOTE_API_ERROR,
+                auditId: auditFailed?.id,
+                httpStatus
+            };
         } finally {
             await redisConnection.del(lockKey);
         }

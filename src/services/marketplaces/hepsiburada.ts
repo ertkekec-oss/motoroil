@@ -18,8 +18,8 @@ export class HepsiburadaService implements IMarketplaceService {
 
         if (proxy) {
             // Option B: Reverse Proxy Mode (Path-based)
-            // This expects Nginx to handle SNI and Host properly for the path /hepsiburada
-            this.baseUrl = isTest ? `${proxy}/hepsiburada-sit` : `${proxy}/hepsiburada`;
+            // This expects Nginx to handle SNI and Host properly for the path /proxy/hepsiburada
+            this.baseUrl = isTest ? `${proxy}/proxy/hepsiburada-sit` : `${proxy}/proxy/hepsiburada`;
         } else {
             // Option A: Direct Mode
             this.baseUrl = `https://${this.targetHost}`;
@@ -99,7 +99,7 @@ export class HepsiburadaService implements IMarketplaceService {
         }
     }
 
-    async getCargoLabel(packageNumber: string): Promise<{ pdfBase64?: string; error?: string; status?: number }> {
+    async getCargoLabel(packageNumber: string): Promise<{ pdfBase64?: string; error?: string; status?: number; rawBody?: string }> {
         try {
             const merchantId = (this.config.merchantId || '').trim();
             const url = `${this.baseUrl}/packages/merchantid/${merchantId}/packagenumber/${packageNumber}/labels?format=PDF`;
@@ -138,7 +138,11 @@ export class HepsiburadaService implements IMarketplaceService {
             } else {
                 const text = await res.text();
                 console.error(`[HB_LABEL_FAIL] Status: ${status} | URL: ${url} | Body: ${text.substring(0, 200)}`);
-                return { error: `HB API Hatası (${status}): ${text.substring(0, 100)}`, status };
+                return {
+                    error: `HB API Hatası (${status}): ${text.substring(0, 100)}`,
+                    status,
+                    rawBody: text
+                };
             }
         } catch (err: any) {
             console.error(`[HB_LABEL_ERR] pkg: ${packageNumber}`, err);

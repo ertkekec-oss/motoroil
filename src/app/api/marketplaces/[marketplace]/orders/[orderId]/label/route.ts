@@ -114,8 +114,9 @@ export async function GET(
 
         if (result.status === "FAILED") {
             console.error(`${ctx} Execution FAILED:`, result.errorMessage);
+            const status = result.httpStatus || 502;
             return respondWith(new Response(JSON.stringify({ error: result.errorMessage || "Etiket alınamadı", status: "FAILED", auditId: result.auditId }), {
-                status: 502, headers: { "Content-Type": "application/json" }
+                status, headers: { "Content-Type": "application/json" }
             }));
         }
 
