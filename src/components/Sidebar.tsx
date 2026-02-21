@@ -18,6 +18,15 @@ export default function Sidebar() {
         activeTenantId, setActiveTenantId, availableTenants
     } = useApp();
 
+    const [fieldSalesOpen, setFieldSalesOpen] = useState(false);
+
+    // Auto-expand if active
+    useEffect(() => {
+        if (pathname.includes('/field-sales')) {
+            setFieldSalesOpen(true);
+        }
+    }, [pathname]);
+
     const isSystemAdmin = currentUser === null || currentUser?.role === 'SUPER_ADMIN' || (currentUser?.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
     const isPlatformAdmin = authUser?.tenantId === 'PLATFORM_ADMIN' || authUser?.role === 'SUPER_ADMIN';
     const isAuditor = currentUser?.role === 'AUDITOR';
@@ -69,9 +78,17 @@ export default function Sidebar() {
 
         // OPERASYON GRUBU
         { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
-        { name: 'Saha Satış Paneli', href: '/field-sales', icon: '📍' },
-        { name: 'Canlı Saha Takibi', href: '/field-sales/admin/live', icon: '🛰️' },
-        { name: 'Saha Satış Yönetimi', href: '/field-sales/admin/routes', icon: '🗺️' },
+        {
+            name: 'Saha Satış Yönetimi',
+            icon: '🗺️',
+            isParent: true,
+            id: 'field-sales-parent',
+            subItems: [
+                { name: 'Yönetim Paneli', href: '/field-sales/admin/routes', icon: '⚙️' },
+                { name: 'Saha Satış Paneli', href: '/field-sales', icon: '📍' },
+                { name: 'Canlı Saha Takibi', href: '/field-sales/admin/live', icon: '🛰️' },
+            ]
+        },
         { name: 'Teklifler', href: '/quotes', icon: '📋' },
         { name: 'Servis Masası', href: '/service', icon: '🛠️' },
 
@@ -110,6 +127,21 @@ export default function Sidebar() {
         }
 
         return true;
+    }).map(item => {
+        if (item.subItems) {
+            return {
+                ...item,
+                subItems: item.subItems.filter(sub => {
+                    const subConfig = permMap[sub.href];
+                    if (!subConfig) return true;
+                    if (subConfig.feature && !hasFeature(subConfig.feature)) return false;
+                    if (isSystemAdmin) return true;
+                    if (subConfig.perm) return hasPermission(subConfig.perm);
+                    return true;
+                })
+            };
+        }
+        return item;
     });
 
     const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -228,7 +260,62 @@ export default function Sidebar() {
                 flex: 1,
                 overflowY: 'auto'
             }}>
-                {menuItems.map((item) => {
+                {menuItems.map((item: any) => {
+                    if (item.isParent) {
+                        const isExpanded = item.id === 'field-sales-parent' ? fieldSalesOpen : false;
+                        const anyChildActive = item.subItems?.some((sub: any) => pathname === sub.href);
+
+                        return (
+                            <div key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <div
+                                    onClick={() => {
+                                        if (item.id === 'field-sales-parent') setFieldSalesOpen(!fieldSalesOpen);
+                                    }}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '14px',
+                                        padding: '12px 18px', borderRadius: '14px',
+                                        background: anyChildActive ? 'rgba(255, 85, 0, 0.05)' : 'transparent',
+                                        color: anyChildActive ? 'var(--primary)' : 'var(--text-muted)',
+                                        transition: '0.3s', cursor: 'pointer',
+                                        fontWeight: '800',
+                                        border: anyChildActive ? '1px solid rgba(255, 85, 0, 0.1)' : '1px solid transparent'
+                                    }}
+                                    className="sidebar-link"
+                                >
+                                    <span style={{ fontSize: '18px', filter: anyChildActive ? 'none' : 'grayscale(100%) opacity(0.5)' }}>{item.icon}</span>
+                                    <span style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1 }}>{item.name}</span>
+                                    <span style={{ fontSize: '10px', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: '0.3s' }}>▼</span>
+                                </div>
+
+                                {isExpanded && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '12px', borderLeft: '2px solid var(--border-light)', marginLeft: '26px', marginTop: '4px', marginBottom: '8px' }}>
+                                        {item.subItems.map((sub: any) => {
+                                            const isSubActive = pathname === sub.href;
+                                            return (
+                                                <Link key={sub.href} href={sub.href} style={{ textDecoration: 'none' }}>
+                                                    <div style={{
+                                                        display: 'flex', alignItems: 'center', gap: '10px',
+                                                        padding: '10px 14px', borderRadius: '10px',
+                                                        background: isSubActive ? 'var(--primary)' : 'transparent',
+                                                        color: isSubActive ? 'white' : 'var(--text-muted)',
+                                                        transition: '0.2s',
+                                                        fontWeight: '700',
+                                                        fontSize: '13px'
+                                                    }}
+                                                        className="sidebar-sublink"
+                                                    >
+                                                        <span>{sub.icon}</span>
+                                                        <span>{sub.name}</span>
+                                                    </div>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    }
+
                     const isActive = pathname === item.href;
                     return (
                         <Link
