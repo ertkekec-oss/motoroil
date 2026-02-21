@@ -92,26 +92,34 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
 
         for (const url of endpointsToTry) {
             try {
-                const pdfResponse = await axios.get(url, {
-                    headers: { 'Authorization': `Bearer ${apiKey}` },
-                    responseType: 'arraybuffer',
-                    timeout: 10000,
-                    validateStatus: () => true
+                console.log(`[PDF Proxy] Trying URL: ${url}`);
+                const pdfResponse = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Accept': 'application/pdf'
+                    },
+                    cache: 'no-store'
                 });
 
-                if (pdfResponse.status === 200) {
-                    return new NextResponse(pdfResponse.data, {
+                if (pdfResponse.ok) {
+                    console.log(`[PDF Proxy] Success for URL: ${url}`);
+                    const buffer = await pdfResponse.arrayBuffer();
+
+                    return new Response(buffer, {
+                        status: 200,
                         headers: {
                             'Content-Type': 'application/pdf',
                             'Content-Disposition': `inline; filename="Fatura-${uuid}.pdf"`,
-                            'Cache-Control': 'public, max-age=3600'
+                            'Cache-Control': 'no-store, no-cache, must-revalidate',
+                            'Pragma': 'no-cache'
                         }
                     });
                 }
+
                 lastStatus = pdfResponse.status;
-                if (pdfResponse.data && pdfResponse.data.length < 500) lastErrorData = pdfResponse.data.toString();
+                console.warn(`[PDF Proxy] Failed ${url} with status ${lastStatus}`);
             } catch (err: any) {
-                console.warn(`[PDF Proxy] Attempt failed for ${url}:`, err.message);
+                console.warn(`[PDF Proxy] Exception for ${url}:`, err.message);
             }
         }
 
