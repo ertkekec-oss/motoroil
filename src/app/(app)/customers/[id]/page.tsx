@@ -78,6 +78,14 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             }
         }
 
+        // Build a map: orderId -> invoice, for quickly checking if a sale already has a formal invoice
+        const formalInvoiceByOrderId = new Map<string, any>();
+        (customer.invoices || []).forEach((inv: any) => {
+            if (inv.orderId && inv.isFormal) {
+                formalInvoiceByOrderId.set(inv.orderId, inv);
+            }
+        });
+
         // Prepare history data on server to keep client component clean and fast
         const txs = (customer.transactions || [])
             .map((t: any) => {
@@ -105,9 +113,14 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     amount: isCollection ? -Number(t.amount || 0) : Number(t.amount || 0),
                     color: isCollection ? '#10b981' : (t.type === 'Payment' ? '#3b82f6' : (t.type === 'Sales' ? '#10b981' : '#ef4444')),
                     items: null,
-                    orderId: orderId
+                    orderId: orderId,
+                    // If an orderId exists and a formal invoice was created for it, mark as invoiced
+                    isFormal: orderId ? (formalInvoiceByOrderId.has(orderId) ? true : false) : false,
+                    formalUuid: orderId ? (formalInvoiceByOrderId.get(orderId)?.formalUuid || null) : null,
+                    formalInvoiceId: orderId ? (formalInvoiceByOrderId.get(orderId)?.id || null) : null
                 };
             });
+
 
         const invs = (customer.invoices || []).map((inv: any) => {
             let safeItems = [];
@@ -125,9 +138,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 desc: `${inv.invoiceNo || 'Fatura'} - ${inv.isFormal ? 'Resmi' : 'Taslak'}`,
                 amount: Number(inv.totalAmount || 0),
                 color: '#3b82f6',
-                items: safeItems
+                items: safeItems,
+                isFormal: inv.isFormal || false,
+                formalUuid: inv.formalUuid || null,
+                formalType: inv.formalType || null
             };
         });
+
 
         const chkList = (customer.checks || []).map((c: any) => {
             const isReceivable = (c.type || '').includes('Alınan');

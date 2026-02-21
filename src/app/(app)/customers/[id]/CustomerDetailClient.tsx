@@ -1036,12 +1036,44 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                             {processingIds.includes(item.id) ? '⏳ İşleniyor...' : (completedIds.includes(item.id) ? '✅ İade Edildi' : '↩️ İade')}
                                                         </button>
                                                         {item.orderId && (
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
-                                                                style={{ padding: '6px 8px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                                                            >
-                                                                🧾 Faturalandır
-                                                            </button>
+                                                            item.isFormal ? (
+                                                                // Already invoiced — show locked badge + print button
+                                                                <>
+                                                                    <span style={{
+                                                                        padding: '6px 8px',
+                                                                        background: 'rgba(16,185,129,0.1)',
+                                                                        color: '#10b981',
+                                                                        border: '1px solid rgba(16,185,129,0.3)',
+                                                                        borderRadius: '8px',
+                                                                        fontSize: '11px',
+                                                                        fontWeight: 'bold',
+                                                                        whiteSpace: 'nowrap',
+                                                                        display: 'inline-flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '4px'
+                                                                    }}>
+                                                                        ✅ Faturalandı
+                                                                    </span>
+                                                                    {item.formalInvoiceId && (
+                                                                        <button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${item.formalInvoiceId}`, '_blank');
+                                                                            }}
+                                                                            style={{ padding: '6px 8px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                                                                        >
+                                                                            🖨️ Yazdır
+                                                                        </button>
+                                                                    )}
+                                                                </>
+                                                            ) : (
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
+                                                                    style={{ padding: '6px 8px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                                                                >
+                                                                    🧾 Faturalandır
+                                                                </button>
+                                                            )
                                                         )}
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); handleOpenPlanModal(item); }}
