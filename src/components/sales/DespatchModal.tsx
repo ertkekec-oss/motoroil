@@ -51,7 +51,7 @@ export function DespatchModal({
                                 value={despatchForm.despatchSeries || ''}
                                 onChange={e => setDespatchForm({ ...despatchForm, despatchSeries: e.target.value.toUpperCase() })}
                             />
-                            <p className="text-[10px] text-white/30 mt-1 italic leading-tight">Boş bırakılırsa Nilvera'daki varsayılan seri kullanılır.</p>
+                            <p className="text-[10px] text-white/30 mt-1 italic leading-tight">Boş bırakılırsa entegrasyondaki varsayılan seri kullanılır.</p>
                         </div>
                         <div className="form-group">
                             <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>ARAÇ PLAKA</label>
