@@ -100,6 +100,11 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
 
     };
 
+    const handleViewPDF = async (invoiceId: string) => {
+        if (!invoiceId) return;
+        window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${invoiceId}`, '_blank');
+    };
+
     return (
         <div className="container" style={{ padding: '40px 20px' }}>
 
@@ -295,12 +300,30 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                                                             {item.amount.toLocaleString()} ₺
                                                         </td>
                                                         <td style={{ textAlign: 'center' }}>
-                                                            <button
-                                                                onClick={() => { setSelectedTransaction(item); setIsDetailModalOpen(true); }}
-                                                                style={{ fontSize: '11px', padding: '4px 10px', background: 'transparent', border: '1px solid #555', color: '#ccc', borderRadius: '4px', cursor: 'pointer' }}
-                                                            >
-                                                                🔍 Detay
-                                                            </button>
+                                                            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                                                                <button
+                                                                    onClick={() => { setSelectedTransaction(item); setIsDetailModalOpen(true); }}
+                                                                    style={{ fontSize: '11px', padding: '4px 10px', background: 'transparent', border: '1px solid #555', color: '#ccc', borderRadius: '4px', cursor: 'pointer' }}
+                                                                >
+                                                                    🔍 Detay
+                                                                </button>
+                                                                {(item.invoiceId || (item.type === 'Bekleyen Fatura' && item.id)) && (
+                                                                    <button
+                                                                        onClick={() => handleViewPDF(item.invoiceId || item.id)}
+                                                                        style={{
+                                                                            fontSize: '11px',
+                                                                            padding: '4px 10px',
+                                                                            background: 'rgba(59, 130, 246, 0.1)',
+                                                                            border: '1px solid #3b82f6',
+                                                                            color: '#3b82f6',
+                                                                            borderRadius: '4px',
+                                                                            cursor: 'pointer'
+                                                                        }}
+                                                                    >
+                                                                        📄 Fatura
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))}

@@ -51,11 +51,20 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
             let trType = 'Düzeltme';
             let trAmount = tr.amount;
             let trColor = tr.amount < 0 ? '#ef4444' : '#10b981';
+            let invoiceId = null;
 
             if (tr.type === 'Purchase') {
                 trType = 'Alış';
                 trAmount = -Math.abs(Number(tr.amount)); // Purchases are always debt (negative impact on balance)
                 trColor = '#ef4444';
+
+                // Try to find matching invoice by invoiceNo in description
+                const match = tr.description?.match(/ADA\d+|[A-Z0-9]{3}20\d{2}\d+/); // Improved regex for invoice numbers
+                if (match) {
+                    const invNo = match[0];
+                    const matchedInv = dbInvoices.find((i: any) => i.invoiceNo === invNo);
+                    if (matchedInv) invoiceId = matchedInv.id;
+                }
             } else if (tr.type === 'Payment') {
                 trType = 'Ödeme';
                 trAmount = Math.abs(Number(tr.amount)); // Payments are credit (positive impact on balance)
@@ -67,6 +76,7 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
 
             return {
                 id: tr.id,
+                invoiceId: invoiceId,
                 date: new Date(tr.date).toLocaleDateString('tr-TR'),
                 rawDate: tr.date,
                 desc: tr.description || trType,
