@@ -12,10 +12,18 @@ export async function GET(req: Request) {
     const branch = searchParams.get('branch');
 
     // Strict Tenant Isolation for GET
+    const user = auth.user;
+    const isPlatformAdmin = user.tenantId === 'PLATFORM_ADMIN' || user.role === 'SUPER_ADMIN';
+    const effectiveTenantId = user.impersonateTenantId || user.tenantId;
+
     const where: any = {
-        deletedAt: null,
-        tenantId: auth.user.tenantId || 'PLATFORM_ADMIN'
+        deletedAt: null
     };
+
+    // If not platform admin, or if platform admin is impersonating, filter by tenant
+    if (!isPlatformAdmin || user.impersonateTenantId) {
+        where.tenantId = effectiveTenantId;
+    }
 
     if (branch && branch !== 'all') {
         where.branch = branch;
@@ -26,8 +34,16 @@ export async function GET(req: Request) {
             where,
             orderBy: { name: 'asc' }
         });
-        return NextResponse.json({ success: true, staff });
+
+        // Ensure salary is number
+        const formattedStaff = staff.map(s => ({
+            ...s,
+            salary: s.salary ? Number(s.salary) : 0
+        }));
+
+        return NextResponse.json({ success: true, staff: formattedStaff });
     } catch (error: any) {
+        console.error('[Staff API GET Error]:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
@@ -38,11 +54,13 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-
         const { name, role, salary, branch, phone, email, type, username, companyId } = body;
 
         // Basic validation
         if (!name) return NextResponse.json({ success: false, error: 'İsim zorunludur' }, { status: 400 });
+
+        const user = auth.user;
+        const effectiveTenantId = user.impersonateTenantId || user.tenantId || 'PLATFORM_ADMIN';
 
         const newStaff = await prisma.staff.create({
             data: {
@@ -50,17 +68,48 @@ export async function POST(req: Request) {
                 name,
                 phone,
                 role: role || 'Personel',
-                salary: parseFloat(salary) || 17002,
+                salary: salary ? Number(salary) : 17002,
                 branch: branch || 'Merkez',
                 email,
                 type: type || 'service',
-                tenantId: auth.user.tenantId || 'PLATFORM_ADMIN',
-                companyId: companyId || auth.user.companyId
+                tenantId: effectiveTenantId,
+                companyId: companyId || user.companyId
             }
         });
 
         return NextResponse.json({ success: true, staff: newStaff });
     } catch (error: any) {
+        console.error('[Staff API POST Error]:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+}
+
+export async function DELETE(req: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+
+    try {
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get('id');
+
+        if (!id) return NextResponse.json({ success: false, error: 'ID zorunludur' }, { status: 400 });
+
+        const user = auth.user;
+        const isPlatformAdmin = user.tenantId === 'PLATFORM_ADMIN' || user.role === 'SUPER_ADMIN';
+
+        // Soft delete
+        await prisma.staff.update({
+            where: {
+                id,
+                // Security: Ensure user belongs to same tenant unless platform admin
+                tenantId: isPlatformAdmin ? undefined : user.tenantId
+            },
+            data: { deletedAt: new Date() }
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error: any) {
+        console.error('[Staff API DELETE Error]:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

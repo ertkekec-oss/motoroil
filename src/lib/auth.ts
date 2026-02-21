@@ -185,7 +185,6 @@ export async function resolveCompanyId(user: any): Promise<string | undefined> {
     if (user.companyId) return user.companyId;
 
     // Use prismaBase to avoid circular middleware dependency 
-    // or just assume we need it for context resolution
     const prisma = (await import('@/lib/prisma')).default;
 
     const access = await prisma.userCompanyAccess.findFirst({
@@ -193,5 +192,16 @@ export async function resolveCompanyId(user: any): Promise<string | undefined> {
         select: { companyId: true }
     });
 
-    return access?.companyId;
+    if (access?.companyId) return access.companyId;
+
+    // Fallback for Platform Admin or Super Admin: Get first company
+    const role = (user.role || '').toUpperCase();
+    if (user.tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN') {
+        const firstCompany = await prisma.company.findFirst({
+            select: { id: true }
+        });
+        return firstCompany?.id;
+    }
+
+    return undefined;
 }

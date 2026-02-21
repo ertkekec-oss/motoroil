@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
         let companyId = ctx.companyId;
         if (!companyId) {
             const company = await prisma.company.findFirst({
-                where: { tenantId: ctx.tenantId },
+                where: ctx.tenantId === 'PLATFORM_ADMIN' ? {} : { tenantId: ctx.tenantId },
                 select: { id: true }
             });
             companyId = company?.id;

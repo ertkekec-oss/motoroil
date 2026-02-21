@@ -93,7 +93,7 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
     if (!user) {
         const staff = await prismaBase.staff.findUnique({
             where: { id: session.id },
-            select: { id: true, role: true, lastActive: true, tenantId: true }
+            select: { id: true, role: true, lastActive: true, tenantId: true, companyId: true }
         });
 
         if (staff) {
@@ -102,7 +102,8 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
                 id: staff.id,
                 tenantId: staff.tenantId || 'PLATFORM_ADMIN',
                 role: (staff.role || 'Staff').toUpperCase(),
-                lastActiveAt: staff.lastActive
+                lastActiveAt: staff.lastActive,
+                companyId: staff.companyId
             };
         }
     }
@@ -115,14 +116,18 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
         throw new ApiError("FORBIDDEN: Kullanıcının Tenant bilgisi eksik.", 403, 'TENANT_MISSING');
     }
 
-    // If companyId is still missing, try to find it from UserCompanyAccess
-    if (!resolvedCompanyId && user.id) {
-        const access = await (prisma as any).userCompanyAccess.findFirst({
-            where: { userId: user.id },
-            select: { companyId: true }
-        });
-        if (access) {
-            resolvedCompanyId = access.companyId;
+    // If companyId is still missing, try to find it from UserCompanyAccess or user object
+    if (!resolvedCompanyId) {
+        if ((user as any).companyId) {
+            resolvedCompanyId = (user as any).companyId;
+        } else if (user.id) {
+            const access = await (prisma as any).userCompanyAccess.findFirst({
+                where: { userId: user.id },
+                select: { companyId: true }
+            });
+            if (access) {
+                resolvedCompanyId = access.companyId;
+            }
         }
     }
 

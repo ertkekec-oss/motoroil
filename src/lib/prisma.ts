@@ -78,6 +78,9 @@ const prismaClientSingleton = () => {
                 debt: { needs: { debt: true }, compute(i) { return Number(i.debt); } },
                 credit: { needs: { credit: true }, compute(i) { return Number(i.credit); } },
             },
+            staff: {
+                salary: { needs: { salary: true }, compute(s) { return Number(s.salary); } },
+            },
         },
         query: {
             $allModels: {
