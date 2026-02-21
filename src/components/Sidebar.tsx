@@ -62,6 +62,7 @@ export default function Sidebar() {
         '/security/suspicious': { perm: 'security_access' },
         '/billing': { perm: 'settings_manage' },
         '/field-mobile/routes': { perm: 'field_sales_access' },
+        '/staff/me': { perm: 'pos_access' }, // Herkes erişebilir genelde POS yetkisi olanlar
         '/fintech/control-tower': { perm: 'finance_view', feature: 'fintech_tower' },
         '/fintech/profitability-heatmap': { perm: 'finance_view', feature: 'pnl_heatmap' },
         '/fintech/open-banking': { perm: 'finance_view' },
@@ -70,6 +71,7 @@ export default function Sidebar() {
 
     const menuItems = [
         { name: 'POS Terminal', href: '/', icon: '🏮' },
+        { name: 'Personel Paneli', href: '/staff/me', icon: '👤' },
 
         // FINANSAL YÖNETİM GRUBU
         { name: 'Finansal Yönetim', href: '/accounting', icon: '🏛️' },
