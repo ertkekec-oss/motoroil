@@ -50,12 +50,22 @@ export function InvoicesTab({
     const [currentPage, setCurrentPage] = useState(1);
     const ordersPerPage = 10;
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+    const [wayslipType, setWayslipType] = useState<'gelen' | 'giden'>('giden');
 
     const toggleExpand = (id: string) => {
         setExpandedOrderId(expandedOrderId === id ? null : id);
     };
 
-    const activeList = invoiceSubTab === 'sales' ? realInvoices : (invoiceSubTab === 'incoming' ? purchaseInvoices : wayslips);
+    let activeList = [];
+    if (invoiceSubTab === 'sales') {
+        activeList = realInvoices;
+    } else if (invoiceSubTab === 'incoming') {
+        activeList = purchaseInvoices;
+    } else if (invoiceSubTab === 'wayslips') {
+        const filterType = wayslipType === 'gelen' ? 'Gelen' : 'Giden';
+        activeList = (wayslips || []).filter(w => w.type === filterType);
+    }
+
     const totalPages = Math.ceil((activeList?.length || 0) / ordersPerPage);
     const paginatedList = activeList.slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage);
 
@@ -379,6 +389,42 @@ export function InvoicesTab({
                             <button onClick={() => setView('new_wayslip')} className="btn btn-primary" style={{ fontSize: '12px' }}>+ Yeni İrsaliye Oluştur</button>
                             <button onClick={fetchWayslips} className="btn btn-outline" style={{ fontSize: '12px' }}>🔄 Yenile</button>
                         </div>
+                    </div>
+
+                    {/* Wayslip Sub-Tabs */}
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', background: 'rgba(255,255,255,0.02)', padding: '4px', borderRadius: '10px', width: 'fit-content' }}>
+                        <button
+                            onClick={() => setWayslipType('giden')}
+                            style={{
+                                padding: '8px 20px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                background: wayslipType === 'giden' ? 'rgba(167, 139, 250, 0.15)' : 'transparent',
+                                color: wayslipType === 'giden' ? '#A78BFA' : 'rgba(255,255,255,0.5)',
+                                fontSize: '13px',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            📤 Giden İrsaliyeler
+                        </button>
+                        <button
+                            onClick={() => setWayslipType('gelen')}
+                            style={{
+                                padding: '8px 20px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                background: wayslipType === 'gelen' ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+                                color: wayslipType === 'gelen' ? '#3B82F6' : 'rgba(255,255,255,0.5)',
+                                fontSize: '13px',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            📥 Gelen İrsaliyeler
+                        </button>
                     </div>
 
                     {isLoadingWayslips ? <p>Yükleniyor...</p> : (
