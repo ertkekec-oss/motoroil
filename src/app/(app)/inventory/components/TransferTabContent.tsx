@@ -346,7 +346,7 @@ export default function TransferTabContent({
                     <div className="grid grid-cols-4 gap-4">
                         <div className="card glass p-5 flex flex-col gap-1 border-b-4 border-b-primary shadow-xl">
                             <div className="text-white/40 text-[9px] font-black tracking-widest uppercase">BUGÜN YAPILAN</div>
-                            <div className="text-3xl font-black">{pastTransfers.filter(t => new Date(t.shippedAt).toDateString() === new Date().toDateString()).length}</div>
+                            <div className="text-3xl font-black">{visibleTransfers.filter(t => new Date(t.shippedAt).toDateString() === new Date().toDateString()).length}</div>
                             <div className="text-[10px] text-primary font-bold">Tamamlanan Sevkiyat</div>
                         </div>
                         <div className="card glass p-5 flex flex-col gap-1 border-b-4 border-b-blue-500 shadow-xl">
