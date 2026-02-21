@@ -1,0 +1,4 @@
+Path: /einvoice/Purchase/Details?uuid=d1230639-c887-48d9-8c55-576ad87971f0 | Error: 404
+Path: /einvoice/Purchase/Model?uuid=d1230639-c887-48d9-8c55-576ad87971f0 | Error: 404
+Path: /einvoice/Purchase/Incoming?uuid=d1230639-c887-48d9-8c55-576ad87971f0 | Error: 404
+Path: /einvoice/Purchase?uuid=d1230639-c887-48d9-8c55-576ad87971f0 | Status: 200 | DataKeys: Page,PageSize,TotalCount,TotalPages,Content

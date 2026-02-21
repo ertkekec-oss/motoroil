@@ -1,0 +1,6 @@
+Query: ?includeLines=true | Status: 200 | HasLines: false
+Query: ?includeModel=true | Status: 200 | HasLines: false
+Query: ?IncludeModel=true | Status: 200 | HasLines: false
+Query: ?includeUbl=true | Status: 200 | HasLines: false
+Query: ?IncludeUBL=true | Status: 200 | HasLines: false
+Query: ?includeUBL=true | Status: 200 | HasLines: false

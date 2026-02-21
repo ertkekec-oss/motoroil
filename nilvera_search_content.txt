@@ -1,0 +1,36 @@
+Content Keys: UUID,TaxNumber,SenderTaxNumber,SenderName,InvoiceNumber,InvoiceProfile,InvoiceType,CurrencyCode,IssueDate,PayableAmount,TaxExclusiveAmount,TaxTotalAmount,LineExtensionAmount,ExchangeRate,AllowanceTotalAmount,ChargeTotalAmount,IsRead,IsPrint,IsArchive,IsTransfer,IsZirveTransfer,AnswerCode,StatusCode,CreatedDate,StatusDetail,EnvelopeUUID,EnvelopeDate,Tags,SpecialCode,Luca
+Full Data: {
+  "UUID": "f98d8b80-bf2f-4825-a415-babf78995b14",
+  "TaxNumber": "1234567801",
+  "SenderTaxNumber": "1234567801",
+  "SenderName": "TR Company",
+  "InvoiceNumber": "IAD2026000000006",
+  "InvoiceProfile": "TEMELFATURA",
+  "InvoiceType": "IADE",
+  "CurrencyCode": "TRY",
+  "IssueDate": "2026-02-17T00:00:00",
+  "PayableAmount": 0.24,
+  "TaxExclusiveAmount": 0.2,
+  "TaxTotalAmount": 0.04,
+  "LineExtensionAmount": 0.2,
+  "ExchangeRate": 1,
+  "AllowanceTotalAmount": 0,
+  "ChargeTotalAmount": 0,
+  "IsRead": true,
+  "IsPrint": false,
+  "IsArchive": false,
+  "IsTransfer": true,
+  "IsZirveTransfer": false,
+  "AnswerCode": "documentAnsweredAutomatically",
+  "StatusCode": "succeed",
+  "CreatedDate": "2026-02-17T13:22:26.337",
+  "StatusDetail": "Alındı Yanıtı Gönderildi.",
+  "EnvelopeUUID": "e5177577-3fe4-4434-8c58-7fca0fa2dc69",
+  "EnvelopeDate": "2026-02-17T13:22:24.913",
+  "Tags": null,
+  "SpecialCode": null,
+  "Luca": {
+    "Status": "None",
+    "Description": null
+  }
+}

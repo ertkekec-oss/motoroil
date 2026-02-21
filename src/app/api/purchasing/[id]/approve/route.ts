@@ -171,7 +171,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
             // B. Update Stocks & Record Movements
             const items = invoice!.items as any[];
-            const branch = (session.user as any)?.branch || 'Merkez';
+            const branch = (session.user as any)?.branch || (session as any).branch || 'Merkez';
 
             for (const item of items) {
                 if (item.productId) {

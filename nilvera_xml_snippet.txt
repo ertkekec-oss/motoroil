@@ -1,0 +1,30 @@
+<Invoice xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:ubltr="urn:oasis:names:specification:ubl:schema:xsd:TurkishCustomizationExtensionComponents" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2 UBL-Invoice-2.1.xsd" xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"><ext:UBLExtensions><ext:UBLExtension><ext:ExtensionContent><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="Signature_INV2025100000053">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" />
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256" />
+<ds:Reference Id="Reference-Id-d8101eab-9fbf-4c7d-9b72-252a0bd3ed52" URI="#Signed-Properties-Id-f716f74a-bb35-402b-b77c-0b6d333448ba" Type="http://uri.etsi.org/01903#SignedProperties">
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" />
+<ds:DigestValue>VS58WxWcFqFe3HHFZlZOrG1Za1ku+A10QVfdLYzwKnI=</ds:DigestValue>
+</ds:Reference>
+<ds:Reference Id="Reference-Id-04abb799-b124-4b86-9525-d55a86ab0934" URI="">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" />
+<ds:DigestValue>h7uAji5TF4YsztKLbxDI87mHycgebQQmF1DVX0o+GhA=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue Id="Signature-Value-Id-70232339-e4d1-4e93-a69f-2cd7eaf5faa3">uomrGcWKvKX/Ih4qViclp13HVzUXzdVJL/oGe1GPW3eyRBIn1FYK+EakMqdTjfORl4mGJ03VOC77tHJYI8m5i10uqr6e0YQQtK8kXL44bQO4BE1C3bQ8cT9OUvJB8ShOCGVAb2acMv04VR5LzfjJPIWvD3MMaNvLvH6wb2CJS6FqWbL8tR6hldzK8sEgGHjCPcvG95wyVyuNU8Ycc1X6wwzO6iv6DhBJmVPal5WstaVKhcfhGd8LvPAfaUI4hkPJk94DtYM6wDzaNdZKmZmQVcN2GVYm+xSOOB5uI0sZUtFZTSA2nAYrLjdnXJrOIR7C5B8XKomZubpJVOZeuJybLQ==</ds:SignatureValue>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate>MIIFKjCCBLCgAwIBAgIIAI+UgkBOswIwCgYIKoZIzj0EAwMwgdExCzAJBgNVBAYTAlRSMRgwFgYDVQQHDA9HZWJ6ZSAtIEtvY2FlbGkxRzBFBgNVBAoMPlTDvHJraXllIEJpbGltc2VsIHZlIFRla25vbG9qaWsgQXJhxZ90xLFybWEgS3VydW11IC0gVMOcQsSwVEFLMRAwDgYDVQQLDAdCxLBMR0VNMU0wSwYDVQQDDERNYWxpIE3DvGjDvHIgRWxla3Ryb25payBTZXJ0aWZpa2EgSGl6bWV0IFNhxJ9sYXnEsWPEsXPEsSAtIFPDvHLDvG0gMzAeFw0yNTA3MDkxMTA5NTJaFw0yODA3MDgxMTA5NTJaMGoxEzARBgNVBAUTCjYzMTA1NDA1NjUxUzBRBgNVBAMMSk7EsExWRVJBIFlBWklMSU0gVkUgQsSwTMSwxZ7EsE0gSMSwWk1FVExFUsSwIFTEsENBUkVUIEzEsE3EsFRFRCDFnsSwUktFVMSwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvodNBXzXLR5C8Xqx65uCKYfxOka9sBtSTNnIzyDIlVZ3fSj7BO7FUjdcYnU7tFwpLyI/y90WUpFGgc5FDHqtN3BBPivygdCAIDevzZYnLkueCKXX0isOB55ZxsD0mzDKhAqnEUprefclIITjiymbpgdmoYKrFFQA65XPKEVKTfa1b4+xXJW92e1CGdDe8XpiHJrlgM3Q08DoA15k8PwF1THH9qkerBvOtoTTWJlFEebbHsvtZW49q0+JgYoIUlw6+npNrIAIehGjycFxzgVCVOgx9/d1ESPyWG8VZpEBjVoauZSmXAZsYYaYsYDCMW5yKVfOObXSJkzE8Hc1AprPkQIDAQABo4ICCzCCAgcwHwYDVR0jBBgwFoAUBjloES0EC4AUvbc5gqsEyPbYqXwwHQYDVR0OBBYEFD6DliBI7l70IT3dV1qOT6aT0BMYMA4GA1UdDwEB/wQEAwIHgDCBxgYDVR0gBIG+MIG7MIG4BgtghhgBAgEBBQcEATCBqDAqBggrBgEFBQcCARYeaHR0cDovL2RlcG8ua2FtdXNtLmdvdi50ci9pbGtlMHoGCCsGAQUFBwICMG4MbEJ1IHNlcnRpZmlrYSBpbGUgaWxnaWxpIHNlcnRpZmlrYSB1eWd1bGFtYSBlc2FzbGFyxLFuxLEgb2t1bWFrIGnDp2luIGJlbGlydGlsZW4gd2ViIHNpdGVzaW5pIHppeWFyZXQgZWRpbml6LjAMBgNVHRMBAf8EAjAAMBYGA1UdJQQPMA0GC2CGGAECAQEFBzIBMEEGA1UdHwQ6MDgwNqA0oDKGMGh0dHA6Ly9kZXBvLmthbXVzbS5nb3YudHIva3VydW1zYWwvbW1lc2hzLXMzLmNybDCBggYIKwYBBQUHAQEEdjB0MDwGCCsGAQUFBzAChjBodHRwOi8vZGVwby5rYW11c20uZ292LnRyL2t1cnVtc2FsL21tZXNocy1zMy5jcnQwNAYIKwYBBQUHMAGGKGh0dHA6Ly9jaXNkdXBtbXMzLmt1cnVtc2FsLmthbXVzbS5nb3YudHIwCgYIKoZIzj0EAwMDaAAwZQIxAP9eK1vT78jL+EtVRCOBhG7S8RbV5IgLMR2XTG4K2liLhn17N+tNprqUaBD+RaBwTAIwCGnPXgHVkV7MspVOR4+1C6a3B1D91BZ6OvjWFr2ztk4iwcE0vOxjEdQ+niQSgqBy</ds:X509Certificate>
+<ds:X509SubjectName>CN=NİLVERA YAZILIM VE BİLİŞİM HİZMETLERİ TİCARET LİMİTED ŞİRKETİ,SERIALNUMBER=6310540565</ds:X509SubjectName>
+</ds:X509Data>
+<ds:KeyValue>
+<ds:RSAKeyValue>
+<ds:Modulus>vodNBXzXLR5C8Xqx65uCKYfxOka9sBtSTNnIzyDIlVZ3fSj7BO7FUjdcYnU7tFwpLyI/y90WUpFGgc5FDHqtN3BBPivygdCAIDevzZYnLkueCKXX0isOB55ZxsD0mzDKhAqnEUprefclIITjiymbpgdmoYKrFFQA65XPKEVKTfa1b4+xXJW92e1CGdDe8XpiHJrlgM3Q08DoA15k8PwF1THH9qkerBvOtoTTWJlFEebbHsvtZW49q0+JgYoIUlw6+npNrIAIehGjycFxzgVCVOgx9/d1ESPyWG8VZpEBjVoauZSmXAZsYYaYsYDCMW5yKVfOObXSJkzE8Hc1AprPkQ==</ds:Modulus>
+<ds:Exponent>AQAB</ds:Exponent>
+</ds:RSAKeyValue>
+</ds:KeyValue>
+</ds:KeyInfo>
+<ds:Object Id="Object-Id-97b8c212-4eae-4484-b2e3-2dd7e19eac94"><xades:QualifyingProperties xmln

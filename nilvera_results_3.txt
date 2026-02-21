@@ -1,0 +1,6 @@
+Path: /einvoice/Purchase/Model/Incoming/d1230639-c887-48d9-8c55-576ad87971f0 | Error: 404
+Path: /einvoice/Purchase/Details/Incoming/d1230639-c887-48d9-8c55-576ad87971f0 | Error: 404
+Path: /einvoice/Purchase/Model/d1230639-c887-48d9-8c55-576ad87971f0 | Error: 404
+Path: /einvoice/Purchase/Details/d1230639-c887-48d9-8c55-576ad87971f0 | Error: 404
+Path: /einvoice/Purchase/d1230639-c887-48d9-8c55-576ad87971f0/Model | Error: 404
+Path: /einvoice/Purchase/Incoming/d1230639-c887-48d9-8c55-576ad87971f0 | Error: 404

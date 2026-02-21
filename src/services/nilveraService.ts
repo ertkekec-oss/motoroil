@@ -1,5 +1,6 @@
 import axios from 'axios';
 import crypto from 'crypto';
+import { XMLParser } from 'fast-xml-parser';
 
 // --- INTERFACES ---
 
@@ -476,7 +477,9 @@ export class NilveraInvoiceService {
      * Fatura detaylarını çek (Alım faturası için)
      */
     async getInvoiceDetails(uuid: string) {
+        // Öncelikli olarak JSON Model veya Details deniyoruz
         const endpoints = [
+            `${this.config.baseUrl}/einvoice/Purchase/${uuid}/Model`,
             `${this.config.baseUrl}/einvoice/Purchase/${uuid}/Details`,
             `${this.config.baseUrl}/einvoice/Purchase/${uuid}`
         ];
@@ -484,20 +487,127 @@ export class NilveraInvoiceService {
         let lastError = null;
         for (const url of endpoints) {
             try {
-                console.log(`[NilveraService] Fetching from: ${url}`);
+                console.log(`[NilveraService] Fetching JSON from: ${url}`);
                 const res = await axios.get(url, { headers: this.getHeaders() });
-                console.log(`[NilveraService] Success fetching from: ${url}. Data keys: ${Object.keys(res.data).join(',')}`);
-                return { success: true, data: res.data };
+
+                // Eğer gelen veri sadece bir özelse (InvoiceLines yoksa), XML'e geçmeyi düşünmeliyiesiz
+                const data = res.data;
+                const hasLines = !!(data.InvoiceLines || data.Items || data.Lines || data.PurchaseInvoice?.InvoiceLines || data.Model?.InvoiceLines);
+                const hasVkn = !!(data.TaxNumber || data.SupplierVknTckn || data.Supplier?.TaxNumber || data.SenderTaxNumber);
+
+                if (hasLines && hasVkn) {
+                    console.log(`[NilveraService] Valid JSON found at: ${url}`);
+                    return { success: true, data: res.data };
+                }
+
+                console.warn(`[NilveraService] JSON found at ${url} but seems to be a summary (no lines/vkn).`);
             } catch (error: any) {
                 lastError = error;
-                console.warn(`[NilveraService] Failed for ${url}: ${error.response?.status || error.message}`);
-                if (error.response?.status !== 404) break; // If not 404, maybe auth error, don't retry
+                if (error.response?.status !== 404) {
+                    console.warn(`[NilveraService] Request failed for ${url}: ${error.response?.status}`);
+                }
             }
         }
 
-        const detail = lastError.response?.data || lastError.message;
+        // Eğer JSON'lar tatmin etmediyse veya 404 verdiyse, XML (UBL) çekip parse etmeyi deniyoruz
+        try {
+            const xmlUrl = `${this.config.baseUrl}/einvoice/Purchase/${uuid}/Xml`;
+            console.log(`[NilveraService] Attempting XML Fallback: ${xmlUrl}`);
+            const xmlRes = await axios.get(xmlUrl, { headers: this.getHeaders() });
+
+            if (xmlRes.status === 200 && xmlRes.data) {
+                const parsedData = this.parseUblXml(xmlRes.data);
+                if (parsedData) {
+                    console.log(`[NilveraService] XML Parse Successful for ${uuid}`);
+                    return { success: true, data: parsedData };
+                }
+            }
+        } catch (xmlErr: any) {
+            console.error(`[NilveraService] XML Fallback failed: ${xmlErr.message}`);
+        }
+
+        const detail = lastError?.response?.data || lastError?.message || "Detay bulunamadı";
         console.error("[NilveraService] Get Invoice Details Error FINAL:", detail);
         return { success: false, error: typeof detail === 'object' ? JSON.stringify(detail) : detail };
+    }
+
+    private extractText(obj: any): string | null {
+        if (!obj) return null;
+        if (typeof obj === 'string' || typeof obj === 'number') return String(obj);
+        if (obj['#text'] !== undefined) return String(obj['#text']);
+        return null;
+    }
+
+    private parseUblXml(xml: string) {
+        try {
+            const parser = new XMLParser({
+                ignoreAttributes: false,
+                attributeNamePrefix: "@_",
+                removeNSPrefix: false // Namespace prefixlerini tutuyoruz (cac:, cbc: vb.)
+            });
+            const jObj = parser.parse(xml);
+
+            // Farklı UBL rootları olabilir ama genelde Invoice'dır
+            const invoice = jObj.Invoice || jObj.EInvoice || jObj;
+            if (!invoice) return null;
+
+            const supplier = invoice["cac:AccountingSupplierParty"]?.["cac:Party"];
+            const idListRaw = supplier?.["cac:PartyIdentification"];
+            const idList = Array.isArray(idListRaw) ? idListRaw : [idListRaw];
+
+            const vknObj = idList.find((id: any) => {
+                const schemeId = id?.["cbc:ID"]?.["@_schemeID"] || "";
+                return schemeId.includes('VKN') || schemeId.includes('TCKN');
+            });
+
+            const vkn = this.extractText(vknObj?.["cbc:ID"]) || this.extractText(idList[0]?.["cbc:ID"]);
+            const name = this.extractText(supplier?.["cac:PartyName"]?.["cbc:Name"]) ||
+                this.extractText(supplier?.["cac:PartyLegalEntity"]?.["cbc:RegistrationName"]) ||
+                "Bilinmeyen Tedarikçi";
+
+            const linesRaw = invoice["cac:InvoiceLine"];
+            const lines = Array.isArray(linesRaw) ? linesRaw : [linesRaw];
+
+            const monetaryTotal = invoice["cac:LegalMonetaryTotal"];
+
+            // Bizim approve/route.ts'in beklediği yapıya benzetiyoruz
+            return {
+                Model: {
+                    InvoiceInfo: {
+                        UUID: this.extractText(invoice["cbc:UUID"]),
+                        InvoiceNumber: this.extractText(invoice["cbc:ID"]),
+                        IssueDate: this.extractText(invoice["cbc:IssueDate"]),
+                        CurrencyCode: this.extractText(invoice["cbc:DocumentCurrencyCode"]),
+                        PayableAmount: Number(this.extractText(monetaryTotal?.["cbc:PayableAmount"]) || 0),
+                        TaxExclusiveAmount: Number(this.extractText(monetaryTotal?.["cbc:TaxExclusiveAmount"]) || 0),
+                        TaxInclusiveAmount: Number(this.extractText(monetaryTotal?.["cbc:TaxInclusiveAmount"]) || 0),
+                        TaxAmount: Number(this.extractText(invoice["cac:TaxTotal"]?.["cbc:TaxAmount"]) || 0)
+                    },
+                    Supplier: {
+                        TaxNumber: vkn,
+                        Name: name,
+                        Address: this.extractText(supplier?.["cac:PostalAddress"]?.["cbc:StreetName"]),
+                        City: this.extractText(supplier?.["cac:PostalAddress"]?.["cbc:CityName"]),
+                        District: this.extractText(supplier?.["cac:PostalAddress"]?.["cbc:CitySubdivisionName"])
+                    },
+                    InvoiceLines: lines.filter(Boolean).map((line: any) => {
+                        const taxSubtotal = line["cac:TaxTotal"]?.["cac:TaxSubtotal"];
+                        const taxObj = Array.isArray(taxSubtotal) ? taxSubtotal[0] : taxSubtotal;
+
+                        return {
+                            Name: this.extractText(line["cac:Item"]?.["cbc:Name"]),
+                            Quantity: Number(this.extractText(line["cbc:InvoicedQuantity"]) || 0),
+                            UnitPrice: Number(this.extractText(line["cac:Price"]?.["cbc:PriceAmount"]) || 0),
+                            VatRate: Number(this.extractText(taxObj?.["cbc:Percent"]) || 0),
+                            UnitCode: line["cbc:InvoicedQuantity"]?.["@_unitCode"] || "C62"
+                        };
+                    })
+                }
+            };
+        } catch (err) {
+            console.error("[NilveraService] XML Parse Exception:", err);
+            return null;
+        }
     }
 
     /**
