@@ -133,7 +133,8 @@ export default function SalesPage() {
                 status: i.isFormal ? 'Resmileştirildi' : 'Taslak',
                 isFormal: i.isFormal,
                 formalId: i.formalId,
-                formalType: i.formalType
+                formalType: i.formalType,
+                items: i.items
             }));
 
             const purIrs = (purData.invoices || []).filter((i: any) => i.status === 'İrsaliye').map((i: any) => ({
@@ -143,7 +144,8 @@ export default function SalesPage() {
                 date: i.date,
                 total: i.total,
                 status: 'Kabul Edildi',
-                isFormal: false
+                isFormal: false,
+                items: i.items || i.InvoiceLines
             }));
 
             setWayslips([...salesIrs, ...purIrs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));

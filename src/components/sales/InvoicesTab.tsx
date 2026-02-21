@@ -433,50 +433,101 @@ export function InvoicesTab({
                             <tbody>
                                 {paginatedList.length === 0 ? (
                                     <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px' }} className="text-muted">İrsaliye bulunamadı.</td></tr>
-                                ) : paginatedList.map((irs) => (
-                                    <tr key={irs.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                        <td style={{ padding: '16px 12px' }}>
-                                            <div style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{irs.formalId || irs.invoiceNo || irs.id}</div>
-                                            {irs.formalId && <div style={{ fontSize: '10px', color: 'var(--success)' }}>Resmi e-İrsaliye</div>}
-                                        </td>
-                                        <td>
-                                            <span style={{
-                                                fontSize: '10px', padding: '2px 6px', borderRadius: '4px',
-                                                background: irs.type === 'Gelen' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(167, 139, 250, 0.1)',
-                                                color: irs.type === 'Gelen' ? '#3B82F6' : '#A78BFA'
-                                            }}>
-                                                {irs.type}
-                                            </span>
-                                        </td>
-                                        <td style={{ fontWeight: '500' }}>{irs.customer || irs.supplier}</td>
-                                        <td style={{ fontSize: '12px' }}>{new Date(irs.date).toLocaleDateString('tr-TR')}</td>
-                                        <td>{irs.total?.toLocaleString()} ₺</td>
-                                        <td>
-                                            <span style={{
-                                                padding: '4px 8px', borderRadius: '4px', fontSize: '11px',
-                                                background: irs.isFormal ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                                                color: irs.isFormal ? 'var(--success)' : 'var(--warning)',
-                                                border: `1px solid ${irs.isFormal ? 'var(--success)' : 'var(--warning)'}`
-                                            }}>
-                                                {irs.status}
-                                            </span>
-                                        </td>
-                                        <td style={{ textAlign: 'right' }}>
-                                            <div className="flex-end gap-2">
-                                                {irs.type === 'Giden' && !irs.isFormal && (
-                                                    <button
-                                                        onClick={() => handleSendToELogo(irs.id, 'EIRSALIYE')}
-                                                        className="btn btn-primary"
-                                                        style={{ fontSize: '11px', padding: '4px 8px', background: 'var(--warning)', border: 'none', color: 'black' }}
-                                                    >
-                                                        🚀 e-İrsaliye Gönder
-                                                    </button>
-                                                )}
-                                                <button className="btn btn-outline" style={{ fontSize: '11px', padding: '4px 8px' }}>Yönet</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                ) : paginatedList.map((irs) => {
+                                    const isExpanded = expandedOrderId === irs.id;
+                                    return (
+                                        <Fragment key={irs.id}>
+                                            <tr
+                                                style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent' }}
+                                                onClick={() => toggleExpand(irs.id)}
+                                            >
+                                                <td style={{ padding: '16px 12px' }}>
+                                                    <div style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{irs.formalId || irs.invoiceNo || irs.id}</div>
+                                                    {irs.formalId && <div style={{ fontSize: '10px', color: 'var(--success)' }}>Resmi e-İrsaliye</div>}
+                                                </td>
+                                                <td>
+                                                    <span style={{
+                                                        fontSize: '10px', padding: '2px 6px', borderRadius: '4px',
+                                                        background: irs.type === 'Gelen' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(167, 139, 250, 0.1)',
+                                                        color: irs.type === 'Gelen' ? '#3B82F6' : '#A78BFA'
+                                                    }}>
+                                                        {irs.type}
+                                                    </span>
+                                                </td>
+                                                <td style={{ fontWeight: '500' }}>{irs.customer || irs.supplier}</td>
+                                                <td style={{ fontSize: '12px' }}>{new Date(irs.date).toLocaleDateString('tr-TR')}</td>
+                                                <td>{irs.total?.toLocaleString()} ₺</td>
+                                                <td>
+                                                    <span style={{
+                                                        padding: '4px 8px', borderRadius: '4px', fontSize: '11px',
+                                                        background: irs.isFormal ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                                        color: irs.isFormal ? 'var(--success)' : 'var(--warning)',
+                                                        border: `1px solid ${irs.isFormal ? 'var(--success)' : 'var(--warning)'}`
+                                                    }}>
+                                                        {irs.status}
+                                                    </span>
+                                                </td>
+                                                <td style={{ textAlign: 'right' }}>
+                                                    <div className="flex-end gap-2">
+                                                        {irs.type === 'Giden' && !irs.isFormal && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleSendToELogo(irs.id, 'EIRSALIYE'); }}
+                                                                className="btn btn-primary"
+                                                                style={{ fontSize: '11px', padding: '4px 8px', background: 'var(--warning)', border: 'none', color: 'black' }}
+                                                            >
+                                                                🚀 e-İrsaliye Gönder
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            className="btn btn-outline"
+                                                            style={{ fontSize: '11px', padding: '4px 8px' }}
+                                                            onClick={(e) => { e.stopPropagation(); toggleExpand(irs.id); }}
+                                                        >
+                                                            {isExpanded ? 'Kapat' : 'Yönet'}
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {isExpanded && (
+                                                <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                                                    <td colSpan={7} style={{ padding: '20px' }}>
+                                                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px' }}>
+                                                            <div className="flex-between mb-3">
+                                                                <h5 className="m-0">İrsaliye İçeriği</h5>
+                                                                <div className="flex gap-2">
+                                                                    {irs.isFormal && (
+                                                                        <button onClick={() => handleViewPDF(irs.id)} className="btn btn-outline btn-sm" style={{ fontSize: '11px' }}>📄 PDF Görüntüle</button>
+                                                                    )}
+                                                                    {!irs.isFormal && irs.type === 'Giden' && (
+                                                                        <button onClick={() => handleDeleteInvoice(irs.id)} className="btn btn-outline btn-sm text-danger" style={{ fontSize: '11px', borderColor: 'rgba(239, 68, 68, 0.3)' }}>🗑️ Sil</button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <table style={{ width: '100%', fontSize: '13px' }}>
+                                                                <thead className="text-muted">
+                                                                    <tr><th>Ürün</th><th>Miktar</th><th style={{ textAlign: 'right' }}>Birim Fiyat</th><th style={{ textAlign: 'right' }}>Toplam</th></tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {(irs.items || []).map((item: any, idx: number) => (
+                                                                        <tr key={idx} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                            <td style={{ padding: '8px 0' }}>{item.name || item.Name}</td>
+                                                                            <td>{item.qty || item.Quantity} {item.unit || item.UnitType}</td>
+                                                                            <td style={{ textAlign: 'right' }}>{(item.price || item.Price || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                                            <td style={{ textAlign: 'right' }}>{((item.qty || item.Quantity || 0) * (item.price || item.Price || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                            <div className="flex-end mt-4" style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                                                                TOPLAM: {irs.total?.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </Fragment>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     )}

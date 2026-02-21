@@ -103,7 +103,8 @@ export async function GET() {
                 msg: inv.description || `${(inv.items as any[])?.length || 0} Kalem Ürün Girişi`,
                 total: Number(inv.totalAmount),
                 status: inv.status === 'Bekliyor' ? 'Bekliyor' : (inv.status === 'Onaylandı' ? 'Onaylandı' : inv.status),
-                isFormal: false
+                isFormal: false,
+                items: inv.items
             }));
 
         // Combined results
