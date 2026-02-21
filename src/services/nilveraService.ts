@@ -486,7 +486,7 @@ export class NilveraInvoiceService {
             try {
                 console.log(`[NilveraService] Fetching from: ${url}`);
                 const res = await axios.get(url, { headers: this.getHeaders() });
-                console.log(`[NilveraService] Success fetching from: ${url}`);
+                console.log(`[NilveraService] Success fetching from: ${url}. Data keys: ${Object.keys(res.data).join(',')}`);
                 return { success: true, data: res.data };
             } catch (error: any) {
                 lastError = error;

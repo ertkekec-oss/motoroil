@@ -59,28 +59,40 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             }
 
             const nilvera = new NilveraInvoiceService({ apiKey, baseUrl });
-            const result = await nilvera.getInvoiceDetails(id); // Using the UUID
+            const result = await nilvera.getInvoiceDetails(id);
 
             if (!result.success) {
                 return NextResponse.json({ success: false, error: `Nilvera'dan fatura detayları alınamadı: ${result.error}` }, { status: 404 });
             }
 
             // DYNAMIC STRUCTURE MAPPING
-            // Nilvera can return the object directly or wrapped in "PurchaseInvoice" or similar
             const rawData = result.data;
-            const invData = rawData.PurchaseInvoice || rawData.Model || rawData.EInvoice || rawData;
+            console.log(`[PurchaseApprove] Raw Keys: ${Object.keys(rawData).join(', ')}`);
 
-            const supplierData = invData.Supplier || invData.Seller || invData.DespatchSupplierInfo || invData.SenderInfo;
-            const vkn = supplierData?.TaxNumber || supplierData?.SupplierVknTckn || supplierData?.VknTckn || invData.SupplierVknTckn;
+            const invData = rawData.PurchaseInvoice || rawData.Model || rawData.EInvoice || rawData.EArchive || rawData;
+            const supplierData = invData.Supplier || invData.Seller || invData.DespatchSupplierInfo || invData.SenderInfo || invData.Sender;
+
+            let vkn = supplierData?.TaxNumber || supplierData?.SupplierVknTckn || supplierData?.VknTckn || invData.SupplierVknTckn || invData.SenderVknTckn;
             const name = invData.SenderName || invData.SenderTitle || supplierData?.Name || supplierData?.Title || invData.SupplierName || "Bilinmeyen Tedarikçi";
 
+            // Emergency Fallback: If VKN still missing, try to find it in the rawData root (some summary formats have it)
             if (!vkn) {
-                return NextResponse.json({ success: false, error: 'Faturada VKN/TCKN bilgisi bulunamadı.' }, { status: 400 });
+                vkn = rawData.SenderVknTckn || rawData.SupplierVknTckn || rawData.TaxNumber;
+            }
+
+            console.log(`[PurchaseApprove] Mapping result: VKN=${vkn}, Name=${name}`);
+
+            if (!vkn) {
+                console.error(`[PurchaseApprove] Missing VKN. invData Keys:`, Object.keys(invData));
+                return NextResponse.json({
+                    success: false,
+                    error: `Faturada VKN/TCKN bilgisi bulunamadı. Gelen Alanlar: ${Object.keys(invData).join(', ')}`
+                }, { status: 400 });
             }
 
             // A. Find or Create Supplier
             let supplier = await prisma.supplier.findFirst({
-                where: { companyId, taxNumber: vkn }
+                where: { companyId, taxNumber: String(vkn) }
             });
 
             if (!supplier) {
@@ -89,7 +101,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                     data: {
                         companyId,
                         name: name,
-                        taxNumber: vkn,
+                        taxNumber: String(vkn),
                         address: supplierData?.Address || '',
                         city: supplierData?.City || '',
                         district: supplierData?.District || '',
@@ -99,18 +111,19 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
             // B. Map Items and Prepare Local Invoice Data
             const nilveraLines = invData.InvoiceLines || invData.Items || invData.Lines || invData.PurchaseInvoiceLines || [];
-            const localItems = [];
+            console.log(`[PurchaseApprove] Line count: ${nilveraLines.length}`);
 
+            const localItems = [];
             for (const line of nilveraLines) {
                 const productName = line.Name || line.Description || "Bilinmeyen Ürün";
-                const productCode = line.SellerItemCode || line.BuyerItemCode || line.ItemCode || line.Name;
+                const productCode = line.SellerItemCode || line.BuyerItemCode || line.ItemCode || line.Name || productName;
 
                 let product = await prisma.product.findFirst({
                     where: {
                         companyId,
                         OR: [
-                            { code: productCode },
-                            { name: productName }
+                            { code: String(productCode) },
+                            { name: String(productName) }
                         ]
                     }
                 });
@@ -144,7 +157,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             });
         }
 
-        // 3. Approval Logic (existing core logic but simplified)
+        // 3. Approval Logic (existing core logic)
         if (invoice.status === 'Onaylandı') {
             return NextResponse.json({ success: false, error: 'Bu fatura zaten onaylanmış.' }, { status: 400 });
         }
@@ -158,7 +171,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
             // B. Update Stocks & Record Movements
             const items = invoice!.items as any[];
-            const branch = session.branch || 'Merkez';
+            const branch = (session.user as any)?.branch || 'Merkez';
 
             for (const item of items) {
                 if (item.productId) {
@@ -190,7 +203,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                 }
             }
 
-            // C. Update Supplier Balance (Subtracting from balance means increasing debt usually, but matches current logic)
+            // C. Update Supplier Balance
             await tx.supplier.update({
                 where: { id: invoice!.supplierId },
                 data: { balance: { decrement: Number(invoice!.totalAmount) } }
@@ -211,7 +224,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             return { updatedInvoice, transaction };
         });
 
-        return NextResponse.json({ success: true, message: 'Fatura kabul edildi, tedarikçi kaydedildi ve stoklara işlendi.' });
+        return NextResponse.json({ success: true, message: 'Fatura kabul edildi ve stoklara işlendi.' });
     } catch (error: any) {
         console.error('Purchase Approve Error:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
