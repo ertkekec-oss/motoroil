@@ -122,25 +122,35 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
                     cache: 'no-store'
                 });
 
-                if (pdfResponse.ok) {
-                    const contentType = pdfResponse.headers.get('content-type');
-                    // Check if it's REALLY a PDF and not an error HTML/JSON
-                    if (contentType?.includes('application/pdf')) {
-                        console.log(`[PDF Proxy] Success for URL: ${url}`);
-                        const buffer = await pdfResponse.arrayBuffer();
-                        return new Response(buffer, {
-                            status: 200,
-                            headers: {
-                                'Content-Type': 'application/pdf',
-                                'Content-Disposition': `inline; filename="Fatura-${uuid}.pdf"`,
-                                'Cache-Control': 'no-store'
-                            }
-                        });
-                    }
+                // Read buffer regardless of status for inspection
+                const buf = Buffer.from(await pdfResponse.arrayBuffer());
+                const contentType = pdfResponse.headers.get('content-type') || '';
+                const magicBytes = buf.subarray(0, 5).toString('ascii');
+                const isPdf = contentType.includes('pdf') || magicBytes === '%PDF-';
+
+                if (pdfResponse.ok && isPdf) {
+                    console.log(`[PDF Proxy] ✅ Real PDF confirmed for: ${url}`);
+                    return new Response(buf, {
+                        status: 200,
+                        headers: {
+                            'Content-Type': 'application/pdf',
+                            'Content-Disposition': `inline; filename="Fatura-${uuid}.pdf"`,
+                            'Cache-Control': 'no-store'
+                        }
+                    });
                 }
-                console.warn(`[PDF Proxy] Failed ${url} with status ${pdfResponse.status}`);
+
+                if (pdfResponse.ok && !isPdf) {
+                    // 200 but NOT a PDF — log exactly what Nilvera returned
+                    const preview = buf.subarray(0, 500).toString('utf8');
+                    console.warn(`[PDF Proxy] ⚠️ 200 but NOT PDF. content-type="${contentType}", magic="${magicBytes}", preview: ${preview}`);
+                    // Don't serve this as PDF — continue to next URL
+                } else {
+                    console.warn(`[PDF Proxy] Failed ${url} with status ${pdfResponse.status}`);
+                }
+
             } catch (err: any) {
-                console.warn(`[PDF Proxy] Error for ${url}:`, err.message);
+                console.warn(`[PDF Proxy] Exception for ${url}:`, err.message);
             }
         }
 
