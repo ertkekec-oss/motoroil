@@ -144,7 +144,7 @@ export function InvoicesTab({
                                                         color: inv.isFormal ? 'var(--success)' : 'var(--warning)',
                                                         border: `1px solid ${inv.isFormal ? 'var(--success)' : 'var(--warning)'}`
                                                     }}>
-                                                        {inv.isFormal ? 'Faturalandı' : inv.status}
+                                                        {inv.isFormal ? 'Faturalandırıldı' : inv.status}
                                                     </span>
                                                 </td>
                                                 <td style={{ textAlign: 'center' }}>
