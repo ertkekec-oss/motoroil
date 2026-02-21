@@ -9,7 +9,15 @@ export async function GET() {
         const session: any = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
-        const companyId = session.companyId;
+        const { resolveCompanyId } = await import('@/lib/auth');
+        let companyId = session.companyId || (session.user?.companyId);
+
+        if (!companyId) {
+            companyId = await resolveCompanyId(session.user || session);
+        }
+
+        if (!companyId) return NextResponse.json({ error: 'Firma ID bulunamadı' }, { status: 400 });
+
         const settings = await prisma.appSettings.findMany({
             where: { companyId }
         });
@@ -30,7 +38,14 @@ export async function POST(request: Request) {
         const session: any = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
-        const companyId = session.companyId;
+        const { resolveCompanyId } = await import('@/lib/auth');
+        let companyId = session.companyId || (session.user?.companyId);
+
+        if (!companyId) {
+            companyId = await resolveCompanyId(session.user || session);
+        }
+
+        if (!companyId) return NextResponse.json({ error: 'Firma ID bulunamadı' }, { status: 400 });
         if (!hasPermission(session, 'settings_manage')) {
             return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
         }

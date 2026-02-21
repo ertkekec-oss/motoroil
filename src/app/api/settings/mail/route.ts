@@ -1,12 +1,16 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { authorize } from '@/lib/auth';
+import { authorize, resolveCompanyId } from '@/lib/auth';
 
 export async function GET() {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const companyId = auth.user.companyId;
+
+    let companyId = auth.user.companyId;
+    if (!companyId) {
+        companyId = await resolveCompanyId(auth.user);
+    }
 
     if (!companyId) return NextResponse.json({ error: 'Firma ID bulunamadı' }, { status: 400 });
 
@@ -28,7 +32,11 @@ export async function GET() {
 export async function POST(request: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
-    const companyId = auth.user.companyId;
+
+    let companyId = auth.user.companyId;
+    if (!companyId) {
+        companyId = await resolveCompanyId(auth.user);
+    }
 
     if (!companyId) return NextResponse.json({ error: 'Firma ID bulunamadı' }, { status: 400 });
 

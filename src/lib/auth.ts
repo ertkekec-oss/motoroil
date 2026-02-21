@@ -162,7 +162,15 @@ export async function authorize() {
             response: Response.json({ success: false, error: 'Oturum gerekli.' }, { status: 401 })
         };
     }
-    return { authorized: true, user: session.user || session };
+
+    const user = session.user || session;
+
+    // Auto-resolve companyId if missing from session
+    if (!user.companyId) {
+        user.companyId = await resolveCompanyId(user);
+    }
+
+    return { authorized: true, user };
 }
 
 export function verifyWriteAccess(session: any) {
