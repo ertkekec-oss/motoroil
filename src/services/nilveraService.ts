@@ -473,6 +473,22 @@ export class NilveraInvoiceService {
     }
 
     /**
+     * Fatura detaylarını çek (Alım faturası için)
+     */
+    async getInvoiceDetails(uuid: string) {
+        try {
+            console.log(`[NilveraService] Fetching Invoice Details: ${uuid}`);
+            const res = await axios.get(`${this.config.baseUrl}/einvoice/Purchase/${uuid}`, {
+                headers: this.getHeaders()
+            });
+            return { success: true, data: res.data };
+        } catch (error: any) {
+            console.error("[NilveraService] Get Invoice Details Error:", error.response?.data || error.message);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
      * e-Arşiv Raporu Oluşturma (GİB'e iletim için kritik ikinci adım)
      */
     async createArchiveReport(uuid: string, dateObj?: Date) {
