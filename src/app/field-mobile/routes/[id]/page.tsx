@@ -16,6 +16,8 @@ export default function MobileRouteDetailPage() {
     const [activeVisit, setActiveVisit] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
+    const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+    const [checkoutNotes, setCheckoutNotes] = useState('');
 
     useEffect(() => {
         fetchData();
@@ -87,44 +89,50 @@ export default function MobileRouteDetailPage() {
 
     const handleCheckOut = async () => {
         if (!activeVisit) return;
-        showConfirm('Çıkış Yap', 'Ziyareti sonlandırmak istiyor musunuz?', async () => {
-            const visitId = activeVisit.id;
-            setActionLoading(true);
 
-            const performCheckOut = async (location: any = null) => {
-                try {
-                    const res = await fetch('/api/field-sales/visits/end', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ visitId, location, notes: '' })
-                    });
+        const visitId = activeVisit.id;
+        setActionLoading(true);
 
-                    if (res.ok) {
-                        fetchData(); // Refresh stops status
-                    } else {
-                        showError('Hata', 'Check-out başarısız.');
-                    }
-                } catch (e) {
-                    console.error(e);
-                    showError('Hata', 'Bağlantı hatası.');
-                } finally {
-                    setActionLoading(false);
+        const performCheckOut = async (location: any = null) => {
+            try {
+                const res = await fetch('/api/field-sales/visits/end', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        visitId,
+                        location,
+                        notes: checkoutNotes,
+                        photos: []
+                    })
+                });
+
+                if (res.ok) {
+                    setShowCheckoutModal(false);
+                    setCheckoutNotes('');
+                    fetchData(); // Refresh stops status
+                } else {
+                    showError('Hata', 'Check-out başarısız.');
                 }
-            };
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => performCheckOut({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                    (err) => {
-                        console.warn("Geolocation warning:", err.message);
-                        performCheckOut(null); // Fallback
-                    },
-                    { timeout: 5000 }
-                );
-            } else {
-                performCheckOut(null);
+            } catch (e) {
+                console.error(e);
+                showError('Hata', 'Bağlantı hatası.');
+            } finally {
+                setActionLoading(false);
             }
-        });
+        };
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => performCheckOut({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                (err) => {
+                    console.warn("Geolocation warning:", err.message);
+                    performCheckOut(null); // Fallback
+                },
+                { timeout: 5000 }
+            );
+        } else {
+            performCheckOut(null);
+        }
     };
 
     if (loading) return <div className="p-8 text-center text-white">Yükleniyor...</div>;
@@ -151,20 +159,56 @@ export default function MobileRouteDetailPage() {
                     <div className="text-xs font-bold text-green-400 uppercase mb-1">ŞU AN ZİYARETTESİNİZ</div>
                     <div className="font-bold text-lg">{activeVisit.customer?.name}</div>
 
-                    <button
-                        onClick={() => router.push(`/field-mobile/order/create?visitId=${activeVisit.id}&customerId=${activeVisit.customer?.id}&customerName=${activeVisit.customer?.name}`)}
-                        className="mt-3 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2"
-                    >
-                        <span>🛒</span> SİPARİŞ OLUŞTUR
-                    </button>
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                        <button
+                            onClick={() => router.push(`/field-mobile/order/create?visitId=${activeVisit.id}&customerId=${activeVisit.customer?.id}&customerName=${activeVisit.customer?.name}`)}
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2"
+                        >
+                            <span>🛒</span> SİPARİŞ
+                        </button>
+                        <button
+                            onClick={() => router.push(`/field-mobile/collection/create?visitId=${activeVisit.id}&customerId=${activeVisit.customer?.id}&customerName=${activeVisit.customer?.name}`)}
+                            className="bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-amber-900/20 transition-all flex items-center justify-center gap-2"
+                        >
+                            <span>💰</span> TAHSİLAT
+                        </button>
+                    </div>
 
                     <button
-                        onClick={handleCheckOut}
+                        onClick={() => setShowCheckoutModal(true)}
                         disabled={actionLoading}
                         className="mt-3 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-green-900/20 transition-all"
                     >
                         {actionLoading ? 'İşleniyor...' : 'ZİYARETİ BİTİR (CHECK-OUT)'}
                     </button>
+                </div>
+            )}
+
+            {/* Checkout Form Modal (Simple Overlay) */}
+            {showCheckoutModal && (
+                <div className="fixed inset-0 bg-black/80 z-[60] flex items-end animate-in fade-in duration-200">
+                    <div className="w-full bg-[#161b22] rounded-t-3xl p-6 space-y-4 animate-in slide-in-from-bottom duration-300">
+                        <div className="flex justify-between items-center">
+                            <h2 className="font-bold text-lg text-white">Ziyareti Sonlandır</h2>
+                            <button onClick={() => setShowCheckoutModal(false)} className="text-gray-400">✖</button>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">GÖRÜŞME NOTLARI</label>
+                            <textarea
+                                value={checkoutNotes}
+                                onChange={(e) => setCheckoutNotes(e.target.value)}
+                                placeholder="Görüşme nasıl geçti? Önemli notlar..."
+                                className="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-sm text-white focus:outline-none focus:border-green-500 min-h-[120px]"
+                            />
+                        </div>
+                        <button
+                            onClick={handleCheckOut}
+                            disabled={actionLoading}
+                            className="w-full bg-green-600 hover:bg-green-500 text-white font-black py-4 rounded-xl shadow-lg shadow-green-900/20 transition-all flex items-center justify-center gap-2"
+                        >
+                            {actionLoading ? 'KAYDEDİLİYOR...' : 'ZİYARETİ TAMAMLA'}
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -188,7 +232,21 @@ export default function MobileRouteDetailPage() {
                                     {isVisited && <span className="text-green-500 text-xl">✅</span>}
                                 </div>
                                 <div className="font-bold text-lg mb-1">{stop.customer?.name}</div>
-                                <div className="text-xs text-gray-400 mb-4">{stop.customer?.district || '-'}, {stop.customer?.city || '-'}</div>
+                                <div className="text-xs text-gray-400 mb-4 flex justify-between items-center">
+                                    <span>{stop.customer?.district || '-'}, {stop.customer?.city || '-'}</span>
+                                    {stop.customer?.address && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const addr = encodeURIComponent(`${stop.customer.address} ${stop.customer.district || ''} ${stop.customer.city || ''}`);
+                                                window.open(`https://www.google.com/maps/dir/?api=1&destination=${addr}`, '_blank');
+                                            }}
+                                            className="text-blue-400 font-bold bg-blue-400/10 px-2 py-1 rounded text-[10px] hover:bg-blue-400/20 transition-all"
+                                        >
+                                            🗺️ YOL TARİFİ
+                                        </button>
+                                    )}
+                                </div>
 
                                 {!isVisited && !isCurrentVisit && (
                                     <button

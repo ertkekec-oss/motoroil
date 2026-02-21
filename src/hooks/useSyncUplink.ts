@@ -9,11 +9,8 @@ export function useSyncUplink() {
         if (typeof navigator !== 'undefined' && !navigator.onLine) return;
 
         try {
+            // 1. Sync Pending Orders
             const pendingOrders = await fieldDb.orders.where('synced').equals(0).toArray();
-            if (pendingOrders.length === 0) return;
-
-            setUploading(true);
-
             for (const order of pendingOrders) {
                 try {
                     const res = await fetch('/api/field-sales/orders/create', {
@@ -27,13 +24,27 @@ export function useSyncUplink() {
                             notes: order.notes
                         })
                     });
+                    if (res.ok) await fieldDb.orders.update(order.id!, { synced: true });
+                } catch (e) { console.error('Order sync error', e); }
+            }
 
-                    if (res.ok) {
-                        await fieldDb.orders.update(order.id!, { synced: true });
-                    }
-                } catch (e) {
-                    console.error('Error syncing order', order.id, e);
-                }
+            // 2. Sync Pending Collections
+            const pendingCollections = await (fieldDb as any).collections.where('synced').equals(0).toArray();
+            for (const col of pendingCollections) {
+                try {
+                    const res = await fetch('/api/field-sales/collections', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            visitId: col.visitId,
+                            customerId: col.customerId,
+                            kasaId: col.kasaId,
+                            amount: col.amount,
+                            description: col.description
+                        })
+                    });
+                    if (res.ok) await (fieldDb as any).collections.update(col.id!, { synced: true });
+                } catch (e) { console.error('Collection sync error', e); }
             }
         } catch (e) {
             console.error('Sync Uplink failed', e);

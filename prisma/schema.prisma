@@ -626,11 +626,13 @@ model Transaction {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   branch       String?   @default("Merkez")
+  visitId      String?
   companyId    String
   company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customer     Customer? @relation(fields: [customerId], references: [id])
   kasa         Kasa?     @relation(fields: [kasaId], references: [id])
   supplier     Supplier? @relation(fields: [supplierId], references: [id])
+  visit        SalesVisit? @relation(fields: [visitId], references: [id])
 
   @@index([customerId])
   @@index([supplierId])
@@ -1335,6 +1337,7 @@ model SalesVisit {
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
   orders           SalesOrder[]
+  transactions     Transaction[]
   company          Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customer         Customer     @relation(fields: [customerId], references: [id])
   stop             RouteStop?   @relation(fields: [routeStopId], references: [id])

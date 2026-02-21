@@ -33,6 +33,7 @@ export default function Sidebar() {
         '/service': { perm: 'service_view', feature: 'service_desk' },
         '/sales': { perm: 'sales_archive', feature: 'sales' },
         '/field-sales': { perm: 'field_sales_access', feature: 'field_sales' },
+        '/field-sales/admin/live': { perm: 'field_sales_admin', feature: 'field_sales' },
         '/field-sales/admin/routes': { perm: 'field_sales_admin', feature: 'field_sales' },
         '/quotes': { perm: 'offer_create', feature: 'quotes' },
         '/reports': { perm: 'reports_view', feature: 'analytics' },
@@ -71,6 +72,7 @@ export default function Sidebar() {
         // OPERASYON GRUBU
         { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
         { name: 'Saha Satış Paneli', href: '/field-sales', icon: '📍' },
+        { name: 'Canlı Saha Takibi', href: '/field-sales/admin/live', icon: '🛰️' },
         { name: 'Saha Satış Yönetimi', href: '/field-sales/admin/routes', icon: '🗺️' },
         { name: 'Teklifler', href: '/quotes', icon: '📋' },
         { name: 'Servis Masası', href: '/service', icon: '🛠️' },

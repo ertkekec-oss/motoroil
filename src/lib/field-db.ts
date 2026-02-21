@@ -41,19 +41,32 @@ export interface OfflineVisit {
     serverId?: string; // If synced
 }
 
+export interface OfflineCollection {
+    id?: number;
+    visitId: string;
+    customerId: string;
+    kasaId: string;
+    amount: number;
+    description: string;
+    timestamp: number;
+    synced: boolean;
+}
+
 export class FieldDatabase extends Dexie {
     products!: Table<Product, string>;
     customers!: Table<Customer, string>;
     orders!: Table<OfflineOrder, number>;
     visits!: Table<OfflineVisit, number>;
+    collections!: Table<OfflineCollection, number>;
 
     constructor() {
         super('FieldSalesDB');
-        this.version(1).stores({
+        this.version(2).stores({
             products: 'id, name, category',
             customers: 'id, name',
             orders: '++id, visitId, synced',
-            visits: '++id, routeStopId, synced'
+            visits: '++id, routeStopId, synced',
+            collections: '++id, visitId, synced'
         });
     }
 }

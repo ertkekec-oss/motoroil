@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const body = await req.json();
-        const { visitId, location, notes } = body;
+        const { visitId, location, notes, photos } = body;
 
         if (!visitId) return NextResponse.json({ error: 'Visit ID required' }, { status: 400 });
 
@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
             data: {
                 checkOutTime: new Date(),
                 checkOutLocation: location || {},
-                notes
+                notes,
+                photos: photos || []
             }
         });
 
