@@ -476,16 +476,28 @@ export class NilveraInvoiceService {
      * Fatura detaylarını çek (Alım faturası için)
      */
     async getInvoiceDetails(uuid: string) {
-        try {
-            console.log(`[NilveraService] Fetching Invoice Details: ${uuid}`);
-            const res = await axios.get(`${this.config.baseUrl}/einvoice/Purchase/${uuid}`, {
-                headers: this.getHeaders()
-            });
-            return { success: true, data: res.data };
-        } catch (error: any) {
-            console.error("[NilveraService] Get Invoice Details Error:", error.response?.data || error.message);
-            return { success: false, error: error.message };
+        const endpoints = [
+            `${this.config.baseUrl}/einvoice/Purchase/${uuid}/Details`,
+            `${this.config.baseUrl}/einvoice/Purchase/${uuid}`
+        ];
+
+        let lastError = null;
+        for (const url of endpoints) {
+            try {
+                console.log(`[NilveraService] Fetching from: ${url}`);
+                const res = await axios.get(url, { headers: this.getHeaders() });
+                console.log(`[NilveraService] Success fetching from: ${url}`);
+                return { success: true, data: res.data };
+            } catch (error: any) {
+                lastError = error;
+                console.warn(`[NilveraService] Failed for ${url}: ${error.response?.status || error.message}`);
+                if (error.response?.status !== 404) break; // If not 404, maybe auth error, don't retry
+            }
         }
+
+        const detail = lastError.response?.data || lastError.message;
+        console.error("[NilveraService] Get Invoice Details Error FINAL:", detail);
+        return { success: false, error: typeof detail === 'object' ? JSON.stringify(detail) : detail };
     }
 
     /**

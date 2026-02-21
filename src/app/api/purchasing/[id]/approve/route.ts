@@ -65,10 +65,14 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                 return NextResponse.json({ success: false, error: `Nilvera'dan fatura detayları alınamadı: ${result.error}` }, { status: 404 });
             }
 
-            const invData = result.data;
-            const supplierData = invData.Supplier || invData.Seller || invData.DespatchSupplierInfo;
-            const vkn = supplierData?.TaxNumber || supplierData?.SupplierVknTckn || supplierData?.VknTckn;
-            const name = invData.SenderName || invData.SenderTitle || supplierData?.Name || supplierData?.Title || "Bilinmeyen Tedarikçi";
+            // DYNAMIC STRUCTURE MAPPING
+            // Nilvera can return the object directly or wrapped in "PurchaseInvoice" or similar
+            const rawData = result.data;
+            const invData = rawData.PurchaseInvoice || rawData.Model || rawData.EInvoice || rawData;
+
+            const supplierData = invData.Supplier || invData.Seller || invData.DespatchSupplierInfo || invData.SenderInfo;
+            const vkn = supplierData?.TaxNumber || supplierData?.SupplierVknTckn || supplierData?.VknTckn || invData.SupplierVknTckn;
+            const name = invData.SenderName || invData.SenderTitle || supplierData?.Name || supplierData?.Title || invData.SupplierName || "Bilinmeyen Tedarikçi";
 
             if (!vkn) {
                 return NextResponse.json({ success: false, error: 'Faturada VKN/TCKN bilgisi bulunamadı.' }, { status: 400 });
@@ -86,22 +90,21 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                         companyId,
                         name: name,
                         taxNumber: vkn,
-                        address: supplierData?.Address,
-                        city: supplierData?.City,
-                        district: supplierData?.District,
+                        address: supplierData?.Address || '',
+                        city: supplierData?.City || '',
+                        district: supplierData?.District || '',
                     }
                 });
             }
 
             // B. Map Items and Prepare Local Invoice Data
-            const nilveraLines = invData.InvoiceLines || invData.Items || [];
+            const nilveraLines = invData.InvoiceLines || invData.Items || invData.Lines || invData.PurchaseInvoiceLines || [];
             const localItems = [];
 
             for (const line of nilveraLines) {
-                const productName = line.Name || "Bilinmeyen Ürün";
-                const productCode = line.SellerItemCode || line.BuyerItemCode || line.Name;
+                const productName = line.Name || line.Description || "Bilinmeyen Ürün";
+                const productCode = line.SellerItemCode || line.BuyerItemCode || line.ItemCode || line.Name;
 
-                // Try to match product
                 let product = await prisma.product.findFirst({
                     where: {
                         companyId,
@@ -115,23 +118,24 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                 localItems.push({
                     productId: product?.id || null,
                     name: productName,
-                    qty: Number(line.Quantity || 0),
-                    price: Number(line.UnitPrice || line.Price || 0),
-                    vatRate: Number(line.VatRate || line.KDVPercent || 0),
-                    unit: line.UnitType || "Adet"
+                    qty: Number(line.Quantity || line.InvoicedQuantity || 0),
+                    price: Number(line.UnitPrice || line.Price || line.Amount || 0),
+                    vatRate: Number(line.VatRate || line.KDVPercent || line.TaxPercent || 0),
+                    unit: line.UnitType || line.UnitCode || "Adet"
                 });
             }
 
             // C. Create Local Purchase Invoice Header
+            const header = invData.InvoiceInfo || invData.PurchaseInvoiceInfo || invData;
             invoice = await prisma.purchaseInvoice.create({
                 data: {
                     companyId,
                     supplierId: supplier.id,
-                    invoiceNo: invData.InvoiceInfo?.InvoiceSerieOrNumber || invData.InvoiceNumber || id,
-                    invoiceDate: invData.InvoiceInfo?.IssueDate ? new Date(invData.InvoiceInfo.IssueDate) : new Date(),
-                    amount: Number(invData.InvoiceInfo?.TaxExclusiveAmount || 0),
-                    taxAmount: Number(invData.InvoiceInfo?.TaxInclusiveAmount - invData.InvoiceInfo?.TaxExclusiveAmount || 0),
-                    totalAmount: Number(invData.InvoiceInfo?.PayableAmount || 0),
+                    invoiceNo: header.InvoiceSerieOrNumber || header.InvoiceNumber || invData.InvoiceNumber || id,
+                    invoiceDate: header.IssueDate ? new Date(header.IssueDate) : new Date(),
+                    amount: Number(header.TaxExclusiveAmount || header.LineExtensionAmount || (header.InvoiceAmount - (header.TaxAmount || 0)) || 0),
+                    taxAmount: Number(header.TaxInclusiveAmount - header.TaxExclusiveAmount || header.TaxAmount || 0),
+                    totalAmount: Number(header.PayableAmount || header.TaxInclusiveAmount || header.InvoiceAmount || 0),
                     items: localItems as any,
                     status: 'Bekliyor',
                     description: 'Nilvera Sisteminden Aktarıldı'

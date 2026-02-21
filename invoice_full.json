@@ -1,0 +1,18 @@
+{
+  "UUID": "d1230639-c887-48d9-8c55-576ad87971f0",
+  "InvoiceType": "SATIS",
+  "InvoiceProfile": "TICARIFATURA",
+  "InvoiceNumber": "INV2025100000053",
+  "EnvelopeUUID": "2262eeeb-66e5-41eb-b0d8-9db1466c0488",
+  "EnvelopeAlias": "urn:mail:defaultpk@nilvera.com",
+  "UBLVersionID": "2.1",
+  "CustomizationID": "TR1.2",
+  "SendDate": "12/04/2025 16:19:11",
+  "IssueDate": "2025-12-04",
+  "CurrencyCode": "TRY",
+  "NumberOfItems": 1,
+  "InvoiceAmount": 120,
+  "TaxAmount": 20,
+  "AdditionalDocumentCount": 1,
+  "AnswerCode": "approved"
+}
