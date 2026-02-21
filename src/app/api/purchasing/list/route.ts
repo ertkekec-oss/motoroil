@@ -23,48 +23,75 @@ export async function GET() {
         // 2. Try to fetch from Nilvera
         let nilveraInvoices: any[] = [];
         try {
-            const settingsRecord = await prisma.appSettings.findUnique({
-                where: {
-                    companyId_key: {
-                        companyId,
-                        key: 'eFaturaSettings'
-                    }
-                }
+            let apiKey = '';
+            let baseUrl = '';
+
+            // A. Try new IntegratorSettings table first
+            const intSettings = await (prisma as any).integratorSettings.findFirst({
+                where: { companyId, isActive: true }
             });
-            const rawConfig = settingsRecord?.value as any;
 
-            // Supporting both flat and nested config structures
-            const config = rawConfig?.apiKey ? rawConfig : (rawConfig?.nilvera || {});
+            if (intSettings?.credentials) {
+                try {
+                    const { decrypt } = await import('@/lib/encryption');
+                    const creds = JSON.parse(decrypt(intSettings.credentials));
+                    apiKey = (creds.apiKey || creds.ApiKey || '').trim();
+                    baseUrl = (intSettings.environment === 'PRODUCTION')
+                        ? 'https://api.nilvera.com'
+                        : 'https://apitest.nilvera.com';
+                } catch (e) {
+                    console.warn('[PurchasingList] Failed to decrypt integratorSettings credentials');
+                }
+            }
 
-            if (config.apiKey) {
-                console.log("[PurchasingList] Fetching from Nilvera with API Key...");
+            // B. Fallback: legacy appSettings table
+            if (!apiKey) {
+                const settingsRecord = await prisma.appSettings.findUnique({
+                    where: { companyId_key: { companyId, key: 'eFaturaSettings' } }
+                });
+                const rawConfig = settingsRecord?.value as any;
+                const config = rawConfig?.apiKey ? rawConfig : (rawConfig?.nilvera || {});
+                apiKey = config.apiKey;
+                baseUrl = config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
+            }
+
+            if (apiKey) {
+                console.log("[PurchasingList] Fetching from Nilvera...");
                 const nilvera = new NilveraInvoiceService({
-                    apiKey: config.apiKey,
-                    baseUrl: config.environment === 'production' ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com'
+                    apiKey,
+                    baseUrl: baseUrl || 'https://apitest.nilvera.com'
                 });
 
                 const result = await nilvera.getIncomingInvoices();
-                console.log("[PurchasingList] Nilvera Result Success:", result.success);
-
                 if (result.success) {
                     const content = result.data?.Content || (Array.isArray(result.data) ? result.data : []);
-                    console.log("[PurchasingList] Received Items Count:", content.length);
+                    nilveraInvoices = content.map((inv: any) => {
+                        // Resilient name finding: Nilvera Purchase return might use various names
+                        const supplierName = inv.SenderName ||
+                            inv.SenderTitle ||
+                            inv.SupplierName ||
+                            inv.SupplierTitle ||
+                            inv.Supplier?.Name ||
+                            inv.Supplier?.Title ||
+                            inv.SenderVknTckn ||
+                            "Bilinmeyen Tedarikçi";
 
-                    nilveraInvoices = content.map((inv: any) => ({
-                        id: inv.UUID || inv.Id,
-                        supplier: inv.SupplierName || inv.SupplierTitle || inv.SupplierVknTckn || "Bilinmeyen Tedarikçi",
-                        date: inv.IssueDate ? new Date(inv.IssueDate).toLocaleDateString('tr-TR') : '-',
-                        msg: `e-Fatura: ${inv.InvoiceNumber || 'No Yok'}`,
-                        total: Number(inv.PayableAmount || 0),
-                        status: 'Bekliyor',
-                        isFormal: true,
-                        invoiceNo: inv.InvoiceNumber
-                    }));
+                        return {
+                            id: inv.UUID || inv.Id,
+                            supplier: supplierName,
+                            date: inv.IssueDate ? new Date(inv.IssueDate).toLocaleDateString('tr-TR') : '-',
+                            msg: `e-Fatura: ${inv.InvoiceNumber || 'No Yok'}`,
+                            total: Number(inv.PayableAmount || 0),
+                            status: 'Bekliyor',
+                            isFormal: true,
+                            invoiceNo: inv.InvoiceNumber
+                        };
+                    });
                 } else {
                     console.error("[PurchasingList] Nilvera Error:", result.error);
                 }
             } else {
-                console.warn("[PurchasingList] Nilvera API Key is missing in settings.");
+                console.warn("[PurchasingList] Nilvera API Key is missing.");
             }
         } catch (nilErr: any) {
             console.error("[PurchasingList] Nilvera fetch CRITICAL failure:", nilErr.message);
