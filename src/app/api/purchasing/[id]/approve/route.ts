@@ -155,6 +155,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                                 code: String(productCode),
                                 stock: 0,
                                 buyPrice: Number(line.UnitPrice || line.Price || 0),
+                                price: Number(line.UnitPrice || line.Price || 0), // Default sales price to buy price
                                 unit: line.UnitType || line.UnitCode || "Adet"
                             }
                         });
