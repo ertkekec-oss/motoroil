@@ -66,8 +66,6 @@ export default function Sidebar() {
 
         // AKILLI SİSTEMLER GRUBU
         { name: 'Finansal Kontrol Kulesi', href: '/fintech/control-tower', icon: '🗼' },
-        { name: 'Otonom Fiyatlandırma', href: '/fintech/smart-pricing', icon: '🤖' },
-        { name: 'Kârlılık Isı Haritası', href: '/fintech/profitability-heatmap', icon: '🔥' },
 
         // OPERASYON GRUBU
         { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
