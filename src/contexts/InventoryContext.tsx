@@ -183,7 +183,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     // Implement real transfer functions or keep placeholders if API not ready
     const startStockTransfer = async (data: any) => {
         try {
-            const res = await apiFetch('/api/inventory/stock-transfers', { // Corrected endpoint guess
+            const res = await apiFetch('/api/inventory/transfer', {
                 method: 'POST',
                 body: JSON.stringify(data)
             });
@@ -197,8 +197,15 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
 
     const finalizeTransfer = async (id: string, action: string) => {
         try {
-            // Placeholder implementation
-            return true;
+            const res = await apiFetch('/api/inventory/transfer', {
+                method: 'PUT',
+                body: JSON.stringify({ id, action })
+            });
+            if (res.ok) {
+                await refreshStockTransfers();
+                return true;
+            }
+            return false;
         } catch (e) { return false; }
     };
 
