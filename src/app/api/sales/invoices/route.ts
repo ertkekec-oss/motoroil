@@ -210,7 +210,8 @@ export async function GET(request: Request) {
 
         const safeInvoices = invoices.map(inv => ({
             ...inv,
-            isFormal: inv.isFormal && ((inv as any).formalId && (inv as any).formalId.length > 5)
+            formalId: (inv as any).formalUuid, // Alias for frontend
+            isFormal: inv.isFormal && ((inv as any).formalUuid && (inv as any).formalUuid.length > 5)
         }));
 
         return NextResponse.json({ success: true, invoices: safeInvoices });
