@@ -155,7 +155,9 @@ export default function SalesPage() {
         if (activeTab === 'invoices') {
             if (invoiceSubTab === 'sales') fetchInvoices();
             if (invoiceSubTab === 'incoming') fetchPurchaseInvoices();
-            if (invoiceSubTab === 'wayslips') fetchWayslips();
+        }
+        if (activeTab === 'wayslips') {
+            fetchWayslips();
         }
     }, [activeTab, invoiceSubTab]);
 
@@ -771,7 +773,8 @@ export default function SalesPage() {
             <div className="flex-center" style={{ justifyContent: 'flex-start', borderBottom: '1px solid var(--border-light)', marginBottom: '24px', gap: '8px' }}>
                 <button onClick={() => setActiveTab('online')} style={{ padding: '12px 24px', background: activeTab === 'online' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'online' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>E-Ticaret</button>
                 <button onClick={() => setActiveTab('store')} style={{ padding: '12px 24px', background: activeTab === 'store' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'store' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>Mağaza Satışları</button>
-                <button onClick={() => setActiveTab('invoices')} style={{ padding: '12px 24px', background: activeTab === 'invoices' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'invoices' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>Faturalar</button>
+                <button onClick={() => { setActiveTab('invoices'); setInvoiceSubTab('sales'); }} style={{ padding: '12px 24px', background: activeTab === 'invoices' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'invoices' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>Faturalar</button>
+                <button onClick={() => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); }} style={{ padding: '12px 24px', background: activeTab === 'wayslips' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'wayslips' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>e-İrsaliyeler</button>
             </div>
 
 
@@ -792,7 +795,7 @@ export default function SalesPage() {
                     />
                 )}
 
-                {activeTab === 'invoices' && (
+                {(activeTab === 'invoices' || activeTab === 'wayslips') && (
                     <InvoicesTab
                         invoiceSubTab={invoiceSubTab}
                         setInvoiceSubTab={setInvoiceSubTab}

@@ -75,45 +75,35 @@ export function InvoicesTab({
 
     return (
         <div>
-            {/* Invoices Sub-Tabs */}
-            <div className="flex-center" style={{ justifyContent: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '24px', gap: '8px' }}>
-                <button
-                    onClick={() => setInvoiceSubTab('sales')}
-                    style={{
-                        padding: '12px 24px',
-                        background: invoiceSubTab === 'sales' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
-                        border: 'none', color: invoiceSubTab === 'sales' ? 'var(--primary)' : 'white',
-                        borderBottom: invoiceSubTab === 'sales' ? '2px solid var(--primary)' : 'none',
-                        cursor: 'pointer', fontWeight: 'bold', fontSize: '13px'
-                    }}
-                >
-                    📄 Satış Faturaları
-                </button>
-                <button
-                    onClick={() => setInvoiceSubTab('incoming')}
-                    style={{
-                        padding: '12px 24px',
-                        background: invoiceSubTab === 'incoming' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
-                        border: 'none', color: invoiceSubTab === 'incoming' ? 'var(--success)' : 'white',
-                        borderBottom: invoiceSubTab === 'incoming' ? '2px solid var(--success)' : 'none',
-                        cursor: 'pointer', fontWeight: 'bold', fontSize: '13px'
-                    }}
-                >
-                    📥 Gelen Faturalar
-                </button>
-                <button
-                    onClick={() => setInvoiceSubTab('wayslips')}
-                    style={{
-                        padding: '12px 24px',
-                        background: invoiceSubTab === 'wayslips' ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
-                        border: 'none', color: invoiceSubTab === 'wayslips' ? 'var(--warning)' : 'white',
-                        borderBottom: invoiceSubTab === 'wayslips' ? '2px solid var(--warning)' : 'none',
-                        cursor: 'pointer', fontWeight: 'bold', fontSize: '13px'
-                    }}
-                >
-                    🚚 e-İrsaliyeler
-                </button>
-            </div>
+            {/* Invoices Sub-Tabs - Only show if not in wayslips mode */}
+            {invoiceSubTab !== 'wayslips' && (
+                <div className="flex-center" style={{ justifyContent: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '24px', gap: '8px' }}>
+                    <button
+                        onClick={() => setInvoiceSubTab('sales')}
+                        style={{
+                            padding: '12px 24px',
+                            background: invoiceSubTab === 'sales' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                            border: 'none', color: invoiceSubTab === 'sales' ? 'var(--primary)' : 'white',
+                            borderBottom: invoiceSubTab === 'sales' ? '2px solid var(--primary)' : 'none',
+                            cursor: 'pointer', fontWeight: 'bold', fontSize: '13px'
+                        }}
+                    >
+                        📄 Satış Faturaları
+                    </button>
+                    <button
+                        onClick={() => setInvoiceSubTab('incoming')}
+                        style={{
+                            padding: '12px 24px',
+                            background: invoiceSubTab === 'incoming' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                            border: 'none', color: invoiceSubTab === 'incoming' ? 'var(--success)' : 'white',
+                            borderBottom: invoiceSubTab === 'incoming' ? '2px solid var(--success)' : 'none',
+                            cursor: 'pointer', fontWeight: 'bold', fontSize: '13px'
+                        }}
+                    >
+                        📥 Gelen Faturalar
+                    </button>
+                </div>
+            )}
 
             {/* SUB-TAB CONTENT: SALES INVOICES */}
             {invoiceSubTab === 'sales' && (
