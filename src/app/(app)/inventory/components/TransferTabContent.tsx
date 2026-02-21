@@ -92,7 +92,7 @@ export default function TransferTabContent({
     );
 
     const inTransitTransfers = visibleTransfers.filter(t => t.status === 'IN_TRANSIT');
-    const pastTransfers = visibleTransfers.filter(t => t.status !== 'IN_TRANSIT').slice(0, 10);
+    const recentTransfers = visibleTransfers.slice(0, 20);
 
     return (
         <div className="animate-fade-in pb-12">
@@ -386,12 +386,12 @@ export default function TransferTabContent({
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {pastTransfers.length === 0 ? (
+                                    {recentTransfers.length === 0 ? (
                                         <tr>
                                             <td colSpan={5} className="py-12 text-center text-white/20 italic">Henüz geçmiş transfer kaydı bulunmuyor.</td>
                                         </tr>
                                     ) : (
-                                        pastTransfers.map(t => (
+                                        recentTransfers.map(t => (
                                             <tr key={t.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                                                 <td className="py-4 px-6 text-white/40 text-[11px] text-center">
                                                     {new Date(t.shippedAt).toLocaleDateString('tr-TR')}
@@ -411,9 +411,13 @@ export default function TransferTabContent({
                                                 <td className="py-4 px-6 text-center">
                                                     <span className={`
                                                         py-1 px-3 rounded-lg font-black text-[9px] uppercase tracking-widest
-                                                        ${t.status === 'RECEIVED' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}
+                                                        ${t.status === 'RECEIVED' ? 'bg-emerald-500/10 text-emerald-500' :
+                                                            t.status === 'IN_TRANSIT' ? 'bg-blue-500/10 text-blue-400' :
+                                                                'bg-red-500/10 text-red-500'}
                                                     `}>
-                                                        {t.status === 'RECEIVED' ? 'TAMAMLANDI' : 'İPTAL EDİLDİ'}
+                                                        {t.status === 'RECEIVED' ? 'TAMAMLANDI' :
+                                                            t.status === 'IN_TRANSIT' ? '🚚 YOLDA' :
+                                                                'İPTAL EDİLDİ'}
                                                     </span>
                                                 </td>
                                                 <td className="py-4 px-6 text-right">
