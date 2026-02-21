@@ -147,30 +147,58 @@ export function InvoicesTab({
                                                         {inv.isFormal ? 'Faturalandırıldı' : inv.status}
                                                     </span>
                                                 </td>
-                                                <td style={{ textAlign: 'center' }}>
-                                                    <div className="flex-center gap-2" onClick={e => e.stopPropagation()}>
+                                                <td style={{ textAlign: 'center', padding: '12px' }}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }} onClick={e => e.stopPropagation()}>
                                                         {!inv.isFormal ? (
-                                                            <>
-                                                                <button
-                                                                    onClick={() => handleSendToELogo(inv.id, 'EFATURA')}
-                                                                    className="btn btn-primary"
-                                                                    style={{ fontSize: '11px', padding: '6px 10px', background: 'var(--primary)', border: 'none' }}
-                                                                >
-                                                                    🧾 Faturalandır
-                                                                </button>
-                                                            </>
+                                                            <button
+                                                                onClick={() => handleSendToELogo(inv.id, 'EFATURA')}
+                                                                className="btn btn-primary"
+                                                                style={{
+                                                                    fontSize: '11px',
+                                                                    padding: '8px 16px',
+                                                                    background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                                                                    border: 'none',
+                                                                    borderRadius: '8px',
+                                                                    fontWeight: 'bold',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                    boxShadow: '0 4px 10px rgba(249, 115, 22, 0.2)'
+                                                                }}
+                                                            >
+                                                                🧾 Faturalandır
+                                                            </button>
                                                         ) : (
                                                             <>
                                                                 <button
                                                                     onClick={() => handleViewPDF(inv.id)}
                                                                     className="btn btn-outline"
-                                                                    style={{ fontSize: '11px', padding: '6px 10px', background: 'rgba(255,255,255,0.05)' }}
+                                                                    style={{
+                                                                        fontSize: '11px',
+                                                                        padding: '6px 14px',
+                                                                        background: 'rgba(255,255,255,0.03)',
+                                                                        borderRadius: '8px',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '6px',
+                                                                        border: '1px solid rgba(255,255,255,0.1)'
+                                                                    }}
                                                                 >
-                                                                    İndir
+                                                                    📄 İndir (PDF)
                                                                 </button>
-                                                                <div style={{ fontSize: '10px', color: 'var(--success)', fontWeight: 'bold' }}>
-                                                                    {inv.formalId}
-                                                                </div>
+                                                                {inv.formalId && (
+                                                                    <div style={{
+                                                                        fontSize: '9px',
+                                                                        color: 'rgba(16, 185, 129, 0.6)',
+                                                                        fontFamily: 'monospace',
+                                                                        maxWidth: '120px',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap'
+                                                                    }} title={inv.formalId}>
+                                                                        ID: {inv.formalId}
+                                                                    </div>
+                                                                )}
                                                             </>
                                                         )}
                                                     </div>
