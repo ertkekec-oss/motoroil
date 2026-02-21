@@ -8,7 +8,7 @@
 
 ### 1. Satış Sayfasına Git
 - Sol menüden **"💰 Satış"** tıkla
-- Veya URL: `https://www.kech.tr/sales`
+- Veya URL: `https://www.periodya.com/sales`
 
 ### 2. Faturalar Sekmesine Geç
 - Üstteki sekmelerde **"Faturalar"** tıkla

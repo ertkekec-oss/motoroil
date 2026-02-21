@@ -227,7 +227,7 @@ export class NilveraInvoiceService {
                 invoiceInfo.SendType = 2;      // 2: ELEKTRONIK
 
                 const internetData = {
-                    WebSite: params.internetInfo?.WebSite || "www.kech.tr",
+                    WebSite: params.internetInfo?.WebSite || "www.periodya.com",
                     PaymentMethod: "KREDIKARTI/BANKAKARTI", // Nilvera'nın beklediği tam format
                     PaymentDate: params.internetInfo?.PaymentDate || issueDate.split('T')[0],
                     TransporterName: params.internetInfo?.TransporterName || "ARAS KARGO",

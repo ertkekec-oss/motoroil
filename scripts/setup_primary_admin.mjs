@@ -14,7 +14,7 @@ async function main() {
             OR: [
                 { role: 'SUPER_ADMIN' },
                 { tenantId: 'PLATFORM_ADMIN' },
-                { email: 'admin@kech.tr' }
+                { email: 'admin@periodya.com' }
             ]
         }
     });

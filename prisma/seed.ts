@@ -13,7 +13,7 @@ async function main() {
         create: {
             id: 'demo-tenant',
             name: 'Periodya Demo',
-            ownerEmail: 'admin@kech.tr',
+            ownerEmail: 'admin@periodya.com',
             status: 'ACTIVE',
             setupState: 'COMPLETED'
         }
@@ -45,14 +45,14 @@ async function main() {
     const passwordHash = await bcrypt.hash('admin1234', 10);
 
     const user = await prisma.user.upsert({
-        where: { email: 'admin@kech.tr' },
+        where: { email: 'admin@periodya.com' },
         update: {
             password: passwordHash,
             role: 'SUPER_ADMIN',
             tenantId: tenant.id
         },
         create: {
-            email: 'admin@kech.tr',
+            email: 'admin@periodya.com',
             name: 'Admin User',
             password: passwordHash,
             role: 'SUPER_ADMIN', // SUPER_ADMIN has full access

@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
     console.log('--- RESEEDING PLATFORM ADMIN ---');
 
-    const email = 'admin@kech.tr';
+    const email = 'admin@periodya.com';
     const password = 'admin1234';
     const hashedPassword = await bcrypt.hash(password, 10);
 

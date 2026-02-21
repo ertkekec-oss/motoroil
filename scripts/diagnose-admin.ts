@@ -4,7 +4,7 @@ import fs from 'fs';
 const prisma = new PrismaClient();
 
 async function main() {
-    const email = 'admin@kech.tr';
+    const email = 'admin@periodya.com';
 
     // 1. Check User Table
     const user = await prisma.user.findFirst({ where: { email } });

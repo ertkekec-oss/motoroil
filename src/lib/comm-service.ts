@@ -14,12 +14,12 @@ export interface CommPayload {
 export const CommTemplates = {
     ONBOARDING_WELCOME: (name: string) => ({
         subject: "Periodya'ya Hoş Geldiniz! 🎉",
-        emailHtml: `<h1>Merhaba ${name},</h1><p>Periodya ile işlerinizi kolaylaştırmaya hazır mısınız? 3 adımda ilk e-faturanızı kesin:</p><ol><li>Şirket ayarlarınızı tamamlayın</li><li>İlk müşterinizi ekleyin</li><li>Faturanızı oluşturun ve gönderin!</li></ol><p><a href="https://kech.tr">Hemen Başlayın</a></p>`,
+        emailHtml: `<h1>Merhaba ${name},</h1><p>Periodya ile işlerinizi kolaylaştırmaya hazır mısınız? 3 adımda ilk e-faturanızı kesin:</p><ol><li>Şirket ayarlarınızı tamamlayın</li><li>İlk müşterinizi ekleyin</li><li>Faturanızı oluşturun ve gönderin!</li></ol><p><a href="https://periodya.com">Hemen Başlayın</a></p>`,
         whatsapp: `Merhaba ${name}, Periodya'ya hoş geldiniz! 🚀 İlk e-faturanızı saniyeler içinde kesmek için panelinize göz atabilirsiniz. Yardıma ihtiyacınız olursa buradayız!`
     }),
     TRIAL_ENDING: (name: string, daysLeft: number) => ({
         subject: "Deneme Süreniz Doluyor ⏳",
-        emailHtml: `<h1>Merhaba ${name},</h1><p>Periodya deneme sürenizin bitmesine sadece ${daysLeft} gün kaldı. Kesintisiz fatura kesmeye devam etmek için planınızı şimdi güncelleyin.</p><p><a href="https://kech.tr/billing">Planları Gör</a></p>`,
+        emailHtml: `<h1>Merhaba ${name},</h1><p>Periodya deneme sürenizin bitmesine sadece ${daysLeft} gün kaldı. Kesintisiz fatura kesmeye devam etmek için planınızı şimdi güncelleyin.</p><p><a href="https://periodya.com/billing">Planları Gör</a></p>`,
         whatsapp: `Merhaba ${name}, Periodya deneme süreniz ${daysLeft} gün içinde sona eriyor. ⏳ İşlemlerinizin aksamaması için paketinizi saniyeler içinde güncelleyebilirsiniz.`
     }),
     CHURN_WE_MISS_YOU: (name: string) => ({

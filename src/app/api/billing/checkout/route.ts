@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
         const surname = nameParts.length > 1 ? nameParts.slice(1).join(' ') : name;
 
         // 2. Iyzico Checkout Formunu Başlat
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.kech.tr';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://periodya.com';
         const callbackUrl = `${baseUrl}/api/webhooks/iyzico/callback`;
 
         const checkoutData = {

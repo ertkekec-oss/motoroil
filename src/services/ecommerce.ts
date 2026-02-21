@@ -19,7 +19,7 @@ export class EcommerceService {
     private url: string;
     private parser: XMLParser;
 
-    constructor(url: string = 'https://www.motoroil.com.tr/xml.php?c=siparisler&xmlc=10a4cd8d5e') {
+    constructor(url: string = 'https://www.periodya.com/xml.php?c=siparisler&xmlc=10a4cd8d5e') {
         this.url = url;
         this.parser = new XMLParser({
             ignoreAttributes: false,

@@ -192,7 +192,7 @@ vercel --prod
 vercel env ls
 
 # 4. Production'da test et
-curl -I https://www.kech.tr
+curl -I https://www.periodya.com
 # X-Frame-Options, CSP header'larını kontrol et
 ```
 

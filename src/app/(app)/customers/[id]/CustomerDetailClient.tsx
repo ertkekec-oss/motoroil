@@ -606,7 +606,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     <button
                                         onClick={() => {
                                             const plate = services[0].plate;
-                                            const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.kech.tr/vehicle/${plate}`;
+                                            const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.periodya.com/vehicle/${plate}`;
                                             window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                         }}
                                         className="btn btn-primary"
@@ -711,7 +711,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         <button
                                             onClick={() => {
                                                 const plate = services[0].plate;
-                                                const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.kech.tr/vehicle/${plate}`;
+                                                const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.periodya.com/vehicle/${plate}`;
                                                 window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                             }}
                                             className="btn btn-primary"
@@ -735,7 +735,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     <h3 style={{ color: '#000', margin: '0 0 10px 0' }}>Dijital Servis Karnesi</h3>
                                     <div style={{ fontSize: '12px', color: '#666', marginBottom: '20px' }}>Müşteriniz bu QR kodunu okutarak servis geçmişini görebilir.</div>
                                     <img
-                                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://www.kech.tr/vehicle/${qrPlate}`}
+                                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://www.periodya.com/vehicle/${qrPlate}`}
                                         alt="QR"
                                         style={{ width: '100%', borderRadius: '10px' }}
                                     />
@@ -1478,7 +1478,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <button
                                 onClick={() => {
-                                    const msg = `Sayın ${customer.name}, ${lastInvoice.invoiceNo} numaralı faturanızı bu bağlantıdan görüntüleyebilirsiniz: https://www.kech.tr/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
+                                    const msg = `Sayın ${customer.name}, ${lastInvoice.invoiceNo} numaralı faturanızı bu bağlantıdan görüntüleyebilirsiniz: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
                                     window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                 }}
                                 className="btn btn-primary"
@@ -1488,7 +1488,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             </button>
                             <button
                                 onClick={() => {
-                                    window.location.href = `mailto:${customer.email || ''}?subject=Faturanız Hazır - ${lastInvoice.invoiceNo}&body=Sayın ${customer.name}, %0D%0A%0D%0A${lastInvoice.invoiceNo} numaralı faturanız ekte yer almaktadır. %0D%0A%0D%0AFaturayı görüntülemek için tıkla: https://www.kech.tr/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
+                                    window.location.href = `mailto:${customer.email || ''}?subject=Faturanız Hazır - ${lastInvoice.invoiceNo}&body=Sayın ${customer.name}, %0D%0A%0D%0A${lastInvoice.invoiceNo} numaralı faturanız ekte yer almaktadır. %0D%0A%0D%0AFaturayı görüntülemek için tıkla: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
                                 }}
                                 className="btn btn-outline"
                                 style={{ height: '56px', borderRadius: '16px', fontWeight: 'bold', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}

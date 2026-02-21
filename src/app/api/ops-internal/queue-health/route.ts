@@ -10,7 +10,7 @@ export async function GET() {
     }
 
     // Using absolute URL for server-side fetch
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.kech.tr';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://periodya.com';
     const targetUrl = `${baseUrl}/api/admin/marketplace/queue/health`;
 
     const r = await fetch(targetUrl, {

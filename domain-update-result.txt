@@ -1,0 +1,17 @@
+﻿­şöä Domain g├╝ncelleme ba┼şl─▒yor: kech.tr -> periodya.com
+
+1´©ÅÔâú  Staff tablosu kontrol ediliyor...
+   Ôä╣´©Å  Staff tablosunda kech.tr bulunamad─▒ (zaten g├╝ncellenmi┼ş olabilir)
+
+2´©ÅÔâú  User tablosu kontrol ediliyor...
+   Ôä╣´©Å  User tablosunda kech.tr bulunamad─▒
+
+3´©ÅÔâú  CompanyConfig tablosu kontrol ediliyor...
+   ÔÜá´©Å  CompanyConfig tablosu bulunamad─▒ veya eri┼şilemiyor
+
+4´©ÅÔâú  GlobalConfig kontrol ediliyor...
+   ÔÜá´©Å  GlobalConfig tablosu bulunamad─▒ veya eri┼şilemiyor
+
+5´©ÅÔâú  G├╝ncel admin/staff listesi:
+
+Ô£à Domain g├╝ncelleme tamamland─▒!

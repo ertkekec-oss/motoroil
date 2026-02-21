@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    const email = 'admin@kech.tr';
+    const email = 'admin@periodya.com';
     console.log(`Promoting ${email} to PLATFORM ADMIN...`);
 
     // 1. Update User Table

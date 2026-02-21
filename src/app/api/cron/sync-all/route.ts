@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
     try {
         const results: any = {};
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.kech.tr'; // Kendi URL'imiz
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://periodya.com'; // Kendi URL'imiz
 
         console.log('🔄 Cron Job Tetiklendi: Sipariş Senkronizasyonu Başlıyor...');
 

@@ -200,7 +200,7 @@ Route (app)                              Size     First Load JS
 ...
 
 ✅ Production: https://motoroil-xxx.vercel.app
-🔗 Aliased: https://www.kech.tr
+🔗 Aliased: https://www.periodya.com
 ```
 
 ---

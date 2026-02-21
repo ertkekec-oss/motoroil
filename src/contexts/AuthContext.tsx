@@ -117,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         if (hasPOS) {
                             router.push('/');
                         } else if (hasFieldSales) {
-                            router.push('/field-mobile/routes');
+                            router.push('/field-sales');
                         } else {
                             // Default fallback
                             router.push('/');

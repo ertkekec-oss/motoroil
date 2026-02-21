@@ -13,7 +13,7 @@ async function main() {
         create: {
             id: 'test-tenant-id',
             name: 'Periodya Enterprise',
-            ownerEmail: 'admin@kech.tr',
+            ownerEmail: 'admin@periodya.com',
             status: 'ACTIVE'
         }
     });
@@ -34,11 +34,11 @@ async function main() {
     // 3. Create Admin User
     const hashedPassword = await bcrypt.hash('admin1234', 10);
     const user = await prisma.user.upsert({
-        where: { email: 'admin@kech.tr' },
+        where: { email: 'admin@periodya.com' },
         update: { password: hashedPassword },
         create: {
             tenantId: tenant.id,
-            email: 'admin@kech.tr',
+            email: 'admin@periodya.com',
             name: 'Periodya Admin',
             password: hashedPassword,
             role: 'ADMIN'
@@ -56,7 +56,7 @@ async function main() {
         }
     });
 
-    console.log('✅ Admin user created: admin@kech.tr / admin1234');
+    console.log('✅ Admin user created: admin@periodya.com / admin1234');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

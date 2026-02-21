@@ -80,7 +80,7 @@ Deployment sırasında:
 - [ ] Deployment tamamlandı
 
 Deployment sonrası:
-- [ ] Site açılıyor: https://www.kech.tr
+- [ ] Site açılıyor: https://www.periodya.com
 - [ ] Login sayfası çalışıyor
 - [ ] Giriş yapılabiliyor
 
@@ -117,7 +117,7 @@ Başarılı deployment'ta:
 ✓ Finalizing page optimization
 
 ✅ Production: https://motoroil-xxx.vercel.app
-🔗 Aliased: https://www.kech.tr
+🔗 Aliased: https://www.periodya.com
 
 Deployment completed successfully!
 ```

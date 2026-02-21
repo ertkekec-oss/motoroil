@@ -37,4 +37,4 @@ Servis personelinin yaptığı işe göre otomatik prim hak edişi hesaplaması.
 
 ---
 
-**Not:** Yazılım şu an canlı yayında (`https://www.kech.tr`) aktif ve günceldir.
+**Not:** Yazılım şu an canlı yayında (`https://www.periodya.com`) aktif ve günceldir.

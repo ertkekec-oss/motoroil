@@ -82,7 +82,7 @@ export default function IntegrationsContent() {
         },
         custom: {
             enabled: true,
-            url: 'https://www.periodya.com.tr/xml.php?c=siparisler&xmlc=10a4cd8d5e',
+            url: 'https://www.periodya.com/xml.php?c=siparisler&xmlc=10a4cd8d5e',
             autoSync: false,
             syncInterval: 60,
             branch: 'Merkez'

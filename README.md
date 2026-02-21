@@ -269,7 +269,7 @@ console.log('Worker running...');
 #### 🔍 Worker Health Check:
 ```bash
 # Vercel Logs'ta kontrol et:
-vercel logs https://www.kech.tr --follow
+vercel logs https://www.periodya.com --follow
 
 # ✅ İyi: "job_active" ve "job_completed" görünüyor
 # ❌ Kötü: Sadece "job_enqueued" var, "job_active" yok
@@ -321,7 +321,7 @@ vercel env ls
 
 Vercel Functions Logs'u izleyin:
 ```bash
-vercel logs https://www.kech.tr --follow
+vercel logs https://www.periodya.com --follow
 ```
 
 Aranacak event'ler:

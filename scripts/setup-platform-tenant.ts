@@ -12,7 +12,7 @@ async function main() {
             data: {
                 id: 'PLATFORM_ADMIN',
                 name: 'Periodya Platform',
-                ownerEmail: 'admin@kech.tr',
+                ownerEmail: 'admin@periodya.com',
                 status: 'ACTIVE',
                 setupState: 'COMPLETED'
             }

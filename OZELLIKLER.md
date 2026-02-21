@@ -3,7 +3,7 @@
 **Versiyon:** 2.0  
 **Tarih:** 2026-02-02  
 **Platform:** Next.js 15 + PostgreSQL (Neon)  
-**Deployment:** Vercel (https://www.kech.tr)
+**Deployment:** Vercel (https://www.periodya.com)
 
 ---
 

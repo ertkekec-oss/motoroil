@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-    const email = 'admin@kech.tr'
+    const email = 'admin@periodya.com'
     const username = 'admin'
     const password = 'admin123' // Plain text for auto-migration check
 

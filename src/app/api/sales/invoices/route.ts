@@ -351,7 +351,7 @@ export async function POST(request: Request) {
                         customer: {
                             TaxNumber: (invoice.customer.taxNumber || invoice.customer.identityNumber || "11111111111").trim(),
                             Name: invoice.customer.name,
-                            Email: invoice.customer.email || "destek@kech.tr",
+                            Email: invoice.customer.email || "destek@periodya.com",
                             Address: invoice.customer.address || "ADRES",
                             District: invoice.customer.district || "KADIKOY",
                             City: invoice.customer.city || "ISTANBUL",
@@ -361,7 +361,7 @@ export async function POST(request: Request) {
                         company: {
                             TaxNumber: companyVkn || "1111111111",
                             Name: companyTitle,
-                            Email: config.portalEmail || "destek@kech.tr",
+                            Email: config.portalEmail || "destek@periodya.com",
                             Address: companyAddress,
                             District: companyDistrict,
                             City: companyCity,
@@ -390,7 +390,7 @@ export async function POST(request: Request) {
                         customer: {
                             TaxNumber: (invoice.customer.taxNumber || invoice.customer.identityNumber || "11111111111").trim(),
                             Name: invoice.customer.name,
-                            Email: invoice.customer.email || "destek@kech.tr",
+                            Email: invoice.customer.email || "destek@periodya.com",
                             Address: invoice.customer.address || "ADRES",
                             District: invoice.customer.district || "KADIKOY",
                             City: invoice.customer.city || "ISTANBUL",
@@ -400,7 +400,7 @@ export async function POST(request: Request) {
                         company: {
                             TaxNumber: companyVkn || "1111111111",
                             Name: companyTitle,
-                            Email: config.portalEmail || "destek@kech.tr",
+                            Email: config.portalEmail || "destek@periodya.com",
                             Address: companyAddress,
                             District: companyDistrict,
                             City: companyCity,
@@ -421,7 +421,7 @@ export async function POST(request: Request) {
                         },
                         isInternetSale: false,
                         internetInfo: {
-                            WebSite: "www.kech.tr",
+                            WebSite: "www.periodya.com",
                             PaymentMethod: "KREDIKARTI/BANKAKARTI",
                             PaymentDate: new Date().toISOString().split('T')[0],
                             TransporterName: "ARAS KARGO"

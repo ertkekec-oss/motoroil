@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 async function main() {
     let output = '';
     const staff = await prisma.staff.findFirst({
-        where: { OR: [{ username: 'admin' }, { email: 'admin@kech.tr' }] }
+        where: { OR: [{ username: 'admin' }, { email: 'admin@periodya.com' }] }
     });
     output += 'Staff Admin Detail:\n';
     if (staff) {
@@ -21,7 +21,7 @@ async function main() {
     }
 
     const user = await prisma.user.findFirst({
-        where: { email: 'admin@kech.tr' }
+        where: { email: 'admin@periodya.com' }
     });
     output += '\nUser Admin Detail:\n';
     if (user) {
