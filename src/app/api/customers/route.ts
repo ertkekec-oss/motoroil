@@ -83,7 +83,10 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { name, phone, email, address, city, district, taxNumber, taxOffice, categoryId, contactPerson, iban, branch, supplierClass, customerClass, referredByCode, companyId: explicitCompanyId } = body;
+        const { name, phone, email: rawEmail, address, city, district, taxNumber, taxOffice, categoryId, contactPerson, iban, branch, supplierClass, customerClass, referredByCode, companyId: explicitCompanyId } = body;
+
+        // Boş string email'i null'a çevir — yoksa unique constraint (email, companyId) çakışır
+        const email = (rawEmail && rawEmail.trim() !== '') ? rawEmail.trim() : null;
 
         if (!name) {
             return NextResponse.json({ success: false, error: 'Müşteri adı zorunludur.' }, { status: 400 });
@@ -207,6 +210,13 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ success: true, customer: result });
     } catch (error: any) {
+        // Unique constraint hatası için anlaşılır mesaj
+        if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+            return NextResponse.json({
+                success: false,
+                error: 'Bu e-posta adresi bu firmada zaten kayıtlı. Lütfen farklı bir e-posta girin veya e-posta alanını boş bırakın.'
+            }, { status: 409 });
+        }
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

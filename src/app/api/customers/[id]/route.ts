@@ -76,7 +76,8 @@ export async function PUT(
             where: { id },
             data: {
                 name: body.name,
-                email: body.email,
+                // Boş string email'i null'a çevir — unique constraint (email, companyId) çakışmasını önler
+                email: (body.email && body.email.trim() !== '') ? body.email.trim() : null,
                 phone: body.phone,
                 address: body.address,
                 city: body.city,
@@ -107,6 +108,12 @@ export async function PUT(
 
         return NextResponse.json({ success: true, customer: updatedCustomer });
     } catch (error: any) {
+        if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+            return NextResponse.json({
+                success: false,
+                error: 'Bu e-posta adresi bu firmada zaten kayıtlı. Lütfen farklı bir e-posta girin veya e-posta alanını boş bırakın.'
+            }, { status: 409 });
+        }
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

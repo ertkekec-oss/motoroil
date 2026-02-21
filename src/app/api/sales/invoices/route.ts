@@ -248,17 +248,67 @@ export async function POST(request: Request) {
 
                 if (!invoice) return NextResponse.json({ success: false, error: 'Fatura bulunamadı' }, { status: 200 });
 
-                const settingsRecord = await prisma.appSettings.findUnique({
-                    where: {
-                        companyId_key: { companyId: invoice.companyId, key: 'eFaturaSettings' }
-                    }
+                // Fetch company info (VKN, name, address etc.)
+                const company = await prisma.company.findUnique({
+                    where: { id: invoice.companyId }
                 });
-                const config = (settingsRecord?.value as any) || {};
+
+                // --- API credentials: Try IntegratorSettings first (new system), fallback to appSettings ---
+                let nilveraApiKey = '';
+                let nilveraBaseUrl = 'https://apitest.nilvera.com';
+                let config: any = {};
+
+                const intSettings = await (prisma as any).integratorSettings.findFirst({
+                    where: { companyId: invoice.companyId, isActive: true }
+                });
+
+                if (intSettings?.credentials) {
+                    try {
+                        const { decrypt } = await import('@/lib/encryption');
+                        const creds = JSON.parse(decrypt(intSettings.credentials));
+                        nilveraApiKey = (creds.apiKey || creds.ApiKey || '').trim();
+                        nilveraBaseUrl = (intSettings.environment === 'PRODUCTION')
+                            ? 'https://api.nilvera.com'
+                            : 'https://apitest.nilvera.com';
+                        // Keep config populated for legacy fields like companyAddress etc.
+                        config = creds;
+                    } catch (e) {
+                        console.warn('[Formal Send] Failed to decrypt integratorSettings');
+                    }
+                }
+
+                // Fallback: appSettings (legacy)
+                if (!nilveraApiKey) {
+                    const settingsRecord = await prisma.appSettings.findUnique({
+                        where: { companyId_key: { companyId: invoice.companyId, key: 'eFaturaSettings' } }
+                    });
+                    config = (settingsRecord?.value as any) || {};
+                    nilveraApiKey = (config.apiKey || '').trim();
+                    nilveraBaseUrl = (config.environment?.toLowerCase() === 'production')
+                        ? 'https://api.nilvera.com'
+                        : 'https://apitest.nilvera.com';
+                }
+
+                if (!nilveraApiKey) {
+                    return NextResponse.json({ success: false, error: 'Nilvera API anahtarı bulunamadı. Lütfen entegrasyon ayarlarını kontrol edin.' }, { status: 200 });
+                }
+
+                console.log('[Formal Send] Using baseUrl:', nilveraBaseUrl, 'apiKey (first 10):', nilveraApiKey.substring(0, 10));
+
+                // Company VKN: Use Company.vkn (authoritative source) rather than appSettings.companyVkn
+                const companyVkn = (company?.vkn || config.companyVkn || '').trim();
+                const companyTitle = company?.name || config.companyTitle || 'FIRMA UNVANI';
+                const companyAddress = company?.address || config.companyAddress || 'ADRES';
+                const companyDistrict = company?.district || config.portalDistrict || 'KADIKOY';
+                const companyCity = company?.city || config.portalCity || 'ISTANBUL';
+                const companyTaxOffice = company?.taxOffice || config.portalTaxOffice || 'KADIKOY';
+
+                console.log('[Formal Send] Company VKN:', companyVkn, '| Company Name:', companyTitle);
 
                 // Initialize the new professional service
                 const nilveraService = new NilveraInvoiceService({
-                    apiKey: config.apiKey,
-                    baseUrl: (config.environment?.toLowerCase() === 'production') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com'
+                    apiKey: nilveraApiKey,
+                    baseUrl: nilveraBaseUrl
                 });
 
                 // Prepare Data with precise rounding to prevent report generation errors
@@ -308,14 +358,14 @@ export async function POST(request: Request) {
                             TaxOffice: invoice.customer.taxOffice || "KADIKOY"
                         },
                         company: {
-                            TaxNumber: config.companyVkn || "1111111111",
-                            Name: config.companyTitle || "FIRMA UNVANI",
+                            TaxNumber: companyVkn || "1111111111",
+                            Name: companyTitle,
                             Email: config.portalEmail || "destek@kech.tr",
-                            Address: config.companyAddress || "ADRES",
-                            District: config.portalDistrict || "KADIKOY",
-                            City: config.portalCity || "ISTANBUL",
+                            Address: companyAddress,
+                            District: companyDistrict,
+                            City: companyCity,
                             Country: "TR",
-                            TaxOffice: config.portalTaxOffice || "KADIKOY"
+                            TaxOffice: companyTaxOffice
                         },
                         lines: invoiceLines.map(l => ({
                             Name: l.Name,
@@ -345,14 +395,14 @@ export async function POST(request: Request) {
                             TaxOffice: invoice.customer.taxOffice || "KADIKOY"
                         },
                         company: {
-                            TaxNumber: config.companyVkn || "1111111111",
-                            Name: config.companyTitle || "FIRMA UNVANI",
+                            TaxNumber: companyVkn || "1111111111",
+                            Name: companyTitle,
                             Email: config.portalEmail || "destek@kech.tr",
-                            Address: config.companyAddress || "ADRES",
-                            District: config.portalDistrict || "KADIKOY",
-                            City: config.portalCity || "ISTANBUL",
+                            Address: companyAddress,
+                            District: companyDistrict,
+                            City: companyCity,
                             Country: "TR",
-                            TaxOffice: config.portalTaxOffice || "KADIKOY"
+                            TaxOffice: companyTaxOffice
                         },
                         lines: invoiceLines.map(l => ({
                             Name: l.Name,
