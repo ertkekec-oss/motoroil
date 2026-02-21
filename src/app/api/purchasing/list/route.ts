@@ -108,9 +108,15 @@ export async function GET() {
 
         // Combined results
         const combined = [...nilveraInvoices, ...formattedLocal].sort((a, b) => {
-            const dateA = new Date(a.date.split('.').reverse().join('-')).getTime();
-            const dateB = new Date(b.date.split('.').reverse().join('-')).getTime();
-            return dateB - dateA;
+            const parseDate = (dStr: string) => {
+                const parts = dStr.split('.');
+                if (parts.length === 3) {
+                    return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).getTime();
+                }
+                const d = new Date(dStr);
+                return isNaN(d.getTime()) ? 0 : d.getTime();
+            };
+            return parseDate(b.date) - parseDate(a.date);
         });
 
         return NextResponse.json({ success: true, invoices: combined });
