@@ -460,7 +460,7 @@ export function InvoicesTab({
                                                         ? irs.date
                                                         : new Date(irs.date).toLocaleDateString('tr-TR')}
                                                 </td>
-                                                <td>{irs.total?.toLocaleString()} ₺</td>
+                                                <td>{Number(irs.total || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
                                                 <td>
                                                     <span style={{
                                                         padding: '4px 8px', borderRadius: '4px', fontSize: '11px',
