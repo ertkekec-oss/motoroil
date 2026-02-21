@@ -14,17 +14,13 @@ export default function FieldSalesAgentDashboard() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [userRes, targetsRes] = await Promise.all([
-                    fetch('/api/auth/me'), // Assuming this exists or getting from context
-                    fetch('/api/staff/targets?mine=true')
-                ]);
-
-                if (targetsRes.ok) {
-                    const data = await targetsRes.json();
-                    setTargets(data || []);
+                const res = await fetch('/api/staff/targets?mine=true');
+                if (res.ok) {
+                    const data = await res.json();
+                    setTargets(Array.isArray(data) ? data : []);
                 }
             } catch (err) {
-                console.error(err);
+                console.error('Fetch targets error:', err);
             } finally {
                 setLoading(false);
             }
