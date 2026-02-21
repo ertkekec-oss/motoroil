@@ -57,12 +57,68 @@ export async function POST(req: Request) {
             });
 
             if (!exists) {
+                // Calculate performance bonuses for this period
+                let calculatedBonus = 0;
+
+                // Parse period to start/end dates for target matching
+                const [year, month] = period.split('-').map(Number);
+                const periodStart = new Date(year, month - 1, 1);
+                const periodEnd = new Date(year, month, 0, 23, 59, 59);
+
+                const periodTargets = await (prisma as any).staffTarget.findMany({
+                    where: {
+                        staffId: staff.id,
+                        startDate: { lte: periodEnd },
+                        endDate: { gte: periodStart },
+                        status: 'ACTIVE'
+                    }
+                });
+
+                for (const target of periodTargets) {
+                    let currentValue = 0;
+                    if (target.type === 'TURNOVER') {
+                        const fieldAgg = await (prisma as any).salesOrder.aggregate({
+                            where: {
+                                staffId: staff.id,
+                                createdAt: { gte: target.startDate, lte: target.endDate },
+                                status: { not: 'CANCELLED' }
+                            },
+                            _sum: { totalAmount: true }
+                        });
+                        const storeAgg = await (prisma as any).order.aggregate({
+                            where: {
+                                staffId: staff.id,
+                                orderDate: { gte: target.startDate, lte: target.endDate },
+                                status: { notIn: ['CANCELLED', 'Returned'] }
+                            },
+                            _sum: { totalAmount: true }
+                        });
+                        currentValue = Number(fieldAgg._sum?.totalAmount || 0) + Number(storeAgg._sum?.totalAmount || 0);
+
+                        if (target.commissionRate > 0) {
+                            calculatedBonus += (currentValue * Number(target.commissionRate)) / 100;
+                        }
+                    } else if (target.type === 'VISIT') {
+                        currentValue = await (prisma as any).salesVisit.count({
+                            where: {
+                                staffId: staff.id,
+                                checkInTime: { gte: target.startDate, lte: target.endDate }
+                            }
+                        });
+                    }
+
+                    if (currentValue >= Number(target.targetValue) && target.bonusAmount > 0) {
+                        calculatedBonus += Number(target.bonusAmount);
+                    }
+                }
+
                 await prisma.payroll.create({
                     data: {
                         staffId: staff.id,
                         period,
                         salary: staff.salary || 0,
-                        netPay: staff.salary || 0, // Logic for tax/deductions can go here later
+                        bonus: calculatedBonus,
+                        netPay: Number(staff.salary || 0) + calculatedBonus,
                         status: 'Bekliyor'
                     }
                 });

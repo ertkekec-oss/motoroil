@@ -6,7 +6,7 @@ import { useModal } from '@/contexts/ModalContext';
 import { useFinancials } from '@/contexts/FinancialContext';
 
 export default function StaffManagementContent() {
-    const [activeTab, setActiveTab] = useState('list'); // list, roles, performance, shifts, leaves, payroll
+    const [activeTab, setActiveTab] = useState('list'); // list, roles, performance, shifts, leaves, payroll, attendance, puantaj
     const { staff, currentUser, hasPermission, addNotification, refreshStaff, branches } = useApp();
     const { addFinancialTransaction, kasalar, setKasalar } = useFinancials();
     const { showSuccess, showConfirm, showError } = useModal();
@@ -33,9 +33,12 @@ export default function StaffManagementContent() {
     const [payrolls, setPayrolls] = useState<any[]>([]);
     const [currentWeekStart, setCurrentWeekStart] = useState(getMonday(new Date()));
     const [targets, setTargets] = useState<any[]>([]);
+    const [attendance, setAttendance] = useState<any[]>([]);
+    const [puantaj, setPuantaj] = useState<any[]>([]);
+    const [selectedPeriod, setSelectedPeriod] = useState(new Date().toISOString().slice(0, 7));
     const [showTargetModal, setShowTargetModal] = useState(false);
     const [newTarget, setNewTarget] = useState({
-        staffId: '', type: 'TURNOVER', targetValue: '', period: 'MONTHLY', startDate: '', endDate: ''
+        staffId: '', type: 'TURNOVER', targetValue: '', period: 'MONTHLY', startDate: '', endDate: '', commissionRate: '', bonusAmount: ''
     });
 
     // --- STAFF DOCUMENTS STATE ---
@@ -69,7 +72,7 @@ export default function StaffManagementContent() {
             const res = await fetch(`/api/staff/shifts?start=${currentWeekStart.toISOString()}&end=${endWeek.toISOString()}`);
             if (res.ok) {
                 const data = await res.json();
-                setShifts(data);
+                setShifts(Array.isArray(data) ? data : []);
             }
         } catch (e) { console.error(e); }
     };
@@ -77,15 +80,21 @@ export default function StaffManagementContent() {
     const fetchLeaves = async () => {
         try {
             const res = await fetch('/api/staff/leaves');
-            if (res.ok) setLeaves(await res.json());
+            if (res.ok) {
+                const data = await res.json();
+                setLeaves(Array.isArray(data) ? data : []);
+            }
         } catch (e) { console.error(e); }
     };
 
     const fetchPayrolls = async () => {
         try {
-            const currentPeriod = new Date().toISOString().slice(0, 7); // YYYY-MM
+            const currentPeriod = new Date().toISOString().slice(0, 7);
             const res = await fetch(`/api/staff/payroll?period=${currentPeriod}`);
-            if (res.ok) setPayrolls(await res.json());
+            if (res.ok) {
+                const data = await res.json();
+                setPayrolls(data.payrolls || []);
+            }
         } catch (e) { console.error(e); }
     };
 
@@ -100,7 +109,30 @@ export default function StaffManagementContent() {
     const fetchTargets = async () => {
         try {
             const res = await fetch('/api/staff/targets');
-            if (res.ok) setTargets(await res.json());
+            if (res.ok) {
+                const data = await res.json();
+                setTargets(Array.isArray(data) ? data : []);
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    const fetchAttendance = async () => {
+        try {
+            const res = await fetch('/api/staff/attendance');
+            if (res.ok) {
+                const data = await res.json();
+                setAttendance(Array.isArray(data) ? data : []);
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    const fetchPuantaj = async () => {
+        try {
+            const res = await fetch(`/api/staff/puantaj?period=${selectedPeriod}`);
+            if (res.ok) {
+                const data = await res.json();
+                setPuantaj(Array.isArray(data) ? data : []);
+            }
         } catch (e) { console.error(e); }
     };
 
@@ -110,13 +142,20 @@ export default function StaffManagementContent() {
         }
     }, [showEditStaffModal, editStaff.id]);
 
+    useEffect(() => {
+        fetchAttendance(); // Load for list tab indicators
+    }, []);
+
     // Load data when tab changes
     useEffect(() => {
         if (activeTab === 'shifts') fetchShifts();
         if (activeTab === 'leaves') fetchLeaves();
         if (activeTab === 'payroll') fetchPayrolls();
         if (activeTab === 'performance') fetchTargets();
-    }, [activeTab, currentWeekStart]);
+        if (activeTab === 'attendance') fetchAttendance();
+        if (activeTab === 'puantaj') fetchPuantaj();
+        if (activeTab === 'list') fetchAttendance();
+    }, [activeTab, currentWeekStart, selectedPeriod]);
 
     // Set default branch when branches load
     useEffect(() => {
@@ -471,6 +510,29 @@ export default function StaffManagementContent() {
         finally { setIsProcessing(false); }
     };
 
+    const handleGeneratePayrolls = async () => {
+        const period = new Date().toISOString().slice(0, 7);
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/staff/payroll', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ period })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                showSuccess("Başarılı", data.message || "Bordrolar başarıyla oluşturuldu.");
+                await fetchPayrolls();
+            }
+        } catch (e) {
+            console.error(e);
+            showError("Hata", "Bordrolar oluşturulamadı.");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     // --- PAYROLL MANAGEMENT LOGIC ---
     const [showPayrollModal, setShowPayrollModal] = useState(false);
     const [currentPayroll, setCurrentPayroll] = useState({
@@ -596,6 +658,35 @@ export default function StaffManagementContent() {
         }
     };
 
+    const handleProcessAttendance = async (staffId: string, type: 'CHECK_IN' | 'CHECK_OUT') => {
+        setIsProcessing(true);
+        try {
+            const res = await fetch('/api/staff/attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    staffId,
+                    type,
+                    location: 'Merkez Ofis', // Default for manual
+                    deviceInfo: 'Yönetici Paneli'
+                })
+            });
+
+            if (res.ok) {
+                showSuccess(type === 'CHECK_IN' ? "Giriş Yapıldı" : "Çıkış Yapıldı", "İşlem başarıyla PDKS kayıtlarına işlendi.");
+                fetchAttendance();
+                if (activeTab === 'puantaj') fetchPuantaj();
+            } else {
+                const data = await res.json();
+                showError("İşlem Başarısız", data.error || "Hata oluştu.");
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     const handleDeleteStaff = (person: any) => {
         showConfirm("Personel Silinecek", `${person.name} isimli personeli silmek istediğinize emin misiniz?`, async () => {
             try {
@@ -623,13 +714,15 @@ export default function StaffManagementContent() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...newTarget,
-                    targetValue: parseFloat(newTarget.targetValue)
+                    targetValue: parseFloat(newTarget.targetValue),
+                    commissionRate: parseFloat(newTarget.commissionRate || '0'),
+                    bonusAmount: parseFloat(newTarget.bonusAmount || '0')
                 })
             });
             if (res.ok) {
                 await fetchTargets();
                 setShowTargetModal(false);
-                setNewTarget({ staffId: '', type: 'TURNOVER', targetValue: '', period: 'MONTHLY', startDate: '', endDate: '' });
+                setNewTarget({ staffId: '', type: 'TURNOVER', targetValue: '', period: 'MONTHLY', startDate: '', endDate: '', commissionRate: '', bonusAmount: '' });
                 showSuccess("Hedef Tanımlandı", "Personel hedefleri güncellendi.");
             }
         } catch (e) {
@@ -707,6 +800,8 @@ export default function StaffManagementContent() {
                     <button onClick={() => setActiveTab('performance')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'performance' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>PERFORMANS</button>
                     <button onClick={() => setActiveTab('shifts')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'shifts' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>VARDİYA</button>
                     <button onClick={() => setActiveTab('leaves')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'leaves' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>İZİNLER</button>
+                    <button onClick={() => setActiveTab('attendance')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'attendance' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>PDKS</button>
+                    <button onClick={() => setActiveTab('puantaj')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'puantaj' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>PUANTAJ</button>
                     <button onClick={() => setActiveTab('payroll')} className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'payroll' ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}>BORDRO</button>
                 </div>
 
@@ -786,6 +881,21 @@ export default function StaffManagementContent() {
                                 >
                                     🗑️ SİL
                                 </button>
+                                {(() => {
+                                    const activeAtt = attendance.find(a => a.staffId === person.id && !a.checkOut);
+                                    return (
+                                        <button
+                                            onClick={() => handleProcessAttendance(person.id, activeAtt ? 'CHECK_OUT' : 'CHECK_IN')}
+                                            disabled={isProcessing}
+                                            className={`flex-1 py-3 rounded-xl border text-[10px] font-black transition-all ${activeAtt
+                                                ? 'bg-amber-500/10 border-amber-500/30 text-amber-500 hover:bg-amber-500/20'
+                                                : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+                                                }`}
+                                        >
+                                            {activeAtt ? '🏁 ÇIKIŞ YAP' : '🚀 GİRİŞ YAP'}
+                                        </button>
+                                    );
+                                })()}
                             </div>
                         </div>
                     ))}
@@ -869,6 +979,7 @@ export default function StaffManagementContent() {
                                             <th className="p-6">HEDEF TÜRÜ</th>
                                             <th className="p-6">HEDEF</th>
                                             <th className="p-6">GERÇEKLEŞEN</th>
+                                            <th className="p-6">BEKLENEN PRİM</th>
                                             <th className="p-6">İLERLEME</th>
                                             <th className="p-6">TARİH ARALIĞI</th>
                                         </tr>
@@ -890,6 +1001,12 @@ export default function StaffManagementContent() {
                                                         </td>
                                                         <td className="p-6 font-black text-emerald-400">
                                                             {t.type === 'TURNOVER' ? `₺ ${Number(t.currentValue).toLocaleString()}` : `${t.currentValue} Adet`}
+                                                        </td>
+                                                        <td className="p-6">
+                                                            <div className="flex flex-col gap-1">
+                                                                <span className="text-sm font-black text-blue-400">₺ {Number(t.estimatedBonus || 0).toLocaleString()}</span>
+                                                                {t.commissionRate > 0 && <span className="text-[9px] text-white/30">%{t.commissionRate} Komisyon</span>}
+                                                            </div>
                                                         </td>
                                                         <td className="p-6">
                                                             <div className="flex items-center gap-3">
@@ -1121,9 +1238,21 @@ export default function StaffManagementContent() {
             {/* --- PAYROLL TAB --- */}
             {activeTab === 'payroll' && (
                 <div className="card glass p-0 overflow-hidden">
-                    <div className="p-6 border-b border-white/5 flex justify-between items-center">
-                        <h3 className="text-xl font-black">💰 Maaş & Hakediş Listesi (Ocak 2026)</h3>
-                        <button onClick={handlePayAll} className="px-5 py-2 rounded-lg bg-emerald-500 text-black text-xs font-black hover:bg-emerald-400 transition-all">TÜMÜNÜ ÖDE</button>
+                    <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                        <div>
+                            <h3 className="text-xl font-black">💰 Maaş & Hakediş Listesi</h3>
+                            <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">DÖNEM: {new Date().toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })}</div>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleGeneratePayrolls}
+                                disabled={isProcessing}
+                                className="px-5 py-2 rounded-lg bg-blue-500 text-white text-xs font-black hover:bg-blue-400 transition-all shadow-lg shadow-blue-500/20 active:scale-95 disabled:opacity-50"
+                            >
+                                {isProcessing ? 'İŞLENİYOR...' : 'BORDROLARI OLUŞTUR ⚙️'}
+                            </button>
+                            <button onClick={handlePayAll} className="px-5 py-2 rounded-lg bg-emerald-500 text-black text-xs font-black hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20 active:scale-95">TÜMÜNÜ ÖDE</button>
+                        </div>
                     </div>
                     <table className="w-full text-left">
                         <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
@@ -1194,6 +1323,117 @@ export default function StaffManagementContent() {
                             </tr>
                         </tfoot>
                     </table>
+                </div>
+            )}
+
+            {/* --- ATTENDANCE TAB (PDKS) --- */}
+            {activeTab === 'attendance' && (
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="card glass p-6 border-l-4 border-emerald-500">
+                            <div className="text-[10px] font-black text-white/40 uppercase mb-2">ŞU AN ÇALIŞAN</div>
+                            <div className="text-3xl font-black text-white">{attendance.filter(a => !a.checkOut).length}</div>
+                        </div>
+                        <div className="card glass p-6 border-l-4 border-amber-500">
+                            <div className="text-[10px] font-black text-white/40 uppercase mb-2">GEÇ KALANLAR</div>
+                            <div className="text-3xl font-black text-white">0</div>
+                        </div>
+                    </div>
+
+                    <div className="card glass p-0 overflow-hidden">
+                        <div className="p-6 border-b border-white/5 flex justify-between items-center">
+                            <h3 className="text-xl font-black">📍 Günlük Giriş-Çıkış Takibi</h3>
+                        </div>
+                        <table className="w-full text-left">
+                            <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
+                                <tr>
+                                    <th className="p-6">PERSONEL</th>
+                                    <th className="p-6">TARİH</th>
+                                    <th className="p-6">GİRİŞ</th>
+                                    <th className="p-6">ÇIKIŞ</th>
+                                    <th className="p-6">SÜRE</th>
+                                    <th className="p-6 text-right">KONUM</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {attendance.length > 0 ? (
+                                    attendance.map(a => (
+                                        <tr key={a.id} className="hover:bg-white/[0.02]">
+                                            <td className="p-6 font-bold">{a.staff?.name}</td>
+                                            <td className="p-6 text-sm text-white/60">{new Date(a.date).toLocaleDateString('tr-TR')}</td>
+                                            <td className="p-6 font-mono text-emerald-400 font-bold">{new Date(a.checkIn).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</td>
+                                            <td className="p-6 font-mono text-amber-400 font-bold">{a.checkOut ? new Date(a.checkOut).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+                                            <td className="p-6 font-black">{a.workingHours || 0} Sa</td>
+                                            <td className="p-6 text-right text-[10px] text-white/40">{a.locationIn || '—'}</td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr><td colSpan={6} className="p-8 text-center text-white/40">Kayıt bulunamadı.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+
+            {/* --- PUANTAJ TAB --- */}
+            {activeTab === 'puantaj' && (
+                <div className="space-y-6">
+                    <div className="card glass p-6 flex flex-wrap gap-4 items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="text-lg font-black">Aylık Puantaj Çizelgesi</div>
+                            <input
+                                type="month"
+                                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-primary"
+                                value={selectedPeriod}
+                                onChange={(e) => setSelectedPeriod(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div> <span className="text-[10px] font-bold text-white/40">ÇALIŞILAN</span></div>
+                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div> <span className="text-[10px] font-bold text-white/40">İZİNLİ</span></div>
+                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-500 rounded-full"></div> <span className="text-[10px] font-bold text-white/40">GELMEDİ</span></div>
+                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-white/10 rounded-full"></div> <span className="text-[10px] font-bold text-white/40">HAFTA TATİLİ</span></div>
+                        </div>
+                    </div>
+
+                    <div className="card glass p-0 overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-white/5 text-[9px] text-white/40 font-black uppercase border-b border-white/5">
+                                    <th className="p-4 sticky left-0 bg-[#0f111a] z-10 w-[150px]">PERSONEL</th>
+                                    {[...Array(31)].map((_, i) => (
+                                        <th key={i} className="p-2 text-center w-8 border-l border-white/5">{i + 1}</th>
+                                    ))}
+                                    <th className="p-4 text-center border-l-2 border-primary/20">TOPLAM</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {puantaj.map((row: any) => (
+                                    <tr key={row.staffId} className="hover:bg-white/[0.02]">
+                                        <td className="p-4 font-bold text-xs sticky left-0 bg-[#0f111a] border-r border-white/5 z-10">
+                                            {row.name}
+                                            <div className="text-[8px] text-white/40">{row.role}</div>
+                                        </td>
+                                        {row.dailyStats.map((stat: any, idx: number) => (
+                                            <td key={idx} className="p-2 border-l border-white/5 text-center">
+                                                <div className={`w-5 h-5 mx-auto rounded-md flex items-center justify-center text-[8px] font-black ${stat.status === 'WORKED' ? 'bg-emerald-500 text-white' :
+                                                    stat.status === 'LEAVE' ? 'bg-blue-500 text-white' :
+                                                        stat.status === 'OFF_DAY' ? 'bg-white/10 text-white/40' :
+                                                            'bg-red-500/20 text-red-500'
+                                                    }`}>
+                                                    {stat.status === 'WORKED' ? 'Ç' : stat.status === 'LEAVE' ? 'İ' : stat.status === 'OFF_DAY' ? 'H' : 'X'}
+                                                </div>
+                                            </td>
+                                        ))}
+                                        <td className="p-4 text-center border-l-2 border-primary/20">
+                                            <div className="text-[10px] font-black whitespace-nowrap">{row.summary.workedDays}G / {row.summary.workedHours}S</div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 
@@ -1895,6 +2135,32 @@ export default function StaffManagementContent() {
                                     onChange={(e) => setNewTarget({ ...newTarget, targetValue: e.target.value })}
                                 />
                             </div>
+
+                            {newTarget.type === 'TURNOVER' && (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Prim Oranı (%)</label>
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            className="w-full h-12 bg-blue-500/5 border border-blue-500/10 rounded-xl px-4 text-sm text-blue-400 focus:border-blue-500/30 outline-none"
+                                            placeholder="1.5"
+                                            value={newTarget.commissionRate}
+                                            onChange={(e) => setNewTarget({ ...newTarget, commissionRate: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Hedef Bonusu (TL)</label>
+                                        <input
+                                            type="number"
+                                            className="w-full h-12 bg-emerald-500/5 border border-emerald-500/10 rounded-xl px-4 text-sm text-emerald-400 focus:border-emerald-500/30 outline-none"
+                                            placeholder="2500"
+                                            value={newTarget.bonusAmount}
+                                            onChange={(e) => setNewTarget({ ...newTarget, bonusAmount: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">

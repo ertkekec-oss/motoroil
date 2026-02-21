@@ -16,7 +16,18 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { items, total, kasaId, description, paymentMode, customerName, customerId, earnedPoints, pointsUsed, couponCode, referenceCode, branch } = body;
+        const { items, total, kasaId, description, paymentMode, customerName, customerId, earnedPoints, pointsUsed, couponCode, referenceCode, branch, staffId: bodyStaffId } = body;
+
+        // Resolve staffId (either from body or from current session if user is staff)
+        let finalStaffId = bodyStaffId;
+        if (!finalStaffId && (user as any).id) {
+            // Check if current user is stored in Staff table
+            const staffRecord = await prisma.staff.findUnique({
+                where: { id: (user as any).id },
+                select: { id: true }
+            });
+            if (staffRecord) finalStaffId = staffRecord.id;
+        }
 
         // Get the default company for this tenant
         const company = await prisma.company.findFirst({
@@ -29,7 +40,7 @@ export async function POST(request: Request) {
 
         const companyId = company?.id;
 
-        console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode, companyId });
+        console.log('Sales Create Request:', { total, kasaId, paymentMode, customerName, referenceCode, companyId, finalStaffId });
 
         // 1. Kasa ID Güvenli Seçim
         let targetKasaId = (kasaId === 'CashKasa' || !kasaId) ? undefined : kasaId;
@@ -98,6 +109,7 @@ export async function POST(request: Request) {
                     marketplaceId: 'LOCAL',
                     orderNumber: orderNumber,
                     companyId: companyId,
+                    staffId: finalStaffId,
                     customerName: customerName || 'Perakende Müşteri',
                     totalAmount: finalTotal,
                     currency: 'TRY',

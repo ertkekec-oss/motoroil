@@ -58,7 +58,8 @@ export async function GET(req: NextRequest) {
         const detailedTargets = await Promise.all(targets.map(async (target: any) => {
             let currentValue = 0;
             if (target.type === 'TURNOVER') {
-                const aggregate = await (prisma as any).salesOrder.aggregate({
+                // 1. Field Sales turnover (SalesOrder)
+                const fieldAggregate = await (prisma as any).salesOrder.aggregate({
                     where: {
                         staffId: target.staffId,
                         createdAt: {
@@ -69,7 +70,21 @@ export async function GET(req: NextRequest) {
                     },
                     _sum: { totalAmount: true }
                 });
-                currentValue = Number(aggregate._sum?.totalAmount || 0);
+
+                // 2. Store Sales turnover (Order)
+                const storeAggregate = await (prisma as any).order.aggregate({
+                    where: {
+                        staffId: target.staffId,
+                        orderDate: {
+                            gte: target.startDate,
+                            lte: target.endDate
+                        },
+                        status: { notIn: ['CANCELLED', 'Returned'] }
+                    },
+                    _sum: { totalAmount: true }
+                });
+
+                currentValue = Number(fieldAggregate._sum?.totalAmount || 0) + Number(storeAggregate._sum?.totalAmount || 0);
             } else if (target.type === 'VISIT') {
                 const count = await (prisma as any).salesVisit.count({
                     where: {
@@ -83,9 +98,25 @@ export async function GET(req: NextRequest) {
                 currentValue = count;
             }
 
+            // Calculate estimated bonus/commission
+            let estimatedBonus = 0;
+            const progressPercent = target.targetValue > 0 ? (currentValue / Number(target.targetValue)) * 100 : 0;
+
+            // Percentage based commission on total turnover
+            if (target.type === 'TURNOVER' && target.commissionRate > 0) {
+                estimatedBonus += (currentValue * Number(target.commissionRate)) / 100;
+            }
+
+            // Fixed bonus if target is met
+            if (currentValue >= Number(target.targetValue) && target.bonusAmount > 0) {
+                estimatedBonus += Number(target.bonusAmount);
+            }
+
             return {
                 ...target,
-                currentValue
+                currentValue,
+                progressPercent,
+                estimatedBonus
             };
         }));
 
@@ -102,7 +133,7 @@ export async function POST(req: NextRequest) {
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const body = await req.json();
-        const { staffId, type, targetValue, startDate, endDate, period } = body;
+        const { staffId, type, targetValue, startDate, endDate, period, commissionRate, bonusAmount } = body;
 
         // Resolve Company ID
         let company;
@@ -124,6 +155,8 @@ export async function POST(req: NextRequest) {
                 startDate: new Date(startDate),
                 endDate: new Date(endDate),
                 period: period || 'MONTHLY',
+                commissionRate: commissionRate ? Number(commissionRate) : 0,
+                bonusAmount: bonusAmount ? Number(bonusAmount) : 0,
                 status: 'ACTIVE'
             }
         });
