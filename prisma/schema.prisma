@@ -422,6 +422,7 @@ model SalesInvoice {
   totalAmount  Decimal   @db.Decimal(10, 2)
   description  String?
   customerId   String
+  orderId      String?
   items        Json
   status       String    @default("Taslak")
   isFormal     Boolean   @default(false)
@@ -442,6 +443,7 @@ model SalesInvoice {
   @@index([invoiceNo])
   @@index([status])
   @@index([companyId])
+  @@index([orderId])
 }
 
 model Customer {

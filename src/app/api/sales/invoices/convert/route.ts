@@ -46,6 +46,7 @@ export async function POST(request: Request) {
                     companyId: order.companyId,
                     invoiceNo: invoiceNo || `INV-${Date.now()}`,
                     customerId: customerId,
+                    orderId: orderId || null,
                     amount: subtotal - discAmount,
                     taxAmount: totalVat + totalOtv, // Total tax includes OTV
                     totalAmount: grandTotal,
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
                     status: 'Onaylandı'
                 }
             });
+
 
             // B. Update Customer with provided info
             await tx.customer.update({
