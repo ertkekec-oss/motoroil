@@ -364,7 +364,7 @@ export async function POST(request: Request) {
                     if (sendResult.type === 'EARSIV') {
                         try {
                             console.log('[Formal Send] Triggering immediate report creation for e-Archive...');
-                            await nilveraService.createArchiveReport(formalId);
+                            await nilveraService.createArchiveReport(formalId, invoice.invoiceDate ? new Date(invoice.invoiceDate) : undefined);
                         } catch (reportErr: any) {
                             console.warn('[Formal Send] Background report creation warning:', reportErr.message);
                         }

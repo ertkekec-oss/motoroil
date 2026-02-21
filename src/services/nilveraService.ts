@@ -475,24 +475,30 @@ export class NilveraInvoiceService {
     /**
      * e-Arşiv Raporu Oluşturma (GİB'e iletim için kritik ikinci adım)
      */
-    async createArchiveReport(uuid: string) {
+    async createArchiveReport(uuid: string, dateObj?: Date) {
         try {
-            console.log(`[NilveraService] Creating E-Archive Report for UUID: ${uuid}`);
-            const res = await axios.post(`${this.config.baseUrl}/EArchive/Report/Create`, {
-                invoiceUuids: [uuid]
+            const date = dateObj || new Date();
+            const year = date.getFullYear().toString();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+            console.log(`[NilveraService] Triggering E-Archive Report: endpoint=/EArchive/Send/Report, period=${year}-${month}`);
+
+            const res = await axios.post(`${this.config.baseUrl}/EArchive/Send/Report`, {
+                PeriodYear: year,
+                PeriodMonth: month
             }, {
                 headers: this.getHeaders(),
                 validateStatus: () => true
             });
 
             if (res.status >= 400) {
-                console.warn("[NilveraService] Report Creation Response:", res.status, res.data);
+                console.warn("[NilveraService] Report Trigger Response:", res.status, res.data);
                 return { success: false, status: res.status, error: JSON.stringify(res.data) };
             }
 
             return { success: true, data: res.data };
         } catch (error: any) {
-            console.error("[NilveraService] Report Exception:", error.message);
+            console.error("[NilveraService] Report Trigger Exception:", error.message);
             return { success: false, error: error.message };
         }
     }
