@@ -19,11 +19,15 @@ export default function Sidebar() {
     } = useApp();
 
     const [fieldSalesOpen, setFieldSalesOpen] = useState(false);
+    const [reportsOpen, setReportsOpen] = useState(false);
 
     // Auto-expand if active
     useEffect(() => {
         if (pathname.includes('/field-sales')) {
             setFieldSalesOpen(true);
+        }
+        if (pathname.includes('/reports')) {
+            setReportsOpen(true);
         }
     }, [pathname]);
 
@@ -93,8 +97,16 @@ export default function Sidebar() {
         { name: 'Servis Masası', href: '/service', icon: '🛠️' },
 
         // ANALİZ & DENETİM
-        { name: 'Veri Analizi', href: '/reports', icon: '📊' },
-        { name: 'İş Zekası (CEO)', href: '/reports/ceo', icon: '🧠' },
+        {
+            name: 'İş Zekası & Analiz',
+            icon: '🧠',
+            isParent: true,
+            id: 'reports-parent',
+            subItems: [
+                { name: 'İş Zekası (CEO)', href: '/reports/ceo', icon: '🧠' },
+                { name: 'Veri Analizi', href: '/reports', icon: '📊' },
+            ]
+        },
         { name: 'Denetim Kayıtları', href: '/admin/audit-logs', icon: '🔍' },
         { name: 'Kaçak Satış Tespit', href: '/security/suspicious', icon: '🚨' },
 
@@ -262,7 +274,7 @@ export default function Sidebar() {
             }}>
                 {menuItems.map((item: any) => {
                     if (item.isParent) {
-                        const isExpanded = item.id === 'field-sales-parent' ? fieldSalesOpen : false;
+                        const isExpanded = item.id === 'field-sales-parent' ? fieldSalesOpen : (item.id === 'reports-parent' ? reportsOpen : false);
                         const anyChildActive = item.subItems?.some((sub: any) => pathname === sub.href);
 
                         return (
@@ -270,6 +282,7 @@ export default function Sidebar() {
                                 <div
                                     onClick={() => {
                                         if (item.id === 'field-sales-parent') setFieldSalesOpen(!fieldSalesOpen);
+                                        if (item.id === 'reports-parent') setReportsOpen(!reportsOpen);
                                     }}
                                     style={{
                                         display: 'flex', alignItems: 'center', gap: '14px',
