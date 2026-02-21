@@ -34,35 +34,43 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
 
         const effectiveCompanyId = invoice?.companyId || sessionCompanyId;
         if (!effectiveCompanyId) {
-            return NextResponse.json({ success: false, error: 'Firma oturumu bulunamadı.' }, { status: 400 });
+            return new Response('Firma oturumu veya fatura bulunamadı.', { status: 400 });
         }
 
-        const settingsRecord = await prisma.appSettings.findUnique({
-            where: { companyId_key: { companyId: effectiveCompanyId, key: 'eFaturaSettings' } }
+        // Use the new IntegratorSettings table
+        const settings = await prisma.integratorSettings.findUnique({
+            where: { companyId: effectiveCompanyId }
         });
 
-        const rawSettings = (settingsRecord?.value as any) || {};
-        const apiKey = (rawSettings.apiKey || rawSettings.nilvera?.apiKey || rawSettings.ApiKey || '').trim();
-        const environment = rawSettings.environment || rawSettings.nilvera?.environment || 'test';
-
-        if (!apiKey) {
-            return NextResponse.json({ success: false, error: 'Nilvera API anahtarı bulunamadı.' }, { status: 500 });
+        if (!settings || !settings.isActive) {
+            return new Response('Aktif Nilvera entegrasyonu bulunamadı.', { status: 404 });
         }
 
-        const baseUrl = (environment.toLowerCase() === 'production') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
+        // Decrypt credentials to get API key
+        const { decrypt } = require('@/lib/encryption');
+        let apiKey = '';
+        try {
+            const creds = JSON.parse(decrypt(settings.credentials));
+            apiKey = (creds.apiKey || creds.ApiKey || '').trim();
+        } catch (e) {
+            return new Response('Entegrasyon anahtarı çözülemedi.', { status: 500 });
+        }
 
-        // If invoice record found, use its formalUuid. Otherwise, assume invoiceId IS the UUID (for incoming/ephemeral)
+        if (!apiKey) {
+            return new Response('Nilvera API anahtarı boş.', { status: 500 });
+        }
+
+        const baseUrl = (settings.environment === 'PRODUCTION') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
         const uuid = invoice?.formalUuid || (invoiceId.length > 20 ? invoiceId : null);
 
         if (!uuid) {
-            return NextResponse.json({ success: false, error: 'Geçersiz Fatura UUID.' }, { status: 400 });
+            return new Response('Fatura henüz resmileşmemiş (UUID yok).', { status: 400 });
         }
 
         const endpointsToTry = [];
         const formalType = invoice?.formalType;
 
         if (isIncoming) {
-            // Primary for incoming
             endpointsToTry.push(`${baseUrl}/einvoice/Purchase/${uuid}/pdf`);
         } else if (formalType === 'EFATURA') {
             endpointsToTry.push(`${baseUrl}/einvoice/Sale/${uuid}/pdf`);
@@ -73,8 +81,7 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
             endpointsToTry.push(`${baseUrl}/edespatch/Despatch/${uuid}/pdf`);
         }
 
-        // UNIVERSAL FALLBACKS (if above fails or type unknown)
-        // Order: Outgoing Sale -> Incoming Purchase -> E-Archive
+        // Universal fallbacks
         const fallbacks = [
             `${baseUrl}/einvoice/Sale/${uuid}/pdf`,
             `${baseUrl}/einvoice/Purchase/${uuid}/pdf`,
@@ -86,9 +93,6 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
         for (const f of fallbacks) {
             if (!endpointsToTry.includes(f)) endpointsToTry.push(f);
         }
-
-        let lastStatus = 404;
-        let lastErrorData = '';
 
         for (const url of endpointsToTry) {
             try {
@@ -102,36 +106,32 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
                 });
 
                 if (pdfResponse.ok) {
-                    console.log(`[PDF Proxy] Success for URL: ${url}`);
-                    const buffer = await pdfResponse.arrayBuffer();
-
-                    return new Response(buffer, {
-                        status: 200,
-                        headers: {
-                            'Content-Type': 'application/pdf',
-                            'Content-Disposition': `inline; filename="Fatura-${uuid}.pdf"`,
-                            'Cache-Control': 'no-store, no-cache, must-revalidate',
-                            'Pragma': 'no-cache'
-                        }
-                    });
+                    const contentType = pdfResponse.headers.get('content-type');
+                    // Check if it's REALLY a PDF and not an error HTML/JSON
+                    if (contentType?.includes('application/pdf')) {
+                        console.log(`[PDF Proxy] Success for URL: ${url}`);
+                        const buffer = await pdfResponse.arrayBuffer();
+                        return new Response(buffer, {
+                            status: 200,
+                            headers: {
+                                'Content-Type': 'application/pdf',
+                                'Content-Disposition': `inline; filename="Fatura-${uuid}.pdf"`,
+                                'Cache-Control': 'no-store'
+                            }
+                        });
+                    }
                 }
-
-                lastStatus = pdfResponse.status;
-                console.warn(`[PDF Proxy] Failed ${url} with status ${lastStatus}`);
+                console.warn(`[PDF Proxy] Failed ${url} with status ${pdfResponse.status}`);
             } catch (err: any) {
-                console.warn(`[PDF Proxy] Exception for ${url}:`, err.message);
+                console.warn(`[PDF Proxy] Error for ${url}:`, err.message);
             }
         }
 
-        return NextResponse.json({
-            success: false,
-            error: 'Fatura PDF dosyası Nilvera sunucularından alınamadı.',
-            details: `Nilvera Status: ${lastStatus}. UUID: ${uuid}. ${lastErrorData}`
-        }, { status: lastStatus });
+        return new Response('Fatura PDF dosyası Nilvera sunucularından alınamadı.', { status: 404 });
 
     } catch (error: any) {
         console.error("[PDF Proxy Critical Error]:", error);
-        return NextResponse.json({ success: false, error: 'PDF sunucusuyla iletişim hatası.' }, { status: 500 });
+        return new Response('Sunucu hatası.', { status: 500 });
     }
 }
 
