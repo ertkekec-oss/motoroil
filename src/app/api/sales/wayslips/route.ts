@@ -7,6 +7,7 @@ export async function POST(request: Request) {
     try {
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+        const companyId = session.user?.companyId || (session as any).companyId;
 
         const body = await request.json();
         const { type, customerId, supplierId, irsNo, date, items, description } = body;
@@ -14,6 +15,7 @@ export async function POST(request: Request) {
         if (type === 'Giden') {
             const wayslip = await prisma.salesInvoice.create({
                 data: {
+                    companyId,
                     invoiceNo: irsNo || `IRS-${Date.now()}`,
                     customerId,
                     invoiceDate: new Date(date),
@@ -31,6 +33,7 @@ export async function POST(request: Request) {
         } else {
             const wayslip = await prisma.purchaseInvoice.create({
                 data: {
+                    companyId,
                     invoiceNo: irsNo || `IRS-G-${Date.now()}`,
                     supplierId,
                     invoiceDate: new Date(date),

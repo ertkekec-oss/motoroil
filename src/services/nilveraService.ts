@@ -462,8 +462,16 @@ export class NilveraInvoiceService {
             console.log(`[NilveraService] Fetching Incoming: url=${this.config.baseUrl}/einvoice/Purchase, page=${page}, range=${startDate}-${endDate}`);
 
             const res = await axios.get(
-                `${this.config.baseUrl}/einvoice/Purchase?Page=${page}&PageSize=${pageSize}&StartDate=${startDate}&EndDate=${endDate}`,
-                { headers: this.getHeaders() }
+                `${this.config.baseUrl}/einvoice/Purchase`,
+                {
+                    headers: this.getHeaders(),
+                    params: {
+                        Page: page,
+                        PageSize: pageSize,
+                        StartDate: startDate,
+                        EndDate: endDate
+                    }
+                }
             );
 
             console.log(`[NilveraService] Received result. TotalCount=${res.data?.TotalCount || 0}, ContentSize=${res.data?.Content?.length || 0}`);
