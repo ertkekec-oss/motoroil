@@ -37,30 +37,47 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
             return new Response('Firma oturumu veya fatura bulunamadı.', { status: 400 });
         }
 
-        // Use the new IntegratorSettings table
-        const settings = await prisma.integratorSettings.findUnique({
-            where: { companyId: effectiveCompanyId }
+        // Try new IntegratorSettings table first
+        let apiKey = '';
+        let baseUrl = '';
+
+        const intSettings = await (prisma as any).integratorSettings.findFirst({
+            where: { companyId: effectiveCompanyId, isActive: true }
         });
 
-        if (!settings || !settings.isActive) {
-            return new Response('Aktif Nilvera entegrasyonu bulunamadı.', { status: 404 });
+        if (intSettings?.credentials) {
+            try {
+                const { decrypt } = await import('@/lib/encryption');
+                const creds = JSON.parse(decrypt(intSettings.credentials));
+                apiKey = (creds.apiKey || creds.ApiKey || '').trim();
+                baseUrl = (intSettings.environment === 'PRODUCTION')
+                    ? 'https://api.nilvera.com'
+                    : 'https://apitest.nilvera.com';
+            } catch (e) {
+                console.warn('[PDF Proxy] Failed to decrypt integratorSettings credentials');
+            }
         }
 
-        // Decrypt credentials to get API key
-        const { decrypt } = require('@/lib/encryption');
-        let apiKey = '';
-        try {
-            const creds = JSON.parse(decrypt(settings.credentials));
-            apiKey = (creds.apiKey || creds.ApiKey || '').trim();
-        } catch (e) {
-            return new Response('Entegrasyon anahtarı çözülemedi.', { status: 500 });
+        // Fallback: try legacy appSettings table
+        if (!apiKey) {
+            const settingsRecord = await prisma.appSettings.findUnique({
+                where: { companyId_key: { companyId: effectiveCompanyId, key: 'eFaturaSettings' } }
+            });
+            const raw = (settingsRecord?.value as any) || {};
+            apiKey = (raw.apiKey || raw.nilvera?.apiKey || raw.ApiKey || '').trim();
+            const environment = raw.environment || raw.nilvera?.environment || 'test';
+            baseUrl = (environment.toLowerCase() === 'production')
+                ? 'https://api.nilvera.com'
+                : 'https://apitest.nilvera.com';
         }
 
         if (!apiKey) {
-            return new Response('Nilvera API anahtarı boş.', { status: 500 });
+            return new Response(JSON.stringify({ error: 'nilvera_api_key_not_found' }), {
+                status: 409,
+                headers: { 'Content-Type': 'application/json' }
+            });
         }
 
-        const baseUrl = (settings.environment === 'PRODUCTION') ? 'https://api.nilvera.com' : 'https://apitest.nilvera.com';
         const uuid = invoice?.formalUuid || (invoiceId.length > 20 ? invoiceId : null);
 
         if (!uuid) {
