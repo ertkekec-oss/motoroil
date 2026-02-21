@@ -144,45 +144,35 @@ export function InvoicesTab({
                                                         color: inv.isFormal ? 'var(--success)' : 'var(--warning)',
                                                         border: `1px solid ${inv.isFormal ? 'var(--success)' : 'var(--warning)'}`
                                                     }}>
-                                                        {inv.status}
+                                                        {inv.isFormal ? 'Faturalandı' : inv.status}
                                                     </span>
                                                 </td>
                                                 <td style={{ textAlign: 'center' }}>
                                                     <div className="flex-center gap-2" onClick={e => e.stopPropagation()}>
                                                         {!inv.isFormal ? (
                                                             <>
-                                                                {inv.status !== 'Onaylandı' && (
-                                                                    <button
-                                                                        onClick={() => handleApproveInvoice(inv.id)}
-                                                                        className="btn btn-primary"
-                                                                        style={{ fontSize: '11px', padding: '6px 10px', background: 'var(--success)', border: 'none' }}
-                                                                    >
-                                                                        ✅ Onayla
-                                                                    </button>
-                                                                )}
                                                                 <button
                                                                     onClick={() => handleSendToELogo(inv.id, 'EFATURA')}
                                                                     className="btn btn-primary"
                                                                     style={{ fontSize: '11px', padding: '6px 10px', background: 'var(--primary)', border: 'none' }}
                                                                 >
-                                                                    🧾 e-Arşiv/Fatura
+                                                                    🧾 Faturalandır
                                                                 </button>
                                                             </>
                                                         ) : (
-                                                            <div style={{ fontSize: '10px', color: 'var(--success)', fontWeight: 'bold' }}>
-                                                                {inv.formalId}
-                                                            </div>
+                                                            <>
+                                                                <button
+                                                                    onClick={() => handleViewPDF(inv.id)}
+                                                                    className="btn btn-outline"
+                                                                    style={{ fontSize: '11px', padding: '6px 10px', background: 'rgba(255,255,255,0.05)' }}
+                                                                >
+                                                                    İndir
+                                                                </button>
+                                                                <div style={{ fontSize: '10px', color: 'var(--success)', fontWeight: 'bold' }}>
+                                                                    {inv.formalId}
+                                                                </div>
+                                                            </>
                                                         )}
-                                                        <button
-                                                            onClick={() => handleSendToELogo(inv.id, 'EIRSALIYE')}
-                                                            className="btn btn-outline"
-                                                            style={{ fontSize: '11px', padding: '6px 10px', border: '1px solid var(--warning)', color: 'var(--warning)' }}
-                                                            disabled={inv.formalType === 'EIRSALIYE'}
-                                                        >
-                                                            🚚 İrsaliye
-                                                        </button>
-                                                        <button className="btn btn-outline" style={{ fontSize: '11px', padding: '6px 10px' }}>İndir</button>
-                                                        <button onClick={() => handleDeleteInvoice(inv.id)} className="btn btn-outline" style={{ fontSize: '11px', padding: '6px 10px', border: '1px solid #ff4444', color: '#ff4444' }}>Sil</button>
                                                     </div>
                                                 </td>
                                             </tr>

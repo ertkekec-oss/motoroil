@@ -1011,30 +1011,6 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             <td style={{ textAlign: 'right', paddingRight: '20px' }}>
                                                 {item.type === 'Satış' && (
                                                     <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                if (!completedIds.includes(item.id) && !processingIds.includes(item.id)) {
-                                                                    handleReturnTransaction(item.id);
-                                                                }
-                                                            }}
-                                                            disabled={completedIds.includes(item.id) || processingIds.includes(item.id)}
-                                                            style={{
-                                                                padding: '6px 8px',
-                                                                background: completedIds.includes(item.id) ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
-                                                                color: completedIds.includes(item.id) ? '#666' : '#ef4444',
-                                                                border: completedIds.includes(item.id) ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(239, 68, 68, 0.3)',
-                                                                borderRadius: '8px',
-                                                                fontSize: '11px',
-                                                                fontWeight: 'bold',
-                                                                cursor: completedIds.includes(item.id) ? 'default' : 'pointer',
-                                                                whiteSpace: 'nowrap',
-                                                                opacity: processingIds.includes(item.id) ? 0.7 : 1
-                                                            }}
-                                                            title="İade Al / İptal Et"
-                                                        >
-                                                            {processingIds.includes(item.id) ? '⏳ İşleniyor...' : (completedIds.includes(item.id) ? '✅ İade Edildi' : '↩️ İade')}
-                                                        </button>
                                                         {item.orderId && (
                                                             item.isFormal ? (
                                                                 // Already invoiced — show locked badge + print button
