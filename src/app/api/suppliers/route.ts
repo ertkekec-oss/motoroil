@@ -1,18 +1,24 @@
 
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { authorize, resolveCompanyId } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const { user } = auth;
+
     try {
+        const companyId = await resolveCompanyId(user);
+        if (!companyId) return NextResponse.json({ success: false, error: 'Firma bulunamadı.' }, { status: 400 });
+
         const suppliers = await prisma.supplier.findMany({
-            orderBy: {
-                updatedAt: 'desc'
-            }
+            where: { companyId, deletedAt: null },
+            orderBy: { updatedAt: 'desc' }
         });
 
-        // Frontend formatı
         const formattedSuppliers = suppliers.map(s => ({
             id: s.id,
             name: s.name,
@@ -38,12 +44,24 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+    const { user } = auth;
+
     try {
         const body = await request.json();
-        const { name, phone, email, address, city, district, taxNumber, taxOffice, category, contactPerson, iban, branch } = body;
+        const { name, phone, email: rawEmail, address, city, district, taxNumber, taxOffice, category, contactPerson, iban, branch } = body;
 
         if (!name) {
             return NextResponse.json({ success: false, error: 'Tedarikçi adı zorunludur.' }, { status: 400 });
+        }
+
+        // Boş email → null (unique constraint koruması)
+        const email = (rawEmail && rawEmail.trim() !== '') ? rawEmail.trim() : null;
+
+        const companyId = await resolveCompanyId(user);
+        if (!companyId) {
+            return NextResponse.json({ success: false, error: 'Firma kaydı bulunamadı.' }, { status: 400 });
         }
 
         const newSupplier = await prisma.supplier.create({
@@ -59,7 +77,8 @@ export async function POST(request: Request) {
                 contactPerson,
                 iban,
                 category,
-                branch: branch || 'Merkez'
+                branch: branch || 'Merkez',
+                companyId
             }
         });
 
@@ -70,13 +89,18 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+
     try {
         const body = await request.json();
-        const { id, name, phone, email, address, city, district, taxNumber, taxOffice, category, contactPerson, iban, branch, isActive } = body;
+        const { id, name, phone, email: rawEmail, address, city, district, taxNumber, taxOffice, category, contactPerson, iban, branch, isActive } = body;
 
         if (!id) {
             return NextResponse.json({ success: false, error: 'ID zorunludur.' }, { status: 400 });
         }
+
+        const email = (rawEmail && rawEmail.trim() !== '') ? rawEmail.trim() : null;
 
         const updatedSupplier = await prisma.supplier.update({
             where: { id },
@@ -104,6 +128,9 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+
     try {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
@@ -112,8 +139,9 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ success: false, error: 'ID zorunludur.' }, { status: 400 });
         }
 
-        await prisma.supplier.delete({
-            where: { id }
+        await prisma.supplier.update({
+            where: { id },
+            data: { deletedAt: new Date() }
         });
 
         return NextResponse.json({ success: true });
