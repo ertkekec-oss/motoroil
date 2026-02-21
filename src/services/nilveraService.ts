@@ -382,7 +382,10 @@ export class NilveraInvoiceService {
             Quantity: line.Quantity,
             UnitType: (line.UnitType || "C62").toUpperCase(),
             DeliveredQuantity: line.Quantity,
-            DeliveredUnitType: (line.UnitType || "C62").toUpperCase()
+            DeliveredUnitType: (line.UnitType || "C62").toUpperCase(),
+            DeliveredUnitName: line.UnitType === "C62" ? "Adet" : (line.UnitType || "Adet"),
+            QuantityPrice: line.Price || 0,
+            LineTotal: Number(((line.Quantity || 0) * (line.Price || 0)).toFixed(2))
         }));
 
         // Adreslerde PostalCode zorunlu
@@ -395,29 +398,23 @@ export class NilveraInvoiceService {
             PostalCode: (params.company as any).PostalCode || "34000"
         };
 
-        const shipmentInfo: any = {
-            ActualDespatchDate: actualDate,
-            ActualDespatchTime: actualTime,
-            Driver: [{
-                Name: params.driverName || "Sürücü Adı",
-                Surname: params.driverSurname || "Sürücü Soyadı",
-                NationalityID: params.driverId || "11111111111"
-            }],
-            Carrier: {
-                TaxNumber: params.company.TaxNumber,
-                Name: params.company.Name
+        const shipmentDetail: any = {
+            ShipmentInfo: {
+                TransportEquipment: params.plateNumber ? [{ ID: params.plateNumber }] : [],
+                DriverPerson: [{
+                    FirstName: params.driverName || "Sürücü",
+                    FamilyName: params.driverSurname || "Adı",
+                    IdentityDocumentReference: [{ ID: params.driverId || "11111111111" }]
+                }]
             },
             Delivery: {
-                Address: customerAddress
-            },
-            ShipmentInfo: {
-                // Taşıma bilgisi objesi gerekebilir
+                AddressInfo: customerAddress,
+                CarrierInfo: {
+                    TaxNumber: params.company.TaxNumber, // Genelde kendi VKN'niz veya kargo VKN'si
+                    Name: params.company.Name
+                }
             }
         };
-
-        if (params.plateNumber) {
-            shipmentInfo.TransportEquipment = [params.plateNumber];
-        }
 
         const payload = {
             EDespatch: {
@@ -425,7 +422,7 @@ export class NilveraInvoiceService {
                 DespatchSupplierInfo: companyAddress,
                 DeliveryCustomerInfo: customerAddress,
                 DespatchLines: despatchLines,
-                ShipmentDetail: shipmentInfo,
+                ShipmentDetail: shipmentDetail,
                 Notes: [params.description || "İrsaliye"]
             },
             CustomerAlias: alias
