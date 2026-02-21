@@ -141,7 +141,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 items: safeItems,
                 isFormal: inv.isFormal || false,
                 formalUuid: inv.formalUuid || null,
-                formalType: inv.formalType || null
+                formalType: inv.formalType || null,
+                orderId: inv.orderId || null
             };
         });
 
@@ -162,11 +163,19 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             };
         });
 
-        const historyList = [...txs, ...invs, ...chkList].sort((a: any, b: any) => {
-            const tA = a.rawDate ? new Date(a.rawDate).getTime() : 0;
-            const tB = b.rawDate ? new Date(b.rawDate).getTime() : 0;
-            return (isNaN(tA) || isNaN(tB)) ? 0 : tB - tA;
-        });
+        const historyList = [...txs, ...invs, ...chkList]
+            .filter(item => {
+                // MÜKERRER KAYIT FİLTRESİ:
+                // Eğer bir 'Satış' hareketi zaten faturalandırılmışsa (isFormal: true),
+                // o hareketi listede gösterme. Çünkü 'Fatura' satırı zaten listede görünüyor.
+                if (item.type === 'Satış' && item.isFormal) return false;
+                return true;
+            })
+            .sort((a: any, b: any) => {
+                const tA = a.rawDate ? new Date(a.rawDate).getTime() : 0;
+                const tB = b.rawDate ? new Date(b.rawDate).getTime() : 0;
+                return (isNaN(tA) || isNaN(tB)) ? 0 : tB - tA;
+            });
 
         // Use deep serialization for safety
         return <CustomerDetailClient customer={serializeData(customer)} historyList={serializeData(historyList)} />;
