@@ -49,15 +49,25 @@ export async function POST(request: Request) {
             const operations: any[] = [
                 prisma.purchaseInvoice.create({
                     data: {
-                        companyId: company.id, // Set Company ID
+                        companyId: company.id,
                         supplierId,
                         invoiceNo: invoiceNo || `M-${Date.now()}`,
                         invoiceDate: invoiceDate ? new Date(invoiceDate) : new Date(),
                         amount: parseFloat(amount),
                         totalAmount: parseFloat(amount),
                         description: description || 'Manuel Alış Girişi',
-                        status: 'Bekliyor',
+                        status: 'Onaylandı', // If it affects balance, it should be considered approved
                         items: items || []
+                    }
+                }),
+                prisma.transaction.create({
+                    data: {
+                        companyId: company.id,
+                        type: 'Purchase',
+                        amount: parseFloat(amount),
+                        description: description || 'Manuel Alış Girişi',
+                        supplierId: supplierId,
+                        branch: (session as any).branch || 'Merkez'
                     }
                 }),
                 prisma.supplier.update({

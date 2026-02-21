@@ -33,28 +33,49 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
     const dbTransactions = supplier.transactions || [];
 
     const displayHistory = [
-        ...dbInvoices.map((inv: any) => ({
-            id: inv.id,
-            date: new Date(inv.invoiceDate).toLocaleDateString('tr-TR'),
-            rawDate: inv.invoiceDate,
-            desc: inv.description || `Fatura: ${inv.invoiceNo}`,
-            amount: -inv.totalAmount,
-            type: 'Alış',
-            items: inv.items,
-            invoiceNo: inv.invoiceNo,
-            color: '#ef4444',
-            method: inv.invoiceNo
-        })),
-        ...dbTransactions.map((tr: any) => ({
-            id: tr.id,
-            date: new Date(tr.date).toLocaleDateString('tr-TR'),
-            rawDate: tr.date,
-            desc: tr.description || (tr.type === 'Payment' ? 'Ödeme' : 'Düzeltme'),
-            amount: tr.amount,
-            type: tr.type === 'Payment' ? 'Ödeme' : 'Düzeltme',
-            color: tr.amount > 0 ? '#10b981' : '#ef4444',
-            method: tr.kasa?.name || tr.type
-        }))
+        ...dbInvoices
+            .filter((inv: any) => inv.status === 'Bekliyor') // Only show pending invoices to avoid duplicates with transactions
+            .map((inv: any) => ({
+                id: inv.id,
+                date: new Date(inv.invoiceDate).toLocaleDateString('tr-TR'),
+                rawDate: inv.invoiceDate,
+                desc: inv.description || `Fatura: ${inv.invoiceNo}`,
+                amount: -inv.totalAmount, // Debt is negative
+                type: 'Bekleyen Fatura',
+                items: inv.items,
+                invoiceNo: inv.invoiceNo,
+                color: '#f59e0b', // Orange for pending
+                method: inv.invoiceNo
+            })),
+        ...dbTransactions.map((tr: any) => {
+            let trType = 'Düzeltme';
+            let trAmount = tr.amount;
+            let trColor = tr.amount < 0 ? '#ef4444' : '#10b981';
+
+            if (tr.type === 'Purchase') {
+                trType = 'Alış';
+                trAmount = -Math.abs(Number(tr.amount)); // Purchases are always debt (negative impact on balance)
+                trColor = '#ef4444';
+            } else if (tr.type === 'Payment') {
+                trType = 'Ödeme';
+                trAmount = Math.abs(Number(tr.amount)); // Payments are credit (positive impact on balance)
+                trColor = '#10b981';
+            } else if (tr.type === 'ADJUSTMENT') {
+                trType = 'Düzeltme';
+                // tr.amount already has signs from handleAdjustment
+            }
+
+            return {
+                id: tr.id,
+                date: new Date(tr.date).toLocaleDateString('tr-TR'),
+                rawDate: tr.date,
+                desc: tr.description || trType,
+                amount: trAmount,
+                type: trType,
+                color: trColor,
+                method: tr.kasa?.name || trType
+            };
+        })
     ].sort((a, b) => {
         const tA = new Date(a.rawDate).getTime();
         const tB = new Date(b.rawDate).getTime();

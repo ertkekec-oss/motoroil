@@ -276,7 +276,14 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                                                     <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                                                         <td style={{ padding: '16px 12px', color: '#ccc', fontSize: '13px' }}>{item.date}</td>
                                                         <td>
-                                                            <span style={{ fontSize: '10px', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold', background: item.type === 'Alış' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)', color: item.color }}>
+                                                            <span style={{
+                                                                fontSize: '10px',
+                                                                padding: '3px 8px',
+                                                                borderRadius: '4px',
+                                                                fontWeight: 'bold',
+                                                                background: `${item.color}15`, // Add alpha to the hex color
+                                                                color: item.color
+                                                            }}>
                                                                 {item.type.toUpperCase()}
                                                             </span>
                                                         </td>
