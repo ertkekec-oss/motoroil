@@ -122,14 +122,18 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
                     cache: 'no-store'
                 });
 
-                // Read buffer regardless of status for inspection
+                if (!pdfResponse.ok) {
+                    console.warn(`[PDF Proxy] HTTP ${pdfResponse.status} for ${url}`);
+                    continue;
+                }
+
                 const buf = Buffer.from(await pdfResponse.arrayBuffer());
                 const contentType = pdfResponse.headers.get('content-type') || '';
-                const magicBytes = buf.subarray(0, 5).toString('ascii');
-                const isPdf = contentType.includes('pdf') || magicBytes === '%PDF-';
+                const first5 = buf.subarray(0, 5).toString('ascii');
 
-                if (pdfResponse.ok && isPdf) {
-                    console.log(`[PDF Proxy] ✅ Real PDF confirmed for: ${url}`);
+                // Case 1: Raw binary PDF
+                if (first5 === '%PDF-' || contentType.includes('application/pdf')) {
+                    console.log(`[PDF Proxy] ✅ Raw binary PDF from: ${url}`);
                     return new Response(buf, {
                         status: 200,
                         headers: {
@@ -140,13 +144,28 @@ async function handlePdfProxy(invoiceId: string, sessionCompanyId?: string) {
                     });
                 }
 
-                if (pdfResponse.ok && !isPdf) {
-                    // 200 but NOT a PDF — log exactly what Nilvera returned
-                    const preview = buf.subarray(0, 500).toString('utf8');
-                    console.warn(`[PDF Proxy] ⚠️ 200 but NOT PDF. content-type="${contentType}", magic="${magicBytes}", preview: ${preview}`);
-                    // Don't serve this as PDF — continue to next URL
-                } else {
-                    console.warn(`[PDF Proxy] Failed ${url} with status ${pdfResponse.status}`);
+                // Case 2: Nilvera returns PDF as Base64 string inside JSON
+                // Signature: content-type=application/json, body starts with "JVBE (Base64 of %PDF)
+                if (contentType.includes('json') || first5.includes('JVBE') || first5.includes('"JVBE')) {
+                    const bodyStr = buf.toString('utf8').trim();
+                    // Strip surrounding JSON quotes if present: "JVBERi0..." → JVBERi0...
+                    const base64Str = bodyStr.replace(/^"|"$/g, '');
+
+                    if (base64Str.startsWith('JVBE')) {
+                        console.log(`[PDF Proxy] ✅ Base64-encoded PDF detected from: ${url}`);
+                        const pdfBuf = Buffer.from(base64Str, 'base64');
+                        return new Response(pdfBuf, {
+                            status: 200,
+                            headers: {
+                                'Content-Type': 'application/pdf',
+                                'Content-Disposition': `inline; filename="Fatura-${uuid}.pdf"`,
+                                'Cache-Control': 'no-store'
+                            }
+                        });
+                    }
+
+                    // Log what Nilvera actually returned for further debugging
+                    console.warn(`[PDF Proxy] ⚠️ 200 JSON but not Base64 PDF. content-type="${contentType}", preview: ${bodyStr.substring(0, 300)}`);
                 }
 
             } catch (err: any) {
