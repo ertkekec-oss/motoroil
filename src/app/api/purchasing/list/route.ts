@@ -66,48 +66,45 @@ export async function GET() {
                 if (result.success) {
                     const content = result.data?.Content || (Array.isArray(result.data) ? result.data : []);
                     nilveraInvoices = content.map((inv: any) => {
-                        // Resilient name finding: Nilvera Purchase return might use various names
-                        const supplierName = inv.SenderName ||
-                            inv.SenderTitle ||
-                            inv.SupplierName ||
-                            inv.SupplierTitle ||
-                            inv.Supplier?.Name ||
-                            inv.Supplier?.Title ||
-                            inv.SenderVknTckn ||
-                            "Bilinmeyen Tedarikçi";
+                        const supplierName = inv.SenderName || inv.SenderTitle || inv.SupplierName || inv.SupplierTitle || "Bilinmeyen Tedarikçi";
+                        const invoiceNumber = inv.InvoiceNumber || inv.Id;
+
+                        // Check if this invoice is already imported
+                        const localVersion = localInvoices.find(li => li.invoiceNo === invoiceNumber);
 
                         return {
                             id: inv.UUID || inv.Id,
                             supplier: supplierName,
                             date: inv.IssueDate ? new Date(inv.IssueDate).toLocaleDateString('tr-TR') : '-',
-                            msg: `e-Fatura: ${inv.InvoiceNumber || 'No Yok'}`,
+                            msg: `e-Fatura: ${invoiceNumber}`,
                             total: Number(inv.PayableAmount || 0),
-                            status: 'Bekliyor',
+                            status: localVersion ? (localVersion.status === 'Onaylandı' ? 'İşlendi' : localVersion.status) : 'Bekliyor',
                             isFormal: true,
-                            invoiceNo: inv.InvoiceNumber
+                            invoiceNo: invoiceNumber,
+                            isImported: !!localVersion
                         };
                     });
-                } else {
-                    console.error("[PurchasingList] Nilvera Error:", result.error);
                 }
-            } else {
-                console.warn("[PurchasingList] Nilvera API Key is missing.");
             }
         } catch (nilErr: any) {
-            console.error("[PurchasingList] Nilvera fetch CRITICAL failure:", nilErr.message);
+            console.error("[PurchasingList] Nilvera fetch failure:", nilErr.message);
         }
 
-        // Map local to UI format
-        const formattedLocal = localInvoices.map(inv => ({
-            id: inv.id,
-            invoiceNo: inv.invoiceNo,
-            supplier: inv.supplier.name,
-            date: inv.invoiceDate.toLocaleDateString('tr-TR'),
-            msg: inv.description || `${(inv.items as any[])?.length || 0} Kalem Ürün Girişi`,
-            total: Number(inv.totalAmount),
-            status: inv.status === 'Bekliyor' ? 'Bekliyor' : 'Onaylandı',
-            isFormal: false
-        }));
+        // Map local to UI format, filtering out those that are already in nilveraInvoices (to avoid double rows for the same invoice)
+        // Actually, we want to show local ones that were NOT from Nilvera (manual entries)
+        // OR we just show everything but combined.
+        const formattedLocal = localInvoices
+            .filter(li => !nilveraInvoices.some(ni => ni.invoiceNo === li.invoiceNo))
+            .map(inv => ({
+                id: inv.id,
+                invoiceNo: inv.invoiceNo,
+                supplier: inv.supplier.name,
+                date: inv.invoiceDate.toLocaleDateString('tr-TR'),
+                msg: inv.description || `${(inv.items as any[])?.length || 0} Kalem Ürün Girişi`,
+                total: Number(inv.totalAmount),
+                status: inv.status === 'Bekliyor' ? 'Bekliyor' : (inv.status === 'Onaylandı' ? 'Onaylandı' : inv.status),
+                isFormal: false
+            }));
 
         // Combined results
         const combined = [...nilveraInvoices, ...formattedLocal].sort((a, b) => {

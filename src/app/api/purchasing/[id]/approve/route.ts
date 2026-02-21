@@ -80,81 +80,113 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
                 vkn = rawData.SenderVknTckn || rawData.SupplierVknTckn || rawData.TaxNumber;
             }
 
-            console.log(`[PurchaseApprove] Mapping result: VKN=${vkn}, Name=${name}`);
-
-            if (!vkn) {
-                console.error(`[PurchaseApprove] Missing VKN. invData Keys:`, Object.keys(invData));
-                return NextResponse.json({
-                    success: false,
-                    error: `Faturada VKN/TCKN bilgisi bulunamadı. Gelen Alanlar: ${Object.keys(invData).join(', ')}`
-                }, { status: 400 });
-            }
-
-            // A. Find or Create Supplier
-            let supplier = await prisma.supplier.findFirst({
-                where: { companyId, taxNumber: String(vkn) }
-            });
-
-            if (!supplier) {
-                console.log(`[PurchaseApprove] Creating new supplier: ${name} (${vkn})`);
-                supplier = await prisma.supplier.create({
-                    data: {
-                        companyId,
-                        name: name,
-                        taxNumber: String(vkn),
-                        address: supplierData?.Address || '',
-                        city: supplierData?.City || '',
-                        district: supplierData?.District || '',
-                    }
-                });
-            }
-
-            // B. Map Items and Prepare Local Invoice Data
-            const nilveraLines = invData.InvoiceLines || invData.Items || invData.Lines || invData.PurchaseInvoiceLines || [];
-            console.log(`[PurchaseApprove] Line count: ${nilveraLines.length}`);
-
-            const localItems = [];
-            for (const line of nilveraLines) {
-                const productName = line.Name || line.Description || "Bilinmeyen Ürün";
-                const productCode = line.SellerItemCode || line.BuyerItemCode || line.ItemCode || line.Name || productName;
-
-                let product = await prisma.product.findFirst({
-                    where: {
-                        companyId,
-                        OR: [
-                            { code: String(productCode) },
-                            { name: String(productName) }
-                        ]
-                    }
-                });
-
-                localItems.push({
-                    productId: product?.id || null,
-                    name: productName,
-                    qty: Number(line.Quantity || line.InvoicedQuantity || 0),
-                    price: Number(line.UnitPrice || line.Price || line.Amount || 0),
-                    vatRate: Number(line.VatRate || line.KDVPercent || line.TaxPercent || 0),
-                    unit: line.UnitType || line.UnitCode || "Adet"
-                });
-            }
-
-            // C. Create Local Purchase Invoice Header
             const header = invData.InvoiceInfo || invData.PurchaseInvoiceInfo || invData;
-            invoice = await prisma.purchaseInvoice.create({
-                data: {
-                    companyId,
-                    supplierId: supplier.id,
-                    invoiceNo: header.InvoiceSerieOrNumber || header.InvoiceNumber || invData.InvoiceNumber || id,
-                    invoiceDate: header.IssueDate ? new Date(header.IssueDate) : new Date(),
-                    amount: Number(header.TaxExclusiveAmount || header.LineExtensionAmount || (header.InvoiceAmount - (header.TaxAmount || 0)) || 0),
-                    taxAmount: Number(header.TaxInclusiveAmount - header.TaxExclusiveAmount || header.TaxAmount || 0),
-                    totalAmount: Number(header.PayableAmount || header.TaxInclusiveAmount || header.InvoiceAmount || 0),
-                    items: localItems as any,
-                    status: 'Bekliyor',
-                    description: 'Nilvera Sisteminden Aktarıldı'
-                },
+            const finalInvoiceNo = header.InvoiceSerieOrNumber || header.InvoiceNumber || invData.InvoiceNumber || id;
+
+            // Re-check by invoiceNo to prevent duplicate import
+            const existingLocally = await prisma.purchaseInvoice.findFirst({
+                where: { companyId, invoiceNo: finalInvoiceNo },
                 include: { supplier: true }
             });
+
+            if (existingLocally) {
+                console.log(`[PurchaseApprove] Invoice ${finalInvoiceNo} already exists locally with status ${existingLocally.status}`);
+                if (existingLocally.status === 'Onaylandı') {
+                    return NextResponse.json({ success: true, message: 'Bu fatura zaten sisteme aktarılmış ve onaylanmış.' });
+                }
+                invoice = existingLocally;
+            }
+
+            if (!invoice) {
+                console.log(`[PurchaseApprove] Mapping result: VKN=${vkn}, Name=${name}`);
+
+                if (!vkn) {
+                    console.error(`[PurchaseApprove] Missing VKN. invData Keys:`, Object.keys(invData));
+                    return NextResponse.json({
+                        success: false,
+                        error: `Faturada VKN/TCKN bilgisi bulunamadı. Gelen Alanlar: ${Object.keys(invData).join(', ')}`
+                    }, { status: 400 });
+                }
+
+                // A. Find or Create Supplier
+                let supplier = await prisma.supplier.findFirst({
+                    where: { companyId, taxNumber: String(vkn) }
+                });
+
+                if (!supplier) {
+                    console.log(`[PurchaseApprove] Creating new supplier: ${name} (${vkn})`);
+                    supplier = await prisma.supplier.create({
+                        data: {
+                            companyId,
+                            name: name,
+                            taxNumber: String(vkn),
+                            address: supplierData?.Address || '',
+                            city: supplierData?.City || '',
+                            district: supplierData?.District || '',
+                        }
+                    });
+                }
+
+                // B. Map Items and Prepare Local Invoice Data
+                const nilveraLines = invData.InvoiceLines || invData.Items || invData.Lines || invData.PurchaseInvoiceLines || [];
+                console.log(`[PurchaseApprove] Line count: ${nilveraLines.length}`);
+
+                const localItems = [];
+                for (const line of nilveraLines) {
+                    const productName = line.Name || line.Description || "Bilinmeyen Ürün";
+                    const productCode = line.SellerItemCode || line.BuyerItemCode || line.ItemCode || line.Name || productName;
+
+                    let product = await prisma.product.findFirst({
+                        where: {
+                            companyId,
+                            OR: [
+                                { code: String(productCode) },
+                                { name: String(productName) }
+                            ]
+                        }
+                    });
+
+                    if (!product) {
+                        console.log(`[PurchaseApprove] Product not found, creating: ${productName} (${productCode})`);
+                        product = await prisma.product.create({
+                            data: {
+                                companyId,
+                                name: String(productName),
+                                code: String(productCode),
+                                stock: 0,
+                                buyPrice: Number(line.UnitPrice || line.Price || 0),
+                                unit: line.UnitType || line.UnitCode || "Adet"
+                            }
+                        });
+                    }
+
+                    localItems.push({
+                        productId: product?.id || null,
+                        name: productName,
+                        qty: Number(line.Quantity || line.InvoicedQuantity || 0),
+                        price: Number(line.UnitPrice || line.Price || line.Amount || 0),
+                        vatRate: Number(line.VatRate || line.KDVPercent || line.TaxPercent || 0),
+                        unit: line.UnitType || line.UnitCode || "Adet"
+                    });
+                }
+
+                // C. Create Local Purchase Invoice Header
+                invoice = await prisma.purchaseInvoice.create({
+                    data: {
+                        companyId,
+                        supplierId: supplier.id,
+                        invoiceNo: finalInvoiceNo,
+                        invoiceDate: header.IssueDate ? new Date(header.IssueDate) : new Date(),
+                        amount: Number(header.TaxExclusiveAmount || header.LineExtensionAmount || (header.InvoiceAmount - (header.TaxAmount || 0)) || 0),
+                        taxAmount: Number(header.TaxInclusiveAmount - header.TaxExclusiveAmount || header.TaxAmount || 0),
+                        totalAmount: Number(header.PayableAmount || header.TaxInclusiveAmount || header.InvoiceAmount || 0),
+                        items: localItems as any,
+                        status: 'Bekliyor',
+                        description: 'Nilvera Sisteminden Aktarıldı'
+                    },
+                    include: { supplier: true }
+                });
+            }
         }
 
         // 3. Approval Logic (existing core logic)
