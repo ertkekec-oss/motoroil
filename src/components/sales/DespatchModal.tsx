@@ -42,13 +42,34 @@ export function DespatchModal({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                         <div className="form-group">
-                            <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>PLAKA NO</label>
+                            <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>İRSALİYE SERİSİ</label>
+                            <input
+                                type="text"
+                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all placeholder:text-white/20"
+                                placeholder="Örn: IRS"
+                                maxLength={3}
+                                value={despatchForm.despatchSeries || ''}
+                                onChange={e => setDespatchForm({ ...despatchForm, despatchSeries: e.target.value.toUpperCase() })}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>ARAÇ PLAKA</label>
                             <input
                                 type="text"
                                 className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all placeholder:text-white/20"
                                 placeholder="34 ABC 123"
                                 value={despatchForm.plateNumber}
-                                onChange={e => setDespatchForm({ ...despatchForm, plateNumber: e.target.value })}
+                                onChange={e => setDespatchForm({ ...despatchForm, plateNumber: e.target.value.toUpperCase() })}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="text-white/50 mb-2 block font-medium uppercase tracking-wider" style={{ fontSize: '11px' }}>DORSE PLAKA (OPSİYONEL)</label>
+                            <input
+                                type="text"
+                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all placeholder:text-white/20"
+                                placeholder="DORSE NO"
+                                value={despatchForm.trailerPlateNumber || ''}
+                                onChange={e => setDespatchForm({ ...despatchForm, trailerPlateNumber: e.target.value.toUpperCase() })}
                             />
                         </div>
                         <div className="form-group">

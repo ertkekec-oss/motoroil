@@ -337,9 +337,11 @@ export class NilveraInvoiceService {
         shipmentDate?: string, // YYYY-MM-DD
         shipmentTime?: string, // HH:mm:ss
         plateNumber?: string,
+        trailerPlateNumber?: string,
         driverName?: string,
         driverSurname?: string,
-        driverId?: string
+        driverId?: string,
+        despatchSeries?: string
     }) {
         const { isDespatchUser, alias } = await this.checkDespatchTaxpayer(params.customer.TaxNumber);
 
@@ -353,7 +355,7 @@ export class NilveraInvoiceService {
             return { success: false, error: "Alıcı e-İrsaliye mükellefi değil. Lütfen kağıt irsaliye düzenleyiniz." };
         }
 
-        const series = await this.getDefaultDespatchSeries();
+        const series = params.despatchSeries || await this.getDefaultDespatchSeries();
 
         const trNow = new Date(new Date().getTime() + (3 * 60 * 60 * 1000));
         const issueDate = trNow.toISOString().split('.')[0]; // YYYY-MM-DDTHH:mm:ss
@@ -398,9 +400,13 @@ export class NilveraInvoiceService {
             PostalCode: (params.company as any).PostalCode || "34000"
         };
 
+        const transportEquipment = [];
+        if (params.plateNumber) transportEquipment.push({ ID: params.plateNumber });
+        if (params.trailerPlateNumber) transportEquipment.push({ ID: params.trailerPlateNumber });
+
         const shipmentDetail: any = {
             ShipmentInfo: {
-                TransportEquipment: params.plateNumber ? [{ ID: params.plateNumber }] : [],
+                TransportEquipment: transportEquipment,
                 DriverPerson: [{
                     FirstName: params.driverName || "Sürücü",
                     FamilyName: params.driverSurname || "Adı",

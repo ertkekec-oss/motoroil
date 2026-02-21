@@ -252,9 +252,11 @@ export default function SalesPage() {
     const [selectedInvoiceForDespatch, setSelectedInvoiceForDespatch] = useState<string | null>(null);
     const [despatchForm, setDespatchForm] = useState({
         plateNumber: '',
+        trailerPlateNumber: '',
         driverName: '',
         driverSurname: '',
         driverId: '',
+        despatchSeries: '',
         shipmentDate: new Date().toISOString().split('T')[0],
         shipmentTime: new Date().toTimeString().split(' ')[0]
     });

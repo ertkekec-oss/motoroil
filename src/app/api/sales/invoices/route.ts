@@ -238,7 +238,7 @@ export async function POST(request: Request) {
         if (action === 'formal-send' && invoiceId) {
             try {
                 console.log('[Formal Send] Incoming Body:', body);
-                const { type, formalType, shipmentDate, shipmentTime, plateNumber, driverName, driverSurname, driverId } = body;
+                const { type, formalType, shipmentDate, shipmentTime, plateNumber, trailerPlateNumber, driverName, driverSurname, driverId, despatchSeries } = body;
                 const requestedType = formalType || type;
                 console.log('[Formal Send] Requested Type:', requestedType);
 
@@ -379,9 +379,11 @@ export async function POST(request: Request) {
                         shipmentDate,
                         shipmentTime,
                         plateNumber,
+                        trailerPlateNumber,
                         driverName,
                         driverSurname,
-                        driverId
+                        driverId,
+                        despatchSeries
                     });
                 } else {
                     sendResult = await nilveraService.processAndSend({
