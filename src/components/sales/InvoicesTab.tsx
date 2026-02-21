@@ -455,7 +455,11 @@ export function InvoicesTab({
                                                     </span>
                                                 </td>
                                                 <td style={{ fontWeight: '500' }}>{irs.customer || irs.supplier}</td>
-                                                <td style={{ fontSize: '12px' }}>{new Date(irs.date).toLocaleDateString('tr-TR')}</td>
+                                                <td style={{ fontSize: '12px' }}>
+                                                    {typeof irs.date === 'string' && irs.date.includes('.')
+                                                        ? irs.date
+                                                        : new Date(irs.date).toLocaleDateString('tr-TR')}
+                                                </td>
                                                 <td>{irs.total?.toLocaleString()} ₺</td>
                                                 <td>
                                                     <span style={{
@@ -508,18 +512,18 @@ export function InvoicesTab({
                                                                     <tr><th>Ürün</th><th>Miktar</th><th style={{ textAlign: 'right' }}>Birim Fiyat</th><th style={{ textAlign: 'right' }}>Toplam</th></tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    {(irs.items || []).map((item: any, idx: number) => (
+                                                                    {(Array.isArray(irs.items) ? irs.items : []).map((item: any, idx: number) => (
                                                                         <tr key={idx} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                                                                            <td style={{ padding: '8px 0' }}>{item.name || item.Name}</td>
-                                                                            <td>{item.qty || item.Quantity} {item.unit || item.UnitType}</td>
-                                                                            <td style={{ textAlign: 'right' }}>{(item.price || item.Price || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                                                            <td style={{ textAlign: 'right' }}>{((item.qty || item.Quantity || 0) * (item.price || item.Price || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                                            <td style={{ padding: '8px 0' }}>{item.name || item.Name || 'Bilinmeyen Ürün'}</td>
+                                                                            <td>{item.qty || item.Quantity || 0} {item.unit || item.UnitType || 'Adet'}</td>
+                                                                            <td style={{ textAlign: 'right' }}>{Number(item.price || item.Price || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                                            <td style={{ textAlign: 'right' }}>{(Number(item.qty || item.Quantity || 0) * Number(item.price || item.Price || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
                                                                         </tr>
                                                                     ))}
                                                                 </tbody>
                                                             </table>
                                                             <div className="flex-end mt-4" style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                                                                TOPLAM: {irs.total?.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                                TOPLAM: {Number(irs.total || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                                             </div>
                                                         </div>
                                                     </td>

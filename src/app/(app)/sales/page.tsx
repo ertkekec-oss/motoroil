@@ -123,6 +123,16 @@ export default function SalesPage() {
             const salesData = await salesRes.json();
             const purData = await purRes.json();
 
+            const parseDate = (d: any) => {
+                if (!d) return new Date(0);
+                if (d instanceof Date) return d;
+                if (typeof d === 'string' && d.includes('.')) {
+                    const [day, month, year] = d.split('.');
+                    return new Date(`${year}-${month}-${day}`);
+                }
+                return new Date(d);
+            };
+
             const salesIrs = (salesData.invoices || []).filter((i: any) => i.status === 'İrsaliye' || i.formalType === 'EIRSALIYE').map((i: any) => ({
                 id: i.id,
                 invoiceNo: i.invoiceNo,
@@ -148,7 +158,11 @@ export default function SalesPage() {
                 items: i.items || i.InvoiceLines
             }));
 
-            setWayslips([...salesIrs, ...purIrs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            const combined = [...salesIrs, ...purIrs].sort((a, b) => {
+                return parseDate(b.date).getTime() - parseDate(a.date).getTime();
+            });
+
+            setWayslips(combined);
         } catch (err) { console.error(err); }
         finally { setIsLoadingWayslips(false); }
     };
