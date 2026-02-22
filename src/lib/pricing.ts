@@ -49,7 +49,20 @@ export async function resolveCustomerPriceList(companyId: string, customerId?: s
         priceListId = anyList?.id;
     }
 
-    if (!priceListId) throw new Error("No active price list found for company.");
+    // Final fallback: Auto-create a default list if none exists to prevent system crash
+    if (!priceListId) {
+        console.log(`[Pricing] No price list found for company ${companyId}. Creating automatic default.`);
+        const newList = await prisma.priceList.create({
+            data: {
+                companyId,
+                name: "Genel Satış Listesi",
+                currency: "TRY",
+                isDefault: true,
+                isActive: true
+            }
+        });
+        priceListId = newList.id;
+    }
 
     const priceList = await prisma.priceList.findUnique({ where: { id: priceListId } });
     return priceList!;
