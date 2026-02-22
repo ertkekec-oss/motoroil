@@ -71,6 +71,7 @@ model Company {
   purchaseInvoices   PurchaseInvoice[]
   quotes             Quote[]
   routes             Route[]
+  routeTemplates     RouteTemplate[]
   invoices           SalesInvoice[]
   salesOrders        SalesOrder[]
   visits             SalesVisit[]
@@ -485,6 +486,7 @@ model Customer {
   salesOrders     SalesOrder[]
   visits          SalesVisit[]
   services        ServiceRecord[]
+  routeTemplateStops RouteTemplateStop[]
   transactions    Transaction[]
   warranties      Warranty[]
 
@@ -790,6 +792,7 @@ model Staff {
   companyId        String?
   phone            String?
   tenantId         String?         @default("PLATFORM_ADMIN")
+  assignedCategoryIds String[]     @default([])
   leaveRequests    LeaveRequest[]
   receivedMessages Message[]       @relation("ReceivedMessages")
   sentMessages     Message[]       @relation("SentMessages")
@@ -1330,6 +1333,30 @@ model CmsGeneralSettings {
   whatsappNumber String?
   customCss      String?
   updatedAt      DateTime @updatedAt
+}
+
+model RouteTemplate {
+  id        String              @id @default(cuid())
+  companyId String
+  name      String
+  stops     RouteTemplateStop[]
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  company   Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model RouteTemplateStop {
+  id         String        @id @default(cuid())
+  templateId String
+  customerId String
+  sequence   Int
+  template   RouteTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  customer   Customer      @relation(fields: [customerId], references: [id])
+
+  @@index([templateId])
+  @@index([customerId])
 }
 
 model Route {

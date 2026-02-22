@@ -49,7 +49,8 @@ export async function createSession(user: any) {
         companyId: user.companyId || (user.type === 'service' ? user.companyId : undefined), // Ensure companyId is passed if available
         setupState: user.setupState || 'COMPLETED',
         branch: user.branch,
-        permissions: user.permissions
+        permissions: user.permissions,
+        assignedCategoryIds: user.assignedCategoryIds || []
     })
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()

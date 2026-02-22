@@ -135,6 +135,7 @@ export async function POST(request: Request) {
             role: targetUser.role || 'Personel',
             tenantId: (targetUser as any).tenantId || 'PLATFORM_ADMIN',
             permissions: (targetUser as any).permissions || [],
+            assignedCategoryIds: (targetUser as any).assignedCategoryIds || [],
             setupState: (targetUser as any).setupState || 'COMPLETED',
             companyId: (targetUser as any).companyId || undefined,
             branch: (targetUser as any).branch || 'Merkez'
@@ -163,6 +164,7 @@ export async function POST(request: Request) {
             name: targetUser.name,
             tenantId: targetUser.tenantId || 'PLATFORM_ADMIN',
             permissions: (targetUser as any).permissions || [],
+            assignedCategoryIds: (targetUser as any).assignedCategoryIds || [],
             setupState: (targetUser as any).setupState || 'COMPLETED'
         });
     } catch (error: any) {

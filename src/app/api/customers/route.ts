@@ -8,14 +8,40 @@ export const dynamic = 'force-dynamic';
 import { authorize, verifyWriteAccess } from '@/lib/auth';
 import { logActivity } from '@/lib/audit';
 
-export async function GET() {
+export async function GET(request: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
 
     try {
+        const user = auth.user;
+        const isStaff = user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN';
+        const assignedCategoryIds = user.assignedCategoryIds || [];
+
+        // Parse search params
+        const url = new URL(request.url);
+        const searchQuery = url.searchParams.get('search');
+
+        const where: any = { deletedAt: null };
+
+        // Apply Search Filtering
+        if (searchQuery) {
+            where.OR = [
+                { name: { contains: searchQuery, mode: 'insensitive' } },
+                { phone: { contains: searchQuery, mode: 'insensitive' } },
+                { email: { contains: searchQuery, mode: 'insensitive' } },
+                { city: { contains: searchQuery, mode: 'insensitive' } },
+                { district: { contains: searchQuery, mode: 'insensitive' } },
+            ];
+        }
+
+        // Apply Category Isolation if staff has assignments
+        if (isStaff && assignedCategoryIds.length > 0) {
+            where.categoryId = { in: assignedCategoryIds };
+        }
+
         // Optimize: Use select to fetch only necessary fields instead of full include
         const customers = await prisma.customer.findMany({
-            where: { deletedAt: null },
+            where: where,
             select: {
                 id: true,
                 name: true,

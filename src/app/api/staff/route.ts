@@ -60,7 +60,8 @@ export async function POST(req: Request) {
             name, role, salary, branch, phone, email, type, username, companyId,
             password, birthDate, maritalStatus, bloodType, militaryStatus, reference,
             hasDriverLicense, educationLevel, city, district, relativeName,
-            relativePhone, healthReport, certificate, notes, address
+            relativePhone, healthReport, certificate, notes, address,
+            assignedCategoryIds
         } = body;
 
         // Basic validation
@@ -113,7 +114,8 @@ export async function POST(req: Request) {
                 relativePhone,
                 healthReport,
                 certificate,
-                notes
+                notes,
+                assignedCategoryIds: assignedCategoryIds || []
             }
         });
 
@@ -203,7 +205,8 @@ export async function PUT(req: Request) {
             id, name, email, phone, role, salary, branch, type,
             birthDate, maritalStatus, bloodType, militaryStatus, reference,
             hasDriverLicense, educationLevel, city, district, relativeName,
-            relativePhone, healthReport, certificate, notes, address, permissions
+            relativePhone, healthReport, certificate, notes, address, permissions,
+            assignedCategoryIds
         } = body;
 
         if (!id) return NextResponse.json({ success: false, error: 'ID zorunludur' }, { status: 400 });
@@ -214,6 +217,7 @@ export async function PUT(req: Request) {
             educationLevel, city, district, relativeName,
             relativePhone, healthReport, certificate, notes, address,
             permissions,
+            assignedCategoryIds,
             hasDriverLicense: hasDriverLicense !== undefined ? !!hasDriverLicense : undefined
         };
 

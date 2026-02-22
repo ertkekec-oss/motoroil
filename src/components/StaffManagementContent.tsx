@@ -17,23 +17,41 @@ export default function StaffManagementContent() {
     const [showPermissionModal, setShowPermissionModal] = useState(false);
     const [showAddStaffModal, setShowAddStaffModal] = useState(false);
     const [showEditStaffModal, setShowEditStaffModal] = useState(false);
-    const [editStaff, setEditStaff] = useState<any>({
-        name: '', email: '', role: '', branch: '', type: 'service', birthDate: '', address: '', salary: '',
-        maritalStatus: '', bloodType: '', militaryStatus: '', educationLevel: '', hasDriverLicense: false,
-        reference: '', relativeName: '', relativePhone: '', city: '', district: '', notes: '',
-        healthReport: '', certificate: ''
-    });
-
     const [taskContent, setTaskContent] = useState('');
     const [taskPriority, setTaskPriority] = useState('normal');
     const [isProcessing, setIsProcessing] = useState(false);
+
+    // --- STAFF DOCUMENTS STATE ---
+    const [staffDocuments, setStaffDocuments] = useState<any[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
+    const [customerCategories, setCustomerCategories] = useState<any[]>([]);
 
     const [newStaff, setNewStaff] = useState({
         name: '', email: '', username: '', phone: '', password: '', role: '', branch: '', type: 'service',
         birthDate: '', maritalStatus: '', bloodType: '', militaryStatus: '', educationLevel: '',
         hasDriverLicense: false, reference: '', relativeName: '', relativePhone: '',
-        city: '', district: '', address: '', notes: '', healthReport: '', certificate: '', salary: ''
+        city: '', district: '', address: '', notes: '', healthReport: '', certificate: '', salary: '',
+        assignedCategoryIds: [] as string[]
     });
+
+    const [editStaff, setEditStaff] = useState<any>({
+        name: '', email: '', role: '', branch: '', type: 'service', birthDate: '', address: '', salary: '',
+        maritalStatus: '', bloodType: '', militaryStatus: '', educationLevel: '', hasDriverLicense: false,
+        reference: '', relativeName: '', relativePhone: '', city: '', district: '', notes: '',
+        healthReport: '', certificate: '', assignedCategoryIds: []
+    });
+
+    const fetchCustomerCategories = async () => {
+        try {
+            const res = await fetch('/api/customers/categories');
+            if (res.ok) {
+                const data = await res.json();
+                setCustomerCategories(data.data || data.categories || []);
+            }
+        } catch (e) {
+            console.error('Failed to fetch categories', e);
+        }
+    };
 
     // --- NEW STATES FOR HR MODULES ---
     const [shifts, setShifts] = useState<any[]>([]);
@@ -49,10 +67,6 @@ export default function StaffManagementContent() {
         staffId: '', type: 'TURNOVER', targetValue: '', period: 'MONTHLY', startDate: '', endDate: '', commissionRate: '', bonusAmount: ''
     });
 
-    // --- STAFF DOCUMENTS STATE ---
-    const [staffDocuments, setStaffDocuments] = useState<any[]>([]);
-    const [isUploading, setIsUploading] = useState(false);
-
     function getMonday(d: Date) {
         d = new Date(d);
         var day = d.getDay(),
@@ -62,6 +76,7 @@ export default function StaffManagementContent() {
 
     // --- FETCH DATA FUNCTIONS ---
     useEffect(() => {
+        fetchCustomerCategories();
         if (kasalar.length === 0) {
             fetch('/api/kasalar')
                 .then(res => res.json())
@@ -326,7 +341,8 @@ export default function StaffManagementContent() {
                     name: '', email: '', username: '', phone: '', password: '', role: '', branch: '', type: 'service',
                     birthDate: '', maritalStatus: '', bloodType: '', militaryStatus: '', educationLevel: '',
                     hasDriverLicense: false, reference: '', relativeName: '', relativePhone: '',
-                    city: '', district: '', address: '', notes: '', healthReport: '', certificate: '', salary: ''
+                    city: '', district: '', address: '', notes: '', healthReport: '', certificate: '', salary: '',
+                    assignedCategoryIds: []
                 });
                 showSuccess("Personel Eklendi", "Sisteme giriş yetkileri varsayılan olarak tanımlandı. Şifre mail olarak gönderildi.");
             }
@@ -1583,6 +1599,50 @@ export default function StaffManagementContent() {
                                     </div>
                                 ))}
                             </div>
+
+                            {/* MÜŞTERİ KATEGORİ ERİŞİMİ */}
+                            <div className="mt-8 p-6 bg-white/[0.03] border border-white/5 rounded-2xl space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+                                        🛡️ DATA SCOPING: Müşteri Kategorileri
+                                    </h3>
+                                    {selectedStaff.assignedCategoryIds?.length > 0 && (
+                                        <button
+                                            onClick={() => setSelectedStaff({ ...selectedStaff, assignedCategoryIds: [] })}
+                                            className="text-[10px] font-black text-red-400 hover:text-red-300 transition-all uppercase"
+                                        >
+                                            KISITLAMALARI KALDIR
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pl-1">
+                                    Bu personel sadece seçili kategorideki müşterilere erişebilir. Seçim yapılmazsa tümünü görür.
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    {customerCategories.map(cat => {
+                                        const isActive = (selectedStaff.assignedCategoryIds || []).includes(cat.id);
+                                        return (
+                                            <button
+                                                key={cat.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    const currentIds = selectedStaff.assignedCategoryIds || [];
+                                                    const newIds = isActive
+                                                        ? currentIds.filter((id: string) => id !== cat.id)
+                                                        : [...currentIds, cat.id];
+                                                    setSelectedStaff({ ...selectedStaff, assignedCategoryIds: newIds });
+                                                }}
+                                                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all border ${isActive
+                                                        ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                                                        : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10'
+                                                    }`}
+                                            >
+                                                {cat.name}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
                         </div>
 
                         <div className="p-6 border-t border-white/5 bg-white/[0.02] flex justify-end gap-3">
@@ -1749,6 +1809,37 @@ export default function StaffManagementContent() {
                                             <input type="number" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="17002" value={newStaff.salary} onChange={(e) => setNewStaff({ ...newStaff, salary: e.target.value })} />
                                         </div>
                                     </div>
+
+                                    {/* Müşteri Kategori Erişimi */}
+                                    <div className="space-y-3 p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                                        <div className="flex justify-between items-center">
+                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Müşteri Kategori Erişimi (Kısıtlama)</label>
+                                            <span className="text-[9px] text-primary/60 font-bold uppercase">Boş bırakılırsa tüm müşterileri görür</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {customerCategories.map(cat => {
+                                                const isActive = newStaff.assignedCategoryIds.includes(cat.id);
+                                                return (
+                                                    <button
+                                                        key={cat.id}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newIds = isActive
+                                                                ? newStaff.assignedCategoryIds.filter(id => id !== cat.id)
+                                                                : [...newStaff.assignedCategoryIds, cat.id];
+                                                            setNewStaff({ ...newStaff, assignedCategoryIds: newIds });
+                                                        }}
+                                                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all border ${isActive
+                                                            ? 'bg-primary text-white border-primary'
+                                                            : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10'
+                                                            }`}
+                                                    >
+                                                        {cat.name}
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
                                 </section>
 
                                 <button onClick={handleSaveStaff} disabled={isProcessing} className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
@@ -1879,6 +1970,41 @@ export default function StaffManagementContent() {
                                                 <label className="text-[10px] font-bold text-white/20 uppercase">Personel Notları</label>
                                                 <textarea className="w-full h-[92px] bg-white/[0.03] border border-white/5 rounded-xl p-3 text-sm text-white outline-none mt-1 resize-none" placeholder="Örn: Sağlık durumu, özel yetenekler vb." value={editStaff.notes || ''} onChange={(e) => setEditStaff({ ...editStaff, notes: e.target.value })} />
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    {/* MÜŞTERİ KATEGORİ ERİŞİMİ */}
+                                    <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <h3 className="text-[10px] font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                                                <span className="w-2 h-2 rounded-full bg-primary" /> Müşteri Kategori Yetkileri
+                                            </h3>
+                                            <span className="text-[9px] text-white/30 font-bold uppercase italic">Scoping & Segmentation</span>
+                                        </div>
+                                        <p className="text-[9px] text-white/20 uppercase tracking-widest mb-2 border-b border-white/5 pb-2">Seçim yapılmazsa personel tüm müşterilere erişebilir.</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {customerCategories.map(cat => {
+                                                const isActive = (editStaff.assignedCategoryIds || []).includes(cat.id);
+                                                return (
+                                                    <button
+                                                        key={cat.id}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const currentIds = editStaff.assignedCategoryIds || [];
+                                                            const newIds = isActive
+                                                                ? currentIds.filter((id: string) => id !== cat.id)
+                                                                : [...currentIds, cat.id];
+                                                            setEditStaff({ ...editStaff, assignedCategoryIds: newIds });
+                                                        }}
+                                                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all border ${isActive
+                                                            ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                                                            : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10'
+                                                            }`}
+                                                    >
+                                                        {cat.name}
+                                                    </button>
+                                                )
+                                            })}
                                         </div>
                                     </div>
 

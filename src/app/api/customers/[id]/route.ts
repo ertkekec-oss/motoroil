@@ -16,8 +16,18 @@ export async function GET(
         const { id } = await params;
         const companyId = session.companyId;
 
+        const isStaff = session.role !== 'ADMIN' && session.role !== 'SUPER_ADMIN';
+        const assignedCategoryIds = session.assignedCategoryIds || [];
+
+        const where: any = { id, companyId, deletedAt: null };
+
+        // Strict Category Isolation: Staff can only view details of customers in their assigned categories
+        if (isStaff && assignedCategoryIds.length > 0) {
+            where.categoryId = { in: assignedCategoryIds };
+        }
+
         const customer = await prisma.customer.findFirst({
-            where: { id, companyId, deletedAt: null },
+            where: where,
             include: {
                 transactions: {
                     where: { deletedAt: null },
