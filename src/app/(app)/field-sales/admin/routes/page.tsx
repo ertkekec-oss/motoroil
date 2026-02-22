@@ -504,6 +504,7 @@ export default function AdminRoutesPage() {
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
                     background: rgba(255,255,255,0.2);
                 }
+            `}</style>
 
             {/* Create Template Modal */}
             {showCreateTemplateModal && (
