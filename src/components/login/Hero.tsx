@@ -21,26 +21,10 @@ export default function Hero({ onDemoClick }: HeroProps) {
                     </span>
                 </h1>
 
-                <p className="text-lg text-gray-400 leading-relaxed max-w-2xl mx-auto mb-10 font-medium">
+                <p className="text-lg text-gray-400 leading-relaxed max-w-2xl mx-auto mb-12 font-medium">
                     Muhasebe, stok, satış, PDKS, pazaryeri entegrasyonları ve raporlama — tek platformda.
                     Kurulum yok, server yok, sorunsuz çalışır.
                 </p>
-
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button
-                        onClick={() => document.querySelector('#login')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="px-8 py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-105 hover:shadow-xl"
-                        style={{ background: 'linear-gradient(135deg,#FF5500,#E64A00)', boxShadow: '0 8px 30px rgba(255,85,0,0.3)' }}
-                        aria-label="Hesabınıza giriş yapın"
-                    >
-                        Hemen Giriş Yap →
-                    </button>
-                    <a href="mailto:demo@periodya.com"
-                        onClick={e => { e.preventDefault(); onDemoClick?.(); }}
-                        className="px-8 py-3.5 rounded-2xl font-bold text-gray-300 text-sm border border-white/10 hover:bg-white/5 transition-all">
-                        Demo Talep Et
-                    </a>
-                </div>
 
                 {/* Trust signals */}
                 <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-gray-500 font-bold uppercase tracking-widest">
