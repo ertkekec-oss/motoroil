@@ -336,7 +336,17 @@ export default function SettingsPage() {
         type: 'payment_method_discount',
         discountRate: 0,
         pointsRate: 0,
-        conditions: { brands: [], categories: [], paymentMethod: '' }
+        conditions: {
+            brands: [],
+            categories: [],
+            paymentMethod: '',
+            buyQuantity: 1,
+            rewardProductId: '',
+            rewardQuantity: 1,
+            rewardValue: 0,
+            rewardType: 'percentage_discount'
+        },
+        targetCustomerCategoryIds: []
     });
     const [editingCampaignId, setEditingCampaignId] = useState<string | null>(null);
 
@@ -441,7 +451,23 @@ export default function SettingsPage() {
             if (res.ok) {
                 showSuccess('Başarılı', isEditing ? 'Kampanya güncellendi.' : 'Kampanya eklendi.');
                 refreshCampaigns();
-                setNewCampaign({ name: '', type: 'payment_method_discount', discountRate: 0, pointsRate: 0, conditions: { brands: [], categories: [], paymentMethod: '' } });
+                setNewCampaign({
+                    name: '',
+                    type: 'payment_method_discount',
+                    discountRate: 0,
+                    pointsRate: 0,
+                    conditions: {
+                        brands: [],
+                        categories: [],
+                        paymentMethod: '',
+                        buyQuantity: 1,
+                        rewardProductId: '',
+                        rewardQuantity: 1,
+                        rewardValue: 0,
+                        rewardType: 'percentage_discount'
+                    },
+                    targetCustomerCategoryIds: []
+                });
                 setEditingCampaignId(null);
             }
         } catch (e) { showError('Hata', 'Kaydedilemedi.'); }
@@ -453,7 +479,17 @@ export default function SettingsPage() {
             type: camp.type,
             discountRate: camp.discountRate,
             pointsRate: camp.pointsRate,
-            conditions: camp.conditions || { brands: [], categories: [], paymentMethod: '' }
+            conditions: camp.conditions || {
+                brands: [],
+                categories: [],
+                paymentMethod: '',
+                buyQuantity: 1,
+                rewardProductId: '',
+                rewardQuantity: 1,
+                rewardValue: 0,
+                rewardType: 'percentage_discount'
+            },
+            targetCustomerCategoryIds: camp.targetCustomerCategoryIds || []
         });
         setEditingCampaignId(camp.id);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2365,21 +2401,106 @@ export default function SettingsPage() {
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>KAMPANYA TİPİ</label>
                                                         <select value={newCampaign.type} onChange={e => setNewCampaign({ ...newCampaign, type: e.target.value })} style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }}>
                                                             <option value="payment_method_discount">💳 Ödeme İndirimi</option>
+                                                            <option value="buy_x_get_discount">🏷️ X Alana % İndirim</option>
+                                                            <option value="buy_x_get_free">🎁 X Alana Y Bedava</option>
                                                             <option value="loyalty_points">💰 Sadakat Puanı</option>
                                                         </select>
                                                     </div>
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>
-                                                            {newCampaign.type === 'payment_method_discount' ? 'İNDİRİM (%)' : 'KAZANIM (%)'}
+                                                            {newCampaign.type === 'loyalty_points' ? 'KAZANIM (%)' : 'TEMEL İNDİRİM (%)'}
                                                         </label>
                                                         <input type="number"
-                                                            value={(newCampaign.type === 'payment_method_discount' ? (newCampaign.discountRate || 0) : (newCampaign.pointsRate || 0)) * 100}
+                                                            value={(newCampaign.type === 'loyalty_points' ? (newCampaign.pointsRate || 0) : (newCampaign.discountRate || 0)) * 100}
                                                             onChange={e => {
                                                                 const val = parseFloat(e.target.value) / 100;
-                                                                if (newCampaign.type === 'payment_method_discount') setNewCampaign({ ...newCampaign, discountRate: val });
-                                                                else setNewCampaign({ ...newCampaign, pointsRate: val });
+                                                                if (newCampaign.type === 'loyalty_points') setNewCampaign({ ...newCampaign, pointsRate: val });
+                                                                else setNewCampaign({ ...newCampaign, discountRate: val });
                                                             }}
                                                             style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
+                                                    </div>
+                                                </div>
+
+                                                {/* CONDITIONAL FIELDS BASED ON TYPE */}
+                                                {(newCampaign.type === 'buy_x_get_discount' || newCampaign.type === 'buy_x_get_free') && (
+                                                    <div className="card" style={{ background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.2)', padding: '15px' }}>
+                                                        <h4 style={{ fontSize: '12px', fontWeight: '900', marginBottom: '12px', color: 'var(--primary)' }}>KAMPANYA KURALLARI (X ALANA Y DURUMU)</h4>
+                                                        <div className="flex-col gap-4">
+                                                            <div className="flex gap-4">
+                                                                <div className="flex-1 flex-col gap-1">
+                                                                    <label style={{ fontSize: '10px', fontWeight: '800', opacity: 0.5 }}>ALINACAK MİKTAR (X)</label>
+                                                                    <input
+                                                                        type="number"
+                                                                        value={newCampaign.conditions.buyQuantity || 1}
+                                                                        onChange={e => setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, buyQuantity: parseInt(e.target.value) } })}
+                                                                        style={{ padding: '10px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                                                    />
+                                                                </div>
+                                                                {newCampaign.type === 'buy_x_get_discount' && (
+                                                                    <div className="flex-1 flex-col gap-1">
+                                                                        <label style={{ fontSize: '10px', fontWeight: '800', opacity: 0.5 }}>İNDİRİM ORANI (%)</label>
+                                                                        <input
+                                                                            type="number"
+                                                                            value={newCampaign.conditions.rewardValue || 0}
+                                                                            onChange={e => setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, rewardValue: parseFloat(e.target.value) } })}
+                                                                            style={{ padding: '10px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
+                                                            {newCampaign.type === 'buy_x_get_free' && (
+                                                                <div className="flex-col gap-2">
+                                                                    <label style={{ fontSize: '10px', fontWeight: '800', opacity: 0.5 }}>BEDELSİZ VERİLECEK ÜRÜN</label>
+                                                                    <select
+                                                                        value={newCampaign.conditions.rewardProductId || ''}
+                                                                        onChange={e => setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, rewardProductId: e.target.value } })}
+                                                                        style={{ padding: '10px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                                                    >
+                                                                        <option value="">Aynı Üründen</option>
+                                                                        {(products || []).map((p: any) => (
+                                                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                    <div className="flex-col gap-1 mt-2">
+                                                                        <label style={{ fontSize: '10px', fontWeight: '800', opacity: 0.5 }}>BEDELSİZ ADEDİ</label>
+                                                                        <input
+                                                                            type="number"
+                                                                            value={newCampaign.conditions.rewardQuantity || 1}
+                                                                            onChange={e => setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, rewardQuantity: parseInt(e.target.value) } })}
+                                                                            style={{ padding: '10px', width: '100px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                <div className="flex-col gap-2">
+                                                    <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>HEDEF MÜŞTERİ GRUPLARI (SAHA SATIŞ ÖZEL)</label>
+                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '10px', background: 'var(--bg-deep)', borderRadius: '10px', border: '1px solid var(--border-light)', minHeight: '60px' }}>
+                                                        {(custClasses || []).map(cc => (
+                                                            <button
+                                                                key={cc}
+                                                                onClick={() => {
+                                                                    const current = newCampaign.targetCustomerCategoryIds || [];
+                                                                    const next = current.includes(cc) ? current.filter((x: string) => x !== cc) : [...current, cc];
+                                                                    setNewCampaign({ ...newCampaign, targetCustomerCategoryIds: next });
+                                                                }}
+                                                                style={{
+                                                                    padding: '4px 10px',
+                                                                    borderRadius: '6px',
+                                                                    fontSize: '11px',
+                                                                    fontWeight: '700',
+                                                                    background: newCampaign.targetCustomerCategoryIds?.includes(cc) ? 'var(--info)' : 'rgba(255,255,255,0.05)',
+                                                                    border: 'none',
+                                                                    color: 'white',
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                            >{cc}</button>
+                                                        ))}
+                                                        {(custClasses || []).length === 0 && <span style={{ fontSize: '10px', opacity: 0.3 }}>Kategori tanımlanmamış.</span>}
                                                     </div>
                                                 </div>
 
@@ -2456,7 +2577,23 @@ export default function SettingsPage() {
                                                     {editingCampaignId && (
                                                         <button onClick={() => {
                                                             setEditingCampaignId(null);
-                                                            setNewCampaign({ name: '', type: 'payment_method_discount', discountRate: 0, pointsRate: 0, conditions: { brands: [], categories: [], paymentMethod: '' } });
+                                                            setNewCampaign({
+                                                                name: '',
+                                                                type: 'payment_method_discount',
+                                                                discountRate: 0,
+                                                                pointsRate: 0,
+                                                                conditions: {
+                                                                    brands: [],
+                                                                    categories: [],
+                                                                    paymentMethod: '',
+                                                                    buyQuantity: 1,
+                                                                    rewardProductId: '',
+                                                                    rewardQuantity: 1,
+                                                                    rewardValue: 0,
+                                                                    rewardType: 'percentage_discount'
+                                                                },
+                                                                targetCustomerCategoryIds: []
+                                                            });
                                                         }} className="btn-ghost" style={{ padding: '0 20px', borderRadius: '12px' }}>Vazgeç</button>
                                                     )}
                                                 </div>
@@ -2475,21 +2612,29 @@ export default function SettingsPage() {
                                                 {campaigns.map(camp => (
                                                     <div key={camp.id} style={{ background: 'var(--bg-deep)', padding: '16px', borderRadius: '14px', border: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                                            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: camp.type === 'loyalty_points' ? 'rgba(0, 240, 255, 0.1)' : 'rgba(255, 85, 0, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
-                                                                {camp.type === 'loyalty_points' ? '💎' : '🏷️'}
+                                                            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: camp.type === 'loyalty_points' ? 'rgba(0, 240, 255, 0.1)' : (camp.type === 'buy_x_get_free' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 85, 0, 0.1)'), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
+                                                                {camp.type === 'loyalty_points' ? '💎' : (camp.type === 'buy_x_get_free' ? '🎁' : (camp.type === 'buy_x_get_discount' ? '🏷️' : '💳'))}
                                                             </div>
                                                             <div>
                                                                 <div style={{ fontWeight: '800', fontSize: '14px', marginBottom: '2px' }}>{camp.name}</div>
-                                                                <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', gap: '8px' }}>
-                                                                    <span>{camp.type === 'loyalty_points' ? 'Sadakat Puanı' : 'Ödeme İndirimi'}</span>
+                                                                <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                                                    <span>
+                                                                        {camp.type === 'loyalty_points' && 'Sadakat Puanı'}
+                                                                        {camp.type === 'payment_method_discount' && 'Ödeme İndirimi'}
+                                                                        {camp.type === 'buy_x_get_discount' && `${camp.conditions.buyQuantity} Alana %${camp.conditions.rewardValue} İndirim`}
+                                                                        {camp.type === 'buy_x_get_free' && `${camp.conditions.buyQuantity} Alana ${camp.conditions.rewardQuantity} Hediye`}
+                                                                    </span>
                                                                     {camp.conditions.brands?.length > 0 && <span>• {camp.conditions.brands.length} Marka</span>}
+                                                                    {camp.targetCustomerCategoryIds?.length > 0 && <span>• {camp.targetCustomerCategoryIds.length} Müşteri Grubu</span>}
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                                                             <div style={{ textAlign: 'right' }}>
-                                                                <div style={{ fontSize: '18px', fontWeight: '900', color: 'var(--success)' }}>%{((camp.discountRate || camp.pointsRate || 0) * 100).toFixed(0)}</div>
-                                                                <div style={{ fontSize: '9px', fontWeight: '800', opacity: 0.4 }}>ORAN</div>
+                                                                <div style={{ fontSize: '18px', fontWeight: '900', color: 'var(--success)' }}>
+                                                                    {camp.type === 'buy_x_get_free' ? `+${camp.conditions.rewardQuantity}` : `%${((camp.discountRate || camp.pointsRate || 0) * 100).toFixed(0)}`}
+                                                                </div>
+                                                                <div style={{ fontSize: '9px', fontWeight: '800', opacity: 0.4 }}>{camp.type === 'buy_x_get_free' ? 'ADET' : 'ORAN'}</div>
                                                             </div>
                                                             <div style={{ display: 'flex', gap: '4px' }}>
                                                                 <button onClick={() => startEditingCampaign(camp)} className="btn btn-ghost btn-sm" style={{ padding: '8px' }}>✏️</button>

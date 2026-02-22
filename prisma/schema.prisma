@@ -86,6 +86,7 @@ model Company {
   transactions       Transaction[]
   users              UserCompanyAccess[]
   expenses           Expense[]
+  campaigns          Campaign[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -1042,6 +1043,7 @@ model SecurityEvent {
 
 model Campaign {
   id           String    @id @default(cuid())
+  companyId    String?
   name         String
   type         String
   description  String?
@@ -1054,7 +1056,12 @@ model Campaign {
   deletedAt    DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  
+  targetCustomerCategoryIds String[] @default([])
 
+  company      Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
   @@index([type])
   @@index([isActive])
 }
@@ -1408,6 +1415,7 @@ model SalesVisit {
   checkInLocation  Json?
   checkOutLocation Json?
   notes            String?
+  result           String?  // siparis_alindi | ilgilenmedi | beklemede | randevu_alindi | kapali | bilgi_verildi
   photos           String[]
   isOutOfRange     Boolean      @default(false)
   createdAt        DateTime     @default(now())

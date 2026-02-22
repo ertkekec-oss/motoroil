@@ -92,7 +92,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         try {
             const res = await apiFetch('/api/campaigns');
             const data = await res.json();
-            if (data.success) setCampaigns(data.campaigns);
+            const campaignList = Array.isArray(data) ? data : (data.campaigns || []);
+            setCampaigns(campaignList);
         } catch (e) { console.error('Campaigns fetch failed', e); }
     };
 
@@ -100,7 +101,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         try {
             const res = await apiFetch('/api/coupons');
             const data = await res.json();
-            if (data.success) setCoupons(data.coupons);
+            const couponList = Array.isArray(data) ? data : (data.coupons || []);
+            setCoupons(couponList);
         } catch (e) { console.error('Coupons fetch failed', e); }
     };
 
