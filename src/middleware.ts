@@ -39,7 +39,8 @@ export async function middleware(request: NextRequest) {
     const publicPaths = [
         '/login', '/register', '/reset-password',
         '/api/auth', '/api/public',
-        '/api/admin/marketplace/queue/health' // Allow health check for server-side proxy
+        '/api/admin/marketplace/queue/health',
+        '/pdks', '/api/v1/pdks/display'
     ];
     if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
         return NextResponse.next();
