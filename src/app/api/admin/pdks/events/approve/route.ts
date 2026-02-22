@@ -6,6 +6,16 @@ export async function POST(req: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
 
+    const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
+    const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
+
+    if (!isPlatformAdmin &&
+        auth.user.role?.toLowerCase() !== 'admin' &&
+        auth.user.role?.toLowerCase() !== 'müdür' &&
+        !auth.user.permissions?.includes('staff_manage')) {
+        return NextResponse.json({ success: false, error: "PDKS onaylama yetkiniz bulunmamaktadır." }, { status: 403 });
+    }
+
     try {
         const { eventId, status, notes } = await req.json();
 
@@ -14,7 +24,7 @@ export async function POST(req: Request) {
         }
 
         const event = await prisma.pdksEvent.update({
-            where: { id: eventId, tenantId: auth.user.tenantId },
+            where: { id: eventId, tenantId: effectiveTenantId },
             data: {
                 status: status as any,
                 notes: notes || undefined

@@ -6,13 +6,24 @@ export async function GET(req: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
 
+    const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
+    const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
+
+    // Yetki kontrolü (Admin, Müdür veya staff_manage yetkisi olanlar görebilir)
+    if (!isPlatformAdmin &&
+        auth.user.role?.toLowerCase() !== 'admin' &&
+        auth.user.role?.toLowerCase() !== 'müdür' &&
+        !auth.user.permissions?.includes('staff_manage')) {
+        return NextResponse.json({ success: false, error: "PDKS kayıtlarını görme yetkiniz bulunmamaktadır." }, { status: 403 });
+    }
+
     try {
         const { searchParams } = new URL(req.url);
         const status = searchParams.get("status");
         const mode = searchParams.get("mode");
 
         const where: any = {
-            tenantId: auth.user.tenantId
+            tenantId: effectiveTenantId
         };
 
         if (status) where.status = status;
