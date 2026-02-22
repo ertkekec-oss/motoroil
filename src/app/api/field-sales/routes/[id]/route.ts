@@ -18,7 +18,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                 staff: { select: { id: true, name: true } },
                 stops: {
                     include: {
-                        customer: { select: { id: true, name: true, city: true, district: true } }
+                        customer: { select: { id: true, name: true, city: true, district: true, phone: true } }
                     },
                     orderBy: { sequence: 'asc' }
                 }
@@ -26,10 +26,35 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         });
 
         if (!route) {
-            return NextResponse.json({ error: 'Route not found' }, { status: 404 });
+            return NextResponse.json({ error: 'Rota bulunamadı' }, { status: 404 });
         }
 
         return NextResponse.json(route);
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const session: any = await getSession();
+        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const { id } = await params;
+        const body = await req.json();
+        const { name, date, status, staffId } = body;
+
+        const updated = await (prisma as any).route.update({
+            where: { id },
+            data: {
+                ...(name ? { name } : {}),
+                ...(date ? { date: new Date(date) } : {}),
+                ...(status ? { status } : {}),
+                ...(staffId ? { staffId } : {}),
+            }
+        });
+
+        return NextResponse.json(updated);
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -42,9 +67,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
         const { id } = await params;
 
-        await (prisma as any).route.delete({
-            where: { id }
-        });
+        // Önce durakları sil, sonra rotayı sil
+        await (prisma as any).routeStop.deleteMany({ where: { routeId: id } });
+        await (prisma as any).route.delete({ where: { id } });
 
         return NextResponse.json({ success: true });
     } catch (error: any) {
