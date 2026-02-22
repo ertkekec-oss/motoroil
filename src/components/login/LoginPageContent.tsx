@@ -18,7 +18,6 @@ import Roles from './Roles';
 import Pricing from './Pricing';
 import FAQ from './FAQ';
 import CTA from './CTA';
-import LoginPanel from './LoginPanel';
 
 /* ── Ücretsiz Deneme / Demo Kayıt Modalı ── */
 function DemoModal({ onClose }: { onClose: () => void }) {
@@ -211,11 +210,8 @@ export default function LoginPageContent() {
             {/* Demo Modal */}
             {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
 
-            {/* SOL PANEL — 65% */}
-            <div
-                className="hidden lg:flex flex-col overflow-y-auto"
-                style={{ width: '65%', minWidth: 0, borderRight: '1px solid rgba(255,255,255,0.05)' }}
-            >
+            {/* ANA İÇERİK — 100% */}
+            <div className="flex flex-col overflow-y-auto w-full relative">
                 <Banner />
                 <div className="sticky top-0 z-50">
                     <TopNav onDemoClick={() => setShowDemo(true)} />
@@ -251,37 +247,6 @@ export default function LoginPageContent() {
                         </div>
                     </footer>
                 </main>
-            </div>
-
-            {/* SAĞ PANEL — 35% login */}
-            <div
-                className="lg:w-[35%] w-full flex flex-col"
-                style={{ backgroundColor: '#0d0f1a', borderLeft: '1px solid rgba(255,255,255,0.04)' }}
-            >
-                <div className="lg:hidden">
-                    <Banner />
-                    <TopNav onDemoClick={() => setShowDemo(true)} />
-                    <div className="px-6 py-8 text-center border-b border-white/5">
-                        <h1 className="text-2xl font-black text-white mb-2">
-                            İşletmenizi <span style={{ color: '#FF5500' }}>büyütün.</span>
-                        </h1>
-                        <p className="text-sm text-gray-400 font-medium">ERP · Muhasebe · Stok · Pazaryeri</p>
-                    </div>
-                </div>
-
-                <div className="flex-1 flex flex-col justify-center overflow-y-auto">
-                    <LoginPanel />
-                </div>
-
-                <div className="lg:hidden px-8 pb-8 pt-4 border-t border-white/5">
-                    <button
-                        onClick={() => setShowDemo(true)}
-                        className="w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
-                        style={{ background: 'linear-gradient(135deg,#FF5500,#E64A00)' }}
-                    >
-                        Ücretsiz Dene →
-                    </button>
-                </div>
             </div>
         </div>
     );

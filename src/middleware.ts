@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
 
     // 2. Auth Related Paths - Allowed
     const publicPaths = [
-        '/login', '/register', '/reset-password',
+        '/', '/login', '/register', '/reset-password',
         '/api/auth', '/api/public',
         '/api/admin/marketplace/queue/health',
         '/pdks', '/api/v1/pdks/display'

@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function CTA({ onDemoClick }: { onDemoClick?: () => void }) {
     return (
         <section className="py-20 px-6" aria-label="Son Çağrı">
@@ -16,13 +18,13 @@ export default function CTA({ onDemoClick }: { onDemoClick?: () => void }) {
                             30 gün ücretsiz deneyin. Kurulum yok, risk yok. Sadece büyüme.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <button
-                                onClick={() => document.querySelector('#login')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="px-8 py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-105 hover:shadow-xl"
+                            <Link
+                                href="/login"
+                                className="px-8 py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-105 hover:shadow-xl inline-block"
                                 style={{ background: 'linear-gradient(135deg,#FF5500,#E64A00)', boxShadow: '0 8px 30px rgba(255,85,0,0.3)' }}
                             >
                                 Ücretsiz Başla →
-                            </button>
+                            </Link>
                             <button
                                 onClick={onDemoClick}
                                 className="px-8 py-3.5 rounded-2xl font-bold text-gray-300 text-sm border border-white/10 hover:bg-white/5 transition-all">

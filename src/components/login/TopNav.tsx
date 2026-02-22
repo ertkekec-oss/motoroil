@@ -13,9 +13,12 @@ interface TopNavProps {
     onDemoClick?: () => void;
 }
 
+import Link from 'next/link';
+
 export default function TopNav({ onDemoClick }: TopNavProps) {
     const scrollTo = (id: string) => {
-        document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+        const elem = document.querySelector(id);
+        if (elem) elem.scrollIntoView({ behavior: 'smooth' });
     };
 
     return (
@@ -26,13 +29,13 @@ export default function TopNav({ onDemoClick }: TopNavProps) {
         >
             <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
                 {/* Logo */}
-                <a href="#" className="flex items-center gap-2 flex-shrink-0" aria-label="Periodya Ana Sayfa">
+                <Link href="/" className="flex items-center gap-2 flex-shrink-0" aria-label="Periodya Ana Sayfa">
                     <div className="w-8 h-8 rounded-xl flex items-center justify-center font-black text-white text-sm"
                         style={{ background: 'linear-gradient(135deg,#FF5500,#E64A00)' }}>
                         P
                     </div>
                     <span className="font-black text-white text-lg tracking-tight">Periodya</span>
-                </a>
+                </Link>
 
                 {/* Desktop Links */}
                 <div className="flex items-center gap-1">
@@ -45,12 +48,12 @@ export default function TopNav({ onDemoClick }: TopNavProps) {
                             {link.label}
                         </button>
                     ))}
-                    <button
-                        onClick={() => scrollTo('#login')}
+                    <Link
+                        href="/login"
                         className="ml-2 px-3 py-2 rounded-lg text-sm font-medium text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 transition-all"
                     >
                         Giriş
-                    </button>
+                    </Link>
                 </div>
 
                 {/* CTA */}
