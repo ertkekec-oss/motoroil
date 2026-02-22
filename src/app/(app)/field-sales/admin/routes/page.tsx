@@ -504,126 +504,123 @@ export default function AdminRoutesPage() {
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
                     background: rgba(255,255,255,0.2);
                 }
-            `}</style>
-        </div>
-    );
-}
 
-{/* Create Template Modal */ }
-{
-    showCreateTemplateModal && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[110] flex items-center justify-center p-4 animate-in fade-in duration-300">
-            <div className="bg-[#0f111a] border border-white/10 w-full max-w-4xl rounded-[3rem] p-12 shadow-[0_0_150px_rgba(37,99,235,0.15)] relative overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="relative z-10 flex flex-col h-full">
-                    <div className="flex justify-between items-start mb-10">
-                        <div>
-                            <h2 className="text-4xl font-black mb-2 tracking-tighter">YENİ ROTA ŞABLONU</h2>
-                            <p className="text-sm text-gray-500 font-bold uppercase tracking-[0.2em]">Rutin saha operasyonları için hazır rota setleri oluşturun.</p>
-                        </div>
-                        <button onClick={() => setShowCreateTemplateModal(false)} className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-2xl hover:bg-white/10 transition-all">×</button>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 flex-1 overflow-hidden">
-                        <div className="space-y-8">
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest pl-1">Şablon İsmi</label>
-                                <input
-                                    type="text"
-                                    value={newTemplateName}
-                                    onChange={(e) => setNewTemplateName(e.target.value)}
-                                    placeholder="Örn: Salı - İstoç Bloğu / Bursa Rutu"
-                                    className="w-full bg-white/5 border border-white/10 rounded-[1.5rem] p-5 text-sm font-bold focus:border-blue-500 focus:outline-none transition-all"
-                                />
+            {/* Create Template Modal */}
+            {showCreateTemplateModal && (
+                <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[110] flex items-center justify-center p-4 animate-in fade-in duration-300">
+                    <div className="bg-[#0f111a] border border-white/10 w-full max-w-4xl rounded-[3rem] p-12 shadow-[0_0_150px_rgba(37,99,235,0.15)] relative overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="relative z-10 flex flex-col h-full">
+                            <div className="flex justify-between items-start mb-10">
+                                <div>
+                                    <h2 className="text-4xl font-black mb-2 tracking-tighter">YENİ ROTA ŞABLONU</h2>
+                                    <p className="text-sm text-gray-500 font-bold uppercase tracking-[0.2em]">Rutin saha operasyonları için hazır rota setleri oluşturun.</p>
+                                </div>
+                                <button onClick={() => setShowCreateTemplateModal(false)} className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-2xl hover:bg-white/10 transition-all">×</button>
                             </div>
 
-                            <div className="space-y-4">
-                                <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest pl-1">Müşteri Ekle</label>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        value={customerSearch}
-                                        onChange={(e) => {
-                                            setCustomerSearch(e.target.value);
-                                            searchCustomers(e.target.value);
-                                        }}
-                                        placeholder="Müşteri adı veya şehir ara..."
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pl-12 text-sm focus:border-blue-500 outline-none"
-                                    />
-                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 opacity-30">🔍</span>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 flex-1 overflow-hidden">
+                                <div className="space-y-8">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest pl-1">Şablon İsmi</label>
+                                        <input
+                                            type="text"
+                                            value={newTemplateName}
+                                            onChange={(e) => setNewTemplateName(e.target.value)}
+                                            placeholder="Örn: Salı - İstoç Bloğu / Bursa Rutu"
+                                            className="w-full bg-white/5 border border-white/10 rounded-[1.5rem] p-5 text-sm font-bold focus:border-blue-500 focus:outline-none transition-all"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest pl-1">Müşteri Ekle</label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={customerSearch}
+                                                onChange={(e) => {
+                                                    setCustomerSearch(e.target.value);
+                                                    searchCustomers(e.target.value);
+                                                }}
+                                                placeholder="Müşteri adı veya şehir ara..."
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pl-12 text-sm focus:border-blue-500 outline-none"
+                                            />
+                                            <span className="absolute left-5 top-1/2 -translate-y-1/2 opacity-30">🔍</span>
+                                        </div>
+
+                                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                            {searchResults.map(c => (
+                                                <button
+                                                    key={c.id}
+                                                    onClick={() => {
+                                                        if (!selectedCustomers.find(sc => sc.id === c.id)) {
+                                                            setSelectedCustomers([...selectedCustomers, c]);
+                                                        }
+                                                        setCustomerSearch('');
+                                                        setSearchResults([]);
+                                                    }}
+                                                    className="w-full p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-blue-500/30 text-left transition-all flex justify-between items-center group"
+                                                >
+                                                    <div>
+                                                        <div className="text-sm font-bold truncate">{c.name}</div>
+                                                        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{c.city} / {c.district}</div>
+                                                    </div>
+                                                    <span className="opacity-0 group-hover:opacity-100 text-blue-400 font-black">+ EKLE</span>
+                                                </button>
+                                            ))}
+                                            {customerSearch.length >= 2 && searchResults.length === 0 && (
+                                                <div className="p-8 text-center text-[10px] font-black uppercase opacity-20 border border-dashed border-white/5 rounded-2xl">
+                                                    Müşteri bulunamadı
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                    {searchResults.map(c => (
-                                        <button
-                                            key={c.id}
-                                            onClick={() => {
-                                                if (!selectedCustomers.find(sc => sc.id === c.id)) {
-                                                    setSelectedCustomers([...selectedCustomers, c]);
-                                                }
-                                                setCustomerSearch('');
-                                                setSearchResults([]);
-                                            }}
-                                            className="w-full p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-blue-500/30 text-left transition-all flex justify-between items-center group"
-                                        >
-                                            <div>
-                                                <div className="text-sm font-bold truncate">{c.name}</div>
-                                                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{c.city} / {c.district}</div>
+                                <div className="flex flex-col h-full bg-black/20 rounded-[2rem] p-8 border border-white/5">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-400">Rota Akışı ({selectedCustomers.length})</h3>
+                                        <button onClick={() => setSelectedCustomers([])} className="text-[9px] font-black text-red-400/50 hover:text-red-400 uppercase">Listeyi Temizle</button>
+                                    </div>
+
+                                    <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                                        {selectedCustomers.map((c, i) => (
+                                            <div key={c.id} className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center gap-4 group">
+                                                <div className="w-8 h-8 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center font-black text-xs">
+                                                    {i + 1}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-sm font-bold truncate">{c.name}</div>
+                                                    <div className="text-[9px] text-gray-600 font-bold uppercase">{c.city}</div>
+                                                </div>
+                                                <button
+                                                    onClick={() => setSelectedCustomers(selectedCustomers.filter(sc => sc.id !== c.id))}
+                                                    className="w-8 h-8 rounded-xl hover:bg-red-500/10 hover:text-red-400 flex items-center justify-center text-lg transition-all opacity-0 group-hover:opacity-100"
+                                                >
+                                                    ×
+                                                </button>
                                             </div>
-                                            <span className="opacity-0 group-hover:opacity-100 text-blue-400 font-black">+ EKLE</span>
-                                        </button>
-                                    ))}
-                                    {customerSearch.length >= 2 && searchResults.length === 0 && (
-                                        <div className="p-8 text-center text-[10px] font-black uppercase opacity-20 border border-dashed border-white/5 rounded-2xl">
-                                            Müşteri bulunamadı
-                                        </div>
-                                    )}
+                                        ))}
+                                        {selectedCustomers.length === 0 && (
+                                            <div className="h-full flex flex-col items-center justify-center text-center p-10 opacity-20">
+                                                <div className="text-4xl mb-4">📍</div>
+                                                <div className="text-[10px] font-black uppercase tracking-widest">Henüz bir durak eklenmedi</div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <button
+                                        onClick={handleCreateTemplate}
+                                        disabled={isProcessing || selectedCustomers.length === 0}
+                                        className="mt-8 w-full py-5 rounded-[1.5rem] bg-blue-600 hover:bg-blue-500 text-white font-black text-sm uppercase tracking-widest transition-all shadow-2xl shadow-blue-900/40 disabled:opacity-20 disabled:grayscale"
+                                    >
+                                        {isProcessing ? 'SİSTEME KAYDEDİLİYOR...' : 'ŞABLONU OLUŞTUR VE KAYDET'}
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="flex flex-col h-full bg-black/20 rounded-[2rem] p-8 border border-white/5">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-400">Rota Akışı ({selectedCustomers.length})</h3>
-                                <button onClick={() => setSelectedCustomers([])} className="text-[9px] font-black text-red-400/50 hover:text-red-400 uppercase">Listeyi Temizle</button>
-                            </div>
-
-                            <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
-                                {selectedCustomers.map((c, i) => (
-                                    <div key={c.id} className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center gap-4 group">
-                                        <div className="w-8 h-8 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center font-black text-xs">
-                                            {i + 1}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="text-sm font-bold truncate">{c.name}</div>
-                                            <div className="text-[9px] text-gray-600 font-bold uppercase">{c.city}</div>
-                                        </div>
-                                        <button
-                                            onClick={() => setSelectedCustomers(selectedCustomers.filter(sc => sc.id !== c.id))}
-                                            className="w-8 h-8 rounded-xl hover:bg-red-500/10 hover:text-red-400 flex items-center justify-center text-lg transition-all opacity-0 group-hover:opacity-100"
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                ))}
-                                {selectedCustomers.length === 0 && (
-                                    <div className="h-full flex flex-col items-center justify-center text-center p-10 opacity-20">
-                                        <div className="text-4xl mb-4">📍</div>
-                                        <div className="text-[10px] font-black uppercase tracking-widest">Henüz bir durak eklenmedi</div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <button
-                                onClick={handleCreateTemplate}
-                                disabled={isProcessing || selectedCustomers.length === 0}
-                                className="mt-8 w-full py-5 rounded-[1.5rem] bg-blue-600 hover:bg-blue-500 text-white font-black text-sm uppercase tracking-widest transition-all shadow-2xl shadow-blue-900/40 disabled:opacity-20 disabled:grayscale"
-                            >
-                                {isProcessing ? 'SİSTEME KAYDEDİLİYOR...' : 'ŞABLONU OLUŞTUR VE KAYDET'}
-                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
-    )
+    );
 }
