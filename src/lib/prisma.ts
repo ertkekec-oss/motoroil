@@ -127,44 +127,55 @@ const prismaClientSingleton = () => {
                             if (!newArgs.where) newArgs.where = {};
 
                             // Apply filters based on model type
-                            if (modelName === 'company') {
-                                newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
-                            } else if (modelName === 'user' || modelName === 'staff' || modelName === 'subscription') {
-                                newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
+                            if (['company', 'user', 'staff', 'subscription'].includes(modelName)) {
+                                if (!isUnique) {
+                                    if (modelName === 'company') {
+                                        newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
+                                    } else if (modelName === 'tenant') {
+                                        newArgs.where = { ...newArgs.where, id: effectiveTenantId };
+                                    } else {
+                                        newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
+                                    }
+                                }
                             } else if (modelName === 'tenant') {
-                                newArgs.where = { ...newArgs.where, id: effectiveTenantId };
+                                if (!isUnique) newArgs.where = { ...newArgs.where, id: effectiveTenantId };
                             } else if (modelName === 'notification') {
-                                newArgs.where = { ...newArgs.where, user: { tenantId: effectiveTenantId } };
+                                if (!isUnique) newArgs.where = { ...newArgs.where, user: { tenantId: effectiveTenantId } };
                             } else if (modelName === 'journalitem') {
                                 // Nested filter through journal
-                                newArgs.where = { ...newArgs.where, journal: { company: { tenantId: effectiveTenantId } } };
+                                if (!isUnique) newArgs.where = { ...newArgs.where, journal: { company: { tenantId: effectiveTenantId } } };
                             } else if (modelName === 'warranty') {
                                 // Nested through customer
-                                newArgs.where = { ...newArgs.where, customer: { company: { tenantId: effectiveTenantId } } };
+                                if (!isUnique) newArgs.where = { ...newArgs.where, customer: { company: { tenantId: effectiveTenantId } } };
                             } else if (modelName === 'helpcategory') {
                                 // Global Models - No tenant isolation for read
                             } else if (modelName === 'helptopic') {
                                 // HelpTopics can be global (null) or tenant-specific
-                                if (isRead) {
-                                    newArgs.where = {
-                                        ...newArgs.where,
-                                        OR: [
-                                            { tenantId: effectiveTenantId },
-                                            { tenantId: null }
-                                        ]
-                                    };
-                                } else {
-                                    newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
+                                if (!isUnique) {
+                                    if (isRead) {
+                                        newArgs.where = {
+                                            ...newArgs.where,
+                                            OR: [
+                                                { tenantId: effectiveTenantId },
+                                                { tenantId: null }
+                                            ]
+                                        };
+                                    } else {
+                                        newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
+                                    }
                                 }
-                            } else if (['ticket', 'ticketmessage', 'ticketattachment'].includes(modelName)) {
-                                if (modelName === 'ticket') {
-                                    newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
-                                } else {
-                                    // ticketMessage and ticketAttachment have a ticket relation
-                                    newArgs.where = {
-                                        ...newArgs.where,
-                                        ticket: { tenantId: effectiveTenantId }
-                                    };
+                            }
+                            else if (['ticket', 'ticketmessage', 'ticketattachment'].includes(modelName)) {
+                                if (!isUnique) {
+                                    if (modelName === 'ticket') {
+                                        newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
+                                    } else {
+                                        // ticketMessage and ticketAttachment have a ticket relation
+                                        newArgs.where = {
+                                            ...newArgs.where,
+                                            ticket: { tenantId: effectiveTenantId }
+                                        };
+                                    }
                                 }
                             } else if (modelName === 'securityevent') {
                                 // Shared/System model
