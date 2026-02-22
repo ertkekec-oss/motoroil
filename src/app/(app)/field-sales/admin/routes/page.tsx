@@ -433,7 +433,7 @@ export default function AdminRoutesPage() {
 
                             {/* Politika notu */}
                             <div className="mb-4 p-3 bg-blue-500/5 border border-blue-500/10 rounded-2xl text-[10px] text-blue-400/60 font-bold uppercase tracking-widest flex items-center gap-2">
-                                <span>ℹ️</span> Rotalar yalnızca eklenebilir. Oluşturulduktan sonra değiştirilemez ve silinemez.
+                                <span>ℹ️</span> Rota atandıktan sonra takvimde ilgili rotaya tıklayarak durak ekleyebilir veya kaldırabilirsiniz.
                             </div>
 
                             <div>
