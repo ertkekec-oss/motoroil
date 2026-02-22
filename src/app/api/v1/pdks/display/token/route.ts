@@ -59,7 +59,8 @@ export async function GET(req: Request) {
         return NextResponse.json({
             success: true,
             qrToken,
-            exp
+            exp,
+            siteName: display.name
         });
     } catch (error: any) {
         console.error("[PDKS Display Token Error]:", error);

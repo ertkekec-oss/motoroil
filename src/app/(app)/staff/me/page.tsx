@@ -12,6 +12,9 @@ import {
     IconRefresh
 } from '@/components/icons/PremiumIcons';
 import { useApp } from '@/contexts/AppContext';
+import BarcodeScanner from '@/components/BarcodeScanner';
+import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 // --- UI COMPONENTS ---
 
@@ -161,23 +164,50 @@ const DashboardView = ({ stats }: any) => (
                 </div>
             </Card>
 
-            <Card title="Girdi/Çıktı (RFID)" icon={IconZap}>
+            <Card title="PDKS İşlemleri" icon={IconZap}>
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                                <IconCheck className="w-5 h-5 text-emerald-400" />
+                    <div className="grid grid-cols-2 gap-3">
+                        <button
+                            onClick={handleQrCheckin}
+                            className="bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group"
+                        >
+                            <div className="w-10 h-10 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform">
+                                📷
                             </div>
+                            <span className="text-[10px] font-black text-white uppercase tracking-widest text-center">Ofis Girişi (QR)</span>
+                        </button>
+
+                        <button
+                            onClick={handleGpsCheckin}
+                            className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group"
+                        >
+                            <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
+                                📍
+                            </div>
+                            <span className="text-[10px] font-black text-white uppercase tracking-widest text-center">Saha Girişi (GPS)</span>
+                        </button>
+                    </div>
+
+                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                             <div>
-                                <h4 className="text-xs font-bold text-white">Check-in</h4>
-                                <p className="text-[10px] text-gray-500 font-bold">Merkez Ofis Giriş</p>
+                                <h4 className="text-[10px] font-bold text-gray-400 uppercase leading-none">Cihaz Durumu</h4>
+                                <p className="text-[9px] font-black text-white uppercase tracking-widest">GÜVENLİ & EŞLEŞMİŞ</p>
                             </div>
                         </div>
-                        <span className="text-sm font-black text-emerald-400">08:58</span>
+                        <button className="text-[8px] font-black text-indigo-400 uppercase hover:underline">Senkronize Et</button>
                     </div>
-                    <p className="text-[10px] text-gray-500 text-center uppercase font-bold tracking-widest">Bugünkü loglar başarıyla senkronize edildi.</p>
+
+                    <p className="text-[10px] text-gray-500 text-center uppercase font-bold tracking-widest opacity-50">Loglar şifreli olarak saklanır.</p>
                 </div>
             </Card>
+
+            <BarcodeScanner
+                isOpen={isScannerOpen}
+                onClose={() => setIsScannerOpen(false)}
+                onScan={onQrScan}
+            />
         </div>
     </div>
 );
@@ -361,6 +391,80 @@ export default function PersonelPanel() {
     const { currentUser } = useApp();
     const [activeTab, setActiveTab] = useState<'dashboard' | 'leave' | 'profile'>('dashboard');
     const [loading, setLoading] = useState(true);
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+    // PDKS Fonksiyonları
+    const getFingerprint = () => {
+        return btoa(navigator.userAgent + screen.width + screen.height).slice(0, 32);
+    };
+
+    const handleQrCheckin = () => {
+        setIsScannerOpen(true);
+    };
+
+    const onQrScan = async (token: string) => {
+        toast.loading("Konum ve cihaz doğrulanıyor...", { id: "pdks" });
+        try {
+            const res = await fetch("/api/v1/pdks/check-in", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    mode: "OFFICE_QR",
+                    qrToken: token,
+                    deviceFp: getFingerprint(),
+                    clientTime: new Date().toISOString(),
+                    offlineId: uuidv4()
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success("Mesai Başlatıldı!", { id: "pdks" });
+                if (data.status === "PENDING") toast.warning("Risk uyarısı: Yönetici onayı bekleniyor.");
+            } else {
+                toast.error(data.error || "Giriş başarısız", { id: "pdks" });
+            }
+        } catch (err) {
+            toast.error("Bağlantı hatası", { id: "pdks" });
+        }
+    };
+
+    const handleGpsCheckin = () => {
+        if (!navigator.geolocation) {
+            return toast.error("Tarayıcınız konum bilgisini desteklemiyor.");
+        }
+
+        toast.loading("Konum alınıyor...", { id: "gps" });
+
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+                const res = await fetch("/api/v1/pdks/check-in", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        mode: "FIELD_GPS",
+                        deviceFp: getFingerprint(),
+                        clientTime: new Date().toISOString(),
+                        location: {
+                            lat: pos.coords.latitude,
+                            lng: pos.coords.longitude,
+                            acc: pos.coords.accuracy
+                        },
+                        offlineId: uuidv4()
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    toast.success("Saha Girişi Yapıldı!", { id: "gps" });
+                } else {
+                    toast.error(data.error || "Giriş başarısız", { id: "gps" });
+                }
+            } catch (err) {
+                toast.error("Bağlantı hatası", { id: "gps" });
+            }
+        }, (err) => {
+            toast.error("Konum izni reddedildi veya alınamadı.", { id: "gps" });
+        }, { enableHighAccuracy: true });
+    };
 
     useEffect(() => {
         setTimeout(() => setLoading(false), 800);

@@ -59,6 +59,7 @@ export default function Sidebar() {
         '/staff': { perm: 'staff_manage', feature: 'team_management' },
         '/advisor': { perm: 'finance_view', feature: 'accountant' },
         '/admin/audit-logs': { perm: 'audit_view' },
+        '/admin/pdks': { perm: 'staff_manage' },
         '/security/suspicious': { perm: 'security_access' },
         '/billing': { perm: 'settings_manage' },
         '/field-mobile/routes': { perm: 'field_sales_access' },
@@ -109,6 +110,7 @@ export default function Sidebar() {
                 { name: 'Veri Analizi', href: '/reports', icon: '📊' },
             ]
         },
+        { name: 'PDKS Yönetimi', href: '/admin/pdks', icon: '🛡️' },
         { name: 'Denetim Kayıtları', href: '/admin/audit-logs', icon: '🔍' },
         { name: 'Kaçak Satış Tespit', href: '/security/suspicious', icon: '🚨' },
 
