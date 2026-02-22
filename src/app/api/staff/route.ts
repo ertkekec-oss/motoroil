@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 
 import { authorize } from '@/lib/auth';
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
         const body = await req.json();
         const {
             name, role, salary, branch, phone, email, type, username, companyId,
-            birthDate, maritalStatus, bloodType, militaryStatus, reference,
+            password, birthDate, maritalStatus, bloodType, militaryStatus, reference,
             hasDriverLicense, educationLevel, city, district, relativeName,
             relativePhone, healthReport, certificate, notes, address
         } = body;
@@ -67,9 +68,27 @@ export async function POST(req: Request) {
         const user = auth.user;
         const effectiveTenantId = user.impersonateTenantId || user.tenantId || 'PLATFORM_ADMIN';
 
+        // Username generation logic
+        let finalUsername = username;
+        if (!finalUsername) {
+            // If email is provided, check if it's already taken as a username
+            if (email) {
+                const existing = await prisma.staff.findUnique({ where: { username: email } });
+                finalUsername = existing ? `user_${Date.now()}` : email;
+            } else {
+                finalUsername = `user_${Date.now()}`;
+            }
+        }
+
+        let hashedPassword = null;
+        if (password) {
+            hashedPassword = await bcrypt.hash(password, 10);
+        }
+
         const newStaff = await prisma.staff.create({
             data: {
-                username: username || email || `user${Date.now()}`,
+                username: finalUsername,
+                password: hashedPassword,
                 name,
                 phone,
                 role: role || 'Personel',

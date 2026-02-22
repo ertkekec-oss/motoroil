@@ -287,8 +287,8 @@ export default function StaffManagementContent() {
     const handleSaveStaff = async () => {
         if (!newStaff.name || !newStaff.role) return;
 
-        if (!newStaff.email) {
-            showSuccess('Hata', 'Lütfen e-posta adresini giriniz.');
+        if (!newStaff.name) {
+            showError('Hata', 'Lütfen personel adını giriniz.');
             return;
         }
 
@@ -1576,10 +1576,18 @@ export default function StaffManagementContent() {
                                 {/* Temel Bilgiler */}
                                 <section className="space-y-4">
                                     <h3 className="text-xs font-black text-primary uppercase tracking-widest border-l-2 border-primary pl-3">Temel Bilgiler</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Ad Soyad</label>
                                             <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="Tam İsim" value={newStaff.name} onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Kullanıcı Adı</label>
+                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="ali_yilmaz" value={newStaff.username} onChange={(e) => setNewStaff({ ...newStaff, username: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Şifre</label>
+                                            <input type="password" Name="password" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="••••••••" value={newStaff.password} onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">E-Posta</label>
