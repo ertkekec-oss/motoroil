@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { sendMail } from '@/lib/mail';
 
 
 import { authorize } from '@/lib/auth';
@@ -115,6 +116,36 @@ export async function POST(req: Request) {
                 notes
             }
         });
+
+        // Send welcome email with login details if email exists
+        if (email) {
+            try {
+                await sendMail({
+                    to: email,
+                    subject: 'Periodya - Giriş Bilgileriniz',
+                    companyId: user.companyId!,
+                    html: `
+                        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                            <h2 style="color: #6366f1;">Periodya Sistemine Hoş Geldiniz!</h2>
+                            <p>Merhaba <strong>${name}</strong>,</p>
+                            <p>Personel kaydınız başarıyla oluşturulmuştur. Sisteme giriş yapmak için aşağıdaki bilgileri kullanabilirsiniz:</p>
+                            <div style="background-color: #f9fafb; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                                <p style="margin: 5px 0;"><strong>Giriş Linki:</strong> <a href="https://periodya.com/login">periodya.com/login</a></p>
+                                <p style="margin: 5px 0;"><strong>Kullanıcı Adı:</strong> ${finalUsername}</p>
+                                ${password ? `<p style="margin: 5px 0;"><strong>Şifre:</strong> ${password}</p>` : '<p style="margin: 5px 0; color: #666;"><em>Şifreniz önceden belirlenmiştir.</em></p>'}
+                            </div>
+                            <p>Güvenliğiniz için sisteme giriş yaptıktan sonra şifrenizi değiştirmenizi öneririz.</p>
+                            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                            <p style="font-size: 12px; color: #9ca3af;">Bu e-posta otomodik olarak gönderilmiştir, lütfen yanıtlamayınız.</p>
+                        </div>
+                    `
+                });
+                console.log(`[Staff API] Welcome email sent to ${email}`);
+            } catch (mailError) {
+                console.error('[Staff API Mail Error]:', mailError);
+                // We don't fail the whole request if mail fails
+            }
+        }
 
         return NextResponse.json({ success: true, staff: newStaff });
     } catch (error: any) {
