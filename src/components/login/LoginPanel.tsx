@@ -69,18 +69,9 @@ export default function LoginPanel({ className = '' }: LoginPanelProps) {
 
     return (
         <div id="login" className={`flex flex-col justify-center px-8 py-10 ${className}`}>
-            {/* Logo */}
-            <div className="flex items-center gap-2 mb-8">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-white text-base"
-                    style={{ background: 'linear-gradient(135deg,#FF5500,#E64A00)' }}>
-                    P
-                </div>
-                <span className="font-black text-white text-xl tracking-tight">Periodya</span>
-            </div>
-
             {!showForgot ? (
                 <>
-                    <h2 className="text-2xl font-black text-white mb-1 leading-tight">Hesabınıza<br />giriş yapın</h2>
+                    <h2 className="text-3xl font-black text-white mb-2 leading-tight">Hesabınıza giriş yapın</h2>
                     <p className="text-sm text-gray-500 font-medium mb-8">
                         Platformunuza devam edin.
                     </p>
@@ -187,7 +178,7 @@ export default function LoginPanel({ className = '' }: LoginPanelProps) {
                     </form>
 
                     {/* Forgot + Support */}
-                    <div className="mt-4 flex flex-col gap-2 text-center">
+                    <div className="mt-4 flex flex-row gap-6 justify-center items-center text-center">
                         <button
                             onClick={() => { setShowForgot(true); setFormState('idle'); setError(''); }}
                             className="text-xs text-gray-500 hover:text-gray-300 transition-colors font-medium"
