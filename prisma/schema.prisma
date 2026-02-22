@@ -1816,3 +1816,91 @@ model MarketplaceLabel {
   @@unique([companyId, marketplace, shipmentPackageId])
   @@index([companyId, createdAt])
 }
+
+// --- PDKS MODÜLÜ ---
+
+model PdksDisplay {
+  id              String   @id @default(cuid())
+  tenantId        String
+  siteId          String   // Şube veya Lokasyon ID (Branch, Company vb. ile eşleşebilir)
+  name            String
+  isActive        Boolean  @default(true)
+  pairingCode     String   @unique // PDKS-XXXX formatı
+  lastPublicIp    String?
+  lastHeartbeatAt DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([tenantId, siteId])
+}
+
+model PdksEmployeeDevice {
+  id         String   @id @default(cuid())
+  tenantId   String
+  userId     String
+  deviceFp   String   // Donanım ID veya Fingerprint hash
+  isActive   Boolean  @default(true)
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @updatedAt
+
+  @@unique([tenantId, userId, deviceFp])
+  @@index([tenantId, userId])
+}
+
+model PdksEvent {
+  id              String      @id @default(cuid())
+  tenantId        String
+  userId          String
+  siteId          String?     // Ofis girişinde hangi şube olduğu
+  type            PdksType
+  mode            PdksMode
+  status          PdksStatus  @default(APPROVED)
+  
+  deviceFp        String
+  requestPublicIp String?     // Personelin IP'si
+  displayPublicIp String?     // Tabletin IP'si (kanıt için)
+  
+  lat             Float?
+  lng             Float?
+  accuracy        Float?
+  
+  clientTime      DateTime
+  serverTime      DateTime    @default(now())
+  riskScore       Int         @default(0)
+  riskFlags       Json?       // ["IP_MISMATCH", "LOW_ACCURACY", "IMPOSSIBLE_SPEED"]
+  offlineId       String?     @unique // Cihazdaki local UUID
+  notes           String?
+
+  @@index([tenantId, userId])
+  @@index([tenantId, serverTime])
+  @@index([siteId])
+}
+
+model PdksIdempotency {
+  id          String   @id @default(cuid())
+  tenantId    String
+  userId      String
+  offlineId   String   @unique
+  eventId     String?
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId, userId, offlineId])
+}
+
+enum PdksType {
+  SHIFT_START
+  SHIFT_END
+  BREAK_START
+  BREAK_END
+}
+
+enum PdksMode {
+  OFFICE_QR
+  FIELD_GPS
+}
+
+enum PdksStatus {
+  APPROVED
+  PENDING
+  REJECTED
+}
