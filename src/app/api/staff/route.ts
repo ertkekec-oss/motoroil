@@ -80,6 +80,15 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true, staff: newStaff });
     } catch (error: any) {
         console.error('[Staff API POST Error]:', error);
+
+        // Handle Unique Constraint (already exists)
+        if (error.code === 'P2002') {
+            return NextResponse.json({
+                success: false,
+                error: 'Bu kullanıcı adı veya e-posta adresi zaten kullanımda.'
+            }, { status: 400 });
+        }
+
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
