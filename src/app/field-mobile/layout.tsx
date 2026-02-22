@@ -24,7 +24,10 @@ export default function FieldMobileLayout({ children }: { children: React.ReactN
 
     const navItems = [
         { href: '/field-mobile/routes', icon: '🏁', label: 'Rotalar' },
-        { href: '/field-mobile/visits', icon: '📝', label: 'Geçmiş' },
+        { href: '/field-mobile/customers', icon: '👥', label: 'Müşteriler' },
+        { href: '/field-mobile/targets', icon: '🎯', label: 'Hedefler' },
+        { href: '/field-mobile/reports', icon: '📊', label: 'Raporlar' },
+        { href: '/field-mobile/expenses', icon: '💸', label: 'Masraflar' },
         { href: '/field-mobile/profile', icon: '👤', label: 'Profil' },
     ];
 

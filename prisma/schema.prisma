@@ -85,6 +85,7 @@ model Company {
   suspendedSales     SuspendedSale[]
   transactions       Transaction[]
   users              UserCompanyAccess[]
+  expenses           Expense[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -489,6 +490,8 @@ model Customer {
   routeTemplateStops RouteTemplateStop[]
   transactions    Transaction[]
   warranties      Warranty[]
+  assignedStaffId String?
+  assignedStaff   Staff?             @relation("StaffCustomers", fields: [assignedStaffId], references: [id])
 
   @@unique([email, companyId])
   @@index([name])
@@ -806,6 +809,8 @@ model Staff {
   targets          StaffTarget[]
   storeOrders      Order[]         @relation("StaffStoreOrders")
   attendance       Attendance[]
+  expenses         Expense[]       @relation("StaffExpenses")
+  assignedCustomers Customer[]     @relation("StaffCustomers")
 
   // PDKS & Puantaj Fields
   workType          String?   @default("FULL_TIME") // FULL_TIME, PART_TIME, CONTRACT
@@ -1943,4 +1948,24 @@ enum PdksStatus {
   APPROVED
   PENDING
   REJECTED
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  type        String   // Benzin, Yemek, Konaklama, Diğer
+  amount      Decimal  @db.Decimal(12, 2)
+  description String?
+  date        DateTime @default(now())
+  receiptUrl  String?
+  status      String   @default("Beklemede") // Beklemede, Onaylandı, Reddedildi
+  staffId     String
+  companyId   String
+  staff       Staff    @relation("StaffExpenses", fields: [staffId], references: [id])
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([staffId])
+  @@index([companyId])
+  @@index([date])
 }

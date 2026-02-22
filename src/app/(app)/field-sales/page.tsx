@@ -80,17 +80,55 @@ export default function FieldSalesAgentDashboard() {
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     <div
                         onClick={() => router.push('/field-mobile/routes')}
                         className="bg-gradient-to-br from-blue-600 to-blue-700 p-8 rounded-3xl shadow-xl shadow-blue-900/20 cursor-pointer hover:scale-[1.02] transition-all group"
                     >
                         <div className="text-4xl mb-4 group-hover:animate-bounce">🏁</div>
-                        <h2 className="text-2xl font-black mb-2">Rotalarım</h2>
-                        <p className="text-blue-100/70 text-sm">Size atanan aktif rotaları görüntülemek ve ziyaretleri başlatmak için tıklayın.</p>
-                        <div className="mt-6 flex items-center gap-2 font-bold text-sm">
-                            GİT ➔
-                        </div>
+                        <h2 className="text-2xl font-black mb-1">Rotalarım</h2>
+                        <p className="text-blue-100/70 text-sm">Aktif rotalar ve ziyaretler.</p>
+                        <div className="mt-6 flex items-center gap-2 font-bold text-sm">GİT ➔</div>
+                    </div>
+
+                    <div
+                        onClick={() => router.push('/field-mobile/customers')}
+                        className="bg-[#161b22] border border-white/5 p-8 rounded-3xl cursor-pointer hover:border-white/20 transition-all group"
+                    >
+                        <div className="text-4xl mb-4 group-hover:rotate-12 transition-transform">👥</div>
+                        <h2 className="text-2xl font-black mb-1">Müşterilerim</h2>
+                        <p className="text-gray-400 text-sm">Portföyünüz ve hesap ekstresi.</p>
+                        <div className="mt-6 flex items-center gap-2 font-bold text-sm text-blue-400">GÖR ➔</div>
+                    </div>
+
+                    <div
+                        onClick={() => router.push('/field-mobile/reports')}
+                        className="bg-[#161b22] border border-white/5 p-8 rounded-3xl cursor-pointer hover:border-white/20 transition-all group"
+                    >
+                        <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">📊</div>
+                        <h2 className="text-2xl font-black mb-1">Raporlarım</h2>
+                        <p className="text-gray-400 text-sm">Satış ve performans analizi.</p>
+                        <div className="mt-6 flex items-center gap-2 font-bold text-sm text-blue-400">İNCELE ➔</div>
+                    </div>
+
+                    <div
+                        onClick={() => router.push('/field-mobile/expenses')}
+                        className="bg-[#161b22] border border-white/5 p-8 rounded-3xl cursor-pointer hover:border-white/20 transition-all group"
+                    >
+                        <div className="text-4xl mb-4 group-hover:animate-pulse">💸</div>
+                        <h2 className="text-2xl font-black mb-1">Masraflarım</h2>
+                        <p className="text-gray-400 text-sm">Harcamaları girin ve yönetin.</p>
+                        <div className="mt-6 flex items-center gap-2 font-bold text-sm text-blue-400">YÖNET ➔</div>
+                    </div>
+
+                    <div
+                        onClick={() => router.push('/field-mobile/targets')}
+                        className="bg-[#161b22] border border-white/5 p-8 rounded-3xl cursor-pointer hover:border-white/20 transition-all group"
+                    >
+                        <div className="text-4xl mb-4 group-hover:translate-x-1 transition-transform">🎯</div>
+                        <h2 className="text-2xl font-black mb-1">Hedef Detayları</h2>
+                        <p className="text-gray-400 text-sm">Primalar ve hedef ilerlemesi.</p>
+                        <div className="mt-6 flex items-center gap-2 font-bold text-sm text-blue-400">DETAY ➔</div>
                     </div>
 
                     <div
@@ -98,11 +136,9 @@ export default function FieldSalesAgentDashboard() {
                         className="bg-[#161b22] border border-white/5 p-8 rounded-3xl cursor-pointer hover:border-white/20 transition-all group"
                     >
                         <div className="text-4xl mb-4 group-hover:rotate-12 transition-transform">📝</div>
-                        <h2 className="text-2xl font-black mb-2">Ziyaret Geçmişi</h2>
-                        <p className="text-gray-400 text-sm">Daha önce tamamladığınız ziyaretleri ve siparişleri inceleyin.</p>
-                        <div className="mt-6 flex items-center gap-2 font-bold text-sm text-blue-400">
-                            GEÇMİŞİ GÖR ➔
-                        </div>
+                        <h2 className="text-2xl font-black mb-1">Geçmiş</h2>
+                        <p className="text-gray-400 text-sm">Geçmiş ziyaret kayıtları.</p>
+                        <div className="mt-6 flex items-center gap-2 font-bold text-sm text-blue-400">LİSTELE ➔</div>
                     </div>
                 </div>
 
