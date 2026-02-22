@@ -40,6 +40,16 @@ export async function getLabelSignedUrl(key: string, expiresIn: number = 300) {
     return await getSignedUrl(s3Client, command, { expiresIn });
 }
 
+export async function getUploadPresignedUrl(key: string, contentType: string, expiresIn: number = 600) {
+    const command = new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+        ContentType: contentType,
+    });
+
+    return await getSignedUrl(s3Client, command, { expiresIn });
+}
+
 export function generateLabelStorageKey(
     companyId: string,
     marketplace: string,

@@ -24,6 +24,21 @@ const STATUS_COLORS: Record<string, string> = {
     CLOSED: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
 };
 
+function AttachmentLink({ attachment }: { attachment: any }) {
+    return (
+        <a
+            href={`/api/support/attachments/${attachment.id}`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-gray-400 hover:text-white hover:bg-white/10 transition-all font-medium"
+        >
+            <span>📎</span>
+            <span className="truncate max-w-[120px]">{attachment.fileName}</span>
+            <span className="text-[10px] text-gray-600">({(attachment.size / 1024).toFixed(0)} KB)</span>
+        </a>
+    );
+}
+
 export default async function AdminTicketDetailPage({ params }: { params: { id: string } }) {
     const session = await getSession();
     // RBAC
@@ -35,13 +50,28 @@ export default async function AdminTicketDetailPage({ params }: { params: { id: 
         where: { id: params.id },
         include: {
             messages: {
-                orderBy: { createdAt: 'asc' }
+                orderBy: { createdAt: 'asc' },
+                include: { attachments: true }
+            },
+            attachments: {
+                where: { messageId: null }
             },
             relatedHelpTopic: true
         }
     });
 
     if (!ticket) notFound();
+
+    // Fetch support agents for assignment
+    const agents = await prisma.user.findMany({
+        where: {
+            OR: [
+                { role: 'SUPER_ADMIN' },
+                { role: 'SUPPORT_AGENT' }
+            ]
+        },
+        select: { id: true, name: true, email: true }
+    });
 
     const { messages } = ticket;
     const metadataJson = ticket.metadataJson as any || {};
@@ -69,9 +99,16 @@ export default async function AdminTicketDetailPage({ params }: { params: { id: 
                             </div>
                             <div className="text-xs text-gray-500">{new Date(ticket.createdAt).toLocaleString('tr-TR')}</div>
                         </div>
-                        <div className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed">
+                        <div className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed mb-4">
                             {ticket.description}
                         </div>
+                        {ticket.attachments && (ticket.attachments as any).length > 0 && (
+                            <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
+                                {(ticket.attachments as any).map((att: any) => (
+                                    <AttachmentLink key={att.id} attachment={att} />
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Messages */}
@@ -91,14 +128,21 @@ export default async function AdminTicketDetailPage({ params }: { params: { id: 
 
                                         <span className={isInternal ? 'text-yellow-500' : isAdmin ? 'text-orange-400' : 'text-white'}>
                                             {isCustomer ? 'Müşteri' : isAdmin ? `Destek: ${msg.authorId}` : 'Sistem Botu'}
-                                            {isInternal && ' [İÇ NOT MÜŞTERİ GÖRMEZ]'}
+                                            {isInternal && ' [İÇ NOT]'}
                                         </span>
                                     </div>
                                     <div className="text-xs text-gray-500">{new Date(msg.createdAt).toLocaleString('tr-TR')}</div>
                                 </div>
-                                <div className={`${isInternal ? 'text-yellow-100' : 'text-gray-300'} whitespace-pre-wrap text-sm leading-relaxed`}>
+                                <div className={`${isInternal ? 'text-yellow-100' : 'text-gray-300'} whitespace-pre-wrap text-sm leading-relaxed mb-4`}>
                                     {msg.body}
                                 </div>
+                                {msg.attachments && (msg.attachments as any).length > 0 && (
+                                    <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
+                                        {(msg.attachments as any).map((att: any) => (
+                                            <AttachmentLink key={att.id} attachment={att} />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         );
                     })}
@@ -111,23 +155,56 @@ export default async function AdminTicketDetailPage({ params }: { params: { id: 
 
             {/* Sidebar Context */}
             <div className="w-full lg:w-80 flex-shrink-0 space-y-6">
-                {/* Status Card */}
+                {/* Status Card & Assignment */}
                 <div className="bg-[#0f111a] border border-white/5 p-6 rounded-2xl shadow-xl">
-                    <h3 className="text-white font-bold mb-4 border-b border-white/5 pb-2">Talep Durumu</h3>
+                    <h3 className="text-white font-bold mb-4 border-b border-white/5 pb-2">Yönetim Paneli</h3>
                     <div className="space-y-4">
                         <div>
-                            <span className="text-xs text-gray-500 block mb-1">Durum</span>
+                            <span className="text-xs text-gray-500 block mb-1">Talep Durumu</span>
                             <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg border inline-block ${STATUS_COLORS[ticket.status]}`}>
                                 {STATUS_LABELS[ticket.status]}
                             </span>
                         </div>
                         <div>
-                            <span className="text-xs text-gray-500 block mb-1">Öncelik</span>
-                            <span className="text-sm font-bold text-white">{ticket.priority}</span>
+                            <span className="text-xs text-gray-500 block mb-1">Atanan Temsilci</span>
+                            <select
+                                defaultValue={ticket.assignedToUserId || ''}
+                                className="w-full bg-white/5 border border-white/10 p-2 text-xs text-white rounded outline-none focus:border-orange-500/50"
+                                onChange={async (e) => {
+                                    const val = e.target.value;
+                                    await fetch(`/api/admin/tickets/${ticket.id}/update`, {
+                                        method: 'PATCH',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ assignedToUserId: val || null })
+                                    });
+                                    window.location.reload();
+                                }}
+                            >
+                                <option value="">Atanmamış</option>
+                                {agents.map(a => (
+                                    <option key={a.id} value={a.id}>{a.name || a.email}</option>
+                                ))}
+                            </select>
                         </div>
                         <div>
-                            <span className="text-xs text-gray-500 block mb-1">Kategori</span>
-                            <span className="text-sm font-bold text-white">{ticket.category}</span>
+                            <span className="text-xs text-gray-500 block mb-1">Öncelik</span>
+                            <select
+                                defaultValue={ticket.priority}
+                                className="w-full bg-white/5 border border-white/10 p-2 text-xs text-white rounded outline-none focus:border-orange-500/50"
+                                onChange={async (e) => {
+                                    await fetch(`/api/admin/tickets/${ticket.id}/update`, {
+                                        method: 'PATCH',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ priority: e.target.value })
+                                    });
+                                    window.location.reload();
+                                }}
+                            >
+                                <option value="P1_URGENT">P1 - Acil</option>
+                                <option value="P2_HIGH">P2 - Yüksek</option>
+                                <option value="P3_NORMAL">P3 - Normal</option>
+                                <option value="P4_LOW">P4 - Düşük</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -155,7 +232,7 @@ export default async function AdminTicketDetailPage({ params }: { params: { id: 
                         {metadataJson.userAgent && (
                             <div>
                                 <span className="text-xs text-gray-500 block mb-1">Tarayıcı Bilgisi</span>
-                                <span className="text-xs font-mono text-gray-400 break-words">{metadataJson.userAgent}</span>
+                                <span className="text-[10px] font-mono text-gray-500 break-words leading-tight block">{metadataJson.userAgent}</span>
                             </div>
                         )}
                         {ticket.relatedHelpTopic && (

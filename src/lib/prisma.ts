@@ -10,7 +10,8 @@ const operationalModels = [
     'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
     'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'company', 'branch',
     'notification', 'staff', 'user', 'tenant', 'subscription', 'warranty', 'securityevent',
-    'customercategory', 'pricelist', 'productprice'
+    'customercategory', 'pricelist', 'productprice',
+    'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic'
 ];
 
 

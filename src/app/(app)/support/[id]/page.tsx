@@ -24,6 +24,21 @@ const STATUS_COLORS: Record<string, string> = {
     CLOSED: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
 };
 
+function AttachmentLink({ attachment }: { attachment: any }) {
+    return (
+        <a
+            href={`/api/support/attachments/${attachment.id}`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-gray-400 hover:text-white hover:bg-white/10 transition-all font-medium"
+        >
+            <span>📎</span>
+            <span className="truncate max-w-[120px]">{attachment.fileName}</span>
+            <span className="text-[10px] text-gray-600">({(attachment.size / 1024).toFixed(0)} KB)</span>
+        </a>
+    );
+}
+
 export default async function TicketDetailPage({ params }: { params: { id: string } }) {
     const session = await getSession();
     if (!session?.tenantId) redirect('/login');
@@ -32,7 +47,11 @@ export default async function TicketDetailPage({ params }: { params: { id: strin
         where: { id: params.id },
         include: {
             messages: {
-                orderBy: { createdAt: 'asc' }
+                orderBy: { createdAt: 'asc' },
+                include: { attachments: true }
+            },
+            attachments: {
+                where: { messageId: null }
             },
             relatedHelpTopic: true
         }
@@ -79,14 +98,20 @@ export default async function TicketDetailPage({ params }: { params: { id: strin
                         </div>
                         <div className="text-xs text-gray-500">{new Date(ticket.createdAt).toLocaleString('tr-TR')}</div>
                     </div>
-                    <div className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed">
+                    <div className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed mb-4">
                         {ticket.description}
                     </div>
+                    {ticket.attachments && ticket.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
+                            {ticket.attachments.map(att => (
+                                <AttachmentLink key={att.id} attachment={att} />
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Messages */}
                 {messages.map((msg) => {
-                    // Müşteriye gizli (Internal) mesajlar sadece Admin panelinde görünür.
                     if (msg.isInternal) return null;
 
                     const isSystem = msg.authorType === 'SYSTEM';
@@ -107,9 +132,16 @@ export default async function TicketDetailPage({ params }: { params: { id: strin
                                 </div>
                                 <div className="text-xs text-gray-500">{new Date(msg.createdAt).toLocaleString('tr-TR')}</div>
                             </div>
-                            <div className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed">
+                            <div className="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed mb-4">
                                 {msg.body}
                             </div>
+                            {msg.attachments && msg.attachments.length > 0 && (
+                                <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
+                                    {msg.attachments.map(att => (
+                                        <AttachmentLink key={att.id} attachment={att} />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     );
                 })}

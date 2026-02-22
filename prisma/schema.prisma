@@ -2045,6 +2045,9 @@ model Ticket {
   messages           TicketMessage[]
   attachments        TicketAttachment[]
 
+  assignedToUserId   String?    // Atanan destek personeli
+  tags               String[]   @default([])
+
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
 }
