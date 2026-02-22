@@ -376,10 +376,10 @@ export default function AdminRoutesPage() {
                                                             key={route.id}
                                                             onClick={() => router.push(`/field-sales/admin/routes/${route.id}`)}
                                                             className={`p-2.5 rounded-2xl border cursor-pointer hover:scale-[1.02] transition-all text-left ${route.status === 'COMPLETED'
-                                                                    ? 'bg-green-500/10 border-green-500/20 text-green-400'
-                                                                    : route.status === 'ACTIVE'
-                                                                        ? 'bg-blue-600 border-blue-500 shadow-xl shadow-blue-900/30'
-                                                                        : 'bg-white/5 border-white/10 text-white/60'
+                                                                ? 'bg-green-500/10 border-green-500/20 text-green-400'
+                                                                : route.status === 'ACTIVE'
+                                                                    ? 'bg-blue-600 border-blue-500 shadow-xl shadow-blue-900/30'
+                                                                    : 'bg-white/5 border-white/10 text-white/60'
                                                                 }`}
                                                         >
                                                             <div className="text-[9px] font-black truncate">{route.name}</div>
@@ -431,10 +431,10 @@ export default function AdminRoutesPage() {
                                 {selectedDay && formatDay(selectedDay)} • {staffList.find(s => s.id === selectedStaffId)?.name}
                             </p>
 
-                            {/* Sadece ekleme - düzenleme/silme yok */}
-                            <p className="text-[10px] text-yellow-500/50 font-black uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <span>⚠️</span> Rotalar eklendikten sonra bu ekrandan düzenleme yapılamaz.
-                            </p>
+                            {/* Politika notu */}
+                            <div className="mb-4 p-3 bg-blue-500/5 border border-blue-500/10 rounded-2xl text-[10px] text-blue-400/60 font-bold uppercase tracking-widest flex items-center gap-2">
+                                <span>ℹ️</span> Rotalar yalnızca eklenebilir. Oluşturulduktan sonra değiştirilemez ve silinemez.
+                            </div>
 
                             <div>
                                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-3">Bir Rota Şablonu Seçin</label>
@@ -444,8 +444,8 @@ export default function AdminRoutesPage() {
                                             key={t.id}
                                             onClick={() => setSelectedTemplateId(t.id)}
                                             className={`p-5 rounded-[1.5rem] border text-left transition-all flex justify-between items-center ${selectedTemplateId === t.id
-                                                    ? 'bg-blue-600 border-blue-500 shadow-xl shadow-blue-900/20'
-                                                    : 'bg-white/5 border-white/5 hover:border-white/10'
+                                                ? 'bg-blue-600 border-blue-500 shadow-xl shadow-blue-900/20'
+                                                : 'bg-white/5 border-white/5 hover:border-white/10'
                                                 }`}
                                         >
                                             <div>
