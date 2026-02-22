@@ -1,6 +1,4 @@
-
 import { PrismaClient } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
 import { getSession } from './auth';
 
 // List of models that require strict Tenant isolation
@@ -14,73 +12,72 @@ const operationalModels = [
     'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic'
 ];
 
-
-// Prisma Decimal to Number Transformer
 const prismaClientSingleton = () => {
-    console.log('[Prisma] Initializing PrismaClientSingleton');
+    console.log('[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)');
     return new PrismaClient().$extends({
         result: {
+            // ... (keep numerical transformers for decimals if needed, but let's focus on isolation first)
             product: {
-                price: { needs: { price: true }, compute(product) { return Number(product.price); } },
-                buyPrice: { needs: { buyPrice: true }, compute(product) { return Number(product.buyPrice); } },
+                price: { needs: { price: true }, compute(product: any) { return Number(product.price); } },
+                buyPrice: { needs: { buyPrice: true }, compute(product: any) { return Number(product.buyPrice); } },
             },
             order: {
-                totalAmount: { needs: { totalAmount: true }, compute(order) { return Number(order.totalAmount); } },
+                totalAmount: { needs: { totalAmount: true }, compute(order: any) { return Number(order.totalAmount); } },
             },
             transaction: {
-                amount: { needs: { amount: true }, compute(transaction) { return Number(transaction.amount); } },
+                amount: { needs: { amount: true }, compute(transaction: any) { return Number(transaction.amount); } },
             },
             kasa: {
-                balance: { needs: { balance: true }, compute(kasa) { return Number(kasa.balance); } },
+                balance: { needs: { balance: true }, compute(kasa: any) { return Number(kasa.balance); } },
             },
             purchaseInvoice: {
-                amount: { needs: { amount: true }, compute(invoice) { return Number(invoice.amount); } },
-                taxAmount: { needs: { taxAmount: true }, compute(invoice) { return Number(invoice.taxAmount); } },
-                totalAmount: { needs: { totalAmount: true }, compute(invoice) { return Number(invoice.totalAmount); } },
+                amount: { needs: { amount: true }, compute(invoice: any) { return Number(invoice.amount); } },
+                taxAmount: { needs: { taxAmount: true }, compute(invoice: any) { return Number(invoice.taxAmount); } },
+                totalAmount: { needs: { totalAmount: true }, compute(invoice: any) { return Number(invoice.totalAmount); } },
             },
             salesInvoice: {
-                amount: { needs: { amount: true }, compute(invoice) { return Number(invoice.amount); } },
-                taxAmount: { needs: { taxAmount: true }, compute(invoice) { return Number(invoice.taxAmount); } },
-                totalAmount: { needs: { totalAmount: true }, compute(invoice) { return Number(invoice.totalAmount); } },
+                amount: { needs: { amount: true }, compute(invoice: any) { return Number(invoice.amount); } },
+                taxAmount: { needs: { taxAmount: true }, compute(invoice: any) { return Number(invoice.taxAmount); } },
+                totalAmount: { needs: { totalAmount: true }, compute(invoice: any) { return Number(invoice.totalAmount); } },
             },
             supplier: {
-                balance: { needs: { balance: true }, compute(supplier) { return Number(supplier.balance); } },
+                balance: { needs: { balance: true }, compute(supplier: any) { return Number(supplier.balance); } },
             },
             customer: {
-                balance: { needs: { balance: true }, compute(customer) { return Number(customer.balance); } },
-                points: { needs: { points: true }, compute(customer) { return Number(customer.points); } },
+                balance: { needs: { balance: true }, compute(customer: any) { return Number(customer.balance); } },
+                points: { needs: { points: true }, compute(customer: any) { return Number(customer.points); } },
             },
             serviceRecord: {
-                totalAmount: { needs: { totalAmount: true }, compute(record) { return Number(record.totalAmount); } },
+                totalAmount: { needs: { totalAmount: true }, compute(record: any) { return Number(record.totalAmount); } },
             },
             check: {
-                amount: { needs: { amount: true }, compute(check) { return Number(check.amount); } },
+                amount: { needs: { amount: true }, compute(check: any) { return Number(check.amount); } },
             },
             coupon: {
-                minPurchaseAmount: { needs: { minPurchaseAmount: true }, compute(coupon) { return Number(coupon.minPurchaseAmount); } },
+                minPurchaseAmount: { needs: { minPurchaseAmount: true }, compute(coupon: any) { return Number(coupon.minPurchaseAmount); } },
             },
             suspendedSale: {
-                total: { needs: { total: true }, compute(sale) { return Number(sale.total); } },
+                total: { needs: { total: true }, compute(sale: any) { return Number(sale.total); } },
             },
             paymentPlan: {
-                totalAmount: { needs: { totalAmount: true }, compute(plan) { return Number(plan.totalAmount); } },
+                totalAmount: { needs: { totalAmount: true }, compute(plan: any) { return Number(plan.totalAmount); } },
             },
             installment: {
-                amount: { needs: { amount: true }, compute(inst) { return Number(inst.amount); } },
+                amount: { needs: { amount: true }, compute(inst: any) { return Number(inst.amount); } },
             },
             account: {
-                balance: { needs: { balance: true }, compute(acc) { return Number(acc.balance); } },
+                balance: { needs: { balance: true }, compute(acc: any) { return Number(acc.balance); } },
             },
             journal: {
-                totalDebt: { needs: { totalDebt: true }, compute(j) { return Number(j.totalDebt); } },
-                totalCredit: { needs: { totalCredit: true }, compute(j) { return Number(j.totalCredit); } },
+                totalDebt: { needs: { totalDebt: true }, compute(j: any) { return Number(j.totalDebt); } },
+                totalCredit: { needs: { totalCredit: true }, compute(j: any) { return Number(j.totalCredit); } },
             },
             journalItem: {
-                debt: { needs: { debt: true }, compute(i) { return Number(i.debt); } },
-                credit: { needs: { credit: true }, compute(i) { return Number(i.credit); } },
+                debt: { needs: { debt: true }, compute(i: any) { return Number(i.debt); } },
+                credit: { needs: { credit: true }, compute(i: any) { return Number(i.credit); } },
             },
             staff: {
-                salary: { needs: { salary: true }, compute(s) { return Number(s.salary); } },
+                salary: { needs: { salary: true }, compute(s: any) { return Number(s.salary); } },
             },
         },
         query: {
@@ -91,8 +88,6 @@ const prismaClientSingleton = () => {
                         return query(args);
                     }
 
-                    // Avoid calling cookies() if we can skip it
-                    // But we need it for most operations in operationalModels
                     const session: any = await getSession();
                     const user = session?.user || session;
 
@@ -102,7 +97,7 @@ const prismaClientSingleton = () => {
                         const impersonateId = user.impersonateTenantId;
                         const isPlatformAdmin = tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN';
 
-                        // 1. Platform Admin Bypass
+                        // 1. Platform Admin Bypass (Global view)
                         if (isPlatformAdmin && (!impersonateId || (args as any).adminBypass)) {
                             const newArgs = { ...args };
                             if ((newArgs as any).adminBypass) delete (newArgs as any).adminBypass;
@@ -110,95 +105,56 @@ const prismaClientSingleton = () => {
                         }
 
                         const effectiveTenantId = impersonateId || tenantId;
-
                         if (!effectiveTenantId) {
-                            if (['user', 'tenant', 'company', 'plan', 'subscription', 'loginattempt'].includes(modelName)) {
+                            // Public-safe models within operational list
+                            if (['user', 'tenant', 'company', 'plan', 'subscription', 'loginattempt', 'helpcategory', 'helptopic'].includes(modelName)) {
                                 return query(args);
                             }
                             throw new Error("SECURITY_ERROR: Tenant context missing in session.");
                         }
 
                         const newArgs = { ...args };
-                        const isRead = ['findMany', 'findFirst', 'findUnique', 'count', 'aggregate', 'groupBy'].includes(operation);
-                        const isWrite = ['update', 'updateMany', 'delete', 'deleteMany', 'upsert'].includes(operation);
-                        const isUnique = ['findUnique', 'update', 'delete', 'upsert', 'findFirst'].includes(operation);
+                        // ONLY apply filters to operations that accept arbitrary where clauses. 
+                        // findUnique MUST NOT have extra fields in its where.
+                        const isStrictUnique = ['findUnique', 'update', 'delete', 'upsert'].includes(operation);
 
-                        if (isRead || isWrite) {
+                        // findFirst supports relation filters, so it's safer than findUnique but we treat it as unique for safety if needed.
+                        // However, we only inject filters if we are NOT doing a strict unique lookup by ID.
+
+                        if (!isStrictUnique) {
                             if (!newArgs.where) newArgs.where = {};
 
-                            // Apply filters based on model type
-                            if (['company', 'user', 'staff', 'subscription'].includes(modelName)) {
-                                if (!isUnique) {
-                                    if (modelName === 'company') {
-                                        newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
-                                    } else if (modelName === 'tenant') {
-                                        newArgs.where = { ...newArgs.where, id: effectiveTenantId };
-                                    } else {
-                                        newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
-                                    }
-                                }
+                            if (modelName === 'company') {
+                                newArgs.where.tenantId = effectiveTenantId;
+                            } else if (modelName === 'user' || modelName === 'staff' || modelName === 'subscription') {
+                                newArgs.where.tenantId = effectiveTenantId;
                             } else if (modelName === 'tenant') {
-                                if (!isUnique) newArgs.where = { ...newArgs.where, id: effectiveTenantId };
+                                newArgs.where.id = effectiveTenantId;
                             } else if (modelName === 'notification') {
-                                if (!isUnique) newArgs.where = { ...newArgs.where, user: { tenantId: effectiveTenantId } };
-                            } else if (modelName === 'journalitem') {
-                                // Nested filter through journal
-                                if (!isUnique) newArgs.where = { ...newArgs.where, journal: { company: { tenantId: effectiveTenantId } } };
-                            } else if (modelName === 'warranty') {
-                                // Nested through customer
-                                if (!isUnique) newArgs.where = { ...newArgs.where, customer: { company: { tenantId: effectiveTenantId } } };
+                                newArgs.where.user = { tenantId: effectiveTenantId };
                             } else if (modelName === 'helpcategory') {
-                                // Global Models - No tenant isolation for read
+                                // Global
                             } else if (modelName === 'helptopic') {
-                                // HelpTopics can be global (null) or tenant-specific
-                                if (!isUnique) {
-                                    if (isRead) {
-                                        newArgs.where = {
-                                            ...newArgs.where,
-                                            OR: [
-                                                { tenantId: effectiveTenantId },
-                                                { tenantId: null }
-                                            ]
-                                        };
-                                    } else {
-                                        newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
-                                    }
-                                }
-                            }
-                            else if (['ticket', 'ticketmessage', 'ticketattachment'].includes(modelName)) {
-                                if (!isUnique) {
-                                    if (modelName === 'ticket') {
-                                        newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
-                                    } else {
-                                        // ticketMessage and ticketAttachment have a ticket relation
-                                        newArgs.where = {
-                                            ...newArgs.where,
-                                            ticket: { tenantId: effectiveTenantId }
-                                        };
-                                    }
-                                }
-                            } else if (modelName === 'securityevent') {
-                                // Shared/System model
-                            } else {
-                                // Generic isolation through company relation
-                                // CRITICAL: Only apply to non-unique operations OR if the query already targets a non-unique field
-                                // For findUnique, Prisma ONLY allows filtering by Unique ID. 
-                                // Relation filters are forbidden in findUnique 'where'.
-                                if (!isUnique) {
-                                    newArgs.where = {
-                                        ...newArgs.where,
-                                        company: {
-                                            ...(newArgs.where.company || {}),
-                                            tenantId: effectiveTenantId
-                                        }
-                                    };
-                                }
+                                newArgs.where.OR = [
+                                    { tenantId: effectiveTenantId },
+                                    { tenantId: null }
+                                ];
+                            } else if (modelName === 'ticket') {
+                                newArgs.where.tenantId = effectiveTenantId;
+                            } else if (modelName === 'ticketmessage' || modelName === 'ticketattachment') {
+                                newArgs.where.ticket = { tenantId: effectiveTenantId };
+                            } else if (['product', 'customer', 'supplier', 'transaction', 'kasa', 'check', 'order', 'salesinvoice', 'purchaseinvoice', 'servicerecord', 'quote', 'paymentplan', 'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget', 'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'warranty'].includes(modelName)) {
+                                newArgs.where.company = {
+                                    ...(newArgs.where.company || {}),
+                                    tenantId: effectiveTenantId
+                                };
                             }
                         }
 
-                        // Mutation Protection (Ensure companyId matches tenant)
+                        // Mutation Protection for creation
                         if (['create', 'createMany'].includes(operation)) {
-                            if (!['company', 'user', 'tenant', 'subscription', 'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic', 'loginattempt'].includes(modelName)) {
+                            const bypass = ['company', 'user', 'tenant', 'subscription', 'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic', 'loginattempt'];
+                            if (!bypass.includes(modelName)) {
                                 const data = (newArgs as any).data;
                                 if (data && !isPlatformAdmin) {
                                     const validateItem = (item: any) => {
@@ -206,7 +162,6 @@ const prismaClientSingleton = () => {
                                             throw new Error(`SECURITY_ERROR: Missing companyId in ${modelName} creation.`);
                                         }
                                     };
-
                                     if (Array.isArray(data)) data.forEach(validateItem);
                                     else validateItem(data);
                                 }
@@ -217,10 +172,9 @@ const prismaClientSingleton = () => {
                     }
 
                     // PUBLIC ACCESS (No session)
-                    if (['user', 'staff', 'tenant', 'plan', 'company', 'subscription', 'loginattempt', 'salesinvoice', 'appsettings'].includes(modelName)) {
-                        if (['findUnique', 'findFirst', 'findMany', 'create', 'update', 'count'].includes(operation)) {
-                            return query(args);
-                        }
+                    const publicSafe = ['user', 'staff', 'tenant', 'plan', 'company', 'subscription', 'loginattempt', 'salesinvoice', 'appsettings', 'helpcategory', 'helptopic'];
+                    if (publicSafe.includes(modelName)) {
+                        return query(args);
                     }
 
                     throw new Error(`SECURITY_ERROR: Access to model '${model}' denied without active session.`);
