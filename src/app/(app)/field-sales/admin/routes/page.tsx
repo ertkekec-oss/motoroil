@@ -484,17 +484,28 @@ export default function AdminRoutesPage() {
                                                         </div>
                                                     )}
 
-                                                    {/* Hover: Rota Ekle Butonu */}
-                                                    <button
-                                                        onClick={() => {
-                                                            setSelectedDay(day);
-                                                            setSelectedStaffId(staff.id);
-                                                            setShowAssignModal(true);
-                                                        }}
-                                                        className="absolute inset-0 w-full h-full opacity-0 hover:opacity-100 flex items-end justify-center pb-2 transition-all bg-blue-600/5"
-                                                    >
-                                                        <span className="text-[8px] font-black text-blue-400/50 uppercase">+ Rota Ekle</span>
-                                                    </button>
+                                                    {/* Rota Ekle - sadece boşsa tam hücre, varsa küçük buton */}
+                                                    {dayRoutes.length === 0 ? (
+                                                        <button
+                                                            onClick={() => {
+                                                                setSelectedDay(day);
+                                                                setSelectedStaffId(staff.id);
+                                                                setShowAssignModal(true);
+                                                            }}
+                                                            className="w-full flex-1 min-h-[60px] flex items-center justify-center rounded-xl border border-dashed border-white/5 hover:border-blue-500/30 hover:bg-blue-600/5 transition-all group/add"
+                                                        >
+                                                            <span className="text-[10px] font-black text-blue-400/20 group-hover/add:text-blue-400/60 uppercase transition-colors">+</span>
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => {
+                                                                setSelectedDay(day);
+                                                                setSelectedStaffId(staff.id);
+                                                                setShowAssignModal(true);
+                                                            }}
+                                                            className="w-full py-1 rounded-lg text-[8px] font-black text-blue-400/20 hover:text-blue-400/60 hover:bg-blue-500/5 transition-all uppercase text-center"
+                                                        >+ ekle</button>
+                                                    )}
                                                 </div>
                                             );
                                         })}
