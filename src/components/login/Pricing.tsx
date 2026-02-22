@@ -20,7 +20,7 @@ const PLANS = [
     },
 ];
 
-export default function Pricing() {
+export default function Pricing({ onDemoClick }: { onDemoClick?: () => void }) {
     return (
         <section id="fiyatlama" className="py-20 px-6" aria-labelledby="pricing-heading">
             <div className="max-w-4xl mx-auto">
@@ -59,13 +59,14 @@ export default function Pricing() {
                                     </li>
                                 ))}
                             </ul>
-                            <a href="mailto:satis@periodya.com"
+                            <button
+                                onClick={onDemoClick}
                                 className={`block w-full py-3 rounded-xl text-sm font-bold text-center transition-all ${p.accent
                                     ? 'text-white hover:opacity-90'
                                     : 'text-gray-300 border border-white/10 hover:bg-white/5'}`}
                                 style={p.accent ? { background: 'linear-gradient(135deg,#FF5500,#E64A00)' } : {}}>
                                 {p.cta}
-                            </a>
+                            </button>
                         </div>
                     ))}
                 </div>

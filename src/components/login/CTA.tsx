@@ -1,4 +1,4 @@
-export default function CTA() {
+export default function CTA({ onDemoClick }: { onDemoClick?: () => void }) {
     return (
         <section className="py-20 px-6" aria-label="Son Çağrı">
             <div className="max-w-3xl mx-auto">
@@ -23,10 +23,11 @@ export default function CTA() {
                             >
                                 Ücretsiz Başla →
                             </button>
-                            <a href="mailto:demo@periodya.com"
+                            <button
+                                onClick={onDemoClick}
                                 className="px-8 py-3.5 rounded-2xl font-bold text-gray-300 text-sm border border-white/10 hover:bg-white/5 transition-all">
                                 Demo Talep Et
-                            </a>
+                            </button>
                         </div>
                         <p className="mt-6 text-xs text-gray-600 font-bold">
                             Kredi kartı gerekmez · İstediğinde iptal et · KVKK uyumlu

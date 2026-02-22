@@ -1,5 +1,5 @@
-export default function Hero() {
-    const scrollTo = () => document.querySelector('#login')?.scrollIntoView({ behavior: 'smooth' });
+interface HeroProps { onDemoClick?: () => void; }
+export default function Hero({ onDemoClick }: HeroProps) {
 
     return (
         <section id="urun" className="relative py-20 px-6 overflow-hidden" aria-labelledby="hero-heading">
@@ -28,7 +28,7 @@ export default function Hero() {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <button
-                        onClick={scrollTo}
+                        onClick={() => document.querySelector('#login')?.scrollIntoView({ behavior: 'smooth' })}
                         className="px-8 py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-105 hover:shadow-xl"
                         style={{ background: 'linear-gradient(135deg,#FF5500,#E64A00)', boxShadow: '0 8px 30px rgba(255,85,0,0.3)' }}
                         aria-label="Hesabınıza giriş yapın"
@@ -36,6 +36,7 @@ export default function Hero() {
                         Hemen Giriş Yap →
                     </button>
                     <a href="mailto:demo@periodya.com"
+                        onClick={e => { e.preventDefault(); onDemoClick?.(); }}
                         className="px-8 py-3.5 rounded-2xl font-bold text-gray-300 text-sm border border-white/10 hover:bg-white/5 transition-all">
                         Demo Talep Et
                     </a>
