@@ -236,6 +236,15 @@ export default function StaffManagementContent() {
         { id: 'branch_isolation', label: '🚫 Şube İzolasyonu (Sadece Kendi Şubesi)', category: 'Kısıtlama' }
     ];
 
+    const roleTemplates: Record<string, string[]> = {
+        'Yönetici': allPermissions.map(p => p.id),
+        'Şube Müdürü': ['pos_access', 'sales_archive', 'discount_auth', 'inventory_view', 'customer_view', 'customer_edit', 'service_view', 'service_create', 'branch_isolation'],
+        'Saha Satış': ['field_sales_access', 'field_sales_admin', 'customer_view', 'customer_edit', 'inventory_view', 'pos_access', 'sales_archive'],
+        'E-Ticaret Uzmanı': ['ecommerce_view', 'ecommerce_manage', 'inventory_view', 'inventory_edit', 'sales_archive'],
+        'Servis Personeli': ['service_view', 'service_create', 'service_complete', 'inventory_view'],
+        'Personel': ['pos_access', 'branch_isolation']
+    };
+
     const filteredStaff = useMemo(() => {
         return staff.filter(s =>
             s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -914,25 +923,34 @@ export default function StaffManagementContent() {
                             <tr className="bg-white/5 text-[10px] text-white/40 font-black uppercase tracking-widest">
                                 <th className="p-6">ROL TANIMI</th>
                                 <th className="p-6">ERİŞİM KAPSAMI</th>
-                                <th className="p-6">KRİTİK YETKİLER</th>
-                                <th className="p-6 text-right">AKSİYON</th>
+                                <th className="p-6">YETKİ SAYISI</th>
+                                <th className="p-6 text-right">DURUM</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
-                            {[
-                                { name: 'Yönetici', scope: 'Tam Erişim', critical: 'Tüm Sistem Kontrolü', color: 'text-primary' },
-                                { name: 'Şube Müdürü', scope: 'Kendi Şubesi + Raporlar', critical: 'İskonto Yetkisi, Silme Yok', color: 'text-white' },
-                                { name: 'E-Ticaret Uzmanı', scope: 'Siparişler + Ürünler', critical: 'Fiyat Güncelleme', color: 'text-white' },
-                                { name: 'Servis Personeli', scope: 'İş Emirleri + Stok', critical: 'Müşteri Kaydı', color: 'text-white' }
-                            ].map((role, idx) => (
+                            {Object.keys(roleTemplates).map((roleName, idx) => (
                                 <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-6 font-black text-lg">{role.name}</td>
-                                    <td className="p-6 text-sm text-white/60">{role.scope}</td>
                                     <td className="p-6">
-                                        <span className="text-xs bg-red-500/10 text-red-400 px-3 py-1 rounded-full font-bold">{role.critical}</span>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-lg">
+                                                {roleName === 'Yönetici' ? '👑' : roleName === 'Saha Satış' ? '📍' : roleName === 'Şube Müdürü' ? '🏢' : '👤'}
+                                            </div>
+                                            <span className="font-black text-lg">{roleName}</span>
+                                        </div>
+                                    </td>
+                                    <td className="p-6 text-sm text-white/60">
+                                        {roleName === 'Yönetici' ? 'Tüm modüllere sınırsız erişim' :
+                                            roleName === 'Saha Satış' ? 'Müşteri, Stok ve Mobil Saha Satış modülleri' :
+                                                roleName === 'Şube Müdürü' ? 'Şube operasyonları, Satışlar ve Personel takibi' :
+                                                    'Standart personel yetkileri'}
+                                    </td>
+                                    <td className="p-6">
+                                        <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-bold">
+                                            {roleTemplates[roleName].length} Yetki Tanımlı
+                                        </span>
                                     </td>
                                     <td className="p-6 text-right">
-                                        <button className="text-xs font-black text-primary hover:underline">DÜZENLE</button>
+                                        <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded uppercase">Aktif</span>
                                     </td>
                                 </tr>
                             ))}
@@ -1508,10 +1526,29 @@ export default function StaffManagementContent() {
                                     🛡️ <span className="text-white/80">Erişim & Yetki Yönetimi</span>
                                 </h2>
                                 <div className="text-xs text-white/40 font-bold uppercase tracking-widest mt-1">
-                                    {selectedStaff.name} • {selectedStaff.role}
+                                    PERSONEL: {selectedStaff.name} ({selectedStaff.role})
                                 </div>
                             </div>
                             <button onClick={() => setShowPermissionModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                        </div>
+
+                        {/* HIZLI ŞABLONLAR */}
+                        <div className="px-6 py-4 bg-white/[0.03] border-b border-white/5 flex items-center gap-4 shrink-0 overflow-x-auto custom-scrollbar">
+                            <span className="text-[10px] font-black text-primary uppercase whitespace-nowrap">⚡ Hızlı Şablonlar:</span>
+                            <div className="flex gap-2">
+                                {Object.keys(roleTemplates).map(roleName => (
+                                    <button
+                                        key={roleName}
+                                        onClick={() => {
+                                            setSelectedStaff({ ...selectedStaff, permissions: roleTemplates[roleName] });
+                                            addNotification({ type: 'success', icon: '🪄', text: `${roleName} şablonu uygulandı.` });
+                                        }}
+                                        className="px-4 py-1.5 rounded-lg bg-white/5 border border-white/5 text-[10px] font-bold text-white/60 hover:bg-primary hover:text-white hover:border-primary transition-all whitespace-nowrap"
+                                    >
+                                        {roleName}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-6">
@@ -1697,6 +1734,7 @@ export default function StaffManagementContent() {
                                                 <option value="Muhasebe">💰 Muhasebe</option>
                                                 <option value="Servis Personeli">🔧 Servis Personeli</option>
                                                 <option value="Satış Temsilcisi">🤝 Satış Temsilcisi</option>
+                                                <option value="Saha Satış">🚚 Saha Satış</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2">

@@ -98,32 +98,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (res.ok) {
                 const userData = await res.json();
-                setUser(userData);
                 localStorage.setItem('periodya_user', JSON.stringify(userData));
                 localStorage.setItem('periodya_isLoggedIn', 'true');
 
-                // Redirect based on setupState and permissions
-                if (userData.setupState === 'PENDING') {
-                    router.push('/onboarding');
-                } else {
-                    // ADMIN role always goes to main dashboard
-                    if (userData.role === 'ADMIN') {
-                        router.push('/');
+                // Give the browser a moment to process the cookie and state
+                setTimeout(() => {
+                    setUser(userData);
+                    // Redirect based on setupState and permissions
+                    if (userData.setupState === 'PENDING') {
+                        router.push('/onboarding');
                     } else {
-                        // For non-admin users, check permissions
-                        const hasPOS = userData.permissions?.includes('pos_access');
-                        const hasFieldSales = userData.permissions?.includes('field_sales_access');
-
-                        if (hasPOS) {
+                        // ADMIN role always goes to main dashboard
+                        if (userData.role === 'ADMIN') {
                             router.push('/');
-                        } else if (hasFieldSales) {
-                            router.push('/field-sales');
                         } else {
-                            // Default fallback
-                            router.push('/');
+                            // For non-admin users, check permissions
+                            const hasPOS = userData.permissions?.includes('pos_access');
+                            const hasFieldSales = userData.permissions?.includes('field_sales_access');
+
+                            if (hasPOS) {
+                                router.push('/');
+                            } else if (hasFieldSales) {
+                                router.push('/field-sales');
+                            } else {
+                                // Default fallback
+                                router.push('/');
+                            }
                         }
                     }
-                }
+                }, 100);
                 return true;
             }
             return false;

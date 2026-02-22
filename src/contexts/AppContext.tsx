@@ -281,16 +281,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (authUser) {
-            const freshUser = staff.find(s => s.username === authUser.username || s.email === authUser.username);
+            // Priority 1: Match by userId if available
+            // Priority 2: Match by username or email
+            const freshUser = staff.find(s =>
+                (s as any).userId === authUser.id ||
+                s.username === authUser.username ||
+                s.email === authUser.username
+            );
+
             if (freshUser) {
                 setCurrentUser(freshUser);
             } else {
                 setCurrentUser({
-                    id: authUser.username,
+                    id: authUser.id || authUser.username,
                     name: authUser.name,
                     role: authUser.role,
                     branch: authUser.branch,
-                    permissions: authUser.permissions,
+                    permissions: authUser.permissions || [],
                     status: 'Active',
                     currentJob: '',
                     username: authUser.username

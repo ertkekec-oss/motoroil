@@ -203,7 +203,7 @@ export async function PUT(req: Request) {
             id, name, email, phone, role, salary, branch, type,
             birthDate, maritalStatus, bloodType, militaryStatus, reference,
             hasDriverLicense, educationLevel, city, district, relativeName,
-            relativePhone, healthReport, certificate, notes, address
+            relativePhone, healthReport, certificate, notes, address, permissions
         } = body;
 
         if (!id) return NextResponse.json({ success: false, error: 'ID zorunludur' }, { status: 400 });
@@ -213,6 +213,7 @@ export async function PUT(req: Request) {
             maritalStatus, bloodType, militaryStatus, reference,
             educationLevel, city, district, relativeName,
             relativePhone, healthReport, certificate, notes, address,
+            permissions,
             hasDriverLicense: hasDriverLicense !== undefined ? !!hasDriverLicense : undefined
         };
 
@@ -227,8 +228,17 @@ export async function PUT(req: Request) {
             data: updateData
         });
 
+        // Sync with linked User if exists
+        if (updatedStaff.userId && permissions) {
+            await prisma.user.update({
+                where: { id: updatedStaff.userId },
+                data: { permissions: permissions }
+            });
+        }
+
         return NextResponse.json({ success: true, staff: updatedStaff });
     } catch (error: any) {
+        console.error('[STAFF_PUT_ERROR]', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

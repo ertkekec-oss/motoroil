@@ -126,9 +126,16 @@ export async function POST(request: Request) {
             }
         }
 
-        // Create secure session cookie with defaults for platform admins
+        // Create optimized session with only essential data
+        // This prevents the JWT from exceeding the 4KB cookie limit
         await createSession({
-            ...targetUser,
+            id: targetUser.id,
+            username: targetUser.username || (targetUser as any).email,
+            email: (targetUser as any).email,
+            role: targetUser.role || 'Personel',
+            tenantId: (targetUser as any).tenantId || 'PLATFORM_ADMIN',
+            permissions: (targetUser as any).permissions || [],
+            setupState: (targetUser as any).setupState || 'COMPLETED',
             companyId: (targetUser as any).companyId || undefined,
             branch: (targetUser as any).branch || 'Merkez'
         });
