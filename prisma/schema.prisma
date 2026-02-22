@@ -773,7 +773,20 @@ model Staff {
   deletedAt        DateTime?
   salary           Decimal?        @default(17002) @db.Decimal(10, 2)
   address          String?
-  age              Int?
+  city             String?
+  district         String?
+  birthDate        DateTime?
+  maritalStatus    String?
+  bloodType        String?
+  militaryStatus   String?
+  educationLevel   String?
+  hasDriverLicense Boolean?        @default(false)
+  reference        String?
+  relativeName     String?
+  relativePhone    String?
+  healthReport     String?
+  certificate      String?
+  notes            String?
   companyId        String?
   phone            String?
   tenantId         String?         @default("PLATFORM_ADMIN")

@@ -17,14 +17,22 @@ export default function StaffManagementContent() {
     const [showPermissionModal, setShowPermissionModal] = useState(false);
     const [showAddStaffModal, setShowAddStaffModal] = useState(false);
     const [showEditStaffModal, setShowEditStaffModal] = useState(false);
-    const [editStaff, setEditStaff] = useState<any>({ name: '', email: '', role: '', branch: '', type: 'service', age: '', address: '', salary: '' });
+    const [editStaff, setEditStaff] = useState<any>({
+        name: '', email: '', role: '', branch: '', type: 'service', birthDate: '', address: '', salary: '',
+        maritalStatus: '', bloodType: '', militaryStatus: '', educationLevel: '', hasDriverLicense: false,
+        reference: '', relativeName: '', relativePhone: '', city: '', district: '', notes: '',
+        healthReport: '', certificate: ''
+    });
 
     const [taskContent, setTaskContent] = useState('');
     const [taskPriority, setTaskPriority] = useState('normal');
     const [isProcessing, setIsProcessing] = useState(false);
 
     const [newStaff, setNewStaff] = useState({
-        name: '', email: '', username: '', phone: '', password: '', role: '', branch: '', type: 'service', age: '', address: '', salary: ''
+        name: '', email: '', username: '', phone: '', password: '', role: '', branch: '', type: 'service',
+        birthDate: '', maritalStatus: '', bloodType: '', militaryStatus: '', educationLevel: '',
+        hasDriverLicense: false, reference: '', relativeName: '', relativePhone: '',
+        city: '', district: '', address: '', notes: '', healthReport: '', certificate: '', salary: ''
     });
 
     // --- NEW STATES FOR HR MODULES ---
@@ -296,7 +304,6 @@ export default function StaffManagementContent() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...newStaff,
-                    age: newStaff.age ? parseInt(newStaff.age) : null,
                     salary: newStaff.salary ? parseFloat(newStaff.salary) : 17002,
                     status: 'Müsait',
                     permissions: ['branch_isolation']
@@ -306,7 +313,12 @@ export default function StaffManagementContent() {
             if (res.ok) {
                 await refreshStaff();
                 setShowAddStaffModal(false);
-                setNewStaff({ name: '', email: '', username: '', phone: '', password: '', role: '', branch: '', type: 'service', age: '', address: '', salary: '' });
+                setNewStaff({
+                    name: '', email: '', username: '', phone: '', password: '', role: '', branch: '', type: 'service',
+                    birthDate: '', maritalStatus: '', bloodType: '', militaryStatus: '', educationLevel: '',
+                    hasDriverLicense: false, reference: '', relativeName: '', relativePhone: '',
+                    city: '', district: '', address: '', notes: '', healthReport: '', certificate: '', salary: ''
+                });
                 showSuccess("Personel Eklendi", "Sisteme giriş yetkileri varsayılan olarak tanımlandı. Şifre mail olarak gönderildi.");
             }
         } catch (e) {
@@ -328,16 +340,8 @@ export default function StaffManagementContent() {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    id: editStaff.id,
-                    name: editStaff.name,
-                    email: editStaff.email,
-                    phone: editStaff.phone,
-                    role: editStaff.role,
-                    branch: editStaff.branch,
-                    type: editStaff.type,
-                    age: editStaff.age,
-                    address: editStaff.address,
-                    salary: editStaff.salary
+                    ...editStaff,
+                    age: undefined // Remove age as per instruction
                 })
             });
 
@@ -1559,113 +1563,152 @@ export default function StaffManagementContent() {
             {/* 3. ADD STAFF MODAL */}
             {showAddStaffModal && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl shadow-primary/20">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl shadow-primary/20 flex flex-col">
+                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02] shrink-0">
                             <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                🆕 <span className="text-white/80">Yeni Personel Girişi</span>
+                                🆕 <span className="text-white/80">Yeni Personel Kaydı & Özlük Girişi</span>
                             </h2>
                             <button onClick={() => setShowAddStaffModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
                         </div>
-                        <div className="p-8 space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Ad Soyad</label>
-                                    <input
-                                        type="text"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        placeholder="Tam İsim"
-                                        value={newStaff.name}
-                                        onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">E-Posta</label>
-                                    <input
-                                        type="email"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        placeholder="ornek@sirket.com"
-                                        value={newStaff.email}
-                                        onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Telefon</label>
-                                    <input
-                                        type="tel"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        placeholder="05xxxxxxxxx"
-                                        value={newStaff.phone}
-                                        onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Rol / Pozisyon</label>
-                                    <select
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none appearance-none"
-                                        value={newStaff.role}
-                                        onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}
-                                    >
-                                        <option value="" className="bg-[#0f111a]">Rol Seçiniz</option>
-                                        <option value="Yönetici" className="bg-[#0f111a]">👑 Yönetici</option>
-                                        <option value="Şube Müdürü" className="bg-[#0f111a]">🏢 Şube Müdürü</option>
-                                        <option value="Muhasebe" className="bg-[#0f111a]">💰 Muhasebe</option>
-                                        <option value="Denetçi" className="bg-[#0f111a]">🔍 Denetçi (Auditor)</option>
-                                        <option value="Servis Personeli" className="bg-[#0f111a]">🔧 Servis Personeli</option>
-                                        <option value="Satış Temsilcisi" className="bg-[#0f111a]">🤝 Satış Temsilcisi</option>
-                                        <option value="Saha Satış Personeli" className="bg-[#0f111a]">📍 Saha Satış Personeli</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Şube</label>
-                                    <select
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none appearance-none"
-                                        value={newStaff.branch}
-                                        onChange={(e) => setNewStaff({ ...newStaff, branch: e.target.value })}
-                                    >
-                                        <option value="" className="bg-[#0f111a]">Şube Seçiniz</option>
-                                        {branches.map(b => (
-                                            <option key={b.id} value={b.name} className="bg-[#0f111a]">{b.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Maaş (Aylık Net)</label>
-                                    <input
-                                        type="number"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        placeholder="17002"
-                                        value={newStaff.salary}
-                                        onChange={(e) => setNewStaff({ ...newStaff, salary: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Yaş</label>
-                                    <input
-                                        type="number"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        placeholder="25"
-                                        value={newStaff.age}
-                                        onChange={(e) => setNewStaff({ ...newStaff, age: e.target.value })}
-                                    />
-                                </div>
-                            </div>
 
-                            <button
-                                onClick={handleSaveStaff}
-                                disabled={isProcessing}
-                                className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
-                            >
-                                {isProcessing ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>KAYDEDİLİYOR...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>💾 PERSONELİ KAYDET VE DAVET GÖNDER</span>
-                                    </>
-                                )}
-                            </button>
+                        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                            <div className="space-y-8">
+                                {/* Temel Bilgiler */}
+                                <section className="space-y-4">
+                                    <h3 className="text-xs font-black text-primary uppercase tracking-widest border-l-2 border-primary pl-3">Temel Bilgiler</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Ad Soyad</label>
+                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="Tam İsim" value={newStaff.name} onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">E-Posta</label>
+                                            <input type="email" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="ornek@sirket.com" value={newStaff.email} onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Telefon</label>
+                                            <input type="tel" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="05xxxxxxxxx" value={newStaff.phone} onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })} />
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* Özlük Detayları */}
+                                <section className="space-y-4">
+                                    <h3 className="text-xs font-black text-primary uppercase tracking-widest border-l-2 border-primary pl-3">Özlük Bilgileri</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Doğum Tarihi</label>
+                                            <input type="date" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50 cursor-pointer" value={newStaff.birthDate} onChange={(e) => setNewStaff({ ...newStaff, birthDate: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Medeni Durum</label>
+                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" value={newStaff.maritalStatus} onChange={(e) => setNewStaff({ ...newStaff, maritalStatus: e.target.value })}>
+                                                <option value="">Seçiniz</option>
+                                                <option value="Bekar">Bekar</option>
+                                                <option value="Evli">Evli</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Kan Grubu</label>
+                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" value={newStaff.bloodType} onChange={(e) => setNewStaff({ ...newStaff, bloodType: e.target.value })}>
+                                                <option value="">Seçiniz</option>
+                                                {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-'].map(t => <option key={t} value={t}>{t}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Askerlik Durumu</label>
+                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" value={newStaff.militaryStatus} onChange={(e) => setNewStaff({ ...newStaff, militaryStatus: e.target.value })}>
+                                                <option value="">Seçiniz</option>
+                                                <option value="Yapıldı">Yapıldı</option>
+                                                <option value="Muaf">Muaf</option>
+                                                <option value="Tecilli">Tecilli</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Eğitim Durumu</label>
+                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" value={newStaff.educationLevel} onChange={(e) => setNewStaff({ ...newStaff, educationLevel: e.target.value })}>
+                                                <option value="">Seçiniz</option>
+                                                <option value="İlkokul">İlkokul</option>
+                                                <option value="Ortaokul">Ortaokul</option>
+                                                <option value="Lise">Lise</option>
+                                                <option value="Önlisans">Önlisans</option>
+                                                <option value="Lisans">Lisans</option>
+                                                <option value="Yüksek Lisans">Yüksek Lisans</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Ehliyet Durumu</label>
+                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" value={newStaff.hasDriverLicense ? "Evet" : "Hayır"} onChange={(e) => setNewStaff({ ...newStaff, hasDriverLicense: e.target.value === "Evet" })}>
+                                                <option value="Hayır">Yok</option>
+                                                <option value="Evet">Var</option>
+                                            </select>
+                                        </div>
+                                        <div className="col-span-2 space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Referans</label>
+                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="İsim / Telefon / Not" value={newStaff.reference} onChange={(e) => setNewStaff({ ...newStaff, reference: e.target.value })} />
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* Adres & Yakın Bilgisi */}
+                                <section className="space-y-4">
+                                    <h3 className="text-xs font-black text-primary uppercase tracking-widest border-l-2 border-primary pl-3">Adres & İletişim Detayları</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">İl</label>
+                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="İstanbul" value={newStaff.city} onChange={(e) => setNewStaff({ ...newStaff, city: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">İlçe</label>
+                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="Üsküdar" value={newStaff.district} onChange={(e) => setNewStaff({ ...newStaff, district: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Acil Durum Yakını (İsim & Tel)</label>
+                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="Ahmet Yılmaz - 0532..." value={newStaff.relativeName} onChange={(e) => setNewStaff({ ...newStaff, relativeName: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Tam Adres</label>
+                                        <textarea className="w-full min-h-[80px] bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white outline-none focus:border-primary/50 resize-none" placeholder="Mahalle, sokak, no..." value={newStaff.address} onChange={(e) => setNewStaff({ ...newStaff, address: e.target.value })} />
+                                    </div>
+                                </section>
+
+                                {/* İş Bilgileri */}
+                                <section className="space-y-4 pb-4">
+                                    <h3 className="text-xs font-black text-primary uppercase tracking-widest border-l-2 border-primary pl-3">İş & Finansal Bilgiler</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Rol / Pozisyon</label>
+                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" value={newStaff.role} onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}>
+                                                <option value="">Rol Seçiniz</option>
+                                                <option value="Yönetici">👑 Yönetici</option>
+                                                <option value="Şube Müdürü">🏢 Şube Müdürü</option>
+                                                <option value="Muhasebe">💰 Muhasebe</option>
+                                                <option value="Servis Personeli">🔧 Servis Personeli</option>
+                                                <option value="Satış Temsilcisi">🤝 Satış Temsilcisi</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Şube</label>
+                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" value={newStaff.branch} onChange={(e) => setNewStaff({ ...newStaff, branch: e.target.value })}>
+                                                <option value="">Şube Seçiniz</option>
+                                                {branches.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Net Maaş (TL)</label>
+                                            <input type="number" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="17002" value={newStaff.salary} onChange={(e) => setNewStaff({ ...newStaff, salary: e.target.value })} />
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <button onClick={handleSaveStaff} disabled={isProcessing} className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
+                                    {isProcessing ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>KAYDEDİLİYOR...</span></> : <span>💾 PERSONELİ KAYDET VE ÖZLÜK DOSYASI OLUŞTUR</span>}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1674,126 +1717,180 @@ export default function StaffManagementContent() {
             {/* 4. EDIT STAFF MODAL */}
             {showEditStaffModal && editStaff && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl shadow-primary/20 max-h-[90vh] flex flex-col">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                            <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                ✏️ <span className="text-white/80">Personel Düzenle: {editStaff.name}</span>
-                            </h2>
+                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl shadow-primary/20 h-[90vh] flex flex-col">
+                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02] shrink-0">
+                            <div>
+                                <h2 className="text-xl font-black text-white flex items-center gap-3">
+                                    🗂️ <span className="text-white/80">Personel Özlük Dosyası: {editStaff.name}</span>
+                                </h2>
+                                <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1 pl-8">Dijital Arşiv ve Bilgi Yönetimi</div>
+                            </div>
                             <button onClick={() => setShowEditStaffModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
                         </div>
-                        <div className="p-8 space-y-6 overflow-y-auto">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Ad Soyad</label>
-                                    <input
-                                        type="text"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        value={editStaff.name}
-                                        onChange={(e) => setEditStaff({ ...editStaff, name: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">E-Posta</label>
-                                    <input
-                                        type="email"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        value={editStaff.email}
-                                        onChange={(e) => setEditStaff({ ...editStaff, email: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Telefon</label>
-                                    <input
-                                        type="tel"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        value={editStaff.phone || ''}
-                                        onChange={(e) => setEditStaff({ ...editStaff, phone: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Rol / Pozisyon</label>
-                                    <select
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none appearance-none"
-                                        value={editStaff.role}
-                                        onChange={(e) => setEditStaff({ ...editStaff, role: e.target.value })}
-                                    >
-                                        <option value="Yönetici" className="bg-[#0f111a]">👑 Yönetici</option>
-                                        <option value="Şube Müdürü" className="bg-[#0f111a]">🏢 Şube Müdürü</option>
-                                        <option value="Muhasebe" className="bg-[#0f111a]">💰 Muhasebe</option>
-                                        <option value="Denetçi" className="bg-[#0f111a]">🔍 Denetçi (Auditor)</option>
-                                        <option value="Servis Personeli" className="bg-[#0f111a]">🔧 Servis Personeli</option>
-                                        <option value="Satış Temsilcisi" className="bg-[#0f111a]">🤝 Satış Temsilcisi</option>
-                                        <option value="Saha Satış Personeli" className="bg-[#0f111a]">📍 Saha Satış Personeli</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Şube</label>
-                                    <select
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none appearance-none"
-                                        value={editStaff.branch}
-                                        onChange={(e) => setEditStaff({ ...editStaff, branch: e.target.value })}
-                                    >
-                                        {branches.map(b => (
-                                            <option key={b.id} value={b.name} className="bg-[#0f111a]">{b.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Maaş (Net)</label>
-                                    <input
-                                        type="number"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                        value={editStaff.salary}
-                                        onChange={(e) => setEditStaff({ ...editStaff, salary: e.target.value })}
-                                    />
-                                </div>
-                            </div>
 
-                            {/* DOCUMENT UPLOAD SECTION */}
-                            <div className="pt-6 border-t border-white/5">
-                                <h3 className="text-sm font-black text-white mb-4">📄 Personel Belgeleri</h3>
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        {staffDocuments.map(doc => (
-                                            <div key={doc.id} className="p-3 bg-white/5 rounded-xl border border-white/5 flex justify-between items-center group">
-                                                <div className="flex items-center gap-3 overflow-hidden">
-                                                    <span className="text-xl">📄</span>
-                                                    <div className="truncate">
-                                                        <div className="text-xs font-bold text-white truncate">{doc.fileName}</div>
-                                                        <div className="text-[10px] text-white/40">{new Date(doc.uploadedAt).toLocaleDateString()}</div>
+                        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                {/* SOL KOLON: ÖZLÜK BİLGİLERİ */}
+                                <div className="lg:col-span-2 space-y-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                                                <span className="w-2 h-2 rounded-full bg-primary" /> KİMLİK & KİŞİSEL
+                                            </h3>
+                                            <div className="space-y-3">
+                                                <div className="group">
+                                                    <label className="text-[10px] font-bold text-white/20 uppercase group-focus-within:text-primary/50 transition-colors">Doğum Tarihi</label>
+                                                    <input type="date" className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white focus:border-primary/30 outline-none mt-1" value={editStaff.birthDate ? new Date(editStaff.birthDate).toISOString().split('T')[0] : ''} onChange={(e) => setEditStaff({ ...editStaff, birthDate: e.target.value })} />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-white/20 uppercase">Medeni Durum</label>
+                                                        <select className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.maritalStatus || ''} onChange={(e) => setEditStaff({ ...editStaff, maritalStatus: e.target.value })}>
+                                                            <option value="">Seçiniz</option>
+                                                            <option value="Bekar">Bekar</option>
+                                                            <option value="Evli">Evli</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-white/20 uppercase">Kan Grubu</label>
+                                                        <select className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.bloodType || ''} onChange={(e) => setEditStaff({ ...editStaff, bloodType: e.target.value })}>
+                                                            <option value="">Seçiniz</option>
+                                                            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-'].map(t => <option key={t} value={t}>{t}</option>)}
+                                                        </select>
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <a href={doc.fileData} download={doc.fileName} className="w-8 h-8 flex items-center justify-center rounded bg-primary/20 text-primary hover:bg-primary hover:text-white transition-all">⬇</a>
-                                                    <button onClick={() => handleDeleteDocument(doc.id)} className="w-8 h-8 flex items-center justify-center rounded bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all">🗑️</button>
+                                                <div className="group">
+                                                    <label className="text-[10px] font-bold text-white/20 uppercase">Eğitim Durumu</label>
+                                                    <select className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.educationLevel || ''} onChange={(e) => setEditStaff({ ...editStaff, educationLevel: e.target.value })}>
+                                                        <option value="">Seçiniz</option>
+                                                        <option value="İlkokul">İlkokul</option>
+                                                        <option value="Ortaokul">Ortaokul</option>
+                                                        <option value="Lise">Lise</option>
+                                                        <option value="Önlisans">Önlisans</option>
+                                                        <option value="Lisans">Lisans</option>
+                                                        <option value="Yüksek Lisans">Yüksek Lisans</option>
+                                                    </select>
+                                                </div>
+                                                <div className="group">
+                                                    <label className="text-[10px] font-bold text-white/20 uppercase">Askerlik Durumu</label>
+                                                    <select className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.militaryStatus || ''} onChange={(e) => setEditStaff({ ...editStaff, militaryStatus: e.target.value })}>
+                                                        <option value="">Seçiniz</option>
+                                                        <option value="Yapıldı">Yapıldı</option>
+                                                        <option value="Muaf">Muaf</option>
+                                                        <option value="Tecilli">Tecilli</option>
+                                                    </select>
                                                 </div>
                                             </div>
-                                        ))}
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                                                <span className="w-2 h-2 rounded-full bg-primary" /> İLETİŞİM & ADRES
+                                            </h3>
+                                            <div className="space-y-3">
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-white/20 uppercase">İl</label>
+                                                        <input type="text" className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.city || ''} onChange={(e) => setEditStaff({ ...editStaff, city: e.target.value })} />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-white/20 uppercase">İlçe</label>
+                                                        <input type="text" className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.district || ''} onChange={(e) => setEditStaff({ ...editStaff, district: e.target.value })} />
+                                                    </div>
+                                                </div>
+                                                <div className="group">
+                                                    <label className="text-[10px] font-bold text-white/20 uppercase">Acil Durum Yakını</label>
+                                                    <input type="text" className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" placeholder="İsim - Telefon" value={editStaff.relativeName || ''} onChange={(e) => setEditStaff({ ...editStaff, relativeName: e.target.value })} />
+                                                </div>
+                                                <div className="group">
+                                                    <label className="text-[10px] font-bold text-white/20 uppercase">Tam Adres</label>
+                                                    <textarea className="w-full h-24 bg-white/[0.03] border border-white/5 rounded-xl p-3 text-sm text-white outline-none mt-1 resize-none" value={editStaff.address || ''} onChange={(e) => setEditStaff({ ...editStaff, address: e.target.value })} />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div className={`border-2 border-dashed border-white/10 rounded-xl p-8 text-center transition-all ${isUploading ? 'opacity-50 pointer-events-none' : 'hover:border-primary/50 hover:bg-primary/5'}`}>
-                                        <input
-                                            type="file"
-                                            id="doc-upload"
-                                            className="hidden"
-                                            onChange={handleFileUpload}
-                                        />
-                                        <label htmlFor="doc-upload" className="cursor-pointer flex flex-col items-center gap-2">
-                                            <span className="text-2xl">☁️</span>
-                                            <span className="text-sm font-bold text-white">Dosya Yükle</span>
-                                            <span className="text-xs text-white/40">Sözleşme, kimlik vb. belgeler (Max 5MB)</span>
-                                        </label>
+                                    {/* EK BİLGİLER & NOTLAR */}
+                                    <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4">
+                                        <h3 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">🚩 Kurumsal & Ek Bilgiler</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-3">
+                                                <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                                                    <span className="text-[10px] font-bold text-white/40 uppercase">Ehliyet</span>
+                                                    <button
+                                                        onClick={() => setEditStaff({ ...editStaff, hasDriverLicense: !editStaff.hasDriverLicense })}
+                                                        className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${editStaff.hasDriverLicense ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-white/10 text-white/40'}`}
+                                                    >
+                                                        {editStaff.hasDriverLicense ? 'VAR' : 'YOK'}
+                                                    </button>
+                                                </div>
+                                                <div className="group">
+                                                    <label className="text-[10px] font-bold text-white/20 uppercase">Referans</label>
+                                                    <input type="text" className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.reference || ''} onChange={(e) => setEditStaff({ ...editStaff, reference: e.target.value })} />
+                                                </div>
+                                            </div>
+                                            <div className="group">
+                                                <label className="text-[10px] font-bold text-white/20 uppercase">Personel Notları</label>
+                                                <textarea className="w-full h-[92px] bg-white/[0.03] border border-white/5 rounded-xl p-3 text-sm text-white outline-none mt-1 resize-none" placeholder="Örn: Sağlık durumu, özel yetenekler vb." value={editStaff.notes || ''} onChange={(e) => setEditStaff({ ...editStaff, notes: e.target.value })} />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button onClick={handleEditStaff} disabled={isProcessing} className="w-full h-14 bg-primary text-white rounded-xl font-black text-xs tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.01] active:scale-[0.99] transition-all">
+                                        {isProcessing ? 'GÜNCELLENİYOR...' : 'ÖZLÜK BİLGİLERİNİ GÜNCELLE'}
+                                    </button>
+                                </div>
+
+                                {/* SAĞ KOLON: DİJİTAL DOSYALAR */}
+                                <div className="space-y-6">
+                                    <div className="p-6 bg-[#151821] border border-white/5 rounded-2xl flex flex-col h-full min-h-[400px]">
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h3 className="text-[10px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
+                                                <span className="w-2 h-2 rounded-full bg-emerald-500" /> DİJİTAL ARŞİV
+                                            </h3>
+                                            <span className="text-[10px] font-bold text-white/20 bg-white/5 px-2 py-1 rounded-md">{staffDocuments.length} DOSYA</span>
+                                        </div>
+
+                                        <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar mb-6 pr-1">
+                                            {staffDocuments.length === 0 ? (
+                                                <div className="h-40 flex flex-col items-center justify-center text-white/10 gap-3 grayscale opacity-30">
+                                                    <span className="text-4xl">📂</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest">Arşiv Henüz Boş</span>
+                                                </div>
+                                            ) : (
+                                                staffDocuments.map(doc => (
+                                                    <div key={doc.id} className="p-3 bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 rounded-xl flex justify-between items-center group transition-all">
+                                                        <div className="flex items-center gap-3 overflow-hidden">
+                                                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-lg">
+                                                                {doc.fileType.includes('pdf') ? '📕' : '🖼️'}
+                                                            </div>
+                                                            <div className="truncate">
+                                                                <div className="text-[11px] font-bold text-white/80 truncate">{doc.fileName}</div>
+                                                                <div className="text-[9px] text-white/20 uppercase tracking-tighter">{new Date(doc.uploadedAt).toLocaleDateString()} • {(doc.fileSize / 1024).toFixed(0)} KB</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                                            <a href={doc.fileData} download={doc.fileName} className="w-7 h-7 flex items-center justify-center rounded bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all text-xs">⬇</a>
+                                                            <button onClick={() => handleDeleteDocument(doc.id)} className="w-7 h-7 flex items-center justify-center rounded bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all text-xs">🗑️</button>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+
+                                        <div className={`mt-auto shrink-0 border-2 border-dashed border-white/5 rounded-2xl p-6 text-center transition-all ${isUploading ? 'opacity-50 pointer-events-none' : 'hover:border-primary/30 hover:bg-primary/5 group'}`}>
+                                            <input type="file" id="doc-upload" className="hidden" onChange={handleFileUpload} accept=".pdf,.png,.jpg,.jpeg" />
+                                            <label htmlFor="doc-upload" className="cursor-pointer flex flex-col items-center gap-2">
+                                                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/20 transition-all">
+                                                    <span className="text-xl">📤</span>
+                                                </div>
+                                                <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">Belge Yükle</span>
+                                                <span className="text-[8px] text-white/20 leading-tight uppercase">PDF, PNG, JPEG (MAX 5MB)</span>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <button
-                                onClick={handleEditStaff}
-                                disabled={isProcessing}
-                                className="w-full h-14 bg-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
-                            >
-                                {isProcessing ? 'GÜNCELLENİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
-                            </button>
                         </div>
                     </div>
                 </div>

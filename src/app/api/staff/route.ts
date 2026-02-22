@@ -54,7 +54,12 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const { name, role, salary, branch, phone, email, type, username, companyId } = body;
+        const {
+            name, role, salary, branch, phone, email, type, username, companyId,
+            birthDate, maritalStatus, bloodType, militaryStatus, reference,
+            hasDriverLicense, educationLevel, city, district, relativeName,
+            relativePhone, healthReport, certificate, notes, address
+        } = body;
 
         // Basic validation
         if (!name) return NextResponse.json({ success: false, error: 'İsim zorunludur' }, { status: 400 });
@@ -73,7 +78,22 @@ export async function POST(req: Request) {
                 email,
                 type: type || 'service',
                 tenantId: effectiveTenantId,
-                companyId: companyId || user.companyId
+                companyId: companyId || user.companyId,
+                address,
+                city,
+                district,
+                birthDate: birthDate ? new Date(birthDate) : null,
+                maritalStatus,
+                bloodType,
+                militaryStatus,
+                educationLevel,
+                hasDriverLicense: !!hasDriverLicense,
+                reference,
+                relativeName,
+                relativePhone,
+                healthReport,
+                certificate,
+                notes
             }
         });
 
@@ -129,17 +149,32 @@ export async function PUT(req: Request) {
 
     try {
         const body = await req.json();
-        const { id, ...data } = body;
+        const {
+            id, name, email, phone, role, salary, branch, type,
+            birthDate, maritalStatus, bloodType, militaryStatus, reference,
+            hasDriverLicense, educationLevel, city, district, relativeName,
+            relativePhone, healthReport, certificate, notes, address
+        } = body;
 
         if (!id) return NextResponse.json({ success: false, error: 'ID zorunludur' }, { status: 400 });
 
-        // Convert numeric fields if they exist
-        if (data.salary) data.salary = parseFloat(data.salary);
-        if (data.age) data.age = parseInt(data.age);
+        const updateData: any = {
+            name, email, phone, role, branch, type,
+            maritalStatus, bloodType, militaryStatus, reference,
+            educationLevel, city, district, relativeName,
+            relativePhone, healthReport, certificate, notes, address,
+            hasDriverLicense: hasDriverLicense !== undefined ? !!hasDriverLicense : undefined
+        };
+
+        if (salary !== undefined) updateData.salary = parseFloat(salary);
+        if (birthDate) updateData.birthDate = new Date(birthDate);
+
+        // Remove undefined fields
+        Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
 
         const updatedStaff = await prisma.staff.update({
             where: { id },
-            data
+            data: updateData
         });
 
         return NextResponse.json({ success: true, staff: updatedStaff });
