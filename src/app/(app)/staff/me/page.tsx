@@ -12,7 +12,8 @@ import {
     IconRefresh
 } from '@/components/icons/PremiumIcons';
 import { useApp } from '@/contexts/AppContext';
-import BarcodeScanner from '@/components/BarcodeScanner';
+import dynamic from 'next/dynamic';
+const BarcodeScanner = dynamic(() => import('@/components/BarcodeScanner'), { ssr: false });
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -49,7 +50,13 @@ const ProgressBar = ({ label, value, max, color = "bg-emerald-500" }: any) => {
 
 // --- SUB-PAGES ---
 
-const DashboardView = ({ stats }: any) => (
+const DashboardView = ({
+    handleQrCheckin,
+    handleGpsCheckin,
+    isScannerOpen,
+    setIsScannerOpen,
+    onQrScan
+}: any) => (
     <div className="space-y-8 animate-in fade-in duration-500">
         {/* Top Summary */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -527,7 +534,15 @@ export default function PersonelPanel() {
             </div>
 
             {/* Content Rendering */}
-            {activeTab === 'dashboard' && <DashboardView />}
+            {activeTab === 'dashboard' && (
+                <DashboardView
+                    handleQrCheckin={handleQrCheckin}
+                    handleGpsCheckin={handleGpsCheckin}
+                    isScannerOpen={isScannerOpen}
+                    setIsScannerOpen={setIsScannerOpen}
+                    onQrScan={onQrScan}
+                />
+            )}
             {activeTab === 'leave' && <LeaveRequestView />}
             {activeTab === 'profile' && <ProfileSettingsView user={currentUser} />}
 
