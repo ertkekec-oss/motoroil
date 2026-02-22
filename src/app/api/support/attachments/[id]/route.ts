@@ -3,13 +3,14 @@ import { getSession } from '@/lib/auth';
 import { getLabelSignedUrl } from '@/lib/s3';
 import prisma from '@/lib/prisma';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await getSession();
     if (!session?.tenantId) return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
 
     try {
         const attachment = await prisma.ticketAttachment.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: { ticket: true }
         });
 

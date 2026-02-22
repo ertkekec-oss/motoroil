@@ -3,7 +3,8 @@ import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { sendMail } from '@/lib/mail';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await getSession();
     // RBAC Check for Admin Access
     if (!session || (session.tenantId !== 'PLATFORM_ADMIN' && session.role !== 'SUPER_ADMIN' && session.role !== 'SUPPORT_AGENT')) {
@@ -18,7 +19,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             return NextResponse.json({ error: 'Mesaj boş bırakılamaz' }, { status: 400 });
         }
 
-        const ticketId = params.id;
+        const ticketId = id;
         const ticket = await prisma.ticket.findUnique({
             where: { id: ticketId },
             include: { relatedHelpTopic: true }

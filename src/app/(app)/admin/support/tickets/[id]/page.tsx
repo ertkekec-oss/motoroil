@@ -39,7 +39,8 @@ function AttachmentLink({ attachment }: { attachment: any }) {
     );
 }
 
-export default async function AdminTicketDetailPage({ params }: { params: { id: string } }) {
+export default async function AdminTicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await getSession();
     // RBAC
     if (!session || (session.tenantId !== 'PLATFORM_ADMIN' && session.role !== 'SUPER_ADMIN' && session.role !== 'SUPPORT_AGENT')) {
@@ -47,7 +48,7 @@ export default async function AdminTicketDetailPage({ params }: { params: { id: 
     }
 
     const ticket = await prisma.ticket.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             messages: {
                 orderBy: { createdAt: 'asc' },

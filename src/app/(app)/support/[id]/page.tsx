@@ -39,12 +39,13 @@ function AttachmentLink({ attachment }: { attachment: any }) {
     );
 }
 
-export default async function TicketDetailPage({ params }: { params: { id: string } }) {
+export default async function TicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await getSession();
     if (!session?.tenantId) redirect('/login');
 
     const ticket = await prisma.ticket.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             messages: {
                 orderBy: { createdAt: 'asc' },

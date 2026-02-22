@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await getSession();
     if (!session || (session.tenantId !== 'PLATFORM_ADMIN' && session.role !== 'SUPER_ADMIN' && session.role !== 'SUPPORT_AGENT')) {
         return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
@@ -19,7 +20,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         if (priority !== undefined) updateData.priority = priority;
 
         const ticket = await prisma.ticket.update({
-            where: { id: params.id },
+            where: { id },
             data: updateData
         });
 
@@ -27,7 +28,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         if (assignedToUserId) {
             await prisma.ticketMessage.create({
                 data: {
-                    ticketId: params.id,
+                    ticketId: id,
                     authorType: 'SYSTEM',
                     authorId: 'SYSTEM',
                     body: `Bu talep şuraya atandı: ${assignedToUserId}`,
