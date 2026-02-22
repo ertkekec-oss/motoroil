@@ -49,7 +49,8 @@ export const sendMail = async ({ to, subject, text, html, companyId }: { to: str
     }
 
     // Determine service or host
-    const isGmail = smtpConfig.email.toLowerCase().includes('gmail.com');
+    const isGmail = smtpConfig.email.toLowerCase().includes('gmail.com') ||
+        smtpConfig.email.toLowerCase().includes('periodya.com');
 
     const transportOptions: any = {
         host: isGmail ? 'smtp.gmail.com' : (smtpConfig.email.split('@')[1] ? `smtp.${smtpConfig.email.split('@')[1]}` : 'smtp.gmail.com'),
@@ -74,7 +75,8 @@ export const sendMail = async ({ to, subject, text, html, companyId }: { to: str
         transportOptions.service = 'gmail';
     } else {
         // More robust generic SMTP
-        transportOptions.host = smtpConfig.email.split('@')[1] ? `smtp.${smtpConfig.email.split('@')[1]}` : 'smtp.gmail.com';
+        const domain = smtpConfig.email.split('@')[1];
+        transportOptions.host = domain ? `smtp.${domain}` : 'smtp.gmail.com';
         transportOptions.port = 465;
         transportOptions.secure = true;
     }
