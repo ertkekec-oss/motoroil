@@ -10,7 +10,10 @@ export async function GET(req: Request) {
     const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
     const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
 
-    if (!isPlatformAdmin && auth.user.role?.toLowerCase() !== 'admin' && auth.user.role?.toLowerCase() !== 'müdür') {
+    if (!isPlatformAdmin &&
+        auth.user.role?.toLowerCase() !== 'admin' &&
+        auth.user.role?.toLowerCase() !== 'müdür' &&
+        !auth.user.permissions?.includes('staff_manage')) {
         return NextResponse.json({ success: false, error: "Bu işlem için yetkiniz bulunmamaktadır." }, { status: 403 });
     }
 
@@ -33,8 +36,11 @@ export async function POST(req: Request) {
     const isPlatformAdmin = auth.user.tenantId === 'PLATFORM_ADMIN' || auth.user.role === 'SUPER_ADMIN';
     const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
 
-    // Sadece admin yetkisi olanlar tablet ekleyebilir
-    if (!isPlatformAdmin && auth.user.role?.toLowerCase() !== 'admin' && auth.user.role?.toLowerCase() !== 'müdür') {
+    // Yetki kontrolü
+    if (!isPlatformAdmin &&
+        auth.user.role?.toLowerCase() !== 'admin' &&
+        auth.user.role?.toLowerCase() !== 'müdür' &&
+        !auth.user.permissions?.includes('staff_manage')) {
         return NextResponse.json({ success: false, error: "Tablet ekleme yetkiniz bulunmamaktadır." }, { status: 403 });
     }
 
