@@ -57,7 +57,8 @@ export async function POST(request: Request) {
                 to: email,
                 subject: '🔑 Periodya Şifre Sıfırlama Talebi',
                 html: htmlBody,
-                text: `Şifrenizi sıfırlamak için şu bağlantıyı kullanın: ${resetLink}`
+                text: `Şifrenizi sıfırlamak için şu bağlantıyı kullanın: ${resetLink}`,
+                companyId: targetUser.companyId
             });
         }
 

@@ -4,14 +4,16 @@ import { prisma } from '@/lib/prisma';
 export const sendMail = async ({ to, subject, text, html, companyId }: { to: string, subject: string, text?: string, html?: string, companyId?: string }) => {
     // 1. SMTP Ayarlarını Belirle (Varsayılan ENV ayarları)
     let smtpConfig = {
-        email: process.env.SMTP_EMAIL || 'motoroil.app.demo@gmail.com',
-        password: process.env.SMTP_PASSWORD || ''
+        email: process.env.SMTP_EMAIL || 'info@periodya.com',
+        password: process.env.SMTP_PASSWORD || 'ezgf kvdd mact qtcd'
     };
 
     // 2. Eğer companyId verilmişse o firmanın özel SMTP ayarlarını çek
+    // 3. Eğer companyId yoksa veya ayar bulunamazsa, sistemdeki herhangi bir geçerli SMTP ayarını "Master" olarak kullanmayı dene
     try {
+        let dbSettings = null;
         if (companyId) {
-            const dbSettings = await (prisma as any).appSettings.findUnique({
+            dbSettings = await (prisma as any).appSettings.findUnique({
                 where: {
                     companyId_key: {
                         companyId: companyId,
@@ -19,19 +21,26 @@ export const sendMail = async ({ to, subject, text, html, companyId }: { to: str
                     }
                 }
             });
+        }
 
-            if (dbSettings && dbSettings.value) {
-                const val = dbSettings.value as any;
-                if (val.email && val.password) {
-                    smtpConfig = {
-                        email: val.email,
-                        password: val.password.replace(/\s/g, '')
-                    };
-                }
+        // Fallback to first available SMTP settings if none found for company
+        if (!dbSettings) {
+            dbSettings = await (prisma as any).appSettings.findFirst({
+                where: { key: 'smtp_settings' }
+            });
+        }
+
+        if (dbSettings && dbSettings.value) {
+            const val = dbSettings.value as any;
+            if (val.email && val.password) {
+                smtpConfig = {
+                    email: val.email,
+                    password: val.password.replace(/\s/g, '')
+                };
             }
         }
     } catch (e) {
-        console.warn(`[MAILER] ${companyId} için SMTP ayarları çekilemedi, varsayılan kullanılıyor.`, e);
+        console.warn(`[MAILER] SMTP ayarları çekilemedi, varsayılan kullanılıyor.`, e);
     }
 
     if (!smtpConfig.email || !smtpConfig.password) {
@@ -65,7 +74,7 @@ export const sendMail = async ({ to, subject, text, html, companyId }: { to: str
         transportOptions.service = 'gmail';
     } else {
         // More robust generic SMTP
-        transportOptions.host = isGmail ? 'smtp.gmail.com' : 'smtp.gmail.com'; // Defaulting to gmail if unsure, but let's try to be smarter
+        transportOptions.host = smtpConfig.email.split('@')[1] ? `smtp.${smtpConfig.email.split('@')[1]}` : 'smtp.gmail.com';
         transportOptions.port = 465;
         transportOptions.secure = true;
     }
