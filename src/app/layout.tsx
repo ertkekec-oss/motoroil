@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import CookieConsent from "@/components/CookieConsent";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="tr" suppressHydrationWarning={true}>
       <body suppressHydrationWarning={true}>
         <Providers>{children}</Providers>
+        <CookieConsent />
       </body>
     </html>
   );
