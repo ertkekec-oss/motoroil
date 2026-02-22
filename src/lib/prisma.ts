@@ -141,6 +141,31 @@ const prismaClientSingleton = () => {
                             } else if (modelName === 'warranty') {
                                 // Nested through customer
                                 newArgs.where = { ...newArgs.where, customer: { company: { tenantId: effectiveTenantId } } };
+                            } else if (modelName === 'helpcategory') {
+                                // Global Models - No tenant isolation for read
+                            } else if (modelName === 'helptopic') {
+                                // HelpTopics can be global (null) or tenant-specific
+                                if (isRead) {
+                                    newArgs.where = {
+                                        ...newArgs.where,
+                                        OR: [
+                                            { tenantId: effectiveTenantId },
+                                            { tenantId: null }
+                                        ]
+                                    };
+                                } else {
+                                    newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
+                                }
+                            } else if (['ticket', 'ticketmessage', 'ticketattachment'].includes(modelName)) {
+                                if (modelName === 'ticket') {
+                                    newArgs.where = { ...newArgs.where, tenantId: effectiveTenantId };
+                                } else {
+                                    // ticketMessage and ticketAttachment have a ticket relation
+                                    newArgs.where = {
+                                        ...newArgs.where,
+                                        ticket: { tenantId: effectiveTenantId }
+                                    };
+                                }
                             } else if (modelName === 'securityevent') {
                                 // Shared/System model
                             } else {
@@ -162,7 +187,7 @@ const prismaClientSingleton = () => {
 
                         // Mutation Protection (Ensure companyId matches tenant)
                         if (['create', 'createMany'].includes(operation)) {
-                            if (!['company', 'user', 'tenant', 'subscription'].includes(modelName)) {
+                            if (!['company', 'user', 'tenant', 'subscription', 'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic', 'loginattempt'].includes(modelName)) {
                                 const data = (newArgs as any).data;
                                 if (data && !isPlatformAdmin) {
                                     const validateItem = (item: any) => {
