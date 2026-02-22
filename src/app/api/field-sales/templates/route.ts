@@ -10,29 +10,23 @@ export async function GET(req: NextRequest) {
         const session: any = await getSession();
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        // Resolve Company ID
         let company;
         if (session.tenantId === 'PLATFORM_ADMIN') {
             company = await (prisma as any).company.findFirst();
         } else {
-            company = await (prisma as any).company.findFirst({
-                where: { tenantId: session.tenantId }
-            });
+            company = await (prisma as any).company.findFirst({ where: { tenantId: session.tenantId } });
         }
 
-        if (!company) {
-            return NextResponse.json({ error: 'Firma bulunamadı' }, { status: 404 });
-        }
+        if (!company) return NextResponse.json({ error: 'Firma bulunamadı' }, { status: 404 });
 
         const templates = await (prisma as any).routeTemplate.findMany({
             where: { companyId: company.id },
             include: {
                 stops: {
                     include: {
-                        customer: {
-                            select: { id: true, name: true, address: true, city: true, district: true }
-                        }
-                    }
+                        customer: { select: { id: true, name: true, address: true, city: true, district: true } }
+                    },
+                    orderBy: { sequence: 'asc' }
                 }
             },
             orderBy: { name: 'asc' }
@@ -50,23 +44,18 @@ export async function POST(req: NextRequest) {
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const body = await req.json();
-        const { name, stops } = body; // stops: { customerId: string, sequence: number }[]
+        const { name, stops } = body;
 
         if (!name) return NextResponse.json({ error: 'İsim gerekli' }, { status: 400 });
 
-        // Resolve Company ID
         let company;
         if (session.tenantId === 'PLATFORM_ADMIN') {
             company = await (prisma as any).company.findFirst();
         } else {
-            company = await (prisma as any).company.findFirst({
-                where: { tenantId: session.tenantId }
-            });
+            company = await (prisma as any).company.findFirst({ where: { tenantId: session.tenantId } });
         }
 
-        if (!company) {
-            return NextResponse.json({ error: 'Firma bulunamadı' }, { status: 404 });
-        }
+        if (!company) return NextResponse.json({ error: 'Firma bulunamadı' }, { status: 404 });
 
         const template = await (prisma as any).routeTemplate.create({
             data: {
@@ -79,9 +68,7 @@ export async function POST(req: NextRequest) {
                     })) || []
                 }
             },
-            include: {
-                stops: true
-            }
+            include: { stops: true }
         });
 
         return NextResponse.json(template);

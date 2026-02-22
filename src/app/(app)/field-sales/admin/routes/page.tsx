@@ -31,6 +31,10 @@ export default function AdminRoutesPage() {
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [selectedCustomers, setSelectedCustomers] = useState<any[]>([]);
 
+    // Şablon düzenleme
+    const [editingTemplate, setEditingTemplate] = useState<any>(null);
+    const [editTemplateName, setEditTemplateName] = useState('');
+
     const searchCustomers = async (query: string) => {
         if (query.length < 2) { setSearchResults([]); return; }
         try {
@@ -73,6 +77,62 @@ export default function AdminRoutesPage() {
         } finally {
             setIsProcessing(false);
         }
+    };
+
+    const handleDeleteTemplate = async (template: any) => {
+        showConfirm(
+            'Şablonu Sil',
+            `"${template.name}" şablonunu silmek istediğinize emin misiniz?`,
+            async () => {
+                try {
+                    const res = await fetch(`/api/field-sales/templates/${template.id}`, { method: 'DELETE' });
+                    if (res.ok) {
+                        showSuccess('Silindi', 'Şablon silindi.');
+                        fetchData();
+                    } else {
+                        showError('Hata', 'Şablon silinemedi.');
+                    }
+                } catch (e) { showError('Hata', 'Bir hata oluştu.'); }
+            }
+        );
+    };
+
+    const handleRenameTemplate = async () => {
+        if (!editingTemplate || !editTemplateName.trim()) return;
+        setIsProcessing(true);
+        try {
+            const res = await fetch(`/api/field-sales/templates/${editingTemplate.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: editTemplateName })
+            });
+            if (res.ok) {
+                showSuccess('Güncellendi', 'Şablon adı değiştirildi.');
+                setEditingTemplate(null);
+                fetchData();
+            } else {
+                showError('Hata', 'Güncellenemedi.');
+            }
+        } catch (e) { showError('Hata', 'Bir hata oluştu.'); }
+        finally { setIsProcessing(false); }
+    };
+
+    const handleDeleteRoute = (route: any) => {
+        showConfirm(
+            'Rotayı Sil',
+            `"${route.name}" rotasını silmek istediğinize emin misiniz?`,
+            async () => {
+                try {
+                    const res = await fetch(`/api/field-sales/routes/${route.id}`, { method: 'DELETE' });
+                    if (res.ok) {
+                        showSuccess('Silindi', 'Rota silindi.');
+                        fetchData();
+                    } else {
+                        showError('Hata', 'Rota silinemedi.');
+                    }
+                } catch (e) { showError('Hata', 'Bir hata oluştu.'); }
+            }
+        );
     };
 
     useEffect(() => {
@@ -264,7 +324,10 @@ export default function AdminRoutesPage() {
                     <div className="bg-white/5 border border-white/5 rounded-3xl p-6">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-blue-400">Rota Şablonları</h3>
-                            <span className="text-[9px] text-gray-600 font-black uppercase">SADECE GÖRÜNTÜLEME</span>
+                            <button
+                                onClick={() => setShowCreateTemplateModal(true)}
+                                className="text-[10px] font-black text-blue-400/50 hover:text-blue-400 uppercase transition-colors"
+                            >+ Yeni</button>
                         </div>
 
                         <div className="space-y-3">
@@ -273,15 +336,28 @@ export default function AdminRoutesPage() {
                                     key={template.id}
                                     draggable
                                     onDragStart={(e) => { e.dataTransfer.setData('templateId', template.id); }}
-                                    className="p-4 bg-white/[0.03] border border-white/5 rounded-2xl cursor-grab active:cursor-grabbing hover:border-blue-500/30 transition-all group"
+                                    className="p-3 bg-white/[0.03] border border-white/5 rounded-2xl hover:border-blue-500/20 transition-all group"
                                 >
-                                    <div className="font-bold text-sm mb-1 group-hover:text-blue-400 transition-colors">{template.name}</div>
-                                    <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest flex items-center gap-2">
-                                        <span>📍 {template.stops?.length || 0} Durak</span>
-                                        <span className="opacity-20">•</span>
-                                        <span>Sürükle & Bırak</span>
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="cursor-grab flex-1 min-w-0">
+                                            <div className="font-bold text-sm truncate group-hover:text-blue-400 transition-colors">{template.name}</div>
+                                            <div className="text-[10px] text-gray-500 font-bold uppercase mt-0.5">
+                                                📍 {template.stops?.length || 0} durak • Sürükle
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setEditingTemplate(template); setEditTemplateName(template.name); }}
+                                                className="w-6 h-6 rounded-lg bg-white/5 hover:bg-blue-500/20 hover:text-blue-400 flex items-center justify-center text-xs transition-all"
+                                                title="Adını düzenle"
+                                            >✏️</button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(template); }}
+                                                className="w-6 h-6 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center text-xs transition-all"
+                                                title="Sil"
+                                            >✕</button>
+                                        </div>
                                     </div>
-                                    {/* Not: Şablonlar silinemez/düzenlenemez */}
                                 </div>
                             ))}
                             {templates.length === 0 && (
@@ -374,20 +450,30 @@ export default function AdminRoutesPage() {
                                                     {dayRoutes.map(route => (
                                                         <div
                                                             key={route.id}
-                                                            onClick={() => router.push(`/field-sales/admin/routes/${route.id}`)}
-                                                            className={`p-2.5 rounded-2xl border cursor-pointer hover:scale-[1.02] transition-all text-left ${route.status === 'COMPLETED'
+                                                            className={`p-2 rounded-2xl border transition-all text-left group/card relative ${route.status === 'COMPLETED'
                                                                 ? 'bg-green-500/10 border-green-500/20 text-green-400'
                                                                 : route.status === 'ACTIVE'
-                                                                    ? 'bg-blue-600 border-blue-500 shadow-xl shadow-blue-900/30'
+                                                                    ? 'bg-blue-600/80 border-blue-500 shadow-xl shadow-blue-900/30'
                                                                     : 'bg-white/5 border-white/10 text-white/60'
                                                                 }`}
                                                         >
-                                                            <div className="text-[9px] font-black truncate">{route.name}</div>
-                                                            <div className="flex items-center justify-between text-[8px] font-bold uppercase opacity-60 mt-0.5">
-                                                                <span>📍 {route._count?.stops || 0}</span>
-                                                                {route.status === 'COMPLETED' && <span>✅</span>}
-                                                                {route.status === 'ACTIVE' && <span className="animate-pulse">🟢</span>}
+                                                            <div
+                                                                onClick={() => router.push(`/field-sales/admin/routes/${route.id}`)}
+                                                                className="cursor-pointer"
+                                                            >
+                                                                <div className="text-[9px] font-black truncate pr-8">{route.name}</div>
+                                                                <div className="flex items-center justify-between text-[8px] font-bold uppercase opacity-60 mt-0.5">
+                                                                    <span>📍 {route._count?.stops || 0}</span>
+                                                                    {route.status === 'COMPLETED' && <span>✅</span>}
+                                                                    {route.status === 'ACTIVE' && <span className="animate-pulse">🟢</span>}
+                                                                </div>
                                                             </div>
+                                                            {/* Silme Butonu */}
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleDeleteRoute(route); }}
+                                                                className="absolute top-1 right-1 w-5 h-5 rounded-lg bg-black/30 hover:bg-red-500/30 hover:text-red-400 flex items-center justify-center text-[10px] opacity-0 group-hover/card:opacity-100 transition-all"
+                                                                title="Rotayı Sil"
+                                                            >✕</button>
                                                         </div>
                                                     ))}
 
@@ -588,6 +674,41 @@ export default function AdminRoutesPage() {
                                         {isProcessing ? 'KAYDEDİLİYOR...' : 'ŞABLONU OLUŞTUR'}
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Şablon Adı Düzenleme Modalı */}
+            {editingTemplate && (
+                <div className="fixed inset-0 bg-black/85 backdrop-blur-xl z-[120] flex items-center justify-center p-4">
+                    <div className="bg-[#161b22] border border-white/10 w-full max-w-md rounded-3xl shadow-2xl p-8">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-black">Şablon Adını Değiştir</h2>
+                            <button onClick={() => setEditingTemplate(null)} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 text-xl">×</button>
+                        </div>
+                        <div className="space-y-4">
+                            <input
+                                type="text"
+                                autoFocus
+                                value={editTemplateName}
+                                onChange={e => setEditTemplateName(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && handleRenameTemplate()}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:border-blue-500 focus:outline-none text-sm font-bold"
+                                placeholder="Şablon adı..."
+                            />
+                            <div className="flex gap-3">
+                                <button onClick={() => setEditingTemplate(null)} className="flex-1 py-3 rounded-xl border border-white/10 font-black text-xs uppercase tracking-widest hover:bg-white/5 transition-all">
+                                    İPTAL
+                                </button>
+                                <button
+                                    onClick={handleRenameTemplate}
+                                    disabled={isProcessing || !editTemplateName.trim()}
+                                    className="flex-[2] py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-widest transition-all disabled:opacity-50"
+                                >
+                                    {isProcessing ? 'KAYDEDİLİYOR...' : 'KAYDET'}
+                                </button>
                             </div>
                         </div>
                     </div>
