@@ -1977,3 +1977,136 @@ model Expense {
   @@index([companyId])
   @@index([date])
 }
+
+// --- YARDIM MERKEZİ (KNOWLEDGE BASE) ---
+
+model HelpCategory {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String?
+  order       Int         @default(0)
+  topics      HelpTopic[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model HelpTopic {
+  id          String        @id @default(cuid())
+  categoryId  String
+  category    HelpCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  title       String
+  slug        String        @unique
+  excerpt     String?
+  body        String        @db.Text // Markdown content
+  
+  status      TopicStatus   @default(DRAFT)
+  order       Int           @default(0)
+  
+  // Visibility: NULL = Global (All Tenants), yoksa specific tenant
+  tenantId    String?       
+  
+  upvotes     Int           @default(0)
+  downvotes   Int           @default(0)
+
+  tickets     Ticket[]      // Bu konu ile ilişkilendirilmiş talepler
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+enum TopicStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// --- DESTEK VE TICKET SİSTEMİ ---
+
+model Ticket {
+  id                 String     @id @default(cuid())
+  ticketNumber       Int        @default(autoincrement()) @unique
+
+  subject            String
+  description        String     @db.Text
+  category           TicketCategory @default(GENERAL)
+  priority           TicketPriority @default(P3_NORMAL)
+  status             TicketStatus   @default(NEW)
+
+  tenantId           String     // Multi-tenant isolation constraint
+  requesterUserId    String     // Biletin sahibi
+
+  relatedHelpTopicId String?    
+  relatedHelpTopic   HelpTopic? @relation(fields: [relatedHelpTopicId], references: [id])
+
+  metadataJson       Json?      // Browser info, route, app build version vs.
+
+  messages           TicketMessage[]
+  attachments        TicketAttachment[]
+
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
+model TicketMessage {
+  id          String        @id @default(cuid())
+  ticketId    String
+  ticket      Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  authorType  AuthorType    // Müşteri mi, Admin mi, Sistem Otomasyonu mu?
+  authorId    String        // UserID veya AdminID
+
+  body        String        @db.Text
+  isInternal  Boolean       @default(false) // Sadece Adminlerin Göreceği Notlar
+
+  attachments TicketAttachment[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model TicketAttachment {
+  id              String         @id @default(cuid())
+  ticketId        String
+  ticket          Ticket         @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  messageId       String?        // Ek, belirli bir yoruma aitse
+  message         TicketMessage? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+
+  fileKey         String         // AWS S3 veya R2 storage key
+  fileName        String
+  mimeType        String
+  size            Int            // bytes
+
+  createdAt       DateTime       @default(now())
+}
+
+enum TicketCategory {
+  GENERAL
+  BILLING
+  TECHNICAL
+  FEATURE_REQUEST
+  BUG
+}
+
+enum TicketPriority {
+  P1_URGENT
+  P2_HIGH
+  P3_NORMAL
+  P4_LOW
+}
+
+enum TicketStatus {
+  NEW
+  IN_PROGRESS
+  WAITING_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum AuthorType {
+  CUSTOMER
+  ADMIN
+  SYSTEM
+}
