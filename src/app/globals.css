@@ -103,10 +103,40 @@
   color: var(--text-pos) !important;
 }
 
-[data-pos-theme="light"] [class*="opacity-"],
-[data-pos-theme="light"] .text-muted {
+[data-pos-theme="light"] .text-muted,
+[data-pos-theme="light"] .opacity-60,
+[data-pos-theme="light"] .opacity-50,
+[data-pos-theme="light"] .opacity-40 {
   color: var(--text-muted-pos) !important;
   opacity: 1 !important;
+}
+
+/* 💎 Premium Status Badges */
+[data-pos-theme="light"] .bg-amber-500\/10 {
+  background: rgba(201, 175, 124, 0.12) !important;
+  border: 1px solid rgba(201, 175, 124, 0.2) !important;
+  color: #856404 !important;
+}
+
+[data-pos-theme="light"] .bg-red-500\/10 {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+  color: #B91C1C !important;
+}
+
+[data-pos-theme="light"] .bg-blue-500\/10 {
+  background: rgba(36, 123, 254, 0.08) !important;
+  border: 1px solid rgba(36, 123, 254, 0.15) !important;
+  color: #1D4ED8 !important;
+}
+
+/* Ensure inner elements in status badges inherit colors and have no nested backgrounds */
+[data-pos-theme="light"] .bg-amber-500\/10 *,
+[data-pos-theme="light"] .bg-red-500\/10 *,
+[data-pos-theme="light"] .bg-blue-500\/10 * {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Inputs & Forms */
@@ -163,34 +193,12 @@
   color: var(--primary) !important;
 }
 
-/* Amber/Orange Badges -> Primary Blue or Warning Amber */
-[data-pos-theme="light"] .bg-amber-500\/10,
-[data-pos-theme="light"] .text-amber-500 {
-  background: rgba(201, 175, 124, 0.1) !important;
-  color: var(--amber) !important;
-  border-color: rgba(201, 175, 124, 0.2) !important;
-}
-
-[data-pos-theme="light"] .bg-amber-500 {
-  background: var(--amber) !important;
-  color: #FFFFFF !important;
-}
-
-/* Success Indicators */
-[data-pos-theme="light"] .bg-emerald-500\/10,
-[data-pos-theme="light"] .text-emerald-400,
-[data-pos-theme="light"] .text-green-400 {
-  background: rgba(2, 201, 81, 0.1) !important;
-  color: var(--success) !important;
-}
-
 /* Chart & Analytics Overrides (Using Purple) */
 [data-pos-theme="light"] .text-indigo-400,
 [data-pos-theme="light"] .bg-indigo-900,
 [data-pos-theme="light"] .bg-blue-500\/10,
 [data-pos-theme="light"] .text-blue-500 {
   color: var(--primary-purple) !important;
-  background: rgba(98, 96, 254, 0.08) !important;
 }
 
 /* Modal specific overrides */
