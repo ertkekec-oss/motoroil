@@ -58,11 +58,17 @@ export default function MobileRouteDetailPage() {
                         body: JSON.stringify({ routeStopId: stopId, customerId, location })
                     });
 
+                    const data = await res.json();
+
                     if (res.ok) {
-                        fetchData(); // Refresh active visit
+                        // Show distance warning if out of range
+                        if (data.isOutOfRange && data.distanceMeters) {
+                            showError('📍 Konum Uyarısı',
+                                `Müşteri konumuna ${data.distanceMeters}m uzaktasınız.\n\nZiyaret kaydedildi ancak yöneticiniz bu durumu görebilir.`);
+                        }
+                        fetchData();
                     } else {
-                        const err = await res.json();
-                        showError('Hata', err.error || 'Check-in başarısız.');
+                        showError('Hata', data.error || 'Check-in başarısız.');
                     }
                 } catch (e) {
                     console.error(e);
@@ -74,12 +80,16 @@ export default function MobileRouteDetailPage() {
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (pos) => performCheckIn({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                    (pos) => performCheckIn({
+                        lat: pos.coords.latitude,
+                        lng: pos.coords.longitude,
+                        accuracy: Math.round(pos.coords.accuracy)
+                    }),
                     (err) => {
-                        console.warn("Geolocation warning:", err.message);
-                        performCheckIn(null); // Fallback
+                        console.warn('Geolocation warning:', err.message);
+                        performCheckIn(null); // Fallback — no block
                     },
-                    { timeout: 5000 }
+                    { timeout: 8000, enableHighAccuracy: true }
                 );
             } else {
                 performCheckIn(null);
@@ -98,18 +108,13 @@ export default function MobileRouteDetailPage() {
                 const res = await fetch('/api/field-sales/visits/end', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        visitId,
-                        location,
-                        notes: checkoutNotes,
-                        photos: []
-                    })
+                    body: JSON.stringify({ visitId, location, notes: checkoutNotes, photos: [] })
                 });
 
                 if (res.ok) {
                     setShowCheckoutModal(false);
                     setCheckoutNotes('');
-                    fetchData(); // Refresh stops status
+                    fetchData();
                 } else {
                     showError('Hata', 'Check-out başarısız.');
                 }
@@ -123,12 +128,16 @@ export default function MobileRouteDetailPage() {
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (pos) => performCheckOut({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                (pos) => performCheckOut({
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude,
+                    accuracy: Math.round(pos.coords.accuracy)
+                }),
                 (err) => {
-                    console.warn("Geolocation warning:", err.message);
-                    performCheckOut(null); // Fallback
+                    console.warn('Geolocation warning:', err.message);
+                    performCheckOut(null);
                 },
-                { timeout: 5000 }
+                { timeout: 8000, enableHighAccuracy: true }
             );
         } else {
             performCheckOut(null);

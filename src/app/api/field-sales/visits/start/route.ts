@@ -5,6 +5,19 @@ import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
+// Haversine distance in meters between two lat/lng points
+function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371000;
+    const toRad = (d: number) => d * (Math.PI / 180);
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Max allowed distance from customer address (meters). No hard block — only flag.
+const MAX_RANGE_METERS = 1500;
+
 export async function POST(req: NextRequest) {
     try {
         const session: any = await getSession();
@@ -26,23 +39,15 @@ export async function POST(req: NextRequest) {
         });
 
         if (!staff && session.tenantId === 'PLATFORM_ADMIN') {
-            // Admin Test Mode: Use first available staff
             staff = await (prisma as any).staff.findFirst();
         }
+        if (!staff) return NextResponse.json({ error: 'Personel kaydı bulunamadı.' }, { status: 403 });
 
-        if (!staff) {
-            return NextResponse.json({ error: 'Personel kaydı bulunamadı.' }, { status: 403 });
-        }
-
-        // 2. Check for active visit
+        // 2. Active visit check
         const activeVisit = await (prisma as any).salesVisit.findFirst({
-            where: {
-                staffId: staff.id,
-                checkOutTime: null
-            },
+            where: { staffId: staff.id, checkOutTime: null },
             include: { customer: { select: { name: true } } }
         });
-
         if (activeVisit) {
             return NextResponse.json({
                 error: `Zaten aktif bir ziyaretiniz var: ${activeVisit.customer?.name}`,
@@ -50,19 +55,43 @@ export async function POST(req: NextRequest) {
             }, { status: 409 });
         }
 
-        // Resolve Company ID
-        // Resolve Company ID (Platform Admin Support)
+        // 3. Company
         let company;
         if (session.tenantId === 'PLATFORM_ADMIN') {
             company = await (prisma as any).company.findFirst();
         } else {
-            company = await (prisma as any).company.findFirst({
-                where: { tenantId: session.tenantId }
-            });
+            company = await (prisma as any).company.findFirst({ where: { tenantId: session.tenantId } });
         }
         if (!company) return NextResponse.json({ error: 'Company not found' }, { status: 404 });
 
-        // 3. Create Visit
+        // 4. GPS distance check
+        let isOutOfRange = false;
+        let distanceMeters: number | null = null;
+
+        if (location?.lat && location?.lng) {
+            // Fetch customer's lat/lng if stored, or try geocoding from address
+            const customer = await (prisma as any).customer.findUnique({
+                where: { id: customerId },
+                select: { lat: true, lng: true, address: true, city: true, district: true }
+            });
+
+            if (customer?.lat && customer?.lng) {
+                distanceMeters = Math.round(haversineMeters(location.lat, location.lng, customer.lat, customer.lng));
+                isOutOfRange = distanceMeters > MAX_RANGE_METERS;
+            }
+        }
+
+        // 5. Create Visit — store lat/lng separately inside location JSON for fast access
+        const locationPayload = location
+            ? {
+                lat: location.lat,
+                lng: location.lng,
+                accuracy: location.accuracy || null,
+                timestamp: new Date().toISOString(),
+                distanceMeters
+            }
+            : {};
+
         const visit = await (prisma as any).salesVisit.create({
             data: {
                 companyId: company.id,
@@ -70,17 +99,19 @@ export async function POST(req: NextRequest) {
                 customerId,
                 routeStopId,
                 checkInTime: new Date(),
-                checkInLocation: location || {},
-                isOutOfRange: false // TODO: GPS Check
+                checkInLocation: locationPayload,
+                isOutOfRange
             }
         });
 
-        // 4. Update Stop Status to VISITED (or IN_PROGRESS if supported, but Schema has PENDING/SKIPPED/VISITED)
-        // I will keep it PENDING until Check-out?
-        // Or make it VISITED only on check-out.
-        // Let's keep PENDING, UI will show "Currently Visiting" if active visit exists.
-
-        return NextResponse.json(visit);
+        return NextResponse.json({
+            ...visit,
+            distanceMeters,
+            isOutOfRange,
+            warning: isOutOfRange
+                ? `Uyarı: Müşteri konumuna ${distanceMeters}m uzaktasınız (max ${MAX_RANGE_METERS}m).`
+                : null
+        });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

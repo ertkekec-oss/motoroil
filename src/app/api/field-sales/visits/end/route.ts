@@ -15,25 +15,30 @@ export async function POST(req: NextRequest) {
 
         if (!visitId) return NextResponse.json({ error: 'Visit ID required' }, { status: 400 });
 
-        const visit = await (prisma as any).salesVisit.findUnique({
-            where: { id: visitId }
-        });
-
+        const visit = await (prisma as any).salesVisit.findUnique({ where: { id: visitId } });
         if (!visit) return NextResponse.json({ error: 'Visit not found' }, { status: 404 });
         if (visit.checkOutTime) return NextResponse.json({ success: true, message: 'Already checked out' });
 
-        // Update Visit
+        const locationPayload = location
+            ? {
+                lat: location.lat,
+                lng: location.lng,
+                accuracy: location.accuracy || null,
+                timestamp: new Date().toISOString()
+            }
+            : {};
+
         await (prisma as any).salesVisit.update({
             where: { id: visitId },
             data: {
                 checkOutTime: new Date(),
-                checkOutLocation: location || {},
+                checkOutLocation: locationPayload,
                 notes,
                 photos: photos || []
             }
         });
 
-        // Update Route Stop Status if linked
+        // Update Route Stop Status
         if (visit.routeStopId) {
             await (prisma as any).routeStop.update({
                 where: { id: visit.routeStopId },
