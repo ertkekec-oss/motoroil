@@ -218,21 +218,21 @@ export function OnlineOrdersTab({
     return (
         <div>
             {/* Stats Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="card glass p-6">
-                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">BEKLEYEN SİPARİŞ</div>
-                    <div className="text-3xl font-black text-indigo-500">
+            <div className="grid-cols-4" style={{ marginBottom: '32px', gap: '20px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                <div className="card glass">
+                    <div className="text-muted" style={{ fontSize: '12px' }}>BEKLEYEN SİPARİŞ</div>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--primary)', marginTop: '8px' }}>
                         {onlineOrders.filter(o => ['Yeni', 'Hazırlanıyor', 'WaitingForApproval', 'Picking'].includes(o.status)).length} Adet
                     </div>
-                    <div className="text-[10px] font-bold text-gray-400 uppercase mt-1">Hazırlanması gereken</div>
+                    <div style={{ fontSize: '12px', marginTop: '4px' }}>Hazırlanması gereken</div>
                 </div>
-                <div className="card glass p-6 relative">
-                    <div className="flex justify-between items-center mb-1">
-                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{getTurnoverTitle()}</div>
+                <div className="card glass" style={{ position: 'relative' }}>
+                    <div className="flex-between">
+                        <div className="text-muted" style={{ fontSize: '12px' }}>{getTurnoverTitle()}</div>
                         <select
                             value={turnoverFilter}
                             onChange={(e) => setTurnoverFilter(e.target.value)}
-                            className="bg-white/5 border border-white/10 text-pos text-[10px] rounded px-1 outline-none"
+                            style={{ fontSize: '10px', padding: '2px', background: 'var(--bg-deep)', color: 'white', border: 'none', borderRadius: '4px' }}
                         >
                             <option value="TODAY">Bugün</option>
                             <option value="WEEK">1 Hafta</option>
@@ -248,26 +248,27 @@ export function OnlineOrdersTab({
                         </div>
                     )}
 
-                    <div className="text-3xl font-black text-emerald-500">
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--success)', marginTop: '8px' }}>
                         ₺ {calculateTurnover(onlineOrders).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
-                    <div className="text-[10px] font-bold text-gray-400 uppercase mt-1">Seçili dönem cirosu</div>
+                    <div style={{ fontSize: '12px', marginTop: '4px' }}>Seçili dönem cirosu</div>
                 </div>
-                <div className="card glass p-6">
-                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">STOK HATA ORANI</div>
-                    <div className={posTheme === 'light' ? "text-3xl font-black text-slate-800" : "text-3xl font-bold text-white text-3xl font-black"}>%0.1</div>
-                    <div className="text-[10px] font-bold text-gray-400 uppercase mt-1">Senkronizasyon stabil</div>
+                <div className="card glass">
+                    <div className="text-muted" style={{ fontSize: '12px' }}>STOK HATA ORANI</div>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', marginTop: '8px' }}>%0.1</div>
+                    <div style={{ fontSize: '12px', marginTop: '4px' }}>Senkronizasyon stabil</div>
                 </div>
             </div>
 
-            <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
-                <div className="flex items-center gap-4">
-                    <h3 className={posTheme === 'light' ? "text-2xl font-black text-slate-800" : "text-2xl font-bold text-white"}>E-Ticaret Siparişleri</h3>
-                    <span className="px-2 py-1 rounded bg-indigo-600 text-white text-[10px] font-black tracking-tighter shadow-lg shadow-indigo-900/20 uppercase">LIVE v1.4</span>
+            <div className="flex-between mb-4" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                <div className="flex-center gap-4">
+                    <h3 className="text-gradient">E-Ticaret Siparişleri</h3>
+                    <span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '4px', background: 'var(--primary)', color: 'white' }}>LIVE v1.4</span>
                     {selectedOrders.length > 0 && (
                         <button
                             onClick={handleCollectBulk}
-                            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-lg shadow-emerald-900/20 transition-all active:scale-95 text-xs"
+                            className="btn btn-success"
+                            style={{ padding: '8px 16px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
                             disabled={isCollecting}
                         >
                             <span>💰 Seçilenleri Tahsil Et ({selectedOrders.length})</span>

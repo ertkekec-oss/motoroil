@@ -79,22 +79,28 @@ export function InvoicesTab({
         <div>
             {/* Invoices Sub-Tabs - Only show if not in wayslips mode */}
             {invoiceSubTab !== 'wayslips' && (
-                <div className="flex flex-wrap gap-2 border-b border-white/10 pb-4 mb-6">
+                <div className="flex-center" style={{ justifyContent: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '24px', gap: '8px' }}>
                     <button
                         onClick={() => setInvoiceSubTab('sales')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-sm ${invoiceSubTab === 'sales'
-                            ? 'bg-orange-600 text-white shadow-lg scale-105'
-                            : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
-                            }`}
+                        style={{
+                            padding: '12px 24px',
+                            background: invoiceSubTab === 'sales' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                            border: 'none', color: invoiceSubTab === 'sales' ? 'var(--primary)' : 'white',
+                            borderBottom: invoiceSubTab === 'sales' ? '2px solid var(--primary)' : 'none',
+                            cursor: 'pointer', fontWeight: 'bold', fontSize: '13px'
+                        }}
                     >
                         📄 Satış Faturaları
                     </button>
                     <button
                         onClick={() => setInvoiceSubTab('incoming')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-sm ${invoiceSubTab === 'incoming'
-                            ? 'bg-emerald-600 text-white shadow-lg scale-105'
-                            : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
-                            }`}
+                        style={{
+                            padding: '12px 24px',
+                            background: invoiceSubTab === 'incoming' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                            border: 'none', color: invoiceSubTab === 'incoming' ? 'var(--success)' : 'white',
+                            borderBottom: invoiceSubTab === 'incoming' ? '2px solid var(--success)' : 'none',
+                            cursor: 'pointer', fontWeight: 'bold', fontSize: '13px'
+                        }}
                     >
                         📥 Gelen Faturalar
                     </button>
@@ -104,11 +110,9 @@ export function InvoicesTab({
             {/* SUB-TAB CONTENT: SALES INVOICES */}
             {invoiceSubTab === 'sales' && (
                 <div>
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className={posTheme === 'light' ? "text-xl font-black text-slate-800" : "text-xl font-bold text-white"}>📑 Kesilen Satış Faturaları</h3>
-                        <button onClick={fetchInvoices} className="flex items-center gap-2 px-4 py-2 border border-pos glass rounded-lg text-pos hover:bg-white/10 transition-all text-xs">
-                            🔄 Yenile
-                        </button>
+                    <div className="flex-between mb-4">
+                        <h3>📑 Kesilen Satış Faturaları</h3>
+                        <button onClick={fetchInvoices} className="btn btn-outline" style={{ fontSize: '12px' }}>🔄 Yenile</button>
                     </div>
 
                     {isLoadingInvoices ? <p>Yükleniyor...</p> : (
@@ -136,10 +140,12 @@ export function InvoicesTab({
                                                 <td style={{ fontSize: '12px' }}>{new Date(inv.invoiceDate).toLocaleDateString('tr-TR')}</td>
                                                 <td style={{ fontWeight: 'bold' }}>{inv.totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
                                                 <td>
-                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${inv.isFormal
-                                                        ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30'
-                                                        : 'bg-amber-500/20 text-amber-500 border border-amber-500/30'
-                                                        }`}>
+                                                    <span style={{
+                                                        padding: '4px 8px', borderRadius: '4px', fontSize: '11px',
+                                                        background: inv.isFormal ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                                        color: inv.isFormal ? 'var(--success)' : 'var(--warning)',
+                                                        border: `1px solid ${inv.isFormal ? 'var(--success)' : 'var(--warning)'}`
+                                                    }}>
                                                         {inv.isFormal ? 'Faturalandırıldı' : inv.status}
                                                     </span>
                                                 </td>
