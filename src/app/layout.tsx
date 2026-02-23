@@ -4,8 +4,21 @@ import CookieConsent from "@/components/CookieConsent";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Periodya Enterprise",
-  description: "Kurumsal Kaynak Yönetimi",
+  title: {
+    default: "Periodya Enterprise",
+    template: "%s | Periodya"
+  },
+  description: "Kurumsal Kaynak Yönetimi ve ERP Çözümleri",
+  metadataBase: new URL('https://www.periodya.com'),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'tr_TR',
+    url: 'https://www.periodya.com',
+    siteName: 'Periodya',
+  }
 };
 
 export default function RootLayout({
