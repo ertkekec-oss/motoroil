@@ -5,14 +5,14 @@ import HelpManager from './HelpManager';
 
 export const metadata = { title: 'Yardım Merkezi Yönetimi' };
 
-export default async function AdminTenantHelpPage({ params }: { params: { id: string } }) {
+export default async function AdminTenantHelpPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: tenantId } = await params;
     const session = await getSession();
     if (!session || (session.tenantId !== 'PLATFORM_ADMIN' && session.role !== 'SUPER_ADMIN' && session.role !== 'SUPPORT_AGENT')) {
         redirect('/login');
     }
 
-    const tenantId = params.id;
-    const isGlobal = tenantId === 'global'; // using 'global' as keyword to manage global topics
+    const isGlobal = tenantId === 'global' || tenantId === 'PLATFORM_ADMIN'; // using 'global' or 'PLATFORM_ADMIN' as keyword to manage global topics
 
     const categories = await prisma.helpCategory.findMany({
         orderBy: { order: 'asc' },

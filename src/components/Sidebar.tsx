@@ -32,7 +32,7 @@ export default function Sidebar() {
     }, [pathname]);
 
     const isSystemAdmin = currentUser === null || currentUser?.role === 'SUPER_ADMIN' || (currentUser?.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
-    const isPlatformAdmin = authUser?.tenantId === 'PLATFORM_ADMIN' || authUser?.role === 'SUPER_ADMIN';
+    const isPlatformAdmin = authUser?.tenantId === 'PLATFORM_ADMIN' || authUser?.role === 'SUPER_ADMIN' || authUser?.role === 'SUPPORT_AGENT';
     const isAuditor = currentUser?.role === 'AUDITOR';
     const displayUser = currentUser || authUser;
 
@@ -120,6 +120,10 @@ export default function Sidebar() {
         { name: 'Ekip & Yetki', href: '/staff', icon: '👥' },
         { name: 'Abonelik & Planlar', href: '/billing', icon: '💎' },
         { name: 'Yardım & Kılavuz', href: '/help', icon: '❓' },
+        ...(isPlatformAdmin ? [
+            { name: 'Destek Masası (Inbox)', href: '/admin/support/tickets', icon: '📥' },
+            { name: 'Bilgi Bankası Yönetimi', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: '📚' }
+        ] : []),
     ].filter(item => {
         const config = permMap[item.href];
         if (!config) return true; // default public items

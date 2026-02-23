@@ -40,6 +40,8 @@ export default async function AdminLayout({
                     <NavLink href="/admin/plans" icon="tag">Paketler & Fiyatlar</NavLink>
                     <NavLink href="/admin/transactions" icon="credit-card">Ödemeler</NavLink>
                     <NavLink href="/admin/audit-logs" icon="activity">Denetim Kayıtları</NavLink>
+                    <NavLink href="/admin/support/tickets" icon="inbox">Destek Talepleri</NavLink>
+                    <NavLink href="/admin/tenants/PLATFORM_ADMIN/help" icon="help">Yardım Merkezi</NavLink>
                     <NavLink href="/admin/marketplace/ops" icon="radar">Pazaryeri Operasyonları</NavLink>
                     <NavLink href="/admin/logs" icon="terminal">Sistem Logları</NavLink>
 
@@ -81,7 +83,9 @@ function NavLink({ href, children, icon }: { href: string, children: React.React
         radar: <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75l3 3m0 0l3-3m-3 3v-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
         activity: <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M6 16.5v2.25a2.25 2.25 0 01-2.25 2.25H3.75m11.25-18v11.25c0 1.242.504 2.375 1.314 3.214C16.89 15.65 17.5 16.023 18 16.5m-2.25-2.25v2.25a2.25 2.25 0 01-2.25 2.25H12.75m6-4.5V3" />,
         globe: <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A11.952 11.952 0 0112 13.5c-2.998 0-5.74-1.1-7.843-2.918m0 0A8.959 8.959 0 003 12c0 .778.099 1.533.284 2.253" />,
-        terminal: <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />
+        terminal: <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />,
+        inbox: <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-2.24-1.815-4.055-4.055-4.055H4.055A4.055 4.055 0 000 13.838z" />,
+        help: <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
     };
 
     return (

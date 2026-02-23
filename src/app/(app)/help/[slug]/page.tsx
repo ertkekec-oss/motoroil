@@ -4,18 +4,18 @@ import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-    const topic = await prisma.helpTopic.findUnique({ where: { slug: params.slug } });
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    const topic = await prisma.helpTopic.findUnique({ where: { slug } });
     return { title: topic?.title ? `${topic.title} - Yardım` : 'Yardım Detayı' };
 }
 
-export default async function HelpTopicPage({ params }: { params: { slug: string } }) {
+export default async function HelpTopicPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     const session = await getSession();
     if (!session?.tenantId) {
         redirect('/login');
     }
-
-    const { slug } = params;
 
     const topic = await prisma.helpTopic.findUnique({
         where: { slug },

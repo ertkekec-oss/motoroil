@@ -33,8 +33,9 @@ const PRIORITY_STYLES: Record<string, string> = {
 export default async function AdminTicketsPage({
     searchParams
 }: {
-    searchParams: { status?: string, tenantId?: string, assignedTo?: string }
+    searchParams: Promise<{ status?: string, tenantId?: string, assignedTo?: string }>
 }) {
+    const { status, tenantId, assignedTo } = await searchParams;
     const session = await getSession();
     if (!session || (session.tenantId !== 'PLATFORM_ADMIN' && session.role !== 'SUPER_ADMIN' && session.role !== 'SUPPORT_AGENT')) {
         redirect('/login');
@@ -42,9 +43,9 @@ export default async function AdminTicketsPage({
 
     const tickets = await prisma.ticket.findMany({
         where: {
-            ...(searchParams.status ? { status: searchParams.status as any } : {}),
-            ...(searchParams.tenantId ? { tenantId: searchParams.tenantId } : {}),
-            ...(searchParams.assignedTo ? { assignedToUserId: searchParams.assignedTo === 'none' ? null : searchParams.assignedTo } : {}),
+            ...(status ? { status: status as any } : {}),
+            ...(tenantId ? { tenantId: tenantId } : {}),
+            ...(assignedTo ? { assignedToUserId: assignedTo === 'none' ? null : assignedTo } : {}),
         },
         orderBy: { updatedAt: 'desc' },
         include: {
@@ -57,7 +58,12 @@ export default async function AdminTicketsPage({
             <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-black text-white">Destek Masası (Inbox)</h1>
-                    <p className="text-gray-400 text-sm mt-1">Sistemdeki tüm kiracılar tarafından oluşturulan destek talepleri.</p>
+                    <div className="flex items-center gap-4 mt-1">
+                        <p className="text-gray-400 text-sm">Sistemdeki tüm kiracılar tarafından oluşturulan destek talepleri.</p>
+                        <Link href="/admin/tenants/PLATFORM_ADMIN/help" className="text-orange-500 font-bold text-xs bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full hover:bg-orange-500/20 transition-all">
+                            📚 Bilgi Bankasını Yönet
+                        </Link>
+                    </div>
                 </div>
                 <div className="flex gap-2">
                     <Link href="/admin/support/tickets" className="px-3 py-1.5 text-xs bg-white/5 border border-white/10 text-white rounded-lg">Hepsi</Link>

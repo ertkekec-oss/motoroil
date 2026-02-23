@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import AdminReplyForm from './AdminReplyForm';
+import UpdateControls from './UpdateControls';
 
 export const metadata = {
     title: 'Destek Talebi İnceleme - Admin'
@@ -66,12 +67,13 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
     // Fetch support agents for assignment
     const agents = await prisma.user.findMany({
         where: {
-            OR: [
-                { role: 'SUPER_ADMIN' },
-                { role: 'SUPPORT_AGENT' }
-            ]
+            role: { in: ['SUPPORT_AGENT', 'SUPER_ADMIN'] }
         },
-        select: { id: true, name: true, email: true }
+        select: {
+            id: true,
+            name: true,
+            email: true
+        }
     });
 
     const { messages } = ticket;
@@ -160,53 +162,15 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                 <div className="bg-[#0f111a] border border-white/5 p-6 rounded-2xl shadow-xl">
                     <h3 className="text-white font-bold mb-4 border-b border-white/5 pb-2">Yönetim Paneli</h3>
                     <div className="space-y-4">
-                        <div>
-                            <span className="text-xs text-gray-500 block mb-1">Talep Durumu</span>
-                            <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg border inline-block ${STATUS_COLORS[ticket.status]}`}>
-                                {STATUS_LABELS[ticket.status]}
-                            </span>
-                        </div>
-                        <div>
-                            <span className="text-xs text-gray-500 block mb-1">Atanan Temsilci</span>
-                            <select
-                                defaultValue={ticket.assignedToUserId || ''}
-                                className="w-full bg-white/5 border border-white/10 p-2 text-xs text-white rounded outline-none focus:border-orange-500/50"
-                                onChange={async (e) => {
-                                    const val = e.target.value;
-                                    await fetch(`/api/admin/tickets/${ticket.id}/update`, {
-                                        method: 'PATCH',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ assignedToUserId: val || null })
-                                    });
-                                    window.location.reload();
-                                }}
-                            >
-                                <option value="">Atanmamış</option>
-                                {agents.map(a => (
-                                    <option key={a.id} value={a.id}>{a.name || a.email}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <span className="text-xs text-gray-500 block mb-1">Öncelik</span>
-                            <select
-                                defaultValue={ticket.priority}
-                                className="w-full bg-white/5 border border-white/10 p-2 text-xs text-white rounded outline-none focus:border-orange-500/50"
-                                onChange={async (e) => {
-                                    await fetch(`/api/admin/tickets/${ticket.id}/update`, {
-                                        method: 'PATCH',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ priority: e.target.value })
-                                    });
-                                    window.location.reload();
-                                }}
-                            >
-                                <option value="P1_URGENT">P1 - Acil</option>
-                                <option value="P2_HIGH">P2 - Yüksek</option>
-                                <option value="P3_NORMAL">P3 - Normal</option>
-                                <option value="P4_LOW">P4 - Düşük</option>
-                            </select>
-                        </div>
+                        <UpdateControls
+                            ticketId={ticket.id}
+                            assignedToUserId={ticket.assignedToUserId}
+                            priority={ticket.priority}
+                            agents={agents}
+                            STATUS_COLORS={STATUS_COLORS}
+                            STATUS_LABELS={STATUS_LABELS}
+                            currentStatus={ticket.status}
+                        />
                     </div>
                 </div>
 
