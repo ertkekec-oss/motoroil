@@ -138,9 +138,9 @@ export default function PdksDisplayPage() {
                 <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-violet-600 rounded-full blur-[150px] animate-pulse delay-700" />
             </div>
 
-            <div className="flex flex-col md:flex-row h-screen relative z-10">
+            <div className="flex flex-col md:flex-row h-screen relative z-10 overflow-hidden">
                 {/* Left Side: QR and Basic Info */}
-                <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-12 relative border-r border-white/5">
+                <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 md:p-12 relative border-b md:border-b-0 md:border-r border-white/5">
 
                     {/* Header Site Info */}
                     <div className="mb-12 text-center">
@@ -212,24 +212,24 @@ export default function PdksDisplayPage() {
                 </div>
 
                 {/* Right Side: Announcements and Clock */}
-                <div className="w-full md:w-1/2 bg-white/5 backdrop-blur-3xl flex flex-col p-12 md:p-20 relative">
+                <div className="w-full md:w-1/2 bg-white/5 backdrop-blur-3xl flex flex-col p-10 md:p-16 relative overflow-hidden h-screen">
 
                     {/* Main Clock Display */}
-                    <div className="mb-20">
+                    <div className="mb-10 lg:mb-16">
                         <div className="flex flex-col gap-0">
-                            <p className="text-indigo-400 text-xs font-black uppercase tracking-[0.4em] flex items-center gap-3 mb-4">
+                            <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.4em] flex items-center gap-3 mb-2">
                                 <IconClock className="w-4 h-4" />
                                 GÜNCEL ZAMAN
                             </p>
-                            <span className="text-[120px] font-black tracking-tighter tabular-nums leading-none bg-clip-text text-transparent bg-gradient-to-b from-white to-white/20">
+                            <span className="text-7xl lg:text-9xl font-black tracking-tighter tabular-nums leading-none bg-clip-text text-transparent bg-gradient-to-b from-white to-white/20">
                                 {currentTime.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', hour12: false })}
                             </span>
-                            <div className="flex items-center gap-4 mt-6">
-                                <span className="text-2xl md:text-3xl font-black text-slate-300 uppercase tracking-tighter">
+                            <div className="flex items-center gap-4 mt-4">
+                                <span className="text-xl font-black text-slate-300 uppercase tracking-tighter">
                                     {currentTime.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
                                 </span>
-                                <div className="h-6 w-[1px] bg-white/10" />
-                                <span className="text-2xl md:text-3xl font-bold text-slate-500 uppercase tracking-tighter">
+                                <div className="h-4 w-[1px] bg-white/10" />
+                                <span className="text-xl font-bold text-slate-500 uppercase tracking-tighter">
                                     {currentTime.toLocaleDateString('tr-TR', { weekday: 'long' })}
                                 </span>
                             </div>
