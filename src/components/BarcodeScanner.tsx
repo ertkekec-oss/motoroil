@@ -20,11 +20,27 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
             setCameraError(null);
             setIsCameraReady(false);
 
-            // Wait for DOM
+            // Wait for DOM to be fully stable
             const timer = setTimeout(async () => {
                 try {
                     const html5QrCode = new Html5Qrcode(scannerId);
                     html5QrCodeRef.current = html5QrCode;
+
+                    // 1. Requesting cameras typically triggers the browser's permission pop-up
+                    const devices = await Html5Qrcode.getCameras();
+
+                    if (!devices || devices.length === 0) {
+                        throw { name: 'NotFoundError', message: 'Kamera bulunamadı.' };
+                    }
+
+                    // 2. Look for back camera
+                    const backCamera = devices.find(device =>
+                        device.label.toLowerCase().includes('back') ||
+                        device.label.toLowerCase().includes('arka') ||
+                        device.label.toLowerCase().includes('environment')
+                    );
+
+                    const cameraId = backCamera ? backCamera.id : devices[0].id;
 
                     const config = {
                         fps: 15,
@@ -32,36 +48,36 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
                         aspectRatio: 1.0
                     };
 
-                    // Try to start with environment camera (back camera)
+                    // 3. Start scanning with explicit cameraId
                     await html5QrCode.start(
-                        { facingMode: "environment" },
+                        cameraId,
                         config,
                         (decodedText) => {
                             onScan(decodedText);
                             stopScanner();
                         },
-                        (errorMessage) => {
-                            // Silent frame error
-                        }
+                        () => { } // Silent frame error
                     );
 
                     setIsCameraReady(true);
                 } catch (err: any) {
-                    console.error("Scanner Error:", err);
+                    console.error("Scanner Error Details:", err);
                     let errorMsg = "Kamera başlatılamadı.";
 
-                    if (err?.name === 'NotAllowedError') {
-                        errorMsg = "Kamera izni reddedildi. Lütfen ayarlardan izin verin.";
+                    if (err?.name === 'NotAllowedError' || err === 'NotAllowedError') {
+                        errorMsg = "Kamera izni reddedildi. Lütfen tarayıcı ayarlarından (adres çubuğundaki kilit ikonu) kamera iznini aktif edin.";
                     } else if (err?.name === 'NotFoundError') {
-                        errorMsg = "Kamera bulunamadı.";
+                        errorMsg = "Cihazda uygun bir kamera bulunamadı.";
                     } else if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-                        errorMsg = "Güvenli bağlantı (HTTPS) gerekli.";
+                        errorMsg = "Kamera erişimi için HTTPS güvenli bağlantı gereklidir.";
+                    } else if (err?.message) {
+                        errorMsg = `Hata: ${err.message}`;
                     }
 
                     setCameraError(errorMsg);
                     toast.error(errorMsg);
                 }
-            }, 500);
+            }, 1000);
 
             return () => {
                 clearTimeout(timer);
