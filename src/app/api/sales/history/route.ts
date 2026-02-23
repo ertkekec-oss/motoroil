@@ -1,6 +1,6 @@
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,17 +29,65 @@ export async function GET(request: Request) {
             };
         }
 
-        const orders = await prisma.order.findMany({
-            where: whereClause,
-            orderBy: {
-                orderDate: 'desc'
-            },
-            take: limit
-        });
+        // Resolve Company ID from session
+        const authResult = await authorize();
+        if (!authResult.authorized) return authResult.response;
+        const user = authResult.user;
+
+        if (!user.companyId) {
+            return NextResponse.json({ success: true, orders: [] });
+        }
+
+        whereClause.companyId = user.companyId;
+
+        const [orders, salesOrders] = await Promise.all([
+            prisma.order.findMany({
+                where: whereClause,
+                orderBy: {
+                    orderDate: 'desc'
+                },
+                take: limit
+            }),
+            (prisma as any).salesOrder.findMany({
+                where: {
+                    // Filter field sales by company if whereClause has it, or just show last ones
+                    companyId: whereClause.companyId
+                },
+                include: {
+                    customer: { select: { name: true } },
+                    items: true
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                },
+                take: limit
+            })
+        ]);
+
+        // Normalize SalesOrders to match Order structure
+        const normalizedSalesOrders = salesOrders.map((so: any) => ({
+            id: so.id,
+            orderNumber: `SS-${so.id.substring(so.id.length - 6).toUpperCase()}`,
+            marketplace: 'SAHA SATIŞ',
+            customerName: so.customer?.name || 'Bilinmeyen',
+            totalAmount: Number(so.totalAmount),
+            status: so.status,
+            orderDate: so.createdAt,
+            items: so.items.map((i: any) => ({
+                name: i.productName,
+                qty: i.quantity,
+                price: Number(i.unitPrice)
+            })),
+            sourceType: 'FIELD_SALE'
+        }));
+
+        const combined = [...orders, ...normalizedSalesOrders]
+            .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime())
+            .slice(0, limit);
 
         return NextResponse.json({
             success: true,
-            orders
+            orders: combined
         });
 
     } catch (error: any) {

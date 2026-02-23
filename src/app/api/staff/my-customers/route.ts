@@ -25,15 +25,30 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ customers: [] });
         }
 
+        // If staff has no specific category or assigned customers, show all customers of the company
+        // Otherwise, filter by their assignments.
+        const where: any = {
+            companyId: staffUser.companyId,
+            deletedAt: null
+        };
+
+        const hasCategoryAssignments = staffUser.assignedCategoryIds && staffUser.assignedCategoryIds.length > 0;
+        const hasAssignedCustomers = await (prisma as any).customer.count({
+            where: { assignedStaffId: staffUser.id, deletedAt: null }
+        }) > 0;
+
+        if (hasCategoryAssignments || hasAssignedCustomers) {
+            where.OR = [];
+            if (hasCategoryAssignments) {
+                where.OR.push({ categoryId: { in: staffUser.assignedCategoryIds } });
+            }
+            if (hasAssignedCustomers) {
+                where.OR.push({ assignedStaffId: staffUser.id });
+            }
+        }
+
         const customers = await (prisma as any).customer.findMany({
-            where: {
-                companyId: staffUser.companyId,
-                OR: [
-                    { assignedStaffId: staffUser.id },
-                    { categoryId: { in: staffUser.assignedCategoryIds } }
-                ],
-                deletedAt: null
-            },
+            where: where,
             include: {
                 category: true
             },

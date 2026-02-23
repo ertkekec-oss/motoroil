@@ -33,10 +33,10 @@ export async function GET(
             ...transactions.map((t: any) => ({
                 id: t.id,
                 date: t.date,
-                description: t.description || 'Tahsilat/Ödeme',
+                description: t.description || (t.type === 'SATIŞ' ? 'Saha Satışı' : 'Tahsilat/Ödeme'),
                 amount: Number(t.amount),
-                type: 'PAYMENT',
-                direction: 'IN' // Payment received
+                type: t.type === 'SATIŞ' ? 'SALE' : 'PAYMENT',
+                direction: t.type === 'SATIŞ' ? 'OUT' : 'IN'
             })),
             ...invoices.map((i: any) => ({
                 id: i.id,
