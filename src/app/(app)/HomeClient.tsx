@@ -392,13 +392,14 @@ function POSContent() {
 
         {/* ROW 4: SEARCH + ACTIONS */}
         <div className="flex flex-wrap gap-4">
-          <form onSubmit={handleSearchSubmit} className={posTheme === 'light' ? "flex-1 flex gap-2 card !p-2 !rounded-xl relative items-center min-w-[300px]" : "flex-1 flex gap-2 bg-white/5 p-1.5 rounded-xl border border-white/5 relative items-center min-w-[300px]"}>
+          <form onSubmit={handleSearchSubmit} className={posTheme === 'light' ? "flex-1 flex gap-2 card !p-2 !rounded-xl relative items-center min-w-[300px] overflow-hidden" : "flex-1 flex gap-2 bg-white/5 p-1.5 rounded-xl border border-white/5 relative items-center min-w-[300px]"}>
+            <Search size={18} className="ml-3 text-muted-pos shrink-0" />
             <input
               ref={inputRef} type="text" placeholder="Barkod, ürün adı veya kod..."
               value={searchInput} onChange={e => setSearchInput(e.target.value)}
-              className={posTheme === 'light' ? "flex-1 bg-transparent border-none px-4 text-sm text-pos focus:outline-none" : "flex-1 bg-transparent border-none px-4 text-sm text-antigravity focus:outline-none"}
+              className={posTheme === 'light' ? "flex-1 bg-transparent border-none px-2 text-sm text-pos focus:outline-none placeholder:text-muted-pos/50" : "flex-1 bg-transparent border-none px-4 text-sm text-antigravity focus:outline-none"}
             />
-            <button type="submit" className={posTheme === 'light' ? "bg-primary hover:opacity-90 text-white px-6 py-2.5 rounded-lg text-xs font-bold transition-all shadow-md" : "bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-xs font-bold transition-colors"}>EKLE</button>
+            <button type="submit" className={posTheme === 'light' ? "bg-primary hover:opacity-90 text-white px-6 py-2.5 rounded-lg text-xs font-bold transition-all shadow-md mr-1" : "bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-xs font-bold transition-colors"}>EKLE</button>
 
             {/* DYNAMIC PRODUCT LIST */}
             {filteredProducts.length > 0 && (
@@ -413,17 +414,26 @@ function POSContent() {
             )}
           </form>
 
-          <div onClick={() => setShowResumptionModal(true)} className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-2 flex flex-col justify-center min-w-[100px] cursor-pointer hover:bg-amber-500/20 transition-all">
-            <div className="text-[9px] font-bold text-amber-500 opacity-80">BEKLEYEN</div>
-            <div className="text-xl font-black text-amber-500">{stats.waitingSales}</div>
+          <div onClick={() => setShowResumptionModal(true)} className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-2 flex items-center gap-3 min-w-[120px] cursor-pointer hover:bg-amber-500/20 transition-all">
+            <Clock size={20} className="text-amber-500" />
+            <div className="flex flex-col">
+              <div className="text-[9px] font-bold text-amber-500 opacity-80 leading-none mb-1">BEKLEYEN</div>
+              <div className="text-xl font-black text-amber-500 leading-none">{stats.waitingSales}</div>
+            </div>
           </div>
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2 flex flex-col justify-center min-w-[100px]">
-            <div className="text-[9px] font-bold text-red-500 opacity-80">KRİTİK</div>
-            <div className="text-xl font-black text-red-500">{stats.criticalStock}</div>
+          <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2 flex items-center gap-3 min-w-[120px]">
+            <Bell size={20} className="text-red-500" />
+            <div className="flex flex-col">
+              <div className="text-[9px] font-bold text-red-500 opacity-80 leading-none mb-1">KRİTİK</div>
+              <div className="text-xl font-black text-red-500 leading-none">{stats.criticalStock}</div>
+            </div>
           </div>
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl px-4 py-2 flex flex-col justify-center min-w-[100px]">
-            <div className="text-[9px] font-bold text-blue-500 opacity-80">YOLDAKİ</div>
-            <div className="text-xl font-black text-blue-500">{stats.inTransit}</div>
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl px-4 py-2 flex items-center gap-3 min-w-[120px]">
+            <Landmark size={20} className="text-blue-500" />
+            <div className="flex flex-col">
+              <div className="text-[9px] font-bold text-blue-500 opacity-80 leading-none mb-1">YOLDAKİ</div>
+              <div className="text-xl font-black text-blue-500 leading-none">{stats.inTransit}</div>
+            </div>
           </div>
         </div>
 
