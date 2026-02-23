@@ -27,14 +27,11 @@ export async function GET(
 
         console.info(`[LABEL_START] ${marketplace} orderId=${orderId} shipmentPackageId=${shipmentPackageId}`);
 
-        // ✅ companyId resolve
-        const company = await prisma.company.findFirst({
-            where: { tenantId: auth.user.tenantId },
-            select: { id: true },
-        });
-        if (!company) return new Response(JSON.stringify({ error: "Firma bulunamadı" }), { status: 403 });
+        // ✅ companyId resolve from auth session
+        const companyId = auth.user.companyId;
+        if (!companyId) return new Response(JSON.stringify({ error: "Firma bağlamı bulunamadı" }), { status: 403 });
 
-        const idempotencyKey = `LABEL_${format}:${company.id}:${marketplace}:${shipmentPackageId}`;
+        const idempotencyKey = `LABEL_${format}:${companyId}:${marketplace}:${shipmentPackageId}`;
         const ctx = `[LABEL:${marketplace}][IDEMP:${idempotencyKey}]`;
         // Helper: Respond and Log
         const respondWith = (res: Response) => {
