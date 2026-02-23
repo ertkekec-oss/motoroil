@@ -15,6 +15,11 @@ import {
 import { toast } from "sonner";
 
 export default function AdminPdksPage() {
+    const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [activeTab, setActiveTab] = useState<"onay" | "tabletler" | "loglar">("onay");
+    const [displays, setDisplays] = useState<any[]>([]);
+    const [events, setEvents] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDisplay, setEditingDisplay] = useState<any>(null);
     const [formData, setFormData] = useState({ name: "", announcement: "", isActive: true });
