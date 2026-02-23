@@ -54,153 +54,146 @@
 /* POS ONLY COOL TECH LIGHT THEME */
 /* POS ONLY COOL TECH LIGHT THEME */
 [data-pos-theme="light"] {
-  --bg-pos: #F8FAFC;
+  /* Refined Color System */
+  --primary: #247BFE;
+  --primary-purple: #6260FE;
+  --success: #02C951;
+  --teal: #02BC7E;
+  --amber: #C9AF7C;
+  --bg-pos: #F7F9FB;
   --card-pos: #FFFFFF;
-  --text-pos: #020617;
-  --text-muted-pos: #64748B;
-  --border-pos: #CBD5E1;
-  --shadow-pos: 0 12px 32px rgba(15, 23, 42, 0.12);
-  --glass-border: 1px solid #CBD5E1;
+  --text-pos: #0F172A;
+  --text-muted-pos: #B8C0C8;
+  --border-pos: #E6EBF0;
+  --shadow-pos: 0 4px 20px -2px rgba(216, 221, 227, 0.4), 0 2px 10px -2px rgba(216, 221, 227, 0.3);
+
+  --glass-border: 1px solid var(--border-pos);
+  --noise-opacity: 0.005;
 
   background-color: var(--bg-pos) !important;
   color: var(--text-pos) !important;
 }
 
-/* Ensure parent containers also respect the background if they contain the light theme */
-html:has([data-pos-theme="light"]),
-body:has([data-pos-theme="light"]) {
-  background-color: #F8FAFC !important;
+[data-pos-theme="light"] body {
+  background: var(--bg-pos) !important;
 }
 
 [data-pos-theme="light"] .card,
 [data-pos-theme="light"] .glass,
-[data-pos-theme="light"] .bg-\[\#0f111a\],
-[data-pos-theme="light"] .bg-gradient-to-br,
-[data-pos-theme="light"] .bg-slate-900,
-[data-pos-theme="light"] .bg-indigo-900,
-[data-pos-theme="light"] .bg-emerald-900 {
+[data-pos-theme="light"] [class*="bg-[#0f111a]"],
+[data-pos-theme="light"] [class*="bg-indigo-900"],
+[data-pos-theme="light"] [class*="bg-emerald-900"] {
   background: var(--card-pos) !important;
   border: 1px solid var(--border-pos) !important;
   box-shadow: var(--shadow-pos) !important;
   color: var(--text-pos) !important;
-  backdrop-filter: blur(20px);
+  border-radius: 16px !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 
+[data-pos-theme="light"] .card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 25px -4px rgba(216, 221, 227, 0.5) !important;
+}
+
+/* Typography Hierarchy */
 [data-pos-theme="light"] .text-white,
-[data-pos-theme="light"] .text-white\/50,
-[data-pos-theme="light"] .text-white\/30,
-[data-pos-theme="light"] .text-indigo-400,
-[data-pos-theme="light"] .text-emerald-400 {
+[data-pos-theme="light"] .text-pos,
+[data-pos-theme="light"] .text-black {
   color: var(--text-pos) !important;
 }
 
-[data-pos-theme="light"] .text-muted,
-[data-pos-theme="light"] .text-xs.opacity-50,
-[data-pos-theme="light"] .text-\[10px\].opacity-60,
 [data-pos-theme="light"] .opacity-50,
 [data-pos-theme="light"] .opacity-60,
-[data-pos-theme="light"] .opacity-40 {
+[data-pos-theme="light"] .text-muted,
+[data-pos-theme="light"] .text-xs.opacity-50 {
   color: var(--text-muted-pos) !important;
   opacity: 1 !important;
 }
 
+/* Inputs & Forms */
 [data-pos-theme="light"] input,
-[data-pos-theme="light"] select {
-  background: white;
-  border: 1px solid var(--border-pos);
-  color: var(--text-pos) !important;
-}
-
-/* Fix for transparent/borderless inputs (like search bar) */
-[data-pos-theme="light"] input.border-none,
-[data-pos-theme="light"] .border-none {
-  border: none !important;
-}
-
-[data-pos-theme="light"] input.bg-transparent,
-[data-pos-theme="light"] .bg-transparent {
-  background: transparent !important;
-}
-
-[data-pos-theme="light"] input:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Payment Buttons & Smaller Chips */
-[data-pos-theme="light"] .bg-black\/20,
-[data-pos-theme="light"] .bg-white\/5,
-[data-pos-theme="light"] .bg-white\/10 {
+[data-pos-theme="light"] select,
+[data-pos-theme="light"] [class*="bg-white/5"] {
   background: #FFFFFF !important;
   border: 1px solid var(--border-pos) !important;
   color: var(--text-pos) !important;
-  box-shadow: 0 4px 6px rgba(15, 23, 42, 0.05) !important;
+  border-radius: 12px !important;
 }
 
-/* Specific fix for Payment Method Icons Visibility */
-[data-pos-theme="light"] .bg-black\/20 span {
-  color: var(--text-pos) !important;
-}
-
-[data-pos-theme="light"] .text-white\/50 {
+[data-pos-theme="light"] input::placeholder {
   color: var(--text-muted-pos) !important;
 }
 
-[data-pos-theme="light"] .hover-bg:hover,
-[data-pos-theme="light"] .sidebar-link:hover {
-  background-color: #F1F5F9 !important;
-}
-
-[data-pos-theme="light"] .bg-primary\/10 {
-  background: rgba(255, 85, 0, 0.1) !important;
-  color: #FF5500 !important;
-}
-
-[data-pos-theme="light"] .border-white\/10,
-[data-pos-theme="light"] .border-white\/5,
-[data-pos-theme="light"] .border-indigo-500\/30,
-[data-pos-theme="light"] .border-emerald-500\/30 {
-  border-color: var(--border-pos) !important;
-}
-
-/* Primary Action Buttons (Orange) */
+/* Main CTA Buttons */
 [data-pos-theme="light"] .bg-primary,
 [data-pos-theme="light"] .bg-gradient-to-r.from-orange-600 {
-  background: #FF5500 !important;
+  background: var(--primary) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(36, 123, 254, 0.3) !important;
+  border: none !important;
+  border-radius: 12px !important;
+}
+
+[data-pos-theme="light"] .bg-primary:hover,
+[data-pos-theme="light"] .bg-gradient-to-r.from-orange-600:hover {
+  filter: brightness(0.95) !important;
+}
+
+/* Secondary / Outline Buttons (referenced as blue outline in rules) */
+[data-pos-theme="light"] .btn-outline,
+[data-pos-theme="light"] [class*="border-primary"] {
+  border: 1px solid var(--primary) !important;
+  background: transparent !important;
+  color: var(--primary) !important;
+}
+
+/* Amber/Orange Badges -> Primary Blue or Warning Amber */
+[data-pos-theme="light"] .bg-amber-500\/10,
+[data-pos-theme="light"] .text-amber-500 {
+  background: rgba(201, 175, 124, 0.1) !important;
+  color: var(--amber) !important;
+  border-color: rgba(201, 175, 124, 0.2) !important;
+}
+
+[data-pos-theme="light"] .bg-amber-500 {
+  background: var(--amber) !important;
+  color: #FFFFFF !important;
+}
+
+/* Success Indicators */
+[data-pos-theme="light"] .bg-emerald-500\/10,
+[data-pos-theme="light"] .text-emerald-400,
+[data-pos-theme="light"] .text-green-400 {
+  background: rgba(2, 201, 81, 0.1) !important;
+  color: var(--success) !important;
+}
+
+/* Chart & Analytics Overrides (Using Purple) */
+[data-pos-theme="light"] .text-indigo-400,
+[data-pos-theme="light"] .bg-indigo-900,
+[data-pos-theme="light"] .bg-blue-500\/10,
+[data-pos-theme="light"] .text-blue-500 {
+  color: var(--primary-purple) !important;
+  background: rgba(98, 96, 254, 0.08) !important;
+}
+
+/* Modal specific overrides */
+[data-pos-theme="light"] .fixed.inset-0.bg-black\/80 {
+  background: rgba(15, 23, 42, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+[data-pos-theme="light"] .bg-\[\#0f111a\] {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-pos) !important;
+}
+
+/* Specific button in "Beklemeye Al" panel */
+[data-pos-theme="light"] .bg-amber-500\/10.border-amber-500\/20.text-amber-500 {
+  background: linear-gradient(135deg, #247BFE 0%, #1d6edb 100%) !important;
   color: white !important;
-  opacity: 1 !important;
-  box-shadow: 0 4px 12px rgba(255, 85, 0, 0.2) !important;
-}
-
-/* Secondary Action Buttons (Amber - Suspend / Waiting) */
-[data-pos-theme="light"] .bg-amber-500\/10 {
-  background: #F59E0B !important;
-  color: white !important;
-  border-color: #D97706 !important;
-  opacity: 1 !important;
-}
-
-[data-pos-theme="light"] .bg-amber-500\/10 div,
-[data-pos-theme="light"] .bg-amber-500\/10 span {
-  color: white !important;
-  opacity: 1 !important;
-}
-
-[data-pos-theme="light"] .bg-amber-500\/10:hover {
-  background: #D97706 !important;
-}
-
-/* Ensure other status badges (Critical/Transit) follow suit for consistency if needed */
-[data-pos-theme="light"] .bg-red-500\/10,
-[data-pos-theme="light"] .bg-blue-500\/10 {
-  background: white !important;
-  border-color: var(--border-pos) !important;
-}
-
-[data-pos-theme="light"] .bg-white\/10.border-white\/5.text-white\/30 {
-  background: #F1F5F9 !important;
-  color: #94A3B8 !important;
-  border-color: var(--border-pos) !important;
+  border: none !important;
 }
 
 

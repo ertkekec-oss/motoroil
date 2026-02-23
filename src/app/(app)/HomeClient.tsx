@@ -74,8 +74,8 @@ function POSContent() {
   // CSS Fix & Theme Sync
   useEffect(() => {
     if (posTheme === 'light') {
-      document.body.style.background = '#F8FAFC'; // Light mode explicit body bg
-      document.body.style.color = '#020617';
+      document.body.style.background = '#F7F9FB'; // Updated to specific SaaS neutral bg
+      document.body.style.color = '#0F172A';
     } else {
       document.body.style.background = 'var(--bg-deep)';
       document.body.style.color = 'var(--text-main)';
@@ -345,7 +345,7 @@ function POSContent() {
         <div className="space-y-4">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-black mb-1">Hoş geldin, <span className="text-primary">{currentUser?.name?.split(' ')[0]}</span> 👋</h2>
+              <h2 className="text-2xl font-black mb-1">Hoş geldin, <span className={posTheme === 'light' ? "text-primary" : "text-primary"}>{currentUser?.name?.split(' ')[0]}</span> 👋</h2>
               <p className="text-xs opacity-50">Sistemdeki genel durumun ve sana özel ipuçları aşağıda.</p>
             </div>
             <button
@@ -360,26 +360,26 @@ function POSContent() {
 
         {/* ROW 2: CHARTS & NOTIFICATIONS */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full md:h-auto">
-          <div className={posTheme === 'light' ? "lg:col-span-6 bg-white border border-border-pos rounded-2xl p-4 shadow-pos min-h-[160px]" : "lg:col-span-6 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center gap-2"><span className="text-lg">📈</span><span className="text-xs font-bold opacity-70">HAFTALIK TREND</span></div>
+          <div className={posTheme === 'light' ? "lg:col-span-6 bg-white border border-border-pos rounded-2xl p-6 shadow-pos min-h-[160px]" : "lg:col-span-6 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2"><span className="text-lg">📈</span><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Haftalık Satış Trendi</span></div>
             </div>
             {insightsData?.stats?.weeklyTrend ? (
-              <ResponsiveContainer width="100%" aspect={2.8}><AreaChart data={insightsData.stats.weeklyTrend}><Area type="monotone" dataKey="value" stroke="#FF5500" fill="#FF5500" fillOpacity={0.1} strokeWidth={2} /></AreaChart></ResponsiveContainer>
+              <ResponsiveContainer width="100%" aspect={2.8}><AreaChart data={insightsData.stats.weeklyTrend}><Area type="monotone" dataKey="value" stroke={posTheme === 'light' ? "#247BFE" : "#FF5500"} fill={posTheme === 'light' ? "url(#colorBlue)" : "#FF5500"} fillOpacity={0.1} strokeWidth={2} /><defs><linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#247BFE" stopOpacity={0.3} /><stop offset="95%" stopColor="#247BFE" stopOpacity={0} /></linearGradient></defs></AreaChart></ResponsiveContainer>
             ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri yükleniyor...</div>}
           </div>
 
-          <div className={posTheme === 'light' ? "lg:col-span-3 bg-white border border-border-pos rounded-2xl p-4 shadow-pos min-h-[160px]" : "lg:col-span-3 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
-            <div className="flex items-center gap-2 mb-2"><span className="text-lg">🍰</span><span className="text-xs font-bold opacity-70">DAĞILIM</span></div>
+          <div className={posTheme === 'light' ? "lg:col-span-3 bg-white border border-border-pos rounded-2xl p-6 shadow-pos min-h-[160px]" : "lg:col-span-3 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
+            <div className="flex items-center gap-2 mb-4"><span className="text-lg">🍰</span><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Kategori Analizi</span></div>
             {insightsData?.stats?.categoryAnalysis ? (
-              <ResponsiveContainer width="100%" height={100}><PieChart><Pie data={insightsData.stats.categoryAnalysis} innerRadius={25} outerRadius={35} dataKey="value"><Cell fill="#FF5500" /></Pie></PieChart></ResponsiveContainer>
+              <ResponsiveContainer width="100%" height={100}><PieChart><Pie data={insightsData.stats.categoryAnalysis} innerRadius={25} outerRadius={35} dataKey="value"><Cell fill={posTheme === 'light' ? "#6260FE" : "#FF5500"} /></Pie></PieChart></ResponsiveContainer>
             ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri yükleniyor...</div>}
           </div>
 
-          <div onClick={() => router.push('/notifications')} className="lg:col-span-3 bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/30 rounded-2xl p-4 shadow-lg min-h-[160px] relative cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-center">
-            <div className="text-[10px] font-bold text-amber-500 mb-1">BİLDİRİMLER</div>
-            <div className="text-4xl font-black text-amber-500">{stats.criticalStock + stats.inTransit}</div>
-            <div className="text-[10px] opacity-60 mt-1">Kritik Stok & Bekleyen</div>
+          <div onClick={() => router.push('/notifications')} className={posTheme === 'light' ? "lg:col-span-3 bg-white border border-border-pos rounded-2xl p-6 shadow-pos min-h-[160px] relative cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-center" : "lg:col-span-3 bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/30 rounded-2xl p-4 shadow-lg min-h-[160px] relative cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-center"}>
+            <div className={posTheme === 'light' ? "text-[10px] font-bold text-amber-600 mb-1 tracking-wider" : "text-[10px] font-bold text-amber-500 mb-1"}>BİLDİRİMLER</div>
+            <div className={posTheme === 'light' ? "text-4xl font-black text-amber-600" : "text-4xl font-black text-amber-500"}>{stats.criticalStock + stats.inTransit}</div>
+            <div className="text-[10px] opacity-60 mt-2">Kritik Stok & Bekleyen</div>
           </div>
         </div>
 
@@ -387,13 +387,13 @@ function POSContent() {
 
         {/* ROW 4: SEARCH + ACTIONS */}
         <div className="flex flex-wrap gap-4">
-          <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2 bg-white/5 p-1.5 rounded-xl border border-white/5 relative items-center min-w-[300px]">
+          <form onSubmit={handleSearchSubmit} className={posTheme === 'light' ? "flex-1 flex gap-2 bg-white p-2 rounded-xl border border-border-pos shadow-sm relative items-center min-w-[300px]" : "flex-1 flex gap-2 bg-white/5 p-1.5 rounded-xl border border-white/5 relative items-center min-w-[300px]"}>
             <input
               ref={inputRef} type="text" placeholder="Barkod, ürün adı veya kod..."
               value={searchInput} onChange={e => setSearchInput(e.target.value)}
-              className="flex-1 bg-transparent border-none px-4 text-sm text-white focus:outline-none"
+              className={posTheme === 'light' ? "flex-1 bg-transparent border-none px-4 text-sm text-pos focus:outline-none" : "flex-1 bg-transparent border-none px-4 text-sm text-antigravity focus:outline-none"}
             />
-            <button type="submit" className="bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-xs font-bold transition-colors">EKLE</button>
+            <button type="submit" className={posTheme === 'light' ? "bg-primary hover:opacity-90 text-white px-6 py-2.5 rounded-lg text-xs font-bold transition-all shadow-md" : "bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-xs font-bold transition-colors"}>EKLE</button>
 
             {/* DYNAMIC PRODUCT LIST */}
             {filteredProducts.length > 0 && (
@@ -423,24 +423,24 @@ function POSContent() {
         </div>
 
         {/* CART */}
-        <div className={posTheme === 'light' ? "flex-1 bg-white rounded-xl border border-border-pos p-2 overflow-y-auto min-h-[300px] shadow-pos" : "flex-1 bg-[#0f111a] rounded-xl border border-white/5 p-2 overflow-y-auto min-h-[300px] shadow-2xl"}>
+        <div className={posTheme === 'light' ? "flex-1 bg-white rounded-2xl border border-border-pos p-4 overflow-y-auto min-h-[300px] shadow-pos" : "flex-1 bg-[#0f111a] rounded-xl border border-white/5 p-2 overflow-y-auto min-h-[300px] shadow-2xl"}>
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center opacity-20"><span className="text-6xl mb-4">🛒</span><span className="text-sm font-bold">Sepet Boş</span></div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {cart.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5">
+                <div key={idx} className={posTheme === 'light' ? "flex items-center gap-4 bg-white p-4 rounded-xl border border-border-pos shadow-sm hover:shadow-md transition-all group" : "flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5"}>
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-sm truncate">{item.name}</div>
                     <div className="text-[10px] opacity-40">{item.barcode}</div>
                   </div>
-                  <div className="flex items-center gap-2 bg-black/20 rounded-lg p-1">
-                    <button onClick={() => setCart(c => c.map((x, i) => i === idx ? { ...x, qty: Math.max(1, x.qty - 1) } : x))} className="w-6 h-6 hover:bg-white/10 rounded">-</button>
+                  <div className={posTheme === 'light' ? "flex items-center gap-2 bg-gray-50 rounded-xl p-1.5" : "flex items-center gap-2 bg-black/20 rounded-lg p-1"}>
+                    <button onClick={() => setCart(c => c.map((x, i) => i === idx ? { ...x, qty: Math.max(1, x.qty - 1) } : x))} className="w-7 h-7 hover:bg-gray-200 rounded-lg transition-colors">-</button>
                     <span className="w-6 text-center font-bold text-sm">{item.qty}</span>
-                    <button onClick={() => setCart(c => c.map((x, i) => i === idx ? { ...x, qty: x.qty + 1 } : x))} className="w-6 h-6 hover:bg-white/10 rounded">+</button>
+                    <button onClick={() => setCart(c => c.map((x, i) => i === idx ? { ...x, qty: x.qty + 1 } : x))} className="w-7 h-7 hover:bg-gray-200 rounded-lg transition-colors">+</button>
                   </div>
-                  <div className="font-bold text-primary min-w-[80px] text-right">₺{(item.price * item.qty).toLocaleString()}</div>
-                  <button onClick={() => setCart(c => c.filter((_, i) => i !== idx))} className="text-red-500 hover:bg-red-500/10 w-8 h-8 rounded flex items-center justify-center">×</button>
+                  <div className="font-bold text-primary min-w-[100px] text-right text-lg">₺{(item.price * item.qty).toLocaleString()}</div>
+                  <button onClick={() => setCart(c => c.filter((_, i) => i !== idx))} className="text-gray-400 hover:text-red-500 hover:bg-red-50 w-8 h-8 rounded-lg flex items-center justify-center transition-all">×</button>
                 </div>
               ))}
             </div>
@@ -487,16 +487,16 @@ function POSContent() {
         <div className="flex-1 overflow-y-auto pr-0 space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {/* Customer */}
           <div className="mb-4">
-            <label className="text-[10px] font-bold opacity-50 block mb-2 uppercase">MÜŞTERİ</label>
-            <div onClick={() => setIsCustomerModalOpen(true)} className="flex justify-between items-center bg-black/20 p-3 rounded-lg border border-white/5 cursor-pointer hover:border-white/20 transition-all">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px]">{selectedCustomer.charAt(0)}</div>
+            <label className="text-[10px] font-bold opacity-50 block mb-3 uppercase tracking-wider">Müşteri Bilgileri</label>
+            <div onClick={() => setIsCustomerModalOpen(true)} className={posTheme === 'light' ? "flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-border-pos cursor-pointer hover:bg-gray-100 transition-all shadow-sm" : "flex justify-between items-center bg-black/20 p-3 rounded-lg border border-white/5 cursor-pointer hover:border-white/20 transition-all"}>
+              <div className="flex items-center gap-3">
+                <div className={posTheme === 'light' ? "w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs text-white shadow-sm" : "w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px]"}>{selectedCustomer.charAt(0)}</div>
                 <span className="font-bold text-sm truncate max-w-[200px]">{selectedCustomer}</span>
               </div>
               <div className="flex flex-col items-end">
-                <div className="text-[10px] text-primary font-bold">DEĞİŞTİR ▾</div>
+                <div className="text-[10px] text-primary font-bold tracking-tighter">DEĞİŞTİR ▾</div>
                 {activePriceListName && (
-                  <div className="text-[8px] opacity-70 mt-0.5 bg-primary/10 px-1 rounded border border-primary/20 uppercase">
+                  <div className={posTheme === 'light' ? "text-[8px] text-primary font-bold mt-1 bg-white px-2 py-0.5 rounded-full border border-primary/20 uppercase" : "text-[8px] opacity-70 mt-0.5 bg-primary/10 px-1 rounded border border-primary/20 uppercase"}>
                     {activePriceListName}
                   </div>
                 )}
@@ -566,15 +566,18 @@ function POSContent() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {[{ id: 'cash', l: 'Nakit', i: '💵' }, { id: 'card', l: 'Kredi Kartı', i: '💳' }, { id: 'transfer', l: 'Havale/EFT', i: '🏦' }, { id: 'account', l: 'VERESİYE', i: '📖' }].map(m => (
                 <button
                   key={m.id}
                   onClick={() => setPaymentMode(m.id as any)}
-                  className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${paymentMode === m.id ? 'bg-white/10 border-primary text-white shadow-lg' : 'bg-black/20 border-white/5 hover:bg-white/5 text-white/50'}`}
+                  className={`p-5 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${paymentMode === m.id
+                    ? (posTheme === 'light' ? 'bg-white border-primary shadow-lg ring-1 ring-primary/20 scale-[1.02]' : 'bg-white/10 border-primary text-white shadow-lg')
+                    : (posTheme === 'light' ? 'bg-gray-50/50 border-gray-100 hover:bg-white hover:border-gray-200 text-gray-400' : 'bg-black/20 border-white/5 hover:bg-white/5 text-white/50')
+                    }`}
                 >
-                  <span className="text-xl mb-1">{m.i}</span>
-                  <span className="text-[9px] font-bold uppercase">{m.l}</span>
+                  <span className={`text-2xl transition-transform ${paymentMode === m.id ? 'scale-110' : ''}`}>{m.i}</span>
+                  <span className={`text-[10px] font-bold uppercase tracking-wide`}>{m.l}</span>
                 </button>
               ))}
             </div>
@@ -623,15 +626,18 @@ function POSContent() {
           <button
             onClick={handleFinalize}
             disabled={isProcessing || cart.length === 0}
-            className={`w-full py-4 rounded-xl font-black text-white shadow-lg transition-all duration-300 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 ${cart.length > 0 ? 'bg-gradient-to-r from-orange-600 to-orange-400 shadow-orange-600/20' : 'bg-white/10 border border-white/5 text-white/30'}`}
+            className={`w-full py-5 rounded-2xl font-black text-white shadow-xl transition-all duration-300 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed hover:scale-[1.03] active:scale-95 ${cart.length > 0
+              ? (posTheme === 'light' ? 'bg-primary shadow-primary/20' : 'bg-gradient-to-r from-orange-600 to-orange-400 shadow-orange-600/20')
+              : 'bg-white/10 border border-white/5 text-white/30'
+              }`}
           >
             {isProcessing ? (
               <div className="flex items-center justify-center gap-2">
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                 <span>İŞLENİYOR...</span>
               </div>
             ) : (
-              'ONAYLA ➔'
+              'ÖDEMEYİ TAMAMLA ➔'
             )}
           </button>
         </div>
