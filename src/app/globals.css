@@ -81,9 +81,12 @@
 [data-pos-theme="light"] .card,
 [data-pos-theme="light"] .glass,
 [data-pos-theme="light"] [class*="bg-[#0f111a]"],
+[data-pos-theme="light"] [class*="bg-[#0f1115]"],
 [data-pos-theme="light"] [class*="bg-indigo-900"],
 [data-pos-theme="light"] [class*="bg-emerald-900"],
-[data-pos-theme="light"] [class*="bg-white/5"] {
+[data-pos-theme="light"] [class*="bg-white/5"],
+[data-pos-theme="light"] [class*="bg-white/10"],
+[data-pos-theme="light"] [class*="bg-white/20"] {
   background: var(--card-pos) !important;
   border: 1px solid var(--border-pos) !important;
   box-shadow: var(--shadow-pos) !important;
@@ -100,6 +103,9 @@
 
 /* Typography Hierarchy */
 [data-pos-theme="light"] .text-white,
+[data-pos-theme="light"] [class*="text-white/90"],
+[data-pos-theme="light"] [class*="text-white/80"],
+[data-pos-theme="light"] [class*="text-white/70"],
 [data-pos-theme="light"] .text-pos,
 [data-pos-theme="light"] .text-black {
   color: var(--text-pos) !important;
@@ -109,6 +115,11 @@
 [data-pos-theme="light"] .text-gray-400,
 [data-pos-theme="light"] .text-gray-500,
 [data-pos-theme="light"] .text-gray-600,
+[data-pos-theme="light"] [class*="text-white/60"],
+[data-pos-theme="light"] [class*="text-white/50"],
+[data-pos-theme="light"] [class*="text-white/40"],
+[data-pos-theme="light"] [class*="text-white/30"],
+[data-pos-theme="light"] [class*="text-white/20"],
 [data-pos-theme="light"] .opacity-60,
 [data-pos-theme="light"] .opacity-50,
 [data-pos-theme="light"] .opacity-40 {
@@ -145,17 +156,29 @@
 }
 
 /* 🎨 Semantic Color Mappings for Tailwind Classes */
-[data-pos-theme="light"] .bg-emerald-500 {
+[data-pos-theme="light"] .bg-emerald-500,
+[data-pos-theme="light"] .bg-emerald-600 {
   background-color: var(--success) !important;
 }
 
 [data-pos-theme="light"] .bg-rose-500,
+[data-pos-theme="light"] .bg-rose-600,
 [data-pos-theme="light"] .bg-red-500 {
   background-color: #EF4444 !important;
 }
 
-[data-pos-theme="light"] .bg-indigo-500 {
+[data-pos-theme="light"] .bg-indigo-500,
+[data-pos-theme="light"] .bg-indigo-600 {
   background-color: var(--primary) !important;
+}
+
+[data-pos-theme="light"] .bg-orange-500,
+[data-pos-theme="light"] .bg-orange-600 {
+  background-color: #F97316 !important;
+}
+
+[data-pos-theme="light"] .bg-slate-600 {
+  background-color: #475569 !important;
 }
 
 [data-pos-theme="light"] .text-emerald-500 {
@@ -164,6 +187,29 @@
 
 [data-pos-theme="light"] .text-indigo-500 {
   color: var(--primary) !important;
+}
+
+[data-pos-theme="light"] .text-blue-400 {
+  color: #2563EB !important;
+}
+
+[data-pos-theme="light"] .text-emerald-400 {
+  color: var(--success) !important;
+}
+
+[data-pos-theme="light"] .text-rose-400,
+[data-pos-theme="light"] .text-red-400 {
+  color: #DC2626 !important;
+}
+
+[data-pos-theme="light"] .text-amber-400 {
+  color: #B45309 !important;
+}
+
+[data-pos-theme="light"] .bg-orange-500\/10 {
+  background: rgba(249, 115, 22, 0.12) !important;
+  border: 1px solid rgba(249, 115, 22, 0.2) !important;
+  color: #C2410C !important;
 }
 
 /* Inputs & Forms */

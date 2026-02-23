@@ -6,11 +6,13 @@ import { useCRM } from '@/contexts/CRMContext'; // Added useCRM
 export default function AccountingModals({
     isOpen,
     onClose,
-    type // 'transaction', 'debt', 'collection', 'check', 'account', 'statement'
+    type, // 'transaction', 'debt', 'collection', 'check', 'account', 'statement'
+    posTheme
 }: {
     isOpen: boolean;
     onClose: () => void;
     type: string;
+    posTheme: 'dark' | 'light';
 }) {
     const { addFinancialTransaction, addCheck, refreshKasalar, kasalar } = useFinancials();
     const { customers, suppliers } = useCRM(); // Get CRM data
@@ -179,11 +181,23 @@ export default function AccountingModals({
 
     // Render based on type
     return (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
-            <div className="bg-[#1a1a1a] border border-white/10 p-6 rounded-2xl w-full max-w-lg relative animate-in zoom-in-95 transaction-modal max-h-[90vh] overflow-y-auto">
+        <div
+            style={{
+                position: 'fixed',
+                inset: 0,
+                background: posTheme === 'light' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.8)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 2000,
+                backdropBlur: '4px'
+            }}
+            data-pos-theme={posTheme}
+        >
+            <div className={`card glass border border-white/10 p-6 rounded-3xl w-full max-w-lg relative animate-in zoom-in-95 transaction-modal max-h-[90vh] overflow-y-auto ${posTheme === 'light' ? 'bg-white' : 'bg-[#1a1a1a]'}`}>
                 <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white">✕</button>
 
-                <h2 className="text-xl font-bold text-white mb-6">
+                <h2 className={posTheme === 'light' ? "text-xl font-black text-pos mb-6" : "text-xl font-bold text-white mb-6"}>
                     {type === 'debt' && 'Ödeme Yap (Borç)'}
                     {type === 'collection' && 'Tahsilat Ekle'}
                     {type === 'check' && 'Çek / Senet Ekle'}
@@ -195,9 +209,9 @@ export default function AccountingModals({
                 {type === 'statement' ? (
                     <div className="space-y-4">
                         <div className="space-y-4">
-                            <label className="block text-xs font-bold text-white/50 mb-1">İşlem Yapılacak IBAN (XML için zorunlu)</label>
+                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">İşlem Yapılacak IBAN (XML için zorunlu)</label>
                             <select
-                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none mb-4"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-pos outline-none mb-4"
                                 value={selectedIban}
                                 onChange={e => setSelectedIban(e.target.value)}
                             >
@@ -207,12 +221,12 @@ export default function AccountingModals({
                                 ))}
                             </select>
 
-                            <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-blue-500/50 transition-colors">
+                            <div className={`border-2 border-dashed ${posTheme === 'light' ? 'border-primary/20 bg-primary/5' : 'border-white/20 bg-white/5'} rounded-2xl p-8 text-center hover:border-primary transition-colors`}>
                                 <input type="file" onChange={handleFileUpload} accept=".pdf,.xml" className="hidden" id="file-upload" />
                                 <label htmlFor="file-upload" className="cursor-pointer block">
                                     <div className="text-4xl mb-2">📄</div>
-                                    <div className="text-sm font-bold text-white">PDF veya XML Ekstre Yükle</div>
-                                    <div className="text-xs text-white/40 mt-1">Bankanızdan aldığınız PDF veya XML (BizimHesap) ekstrelerini buraya sürükleyin.</div>
+                                    <div className={posTheme === 'light' ? "text-sm font-black text-pos" : "text-sm font-bold text-white"}>PDF veya XML Ekstre Yükle</div>
+                                    <div className="text-[10px] text-gray-500 font-bold uppercase mt-1">Bankanızdan aldığınız PDF veya XML (BizimHesap) ekstrelerini buraya sürükleyin.</div>
                                 </label>
                             </div>
                         </div>
@@ -246,9 +260,9 @@ export default function AccountingModals({
                         {/* CUSTOMER / SUPPLIER SELECTION LOGIC */}
                         {type === 'collection' && (
                             <div>
-                                <label className="block text-xs font-bold text-white/50 mb-1">Kimden Tahsilat Yapılacak?</label>
+                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Kimden Tahsilat Yapılacak?</label>
                                 <select
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-pos outline-none focus:border-primary/50"
                                     value={formData.customerId}
                                     onChange={e => setFormData({ ...formData, customerId: e.target.value })}
                                 >
@@ -262,9 +276,9 @@ export default function AccountingModals({
 
                         {type === 'debt' && (
                             <div>
-                                <label className="block text-xs font-bold text-white/50 mb-1">Kime Ödeme Yapılacak?</label>
+                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Kime Ödeme Yapılacak?</label>
                                 <select
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-pos outline-none focus:border-primary/50"
                                     value={formData.supplierId}
                                     onChange={e => setFormData({ ...formData, supplierId: e.target.value })}
                                 >
@@ -280,9 +294,9 @@ export default function AccountingModals({
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-xs font-bold text-white/50 mb-1">Çek Türü</label>
+                                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Çek Türü</label>
                                         <select
-                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-pos outline-none focus:border-primary/50"
                                             value={formData.type}
                                             onChange={e => setFormData({ ...formData, type: e.target.value, customerId: '', supplierId: '' })}
                                         >
@@ -291,11 +305,11 @@ export default function AccountingModals({
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-white/50 mb-1">Vade Tarihi</label>
+                                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Vade Tarihi</label>
                                         <input
                                             type="date"
                                             required
-                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-blue-500/50"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-pos outline-none focus:border-primary/50"
                                             value={formData.dueDate}
                                             onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
                                         />
@@ -440,7 +454,7 @@ export default function AccountingModals({
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all active:scale-95 disabled:opacity-50 mt-4"
+                            className={`w-full ${posTheme === 'light' ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-blue-600'} hover:opacity-90 text-white font-black py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50 mt-4 uppercase tracking-widest text-xs`}
                         >
                             {loading ? 'Kaydediliyor...' : 'Kaydet'}
                         </button>

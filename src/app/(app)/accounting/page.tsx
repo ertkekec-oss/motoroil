@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFinancials } from "@/contexts/FinancialContext";
-import { useCRM } from "@/contexts/CRMContext"; // Added useCRM
+import { useCRM } from "@/contexts/CRMContext";
 import { formatCurrency } from "@/lib/utils";
+import { Sun, Moon } from "lucide-react";
 
 import { useSearchParams } from "next/navigation";
 import { useModal } from "@/contexts/ModalContext";
@@ -83,6 +84,34 @@ export default function AccountingPage() {
             setSyncStates(prev => ({ ...prev, [key]: 'ERROR' }));
         }
     };
+
+    const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
+
+    // Theme Sync
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('pos-theme') as 'dark' | 'light';
+        if (savedTheme) setPosTheme(savedTheme);
+    }, []);
+
+    const togglePosTheme = () => {
+        const newTheme = posTheme === 'dark' ? 'light' : 'dark';
+        setPosTheme(newTheme);
+        localStorage.setItem('pos-theme', newTheme);
+    };
+
+    useEffect(() => {
+        if (posTheme === 'light') {
+            document.body.style.background = '#F7F9FC';
+            document.body.style.color = '#1A1F36';
+        } else {
+            document.body.style.background = 'var(--bg-deep)';
+            document.body.style.color = 'var(--text-main)';
+        }
+        return () => {
+            document.body.style.background = 'var(--bg-deep)';
+            document.body.style.color = 'var(--text-main)';
+        };
+    }, [posTheme]);
 
     // Sync activeTab with URL is optional but helpful
     useEffect(() => {
@@ -168,25 +197,35 @@ export default function AccountingPage() {
     ];
 
     return (
-        <div className="w-full min-h-full p-6 md:p-8 space-y-8">
+        <div data-pos-theme={posTheme} className="w-full min-h-screen p-6 md:p-8 space-y-8 transition-colors duration-300">
             <AccountingModals
                 isOpen={!!modalType}
                 onClose={() => setModalType(null)}
                 type={modalType || ''}
+                posTheme={posTheme}
             />
 
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Muhasebe & Finans</h1>
-                    <p className="text-white/60">Nakit akışı, cari hesaplar ve kasa yönetimi</p>
+                    <h1 className={posTheme === 'light' ? "text-3xl font-black text-slate-800 mb-2" : "text-3xl font-bold text-white mb-2"}>Muhasebe & Finans</h1>
+                    <p className={posTheme === 'light' ? "text-slate-500 font-medium" : "text-white/60"}>Nakit akışı, cari hesaplar ve kasa yönetimi</p>
                 </div>
-                <button
-                    onClick={() => refreshData()}
-                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-white transition-all active:scale-95"
-                >
-                    {isInitialLoading ? "🔄 Yenileniyor..." : "🔄 Verileri Yenile"}
-                </button>
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={togglePosTheme}
+                        className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all shadow-pos flex items-center justify-center bg-white/5"
+                        title={posTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}
+                    >
+                        {posTheme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-primary" />}
+                    </button>
+                    <button
+                        onClick={() => refreshData()}
+                        className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-white transition-all active:scale-95"
+                    >
+                        {isInitialLoading ? "🔄 Yenileniyor..." : "🔄 Verileri Yenile"}
+                    </button>
+                </div>
             </div>
 
             {/* Cards Grid */}
@@ -194,7 +233,7 @@ export default function AccountingPage() {
                 {cards.map((card, idx) => (
                     <div
                         key={idx}
-                        className={`p-6 rounded-2xl border ${card.border} ${card.bg} backdrop-blur-sm relative overflow-hidden group hover:scale-[1.02] transition-all duration-300`}
+                        className={`p-6 rounded-2xl border ${card.border} ${card.bg} card glass backdrop-blur-sm relative overflow-hidden group hover:scale-[1.02] transition-all duration-300`}
                     >
                         <div className="flex justify-between items-start mb-4">
                             <span className="text-xs font-bold tracking-wider text-white/40">{card.title}</span>
@@ -224,17 +263,17 @@ export default function AccountingPage() {
             <div className="flex flex-wrap gap-4 border-b border-white/10 pb-1">
                 {[
                     { id: 'receivables', label: 'Alacaklar', color: 'bg-orange-600' },
-                    { id: 'payables', label: 'Borçlar', color: 'bg-white/10' },
-                    { id: 'checks', label: 'Çek & Senet', color: 'bg-white/10' },
-                    { id: 'banks', label: 'Banka & Kasa', color: 'bg-white/10' },
-                    { id: 'expenses', label: 'Giderler', color: 'bg-white/10' },
-                    { id: 'transactions', label: 'Finansal Hareketler', color: 'bg-white/10' },
+                    { id: 'payables', label: 'Borçlar', color: 'bg-rose-600' },
+                    { id: 'checks', label: 'Çek & Senet', color: 'bg-indigo-600' },
+                    { id: 'banks', label: 'Banka & Kasa', color: 'bg-emerald-600' },
+                    { id: 'expenses', label: 'Giderler', color: 'bg-rose-600' },
+                    { id: 'transactions', label: 'Finansal Hareketler', color: 'bg-slate-600' },
                 ].map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === tab.id
-                            ? 'bg-orange-600 text-white shadow-lg shadow-orange-900/20 scale-105'
+                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-sm ${activeTab === tab.id
+                            ? `${tab.color} text-white shadow-lg scale-105`
                             : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
                             }`}
                     >
@@ -244,7 +283,7 @@ export default function AccountingPage() {
             </div>
 
             {/* Content Area */}
-            <div className="bg-[#0f1115] border border-white/5 rounded-2xl p-6 min-h-[400px]">
+            <div className="card glass border border-white/5 rounded-2xl p-6 min-h-[400px]">
                 {activeTab === 'receivables' && (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
@@ -724,7 +763,7 @@ export default function AccountingPage() {
             </div>
 
             {/* Bottom Planner Section */}
-            <div className="bg-[#0f1115] border border-white/5 rounded-2xl p-6">
+            <div className="card glass border border-white/5 rounded-2xl p-6">
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
                         <span className="text-xl">🗓️</span>
