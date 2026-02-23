@@ -196,9 +196,19 @@ export class TrendyolService implements IMarketplaceService {
             const postResult = await this.createCommonLabelRequest(shipmentPackageId, trackingNo);
             if (!postResult.success) {
                 if (postResult.status === 400 && postResult.body?.includes('COMMON_LABEL_NOT_ALLOWED')) {
+                    console.warn(`${ctx} Common Label not allowed. Falling back to integrated label...`);
+                    const fallback = await this.getIntegratedLabel(shipmentPackageId);
+                    if (fallback.success) {
+                        return {
+                            status: 'SUCCESS',
+                            pdfBase64: fallback.pdfBase64,
+                            httpStatus: 200,
+                            error: format === 'ZPL' ? "Trendyol hesabınızda ZPL (Ortak Barkod) yetkisi bulunmadığı için standart PDF barkoduna geri dönüldü." : undefined
+                        };
+                    }
                     return {
                         status: 'FAILED',
-                        error: "Trendyol: Bu paket için ortak barkod izni verilmedi (COMMON_LABEL_NOT_ALLOWED). Sadece TEX/Aras ve Trendyol Öder paketlerde çalışır. Lütfen paketi onayladığınızdan emin olun."
+                        error: "Trendyol: Bu paket için ortak barkod izni verilmedi ve standart barkoda erişilemedi. Lütfen ürün kategorinizin ortak barkod sürecine dahil olduğundan emin olun."
                     };
                 }
                 return {
@@ -282,6 +292,20 @@ export class TrendyolService implements IMarketplaceService {
             return null;
         } catch {
             return null;
+        }
+    }
+
+    async getIntegratedLabel(shipmentPackageId: string): Promise<{ success: boolean; pdfBase64?: string; error?: string }> {
+        try {
+            const url = `${this.baseUrl}/integration/sellers/${this.config.supplierId}/labels?shipmentPackageIds=${shipmentPackageId}`;
+            const effectiveProxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+            const fetchUrl = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url)}` : url;
+            const response = await fetch(fetchUrl, { headers: this.getHeaders({ 'Accept': 'application/pdf' }) });
+            if (!response.ok) return { success: false, error: await response.text() };
+            const buffer = await response.arrayBuffer();
+            return { success: true, pdfBase64: Buffer.from(buffer).toString('base64') };
+        } catch (error: any) {
+            return { success: false, error: error.message };
         }
     }
 

@@ -120,22 +120,46 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
                     throw new Error(labelResult.error || 'Etiket alınamadı');
                 }
 
-                // Success processing
-                const zplContent = labelResult.zpl!;
-                const zplBuffer = Buffer.from(zplContent, 'utf-8');
-                const sha256 = createHash('sha256').update(zplBuffer).digest('hex');
-                const storageKey = generateLabelStorageKey(companyId, marketplace, shipmentPackageId) + ".zpl";
+                // Success processing - Handle Fallback (PDF received instead of ZPL)
+                if (!labelResult.zpl && labelResult.pdfBase64) {
+                    const pdfBuffer = Buffer.from(labelResult.pdfBase64, 'base64');
+                    const sha256 = createHash('sha256').update(pdfBuffer).digest('hex');
+                    const storageKey = generateLabelStorageKey(companyId, marketplace, shipmentPackageId);
 
-                await uploadLabel(storageKey, zplBuffer);
+                    await uploadLabel(storageKey, pdfBuffer);
 
-                await (prisma as any).marketplaceLabel.upsert({
-                    where: { companyId_marketplace_shipmentPackageId: { companyId, marketplace, shipmentPackageId } },
-                    update: { storageKey, sha256, size: zplBuffer.length },
-                    create: { companyId, marketplace, shipmentPackageId, storageKey, sha256, size: zplBuffer.length }
-                });
+                    await (prisma as any).marketplaceLabel.upsert({
+                        where: { companyId_marketplace_shipmentPackageId: { companyId, marketplace, shipmentPackageId } },
+                        update: { storageKey, sha256, size: pdfBuffer.length },
+                        create: { companyId, marketplace, shipmentPackageId, storageKey, sha256, size: pdfBuffer.length }
+                    });
 
-                console.info(`${ctx} SUCCESS: ZPL Label generated. Storage: ${storageKey}, Size: ${zplBuffer.length} bytes`);
-                result = { shipmentPackageId, storageKey, sha256, format: 'ZPL', labelReady: true, size: zplBuffer.length, zpl: zplContent };
+                    result = {
+                        shipmentPackageId,
+                        storageKey,
+                        sha256,
+                        format: 'A4', // Fallback format
+                        labelReady: true,
+                        size: pdfBuffer.length,
+                        message: "ZPL yetkisi olmadığı için PDF formatına geri dönüldü."
+                    };
+                } else {
+                    const zplContent = labelResult.zpl!;
+                    const zplBuffer = Buffer.from(zplContent, 'utf-8');
+                    const sha256 = createHash('sha256').update(zplBuffer).digest('hex');
+                    const storageKey = generateLabelStorageKey(companyId, marketplace, shipmentPackageId) + ".zpl";
+
+                    await uploadLabel(storageKey, zplBuffer);
+
+                    await (prisma as any).marketplaceLabel.upsert({
+                        where: { companyId_marketplace_shipmentPackageId: { companyId, marketplace, shipmentPackageId } },
+                        update: { storageKey, sha256, size: zplBuffer.length },
+                        create: { companyId, marketplace, shipmentPackageId, storageKey, sha256, size: zplBuffer.length }
+                    });
+
+                    console.info(`${ctx} SUCCESS: ZPL Label generated. Storage: ${storageKey}, Size: ${zplBuffer.length} bytes`);
+                    result = { shipmentPackageId, storageKey, sha256, format: 'ZPL', labelReady: true, size: zplBuffer.length, zpl: zplContent };
+                }
             } else if (actionKey === 'REFRESH_STATUS') {
                 const order = await prisma.order.findFirst({ where: { id: orderId, companyId } });
                 if (!order || !order.orderNumber) throw new Error('Sipariş verisi eksik');
