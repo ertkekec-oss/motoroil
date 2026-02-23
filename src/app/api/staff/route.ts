@@ -5,6 +5,7 @@ import { sendMail } from '@/lib/mail';
 
 
 import { authorize } from '@/lib/auth';
+import { checkLimit } from '@/lib/limits';
 
 export async function GET(req: Request) {
     const auth = await authorize();
@@ -69,6 +70,14 @@ export async function POST(req: Request) {
 
         const user = auth.user;
         const effectiveTenantId = user.impersonateTenantId || user.tenantId || 'PLATFORM_ADMIN';
+
+        // 1. Limit Check
+        if (effectiveTenantId !== 'PLATFORM_ADMIN') {
+            const limitCheck = await checkLimit(effectiveTenantId, 'employees');
+            if (!limitCheck.allowed) {
+                return NextResponse.json({ success: false, error: limitCheck.error }, { status: 403 });
+            }
+        }
 
         // Username generation logic
         let finalUsername = username;

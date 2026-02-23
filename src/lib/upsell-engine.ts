@@ -60,6 +60,11 @@ export async function calculateUpsellSignal(tenantId: string, currentSource: str
             where: { tenantId }
         });
 
+        // Add staff/employee usage check
+        const staffUsage = await (prisma as any).staff.count({
+            where: { tenantId }
+        });
+
         const getLimit = (key: string) => {
             const l = currentPlan.limits.find((l: any) => l.resource === key);
             return l ? l.limit : -1;
@@ -67,11 +72,13 @@ export async function calculateUpsellSignal(tenantId: string, currentSource: str
 
         const docLimit = getLimit('monthly_documents');
         const companyLimit = getLimit('companies');
-        const userLimit = getLimit('users');
+        const userLimit = getLimit('users'); // System Users
+        const employeeLimit = getLimit('employees'); // Company Staff
 
         const docPercent = docLimit > 0 ? (monthlyDocsUsage / docLimit) * 100 : 0;
         const companyPercent = companyLimit > 0 ? (companies.length / companyLimit) * 100 : 0;
         const userPercent = userLimit > 0 ? (userUsage / userLimit) * 100 : 0;
+        const employeePercent = employeeLimit > 0 ? (staffUsage / employeeLimit) * 100 : 0;
 
         // 3. Growth Events (Sinayl Matrisi)
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -88,7 +95,7 @@ export async function calculateUpsellSignal(tenantId: string, currentSource: str
         // --- RULE ENGINE ---
 
         // RULE: Hard Limit Near (Priority 10)
-        if (docPercent >= 95 || companyPercent >= 100 || userPercent >= 100) {
+        if (docPercent >= 95 || companyPercent >= 100 || userPercent >= 100 || employeePercent >= 100) {
             return {
                 shouldTrigger: true,
                 type: 'HARD',

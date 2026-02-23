@@ -345,6 +345,9 @@ export default function StaffManagementContent() {
                     assignedCategoryIds: []
                 });
                 showSuccess("Personel Eklendi", "Sisteme giriş yetkileri varsayılan olarak tanımlandı. Şifre mail olarak gönderildi.");
+            } else {
+                const errData = await res.json();
+                showError("İşlem Başarısız", errData.error || "Personel eklenirken bir hata oluştu.");
             }
         } catch (e) {
             console.error('Save staff failed', e);
@@ -1633,8 +1636,8 @@ export default function StaffManagementContent() {
                                                     setSelectedStaff({ ...selectedStaff, assignedCategoryIds: newIds });
                                                 }}
                                                 className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all border ${isActive
-                                                        ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
-                                                        : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10'
+                                                    ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                                                    : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10'
                                                     }`}
                                             >
                                                 {cat.name}

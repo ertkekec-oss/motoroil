@@ -76,6 +76,11 @@ export async function GET(req: NextRequest) {
             where: { tenantId: ctx.tenantId }
         });
 
+        // 4. Şirket Çalışanı / Personel Sayısı
+        const employeeUsage = await (prisma as any).staff.count({
+            where: { tenantId: ctx.tenantId }
+        });
+
         // Limitleri Eşleştir
         const getLimit = (key: string) => {
             const l = (subscription as any).plan.limits.find((l: any) => l.resource === key);
@@ -102,6 +107,11 @@ export async function GET(req: NextRequest) {
                     used: userUsage,
                     limit: getLimit('users'),
                     percent: getLimit('users') > 0 ? Math.round((userUsage / getLimit('users')) * 100) : 0
+                },
+                employees: {
+                    used: employeeUsage,
+                    limit: getLimit('employees'),
+                    percent: getLimit('employees') > 0 ? Math.round((employeeUsage / getLimit('employees')) * 100) : 0
                 }
             },
             features: (subscription as any).plan.features.map((f: any) => f.feature.key)
