@@ -55,7 +55,7 @@ export async function GET(
 
         // 1) Fast Path: Check existing state
         const existingLabel = await (prisma as any).marketplaceLabel.findUnique({
-            where: { companyId_marketplace_shipmentPackageId: { companyId: company.id, marketplace, shipmentPackageId } }
+            where: { companyId_marketplace_shipmentPackageId: { companyId: companyId, marketplace, shipmentPackageId } }
         });
         if (existingLabel) {
             console.log(`${ctx} Found existing label in DB. Responding with success.`);
@@ -95,7 +95,7 @@ export async function GET(
         // 3) Execute Action ONCE
         const provider = ActionProviderRegistry.getProvider(marketplace);
         const result = await provider.executeAction({
-            companyId: company.id,
+            companyId: companyId,
             marketplace: marketplace as any,
             orderId,
             actionKey: `PRINT_LABEL_${format}` as any,
