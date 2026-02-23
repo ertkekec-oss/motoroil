@@ -83,8 +83,9 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
             setCustomers(customers);
             setError(null);
         } catch (err: any) {
-            console.error('CRM Critical Error:', err);
-            setError(err);
+            console.error('CRM Fetching Error (Customers):', err);
+            // Don't set global error to prevent app-wide crash screen
+            // setError(err); 
         }
     };
 
@@ -100,8 +101,9 @@ export function CRMProvider({ children }: { children: React.ReactNode }) {
             setSuppliers(suppliers);
             setError(null);
         } catch (err: any) {
-            console.error('CRM Critical Error:', err);
-            setError(err);
+            console.error('CRM Fetching Error (Suppliers):', err);
+            // Don't set global error to prevent app-wide crash screen
+            // setError(err);
         }
     };
 

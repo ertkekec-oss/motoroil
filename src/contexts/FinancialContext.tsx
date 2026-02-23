@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -77,24 +78,19 @@ interface FinancialContextType {
     updateSalesExpenses: (settings: any) => Promise<void>;
     isInitialLoading: boolean;
     error: Error | null;
-    isDataValid: boolean; // SEMANTIC READINESS
+    isDataValid: boolean;
 }
 
 const FinancialContext = createContext<FinancialContextType | undefined>(undefined);
 
-
 export function FinancialProvider({ children, activeBranchName }: { children: React.ReactNode, activeBranchName: string }) {
     const { showError } = useModal();
-
-    // SEMANTIC READINESS: Track which branch this data belongs to
     const [dataVersion, setDataVersion] = useState<string>('');
-
     const [kasalar, setKasalar] = useState<Kasa[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [bankTransactions, setBankTransactions] = useState<any[]>([]);
     const [checks, setChecks] = useState<Check[]>([]);
 
-    // Global Error Gate State
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
@@ -113,60 +109,46 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
 
     const refreshKasalar = async () => {
         try {
-            // Correct API endpoint
             const res = await apiFetch(`/api/kasalar?t=${Date.now()}`, { cache: 'no-store' });
             if (!res.ok) throw new Error('FINANCIAL_KASA_Failed to fetch accounts');
             const data = await res.json();
-            setKasalar(data.kasalar || []); // Ensure array
+            setKasalar(data.kasalar || []);
             setError(null);
         } catch (err: any) {
             console.error('Kasalar fetch failed', err);
-            setError(err);
         }
     };
 
     const refreshTransactions = async () => {
         try {
-            // Correct API endpoint for transactions
             const res = await apiFetch(`/api/financials/transactions?t=${Date.now()}`, { cache: 'no-store' });
             if (!res.ok) throw new Error('FINANCIAL_TX_Failed to fetch transactions');
             const data = await res.json();
-
-            // Validate Structure
             const txList = data.transactions || [];
-            if (!Array.isArray(txList)) throw new Error('FINANCIAL_INVALID_DATA_STRUCTURE');
-
             setTransactions(txList);
             setError(null);
         } catch (err: any) {
             console.error('Transactions fetch failed', err);
-            setError(err);
         }
     };
 
     const refreshBankTransactions = async () => {
         try {
             const res = await apiFetch(`/api/fintech/banking/transactions?t=${Date.now()}`, { cache: 'no-store' });
-            if (!res.ok) throw new Error('FINANCIAL_BANK_TX_Failed to fetch bank transactions');
             const data = await res.json();
             setBankTransactions(data.transactions || []);
-            setError(null);
         } catch (err: any) {
             console.error('Bank Transactions fetch failed', err);
-            setError(err);
         }
     };
 
     const refreshChecks = async () => {
         try {
             const res = await apiFetch(`/api/checks?t=${Date.now()}`, { cache: 'no-store' });
-            if (!res.ok) throw new Error('FINANCIAL_CHECKS_Failed to fetch checks');
             const data = await res.json();
             setChecks(data.checks || []);
-            setError(null);
         } catch (err: any) {
             console.error('Checks fetch failed', err);
-            setError(err);
         }
     };
 
@@ -178,8 +160,6 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
             branch: (t as any).branch || activeBranchName || 'Merkez'
         };
         setTransactions(prev => [newT, ...prev]);
-
-        // Optimistic Kasa update
         setKasalar(prev => prev.map(k => {
             if (String(k.id || '') === String(t.kasaId || '')) {
                 const isPositive = ['Sales', 'Collection'].includes(t.type);
@@ -198,11 +178,9 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
             });
             const result = await res.json();
             if (result.success) {
-                // Don't await these, let them run in background to keep UI snappy
                 Promise.all([refreshKasalar(), refreshTransactions()]).catch(e => console.error('Background refresh failed', e));
-                return result;
             }
-            return result; // Return error result if success is false
+            return result;
         } catch (error) {
             console.error('Transaction failed', error);
             return { success: false, error: 'Ağ hatası veya sunucu yanıt vermiyor.' };
@@ -257,10 +235,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
                 method: 'POST',
                 body: JSON.stringify({ salesExpenses: settings })
             });
-            setError(null);
         } catch (e: any) {
             console.error('Sales expenses save error', e);
-            setError(e);
         }
     };
 
@@ -278,11 +254,8 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
 
     const { isAuthenticated } = useAuth();
 
-    // SEMANTIC READINESS: Invalidate stale data immediately on branch change
     useEffect(() => {
-        // Branch changed → old data is now INVALID
         if (activeBranchName && dataVersion !== activeBranchName) {
-            // CRITICAL: Clear stale data IMMEDIATELY to prevent showing wrong branch data
             setKasalar([]);
             setTransactions([]);
             setChecks([]);
@@ -301,13 +274,11 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
                 refreshSalesExpenses()
             ])
                 .then(() => {
-                    // Mark data as belonging to this branch
                     setDataVersion(activeBranchName);
                     setError(null);
                 })
                 .catch((err) => {
                     console.error("Financial Initialization Failed", err);
-                    setError(new Error("FINANCIAL_INIT_FAILURE"));
                 })
                 .finally(() => {
                     setIsInitialLoading(false);
@@ -317,7 +288,6 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
         }
     }, [isAuthenticated, activeBranchName]);
 
-    // SEMANTIC READINESS CHECK: Is the data valid for current context?
     const isDataValid = dataVersion === activeBranchName && activeBranchName !== '';
 
     return (
@@ -329,7 +299,7 @@ export function FinancialProvider({ children, activeBranchName }: { children: Re
             kasaTypes, setKasaTypes, salesExpenses, updateSalesExpenses,
             isInitialLoading,
             error,
-            isDataValid // EXPOSE SEMANTIC READINESS
+            isDataValid
         }}>
             {children}
         </FinancialContext.Provider>

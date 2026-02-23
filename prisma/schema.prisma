@@ -87,6 +87,7 @@ model Company {
   users              UserCompanyAccess[]
   expenses           Expense[]
   campaigns          Campaign[]
+  locationRequests   CustomerLocationRequest[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -474,6 +475,9 @@ model Customer {
   city            String?
   companyId       String
   district        String?
+  lat             Float?             // GPS latitude — pinned on first field sales visit
+  lng             Float?             // GPS longitude — pinned on first field sales visit
+  locationPinnedAt DateTime?         // when the pin was first set
   isPortalActive  Boolean            @default(false)
   lastPortalLogin DateTime?
   portalPassword  String?
@@ -493,6 +497,7 @@ model Customer {
   warranties      Warranty[]
   assignedStaffId String?
   assignedStaff   Staff?             @relation("StaffCustomers", fields: [assignedStaffId], references: [id])
+  locationRequests CustomerLocationRequest[]
 
   @@unique([email, companyId])
   @@index([name])
@@ -812,6 +817,7 @@ model Staff {
   attendance       Attendance[]
   expenses         Expense[]       @relation("StaffExpenses")
   assignedCustomers Customer[]     @relation("StaffCustomers")
+  locationRequests CustomerLocationRequest[]
 
   // PDKS & Puantaj Fields
   workType          String?   @default("FULL_TIME") // FULL_TIME, PART_TIME, CONTRACT
@@ -2112,4 +2118,23 @@ enum AuthorType {
   CUSTOMER
   ADMIN
   SYSTEM
+}
+model CustomerLocationRequest {
+  id           String   @id @default(cuid())
+  customerId   String
+  staffId      String
+  companyId    String
+  requestedLat Float
+  requestedLng Float
+  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  staff        Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
 }

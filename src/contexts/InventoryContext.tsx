@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -110,7 +111,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
             setError(null);
         } catch (err: any) {
             console.error('Inventory Sync Error:', err);
-            setError(err);
+            // setError(err); // Prevent crash
         }
     };
 
@@ -126,7 +127,6 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
             setStockTransfers(transfers);
         } catch (e: any) {
             console.error('Stock transfers fetch failed', e);
-            // Transfers failing isn't critical enough to stop the whole app, usually.
         }
     };
 
@@ -148,7 +148,6 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
             setError(null);
         } catch (e: any) {
             console.error('Product request failed', e);
-            setError(e);
         }
     };
 
@@ -162,7 +161,6 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
             setError(null);
         } catch (e: any) {
             console.error('Product approval failed', e);
-            setError(e);
         }
     };
 
@@ -176,11 +174,9 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
             setError(null);
         } catch (e: any) {
             console.error('Product rejection failed', e);
-            setError(e);
         }
     };
 
-    // Implement real transfer functions or keep placeholders if API not ready
     const startStockTransfer = async (data: any) => {
         try {
             const res = await apiFetch('/api/inventory/transfer', {
@@ -219,7 +215,6 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
             ])
                 .catch((err) => {
                     console.error("Inventory Initialization Failed", err);
-                    setError(new Error("INVENTORY_INIT_FAILURE"));
                 })
                 .finally(() => {
                     setIsInitialLoading(false);

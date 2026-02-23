@@ -5,18 +5,14 @@ import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-// Haversine distance in meters between two lat/lng points
 function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const R = 6371000;
     const toRad = (d: number) => d * (Math.PI / 180);
     const dLat = toRad(lat2 - lat1);
-    const dLng = toRad(lng2 - lng1);
+    const dLng = toRad(lng1 - lng2); // Fixed longitude diff direction (doesn't change result but cleaner)
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
-
-// Max allowed distance from customer address (meters). No hard block — only flag.
-const MAX_RANGE_METERS = 1500;
 
 export async function POST(req: NextRequest) {
     try {
@@ -28,7 +24,7 @@ export async function POST(req: NextRequest) {
 
         if (!customerId) return NextResponse.json({ error: 'Customer ID required' }, { status: 400 });
 
-        // 1. Find Staff
+        // 1. Staff
         let staff = await (prisma as any).staff.findFirst({
             where: {
                 OR: [
@@ -37,13 +33,27 @@ export async function POST(req: NextRequest) {
                 ]
             }
         });
-
-        if (!staff && session.tenantId === 'PLATFORM_ADMIN') {
-            staff = await (prisma as any).staff.findFirst();
-        }
+        if (!staff && session.tenantId === 'PLATFORM_ADMIN') staff = await (prisma as any).staff.findFirst();
         if (!staff) return NextResponse.json({ error: 'Personel kaydı bulunamadı.' }, { status: 403 });
 
-        // 2. Active visit check
+        // 2. Resolve Company
+        let company;
+        if (session.tenantId === 'PLATFORM_ADMIN') {
+            company = await (prisma as any).company.findFirst();
+        } else {
+            company = await (prisma as any).company.findFirst({ where: { tenantId: session.tenantId } });
+        }
+        if (!company) return NextResponse.json({ error: 'Company not found' }, { status: 404 });
+
+        // 3. Fetch Settings
+        const settingsRecord = await prisma.appSettings.findUnique({
+            where: { companyId_key: { companyId: company.id, key: 'field_sales_config' } }
+        });
+        const config = (settingsRecord?.value as any) || { maxDistance: 1500, allowOutOfRange: true };
+        const MAX_RANGE = config.maxDistance || 1500;
+        const ALLOW_OUT_OF_RANGE = config.allowOutOfRange !== false;
+
+        // 4. Active visit check
         const activeVisit = await (prisma as any).salesVisit.findFirst({
             where: { staffId: staff.id, checkOutTime: null },
             include: { customer: { select: { name: true } } }
@@ -55,42 +65,40 @@ export async function POST(req: NextRequest) {
             }, { status: 409 });
         }
 
-        // 3. Company
-        let company;
-        if (session.tenantId === 'PLATFORM_ADMIN') {
-            company = await (prisma as any).company.findFirst();
-        } else {
-            company = await (prisma as any).company.findFirst({ where: { tenantId: session.tenantId } });
-        }
-        if (!company) return NextResponse.json({ error: 'Company not found' }, { status: 404 });
+        // 5. Customer & Pinning Logic
+        const customer = await (prisma as any).customer.findUnique({
+            where: { id: customerId },
+            select: { id: true, lat: true, lng: true }
+        });
+        if (!customer) return NextResponse.json({ error: 'Müşteri bulunamadı.' }, { status: 404 });
 
-        // 4. GPS distance check
         let isOutOfRange = false;
         let distanceMeters: number | null = null;
+        let pinnedNow = false;
 
         if (location?.lat && location?.lng) {
-            // Fetch customer's lat/lng if stored, or try geocoding from address
-            const customer = await (prisma as any).customer.findUnique({
-                where: { id: customerId },
-                select: { lat: true, lng: true, address: true, city: true, district: true }
-            });
-
-            if (customer?.lat && customer?.lng) {
+            if (!customer.lat || !customer.lng) {
+                // Auto-pin remains for the VERY FIRST time. 
+                // Any subsequent change will be via Request.
+                await (prisma as any).customer.update({
+                    where: { id: customerId },
+                    data: { lat: location.lat, lng: location.lng, locationPinnedAt: new Date() }
+                });
+                pinnedNow = true;
+                distanceMeters = 0;
+            } else {
                 distanceMeters = Math.round(haversineMeters(location.lat, location.lng, customer.lat, customer.lng));
-                isOutOfRange = distanceMeters > MAX_RANGE_METERS;
+                isOutOfRange = distanceMeters > MAX_RANGE;
             }
         }
 
-        // 5. Create Visit — store lat/lng separately inside location JSON for fast access
-        const locationPayload = location
-            ? {
-                lat: location.lat,
-                lng: location.lng,
-                accuracy: location.accuracy || null,
-                timestamp: new Date().toISOString(),
+        // 6. Block if out of range and not allowed
+        if (isOutOfRange && !ALLOW_OUT_OF_RANGE) {
+            return NextResponse.json({
+                error: `Kapsam dışındasınız (${distanceMeters}m). Bu firma için kapsam dışı ziyaretlere izin verilmiyor.`,
                 distanceMeters
-            }
-            : {};
+            }, { status: 403 });
+        }
 
         const visit = await (prisma as any).salesVisit.create({
             data: {
@@ -99,19 +107,12 @@ export async function POST(req: NextRequest) {
                 customerId,
                 routeStopId,
                 checkInTime: new Date(),
-                checkInLocation: locationPayload,
+                checkInLocation: { ...location, distanceMeters, autoPinned: pinnedNow },
                 isOutOfRange
             }
         });
 
-        return NextResponse.json({
-            ...visit,
-            distanceMeters,
-            isOutOfRange,
-            warning: isOutOfRange
-                ? `Uyarı: Müşteri konumuna ${distanceMeters}m uzaktasınız (max ${MAX_RANGE_METERS}m).`
-                : null
-        });
+        return NextResponse.json({ ...visit, distanceMeters, isOutOfRange, autoPinned: pinnedNow });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

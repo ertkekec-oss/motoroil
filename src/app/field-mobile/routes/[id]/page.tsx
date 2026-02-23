@@ -6,7 +6,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useModal } from '@/contexts/ModalContext';
 
 export default function MobileRouteDetailPage() {
-    const { showError, showConfirm } = useModal();
+    const { showError, showConfirm, showSuccess } = useModal();
     const router = useRouter();
     const params = useParams();
     const routeId = params.id as string;
@@ -61,6 +61,11 @@ export default function MobileRouteDetailPage() {
                     const data = await res.json();
 
                     if (res.ok) {
+                        // 1. Show auto-pin info
+                        if (data.autoPinned) {
+                            showSuccess('📍 Konum Sabitlendi', 'Müşterinin konumu ilk kez kaydedildi. Gelecek ziyaretlerde bu konum baz alınacaktır.');
+                        }
+
                         // Show distance warning if out of range
                         if (data.isOutOfRange && data.distanceMeters) {
                             showError('📍 Konum Uyarısı',
@@ -142,6 +147,45 @@ export default function MobileRouteDetailPage() {
         } else {
             performCheckOut(null);
         }
+    };
+
+    const handleRequestLocationUpdate = async (customerId: string) => {
+        showConfirm('Konum Güncelleme', 'Müşterinin konumunu şu anki koordinatlarınızla güncellemek için yönetici onayı talebi gönderilsin mi?', async () => {
+            if (!navigator.geolocation) return showError('Hata', 'Konum erişimi yok.');
+
+            setActionLoading(true);
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    try {
+                        const res = await fetch('/api/field-sales/location-request', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                customerId,
+                                lat: pos.coords.latitude,
+                                lng: pos.coords.longitude,
+                                notes: 'Saha personeli tarafından konum güncelleme talebi.'
+                            })
+                        });
+
+                        if (res.ok) {
+                            showSuccess('Başarılı', 'Güncelleme talebi iletildi. Yönetici onayından sonra geçerli olacaktır.');
+                        } else {
+                            showError('Hata', 'Talep iletilemedi.');
+                        }
+                    } catch (e) {
+                        showError('Hata', 'Bağlantı hatası.');
+                    } finally {
+                        setActionLoading(false);
+                    }
+                },
+                (err) => {
+                    showError('Hata', 'Konumunuz alınamadı.');
+                    setActionLoading(false);
+                },
+                { enableHighAccuracy: true }
+            );
+        });
     };
 
     if (loading) return <div className="p-8 text-center text-white">Yükleniyor...</div>;
@@ -258,16 +302,28 @@ export default function MobileRouteDetailPage() {
                                 </div>
 
                                 {!isVisited && !isCurrentVisit && (
-                                    <button
-                                        onClick={() => handleCheckIn(stop.id, stop.customer.id)}
-                                        disabled={!!activeVisit || actionLoading}
-                                        className={`w-full py-3 rounded-lg font-bold text-sm transition-all ${!!activeVisit
-                                            ? 'bg-gray-800 text-gray-500 cursor-not-allowed opacity-50'
-                                            : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
-                                            }`}
-                                    >
-                                        {!!activeVisit ? 'BAŞKA ZİYARET AKTİF' : 'ZİYARETİ BAŞLAT'}
-                                    </button>
+                                    <div className="space-y-2">
+                                        <button
+                                            onClick={() => handleCheckIn(stop.id, stop.customer.id)}
+                                            disabled={!!activeVisit || actionLoading}
+                                            className={`w-full py-3 rounded-lg font-bold text-sm transition-all ${!!activeVisit
+                                                ? 'bg-gray-800 text-gray-500 cursor-not-allowed opacity-50'
+                                                : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
+                                                }`}
+                                        >
+                                            {!!activeVisit ? 'BAŞKA ZİYARET AKTİF' : 'ZİYARETİ BAŞLAT'}
+                                        </button>
+
+                                        {stop.customer?.lat && (
+                                            <button
+                                                onClick={() => handleRequestLocationUpdate(stop.customer.id)}
+                                                disabled={actionLoading}
+                                                className="w-full py-2 rounded-lg font-bold text-[10px] bg-white/5 text-white/40 hover:bg-white/10 transition-all uppercase tracking-widest"
+                                            >
+                                                📍 Konumu Güncelle (Pinle)
+                                            </button>
+                                        )}
+                                    </div>
                                 )}
 
                                 {isCurrentVisit && (

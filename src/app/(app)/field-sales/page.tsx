@@ -89,20 +89,22 @@ export default function FieldSalesAgentDashboard() {
                         <h1 className="text-3xl font-black tracking-tight mb-1">Saha Satış Paneli</h1>
                         <p className="text-gray-500 text-sm font-medium capitalize">{today}</p>
                     </div>
-                    <button
-                        onClick={() => router.push('/field-mobile/routes')}
-                        className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg shadow-blue-900/20 flex items-center gap-2 text-sm"
-                    >
-                        <span>📱</span> MOBİL GÖRÜNÜM
-                    </button>
+                    <div className="flex flex-wrap gap-3">
+                        <button
+                            onClick={() => router.push('/field-mobile/routes')}
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg shadow-blue-900/20 flex items-center gap-2 text-sm"
+                        >
+                            <span>📱</span> MOBİL GÖRÜNÜM
+                        </button>
+                    </div>
                 </div>
 
                 {/* Bugünün Rotası */}
                 <div
                     onClick={() => todayRoute ? router.push(`/field-mobile/routes/${todayRoute.id}`) : router.push('/field-mobile/routes')}
                     className={`rounded-3xl p-6 cursor-pointer transition-all hover:scale-[1.01] border ${todayRoute
-                            ? 'bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border-blue-500/30'
-                            : 'bg-white/[0.03] border-white/5 border-dashed'
+                        ? 'bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border-blue-500/30'
+                        : 'bg-white/[0.03] border-white/5 border-dashed'
                         }`}
                 >
                     <div className="flex justify-between items-start">
@@ -117,8 +119,8 @@ export default function FieldSalesAgentDashboard() {
                                             <span className="text-xs font-bold text-gray-500">gidilecek nokta</span>
                                         </span>
                                         <span className={`text-xs font-black px-2 py-0.5 rounded-full ${todayRoute.status === 'ACTIVE' ? 'bg-green-500/10 text-green-400' :
-                                                todayRoute.status === 'COMPLETED' ? 'bg-blue-500/10 text-blue-400' :
-                                                    'bg-white/5 text-gray-500'
+                                            todayRoute.status === 'COMPLETED' ? 'bg-blue-500/10 text-blue-400' :
+                                                'bg-white/5 text-gray-500'
                                             }`}>
                                             {todayRoute.status === 'ACTIVE' ? '🟢 Aktif' :
                                                 todayRoute.status === 'COMPLETED' ? '✅ Tamamlandı' : '⏳ Bekliyor'}
@@ -221,6 +223,40 @@ export default function FieldSalesAgentDashboard() {
                             })}
                         </div>
                     </div>
+                {/* Yönetim Paneli - Only for Admin/SuperAdmin */}
+                {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') && (
+                    <div className="bg-[#161b22]/50 border border-white/5 p-6 rounded-3xl">
+                        <h2 className="text-xs font-black text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-500" />
+                            SAHA YÖNETİM PANELİ
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div
+                                onClick={() => router.push('/field-sales/admin/live')}
+                                className="bg-[#1c2128] border border-white/5 p-5 rounded-2xl cursor-pointer hover:bg-[#22272e] transition-all group"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🛰️</div>
+                                    <div>
+                                        <div className="font-bold text-white">Canlı Saha Takibi</div>
+                                        <div className="text-xs text-gray-500">Personel konumlarını haritada izle</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                onClick={() => router.push('/field-sales/admin/config')}
+                                className="bg-[#1c2128] border border-white/5 p-5 rounded-2xl cursor-pointer hover:bg-[#22272e] transition-all group"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">⚙️</div>
+                                    <div>
+                                        <div className="font-bold text-white">Ayarlar & Talepler</div>
+                                        <div className="text-xs text-gray-500">Mesafe sınırları ve konum onayları</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 {/* Hızlı Erişim Kartları */}
@@ -239,8 +275,8 @@ export default function FieldSalesAgentDashboard() {
                                 key={card.path}
                                 onClick={() => router.push(card.path)}
                                 className={`p-6 rounded-2xl cursor-pointer hover:scale-[1.02] transition-all group ${card.featured
-                                        ? `bg-gradient-to-br ${card.accent} shadow-xl shadow-blue-900/20`
-                                        : 'bg-[#161b22] border border-white/5 hover:border-white/15'
+                                    ? `bg-gradient-to-br ${card.accent} shadow-xl shadow-blue-900/20`
+                                    : 'bg-[#161b22] border border-white/5 hover:border-white/15'
                                     }`}
                             >
                                 <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">{card.icon}</div>
