@@ -271,6 +271,16 @@ export default function AdminRoutesPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
+                    {/* Ayarlar & Talepler (Sadece Admin) */}
+                    {(currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN') && (
+                        <button
+                            onClick={() => router.push('/field-sales/admin/config')}
+                            className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 border border-white/5 text-gray-400 hover:bg-white/10 transition-all flex items-center gap-2"
+                        >
+                            ⚙️ Saha Ayarları
+                        </button>
+                    )}
+
                     {/* Kampanya Oluştur Linki */}
                     <a
                         href="/settings?tab=campaigns"

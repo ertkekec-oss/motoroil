@@ -232,7 +232,19 @@ export default function FieldSalesAgentDashboard() {
                             <span className="w-2 h-2 rounded-full bg-blue-500" />
                             SAHA YÖNETİM PANELİ
                         </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div
+                                onClick={() => router.push('/field-sales/admin/routes')}
+                                className="bg-blue-600/10 border border-blue-500/20 p-5 rounded-2xl cursor-pointer hover:bg-blue-600/20 transition-all group"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🗺️</div>
+                                    <div>
+                                        <div className="font-bold text-white">Saha Planlama</div>
+                                        <div className="text-xs text-gray-500">Rota ve şablon yönetimi</div>
+                                    </div>
+                                </div>
+                            </div>
                             <div
                                 onClick={() => router.push('/field-sales/admin/live')}
                                 className="bg-[#1c2128] border border-white/5 p-5 rounded-2xl cursor-pointer hover:bg-[#22272e] transition-all group"
@@ -241,7 +253,7 @@ export default function FieldSalesAgentDashboard() {
                                     <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🛰️</div>
                                     <div>
                                         <div className="font-bold text-white">Canlı Saha Takibi</div>
-                                        <div className="text-xs text-gray-500">Personel konumlarını haritada izle</div>
+                                        <div className="text-xs text-gray-500">Anlık konum izleme</div>
                                     </div>
                                 </div>
                             </div>
@@ -250,10 +262,10 @@ export default function FieldSalesAgentDashboard() {
                                 className="bg-[#1c2128] border border-white/5 p-5 rounded-2xl cursor-pointer hover:bg-[#22272e] transition-all group"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">⚙️</div>
+                                    <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">⚙️</div>
                                     <div>
-                                        <div className="font-bold text-white">Ayarlar & Talepler</div>
-                                        <div className="text-xs text-gray-500">Mesafe sınırları ve konum onayları</div>
+                                        <div className="font-bold text-white">Saha Ayarları</div>
+                                        <div className="text-xs text-gray-500">Onay ve mesafe limitleri</div>
                                     </div>
                                 </div>
                             </div>
