@@ -143,26 +143,26 @@ export default function PdksDisplayPage() {
                 <div className="flex flex-col items-center justify-center p-8 md:p-12 relative border-b md:border-b-0 md:border-r border-white/5 h-full">
 
                     {/* Header Site Info */}
-                    <div className="mb-12 text-center">
-                        <div className="px-6 py-2 bg-white/5 border border-white/10 rounded-full flex items-center gap-3 backdrop-blur-xl mb-6 mx-auto w-fit shadow-2xl shadow-indigo-500/10">
+                    <div className="mb-8 w-full">
+                        <div className="px-5 py-2 bg-white/5 border border-white/10 rounded-full flex items-center gap-3 backdrop-blur-xl mb-6 ml-0 w-fit shadow-2xl shadow-indigo-500/10">
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">SİSTEM ÇEVRİMİÇİ</span>
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black tracking-tighter uppercase mb-2 bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40 leading-none">
+                        <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-2 bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40 leading-none">
                             {qrData?.siteName || "PERIODYA TERMINAL"}
                         </h1>
-                        <p className="text-slate-500 text-xs font-black uppercase tracking-[0.4em]">OTONOM PDKS NOKTASI</p>
+                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em]">OTONOM PDKS NOKTASI</p>
                     </div>
 
                     {/* QR Code Container */}
                     <div className="relative group">
                         <div className="absolute -inset-10 bg-indigo-500/20 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
 
-                        <div className="relative bg-white p-10 md:p-14 rounded-[4rem] shadow-2xl shadow-black/80 ring-1 ring-white/10 overflow-hidden transform transition-all duration-700 hover:scale-[1.02]">
+                        <div className="relative bg-white p-8 md:p-10 rounded-[3rem] shadow-2xl shadow-black/80 ring-1 ring-white/10 overflow-hidden transform transition-all duration-700 hover:scale-[1.02]">
                             <div className="relative">
                                 <QRCodeSVG
                                     value={qrData?.token || ""}
-                                    size={360}
+                                    size={280}
                                     level="H"
                                     includeMargin={false}
                                     className="transition-opacity duration-300"
