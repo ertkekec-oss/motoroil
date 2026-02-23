@@ -137,9 +137,10 @@ export class TrendyolService implements IMarketplaceService {
         }
     }
 
-    async getCommonLabel(shipmentPackageId: string): Promise<{
+    async getCommonLabel(shipmentPackageId: string, format: 'A4' | 'ZPL' = 'A4'): Promise<{
         status: 'SUCCESS' | 'PENDING' | 'FAILED';
         pdfBase64?: string;
+        zpl?: string;
         error?: string;
         httpStatus?: number;
     }> {
@@ -244,9 +245,18 @@ export class TrendyolService implements IMarketplaceService {
                 };
             }
 
+            const combinedZpl = labels.join('\n');
+
+            if (format === 'ZPL') {
+                return {
+                    status: 'SUCCESS',
+                    zpl: combinedZpl,
+                    httpStatus: 200
+                };
+            }
+
             // 5) Convert ZPL -> A4 PDF
             console.info(`${ctx} ZPL retrieved. Converting to PDF...`);
-            const combinedZpl = labels.join('\n');
             const pdfBuffer = await this.convertZplToPdf(combinedZpl);
 
             if (!pdfBuffer) {

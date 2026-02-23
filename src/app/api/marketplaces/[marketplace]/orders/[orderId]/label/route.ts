@@ -183,7 +183,7 @@ function pendingHtml(retryAfterSec: number, message: string) {
     <h2>Etiket Hazırlanıyor…</h2>
     <p class="muted">${retryAfterSec} saniye sonra sistem otomatik olarak kontrol edilecek.</p>
     <div class="status-badge">${message}</div>
-    <p class="muted" style="margin-top: 1.5rem; font-size: 0.8rem;">PDF oluşturulduğunda bu sayfa otomatik olarak açılacaktır.<br/>Lütfen bu sekmeyi kapatmayın.</p>
+    <p class="muted" style="margin-top: 1.5rem; font-size: 0.8rem;">Etiket oluşturulduğunda bu sayfa otomatik olarak açılacaktır.<br/>Lütfen bu sekmeyi kapatmayın.</p>
   </div>
 </body>
 </html>`;

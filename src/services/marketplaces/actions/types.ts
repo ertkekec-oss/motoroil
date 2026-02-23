@@ -1,4 +1,4 @@
-export type MarketplaceActionKey = "REFRESH_STATUS" | "PRINT_LABEL_A4" | "CHANGE_CARGO";
+export type MarketplaceActionKey = "REFRESH_STATUS" | "PRINT_LABEL_A4" | "PRINT_LABEL_ZPL" | "CHANGE_CARGO";
 export type ActionStatus = "SUCCESS" | "FAILED" | "PENDING";
 
 export enum MarketplaceActionErrorCode {

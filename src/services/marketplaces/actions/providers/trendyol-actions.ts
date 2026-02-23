@@ -106,6 +106,36 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
 
                 console.info(`${ctx} SUCCESS: Label generated. Storage: ${storageKey}, Size: ${pdfBuffer.length} bytes, SHA256: ${sha256.substring(0, 8)}...`);
                 result = { shipmentPackageId, storageKey, sha256, format: 'A4', labelReady: true, size: pdfBuffer.length };
+            } else if (actionKey === 'PRINT_LABEL_ZPL') {
+                const shipmentPackageId = payload?.shipmentPackageId || payload?.labelShipmentPackageId;
+                if (!shipmentPackageId) throw new Error('shipmentPackageId gerekli');
+
+                const labelResult = await service.getCommonLabel(shipmentPackageId, 'ZPL');
+
+                if (labelResult.status === 'PENDING') {
+                    return { status: "PENDING", auditId: audit.id, httpStatus: labelResult.httpStatus, errorMessage: labelResult.error };
+                }
+
+                if (labelResult.status === 'FAILED') {
+                    throw new Error(labelResult.error || 'Etiket alınamadı');
+                }
+
+                // Success processing
+                const zplContent = labelResult.zpl!;
+                const zplBuffer = Buffer.from(zplContent, 'utf-8');
+                const sha256 = createHash('sha256').update(zplBuffer).digest('hex');
+                const storageKey = generateLabelStorageKey(companyId, marketplace, shipmentPackageId) + ".zpl";
+
+                await uploadLabel(storageKey, zplBuffer);
+
+                await (prisma as any).marketplaceLabel.upsert({
+                    where: { companyId_marketplace_shipmentPackageId: { companyId, marketplace, shipmentPackageId } },
+                    update: { storageKey, sha256, size: zplBuffer.length },
+                    create: { companyId, marketplace, shipmentPackageId, storageKey, sha256, size: zplBuffer.length }
+                });
+
+                console.info(`${ctx} SUCCESS: ZPL Label generated. Storage: ${storageKey}, Size: ${zplBuffer.length} bytes`);
+                result = { shipmentPackageId, storageKey, sha256, format: 'ZPL', labelReady: true, size: zplBuffer.length, zpl: zplContent };
             } else if (actionKey === 'REFRESH_STATUS') {
                 const order = await prisma.order.findFirst({ where: { id: orderId, companyId } });
                 if (!order || !order.orderNumber) throw new Error('Sipariş verisi eksik');
