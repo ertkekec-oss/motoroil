@@ -54,21 +54,21 @@
 /* POS ONLY COOL TECH LIGHT THEME */
 /* POS ONLY COOL TECH LIGHT THEME */
 [data-pos-theme="light"] {
-  /* Refined Color System */
+  /* Ultra-Refined Color System */
   --primary: #247BFE;
   --primary-purple: #6260FE;
   --success: #02C951;
   --teal: #02BC7E;
   --amber: #C9AF7C;
-  --bg-pos: #F7F9FB;
+  --bg-pos: #F7F9FC;
   --card-pos: #FFFFFF;
-  --text-pos: #0F172A;
-  --text-muted-pos: #64748B;
-  --border-pos: #E2E8F0;
-  --shadow-pos: 0 12px 30px -10px rgba(0, 0, 0, 0.04);
+  --text-pos: #1A1F36;
+  --text-muted-pos: #697386;
+  --border-pos: #F1F5F9;
+  --shadow-pos: 0px 5px 15px rgba(0, 0, 0, 0.03), 0px 15px 35px rgba(0, 0, 0, 0.02);
 
   --glass-border: 1px solid var(--border-pos);
-  --noise-opacity: 0.005;
+  --noise-opacity: 0.002;
 
   background-color: var(--bg-pos) !important;
   color: var(--text-pos) !important;
@@ -82,18 +82,20 @@
 [data-pos-theme="light"] .glass,
 [data-pos-theme="light"] [class*="bg-[#0f111a]"],
 [data-pos-theme="light"] [class*="bg-indigo-900"],
-[data-pos-theme="light"] [class*="bg-emerald-900"] {
+[data-pos-theme="light"] [class*="bg-emerald-900"],
+[data-pos-theme="light"] [class*="bg-white/5"] {
   background: var(--card-pos) !important;
   border: 1px solid var(--border-pos) !important;
   box-shadow: var(--shadow-pos) !important;
   color: var(--text-pos) !important;
-  border-radius: 24px !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  border-radius: 20px !important;
+  /* Slightly tighter than 24 but more than 16 */
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 [data-pos-theme="light"] .card:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 10px 25px -4px rgba(216, 221, 227, 0.5) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.04), 0px 20px 45px rgba(0, 0, 0, 0.02) !important;
 }
 
 /* Typography Hierarchy */

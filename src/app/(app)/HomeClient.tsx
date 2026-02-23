@@ -360,7 +360,7 @@ function POSContent() {
 
         {/* ROW 2: CHARTS & NOTIFICATIONS */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full md:h-auto">
-          <div className={posTheme === 'light' ? "lg:col-span-6 bg-white border border-border-pos rounded-2xl p-6 shadow-pos min-h-[160px]" : "lg:col-span-6 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
+          <div className={posTheme === 'light' ? "lg:col-span-6 card min-h-[160px]" : "lg:col-span-6 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2"><span className="text-lg">📈</span><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Haftalık Satış Trendi</span></div>
             </div>
@@ -369,17 +369,17 @@ function POSContent() {
             ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri yükleniyor...</div>}
           </div>
 
-          <div className={posTheme === 'light' ? "lg:col-span-3 bg-white border border-border-pos rounded-2xl p-6 shadow-pos min-h-[160px]" : "lg:col-span-3 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
+          <div className={posTheme === 'light' ? "lg:col-span-3 card min-h-[160px]" : "lg:col-span-3 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
             <div className="flex items-center gap-2 mb-4"><span className="text-lg">🍰</span><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Kategori Analizi</span></div>
             {insightsData?.stats?.categoryAnalysis ? (
               <ResponsiveContainer width="100%" height={100}><PieChart><Pie data={insightsData.stats.categoryAnalysis} innerRadius={25} outerRadius={35} dataKey="value"><Cell fill={posTheme === 'light' ? "#6260FE" : "#FF5500"} /></Pie></PieChart></ResponsiveContainer>
             ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri yükleniyor...</div>}
           </div>
 
-          <div onClick={() => router.push('/notifications')} className={posTheme === 'light' ? "lg:col-span-3 bg-white border border-border-pos rounded-2xl p-6 shadow-pos min-h-[160px] relative cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-center" : "lg:col-span-3 bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/30 rounded-2xl p-4 shadow-lg min-h-[160px] relative cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-center"}>
-            <div className={posTheme === 'light' ? "text-[10px] font-bold text-amber-600 mb-1 tracking-wider" : "text-[10px] font-bold text-amber-500 mb-1"}>BİLDİRİMLER</div>
-            <div className={posTheme === 'light' ? "text-4xl font-black text-amber-600" : "text-4xl font-black text-amber-500"}>{stats.criticalStock + stats.inTransit}</div>
-            <div className="text-[10px] opacity-60 mt-2">Kritik Stok & Bekleyen</div>
+          <div className={posTheme === 'light' ? "lg:col-span-3 card flex flex-col justify-center relative cursor-pointer" : "lg:col-span-3 bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/30 rounded-2xl p-4 shadow-lg min-h-[160px] relative cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-center"}>
+            <div className={posTheme === 'light' ? "w-4 h-4 rounded-full bg-emerald-500 mb-4" : "hidden"}></div>
+            <div className={posTheme === 'light' ? "text-4xl font-black text-pos leading-none" : "text-4xl font-black text-amber-500"}>{stats.criticalStock + stats.inTransit}</div>
+            <div className={posTheme === 'light' ? "text-xs font-medium text-muted-pos mt-2" : "text-[10px] opacity-60 mt-2"}>Kritik Stok & Bekleyen</div>
           </div>
         </div>
 
@@ -387,7 +387,7 @@ function POSContent() {
 
         {/* ROW 4: SEARCH + ACTIONS */}
         <div className="flex flex-wrap gap-4">
-          <form onSubmit={handleSearchSubmit} className={posTheme === 'light' ? "flex-1 flex gap-2 bg-white p-2 rounded-xl border border-border-pos shadow-sm relative items-center min-w-[300px]" : "flex-1 flex gap-2 bg-white/5 p-1.5 rounded-xl border border-white/5 relative items-center min-w-[300px]"}>
+          <form onSubmit={handleSearchSubmit} className={posTheme === 'light' ? "flex-1 flex gap-2 card !p-2 !rounded-xl relative items-center min-w-[300px]" : "flex-1 flex gap-2 bg-white/5 p-1.5 rounded-xl border border-white/5 relative items-center min-w-[300px]"}>
             <input
               ref={inputRef} type="text" placeholder="Barkod, ürün adı veya kod..."
               value={searchInput} onChange={e => setSearchInput(e.target.value)}
@@ -423,7 +423,7 @@ function POSContent() {
         </div>
 
         {/* CART */}
-        <div className={posTheme === 'light' ? "flex-1 bg-white rounded-2xl border border-border-pos p-4 overflow-y-auto min-h-[300px] shadow-pos" : "flex-1 bg-[#0f111a] rounded-xl border border-white/5 p-2 overflow-y-auto min-h-[300px] shadow-2xl"}>
+        <div className={posTheme === 'light' ? "flex-1 card overflow-y-auto min-h-[300px]" : "flex-1 bg-[#0f111a] rounded-xl border border-white/5 p-2 overflow-y-auto min-h-[300px] shadow-2xl"}>
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center opacity-20"><span className="text-6xl mb-4">🛒</span><span className="text-sm font-bold">Sepet Boş</span></div>
           ) : (
@@ -449,7 +449,7 @@ function POSContent() {
 
         {/* ROW 5: INSIGHTS & FORECAST (Moved below cart) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className={posTheme === 'light' ? "bg-white border border-border-pos p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group transition-all shadow-pos cursor-pointer" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group hover:border-white/10 transition-all cursor-pointer"}>
+          <div className={posTheme === 'light' ? "card flex items-center gap-4 relative overflow-hidden group transition-all" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group hover:border-white/10 transition-all cursor-pointer"}>
             <div className="text-3xl">📄</div>
             <div>
               <div className="font-bold text-sm mb-1">E-Fatura'ya Geçin</div>
@@ -457,7 +457,7 @@ function POSContent() {
               <div className="text-[10px] text-primary font-bold mt-2 group-hover:underline">Entegrasyonu Tamamla ➔</div>
             </div>
           </div>
-          <div className={posTheme === 'light' ? "bg-white border border-border-pos p-4 rounded-xl flex items-center gap-4 relative overflow-hidden shadow-pos" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden"}>
+          <div className={posTheme === 'light' ? "card flex items-center gap-4 relative overflow-hidden" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden"}>
             <div className="text-3xl">💡</div>
             <div>
               <div className="font-bold text-sm mb-1">Verimlilik Saati</div>
@@ -467,20 +467,20 @@ function POSContent() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className={posTheme === 'light' ? "bg-white border border-border-pos p-4 rounded-xl flex justify-between items-center relative overflow-hidden shadow-pos" : "bg-gradient-to-br from-indigo-900 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden"}>
-            <div><div className="text-[10px] font-bold text-indigo-400 mb-1 uppercase">GELECEK HAFTA</div><div className="text-2xl font-black">₺{insightsData?.stats?.forecast?.nextWeekRevenue?.toLocaleString() || '0'}</div></div>
-            <div className="text-right"><div className="text-[10px] opacity-50">Güven Skoru</div><div className="text-xs font-bold text-white">%{insightsData?.stats?.forecast?.confidence || 0}</div></div>
+          <div className={posTheme === 'light' ? "card flex justify-between items-center relative overflow-hidden" : "bg-gradient-to-br from-indigo-900 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden"}>
+            <div><div className={posTheme === 'light' ? "text-[10px] font-bold text-primary-purple mb-1 uppercase tracking-wider" : "text-[10px] font-bold text-indigo-400 mb-1 uppercase"}>GELECEK HAFTA</div><div className="text-2xl font-black">₺{insightsData?.stats?.forecast?.nextWeekRevenue?.toLocaleString() || '0'}</div></div>
+            <div className="text-right"><div className="text-[10px] opacity-50">Güven Skoru</div><div className={posTheme === 'light' ? "text-xs font-bold text-pos" : "text-xs font-bold text-white"}>%{insightsData?.stats?.forecast?.confidence || 0}</div></div>
           </div>
 
-          <div className={posTheme === 'light' ? "bg-white border border-border-pos p-4 rounded-xl flex justify-between items-center relative overflow-hidden shadow-pos" : "bg-gradient-to-br from-emerald-900 to-slate-900 border border-emerald-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden"}>
-            <div><div className="text-[10px] font-bold text-emerald-400 mb-1 uppercase">BÜYÜME HIZI</div><div className="text-2xl font-black">%{insightsData?.stats?.docGrowth || 0}</div></div>
-            <div className="text-right"><div className="text-[10px] opacity-50">Fatura Artışı</div><div className="text-xs font-bold text-white">{insightsData?.stats?.thisMonthDocs || 0} Adet</div></div>
+          <div className={posTheme === 'light' ? "card flex justify-between items-center relative overflow-hidden" : "bg-gradient-to-br from-emerald-900 to-slate-900 border border-emerald-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden"}>
+            <div><div className={posTheme === 'light' ? "text-[10px] font-bold text-teal mb-1 uppercase tracking-wider" : "text-[10px] font-bold text-emerald-400 mb-1 uppercase"}>BÜYÜME HIZI</div><div className="text-2xl font-black">%{insightsData?.stats?.docGrowth || 0}</div></div>
+            <div className="text-right"><div className="text-[10px] opacity-50">Fatura Artışı</div><div className={posTheme === 'light' ? "text-xs font-bold text-pos" : "text-xs font-bold text-white"}>{insightsData?.stats?.thisMonthDocs || 0} Adet</div></div>
           </div>
         </div>
       </div>
 
       {/* RIGHT PANEL (Payment) */}
-      <div className={posTheme === 'light' ? "w-[380px] bg-white border border-border-pos rounded-2xl p-6 flex flex-col shadow-pos sticky top-4 h-[calc(100vh-2rem)] overflow-hidden" : "w-[380px] bg-[#0f111a] border border-white/5 rounded-2xl p-6 flex flex-col shadow-2xl sticky top-4 h-[calc(100vh-2rem)] overflow-hidden"}>
+      <div className={posTheme === 'light' ? "w-[380px] card flex flex-col sticky top-4 h-[calc(100vh-2rem)] !p-6 overflow-hidden" : "w-[380px] bg-[#0f111a] border border-white/5 rounded-2xl p-6 flex flex-col shadow-2xl sticky top-4 h-[calc(100vh-2rem)] overflow-hidden"}>
         <h2 className="text-xs font-bold opacity-50 mb-6 tracking-widest text-center shrink-0">SATIŞ ÖZETİ</h2>
 
         {/* Scrollable Middle Section (Scrollbar hidden) */}
@@ -648,8 +648,8 @@ function POSContent() {
 
       {/* Customer Modal */}
       {isCustomerModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg p-6 shadow-2xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className={posTheme === 'light' ? "card w-full max-w-lg !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg p-6 shadow-2xl"}>
             <h3 className="text-xl font-bold mb-4">Müşteri Seçimi</h3>
             <input autoFocus placeholder="Müşteri ara..." value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 mb-4 text-white" />
             <div className="max-h-[300px] overflow-y-auto space-y-2">
@@ -670,8 +670,8 @@ function POSContent() {
 
       {/* Suspend Modal */}
       {showSuspendModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-md p-6">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className={posTheme === 'light' ? "card w-full max-w-md !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-md p-6"}>
             <h3 className="text-xl font-bold mb-4">Satışı Beklemeye Al</h3>
             <input autoFocus placeholder="Etiket / İsim (Örn: Masa 5)" value={suspenseLabel} onChange={e => setSuspenseLabel(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 mb-4 text-white" />
             <div className="flex gap-2">
@@ -684,8 +684,8 @@ function POSContent() {
 
       {/* Resumption Modal */}
       {showResumptionModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg p-6">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className={posTheme === 'light' ? "card w-full max-w-lg !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg p-6"}>
             <h3 className="text-xl font-bold mb-4">Bekleyen Satışlar</h3>
             {suspendedSales.length === 0 ? (
               <div className="text-center opacity-50 py-8">Bekleyen satış yok.</div>
