@@ -13,71 +13,83 @@ export async function POST(request: Request) {
         }
 
         const data = await request.json();
-        const { branchName, city, district, address, createDefaultKasa, createDefaultBank } = data;
+        const { company, branch, finance, integrations } = data;
 
         const tenantId = session.tenantId;
 
-        // 1. Get the default company for this tenant OR CREATE IT
-        let company = await prisma.company.findFirst({
+        // 1. Get the company for this tenant
+        let companyRecord = await prisma.company.findFirst({
             where: { tenantId: tenantId }
         });
 
-        if (!company) {
-            console.log(`[Onboarding] Company missing for tenant ${tenantId}. Creating one automatically.`);
-            // Auto-create company if missing (Fix for new tenants)
-            company = await prisma.company.create({
+        if (!companyRecord) {
+            companyRecord = await prisma.company.create({
                 data: {
                     tenantId: tenantId,
-                    name: session.companyName || session.tenantName || 'Şirketim', // Fallback name
-                    isDefault: true
+                    name: company.name || 'Şirketim',
+                    vkn: company.vkn || '',
+                    taxOffice: company.taxOffice || '',
+                    address: company.address || '',
+                    city: company.city || '',
+                    district: company.district || '',
                 }
             });
-
-            // Also ensure UserCompanyAccess exists for the current user
-            const userId = session.id;
-            if (userId) {
-                await prisma.userCompanyAccess.upsert({
-                    where: {
-                        userId_companyId: {
-                            userId: userId,
-                            companyId: company.id
-                        }
-                    },
-                    create: {
-                        userId: userId,
-                        companyId: company.id,
-                        role: session.role || 'ADMIN'
-                    },
-                    update: {} // Already exists
-                });
-            }
+        } else {
+            // Update existing company with onboarding data
+            companyRecord = await prisma.company.update({
+                where: { id: companyRecord.id },
+                data: {
+                    name: company.name || companyRecord.name,
+                    vkn: company.vkn || companyRecord.vkn,
+                    taxOffice: company.taxOffice || companyRecord.taxOffice,
+                    address: company.address || companyRecord.address,
+                    city: company.city || companyRecord.city,
+                    district: company.district || companyRecord.district,
+                }
+            });
         }
 
         const results = await prisma.$transaction(async (tx) => {
-            // 2. Create the Branch
-            const branch = await tx.branch.create({
+            const createdItems: any = {};
+
+            // 2. Create the Main Branch
+            const mainBranch = await tx.branch.create({
                 data: {
-                    name: branchName || 'Merkez Şube',
-                    city: city || '',
-                    district: district || '',
-                    address: address || '',
+                    name: branch.branchName || 'Merkez Şube',
+                    type: 'Şube',
+                    city: company.city || '',
+                    district: company.district || '',
+                    address: company.address || '',
                     status: 'Active',
-                    companyId: company.id
+                    companyId: companyRecord!.id
                 }
             });
+            createdItems.branch = mainBranch;
 
-            const createdItems: any = { branch };
+            // 3. Create the Warehouse (as a branch with type 'Depo')
+            const warehouse = await tx.branch.create({
+                data: {
+                    name: branch.warehouseName || 'Ana Depo',
+                    type: 'Depo',
+                    city: company.city || '',
+                    district: company.district || '',
+                    address: company.address || '',
+                    status: 'Active',
+                    companyId: companyRecord!.id
+                }
+            });
+            createdItems.warehouse = warehouse;
 
-            // 3. Create Default Kasa
-            if (createDefaultKasa) {
+            // 4. Create Default Kasa
+            if (finance.createDefaultKasa) {
                 const kasa = await tx.kasa.create({
                     data: {
-                        name: 'Merkez TL Kasası',
+                        name: finance.kasaName || 'Merkez TL Kasası',
                         type: 'Nakit',
                         currency: 'TRY',
                         balance: 0,
-                        branch: branch.name,
-                        companyId: company.id
+                        branch: mainBranch.name,
+                        companyId: companyRecord!.id
                     }
                 });
                 createdItems.kasa = kasa;
@@ -86,7 +98,7 @@ export async function POST(request: Request) {
                 const currentSettings = await tx.appSettings.findUnique({
                     where: {
                         companyId_key: {
-                            companyId: company.id,
+                            companyId: companyRecord!.id,
                             key: 'paymentMethods'
                         }
                     }
@@ -96,36 +108,34 @@ export async function POST(request: Request) {
                     { id: 'card', label: 'Kredi Kartı', type: 'card', icon: '💳' },
                     { id: 'transfer', label: 'Havale/EFT', type: 'transfer', icon: '🏦' }
                 ];
-
-                // Update cash method to link to this kasa
                 pMethods = pMethods.map((pm: any) => pm.type === 'cash' ? { ...pm, linkedKasaId: kasa.id } : pm);
 
                 await tx.appSettings.upsert({
                     where: {
                         companyId_key: {
-                            companyId: company.id,
+                            companyId: companyRecord!.id,
                             key: 'paymentMethods'
                         }
                     },
                     update: { value: pMethods },
                     create: {
-                        companyId: company.id,
+                        companyId: companyRecord!.id,
                         key: 'paymentMethods',
                         value: pMethods
                     }
                 });
             }
 
-            // 5. Create Default Bank
-            if (createDefaultBank) {
+            // 5. Create Default Bank (as a Kasa of type Banka)
+            if (finance.createDefaultBank) {
                 const bank = await tx.kasa.create({
                     data: {
-                        name: 'Ana Banka Hesabı (TL)',
+                        name: finance.bankName || 'Ana Banka Hesabı (TL)',
                         type: 'Banka',
                         currency: 'TRY',
                         balance: 0,
-                        branch: branch.name,
-                        companyId: company.id
+                        branch: mainBranch.name,
+                        companyId: companyRecord!.id
                     }
                 });
                 createdItems.bank = bank;
@@ -134,7 +144,7 @@ export async function POST(request: Request) {
                 const currentSettings = await tx.appSettings.findUnique({
                     where: {
                         companyId_key: {
-                            companyId: company.id,
+                            companyId: companyRecord!.id,
                             key: 'paymentMethods'
                         }
                     }
@@ -145,7 +155,7 @@ export async function POST(request: Request) {
                     await tx.appSettings.update({
                         where: {
                             companyId_key: {
-                                companyId: company.id,
+                                companyId: companyRecord!.id,
                                 key: 'paymentMethods'
                             }
                         },
@@ -154,13 +164,45 @@ export async function POST(request: Request) {
                 }
             }
 
-            // 6. Update Tenant Setup State
+            // 6. Save Integration Flags to AppSettings for later setup
+            await tx.appSettings.upsert({
+                where: {
+                    companyId_key: {
+                        companyId: companyRecord!.id,
+                        key: 'onboarding_integrations'
+                    }
+                },
+                update: { value: integrations },
+                create: {
+                    companyId: companyRecord!.id,
+                    key: 'onboarding_integrations',
+                    value: integrations
+                }
+            });
+
+            // 7. Update Tenant Setup State
             await tx.tenant.update({
                 where: { id: tenantId },
                 data: { setupState: 'COMPLETED' }
             });
 
-            // 7. Re-create session with updated setupState to update the cookie
+            // 8. Update User's company access if missing
+            await tx.userCompanyAccess.upsert({
+                where: {
+                    userId_companyId: {
+                        userId: session.id,
+                        companyId: companyRecord!.id
+                    }
+                },
+                create: {
+                    userId: session.id,
+                    companyId: companyRecord!.id,
+                    role: 'ADMIN'
+                },
+                update: {}
+            });
+
+            // 9. Re-create session with updated setupState
             await createSession({
                 ...session,
                 setupState: 'COMPLETED'
@@ -169,7 +211,7 @@ export async function POST(request: Request) {
             return createdItems;
         });
 
-        return NextResponse.json({ success: true, data: results });
+        return NextResponse.json({ success: true });
 
     } catch (error: any) {
         console.error('Onboarding Init Error:', error);
