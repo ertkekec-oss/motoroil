@@ -112,11 +112,28 @@
 /* Inputs & Forms */
 [data-pos-theme="light"] input,
 [data-pos-theme="light"] select,
-[data-pos-theme="light"] [class*="bg-white/5"] {
-  background: #FFFFFF !important;
-  border: 1px solid var(--border-pos) !important;
+[data-pos-theme="light"] [class*="bg-white/5"],
+[data-pos-theme="light"] [class*="bg-black/20"] {
+  background: #FFFFFF;
+  border: 1px solid var(--border-pos);
   color: var(--text-pos) !important;
-  border-radius: 12px !important;
+  border-radius: 12px;
+}
+
+/* 🧼 UI Cleanup: Prevent nested borders and double-backgrounds */
+[data-pos-theme="light"] .bg-transparent,
+[data-pos-theme="light"] input.bg-transparent {
+  background: transparent !important;
+}
+
+[data-pos-theme="light"] .border-none,
+[data-pos-theme="light"] input.border-none {
+  border: none !important;
+}
+
+[data-pos-theme="light"] input:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 [data-pos-theme="light"] input::placeholder {
