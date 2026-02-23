@@ -31,7 +31,16 @@ export async function GET(req: Request) {
         const xff = req.headers.get("x-forwarded-for");
         const ip = xff ? xff.split(",")[0].trim() : "unknown";
 
-        const display = await prisma.pdksDisplay.update({
+        const display = await prisma.pdksDisplay.findUnique({
+            where: { id: displayId }
+        });
+
+        if (!display) {
+            return NextResponse.json({ success: false, error: "Cihaz kaydı bulunamadı veya silinmiş." }, { status: 401 });
+        }
+
+        // Heartbeat ve IP güncellemesi
+        await prisma.pdksDisplay.update({
             where: { id: displayId },
             data: {
                 lastPublicIp: ip,
