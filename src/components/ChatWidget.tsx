@@ -119,18 +119,27 @@ export default function ChatWidget() {
             {/* Toggle Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`fixed bottom-6 right-6 z-[9000] w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${isOpen ? 'bg-red-500 rotate-90' : 'bg-indigo-600'}`}
+                className={`fixed z-[9000] rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 
+                    ${isOpen ? 'bg-red-500 rotate-90' : 'bg-indigo-600'}
+                    bottom-20 right-6 w-14 h-14
+                    md:bottom-6 md:right-6 md:w-14 md:h-14
+                    max-md:top-[12px] max-md:right-[80px] max-md:bottom-auto max-md:w-10 max-md:h-10
+                `}
             >
                 {isOpen ? (
-                    <span className="text-2xl text-white">✕</span>
+                    <span className="text-xl md:text-2xl text-white">✕</span>
                 ) : (
-                    <span className="text-2xl text-white">💬</span>
+                    <span className="text-xl md:text-2xl text-white">💬</span>
                 )}
             </button>
 
             {/* Chat Window */}
             {isOpen && (
-                <div className="fixed bottom-24 right-6 z-[9000] w-[350px] h-[500px] bg-[#0c0e14] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300 backdrop-blur-xl bg-opacity-95">
+                <div className={`fixed z-[9000] w-[350px] max-md:w-[90vw] max-md:left-[5vw] h-[500px] max-md:h-[60vh] bg-[#0c0e14] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in duration-300 backdrop-blur-xl bg-opacity-95
+                    bottom-40 right-6 md:bottom-24 md:right-6
+                    max-md:top-20 max-md:bottom-auto
+                    ${view === 'chat' ? 'slide-in-from-right-10' : 'slide-in-from-bottom-10'}
+                `}>
 
                     {/* Header */}
                     <div className="h-14 bg-white/5 border-b border-white/5 flex items-center px-4 justify-between shrink-0">

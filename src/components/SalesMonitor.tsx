@@ -217,126 +217,126 @@ export default function SalesMonitor({
     };
 
     // Rendering Logic
+    const isAdmin = userRole?.toLowerCase().includes('admin') || userRole === 'SUPER_ADMIN';
+    if (!isAdmin) return null;
+
     return (
         <>
-            {/* Removed Admin check to show for all users */}
-            <>
-                {/* Floating Button */}
-                <button
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className="sales-monitor-btn"
-                    style={{
-                        background: isListening ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-                        animation: isListening ? 'pulse 2s infinite' : 'none'
-                    }}
-                >
-                    {isListening ? '🔴' : '🎤'}
-                </button>
+            {/* Floating Button */}
+            <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="sales-monitor-btn"
+                style={{
+                    background: isListening ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                    animation: isListening ? 'pulse 2s infinite' : 'none'
+                }}
+            >
+                {isListening ? '🔴' : '🎤'}
+            </button>
 
-                {/* Badge - Şüpheli olay sayısı */}
-                {suspiciousEvents.length > 0 && (
-                    <div className="sales-monitor-badge">
-                        {suspiciousEvents.length}
+            {/* Badge - Şüpheli olay sayısı */}
+            {suspiciousEvents.length > 0 && (
+                <div className="sales-monitor-badge">
+                    {suspiciousEvents.length}
+                </div>
+            )}
+
+            {/* Expanded Panel */}
+            {isExpanded && (
+                <div className="sales-monitor-panel">
+                    {/* Panel content... */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '12px' }}>
+                        <div>
+                            <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 'bold' }}>🎤 Satış Monitörü</h4>
+                            <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-muted)' }}>Kaçak satış tespiti</p>
+                        </div>
+                        <button
+                            onClick={toggleMonitoring}
+                            style={{
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                border: 'none',
+                                background: isEnabled ? 'var(--danger)' : 'var(--success)',
+                                color: 'white',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            {isEnabled ? '⏸ Durdur' : '▶ Başlat'}
+                        </button>
                     </div>
-                )}
 
-                {/* Expanded Panel */}
-                {isExpanded && (
-                    <div className="sales-monitor-panel">
-                        {/* Panel content... */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '12px' }}>
-                            <div>
-                                <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 'bold' }}>🎤 Satış Monitörü</h4>
-                                <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-muted)' }}>Kaçak satış tespiti</p>
-                            </div>
-                            <button
-                                onClick={toggleMonitoring}
-                                style={{
-                                    padding: '6px 12px',
-                                    borderRadius: '6px',
-                                    border: 'none',
-                                    background: isEnabled ? 'var(--danger)' : 'var(--success)',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    fontSize: '11px',
-                                    fontWeight: 'bold'
-                                }}
-                            >
-                                {isEnabled ? '⏸ Durdur' : '▶ Başlat'}
-                            </button>
+                    {/* Status */}
+                    <div style={{
+                        padding: '10px',
+                        background: isListening ? 'rgba(239, 68, 68, 0.1)' : 'rgba(100, 100, 100, 0.1)',
+                        borderRadius: '8px',
+                        border: `1px solid ${isListening ? 'var(--danger)' : 'var(--border-light)'}`
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                            <span style={{ fontSize: '16px' }}>{isListening ? '🔴' : '⚫'}</span>
+                            <span style={{ fontSize: '12px', fontWeight: 'bold' }}>
+                                {isListening ? 'DİNLENİYOR...' : 'KAPALI'}
+                            </span>
                         </div>
-
-                        {/* Status */}
-                        <div style={{
-                            padding: '10px',
-                            background: isListening ? 'rgba(239, 68, 68, 0.1)' : 'rgba(100, 100, 100, 0.1)',
-                            borderRadius: '8px',
-                            border: `1px solid ${isListening ? 'var(--danger)' : 'var(--border-light)'}`
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                                <span style={{ fontSize: '16px' }}>{isListening ? '🔴' : '⚫'}</span>
-                                <span style={{ fontSize: '12px', fontWeight: 'bold' }}>
-                                    {isListening ? 'DİNLENİYOR...' : 'KAPALI'}
-                                </span>
+                        {detectedText && (
+                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                                Son: "{detectedText.substring(0, 50)}..."
                             </div>
-                            {detectedText && (
-                                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                                    Son: "{detectedText.substring(0, 50)}..."
-                                </div>
-                            )}
-                        </div>
+                        )}
+                    </div>
 
-                        {/* Events List */}
-                        <div style={{ flex: 1, overflowY: 'auto', maxHeight: '300px' }}>
-                            <h5 style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                                ⚠️ ŞÜPHELİ OLAYLAR ({suspiciousEvents.length})
-                            </h5>
-                            {suspiciousEvents.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: '11px' }}>
-                                    Henüz şüpheli olay tespit edilmedi
-                                </div>
-                            ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    {suspiciousEvents.slice(0, 10).map(event => (
-                                        <div
-                                            key={event.id}
-                                            style={{
-                                                padding: '10px',
-                                                background: 'rgba(239, 68, 68, 0.1)',
-                                                border: '1px solid var(--danger)',
-                                                borderRadius: '6px',
-                                                fontSize: '11px'
-                                            }}
-                                        >
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                                <span style={{ fontWeight: 'bold', color: 'var(--danger)' }}>
-                                                    "{event.detectedPhrase}"
-                                                </span>
-                                                <span style={{ color: 'var(--text-muted)' }}>
-                                                    {new Date(event.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
-                                                </span>
-                                            </div>
-                                            <div style={{ color: 'var(--text-muted)', fontSize: '10px' }}>
-                                                📍 {event.branch} • 👤 {event.staff}
-                                            </div>
+                    {/* Events List */}
+                    <div style={{ flex: 1, overflowY: 'auto', maxHeight: '300px' }}>
+                        <h5 style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                            ⚠️ ŞÜPHELİ OLAYLAR ({suspiciousEvents.length})
+                        </h5>
+                        {suspiciousEvents.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: '11px' }}>
+                                Henüz şüpheli olay tespit edilmedi
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {suspiciousEvents.slice(0, 10).map(event => (
+                                    <div
+                                        key={event.id}
+                                        style={{
+                                            padding: '10px',
+                                            background: 'rgba(239, 68, 68, 0.1)',
+                                            border: '1px solid var(--danger)',
+                                            borderRadius: '6px',
+                                            fontSize: '11px'
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                            <span style={{ fontWeight: 'bold', color: 'var(--danger)' }}>
+                                                "{event.detectedPhrase}"
+                                            </span>
+                                            <span style={{ color: 'var(--text-muted)' }}>
+                                                {new Date(event.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        <div style={{
-                            fontSize: '9px',
-                            color: 'var(--text-muted)',
-                            borderTop: '1px solid var(--border-light)',
-                            paddingTop: '8px',
-                            lineHeight: '1.4'
-                        }}>
-                            💡 Sistem şüpheli kelimeleri dinler. Son 5 dakikada satış kaydı yoksa uyarı verir.
-                        </div>
+                                        <div style={{ color: 'var(--text-muted)', fontSize: '10px' }}>
+                                            📍 {event.branch} • 👤 {event.staff}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                )}
-            </>
+
+                    <div style={{
+                        fontSize: '9px',
+                        color: 'var(--text-muted)',
+                        borderTop: '1px solid var(--border-light)',
+                        paddingTop: '8px',
+                        lineHeight: '1.4'
+                    }}>
+                        💡 Sistem şüpheli kelimeleri dinler. Son 5 dakikada satış kaydı yoksa uyarı verir.
+                    </div>
+                </div>
+            )}
 
             <style jsx>{`
                 .sales-monitor-btn {
