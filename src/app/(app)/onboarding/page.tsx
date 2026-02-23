@@ -17,11 +17,15 @@ export default function OnboardingPage() {
     // Form States
     const [companyData, setCompanyData] = useState({
         name: '',
+        slogan: '',
         vkn: '',
         taxOffice: '',
         address: '',
         city: 'İstanbul',
-        district: ''
+        district: '',
+        email: '',
+        website: '',
+        phone: ''
     });
 
     const [branchData, setBranchData] = useState({
@@ -277,6 +281,16 @@ export default function OnboardingPage() {
                             />
                         </div>
 
+                        <div className="input-group">
+                            <label>Slogan / Alt Başlık</label>
+                            <input
+                                type="text"
+                                placeholder="Örn: Profesyonel Oto Servis ve Bakım"
+                                value={companyData.slogan}
+                                onChange={(e) => setCompanyData({ ...companyData, slogan: e.target.value })}
+                            />
+                        </div>
+
                         <div className="input-grid">
                             <div className="input-group">
                                 <label>VKN / TCKN</label>
@@ -326,14 +340,45 @@ export default function OnboardingPage() {
                             </div>
                         </div>
 
+                        <div className="input-grid">
+                            <div className="input-group">
+                                <label>Genel E-posta</label>
+                                <input
+                                    type="email"
+                                    placeholder="info@firma.com"
+                                    value={companyData.email}
+                                    onChange={(e) => setCompanyData({ ...companyData, email: e.target.value })}
+                                />
+                            </div>
+                            <div className="input-group">
+                                <label>Web Sitesi</label>
+                                <input
+                                    type="text"
+                                    placeholder="www.firma.com.tr"
+                                    value={companyData.website}
+                                    onChange={(e) => setCompanyData({ ...companyData, website: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
                         <div className="input-group">
-                            <label>Adres</label>
+                            <label>Varsayılan Adres (Şube Bilgisi Yoksa)</label>
                             <textarea
                                 rows={2}
                                 placeholder="Firma açık adresi..."
                                 value={companyData.address}
                                 onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })}
                                 style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '14px', width: '100%', color: 'white', padding: '14px' }}
+                            />
+                        </div>
+
+                        <div className="input-group">
+                            <label>Varsayılan Telefon</label>
+                            <input
+                                type="text"
+                                placeholder="+90 (---) --- -- --"
+                                value={companyData.phone}
+                                onChange={(e) => setCompanyData({ ...companyData, phone: e.target.value })}
                             />
                         </div>
 

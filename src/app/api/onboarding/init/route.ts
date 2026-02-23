@@ -180,6 +180,35 @@ export async function POST(request: Request) {
                 }
             });
 
+            // 6.b Save Company Profile to AppSettings (for the Settings -> Company Profile page)
+            const companyProfileSettings = [
+                { key: 'company_name', value: company.name },
+                { key: 'company_slogan', value: company.slogan || '' },
+                { key: 'company_email', value: company.email || '' },
+                { key: 'company_website', value: company.website || '' },
+                { key: 'company_address', value: company.address || '' },
+                { key: 'company_city', value: company.city || '' },
+                { key: 'company_district', value: company.district || '' },
+                { key: 'company_phone', value: company.phone || '' },
+            ];
+
+            for (const setting of companyProfileSettings) {
+                await tx.appSettings.upsert({
+                    where: {
+                        companyId_key: {
+                            companyId: companyRecord!.id,
+                            key: setting.key
+                        }
+                    },
+                    update: { value: setting.value },
+                    create: {
+                        companyId: companyRecord!.id,
+                        key: setting.key,
+                        value: setting.value
+                    }
+                });
+            }
+
             // 7. Update Tenant Setup State
             await tx.tenant.update({
                 where: { id: tenantId },
