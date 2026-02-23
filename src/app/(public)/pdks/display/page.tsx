@@ -138,9 +138,9 @@ export default function PdksDisplayPage() {
                 <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-violet-600 rounded-full blur-[150px] animate-pulse delay-700" />
             </div>
 
-            <div className="flex flex-col md:flex-row h-screen relative z-10 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 h-screen relative z-10">
                 {/* Left Side: QR and Basic Info */}
-                <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 md:p-12 relative border-b md:border-b-0 md:border-r border-white/5">
+                <div className="flex flex-col items-center justify-center p-8 md:p-12 relative border-b md:border-b-0 md:border-r border-white/5 h-full">
 
                     {/* Header Site Info */}
                     <div className="mb-12 text-center">
@@ -212,7 +212,7 @@ export default function PdksDisplayPage() {
                 </div>
 
                 {/* Right Side: Announcements and Clock */}
-                <div className="w-full md:w-1/2 bg-white/5 backdrop-blur-3xl flex flex-col p-10 md:p-16 relative overflow-hidden h-screen">
+                <div className="bg-white/5 backdrop-blur-3xl flex flex-col p-10 md:p-16 relative overflow-hidden h-full">
 
                     {/* Main Clock Display */}
                     <div className="mb-10 lg:mb-16">
@@ -221,7 +221,7 @@ export default function PdksDisplayPage() {
                                 <IconClock className="w-4 h-4" />
                                 GÜNCEL ZAMAN
                             </p>
-                            <span className="text-7xl lg:text-9xl font-black tracking-tighter tabular-nums leading-none bg-clip-text text-transparent bg-gradient-to-b from-white to-white/20">
+                            <span className="text-7xl lg:text-9xl font-black tracking-tighter tabular-nums leading-none text-white drop-shadow-2xl">
                                 {currentTime.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', hour12: false })}
                             </span>
                             <div className="flex items-center gap-4 mt-4">
