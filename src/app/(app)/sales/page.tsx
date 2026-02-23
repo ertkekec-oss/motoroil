@@ -501,7 +501,8 @@ export default function SalesPage() {
 
 
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
-    const [mappedItems, setMappedItems] = useState<{ [key: string]: number }>({}); // orderItemName -> inventoryId
+    const [mappedItems, setMappedItems] = useState<{ [key: string]: { productId: any; status: string } }>({}); // itemName → { productId, status }
+    const [rawMappings, setRawMappings] = useState<Record<string, any>>({}); // itemCode → backend result
 
 
     const handlePrepare = (id: string) => {
@@ -524,45 +525,41 @@ export default function SalesPage() {
         const checkMapping = async () => {
             setIsLoadingMapping(true);
             try {
-                // Get item codes from order
-                // IMPORTANT: We need item codes. If item doesn't have code, fallback to name or ask user
                 const payloadItems = selectedOrder.items.map((i: any) => ({
-                    code: i.code || i.barcode || i.name, // Fallback to name as code if others missing (risky but needed)
+                    code: i.code || i.barcode || i.name,
                     name: i.name
                 }));
 
                 const res = await apiFetch('/api/integrations/marketplace/check-mapping', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        marketplace: selectedOrder.marketplace,
-                        items: payloadItems
-                    })
+                    body: JSON.stringify({ marketplace: selectedOrder.marketplace, items: payloadItems })
                 });
 
                 const data = await res.json();
 
                 if (data.success) {
                     const newMappedItems: any = {};
+                    setRawMappings(data.mappings); // store for modal
 
-                    // Process results
+                    // Auto-populate items with 'mapped' status (exact or high-score)
                     Object.keys(data.mappings).forEach(key => {
                         const map = data.mappings[key];
-                        if (map.isMapped && map.internalProduct) {
-                            // Find matching item in order to key by name (as existing logic uses name)
-                            // Ideally we should use ID or Code, but UI uses name heavily.
-                            // Let's map by item name for UI consistency
-                            const item = selectedOrder.items.find((i: any) => (i.code || i.barcode || i.name) === key);
-                            if (item) {
-                                newMappedItems[item.name] = map.internalProduct.id;
-                            }
+                        const item = selectedOrder.items.find((i: any) => (i.code || i.barcode || i.name) === key);
+                        if (item && map.status === 'mapped' && map.internalProduct) {
+                            newMappedItems[item.name] = { productId: map.internalProduct.id, status: 'auto' };
                         }
+                        // 'suggest' → pre-fill but user must confirm (we pre-fill to speed up)
+                        if (item && map.status === 'suggest' && map.internalProduct) {
+                            newMappedItems[item.name] = { productId: map.internalProduct.id, status: 'suggest' };
+                        }
+                        // 'notFound' → leave empty, user will create or manually pick
                     });
 
                     setMappedItems(newMappedItems);
                 }
             } catch (error) {
-                console.error("Mapping check failed", error);
+                console.error('Mapping check failed', error);
             } finally {
                 setIsLoadingMapping(false);
             }
@@ -574,45 +571,38 @@ export default function SalesPage() {
     const finalizeInvoice = async () => {
         setIsLoadingMapping(true);
         try {
-            // 1. Save New Mappings
-            // Identify which items were manually mapped by user vs auto-mapped?
-            // Actually 'upsert' in backend handles it. We can just send all current mappings.
-
+            // 1. Save new mappings (upsert on backend)
             const mappingPayload = selectedOrder.items.map((item: any) => ({
                 marketplaceCode: item.code || item.barcode || item.name,
-                productId: mappedItems[item.name]?.toString()
-            })).filter((m: any) => m.productId); // Only send mapped ones
+                productId: mappedItems[item.name]?.productId?.toString()
+            })).filter((m: any) => m.productId);
 
             if (mappingPayload.length > 0) {
                 await apiFetch('/api/integrations/marketplace/save-mapping', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        marketplace: selectedOrder.marketplace,
-                        mappings: mappingPayload
-                    })
+                    body: JSON.stringify({ marketplace: selectedOrder.marketplace, mappings: mappingPayload })
                 });
             }
 
             // 2. Process Sale & Invoice
             const saleItems = selectedOrder.items.map((item: any) => ({
-                productId: mappedItems[item.name],
+                productId: mappedItems[item.name]?.productId,
                 qty: item.qty || 1
             }));
 
             await processSale({
                 items: saleItems,
                 total: selectedOrder.totalAmount || selectedOrder.total,
-                kasaId: 1, // Varsayılan Merkez Kasa
+                kasaId: 1,
                 description: `Sipariş Faturalandırma: ${selectedOrder.orderNumber} - ${selectedOrder.marketplace}`
             });
 
-            // Update local state
             setOnlineOrders(onlineOrders.map(o => o.id === selectedOrder.id ? { ...o, status: 'Faturalandırıldı' } : o));
-
-            showSuccess('Fatura Oluşturuldu', '✅ FATURA OLUŞTURULDU!\n\nStoklar eşleştirildi ve güncellendi. Gelecek siparişlerde bu ürünler otomatik tanınacak.');
+            showSuccess('Fatura Oluşturuldu', '✅ FATURA OLUŞTURULDU!\n\nStoklar eşleştirildi. Gelecek siparişlerde otomatik tanınacak.');
             setSelectedOrder(null);
             setMappedItems({});
+            setRawMappings({});
 
         } catch (error: any) {
             showError("İşlem Başarısız", "Hata: " + error.message);
@@ -928,6 +918,7 @@ export default function SalesPage() {
                     setMappedItems={setMappedItems}
                     inventoryProducts={inventoryProducts}
                     finalizeInvoice={finalizeInvoice}
+                    rawMappings={rawMappings}
                 />
 
                 <NewWayslipModal
