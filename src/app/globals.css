@@ -51,24 +51,44 @@
   --shadow-pos: var(--shadow-premium);
 }
 
-/* POS ONLY COOL TECH LIGHT THEME */
-/* POS ONLY COOL TECH LIGHT THEME */
+/* ═══════════════════════════════════════════
+   POS LIGHT THEME — Enterprise SaaS Design
+   Linear / Stripe / Vercel style
+═══════════════════════════════════════════ */
 [data-pos-theme="light"] {
-  /* Ultra-Refined Color System */
+  /* ── Brand ── */
   --primary: #247BFE;
+  --primary-rgb: 36, 123, 254;
   --primary-purple: #6260FE;
   --success: #02C951;
   --teal: #02BC7E;
   --amber: #C9AF7C;
-  --bg-pos: #F7F9FC;
-  --card-pos: #FFFFFF;
-  --text-pos: #1A1F36;
-  --text-muted-pos: #697386;
-  --border-pos: #F1F5F9;
-  --shadow-pos: 0px 5px 15px rgba(0, 0, 0, 0.03), 0px 15px 35px rgba(0, 0, 0, 0.02);
+  --danger: #E53E3E;
 
-  --glass-border: 1px solid var(--border-pos);
-  --noise-opacity: 0.002;
+  /* ── Surfaces ── */
+  --bg-pos: #F7F9FB;
+  --card-pos: #FFFFFF;
+  --filter-pos: #F0F4F9;
+  --text-pos: #1A1F36;
+  --text-muted-pos: #8B95A5;
+  --text-subtle-pos: #B8C0C8;
+  --border-pos: #E6EBF0;
+  --border-strong: #D0D7E2;
+  --shadow-pos: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --shadow-hover-pos: 0 4px 12px rgba(36, 123, 254, 0.12), 0 8px 24px rgba(0, 0, 0, 0.06);
+
+  /* ── Override global dark vars ── */
+  --bg-deep: #F7F9FB;
+  --bg-dark: #F0F4F9;
+  --bg-card: #FFFFFF;
+  --bg-hover: rgba(36, 123, 254, 0.05);
+  --text-main: #1A1F36;
+  --text-muted: #8B95A5;
+  --border-light: #E6EBF0;
+  --border-rich: #D0D7E2;
+  --input-bg: #FFFFFF;
+  --glass-border: 1px solid #E6EBF0;
+  --noise-opacity: 0;
 
   background-color: var(--bg-pos) !important;
   color: var(--text-pos) !important;
@@ -76,39 +96,44 @@
 
 [data-pos-theme="light"] body {
   background: var(--bg-pos) !important;
+  background-image: none !important;
 }
 
 [data-pos-theme="light"] .card,
-[data-pos-theme="light"] .glass,
-[data-pos-theme="light"] [class*="bg-[#0f111a]"],
-[data-pos-theme="light"] [class*="bg-[#0f1115]"],
-[data-pos-theme="light"] [class*="bg-indigo-900"],
-[data-pos-theme="light"] [class*="bg-emerald-900"],
-[data-pos-theme="light"] [class*="bg-white/5"],
-[data-pos-theme="light"] [class*="bg-white/10"],
-[data-pos-theme="light"] [class*="bg-white/20"] {
+[data-pos-theme="light"] .glass {
   background: var(--card-pos) !important;
   border: 1px solid var(--border-pos) !important;
   box-shadow: var(--shadow-pos) !important;
   color: var(--text-pos) !important;
-  border-radius: 20px !important;
-  /* Slightly tighter than 24 but more than 16 */
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border-radius: 16px !important;
+  transition: box-shadow 0.2s ease !important;
 }
 
 [data-pos-theme="light"] .card:hover {
-  transform: translateY(-4px) !important;
-  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.04), 0px 20px 45px rgba(0, 0, 0, 0.02) !important;
+  box-shadow: var(--shadow-hover-pos) !important;
 }
 
-/* Typography Hierarchy */
+[data-pos-theme="light"] [class*="bg-white/5"],
+[data-pos-theme="light"] [class*="bg-white/10"],
+[data-pos-theme="light"] [class*="bg-white/20"],
+[data-pos-theme="light"] [class*="bg-black/20"] {
+  background: var(--card-pos) !important;
+  border: 1px solid var(--border-pos) !important;
+}
+
+/* ── Typography ── */
 [data-pos-theme="light"] .text-white,
 [data-pos-theme="light"] [class*="text-white/90"],
 [data-pos-theme="light"] [class*="text-white/80"],
 [data-pos-theme="light"] [class*="text-white/70"],
 [data-pos-theme="light"] .text-pos,
-[data-pos-theme="light"] .text-black {
+[data-pos-theme="light"] .text-black,
+[data-pos-theme="light"] .text-gradient {
   color: var(--text-pos) !important;
+  background: none !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
 }
 
 [data-pos-theme="light"] .text-muted,
@@ -155,21 +180,46 @@
   box-shadow: none !important;
 }
 
-/* 🎨 Semantic Color Mappings for Tailwind Classes */
+/* ── Semantic colour mappings ── */
+[data-pos-theme="light"] .text-emerald-500,
+[data-pos-theme="light"] .text-emerald-400 {
+  color: var(--success) !important;
+}
+
+[data-pos-theme="light"] .text-indigo-500,
+[data-pos-theme="light"] .text-indigo-400 {
+  color: var(--primary) !important;
+}
+
+[data-pos-theme="light"] .text-blue-400,
+[data-pos-theme="light"] .text-blue-500 {
+  color: var(--primary) !important;
+}
+
+[data-pos-theme="light"] .text-rose-400,
+[data-pos-theme="light"] .text-red-400 {
+  color: var(--danger) !important;
+}
+
+[data-pos-theme="light"] .text-amber-400,
+[data-pos-theme="light"] .text-amber-500 {
+  color: var(--amber) !important;
+}
+
 [data-pos-theme="light"] .bg-emerald-500,
 [data-pos-theme="light"] .bg-emerald-600 {
   background-color: var(--success) !important;
 }
 
-[data-pos-theme="light"] .bg-rose-500,
-[data-pos-theme="light"] .bg-rose-600,
-[data-pos-theme="light"] .bg-red-500 {
-  background-color: #EF4444 !important;
-}
-
 [data-pos-theme="light"] .bg-indigo-500,
 [data-pos-theme="light"] .bg-indigo-600 {
   background-color: var(--primary) !important;
+}
+
+[data-pos-theme="light"] .bg-rose-500,
+[data-pos-theme="light"] .bg-rose-600,
+[data-pos-theme="light"] .bg-red-500 {
+  background-color: var(--danger) !important;
 }
 
 [data-pos-theme="light"] .bg-orange-500,
@@ -178,52 +228,46 @@
 }
 
 [data-pos-theme="light"] .bg-slate-600 {
-  background-color: #475569 !important;
+  background-color: #64748B !important;
 }
 
-[data-pos-theme="light"] .text-emerald-500 {
-  color: var(--success) !important;
-}
-
-[data-pos-theme="light"] .text-indigo-500 {
-  color: var(--primary) !important;
-}
-
-[data-pos-theme="light"] .text-blue-400 {
-  color: #2563EB !important;
-}
-
-[data-pos-theme="light"] .text-emerald-400 {
-  color: var(--success) !important;
-}
-
-[data-pos-theme="light"] .text-rose-400,
-[data-pos-theme="light"] .text-red-400 {
-  color: #DC2626 !important;
-}
-
-[data-pos-theme="light"] .text-amber-400 {
-  color: #B45309 !important;
-}
-
+/* ── Teal/purple accent ── */
 [data-pos-theme="light"] .bg-orange-500\/10 {
-  background: rgba(249, 115, 22, 0.12) !important;
-  border: 1px solid rgba(249, 115, 22, 0.2) !important;
+  background: rgba(249, 115, 22, 0.08) !important;
+  border: 1px solid rgba(249, 115, 22, 0.18) !important;
   color: #C2410C !important;
 }
 
-/* Inputs & Forms */
-[data-pos-theme="light"] input,
-[data-pos-theme="light"] select,
-[data-pos-theme="light"] [class*="bg-white/5"],
-[data-pos-theme="light"] [class*="bg-black/20"] {
-  background: #FFFFFF;
-  border: 1px solid var(--border-pos);
-  color: var(--text-pos) !important;
-  border-radius: 12px;
+[data-pos-theme="light"] .bg-emerald-500\/10,
+[data-pos-theme="light"] .bg-green-500\/10 {
+  background: rgba(2, 201, 81, 0.08) !important;
+  border: 1px solid rgba(2, 201, 81, 0.18) !important;
+  color: var(--success) !important;
 }
 
-/* 🧼 UI Cleanup: Prevent nested borders and double-backgrounds */
+/* ── Inputs & Forms ── */
+[data-pos-theme="light"] input:not([type="checkbox"]):not([type="radio"]),
+[data-pos-theme="light"] select,
+[data-pos-theme="light"] textarea {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-pos) !important;
+  color: var(--text-pos) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+[data-pos-theme="light"] input:focus,
+[data-pos-theme="light"] select:focus {
+  outline: none !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(36, 123, 254, 0.12) !important;
+}
+
+[data-pos-theme="light"] input::placeholder,
+[data-pos-theme="light"] textarea::placeholder {
+  color: var(--text-subtle-pos) !important;
+}
+
 [data-pos-theme="light"] .bg-transparent,
 [data-pos-theme="light"] input.bg-transparent {
   background: transparent !important;
@@ -234,31 +278,48 @@
   border: none !important;
 }
 
-[data-pos-theme="light"] input:focus {
-  outline: none !important;
-  box-shadow: none !important;
+/* ── Tables ── */
+[data-pos-theme="light"] table {
+  background: transparent !important;
 }
 
-[data-pos-theme="light"] input::placeholder {
-  color: var(--text-muted-pos) !important;
+[data-pos-theme="light"] thead tr {
+  background: var(--filter-pos) !important;
 }
 
-/* Main CTA Buttons */
+[data-pos-theme="light"] tbody tr {
+  background: #FFFFFF !important;
+  transition: background 0.12s ease !important;
+}
+
+[data-pos-theme="light"] tbody tr:hover {
+  background: rgba(36, 123, 254, 0.04) !important;
+}
+
+[data-pos-theme="light"] td,
+[data-pos-theme="light"] th {
+  border-color: var(--border-pos) !important;
+  color: var(--text-pos) !important;
+}
+
+/* ── Primary Buttons ── */
 [data-pos-theme="light"] .bg-primary,
+[data-pos-theme="light"] .btn-primary,
 [data-pos-theme="light"] .bg-gradient-to-r.from-orange-600 {
   background: var(--primary) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 4px 14px rgba(36, 123, 254, 0.3) !important;
   border: none !important;
-  border-radius: 12px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 14px rgba(36, 123, 254, 0.28) !important;
 }
 
 [data-pos-theme="light"] .bg-primary:hover,
-[data-pos-theme="light"] .bg-gradient-to-r.from-orange-600:hover {
-  filter: brightness(0.95) !important;
+[data-pos-theme="light"] .btn-primary:hover {
+  background: #1a6ee8 !important;
+  box-shadow: 0 6px 18px rgba(36, 123, 254, 0.35) !important;
 }
 
-/* Secondary / Outline Buttons (referenced as blue outline in rules) */
+/* ── Secondary & ghost ── */
 [data-pos-theme="light"] .btn-outline,
 [data-pos-theme="light"] [class*="border-primary"] {
   border: 1px solid var(--primary) !important;
@@ -266,30 +327,47 @@
   color: var(--primary) !important;
 }
 
-/* Chart & Analytics Overrides (Using Purple) */
-[data-pos-theme="light"] .text-indigo-400,
-[data-pos-theme="light"] .bg-indigo-900,
-[data-pos-theme="light"] .bg-blue-500\/10,
-[data-pos-theme="light"] .text-blue-500 {
-  color: var(--primary-purple) !important;
+[data-pos-theme="light"] .btn-ghost {
+  background: var(--filter-pos) !important;
+  color: var(--text-muted-pos) !important;
+  border: 1px solid var(--border-pos) !important;
 }
 
-/* Modal specific overrides */
-[data-pos-theme="light"] .fixed.inset-0.bg-black\/80 {
-  background: rgba(15, 23, 42, 0.6) !important;
-  backdrop-filter: blur(8px) !important;
+[data-pos-theme="light"] .btn-success {
+  background: var(--success) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 14px rgba(2, 201, 81, 0.25) !important;
 }
 
+/* ── Modal overlay ── */
+[data-pos-theme="light"] .fixed.inset-0 {
+  background: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+/* ── Dark hex helpers ── */
 [data-pos-theme="light"] .bg-\[\#0f111a\] {
   background: #FFFFFF !important;
   border: 1px solid var(--border-pos) !important;
 }
 
-/* Specific button in "Beklemeye Al" panel */
-[data-pos-theme="light"] .bg-amber-500\/10.border-amber-500\/20.text-amber-500 {
-  background: linear-gradient(135deg, #247BFE 0%, #1d6edb 100%) !important;
-  color: white !important;
-  border: none !important;
+/* ── Nav tab bar ── */
+[data-pos-theme="light"] .pos-tab-bar {
+  border-bottom: 1px solid var(--border-pos) !important;
+  background: transparent !important;
+}
+
+[data-pos-theme="light"] .pos-tab-bar button {
+  color: var(--text-muted-pos) !important;
+  background: transparent !important;
+}
+
+[data-pos-theme="light"] .pos-tab-bar button.pos-tab-active {
+  color: var(--primary) !important;
+  border-bottom-color: var(--primary) !important;
+  font-weight: 600 !important;
 }
 
 

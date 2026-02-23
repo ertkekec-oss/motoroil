@@ -801,23 +801,63 @@ export default function SalesPage() {
         <div data-pos-theme={posTheme} className="container" style={{ padding: '40px 20px' }}>
             <header className="flex-between" style={{ marginBottom: '32px' }}>
                 <div>
-                    <h1 className="text-gradient">Satış Yönetimi</h1>
-                    <p className="text-muted">E-Ticaret, Mağaza Satışları ve Faturalar</p>
+                    <h1 style={{
+                        fontSize: '28px', fontWeight: '800', margin: 0,
+                        color: posTheme === 'light' ? '#1A1F36' : undefined,
+                    }} className={posTheme === 'light' ? '' : 'text-gradient'}>
+                        Satış Yönetimi
+                    </h1>
+                    <p style={{ marginTop: '6px', fontSize: '14px', color: posTheme === 'light' ? '#8B95A5' : undefined }} className={posTheme === 'light' ? '' : 'text-muted'}>
+                        E-Ticaret, Mağaza Satışları ve Faturalar
+                    </p>
                 </div>
                 <button
                     onClick={togglePosTheme}
-                    style={{ padding: '8px', borderRadius: '10px', border: '1px solid var(--border-pos)', background: 'var(--card-pos)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    title={posTheme === 'dark' ? 'Aydınık Mod' : 'Karanlık Mod'}
+                    style={{
+                        padding: '10px 14px', borderRadius: '12px', cursor: 'pointer',
+                        border: posTheme === 'light' ? '1px solid #E6EBF0' : '1px solid var(--border-pos)',
+                        background: posTheme === 'light' ? '#FFFFFF' : 'var(--card-pos)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: posTheme === 'light' ? '0 1px 3px rgba(0,0,0,0.06)' : 'none',
+                    }}
+                    title={posTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}
                 >
-                    {posTheme === 'dark' ? <Sun size={18} color="#F59E0B" /> : <Moon size={18} color="var(--primary)" />}
+                    {posTheme === 'dark' ? <Sun size={18} color="#F59E0B" /> : <Moon size={18} color="#247BFE" />}
                 </button>
             </header>
 
-            <div className="flex-center" style={{ justifyContent: 'flex-start', borderBottom: '1px solid var(--border-light)', marginBottom: '24px', gap: '8px' }}>
-                <button onClick={() => setActiveTab('online')} style={{ padding: '12px 24px', background: activeTab === 'online' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'online' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>E-Ticaret</button>
-                <button onClick={() => setActiveTab('store')} style={{ padding: '12px 24px', background: activeTab === 'store' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'store' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>Mağaza Satışları</button>
-                <button onClick={() => { setActiveTab('invoices'); setInvoiceSubTab('sales'); }} style={{ padding: '12px 24px', background: activeTab === 'invoices' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'invoices' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>Faturalar</button>
-                <button onClick={() => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); }} style={{ padding: '12px 24px', background: activeTab === 'wayslips' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'wayslips' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>e-İrsaliyeler</button>
+            {/* Tab bar */}
+            <div className="pos-tab-bar" style={{
+                display: 'flex', gap: '4px',
+                borderBottom: posTheme === 'light' ? '1px solid #E6EBF0' : '1px solid var(--border-light)',
+                marginBottom: '24px',
+            }}>
+                {[
+                    { key: 'online', label: 'E-Ticaret', onClick: () => setActiveTab('online') },
+                    { key: 'store', label: 'Mağaza Satışları', onClick: () => setActiveTab('store') },
+                    { key: 'invoices', label: 'Faturalar', onClick: () => { setActiveTab('invoices'); setInvoiceSubTab('sales'); } },
+                    { key: 'wayslips', label: 'e-İrsaliyeler', onClick: () => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); } },
+                ].map(({ key, label, onClick }) => (
+                    <button
+                        key={key}
+                        onClick={onClick}
+                        className={activeTab === key ? 'pos-tab-active' : ''}
+                        style={{
+                            padding: '12px 20px', border: 'none', cursor: 'pointer',
+                            fontSize: '14px', fontWeight: activeTab === key ? '600' : '400',
+                            background: 'transparent',
+                            color: posTheme === 'light'
+                                ? (activeTab === key ? '#247BFE' : '#8B95A5')
+                                : 'white',
+                            borderBottom: activeTab === key
+                                ? `2px solid ${posTheme === 'light' ? '#247BFE' : 'var(--primary)'}`
+                                : '2px solid transparent',
+                            transition: 'all 0.15s ease',
+                        }}
+                    >
+                        {label}
+                    </button>
+                ))}
             </div>
 
 
