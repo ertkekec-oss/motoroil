@@ -10,6 +10,7 @@ import Link from 'next/link';
 import Pagination from '@/components/Pagination';
 import { useSearchParams } from 'next/navigation';
 import { TURKISH_CITIES, TURKISH_DISTRICTS } from '@/lib/constants';
+import { Sun, Moon } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -24,6 +25,34 @@ export default function CustomersPage() {
 
     const [isProcessing, setIsProcessing] = useState(false);
     const [searchTerm, setSearchTerm] = useState(''); // New: Debounced Search
+
+    const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
+
+    // Theme Sync
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('pos-theme') as 'dark' | 'light';
+        if (savedTheme) setPosTheme(savedTheme);
+    }, []);
+
+    const togglePosTheme = () => {
+        const newTheme = posTheme === 'dark' ? 'light' : 'dark';
+        setPosTheme(newTheme);
+        localStorage.setItem('pos-theme', newTheme);
+    };
+
+    useEffect(() => {
+        if (posTheme === 'light') {
+            document.body.style.background = '#F7F9FC';
+            document.body.style.color = '#1A1F36';
+        } else {
+            document.body.style.background = 'var(--bg-deep)';
+            document.body.style.color = 'var(--text-main)';
+        }
+        return () => {
+            document.body.style.background = 'var(--bg-deep)';
+            document.body.style.color = 'var(--text-main)';
+        };
+    }, [posTheme]);
 
     // Sync branch filter and new customer branch with global operational branch
     useEffect(() => {
@@ -256,628 +285,615 @@ export default function CustomersPage() {
     const totalPayable = customers.filter(c => Number(c.balance) < 0).reduce((sum, c) => sum + Math.abs(Number(c.balance)), 0);
 
     return (
-        <div className="container" style={{ padding: '30px', maxWidth: '1600px', margin: '0 auto' }}>
+        <div data-pos-theme={posTheme} className="w-full min-h-screen p-6 md:p-10 space-y-8 transition-colors duration-300">
+            <div className="max-w-[1600px] mx-auto space-y-8">
 
-            {/* HEADER AREA */}
-            <header style={{ marginBottom: '30px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                {/* HEADER AREA */}
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-gradient" style={{ fontSize: '28px', margin: 0 }}>Müşteri & Cari Yönetimi</h1>
-                        <p className="text-muted" style={{ marginTop: '8px' }}>Müşteri portföyü, bakiyeler ve hesap hareketleri</p>
+                        <h1 className={posTheme === 'light' ? "text-4xl font-black text-slate-800 tracking-tight" : "text-3xl font-bold text-white mb-2"}>Müşteri & Cari Yönetimi</h1>
+                        <p className={posTheme === 'light' ? "text-slate-500 font-medium" : "text-white/60"}>Müşteri portföyü, bakiyeler ve hesap hareketleri</p>
                     </div>
-                    <div style={{ display: 'flex', gap: '12px' }}>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={togglePosTheme}
+                            className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all shadow-pos flex items-center justify-center bg-white/5"
+                        >
+                            {posTheme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-primary" />}
+                        </button>
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="btn btn-primary"
-                            style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}>
-                            <span style={{ fontSize: '16px' }}>+</span> Yeni Müşteri
+                            className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-900/20 transition-all active:scale-95"
+                        >
+                            <span className="text-xl">+</span> Yeni Müşteri
                         </button>
                     </div>
-                </div>
+                </header>
 
                 {/* STATS ROW */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-                    <div className="card glass animate-fade-in" style={{ padding: '20px', borderLeft: '4px solid #3b82f6' }}>
-                        <div className="text-muted" style={{ fontSize: '12px', fontWeight: 'bold' }}>TOPLAM MÜŞTERİ</div>
-                        <div style={{ fontSize: '28px', fontWeight: '800', marginTop: '5px' }}>{customers.length}</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="card glass p-6 border-l-4 border-l-blue-500 animate-fade-in">
+                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">TOPLAM MÜŞTERİ</div>
+                        <div className={posTheme === 'light' ? "text-3xl font-black text-slate-800" : "text-3xl font-bold text-white"}>{customers.length}</div>
                     </div>
-                    <div className="card glass animate-fade-in" style={{ padding: '20px', borderLeft: '4px solid #10b981' }}>
-                        <div className="text-muted" style={{ fontSize: '12px', fontWeight: 'bold' }}>TOPLAM ALACAK</div>
-                        <div style={{ fontSize: '28px', fontWeight: '800', marginTop: '5px', color: '#ef4444' }}>{formatCurrency(totalReceivable)}</div>
-                        <div style={{ fontSize: '11px', color: '#888' }}>Borçlu müşterilerden</div>
+                    <div className="card glass p-6 border-l-4 border-l-emerald-500 animate-fade-in">
+                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">TOPLAM ALACAK</div>
+                        <div className="text-3xl font-black text-rose-500">{formatCurrency(totalReceivable)}</div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase mt-1">Borçlu müşterilerden</div>
                     </div>
-                    <div className="card glass animate-fade-in" style={{ padding: '20px', borderLeft: '4px solid #f59e0b' }}>
-                        <div className="text-muted" style={{ fontSize: '12px', fontWeight: 'bold' }}>TOPLAM BORÇ</div>
-                        <div style={{ fontSize: '28px', fontWeight: '800', marginTop: '5px', color: '#10b981' }}>{formatCurrency(totalPayable)}</div>
-                        <div style={{ fontSize: '11px', color: '#888' }}>Alacaklı müşterilere</div>
+                    <div className="card glass p-6 border-l-4 border-l-amber-500 animate-fade-in">
+                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">TOPLAM BORÇ</div>
+                        <div className="text-3xl font-black text-emerald-500">{formatCurrency(totalPayable)}</div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase mt-1">Alacaklı müşterilere</div>
                     </div>
-                    <div className="card glass animate-fade-in" style={{ padding: '20px', borderLeft: '4px solid #8b5cf6' }}>
-                        <div className="text-muted" style={{ fontSize: '12px', fontWeight: 'bold' }}>NET DURUM</div>
-                        <div style={{ fontSize: '28px', fontWeight: '800', marginTop: '5px' }}>{formatCurrency(totalReceivable - totalPayable)}</div>
+                    <div className="card glass p-6 border-l-4 border-l-indigo-500 animate-fade-in">
+                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">NET DURUM</div>
+                        <div className={posTheme === 'light' ? "text-3xl font-black text-slate-800" : "text-3xl font-bold text-white"}>{formatCurrency(totalReceivable - totalPayable)}</div>
                     </div>
                 </div>
-            </header>
 
-            {/* CONTROLS AREA */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '24px' }}>
+                {/* CONTROLS AREA */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '24px' }}>
 
-                {/* Search & View Toggle */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', alignItems: 'center' }}>
-                    <div style={{ position: 'relative', flex: 1, maxWidth: '600px' }}>
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => handleSearchChange(e.target.value)}
-                            placeholder="Müşteri adı, telefon, vergi no veya e-posta ile ara..."
-                            style={{
-                                width: '100%',
-                                padding: '16px 20px 16px 50px',
-                                background: 'rgba(255,255,255,0.03)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '14px',
-                                color: 'white',
-                                fontSize: '15px',
-                                outline: 'none',
-                                transition: 'all 0.3s'
-                            }}
-                            onFocus={(e) => e.target.style.background = 'rgba(255,255,255,0.08)'}
-                            onBlur={(e) => e.target.style.background = 'rgba(255,255,255,0.03)'}
-                        />
-                        <span style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', fontSize: '20px', opacity: 0.5 }}>🔍</span>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                        <button
-                            onClick={() => setShowFilters(!showFilters)}
-                            className="btn btn-outline"
-                            style={{ height: '54px', padding: '0 20px', borderRadius: '12px', border: showFilters ? '1px solid #3b82f6' : '1px solid rgba(255,255,255,0.1)', color: showFilters ? '#3b82f6' : '#888' }}
-                        >
-                            🌪️ Filtreler
-                        </button>
-                        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '5px', borderRadius: '12px', display: 'flex', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <button
-                                onClick={() => setViewMode('grid')}
-                                style={{
-                                    padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                                    background: viewMode === 'grid' ? '#3b82f6' : 'transparent',
-                                    color: viewMode === 'grid' ? 'white' : '#888'
-                                }}
-                            >
-                                ⊞
-                            </button>
-                            <button
-                                onClick={() => setViewMode('list')}
-                                style={{
-                                    padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                                    background: viewMode === 'list' ? '#3b82f6' : 'transparent',
-                                    color: viewMode === 'list' ? 'white' : '#888'
-                                }}
-                            >
-                                ≣
-                            </button>
+                    {/* Search & View Toggle */}
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div className="relative flex-1 w-full max-w-2xl">
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                placeholder="Müşteri adı, telefon, vergi no veya e-posta ile ara..."
+                                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-white/10 bg-white/5 text-pos font-medium focus:border-primary/50 transition-all outline-none shadow-sm"
+                            />
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl opacity-50">🔍</span>
                         </div>
-                    </div>
-                </div>
 
-                {/* Filters Panel */}
-                {showFilters && (
-                    <div className="card glass animate-fade-in" style={{ padding: '20px', marginTop: '-10px', borderTop: 'none', borderRadius: '0 0 16px 16px' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-                            <div>
-                                <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', display: 'block' }}>KATEGORİ</label>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                    {tabs.map(tab => (
-                                        <button
-                                            key={tab.id}
-                                            onClick={() => handleTabChange(tab.id)}
-                                            style={{
-                                                padding: '8px 16px', borderRadius: '8px', fontSize: '12px',
-                                                border: activeTab === tab.id ? '1px solid #3b82f6' : '1px solid rgba(255,255,255,0.1)',
-                                                background: activeTab === tab.id ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
-                                                color: activeTab === tab.id ? '#3b82f6' : '#888',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            {tab.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            <div>
-                                <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', display: 'block' }}>ŞUBE</label>
-                                <select
-                                    value={branchFilter}
-                                    onChange={(e) => setBranchFilter(e.target.value)}
-                                    disabled={!hasPermission('branch_administration')}
-                                    style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }}
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className="btn btn-outline"
+                                style={{ height: '54px', padding: '0 20px', borderRadius: '12px', border: showFilters ? '1px solid #3b82f6' : '1px solid rgba(255,255,255,0.1)', color: showFilters ? '#3b82f6' : '#888' }}
+                            >
+                                🌪️ Filtreler
+                            </button>
+                            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '5px', borderRadius: '12px', display: 'flex', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    style={{
+                                        padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                                        background: viewMode === 'grid' ? '#3b82f6' : 'transparent',
+                                        color: viewMode === 'grid' ? 'white' : '#888'
+                                    }}
                                 >
-                                    {hasPermission('branch_administration') && <option value="all">Tüm Şubeler</option>}
-                                    {branches.map(b => (
-                                        <option key={b.name} value={b.name}>{b.name}</option>
-                                    ))}
-                                </select>
+                                    ⊞
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    style={{
+                                        padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                                        background: viewMode === 'list' ? '#3b82f6' : 'transparent',
+                                        color: viewMode === 'list' ? 'white' : '#888'
+                                    }}
+                                >
+                                    ≣
+                                </button>
                             </div>
                         </div>
                     </div>
-                )}
-            </div>
 
-            {/* CONTENT AREA */}
-            {viewMode === 'grid' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
-                    {paginatedCustomers.map(cust => {
-                        // Calculate effective balance
-                        const portfolioChecks = (cust.checks || [])
-                            .filter((c: any) => c.type.includes('Alınan') && ['Portföyde', 'Beklemede'].includes(c.status))
-                            .reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
-
-                        const rawBalance = Number(cust.balance);
-                        const effectiveBalance = rawBalance + portfolioChecks;
-
-                        return (
-                            <div
-                                key={cust.id}
-                                className="card glass hover-scale"
-                                style={{
-                                    padding: '0',
-                                    overflow: 'hidden',
-                                    border: '1px solid rgba(255,255,255,0.08)',
-                                    background: 'linear-gradient(135deg, rgba(15,17,26,0.95) 0%, rgba(20,22,35,0.95) 100%)',
-                                    backdropFilter: 'blur(10px)',
-                                    transition: 'all 0.3s ease'
-                                }}
-                            >
-                                {/* Header with gradient */}
-                                <div style={{
-                                    padding: '20px 24px',
-                                    background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(37,99,235,0.05) 100%)',
-                                    borderBottom: '1px solid rgba(59,130,246,0.1)'
-                                }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                                        {/* Avatar */}
-                                        <div style={{
-                                            width: '56px',
-                                            height: '56px',
-                                            borderRadius: '16px',
-                                            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: '24px',
-                                            fontWeight: '900',
-                                            color: 'white',
-                                            boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
-                                            border: '2px solid rgba(255,255,255,0.1)'
-                                        }}>
-                                            {cust.name?.charAt(0).toUpperCase()}
-                                        </div>
-
-                                        {/* Balance Badge */}
-                                        <div style={{ textAlign: 'right' }}>
-                                            <div style={{
-                                                fontSize: '20px',
-                                                fontWeight: '900',
-                                                color: effectiveBalance > 0 ? '#ef4444' : (effectiveBalance < 0 ? '#10b981' : '#94a3b8'),
-                                                textShadow: effectiveBalance !== 0 ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
-                                            }}>
-                                                {formatCurrency(Math.abs(effectiveBalance))}
-                                            </div>
-                                            <div style={{
-                                                fontSize: '10px',
-                                                fontWeight: '700',
-                                                color: effectiveBalance > 0 ? '#ef4444' : (effectiveBalance < 0 ? '#10b981' : '#64748b'),
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '0.5px',
-                                                marginTop: '2px'
-                                            }}>
-                                                {effectiveBalance > 0 ? '● Borçlu' : (effectiveBalance < 0 ? '● Alacaklı' : '● Dengeli')}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Customer Name */}
-                                    <h3 style={{
-                                        margin: '0 0 8px 0',
-                                        fontSize: '18px',
-                                        fontWeight: '800',
-                                        color: 'white',
-                                        letterSpacing: '-0.3px',
-                                        lineHeight: '1.3'
-                                    }}>
-                                        {cust.name}
-                                    </h3>
-
-                                    {/* Points & Referral Code */}
-                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                                        <span style={{
-                                            fontSize: '11px',
-                                            fontWeight: '700',
-                                            color: '#10b981',
-                                            background: 'rgba(16,185,129,0.1)',
-                                            padding: '4px 10px',
-                                            borderRadius: '6px',
-                                            border: '1px solid rgba(16,185,129,0.2)'
-                                        }}>
-                                            ⭐ {Number(cust.points || 0).toFixed(0)} Puan
-                                        </span>
-                                        <span style={{
-                                            fontSize: '11px',
-                                            fontWeight: '700',
-                                            color: '#8b5cf6',
-                                            background: 'rgba(139,92,246,0.1)',
-                                            padding: '4px 10px',
-                                            borderRadius: '6px',
-                                            border: '1px solid rgba(139,92,246,0.2)'
-                                        }}>
-                                            🔑 {cust.referralCode}
-                                        </span>
-                                    </div>
-
-                                    {/* Category & Branch */}
-                                    <div style={{ display: 'flex', gap: '6px', fontSize: '11px', color: '#94a3b8', fontWeight: '600' }}>
-                                        <span>{cust.category || 'Genel'}</span>
-                                        <span>•</span>
-                                        <span>{cust.branch || 'Merkez'}</span>
-                                    </div>
-                                </div>
-
-                                {/* Contact Info */}
-                                <div style={{ padding: '16px 24px', background: 'rgba(0,0,0,0.2)' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#cbd5e1' }}>
-                                            <span style={{ fontSize: '16px' }}>📞</span>
-                                            <span style={{ fontWeight: '500' }}>{cust.phone || '-'}</span>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#cbd5e1' }}>
-                                            <span style={{ fontSize: '16px' }}>📧</span>
-                                            <span style={{
-                                                fontWeight: '500',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap'
-                                            }}>
-                                                {cust.email || '-'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Action Buttons */}
-                                <div style={{
-                                    padding: '16px 24px',
-                                    background: 'rgba(0,0,0,0.3)',
-                                    borderTop: '1px solid rgba(255,255,255,0.05)',
-                                    display: 'flex',
-                                    gap: '8px'
-                                }}>
-                                    <Link
-                                        href={`/customers/${cust.id}`}
-                                        className="btn btn-primary"
-                                        style={{
-                                            flex: 1,
-                                            textAlign: 'center',
-                                            padding: '12px',
-                                            fontSize: '13px',
-                                            fontWeight: '700',
-                                            textDecoration: 'none',
-                                            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                                            border: 'none',
-                                            boxShadow: '0 4px 12px rgba(59,130,246,0.3)'
-                                        }}
-                                    >
-                                        📋 Detay & İşlemler
-                                    </Link>
-                                    <a
-                                        href={`tel:${cust.phone}`}
-                                        className="btn btn-outline"
-                                        style={{
-                                            padding: '12px 16px',
-                                            fontSize: '18px',
-                                            background: 'rgba(255,255,255,0.05)',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            transition: 'all 0.2s'
-                                        }}
-                                    >
-                                        📞
-                                    </a>
-                                    <a
-                                        href={`https://wa.me/${cust.phone?.replace(/\s/g, '')}`}
-                                        target="_blank"
-                                        className="btn btn-outline"
-                                        style={{
-                                            padding: '12px 16px',
-                                            fontSize: '18px',
-                                            color: '#25D366',
-                                            background: 'rgba(37,211,102,0.1)',
-                                            border: '1px solid rgba(37,211,102,0.3)',
-                                            transition: 'all 0.2s'
-                                        }}
-                                    >
-                                        💬
-                                    </a>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            ) : (
-                <div className="card glass" style={{ overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead>
-                            <tr style={{ background: 'rgba(255,255,255,0.03)', color: '#888', fontSize: '12px', textTransform: 'uppercase' }}>
-                                <th style={{ padding: '20px' }}>Müşteri</th>
-                                <th>İletişim</th>
-                                <th>Kategori</th>
-                                <th>Bakiye</th>
-                                <th style={{ textAlign: 'right', paddingRight: '20px' }}>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {paginatedCustomers.map(cust => (
-                                <tr key={cust.id} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s' }} className="hover-bg">
-                                    <td style={{ padding: '20px' }}>
-                                        <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>{cust.name}</div>
-                                        <div style={{ fontSize: '11px', color: '#00e676' }}>Puan: {Number(cust.points || 0).toFixed(0)} | Kod: {cust.referralCode}</div>
-                                        {(cust as any).taxNumber && <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>VKN: {(cust as any).taxNumber}</div>}
-                                    </td>
-                                    <td>
-                                        <div style={{ fontSize: '13px', color: 'var(--text-main)', opacity: 0.8 }}>{cust.phone}</div>
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cust.email}</div>
-                                    </td>
-                                    <td>
-                                        <span style={{ padding: '4px 8px', borderRadius: '4px', background: 'var(--input-bg)', fontSize: '11px', color: 'var(--text-muted)' }}>
-                                            {cust.category || 'Genel'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span style={{ fontWeight: 'bold', color: cust.balance > 0 ? '#ef4444' : (cust.balance < 0 ? '#10b981' : '#ccc') }}>
-                                            {formatCurrency(Math.abs(cust.balance))}
-                                            <span style={{ fontSize: '10px', marginLeft: '5px', opacity: 0.7 }}>
-                                                {cust.balance > 0 ? '(B)' : (cust.balance < 0 ? '(A)' : '-')}
-                                            </span>
-                                        </span>
-                                    </td>
-                                    <td style={{ textAlign: 'right', paddingRight: '20px' }}>
-                                        <Link href={`/customers/${cust.id}`} className="btn btn-sm btn-primary" style={{ textDecoration: 'none', marginRight: '8px' }}>Detay</Link>
-                                        <button onClick={() => handleDeleteCustomer(cust.id)} className="btn btn-sm btn-outline" style={{ color: '#ff4444', borderColor: '#ff4444' }}>Sil</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {filteredCustomers.length === 0 && (
-                <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--input-bg)', borderRadius: '16px', border: '1px dashed var(--border-light)', marginTop: '20px' }}>
-                    <div style={{ fontSize: '48px', marginBottom: '20px', opacity: 0.3 }}>🔍</div>
-                    <h3>Kayıt Bulunamadı</h3>
-                    <p>Arama kriterlerinize uygun müşteri bulunmuyor.</p>
-                </div>
-            )}
-
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-            />
-
-            {/* ADD CUSTOMER MODAL */}
-            {isModalOpen && (
-                <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-overlay)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
-                    <div className="card glass animate-in" style={{ width: '600px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: '1px solid var(--border-light)' }}>
-                            <h3 style={{ margin: 0, color: 'var(--text-main)' }}>👤 Yeni Müşteri Ekle</h3>
-                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', fontSize: '24px', cursor: 'pointer' }}>×</button>
-                        </div>
-                        <div className="flex-col gap-4">
-                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                    {/* Filters Panel */}
+                    {showFilters && (
+                        <div className="card glass animate-fade-in" style={{ padding: '20px', marginTop: '-10px', borderTop: 'none', borderRadius: '0 0 16px 16px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
                                 <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>AD SOYAD / UNVAN <span style={{ color: 'red' }}>*</span></label>
-                                    <input type="text" value={newCustomer.name} onChange={e => setNewCustomer({ ...newCustomer, name: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
-                                </div>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>YETKİLİ KİŞİ</label>
-                                    <input type="text" value={newCustomer.contactPerson} onChange={e => setNewCustomer({ ...newCustomer, contactPerson: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
-                                </div>
-                            </div>
-
-                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>TELEFON</label>
-                                    <input type="text" value={newCustomer.phone} onChange={e => setNewCustomer({ ...newCustomer, phone: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
-                                </div>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>E-POSTA</label>
-                                    <input type="text" value={newCustomer.email} onChange={e => setNewCustomer({ ...newCustomer, email: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
-                                </div>
-                            </div>
-
-                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>VERGİ NO / TC</label>
-                                    <input type="text" value={newCustomer.taxNumber} onChange={e => setNewCustomer({ ...newCustomer, taxNumber: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
-                                </div>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>VERGİ DAİRESİ</label>
-                                    <input type="text" value={newCustomer.taxOffice} onChange={e => setNewCustomer({ ...newCustomer, taxOffice: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>IBAN</label>
-                                <input type="text" placeholder="TR..." value={newCustomer.iban} onChange={e => setNewCustomer({ ...newCustomer, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
-                            </div>
-
-                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>MÜŞTERİ SINIFI</label>
-                                    <select
-                                        value={newCustomer.customerClass}
-                                        onChange={e => setNewCustomer({ ...newCustomer, customerClass: e.target.value })}
-                                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
-                                    >
-                                        <option value="">Sınıf Seçin...</option>
-                                        {(custClasses || []).map(cls => (
-                                            <option key={cls} value={cls}>{cls}</option>
+                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', display: 'block' }}>KATEGORİ</label>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                        {tabs.map(tab => (
+                                            <button
+                                                key={tab.id}
+                                                onClick={() => handleTabChange(tab.id)}
+                                                style={{
+                                                    padding: '8px 16px', borderRadius: '8px', fontSize: '12px',
+                                                    border: activeTab === tab.id ? '1px solid #3b82f6' : '1px solid rgba(255,255,255,0.1)',
+                                                    background: activeTab === tab.id ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                                                    color: activeTab === tab.id ? '#3b82f6' : '#888',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {tab.label}
+                                            </button>
                                         ))}
-                                    </select>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ŞUBE <span style={{ color: 'red' }}>*</span></label>
+                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', display: 'block' }}>ŞUBE</label>
                                     <select
-                                        value={newCustomer.branch}
-                                        onChange={e => setNewCustomer({ ...newCustomer, branch: e.target.value })}
-                                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
+                                        value={branchFilter}
+                                        onChange={(e) => setBranchFilter(e.target.value)}
+                                        disabled={!hasPermission('branch_administration')}
+                                        style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }}
                                     >
-                                        {(branches || []).map(b => (
+                                        {hasPermission('branch_administration') && <option value="all">Tüm Şubeler</option>}
+                                        {branches.map(b => (
                                             <option key={b.name} value={b.name}>{b.name}</option>
                                         ))}
                                     </select>
                                 </div>
                             </div>
+                        </div>
+                    )}
+                </div>
 
-                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ŞEHİR</label>
-                                    <select
-                                        value={newCustomer.city}
-                                        onChange={e => setNewCustomer({ ...newCustomer, city: e.target.value, district: '' })}
-                                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
-                                    >
-                                        <option value="">Şehir Seçin...</option>
-                                        {TURKISH_CITIES.map(city => (
-                                            <option key={city} value={city}>{city}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>İLÇE</label>
-                                    <select
-                                        value={newCustomer.district}
-                                        onChange={e => setNewCustomer({ ...newCustomer, district: e.target.value })}
-                                        disabled={!newCustomer.city}
-                                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
-                                    >
-                                        <option value="">İlçe Seçin...</option>
-                                        {(TURKISH_DISTRICTS[newCustomer.city] || []).map(district => (
-                                            <option key={district} value={district}>{district}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
+                {/* CONTENT AREA */}
+                {viewMode === 'grid' ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+                        {paginatedCustomers.map(cust => {
+                            // Calculate effective balance
+                            const portfolioChecks = (cust.checks || [])
+                                .filter((c: any) => c.type.includes('Alınan') && ['Portföyde', 'Beklemede'].includes(c.status))
+                                .reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
 
-                            <div>
-                                <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ADRES</label>
-                                <textarea value={newCustomer.address} onChange={e => setNewCustomer({ ...newCustomer, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)', minHeight: '80px', resize: 'vertical' }} />
+                            const rawBalance = Number(cust.balance);
+                            const effectiveBalance = rawBalance + portfolioChecks;
+
+                            return (
+                                <div
+                                    key={cust.id}
+                                    className="card glass hover-scale group"
+                                    style={{
+                                        padding: '0',
+                                        overflow: 'hidden',
+                                        border: '1px solid rgba(255,255,255,0.08)',
+                                        background: posTheme === 'light' ? 'white' : 'linear-gradient(135deg, rgba(15,17,26,0.95) 0%, rgba(20,22,35,0.95) 100%)',
+                                        backdropFilter: 'blur(10px)',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                >
+                                    {/* Header with gradient */}
+                                    <div style={{
+                                        padding: '20px 24px',
+                                        background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(37,99,235,0.05) 100%)',
+                                        borderBottom: '1px solid rgba(59,130,246,0.1)'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                            {/* Avatar */}
+                                            <div style={{
+                                                width: '56px',
+                                                height: '56px',
+                                                borderRadius: '16px',
+                                                background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '24px',
+                                                fontWeight: '900',
+                                                color: 'white',
+                                                boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
+                                                border: '2px solid rgba(255,255,255,0.1)'
+                                            }}>
+                                                {cust.name?.charAt(0).toUpperCase()}
+                                            </div>
+
+                                            {/* Balance Badge */}
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{
+                                                    fontSize: '20px',
+                                                    fontWeight: '900',
+                                                    color: effectiveBalance > 0 ? '#ef4444' : (effectiveBalance < 0 ? '#10b981' : '#94a3b8'),
+                                                    textShadow: effectiveBalance !== 0 ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
+                                                }}>
+                                                    {formatCurrency(Math.abs(effectiveBalance))}
+                                                </div>
+                                                <div style={{
+                                                    fontSize: '10px',
+                                                    fontWeight: '700',
+                                                    color: effectiveBalance > 0 ? '#ef4444' : (effectiveBalance < 0 ? '#10b981' : '#64748b'),
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.5px',
+                                                    marginTop: '2px'
+                                                }}>
+                                                    {effectiveBalance > 0 ? '● Borçlu' : (effectiveBalance < 0 ? '● Alacaklı' : '● Dengeli')}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Customer Name */}
+                                        <h3 className={posTheme === 'light' ? "text-lg font-black text-slate-800 leading-tight mb-2" : "text-lg font-bold text-white mb-2"}>
+                                            {cust.name}
+                                        </h3>
+
+                                        {/* Points & Referral Code */}
+                                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                                            <span style={{
+                                                fontSize: '11px',
+                                                fontWeight: '700',
+                                                color: '#10b981',
+                                                background: 'rgba(16,185,129,0.1)',
+                                                padding: '4px 10px',
+                                                borderRadius: '6px',
+                                                border: '1px solid rgba(16,185,129,0.2)'
+                                            }}>
+                                                ⭐ {Number(cust.points || 0).toFixed(0)} Puan
+                                            </span>
+                                            <span style={{
+                                                fontSize: '11px',
+                                                fontWeight: '700',
+                                                color: '#8b5cf6',
+                                                background: 'rgba(139,92,246,0.1)',
+                                                padding: '4px 10px',
+                                                borderRadius: '6px',
+                                                border: '1px solid rgba(139,92,246,0.2)'
+                                            }}>
+                                                🔑 {cust.referralCode}
+                                            </span>
+                                        </div>
+
+                                        {/* Category & Branch */}
+                                        <div style={{ display: 'flex', gap: '6px', fontSize: '11px', color: '#94a3b8', fontWeight: '600' }}>
+                                            <span>{cust.category || 'Genel'}</span>
+                                            <span>•</span>
+                                            <span>{cust.branch || 'Merkez'}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Contact Info */}
+                                    <div style={{ padding: '16px 24px', background: 'rgba(0,0,0,0.2)' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#cbd5e1' }}>
+                                                <span style={{ fontSize: '16px' }}>📞</span>
+                                                <span style={{ fontWeight: '500' }}>{cust.phone || '-'}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#cbd5e1' }}>
+                                                <span style={{ fontSize: '16px' }}>📧</span>
+                                                <span style={{
+                                                    fontWeight: '500',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap'
+                                                }}>
+                                                    {cust.email || '-'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div style={{
+                                        padding: '16px 24px',
+                                        background: 'rgba(0,0,0,0.3)',
+                                        borderTop: '1px solid rgba(255,255,255,0.05)',
+                                        display: 'flex',
+                                        gap: '8px'
+                                    }}>
+                                        <Link
+                                            href={`/customers/${cust.id}`}
+                                            className="btn btn-primary"
+                                            style={{
+                                                flex: 1,
+                                                textAlign: 'center',
+                                                padding: '12px',
+                                                fontSize: '13px',
+                                                fontWeight: '700',
+                                                textDecoration: 'none',
+                                                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                                border: 'none',
+                                                boxShadow: '0 4px 12px rgba(59,130,246,0.3)'
+                                            }}
+                                        >
+                                            📋 Detay & İşlemler
+                                        </Link>
+                                        <a
+                                            href={`tel:${cust.phone}`}
+                                            className="btn btn-outline"
+                                            style={{
+                                                padding: '12px 16px',
+                                                fontSize: '18px',
+                                                background: 'rgba(255,255,255,0.05)',
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                transition: 'all 0.2s'
+                                            }}
+                                        >
+                                            📞
+                                        </a>
+                                        <a
+                                            href={`https://wa.me/${cust.phone?.replace(/\s/g, '')}`}
+                                            target="_blank"
+                                            className="btn btn-outline"
+                                            style={{
+                                                padding: '12px 16px',
+                                                fontSize: '18px',
+                                                color: '#25D366',
+                                                background: 'rgba(37,211,102,0.1)',
+                                                border: '1px solid rgba(37,211,102,0.3)',
+                                                transition: 'all 0.2s'
+                                            }}
+                                        >
+                                            💬
+                                        </a>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div className="card glass" style={{ overflow: 'hidden' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <thead>
+                                <tr style={{ background: 'rgba(255,255,255,0.03)', color: '#888', fontSize: '12px', textTransform: 'uppercase' }}>
+                                    <th style={{ padding: '20px' }}>Müşteri</th>
+                                    <th>İletişim</th>
+                                    <th>Kategori</th>
+                                    <th>Bakiye</th>
+                                    <th style={{ textAlign: 'right', paddingRight: '20px' }}>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {paginatedCustomers.map(cust => (
+                                    <tr key={cust.id} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s' }} className="hover-bg">
+                                        <td style={{ padding: '20px' }}>
+                                            <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>{cust.name}</div>
+                                            <div style={{ fontSize: '11px', color: '#00e676' }}>Puan: {Number(cust.points || 0).toFixed(0)} | Kod: {cust.referralCode}</div>
+                                            {(cust as any).taxNumber && <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>VKN: {(cust as any).taxNumber}</div>}
+                                        </td>
+                                        <td>
+                                            <div style={{ fontSize: '13px', color: 'var(--text-main)', opacity: 0.8 }}>{cust.phone}</div>
+                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cust.email}</div>
+                                        </td>
+                                        <td>
+                                            <span style={{ padding: '4px 8px', borderRadius: '4px', background: 'var(--input-bg)', fontSize: '11px', color: 'var(--text-muted)' }}>
+                                                {cust.category || 'Genel'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span style={{ fontWeight: 'bold', color: cust.balance > 0 ? '#ef4444' : (cust.balance < 0 ? '#10b981' : '#ccc') }}>
+                                                {formatCurrency(Math.abs(cust.balance))}
+                                                <span style={{ fontSize: '10px', marginLeft: '5px', opacity: 0.7 }}>
+                                                    {cust.balance > 0 ? '(B)' : (cust.balance < 0 ? '(A)' : '-')}
+                                                </span>
+                                            </span>
+                                        </td>
+                                        <td style={{ textAlign: 'right', paddingRight: '20px' }}>
+                                            <Link href={`/customers/${cust.id}`} className="btn btn-sm btn-primary" style={{ textDecoration: 'none', marginRight: '8px' }}>Detay</Link>
+                                            <button onClick={() => handleDeleteCustomer(cust.id)} className="btn btn-sm btn-outline" style={{ color: '#ff4444', borderColor: '#ff4444' }}>Sil</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {filteredCustomers.length === 0 && (
+                    <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--input-bg)', borderRadius: '16px', border: '1px dashed var(--border-light)', marginTop: '20px' }}>
+                        <div style={{ fontSize: '48px', marginBottom: '20px', opacity: 0.3 }}>🔍</div>
+                        <h3>Kayıt Bulunamadı</h3>
+                        <p>Arama kriterlerinize uygun müşteri bulunmuyor.</p>
+                    </div>
+                )}
+
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+
+                {/* ADD CUSTOMER MODAL */}
+                {isModalOpen && (
+                    <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-overlay)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+                        <div className="card glass animate-in" style={{ width: '600px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', maxHeight: '90vh', overflowY: 'auto' }}>
+                            <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: '1px solid var(--border-light)' }}>
+                                <h3 style={{ margin: 0, color: 'var(--text-main)' }}>👤 Yeni Müşteri Ekle</h3>
+                                <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', fontSize: '24px', cursor: 'pointer' }}>×</button>
                             </div>
-                            <button onClick={handleAddCustomer} disabled={isProcessing} className="btn btn-primary w-full" style={{ padding: '16px', marginTop: '10px', fontSize: '16px' }}>
-                                {isProcessing ? 'KAYDEDİLİYOR...' : 'KAYDET'}
-                            </button>
+                            <div className="flex-col gap-4">
+                                <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>AD SOYAD / UNVAN <span style={{ color: 'red' }}>*</span></label>
+                                        <input type="text" value={newCustomer.name} onChange={e => setNewCustomer({ ...newCustomer, name: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
+                                    </div>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>YETKİLİ KİŞİ</label>
+                                        <input type="text" value={newCustomer.contactPerson} onChange={e => setNewCustomer({ ...newCustomer, contactPerson: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
+                                    </div>
+                                </div>
+
+                                <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>TELEFON</label>
+                                        <input type="text" value={newCustomer.phone} onChange={e => setNewCustomer({ ...newCustomer, phone: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
+                                    </div>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>E-POSTA</label>
+                                        <input type="text" value={newCustomer.email} onChange={e => setNewCustomer({ ...newCustomer, email: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
+                                    </div>
+                                </div>
+
+                                <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>VERGİ NO / TC</label>
+                                        <input type="text" value={newCustomer.taxNumber} onChange={e => setNewCustomer({ ...newCustomer, taxNumber: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
+                                    </div>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>VERGİ DAİRESİ</label>
+                                        <input type="text" value={newCustomer.taxOffice} onChange={e => setNewCustomer({ ...newCustomer, taxOffice: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>IBAN</label>
+                                    <input type="text" placeholder="TR..." value={newCustomer.iban} onChange={e => setNewCustomer({ ...newCustomer, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }} />
+                                </div>
+
+                                <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>MÜŞTERİ SINIFI</label>
+                                        <select
+                                            value={newCustomer.customerClass}
+                                            onChange={e => setNewCustomer({ ...newCustomer, customerClass: e.target.value })}
+                                            style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
+                                        >
+                                            <option value="">Sınıf Seçin...</option>
+                                            {(custClasses || []).map(cls => (
+                                                <option key={cls} value={cls}>{cls}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ŞUBE <span style={{ color: 'red' }}>*</span></label>
+                                        <select
+                                            value={newCustomer.branch}
+                                            onChange={e => setNewCustomer({ ...newCustomer, branch: e.target.value })}
+                                            style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
+                                        >
+                                            {(branches || []).map(b => (
+                                                <option key={b.name} value={b.name}>{b.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ŞEHİR</label>
+                                        <select
+                                            value={newCustomer.city}
+                                            onChange={e => setNewCustomer({ ...newCustomer, city: e.target.value, district: '' })}
+                                            style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
+                                        >
+                                            <option value="">Şehir Seçin...</option>
+                                            {TURKISH_CITIES.map(city => (
+                                                <option key={city} value={city}>{city}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>İLÇE</label>
+                                        <select
+                                            value={newCustomer.district}
+                                            onChange={e => setNewCustomer({ ...newCustomer, district: e.target.value })}
+                                            disabled={!newCustomer.city}
+                                            style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)' }}
+                                        >
+                                            <option value="">İlçe Seçin...</option>
+                                            {(TURKISH_DISTRICTS[newCustomer.city] || []).map(district => (
+                                                <option key={district} value={district}>{district}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ADRES</label>
+                                    <textarea value={newCustomer.address} onChange={e => setNewCustomer({ ...newCustomer, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'var(--text-main)', minHeight: '80px', resize: 'vertical' }} />
+                                </div>
+                                <button onClick={handleAddCustomer} disabled={isProcessing} className="btn btn-primary w-full" style={{ padding: '16px', marginTop: '10px', fontSize: '16px' }}>
+                                    {isProcessing ? 'KAYDEDİLİYOR...' : 'KAYDET'}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* EDIT CUSTOMER MODAL */}
-            {isEditModalOpen && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
-                    <div className="card glass animate-in" style={{ width: '600px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                            <h3 style={{ margin: 0 }}>✏️ Müşteri Düzenle</h3>
-                            <button onClick={() => setIsEditModalOpen(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
-                        </div>
-                        <div className="flex-col gap-4">
-                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '12px' }}>MÜŞTERİ ADI <span style={{ color: 'red' }}>*</span></label>
-                                    <input type="text" value={editCustomer.name} onChange={e => setEditCustomer({ ...editCustomer, name: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
-                                </div>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '12px' }}>TELEFON</label>
-                                    <input type="text" value={editCustomer.phone} onChange={e => setEditCustomer({ ...editCustomer, phone: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
-                                </div>
+                {/* EDIT CUSTOMER MODAL */}
+                {isEditModalOpen && (
+                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+                        <div className="card glass animate-in" style={{ width: '600px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}>
+                            <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                <h3 style={{ margin: 0 }}>✏️ Müşteri Düzenle</h3>
+                                <button onClick={() => setIsEditModalOpen(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
                             </div>
-
-                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '12px' }}>E-POSTA</label>
-                                    <input type="text" value={editCustomer.email} onChange={e => setEditCustomer({ ...editCustomer, email: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                            <div className="flex-col gap-4">
+                                <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '12px' }}>MÜŞTERİ ADI <span style={{ color: 'red' }}>*</span></label>
+                                        <input type="text" value={editCustomer.name} onChange={e => setEditCustomer({ ...editCustomer, name: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    </div>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '12px' }}>TELEFON</label>
+                                        <input type="text" value={editCustomer.phone} onChange={e => setEditCustomer({ ...editCustomer, phone: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '12px' }}>MÜŞTERİ SINIFI</label>
-                                    <select value={editCustomer.customerClass} onChange={e => setEditCustomer({ ...editCustomer, customerClass: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}>
-                                        <option value="">Sınıf Seçin...</option>
-                                        {custClasses.map(cls => (
-                                            <option key={cls} value={cls}>{cls}</option>
-                                        ))}
-                                    </select>
+
+                                <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '12px' }}>E-POSTA</label>
+                                        <input type="text" value={editCustomer.email} onChange={e => setEditCustomer({ ...editCustomer, email: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    </div>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '12px' }}>MÜŞTERİ SINIFI</label>
+                                        <select value={editCustomer.customerClass} onChange={e => setEditCustomer({ ...editCustomer, customerClass: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}>
+                                            <option value="">Sınıf Seçin...</option>
+                                            {custClasses.map(cls => (
+                                                <option key={cls} value={cls}>{cls}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
-                                <div>
-                                    <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ NO</label>
-                                    <input type="text" value={editCustomer.taxNumber} onChange={e => setEditCustomer({ ...editCustomer, taxNumber: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ NO</label>
+                                        <input type="text" value={editCustomer.taxNumber} onChange={e => setEditCustomer({ ...editCustomer, taxNumber: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    </div>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ DAİRESİ</label>
+                                        <input type="text" value={editCustomer.taxOffice} onChange={e => setEditCustomer({ ...editCustomer, taxOffice: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    </div>
                                 </div>
+
                                 <div>
-                                    <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ DAİRESİ</label>
-                                    <input type="text" value={editCustomer.taxOffice} onChange={e => setEditCustomer({ ...editCustomer, taxOffice: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>YETKİLİ KİŞİ</label>
+                                    <input type="text" value={editCustomer.contactPerson} onChange={e => setEditCustomer({ ...editCustomer, contactPerson: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
                                 </div>
-                            </div>
 
-                            <div>
-                                <label className="text-muted" style={{ fontSize: '12px' }}>YETKİLİ KİŞİ</label>
-                                <input type="text" value={editCustomer.contactPerson} onChange={e => setEditCustomer({ ...editCustomer, contactPerson: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
-                            </div>
-
-                            <div>
-                                <label className="text-muted" style={{ fontSize: '12px' }}>IBAN</label>
-                                <input type="text" placeholder="TR..." value={editCustomer.iban} onChange={e => setEditCustomer({ ...editCustomer, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
-                            </div>
-
-                            <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
-                                    <label className="text-muted" style={{ fontSize: '12px' }}>ŞEHİR</label>
-                                    <select
-                                        value={editCustomer.city}
-                                        onChange={e => setEditCustomer({ ...editCustomer, city: e.target.value, district: '' })}
-                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
-                                    >
-                                        <option value="">Şehir Seçin...</option>
-                                        {TURKISH_CITIES.map(city => (
-                                            <option key={city} value={city}>{city}</option>
-                                        ))}
-                                    </select>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>IBAN</label>
+                                    <input type="text" placeholder="TR..." value={editCustomer.iban} onChange={e => setEditCustomer({ ...editCustomer, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
                                 </div>
+
+                                <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '12px' }}>ŞEHİR</label>
+                                        <select
+                                            value={editCustomer.city}
+                                            onChange={e => setEditCustomer({ ...editCustomer, city: e.target.value, district: '' })}
+                                            style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                        >
+                                            <option value="">Şehir Seçin...</option>
+                                            {TURKISH_CITIES.map(city => (
+                                                <option key={city} value={city}>{city}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-muted" style={{ fontSize: '12px' }}>İLÇE</label>
+                                        <select
+                                            value={editCustomer.district}
+                                            onChange={e => setEditCustomer({ ...editCustomer, district: e.target.value })}
+                                            disabled={!editCustomer.city}
+                                            style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
+                                        >
+                                            <option value="">İlçe Seçin...</option>
+                                            {(TURKISH_DISTRICTS[editCustomer.city] || []).map(district => (
+                                                <option key={district} value={district}>{district}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div>
-                                    <label className="text-muted" style={{ fontSize: '12px' }}>İLÇE</label>
-                                    <select
-                                        value={editCustomer.district}
-                                        onChange={e => setEditCustomer({ ...editCustomer, district: e.target.value })}
-                                        disabled={!editCustomer.city}
-                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
-                                    >
-                                        <option value="">İlçe Seçin...</option>
-                                        {(TURKISH_DISTRICTS[editCustomer.city] || []).map(district => (
-                                            <option key={district} value={district}>{district}</option>
-                                        ))}
-                                    </select>
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>ADRES</label>
+                                    <textarea value={editCustomer.address} onChange={e => setEditCustomer({ ...editCustomer, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', minHeight: '80px' }} />
                                 </div>
-                            </div>
 
-                            <div>
-                                <label className="text-muted" style={{ fontSize: '12px' }}>ADRES</label>
-                                <textarea value={editCustomer.address} onChange={e => setEditCustomer({ ...editCustomer, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', minHeight: '80px' }} />
+                                <button onClick={handleEditCustomer} disabled={isProcessing} className="btn btn-primary w-full" style={{ padding: '16px', marginTop: '10px' }}>
+                                    {isProcessing ? 'GÜNCELLENİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
+                                </button>
                             </div>
-
-                            <button onClick={handleEditCustomer} disabled={isProcessing} className="btn btn-primary w-full" style={{ padding: '16px', marginTop: '10px' }}>
-                                {isProcessing ? 'GÜNCELLENİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

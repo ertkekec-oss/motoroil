@@ -9,6 +9,7 @@ import { useSales } from '@/contexts/SalesContext';
 import { useFinancials } from '@/contexts/FinancialContext';
 import { useCRM } from '@/contexts/CRMContext';
 import { apiFetch } from '@/lib/api-client';
+import { Sun, Moon } from 'lucide-react';
 
 // New Sub-Components
 import { OnlineOrdersTab } from '@/components/sales/OnlineOrdersTab';
@@ -22,6 +23,34 @@ export default function SalesPage() {
     const { showSuccess, showError, showConfirm, showWarning, showQuotaExceeded, closeModal } = useModal();
     const { currentUser, hasFeature, hasPermission } = useApp();
     const router = useRouter();
+
+    const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
+
+    // Theme Sync
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('pos-theme') as 'dark' | 'light';
+        if (savedTheme) setPosTheme(savedTheme);
+    }, []);
+
+    const togglePosTheme = () => {
+        const newTheme = posTheme === 'dark' ? 'light' : 'dark';
+        setPosTheme(newTheme);
+        localStorage.setItem('pos-theme', newTheme);
+    };
+
+    useEffect(() => {
+        if (posTheme === 'light') {
+            document.body.style.background = '#F7F9FC';
+            document.body.style.color = '#1A1F36';
+        } else {
+            document.body.style.background = 'var(--bg-deep)';
+            document.body.style.color = 'var(--text-main)';
+        }
+        return () => {
+            document.body.style.background = 'var(--bg-deep)';
+            document.body.style.color = 'var(--text-main)';
+        };
+    }, [posTheme]);
 
     useEffect(() => {
         if (!hasFeature('sales') && currentUser !== null) {
@@ -780,19 +809,44 @@ export default function SalesPage() {
     };
 
     return (
-        <div className="container" style={{ padding: '40px 20px' }}>
-            <header className="flex-between" style={{ marginBottom: '32px' }}>
+        <div data-pos-theme={posTheme} className="w-full min-h-screen p-6 md:p-10 space-y-8 transition-colors duration-300">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                 <div>
-                    <h1 className="text-gradient">Satış Yönetimi</h1>
-                    <p className="text-muted">E-Ticaret, Mağaza Satışları ve Faturalar</p>
+                    <h1 className={posTheme === 'light' ? "text-4xl font-black text-slate-800 tracking-tight" : "text-3xl font-bold text-white mb-2"}>Satış Yönetimi</h1>
+                    <p className={posTheme === 'light' ? "text-slate-500 font-medium" : "text-white/60"}>E-Ticaret, Mağaza Satışları ve Faturalar</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={togglePosTheme}
+                        className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all shadow-pos flex items-center justify-center bg-white/5"
+                    >
+                        {posTheme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-primary" />}
+                    </button>
                 </div>
             </header>
 
-            <div className="flex-center" style={{ justifyContent: 'flex-start', borderBottom: '1px solid var(--border-light)', marginBottom: '24px', gap: '8px' }}>
-                <button onClick={() => setActiveTab('online')} style={{ padding: '12px 24px', background: activeTab === 'online' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'online' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>E-Ticaret</button>
-                <button onClick={() => setActiveTab('store')} style={{ padding: '12px 24px', background: activeTab === 'store' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'store' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>Mağaza Satışları</button>
-                <button onClick={() => { setActiveTab('invoices'); setInvoiceSubTab('sales'); }} style={{ padding: '12px 24px', background: activeTab === 'invoices' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'invoices' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>Faturalar</button>
-                <button onClick={() => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); }} style={{ padding: '12px 24px', background: activeTab === 'wayslips' ? 'var(--bg-hover)' : 'transparent', border: 'none', color: 'white', borderBottom: activeTab === 'wayslips' ? '2px solid var(--primary)' : 'none', cursor: 'pointer' }}>e-İrsaliyeler</button>
+            <div className="flex flex-wrap gap-2 border-b border-white/10 pb-2 mb-4">
+                {[
+                    { id: 'online', label: 'E-Ticaret', color: 'bg-indigo-600' },
+                    { id: 'store', label: 'Mağaza Satışları', color: 'bg-emerald-600' },
+                    { id: 'invoices', label: 'Faturalar', color: 'bg-orange-600' },
+                    { id: 'wayslips', label: 'e-İrsaliyeler', color: 'bg-rose-600' },
+                ].map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => {
+                            setActiveTab(tab.id);
+                            if (tab.id === 'invoices') setInvoiceSubTab('sales');
+                            if (tab.id === 'wayslips') setInvoiceSubTab('wayslips');
+                        }}
+                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-sm ${activeTab === tab.id
+                            ? `${tab.color} text-white shadow-lg scale-105`
+                            : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                            }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
             </div>
 
 
@@ -810,6 +864,7 @@ export default function SalesPage() {
                         isLoadingLabel={isLoadingLabel}
                         showWarning={showWarning}
                         showError={showError}
+                        posTheme={posTheme}
                     />
                 )}
 
@@ -834,6 +889,7 @@ export default function SalesPage() {
                         handleRejectPurchaseInvoice={handleRejectPurchaseInvoice}
                         setView={setView}
                         showWarning={showWarning}
+                        posTheme={posTheme}
                     />
                 )}
 
@@ -849,6 +905,7 @@ export default function SalesPage() {
                         }}
                         handleDeleteStoreSale={handleDeleteStoreSale}
                         isLoadingStore={isLoadingStore}
+                        posTheme={posTheme}
                     />
                 )}
 

@@ -9,13 +9,15 @@ interface StoreOrdersTabProps {
     fetchStoreOrders: () => Promise<void>;
     handleDeleteStoreSale: (id: string) => Promise<void>;
     isLoadingStore: boolean;
+    posTheme?: 'dark' | 'light';
 }
 
 export function StoreOrdersTab({
     storeOrders,
     fetchStoreOrders,
     handleDeleteStoreSale,
-    isLoadingStore
+    isLoadingStore,
+    posTheme = 'dark'
 }: StoreOrdersTabProps) {
     const [turnoverFilter, setTurnoverFilter] = useState('TODAY');
     const [turnoverCustomStart, setTurnoverCustomStart] = useState('');
@@ -70,27 +72,29 @@ export function StoreOrdersTab({
 
     return (
         <div>
-            <div className="flex-between mb-4">
-                <h3>Mağaza Satış Geçmişi (POS)</h3>
-                <button onClick={fetchStoreOrders} className="btn btn-outline" style={{ fontSize: '12px' }}>🔄 Yenile</button>
+            <div className="flex justify-between items-center mb-6">
+                <h3 className={posTheme === 'light' ? "text-2xl font-black text-slate-800" : "text-2xl font-bold text-white"}>Mağaza Satış Geçmişi (POS)</h3>
+                <button onClick={fetchStoreOrders} className="flex items-center gap-2 px-4 py-2 border border-pos glass rounded-lg text-pos hover:bg-white/10 transition-all text-xs">
+                    🔄 Yenile
+                </button>
             </div>
 
             {/* Store Stats Summary */}
-            <div className="grid-cols-4" style={{ marginBottom: '32px', gap: '20px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
-                <div className="card glass">
-                    <div className="text-muted" style={{ fontSize: '12px' }}>TOPLAM İŞLEM</div>
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--primary)', marginTop: '8px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="card glass p-6">
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">TOPLAM İŞLEM</div>
+                    <div className="text-3xl font-black text-indigo-500">
                         {storeOrders.length} Adet
                     </div>
-                    <div style={{ fontSize: '12px', marginTop: '4px' }}>Tüm zamanlar</div>
+                    <div className="text-[10px] font-bold text-gray-400 uppercase mt-1">Tüm zamanlar</div>
                 </div>
-                <div className="card glass" style={{ position: 'relative' }}>
-                    <div className="flex-between">
-                        <div className="text-muted" style={{ fontSize: '12px' }}>{getTurnoverTitle()}</div>
+                <div className="card glass p-6 relative">
+                    <div className="flex justify-between items-center mb-1">
+                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{getTurnoverTitle()}</div>
                         <select
                             value={turnoverFilter}
                             onChange={(e) => setTurnoverFilter(e.target.value)}
-                            style={{ fontSize: '10px', padding: '2px', background: 'var(--bg-deep)', color: 'white', border: 'none', borderRadius: '4px' }}
+                            className="bg-white/5 border border-white/10 text-pos text-[10px] rounded px-1 outline-none"
                         >
                             <option value="TODAY">Bugün</option>
                             <option value="WEEK">1 Hafta</option>
@@ -99,24 +103,23 @@ export function StoreOrdersTab({
                         </select>
                     </div>
                     {turnoverFilter === 'CUSTOM' && (
-                        <div className="flex-center gap-1 mt-1" style={{ fontSize: '10px' }}>
-                            <input type="date" value={turnoverCustomStart} onChange={e => setTurnoverCustomStart(e.target.value)} style={{ padding: '2px', width: '80px', background: 'var(--bg-deep)', color: 'white', border: 'none' }} />
-                            <span>-</span>
-                            <input type="date" value={turnoverCustomEnd} onChange={e => setTurnoverCustomEnd(e.target.value)} style={{ padding: '2px', width: '80px', background: 'var(--bg-deep)', color: 'white', border: 'none' }} />
+                        <div className="flex items-center gap-1 mt-1 text-[10px]">
+                            <input type="date" value={turnoverCustomStart} onChange={e => setTurnoverCustomStart(e.target.value)} className="px-1 w-24 rounded bg-white/5 border border-white/10 text-pos outline-none" />
+                            <span className="text-gray-400">-</span>
+                            <input type="date" value={turnoverCustomEnd} onChange={e => setTurnoverCustomEnd(e.target.value)} className="px-1 w-24 rounded bg-white/5 border border-white/10 text-pos outline-none" />
                         </div>
                     )}
-
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--success)', marginTop: '8px' }}>
+                    <div className="text-3xl font-black text-emerald-500 mt-2">
                         ₺ {calculateTurnover(storeOrders).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
-                    <div style={{ fontSize: '12px', marginTop: '4px' }}>Mağaza cirosu</div>
+                    <div className="text-[10px] font-bold text-gray-400 uppercase mt-1">Mağaza cirosu</div>
                 </div>
-                <div className="card glass">
-                    <div className="text-muted" style={{ fontSize: '12px' }}>ORTALAMA SEPET</div>
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', marginTop: '8px' }}>
+                <div className="card glass p-6">
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">ORTALAMA SEPET</div>
+                    <div className={posTheme === 'light' ? "text-3xl font-black text-slate-800" : "text-3xl font-bold text-white"}>
                         ₺ {storeOrders.length > 0 ? (storeOrders.reduce((acc, curr) => acc + (parseFloat(curr.totalAmount) || 0), 0) / storeOrders.length).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00'}
                     </div>
-                    <div style={{ fontSize: '12px', marginTop: '4px' }}>İşlem başına</div>
+                    <div className="text-[10px] font-bold text-gray-400 uppercase mt-1">İşlem başına</div>
                 </div>
             </div>
 
