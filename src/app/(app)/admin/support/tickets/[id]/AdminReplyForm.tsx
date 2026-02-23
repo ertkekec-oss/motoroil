@@ -88,24 +88,24 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
     ];
 
     return (
-        <form onSubmit={handleSubmit} className={`bg-[#0f111a] border p-4 rounded-2xl shadow-xl flex flex-col gap-4 ${isInternal ? 'border-yellow-500/50' : 'border-white/5'}`}>
+        <form onSubmit={handleSubmit} className={`bg-white border p-6 rounded-2xl shadow-sm flex flex-col gap-4 ${isInternal ? 'border-amber-500/50 bg-amber-50/10' : 'border-slate-200'}`}>
             {error && <div className="text-red-400 text-xs font-medium px-4">{error}</div>}
 
             <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 text-xs font-bold text-gray-400 cursor-pointer">
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-500 cursor-pointer uppercase tracking-widest">
                         <input
                             type="checkbox"
                             checked={isInternal}
                             onChange={(e) => setIsInternal(e.target.checked)}
-                            className="rounded border-gray-600 bg-white/5 text-yellow-500 focus:ring-yellow-500"
+                            className="rounded border-slate-300 bg-slate-50 text-amber-500 focus:ring-amber-500 w-4 h-4"
                         />
-                        <span className={isInternal ? 'text-yellow-500' : ''}>
+                        <span className={isInternal ? 'text-amber-600' : ''}>
                             🟡 İç Not (Internal)
                         </span>
                     </label>
                     <select
-                        className="bg-white/5 border border-white/10 text-white text-[10px] px-2 py-1 rounded-lg outline-none max-w-[150px]"
+                        className="bg-slate-50 border border-slate-200 text-slate-700 text-[10px] px-3 py-1.5 rounded-lg outline-none max-w-[150px] font-bold"
                         onChange={(e) => {
                             const found = cannedResponses.find(r => r.title === e.target.value);
                             if (found) setBody(found.body);
@@ -116,7 +116,7 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
                     </select>
                     {!isInternal && (
                         <select
-                            className="bg-white/5 border border-white/10 text-white text-[10px] px-2 py-1 rounded-lg outline-none"
+                            className="bg-slate-50 border border-slate-200 text-slate-700 text-[10px] px-3 py-1.5 rounded-lg outline-none font-bold"
                             value={statusChange}
                             onChange={(e) => setStatusChange(e.target.value)}
                         >
@@ -133,9 +133,9 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
             {files.length > 0 && (
                 <div className="flex flex-wrap gap-2 px-2">
                     {files.map((f, i) => (
-                        <div key={i} className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-xs text-gray-300 flex items-center gap-2">
+                        <div key={i} className="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs text-slate-600 flex items-center gap-2 font-medium">
                             <span className="truncate max-w-[150px]">{f.fileName}</span>
-                            <button type="button" onClick={() => setFiles(files.filter((_, idx) => idx !== i))} className="text-red-400 hover:text-red-300 font-bold">×</button>
+                            <button type="button" onClick={() => setFiles(files.filter((_, idx) => idx !== i))} className="text-rose-500 hover:text-rose-600 font-bold">×</button>
                         </div>
                     ))}
                 </div>
@@ -147,15 +147,15 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
                 placeholder={isInternal ? "Ekip için iç notunuzu yazın. Müşteri görmeyecek..." : "Müşteriye yanıtınızı buraya yazın..."}
                 rows={5}
                 required={files.length === 0}
-                className={`w-full bg-white/5 border p-4 rounded-xl text-white text-sm outline-none transition-colors placeholder:text-gray-600 resize-y ${isInternal ? 'border-yellow-500/30 focus:border-yellow-500/60 bg-yellow-500/5' : 'border-white/10 focus:border-orange-500/50'}`}
+                className={`w-full bg-slate-50 border p-4 rounded-xl text-slate-900 text-sm outline-none transition-colors placeholder:text-slate-400 resize-y ${isInternal ? 'border-amber-500/30 focus:border-amber-500/60 bg-amber-50/50' : 'border-slate-200 focus:border-orange-500/50'}`}
             />
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                    <label className="cursor-pointer px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold rounded-xl border border-white/10 transition-all flex items-center gap-2">
+                    <label className="cursor-pointer px-4 py-2 bg-white hover:bg-slate-50 text-slate-500 text-xs font-bold rounded-xl border border-slate-200 transition-all flex items-center gap-2 shadow-sm">
                         <span>📎 Ek Ekle</span>
                         <input type="file" multiple className="hidden" onChange={handleFileChange} disabled={uploading} />
                     </label>
-                    {uploading && <span className="text-[10px] text-orange-400 animate-pulse">Yükleniyor...</span>}
+                    {uploading && <span className="text-[10px] text-orange-600 animate-pulse font-bold">Yükleniyor...</span>}
                 </div>
                 <button
                     type="submit"

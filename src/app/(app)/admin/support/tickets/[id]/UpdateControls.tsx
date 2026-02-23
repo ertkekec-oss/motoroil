@@ -35,18 +35,18 @@ export default function UpdateControls({
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
             <div>
-                <span className="text-xs text-gray-500 block mb-1">Talep Durumu</span>
-                <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg border inline-block ${STATUS_COLORS[currentStatus]}`}>
+                <span className="text-[10px] font-bold text-slate-500 block mb-2 uppercase tracking-widest">Talep Durumu</span>
+                <span className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl border inline-block ${STATUS_COLORS[currentStatus]}`}>
                     {STATUS_LABELS[currentStatus]}
                 </span>
             </div>
             <div>
-                <span className="text-xs text-gray-500 block mb-1">Atanan Temsilci</span>
+                <span className="text-[10px] font-bold text-slate-500 block mb-2 uppercase tracking-widest">Atanan Temsilci</span>
                 <select
                     defaultValue={assignedToUserId || ''}
-                    className="w-full bg-white/5 border border-white/10 p-2 text-xs text-white rounded outline-none focus:border-orange-500/50"
+                    className="w-full bg-slate-50 border border-slate-200 p-3 text-sm text-slate-900 rounded-xl outline-none focus:border-orange-500/50 font-medium transition-colors"
                     onChange={(e) => handleUpdate({ assignedToUserId: e.target.value || null })}
                 >
                     <option value="">Atanmamış</option>
@@ -56,10 +56,10 @@ export default function UpdateControls({
                 </select>
             </div>
             <div>
-                <span className="text-xs text-gray-500 block mb-1">Öncelik</span>
+                <span className="text-[10px] font-bold text-slate-500 block mb-2 uppercase tracking-widest">Öncelik</span>
                 <select
                     defaultValue={priority}
-                    className="w-full bg-white/5 border border-white/10 p-2 text-xs text-white rounded outline-none focus:border-orange-500/50"
+                    className="w-full bg-slate-50 border border-slate-200 p-3 text-sm text-slate-900 rounded-xl outline-none focus:border-orange-500/50 font-medium transition-colors"
                     onChange={(e) => handleUpdate({ priority: e.target.value })}
                 >
                     <option value="P1_URGENT">P1 - Acil</option>
