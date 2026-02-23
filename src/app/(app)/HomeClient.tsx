@@ -11,11 +11,16 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell
+  PieChart as RePieChart, Pie, Cell
 } from 'recharts';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUpsell } from '@/hooks/useUpsell';
 import dynamic from 'next/dynamic';
+import {
+  Sun, Moon, TrendingUp, PieChart, Bell, Search,
+  Clock, CreditCard, Banknote, Landmark, BookOpen,
+  Trash2, ShoppingCart, FileText, Lightbulb, X, Plus, Minus, ArrowRight
+} from 'lucide-react';
 
 const LoginPageContent = dynamic(() => import('@/components/login/LoginPageContent'), { ssr: false });
 
@@ -345,15 +350,15 @@ function POSContent() {
         <div className="space-y-4">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-black mb-1">Hoş geldin, <span className={posTheme === 'light' ? "text-primary" : "text-primary"}>{currentUser?.name?.split(' ')[0]}</span> 👋</h2>
+              <h2 className="text-2xl font-black mb-1 flex items-center gap-2">Hoş geldin, <span className={posTheme === 'light' ? "text-primary" : "text-primary"}>{currentUser?.name?.split(' ')[0]}</span></h2>
               <p className="text-xs opacity-50">Sistemdeki genel durumun ve sana özel ipuçları aşağıda.</p>
             </div>
             <button
               onClick={togglePosTheme}
-              className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all text-xl shadow-pos"
+              className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all shadow-pos flex items-center justify-center"
               title={posTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}
             >
-              {posTheme === 'dark' ? '☀️' : '🌙'}
+              {posTheme === 'dark' ? <Sun size={24} className="text-amber-400" /> : <Moon size={24} className="text-primary" />}
             </button>
           </div>
         </div>
@@ -362,7 +367,7 @@ function POSContent() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full md:h-auto">
           <div className={posTheme === 'light' ? "lg:col-span-6 card min-h-[160px]" : "lg:col-span-6 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2"><span className="text-lg">📈</span><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Haftalık Satış Trendi</span></div>
+              <div className="flex items-center gap-2"><TrendingUp size={18} className="text-primary" /><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Haftalık Satış Trendi</span></div>
             </div>
             {insightsData?.stats?.weeklyTrend ? (
               <ResponsiveContainer width="100%" aspect={2.8}><AreaChart data={insightsData.stats.weeklyTrend}><Area type="monotone" dataKey="value" stroke={posTheme === 'light' ? "#247BFE" : "#FF5500"} fill={posTheme === 'light' ? "url(#colorBlue)" : "#FF5500"} fillOpacity={0.1} strokeWidth={2} /><defs><linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#247BFE" stopOpacity={0.3} /><stop offset="95%" stopColor="#247BFE" stopOpacity={0} /></linearGradient></defs></AreaChart></ResponsiveContainer>
@@ -370,9 +375,9 @@ function POSContent() {
           </div>
 
           <div className={posTheme === 'light' ? "lg:col-span-3 card min-h-[160px]" : "lg:col-span-3 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
-            <div className="flex items-center gap-2 mb-4"><span className="text-lg">🍰</span><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Kategori Analizi</span></div>
+            <div className="flex items-center gap-2 mb-4"><PieChart size={18} className="text-primary-purple" /><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Kategori Analizi</span></div>
             {insightsData?.stats?.categoryAnalysis ? (
-              <ResponsiveContainer width="100%" height={100}><PieChart><Pie data={insightsData.stats.categoryAnalysis} innerRadius={25} outerRadius={35} dataKey="value"><Cell fill={posTheme === 'light' ? "#6260FE" : "#FF5500"} /></Pie></PieChart></ResponsiveContainer>
+              <ResponsiveContainer width="100%" height={100}><RePieChart><Pie data={insightsData.stats.categoryAnalysis} innerRadius={25} outerRadius={35} dataKey="value"><Cell fill={posTheme === 'light' ? "#6260FE" : "#FF5500"} /></Pie></RePieChart></ResponsiveContainer>
             ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri yükleniyor...</div>}
           </div>
 
@@ -425,7 +430,7 @@ function POSContent() {
         {/* CART */}
         <div className={posTheme === 'light' ? "flex-1 card overflow-y-auto min-h-[300px]" : "flex-1 bg-[#0f111a] rounded-xl border border-white/5 p-2 overflow-y-auto min-h-[300px] shadow-2xl"}>
           {cart.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center opacity-20"><span className="text-6xl mb-4">🛒</span><span className="text-sm font-bold">Sepet Boş</span></div>
+            <div className="h-full flex flex-col items-center justify-center opacity-20"><ShoppingCart size={64} className="mb-4 text-primary" /><span className="text-sm font-bold">Sepet Boş</span></div>
           ) : (
             <div className="space-y-3">
               {cart.map((item, idx) => (
@@ -435,12 +440,12 @@ function POSContent() {
                     <div className="text-[10px] opacity-40">{item.barcode}</div>
                   </div>
                   <div className={posTheme === 'light' ? "flex items-center gap-2 bg-gray-50 rounded-xl p-1.5" : "flex items-center gap-2 bg-black/20 rounded-lg p-1"}>
-                    <button onClick={() => setCart(c => c.map((x, i) => i === idx ? { ...x, qty: Math.max(1, x.qty - 1) } : x))} className="w-7 h-7 hover:bg-gray-200 rounded-lg transition-colors">-</button>
+                    <button onClick={() => setCart(c => c.map((x, i) => i === idx ? { ...x, qty: Math.max(1, x.qty - 1) } : x))} className="w-7 h-7 hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center"><Minus size={14} /></button>
                     <span className="w-6 text-center font-bold text-sm">{item.qty}</span>
-                    <button onClick={() => setCart(c => c.map((x, i) => i === idx ? { ...x, qty: x.qty + 1 } : x))} className="w-7 h-7 hover:bg-gray-200 rounded-lg transition-colors">+</button>
+                    <button onClick={() => setCart(c => c.map((x, i) => i === idx ? { ...x, qty: x.qty + 1 } : x))} className="w-7 h-7 hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center"><Plus size={14} /></button>
                   </div>
                   <div className="font-bold text-primary min-w-[100px] text-right text-lg">₺{(item.price * item.qty).toLocaleString()}</div>
-                  <button onClick={() => setCart(c => c.filter((_, i) => i !== idx))} className="text-gray-400 hover:text-red-500 hover:bg-red-50 w-8 h-8 rounded-lg flex items-center justify-center transition-all">×</button>
+                  <button onClick={() => setCart(c => c.filter((_, i) => i !== idx))} className="text-gray-400 hover:text-red-500 hover:bg-red-50 w-8 h-8 rounded-lg flex items-center justify-center transition-all"><X size={18} /></button>
                 </div>
               ))}
             </div>
@@ -450,7 +455,7 @@ function POSContent() {
         {/* ROW 5: INSIGHTS & FORECAST (Moved below cart) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className={posTheme === 'light' ? "card flex items-center gap-4 relative overflow-hidden group transition-all" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group hover:border-white/10 transition-all cursor-pointer"}>
-            <div className="text-3xl">📄</div>
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><FileText size={24} /></div>
             <div>
               <div className="font-bold text-sm mb-1">E-Fatura'ya Geçin</div>
               <div className="text-[10px] opacity-60 leading-relaxed">Henüz resmi fatura kesmediniz. Entegrasyonu tamamlayın.</div>
@@ -458,7 +463,7 @@ function POSContent() {
             </div>
           </div>
           <div className={posTheme === 'light' ? "card flex items-center gap-4 relative overflow-hidden" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden"}>
-            <div className="text-3xl">💡</div>
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500"><Lightbulb size={24} /></div>
             <div>
               <div className="font-bold text-sm mb-1">Verimlilik Saati</div>
               <div className="text-[10px] opacity-60 leading-relaxed">İstatistiklerinize göre en verimli saatiniz öğleden önce 10:00.</div>
@@ -506,7 +511,7 @@ function POSContent() {
 
           {/* Promo */}
           <button onClick={() => setShowPromoInputs(!showPromoInputs)} className="w-full bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-600/20 p-3 rounded-lg font-bold text-xs flex items-center justify-center gap-2">
-            🎁 KOD VEYA REFERANS UYGULA
+            <Plus size={16} /> KOD VEYA REFERANS UYGULA
           </button>
 
           {showPromoInputs && (
@@ -567,16 +572,16 @@ function POSContent() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {[{ id: 'cash', l: 'Nakit', i: '💵' }, { id: 'card', l: 'Kredi Kartı', i: '💳' }, { id: 'transfer', l: 'Havale/EFT', i: '🏦' }, { id: 'account', l: 'VERESİYE', i: '📖' }].map(m => (
+              {[{ id: 'cash', l: 'Nakit', i: <Banknote size={24} /> }, { id: 'card', l: 'Kredi Kartı', i: <CreditCard size={24} /> }, { id: 'transfer', l: 'Havale/EFT', i: <Landmark size={24} /> }, { id: 'account', l: 'VERESİYE', i: <BookOpen size={24} /> }].map(m => (
                 <button
                   key={m.id}
                   onClick={() => setPaymentMode(m.id as any)}
                   className={`p-5 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${paymentMode === m.id
-                    ? (posTheme === 'light' ? 'bg-white border-primary shadow-lg ring-1 ring-primary/20 scale-[1.02]' : 'bg-white/10 border-primary text-white shadow-lg')
+                    ? (posTheme === 'light' ? 'bg-white border-primary shadow-lg ring-1 ring-primary/20 scale-[1.02] text-primary' : 'bg-white/10 border-primary text-white shadow-lg')
                     : (posTheme === 'light' ? 'bg-gray-50/50 border-gray-100 hover:bg-white hover:border-gray-200 text-gray-400' : 'bg-black/20 border-white/5 hover:bg-white/5 text-white/50')
                     }`}
                 >
-                  <span className={`text-2xl transition-transform ${paymentMode === m.id ? 'scale-110' : ''}`}>{m.i}</span>
+                  <div className={`transition-transform ${paymentMode === m.id ? 'scale-110' : ''}`}>{m.i}</div>
                   <span className={`text-[10px] font-bold uppercase tracking-wide`}>{m.l}</span>
                 </button>
               ))}
@@ -620,7 +625,7 @@ function POSContent() {
             onClick={() => setShowSuspendModal(true)}
             className="w-full bg-amber-500/10 border border-amber-500/20 text-amber-500 font-bold text-xs py-3 rounded-lg flex justify-center items-center gap-2 hover:bg-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            ⌛ BEKLEMEYE AL
+            <Clock size={16} /> BEKLEMEYE AL
           </button>
 
           <button
@@ -637,7 +642,10 @@ function POSContent() {
                 <span>İŞLENİYOR...</span>
               </div>
             ) : (
-              'ÖDEMEYİ TAMAMLA ➔'
+              <div className="flex items-center justify-center gap-3">
+                <span>ÖDEMEYİ TAMAMLA</span>
+                <ArrowRight size={22} strokeWidth={3} />
+              </div>
             )}
           </button>
         </div>
