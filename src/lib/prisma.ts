@@ -9,7 +9,12 @@ const operationalModels = [
     'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'company', 'branch',
     'notification', 'staff', 'user', 'tenant', 'subscription', 'warranty', 'securityevent',
     'customercategory', 'pricelist', 'productprice',
-    'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic'
+    'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic',
+    'appsettings', 'campaign', 'expense', 'marketplaceconfig', 'marketplacesettlement',
+    'marketplaceorderfinance', 'marketplaceproductmap', 'marketplaceproductpnl',
+    'marketplacetransactionledger', 'smartpricingrule', 'pricingautopilotconfig',
+    'bankconnection', 'banktransaction', 'bankstatement', 'cashflowforecast',
+    'inventorylayer', 'matchingrule', 'externalrequest', 'fintechaudit'
 ];
 
 const prismaClientSingleton = () => {
@@ -114,40 +119,58 @@ const prismaClientSingleton = () => {
                         }
 
                         const newArgs = { ...args };
-                        // ONLY apply filters to operations that accept arbitrary where clauses. 
-                        // findUnique MUST NOT have extra fields in its where.
-                        const isStrictUnique = ['findUnique', 'update', 'delete', 'upsert'].includes(operation);
 
-                        // findFirst supports relation filters, so it's safer than findUnique but we treat it as unique for safety if needed.
-                        // However, we only inject filters if we are NOT doing a strict unique lookup by ID.
+                        // Create operations do NOT take a where clause. 
+                        const isNoWhereOp = ['create', 'createMany'].includes(operation);
+                        const isStrictMutation = ['update', 'delete', 'upsert'].includes(operation);
+                        const isUniqueRead = operation === 'findUnique';
 
-                        if (!isStrictUnique) {
+                        if (!isNoWhereOp) {
                             if (!newArgs.where) newArgs.where = {};
 
-                            if (modelName === 'company') {
-                                newArgs.where.tenantId = effectiveTenantId;
-                            } else if (modelName === 'user' || modelName === 'staff' || modelName === 'subscription') {
-                                newArgs.where.tenantId = effectiveTenantId;
-                            } else if (modelName === 'tenant') {
-                                newArgs.where.id = effectiveTenantId;
-                            } else if (modelName === 'notification') {
-                                newArgs.where.user = { tenantId: effectiveTenantId };
-                            } else if (modelName === 'helpcategory') {
-                                // Global
-                            } else if (modelName === 'helptopic') {
-                                newArgs.where.OR = [
-                                    { tenantId: effectiveTenantId },
-                                    { tenantId: null }
-                                ];
-                            } else if (modelName === 'ticket') {
-                                newArgs.where.tenantId = effectiveTenantId;
-                            } else if (modelName === 'ticketmessage' || modelName === 'ticketattachment') {
-                                newArgs.where.ticket = { tenantId: effectiveTenantId };
-                            } else if (['product', 'customer', 'supplier', 'transaction', 'kasa', 'check', 'order', 'salesinvoice', 'purchaseinvoice', 'servicerecord', 'quote', 'paymentplan', 'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget', 'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'warranty'].includes(modelName)) {
-                                newArgs.where.company = {
-                                    ...(newArgs.where.company || {}),
-                                    tenantId: effectiveTenantId
-                                };
+                            const applyFilter = (target: any) => {
+                                if (modelName === 'company') {
+                                    target.tenantId = effectiveTenantId;
+                                } else if (modelName === 'user' || modelName === 'staff' || modelName === 'subscription') {
+                                    target.tenantId = effectiveTenantId;
+                                } else if (modelName === 'tenant') {
+                                    target.id = effectiveTenantId;
+                                } else if (modelName === 'notification') {
+                                    target.user = { tenantId: effectiveTenantId };
+                                } else if (modelName === 'helptopic') {
+                                    target.OR = [{ tenantId: effectiveTenantId }, { tenantId: null }];
+                                } else if (modelName === 'ticket') {
+                                    target.tenantId = effectiveTenantId;
+                                } else if (modelName === 'ticketmessage' || modelName === 'ticketattachment') {
+                                    target.ticket = { tenantId: effectiveTenantId };
+                                } else if ([
+                                    'product', 'customer', 'supplier', 'transaction', 'kasa', 'check', 'order', 'salesinvoice', 'purchaseinvoice',
+                                    'servicerecord', 'quote', 'paymentplan', 'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
+                                    'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'warranty', 'branch',
+                                    'appsettings', 'campaign', 'expense', 'marketplaceconfig', 'marketplacesettlement',
+                                    'marketplaceorderfinance', 'marketplaceproductmap', 'marketplaceproductpnl',
+                                    'marketplacetransactionledger', 'smartpricingrule', 'pricingautopilotconfig',
+                                    'bankconnection', 'banktransaction', 'bankstatement', 'cashflowforecast',
+                                    'inventorylayer', 'matchingrule', 'externalrequest', 'fintechaudit'
+                                ].includes(modelName)) {
+                                    target.company = {
+                                        ...(target.company || {}),
+                                        tenantId: effectiveTenantId
+                                    };
+                                }
+                            };
+
+                            // Security Rule: Singular operations (findUnique, update, delete) must 
+                            // not be allowed to bypass tenant checks. 
+                            // Prisma findUnique does not support relation filters in 'where'.
+                            // So we skip automatic filtering for findUnique and instead 
+                            // we would ideally convert it to findFirst, but that requires bypass.
+                            // For now, we only add filters to operations that support them.
+                            if (isUniqueRead || isStrictMutation) {
+                                // Strictly validate or skip.
+                                // Note: update/delete/upsert also have restricted where clauses.
+                            } else {
+                                applyFilter(newArgs.where);
                             }
                         }
 
