@@ -9,8 +9,10 @@ import {
     IconAlert,
     IconZap,
     IconShield,
-    IconRefresh
+    IconRefresh,
+    IconTrash
 } from '@/components/icons/PremiumIcons';
+import { Sun, Moon } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import dynamic from 'next/dynamic';
 const BarcodeScanner = dynamic(() => import('@/components/BarcodeScanner'), { ssr: false });
@@ -19,28 +21,28 @@ import { v4 as uuidv4 } from 'uuid';
 
 // --- UI COMPONENTS ---
 
-const Card = ({ children, title, icon: Icon, className = "" }: any) => (
+const Card = ({ children, title, icon: Icon, className = "", posTheme }: any) => (
     <div className={`card glass p-6 relative overflow-hidden group ${className}`}>
         <div className="flex justify-between items-center mb-6">
             <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                {Icon && <Icon className="w-4 h-4 text-emerald-500" />} {title}
+                {Icon && <Icon className={`w-4 h-4 ${posTheme === 'light' ? 'text-primary' : 'text-emerald-500'}`} />} {title}
             </h3>
         </div>
         {children}
     </div>
 );
 
-const ProgressBar = ({ label, value, max, color = "bg-emerald-500" }: any) => {
+const ProgressBar = ({ label, value, max, color = "bg-emerald-500", posTheme }: any) => {
     const percentage = Math.min((value / max) * 100, 100);
     return (
         <div className="space-y-2">
             <div className="flex justify-between text-[10px] font-bold uppercase">
                 <span className="text-gray-500">{label}</span>
-                <span className="text-white">%{percentage.toFixed(0)}</span>
+                <span className={posTheme === 'light' ? "text-pos" : "text-white"}>%{percentage.toFixed(0)}</span>
             </div>
-            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+            <div className={`h-1.5 w-full ${posTheme === 'light' ? 'bg-gray-100' : 'bg-white/5'} rounded-full overflow-hidden`}>
                 <div
-                    className={`h-full ${color} transition-all duration-1000 ease-out`}
+                    className={`h-full ${posTheme === 'light' ? 'bg-primary' : color} transition-all duration-1000 ease-out`}
                     style={{ width: `${percentage}%` }}
                 />
             </div>
@@ -55,45 +57,46 @@ const DashboardView = ({
     handleGpsCheckin,
     isScannerOpen,
     setIsScannerOpen,
-    onQrScan
+    onQrScan,
+    posTheme
 }: any) => (
     <div className="space-y-8 animate-in fade-in duration-500">
         {/* Top Summary */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="card glass p-6 border-emerald-500/20">
-                <IconActivity className="w-6 h-6 text-emerald-500 mb-4" />
+                <IconActivity className={posTheme === 'light' ? "w-6 h-6 text-primary mb-4" : "w-6 h-6 text-emerald-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Performans Skoru</h4>
-                <p className="text-3xl font-black text-white">92.4</p>
-                <p className="text-[10px] text-emerald-500 mt-2">↑ %2.1 geçen aya göre</p>
+                <p className={posTheme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>92.4</p>
+                <p className={posTheme === 'light' ? "text-[10px] text-primary mt-2" : "text-[10px] text-emerald-500 mt-2"}>↑ %2.1 geçen aya göre</p>
             </div>
             <div className="card glass p-6 border-indigo-500/20">
-                <IconTrendingUp className="w-6 h-6 text-indigo-500 mb-4" />
+                <IconTrendingUp className={posTheme === 'light' ? "w-6 h-6 text-primary mb-4" : "w-6 h-6 text-indigo-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hedef Gerçekleşme</h4>
-                <p className="text-3xl font-black text-white">%88</p>
+                <p className={posTheme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>%88</p>
                 <p className="text-[10px] text-gray-500 mt-2">Bu ayki hedefler</p>
             </div>
             <div className="card glass p-6 border-amber-500/20">
-                <IconClock className="w-6 h-6 text-amber-500 mb-4" />
+                <IconClock className={posTheme === 'light' ? "w-6 h-6 text-amber-600 mb-4" : "w-6 h-6 text-amber-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kalan İzin</h4>
-                <p className="text-3xl font-black text-white">14</p>
+                <p className={posTheme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>14</p>
                 <p className="text-[10px] text-gray-500 mt-2">Günlük bakiye</p>
             </div>
             <div className="card glass p-6 border-rose-500/20">
-                <IconZap className="w-6 h-6 text-rose-500 mb-4" />
+                <IconZap className={posTheme === 'light' ? "w-6 h-6 text-rose-500 mb-4" : "w-6 h-6 text-rose-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Aylık Mesai</h4>
-                <p className="text-3xl font-black text-white">12.5</p>
+                <p className={posTheme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>12.5</p>
                 <p className="text-[10px] text-gray-500 mt-2">Ekstradan çalışılan saat</p>
             </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Targets & Performance */}
-            <Card title="Hedefler & Performans" icon={IconActivity} className="lg:col-span-2">
+            <Card title="Hedefler & Performans" icon={IconActivity} className="lg:col-span-2" posTheme={posTheme}>
                 <div className="space-y-6">
-                    <ProgressBar label="Satış Kotası Gerçekleşme" value={850000} max={1000000} />
-                    <ProgressBar label="Müşteri Memnuniyeti (NPS)" value={4.8} max={5} color="bg-indigo-500" />
-                    <ProgressBar label="Rota Uyumluluk Oranı" value={98} max={100} color="bg-blue-500" />
-                    <ProgressBar label="Tahsilat Hedefi" value={420000} max={600000} color="bg-amber-500" />
+                    <ProgressBar label="Satış Kotası Gerçekleşme" value={850000} max={1000000} posTheme={posTheme} />
+                    <ProgressBar label="Müşteri Memnuniyeti (NPS)" value={4.8} max={5} color="bg-indigo-500" posTheme={posTheme} />
+                    <ProgressBar label="Rota Uyumluluk Oranı" value={98} max={100} color="bg-blue-500" posTheme={posTheme} />
+                    <ProgressBar label="Tahsilat Hedefi" value={420000} max={600000} color="bg-amber-500" posTheme={posTheme} />
                 </div>
 
                 <div className="mt-8 p-4 bg-white/5 rounded-2xl border border-white/10">
@@ -118,11 +121,11 @@ const DashboardView = ({
             </Card>
 
             {/* Shift & Calendar */}
-            <Card title="Vardiya & Çalışma" icon={IconClock}>
+            <Card title="Vardiya & Çalışma" icon={IconClock} posTheme={posTheme}>
                 <div className="space-y-6">
-                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-center">
-                        <p className="text-[10px] font-bold text-emerald-500 uppercase mb-1">Şu Anki Vardiya</p>
-                        <p className="text-xl font-black text-white">09:00 - 18:00 (Merkez)</p>
+                    <div className={posTheme === 'light' ? "p-4 bg-primary/10 border border-primary/20 rounded-2xl text-center" : "p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-center"}>
+                        <p className={posTheme === 'light' ? "text-[10px] font-bold text-primary uppercase mb-1" : "text-[10px] font-bold text-emerald-500 uppercase mb-1"}>Şu Anki Vardiya</p>
+                        <p className={posTheme === 'light' ? "text-xl font-black text-pos" : "text-xl font-black text-white"}>09:00 - 18:00 (Merkez)</p>
                     </div>
 
                     <div className="space-y-4">
@@ -132,13 +135,13 @@ const DashboardView = ({
                             { day: 'Salı', hour: '09:00 - 18:00', status: 'Tamamlandı' },
                             { day: 'Çarşamba', hour: '09:00 - 18:00', status: 'Bugün' },
                             { day: 'Perşembe', hour: '09:00 - 18:00', status: 'Bekliyor' },
-                            { day: 'Cuma', hour: '09:00 - 20:00', status: 'Mesaili', color: 'text-amber-500' },
+                            { day: 'Cuma', hour: '09:00 - 20:00', status: 'Mesaili', color: posTheme === 'light' ? 'text-amber-600' : 'text-amber-500' },
                         ].map((s, i) => (
                             <div key={i} className="flex justify-between items-center border-b border-white/5 pb-2">
                                 <span className="text-xs font-bold text-gray-400">{s.day}</span>
                                 <div className="text-right">
-                                    <p className="text-xs font-black text-white leading-none mb-1">{s.hour}</p>
-                                    <p className={`text-[9px] font-bold uppercase ${s.status === 'Tamamlandı' ? 'text-gray-600' : s.color || 'text-emerald-500'}`}>{s.status}</p>
+                                    <p className={posTheme === 'light' ? "text-xs font-black text-pos leading-none mb-1" : "text-xs font-black text-white leading-none mb-1"}>{s.hour}</p>
+                                    <p className={`text-[9px] font-bold uppercase ${s.status === 'Tamamlandı' ? 'text-gray-600' : s.color || (posTheme === 'light' ? 'text-primary' : 'text-emerald-500')}`}>{s.status}</p>
                                 </div>
                             </div>
                         ))}
@@ -149,49 +152,49 @@ const DashboardView = ({
 
         {/* Payroll Summary */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card title="Son Bordro Özetleri" icon={IconShield}>
+            <Card title="Son Bordro Özetleri" icon={IconShield} posTheme={posTheme}>
                 <div className="space-y-4 text-center">
                     <div className="grid grid-cols-3 gap-4 mb-4">
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
                             <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Ocak 2026</p>
-                            <p className="text-sm font-black text-white">₺32,450</p>
+                            <p className={posTheme === 'light' ? "text-sm font-black text-pos" : "text-sm font-black text-white"}>₺32,450</p>
                         </div>
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
                             <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Aralık 2025</p>
-                            <p className="text-sm font-black text-white">₺31,200</p>
+                            <p className={posTheme === 'light' ? "text-sm font-black text-pos" : "text-sm font-black text-white"}>₺31,200</p>
                         </div>
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
                             <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Kasım 2025</p>
-                            <p className="text-sm font-black text-white">₺31,200</p>
+                            <p className={posTheme === 'light' ? "text-sm font-black text-pos" : "text-sm font-black text-white"}>₺31,200</p>
                         </div>
                     </div>
-                    <button className="btn-premium w-full py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2">
+                    <button className={posTheme === 'light' ? "bg-primary text-white w-full py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg" : "btn-premium w-full py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2"}>
                         <IconShield className="w-4 h-4" /> Kâğıtsız Bordro (PDF) İndir
                     </button>
                 </div>
             </Card>
 
-            <Card title="PDKS İşlemleri" icon={IconZap}>
+            <Card title="PDKS İşlemleri" icon={IconZap} posTheme={posTheme}>
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
                         <button
                             onClick={handleQrCheckin}
-                            className="bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group"
+                            className={posTheme === 'light' ? "bg-primary/10 hover:bg-primary/20 border border-primary/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group" : "bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group"}
                         >
-                            <div className="w-10 h-10 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform">
-                                📷
+                            <div className={posTheme === 'light' ? "w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform" : "w-10 h-10 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform"}>
+                                <IconShield className="w-5 h-5 text-white" />
                             </div>
-                            <span className="text-[10px] font-black text-white uppercase tracking-widest text-center">Ofis Girişi (QR)</span>
+                            <span className={posTheme === 'light' ? "text-[10px] font-black text-pos uppercase tracking-widest text-center" : "text-[10px] font-black text-white uppercase tracking-widest text-center"}>Ofis Girişi (QR)</span>
                         </button>
 
                         <button
                             onClick={handleGpsCheckin}
-                            className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group"
+                            className={posTheme === 'light' ? "bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group" : "bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group"}
                         >
-                            <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
-                                📍
+                            <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform text-white">
+                                <IconActivity className="w-5 h-5 text-white" />
                             </div>
-                            <span className="text-[10px] font-black text-white uppercase tracking-widest text-center">Saha Girişi (GPS)</span>
+                            <span className={posTheme === 'light' ? "text-[10px] font-black text-pos uppercase tracking-widest text-center" : "text-[10px] font-black text-white uppercase tracking-widest text-center"}>Saha Girişi (GPS)</span>
                         </button>
                     </div>
 
@@ -200,10 +203,10 @@ const DashboardView = ({
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                             <div>
                                 <h4 className="text-[10px] font-bold text-gray-400 uppercase leading-none">Cihaz Durumu</h4>
-                                <p className="text-[9px] font-black text-white uppercase tracking-widest">GÜVENLİ & EŞLEŞMİŞ</p>
+                                <p className={posTheme === 'light' ? "text-[9px] font-black text-pos uppercase tracking-widest" : "text-[9px] font-black text-white uppercase tracking-widest"}>GÜVENLİ & EŞLEŞMİŞ</p>
                             </div>
                         </div>
-                        <button className="text-[8px] font-black text-indigo-400 uppercase hover:underline">Senkronize Et</button>
+                        <button className={posTheme === 'light' ? "text-[8px] font-black text-primary uppercase hover:underline" : "text-[8px] font-black text-indigo-400 uppercase hover:underline"}>Senkronize Et</button>
                     </div>
 
                     <p className="text-[10px] text-gray-500 text-center uppercase font-bold tracking-widest opacity-50">Loglar şifreli olarak saklanır.</p>
@@ -219,7 +222,7 @@ const DashboardView = ({
     </div>
 );
 
-const LeaveRequestView = () => {
+const LeaveRequestView = ({ posTheme }: any) => {
     const [type, setType] = useState('YILLIK');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
@@ -228,7 +231,7 @@ const LeaveRequestView = () => {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-500">
             <div className="lg:col-span-1 space-y-6">
-                <Card title="Yeni Talep Oluştur" icon={IconActivity}>
+                <Card title="Yeni Talep Oluştur" icon={IconActivity} posTheme={posTheme}>
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <label className="text-[10px] font-bold text-gray-400 uppercase">İzin Türü</label>
@@ -273,7 +276,7 @@ const LeaveRequestView = () => {
             </div>
 
             <div className="lg:col-span-2 space-y-6">
-                <Card title="Geçmiş Taleplerim" icon={IconClock}>
+                <Card title="Geçmiş Taleplerim" icon={IconClock} posTheme={posTheme}>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-separate border-spacing-y-3">
                             <thead>
@@ -314,10 +317,10 @@ const LeaveRequestView = () => {
     );
 };
 
-const ProfileSettingsView = ({ user }: any) => {
+const ProfileSettingsView = ({ user, posTheme }: any) => {
     return (
         <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-500">
-            <Card title="Profil Bilgilerimi Güncelle" icon={IconShield}>
+            <Card title="Profil Bilgilerimi Güncelle" icon={IconShield} posTheme={posTheme}>
                 <div className="flex items-center gap-8 mb-8 border-b border-white/5 pb-8">
                     <div className="w-24 h-24 rounded-3xl bg-indigo-500 flex items-center justify-center text-3xl font-black text-white relative group">
                         {user?.name?.[0]?.toUpperCase() || 'P'}
@@ -399,6 +402,33 @@ export default function PersonelPanel() {
     const [activeTab, setActiveTab] = useState<'dashboard' | 'leave' | 'profile'>('dashboard');
     const [loading, setLoading] = useState(true);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
+    const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
+
+    // Theme Sync
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('pos-theme') as 'dark' | 'light';
+        if (savedTheme) setPosTheme(savedTheme);
+    }, []);
+
+    const togglePosTheme = () => {
+        const newTheme = posTheme === 'dark' ? 'light' : 'dark';
+        setPosTheme(newTheme);
+        localStorage.setItem('pos-theme', newTheme);
+    };
+
+    useEffect(() => {
+        if (posTheme === 'light') {
+            document.body.style.background = '#F7F9FC';
+            document.body.style.color = '#1A1F36';
+        } else {
+            document.body.style.background = 'var(--bg-deep)';
+            document.body.style.color = 'var(--text-main)';
+        }
+        return () => {
+            document.body.style.background = 'var(--bg-deep)';
+            document.body.style.color = 'var(--text-main)';
+        };
+    }, [posTheme]);
 
     // PDKS Fonksiyonları
     const getFingerprint = () => {
@@ -491,15 +521,15 @@ export default function PersonelPanel() {
     );
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700 pb-24">
+        <div data-pos-theme={posTheme} className="p-8 space-y-8 animate-in fade-in duration-700 pb-24 min-h-screen transition-colors duration-300">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-400 to-white animate-gradient">
+                    <h1 className={posTheme === 'light' ? "text-4xl font-black text-primary" : "text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-400 to-white animate-gradient"}>
                         PERSONEL OPERASYON PANELİ
                     </h1>
                     <p className="text-gray-500 text-sm font-medium mt-1 uppercase tracking-widest flex items-center gap-2">
-                        <IconShield className="w-4 h-4 text-indigo-500" /> Merhaba, {currentUser?.name || 'Kullanıcı'} • Bugün Çok Verimlisin!
+                        <IconShield className={posTheme === 'light' ? "w-4 h-4 text-primary" : "w-4 h-4 text-indigo-500"} /> Merhaba, {currentUser?.name || 'Kullanıcı'} • Bugün Çok Verimlisin!
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -507,6 +537,13 @@ export default function PersonelPanel() {
                         <span className="text-[10px] font-bold text-gray-500 uppercase">Mesai Durumu</span>
                         <span className="text-xs font-black text-emerald-400">AKTİF ÇALIŞIYOR</span>
                     </div>
+                    <button
+                        onClick={togglePosTheme}
+                        className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all shadow-pos flex items-center justify-center bg-white/5"
+                        title={posTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}
+                    >
+                        {posTheme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-primary" />}
+                    </button>
                     <IconRefresh className="w-5 h-5 text-gray-500 hover:text-white cursor-pointer transition-all" />
                 </div>
             </div>
@@ -515,19 +552,19 @@ export default function PersonelPanel() {
             <div className="flex items-center gap-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl w-fit">
                 <button
                     onClick={() => setActiveTab('dashboard')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'dashboard' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'text-gray-500 hover:text-white'}`}
+                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'dashboard' ? (posTheme === 'light' ? 'bg-primary text-white shadow-lg' : 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20') : 'text-gray-500 hover:text-white'}`}
                 >
                     <IconActivity className="w-4 h-4" /> Genel Durum
                 </button>
                 <button
                     onClick={() => setActiveTab('leave')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'leave' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'text-gray-500 hover:text-white'}`}
+                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'leave' ? (posTheme === 'light' ? 'bg-primary text-white shadow-lg' : 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20') : 'text-gray-500 hover:text-white'}`}
                 >
                     <IconClock className="w-4 h-4" /> İzin Taleplerim
                 </button>
                 <button
                     onClick={() => setActiveTab('profile')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'profile' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'text-gray-500 hover:text-white'}`}
+                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'profile' ? (posTheme === 'light' ? 'bg-primary text-white shadow-lg' : 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20') : 'text-gray-500 hover:text-white'}`}
                 >
                     <IconShield className="w-4 h-4" /> Profil & Hesap
                 </button>
@@ -541,16 +578,17 @@ export default function PersonelPanel() {
                     isScannerOpen={isScannerOpen}
                     setIsScannerOpen={setIsScannerOpen}
                     onQrScan={onQrScan}
+                    posTheme={posTheme}
                 />
             )}
-            {activeTab === 'leave' && <LeaveRequestView />}
-            {activeTab === 'profile' && <ProfileSettingsView user={currentUser} />}
+            {activeTab === 'leave' && <LeaveRequestView posTheme={posTheme} />}
+            {activeTab === 'profile' && <ProfileSettingsView user={currentUser} posTheme={posTheme} />}
 
             {/* Branding Footer */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/60 backdrop-blur-xl border-t border-white/5 z-50 flex justify-center">
+            <div className={`fixed bottom-0 left-0 right-0 p-4 ${posTheme === 'light' ? 'bg-white/80 border-gray-200' : 'bg-black/60 border-white/5'} backdrop-blur-xl border-t z-50 flex justify-center transition-colors duration-300`}>
                 <div className="max-w-7xl w-full flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                     <span>© 2026 PERIODYA OS • İNSAN KAYNAKLARI MODÜLÜ</span>
-                    <span className="text-indigo-400">Verileriniz End-to-End Şifrelenmiştir</span>
+                    <span className={posTheme === 'light' ? "text-primary" : "text-indigo-400"}>Verileriniz End-to-End Şifrelenmiştir</span>
                 </div>
             </div>
         </div>

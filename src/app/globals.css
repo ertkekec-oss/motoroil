@@ -106,6 +106,9 @@
 }
 
 [data-pos-theme="light"] .text-muted,
+[data-pos-theme="light"] .text-gray-400,
+[data-pos-theme="light"] .text-gray-500,
+[data-pos-theme="light"] .text-gray-600,
 [data-pos-theme="light"] .opacity-60,
 [data-pos-theme="light"] .opacity-50,
 [data-pos-theme="light"] .opacity-40 {
@@ -139,6 +142,28 @@
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+/* 🎨 Semantic Color Mappings for Tailwind Classes */
+[data-pos-theme="light"] .bg-emerald-500 {
+  background-color: var(--success) !important;
+}
+
+[data-pos-theme="light"] .bg-rose-500,
+[data-pos-theme="light"] .bg-red-500 {
+  background-color: #EF4444 !important;
+}
+
+[data-pos-theme="light"] .bg-indigo-500 {
+  background-color: var(--primary) !important;
+}
+
+[data-pos-theme="light"] .text-emerald-500 {
+  color: var(--success) !important;
+}
+
+[data-pos-theme="light"] .text-indigo-500 {
+  color: var(--primary) !important;
 }
 
 /* Inputs & Forms */
