@@ -11,6 +11,7 @@ import SupplierPurchaseModal from '@/components/modals/SupplierPurchaseModal';
 import { formatCurrency } from '@/lib/utils';
 import Pagination from '@/components/Pagination';
 import { TURKISH_CITIES, TURKISH_DISTRICTS } from '@/lib/constants';
+import { Sun, Moon } from 'lucide-react';
 
 export default function SuppliersPage() {
     const router = useRouter();
@@ -18,10 +19,24 @@ export default function SuppliersPage() {
     const { suppliers, suppClasses: dbSuppClasses } = useCRM();
     const { showSuccess, showError, showConfirm } = useModal();
 
+    // ── Theme ──
+    const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
+    useEffect(() => {
+        const saved = localStorage.getItem('pos-theme') as 'dark' | 'light';
+        if (saved) setPosTheme(saved);
+    }, []);
+    const togglePosTheme = () => {
+        const next = posTheme === 'dark' ? 'light' : 'dark';
+        setPosTheme(next);
+        localStorage.setItem('pos-theme', next);
+        document.body.style.background = next === 'light' ? '#F7F9FB' : 'var(--bg-deep)';
+        document.body.style.color = next === 'light' ? '#1A1F36' : 'var(--text-main)';
+    };
+
     // UI States
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState('all'); // all, active, passive, debt, credit
+    const [activeTab, setActiveTab] = useState('all');
     const [branchFilter, setBranchFilter] = useState(activeBranchName || 'all');
 
     useEffect(() => {
@@ -32,7 +47,7 @@ export default function SuppliersPage() {
         }
     }, [activeBranchName]);
 
-    // Pagination State
+    // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
@@ -47,18 +62,14 @@ export default function SuppliersPage() {
     });
     const [editSupplier, setEditSupplier] = useState<any>({
         id: '', name: '', phone: '', email: '', address: '', city: '', district: '', category: '',
-        taxNumber: '', taxOffice: '', contactPerson: '', iban: '',
-        branch: ''
+        taxNumber: '', taxOffice: '', contactPerson: '', iban: '', branch: ''
     });
-
-    // dbSuppClasses is now coming from useCRM()
 
     const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
     const [selectedSup, setSelectedSup] = useState<any>(null);
 
     // --- FILTER LOGIC ---
     const filteredSuppliers = suppliers.filter(sup => {
-        // Search
         if (searchTerm) {
             const low = searchTerm.toLowerCase();
             const match =
@@ -68,334 +79,384 @@ export default function SuppliersPage() {
                 (sup.category || '').toLowerCase().includes(low);
             if (!match) return false;
         }
-
-        // Tabs
-        if (activeTab === 'debt' && sup.balance >= 0) return false; // Borçlu olduklarımız (negatif bakiye genelde alacak anlamına gelir ama sistemde Supplier balance logic: (-) means we owe them usually, check logic below)
-        // Correction: In most accounting systems, Supplier Credit Balance (Alacak) means we owe them money. 
-        // Let's assume standard logic: If Balance < 0 => We owe them (Borçluyuz). If Balance > 0 => They owe us (Alacaklıyız - iade vs).
-
-        if (activeTab === 'debt' && sup.balance >= 0) return false; // Borçlu olduklarımız (Negatif)
-        if (activeTab === 'credit' && sup.balance <= 0) return false; // Alacaklı olduklarımız (Pozitif)
+        if (activeTab === 'debt' && sup.balance >= 0) return false;
+        if (activeTab === 'credit' && sup.balance <= 0) return false;
         if (activeTab === 'passive' && sup.isActive !== false) return false;
-
-        // Branch filter - Respect branch isolation
         if (branchFilter !== 'all' && (sup.branch || 'Merkez') !== branchFilter) return false;
-
         return true;
     });
 
-    // --- PAGINATION LOGIC ---
     const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
     const paginatedSuppliers = filteredSuppliers.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
+        (currentPage - 1) * itemsPerPage, currentPage * itemsPerPage
     );
 
-    // --- STATS CALCULATION ---
+    // Stats
     const totalDebt = suppliers.filter(s => s.balance < 0).reduce((acc, s) => acc + Math.abs(s.balance), 0);
     const totalCredit = suppliers.filter(s => s.balance > 0).reduce((acc, s) => acc + s.balance, 0);
 
     const handleAddSupplier = async () => {
-        if (!newSupplier.name) {
-            showError('Hata', 'Firma adı zorunludur!');
-            return;
-        }
+        if (!newSupplier.name) { showError('Hata', 'Firma adı zorunludur!'); return; }
         if (isProcessing) return;
-
         setIsProcessing(true);
         try {
-            const res = await fetch('/api/suppliers', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newSupplier)
-            });
+            const res = await fetch('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSupplier) });
             const data = await res.json();
             if (data.success) {
                 showSuccess('Başarılı', 'Tedarikçi başarıyla oluşturuldu.');
                 setIsModalOpen(false);
                 setNewSupplier({ name: '', phone: '', email: '', address: '', city: 'İstanbul', district: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '', branch: activeBranchName || currentUser?.branch || 'Merkez' });
                 window.location.reload();
-            } else {
-                showError('Hata', data.error);
-            }
-        } catch (error: any) {
-            console.error(error);
-            showError('Hata', 'Bir hata oluştu.');
-        } finally {
-            setIsProcessing(false);
-        }
+            } else { showError('Hata', data.error); }
+        } catch (e: any) { showError('Hata', 'Bir hata oluştu.'); }
+        finally { setIsProcessing(false); }
     };
 
     const handleEditSupplier = async () => {
-        if (!editSupplier.name) {
-            showError('Hata', 'Firma adı zorunludur!');
-            return;
-        }
+        if (!editSupplier.name) { showError('Hata', 'Firma adı zorunludur!'); return; }
         if (isProcessing) return;
-
         setIsProcessing(true);
         try {
-            const res = await fetch(`/api/suppliers/${editSupplier.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(editSupplier)
-            });
+            const res = await fetch(`/api/suppliers/${editSupplier.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editSupplier) });
             const data = await res.json();
             if (data.success) {
                 showSuccess('Başarılı', 'Tedarikçi başarıyla güncellendi.');
                 setIsEditModalOpen(false);
-                setEditSupplier({ id: '', name: '', phone: '', email: '', address: '', city: '', district: '', category: '', taxNumber: '', taxOffice: '', contactPerson: '', iban: '' });
                 window.location.reload();
-            } else {
-                showError('Hata', data.error);
-            }
-        } catch (error: any) {
-            console.error(error);
-            showError('Hata', 'Bir hata oluştu.');
-        } finally {
-            setIsProcessing(false);
-        }
+            } else { showError('Hata', data.error); }
+        } catch (e: any) { showError('Hata', 'Bir hata oluştu.'); }
+        finally { setIsProcessing(false); }
     };
 
     const handleDeleteSupplier = async (supplier: any) => {
-        showConfirm('Tedarikçiyi Sil', `"${supplier.name}" tedarikçisini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, async () => {
+        showConfirm('Tedarikçiyi Sil', `"${supplier.name}" tedarikçisini silmek istediğinizden emin misiniz?`, async () => {
             try {
-                const res = await fetch(`/api/suppliers?id=${supplier.id}`, {
-                    method: 'DELETE'
-                });
+                const res = await fetch(`/api/suppliers?id=${supplier.id}`, { method: 'DELETE' });
                 const data = await res.json();
-                if (data.success) {
-                    showSuccess('Başarılı', 'Tedarikçi başarıyla silindi.');
-                    window.location.reload();
-                } else {
-                    showError('Hata', data.error || 'Silme işlemi başarısız.');
-                }
-            } catch (error: any) {
-                console.error(error);
-                showError('Hata', 'Bir hata oluştu.');
-            }
+                if (data.success) { showSuccess('Başarılı', 'Tedarikçi silindi.'); window.location.reload(); }
+                else showError('Hata', data.error || 'Silme başarısız.');
+            } catch { showError('Hata', 'Bir hata oluştu.'); }
         });
     };
 
-    return (
-        <div className="container" style={{ padding: '30px', maxWidth: '1600px', margin: '0 auto' }}>
+    // ── Design tokens ──
+    const isLight = posTheme === 'light';
+    const L = {
+        pageBg: '#F7F9FB',
+        card: '#FFFFFF',
+        border: '#E6EBF0',
+        filterBg: '#F0F4F9',
+        textMain: '#1A1F36',
+        textMuted: '#8B95A5',
+        textSubtle: '#B8C0C8',
+        primary: '#247BFE',
+        primaryLight: 'rgba(36,123,254,0.08)',
+        success: '#02C951',
+        successLight: 'rgba(2,201,81,0.1)',
+        danger: '#E53E3E',
+        dangerLight: 'rgba(229,62,62,0.08)',
+        amber: '#C9AF7C',
+        amberLight: 'rgba(201,175,124,0.1)',
+        purple: '#6260FE',
+        shadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+        shadowHover: '0 4px 20px rgba(36,123,254,0.12)',
+    };
 
-            {/* HEADER AREA */}
+    const inputStyle = {
+        width: '100%', padding: '12px',
+        background: isLight ? L.filterBg : 'rgba(0,0,0,0.3)',
+        border: `1px solid ${isLight ? L.border : 'rgba(255,255,255,0.1)'}`,
+        borderRadius: '8px',
+        color: isLight ? L.textMain : 'white',
+    };
+    const modalCardStyle = {
+        width: '600px',
+        background: isLight ? L.card : '#1e1e24',
+        border: `1px solid ${isLight ? L.border : 'rgba(255,255,255,0.1)'}`,
+        maxHeight: '90vh', overflowY: 'auto' as const,
+        borderRadius: '16px', boxShadow: isLight ? '0 20px 60px rgba(0,0,0,0.12)' : undefined,
+    };
+
+    const tabLabels: Record<string, string> = { all: 'Tümü', debt: 'Borçlular', credit: 'Alacaklılar', passive: 'Pasifler' };
+
+    return (
+        <div data-pos-theme={posTheme} className="container"
+            style={{ padding: '30px', maxWidth: '1600px', margin: '0 auto', background: isLight ? L.pageBg : undefined }}>
+
+            {/* HEADER */}
             <header style={{ marginBottom: '30px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     <div>
-                        <h1 className="text-gradient" style={{ fontSize: '28px', margin: 0 }}>Tedarikçi Yönetimi</h1>
-                        <p className="text-muted" style={{ marginTop: '8px' }}>Toptancı listesi, bakiyeler ve satın alma işlemleri</p>
+                        <h1 style={{ fontSize: '28px', fontWeight: '800', margin: 0, color: isLight ? L.textMain : undefined }}
+                            className={isLight ? '' : 'text-gradient'}>
+                            Tedarikçi Yönetimi
+                        </h1>
+                        <p style={{ marginTop: '6px', fontSize: '14px', color: isLight ? L.textMuted : undefined }}
+                            className={isLight ? '' : 'text-muted'}>
+                            Toptancı listesi, bakiyeler ve satın alma işlemleri
+                        </p>
                     </div>
-                    <div>
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="btn btn-primary"
-                            style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <button onClick={togglePosTheme} title={isLight ? 'Karanlık Mod' : 'Aydınlık Mod'}
+                            style={{
+                                padding: '10px 14px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                border: isLight ? `1px solid ${L.border}` : '1px solid var(--border-pos)',
+                                background: isLight ? L.card : 'var(--card-pos)',
+                                boxShadow: isLight ? L.shadow : 'none'
+                            }}>
+                            {isLight ? <Moon size={18} color={L.primary} /> : <Sun size={18} color="#F59E0B" />}
+                        </button>
+                        <button onClick={() => setIsModalOpen(true)} className="btn btn-primary"
+                            style={{
+                                padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px',
+                                background: isLight ? L.primary : undefined,
+                                boxShadow: isLight ? '0 4px 14px rgba(36,123,254,0.3)' : '0 4px 12px rgba(59,130,246,0.3)',
+                                borderRadius: isLight ? '12px' : undefined, border: 'none', color: 'white'
+                            }}>
                             <span style={{ fontSize: '16px' }}>+</span> Yeni Tedarikçi
                         </button>
                     </div>
                 </div>
 
                 {/* STATS ROW */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-                    <div className="card glass animate-fade-in" style={{ padding: '20px', borderLeft: '4px solid #3b82f6' }}>
-                        <div className="text-muted" style={{ fontSize: '12px', fontWeight: 'bold' }}>TOPLAM TEDARİKÇİ</div>
-                        <div style={{ fontSize: '28px', fontWeight: '800', marginTop: '5px' }}>{suppliers.length}</div>
-                    </div>
-                    <div className="card glass animate-fade-in" style={{ padding: '20px', borderLeft: '4px solid #ef4444' }}>
-                        <div className="text-muted" style={{ fontSize: '12px', fontWeight: 'bold' }}>TOPLAM BORCUMUZ</div>
-                        <div style={{ fontSize: '28px', fontWeight: '800', marginTop: '5px', color: '#ef4444' }}>{formatCurrency(totalDebt)}</div>
-                    </div>
-                    <div className="card glass animate-fade-in" style={{ padding: '20px', borderLeft: '4px solid #10b981' }}>
-                        <div className="text-muted" style={{ fontSize: '12px', fontWeight: 'bold' }}>TOPLAM ALACAĞIMIZ</div>
-                        <div style={{ fontSize: '28px', fontWeight: '800', marginTop: '5px', color: '#10b981' }}>{formatCurrency(totalCredit)}</div>
-                    </div>
-                    <div className="card glass animate-fade-in" style={{ padding: '20px', borderLeft: '4px solid #f59e0b' }}>
-                        <div className="text-muted" style={{ fontSize: '12px', fontWeight: 'bold' }}>NET DURUM</div>
-                        <div style={{ fontSize: '28px', fontWeight: '800', marginTop: '5px' }}>{formatCurrency(totalCredit - totalDebt)}</div>
-                    </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: isLight ? '16px' : '20px' }}>
+                    {[
+                        { label: 'Toplam Tedarikçi', value: suppliers.length, color: L.primary, borderColor: L.primary },
+                        { label: 'Toplam Borcumuz', value: formatCurrency(totalDebt), color: L.danger, borderColor: L.danger },
+                        { label: 'Toplam Alacağımız', value: formatCurrency(totalCredit), color: L.success, borderColor: L.success },
+                        { label: 'Net Durum', value: formatCurrency(totalCredit - totalDebt), color: L.purple, borderColor: L.purple },
+                    ].map(({ label, value, color, borderColor }) => (
+                        <div key={label}
+                            style={isLight
+                                ? { background: L.card, border: `1px solid ${L.border}`, borderLeft: `4px solid ${borderColor}`, borderRadius: '14px', padding: '20px', boxShadow: L.shadow }
+                                : { padding: '20px', borderLeft: `4px solid ${borderColor}` }}
+                            className={isLight ? '' : 'card glass animate-fade-in'}>
+                            <div style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.06em', textTransform: 'uppercase', color: isLight ? L.textSubtle : undefined }}
+                                className={isLight ? '' : 'text-muted'}>{label}</div>
+                            <div style={{ fontSize: isLight ? '34px' : '28px', fontWeight: '800', marginTop: '8px', color, lineHeight: 1 }}>{value}</div>
+                        </div>
+                    ))}
                 </div>
             </header>
 
-            {/* CONTROLS AREA */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '24px' }}>
+            {/* CONTROLS */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', alignItems: 'center' }}>
                     {/* Search */}
                     <div style={{ position: 'relative', flex: 1, maxWidth: '600px' }}>
                         <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                            type="text" value={searchTerm}
+                            onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                             placeholder="Tedarikçi adı, kategori veya telefon ile ara..."
                             style={{
-                                width: '100%',
-                                padding: '16px 20px 16px 50px',
-                                background: 'rgba(255,255,255,0.03)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '14px',
-                                color: 'white',
-                                fontSize: '15px',
-                                outline: 'none',
-                                transition: 'all 0.3s'
+                                width: '100%', padding: '14px 20px 14px 50px',
+                                background: isLight ? L.card : 'rgba(255,255,255,0.03)',
+                                border: isLight ? `1px solid ${L.border}` : '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '14px', color: isLight ? L.textMain : 'white',
+                                fontSize: '15px', outline: 'none', transition: 'all 0.2s',
+                                boxShadow: isLight ? L.shadow : 'none'
                             }}
-                            onFocus={(e) => e.target.style.background = 'rgba(255,255,255,0.08)'}
-                            onBlur={(e) => e.target.style.background = 'rgba(255,255,255,0.03)'}
                         />
-                        <span style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', fontSize: '20px', opacity: 0.5 }}>🔍</span>
+                        <span style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', fontSize: '18px', opacity: 0.4 }}>🔍</span>
                     </div>
 
-                    {/* View Toggle & Filter Tabs */}
-                    <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px' }}>
+                    {/* Tabs + Branch + View toggle */}
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        {/* Tab pills */}
+                        <div style={{
+                            display: 'flex', background: isLight ? L.filterBg : 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '4px',
+                            border: isLight ? `1px solid ${L.border}` : 'none'
+                        }}>
                             {['all', 'debt', 'credit', 'passive'].map(tab => (
-                                <button
-                                    key={tab}
-                                    onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
+                                <button key={tab} onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
                                     style={{
-                                        padding: '8px 16px',
-                                        borderRadius: '8px',
-                                        background: activeTab === tab ? 'rgba(255,255,255,0.1)' : 'transparent',
-                                        color: activeTab === tab ? '#fff' : '#888',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        fontSize: '13px',
-                                        fontWeight: activeTab === tab ? 'bold' : 'normal'
-                                    }}
-                                >
-                                    {tab === 'all' ? 'Tümü' : tab === 'debt' ? 'Borçlular' : tab === 'credit' ? 'Alacaklılar' : 'Pasifler'}
+                                        padding: '8px 16px', borderRadius: '9px', border: 'none', cursor: 'pointer', fontSize: '13px', transition: 'all 0.15s',
+                                        fontWeight: activeTab === tab ? '600' : '400',
+                                        background: activeTab === tab ? (isLight ? L.primary : 'rgba(255,255,255,0.1)') : 'transparent',
+                                        color: activeTab === tab ? (isLight ? 'white' : '#fff') : (isLight ? L.textMuted : '#888')
+                                    }}>
+                                    {tabLabels[tab]}
                                 </button>
                             ))}
                         </div>
 
-                        <select
-                            value={branchFilter}
-                            onChange={(e) => { setBranchFilter(e.target.value); setCurrentPage(1); }}
+                        {/* Branch select */}
+                        <select value={branchFilter} onChange={e => { setBranchFilter(e.target.value); setCurrentPage(1); }}
                             disabled={!hasPermission('branch_administration')}
                             style={{
-                                padding: '12px',
-                                background: 'rgba(255,255,255,0.03)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                color: 'white',
-                                fontSize: '13px'
-                            }}
-                        >
+                                padding: '10px 14px', borderRadius: '10px', fontSize: '13px',
+                                background: isLight ? L.filterBg : 'rgba(255,255,255,0.03)',
+                                border: isLight ? `1px solid ${L.border}` : '1px solid rgba(255,255,255,0.1)',
+                                color: isLight ? L.textMain : 'white'
+                            }}>
                             {hasPermission('branch_administration') && <option value="all">Tüm Şubeler</option>}
-                            {branches.map(b => (
-                                <option key={b.name} value={b.name}>{b.name}</option>
-                            ))}
+                            {branches.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
                         </select>
 
-                        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '5px', borderRadius: '12px', display: 'flex', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <button
-                                onClick={() => setViewMode('grid')}
+                        {/* Grid / List toggle */}
+                        <div style={{
+                            background: isLight ? L.filterBg : 'rgba(255,255,255,0.03)', padding: '5px', borderRadius: '12px', display: 'flex',
+                            border: isLight ? `1px solid ${L.border}` : '1px solid rgba(255,255,255,0.1)'
+                        }}>
+                            <button onClick={() => setViewMode('grid')}
                                 style={{
-                                    padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                                    background: viewMode === 'grid' ? '#3b82f6' : 'transparent',
-                                    color: viewMode === 'grid' ? 'white' : '#888'
-                                }}
-                            >
-                                ⊞
-                            </button>
-                            <button
-                                onClick={() => setViewMode('list')}
+                                    padding: '10px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '16px',
+                                    background: viewMode === 'grid' ? L.primary : 'transparent',
+                                    color: viewMode === 'grid' ? 'white' : (isLight ? L.textMuted : '#888')
+                                }}>⊞</button>
+                            <button onClick={() => setViewMode('list')}
                                 style={{
-                                    padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                                    background: viewMode === 'list' ? '#3b82f6' : 'transparent',
-                                    color: viewMode === 'list' ? 'white' : '#888'
-                                }}
-                            >
-                                ≣
-                            </button>
+                                    padding: '10px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '16px',
+                                    background: viewMode === 'list' ? L.primary : 'transparent',
+                                    color: viewMode === 'list' ? 'white' : (isLight ? L.textMuted : '#888')
+                                }}>≣</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* LISTING CONTENT */}
+            {/* LISTING */}
             {viewMode === 'grid' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-                    {paginatedSuppliers.map(sup => (
-                        <div key={sup.id} className="card glass hover-scale" style={{ padding: '0', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <div style={{ padding: '24px', background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                    <div style={{
-                                        width: '48px', height: '48px', borderRadius: '12px',
-                                        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: '20px', fontWeight: 'bold', color: 'white',
-                                        boxShadow: '0 4px 10px rgba(245, 158, 11, 0.3)'
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+                    {paginatedSuppliers.map(sup => {
+                        const balColor = sup.balance < 0 ? L.danger : (sup.balance > 0 ? L.success : (isLight ? L.textMuted : '#ccc'));
+                        return (
+                            <div key={sup.id}
+                                style={isLight
+                                    ? { background: L.card, border: `1px solid ${L.border}`, borderRadius: '16px', boxShadow: L.shadow, overflow: 'hidden', transition: 'box-shadow 0.2s ease' }
+                                    : { padding: '0', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}
+                                className={isLight ? '' : 'card glass hover-scale'}
+                                onMouseEnter={e => { if (isLight) (e.currentTarget as HTMLElement).style.boxShadow = L.shadowHover; }}
+                                onMouseLeave={e => { if (isLight) (e.currentTarget as HTMLElement).style.boxShadow = L.shadow; }}>
+
+                                {/* Card Header */}
+                                <div style={isLight
+                                    ? { padding: '24px', background: L.amberLight, borderBottom: `1px solid ${L.border}` }
+                                    : { padding: '24px', background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        {/* Avatar */}
+                                        <div style={{
+                                            width: '48px', height: '48px', borderRadius: '14px',
+                                            background: isLight ? 'linear-gradient(135deg, #C9AF7C 0%, #a8883c 100%)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            fontSize: '20px', fontWeight: 'bold', color: 'white',
+                                            boxShadow: isLight ? '0 4px 12px rgba(201,175,124,0.4)' : '0 4px 10px rgba(245,158,11,0.3)'
+                                        }}>
+                                            {sup.name?.charAt(0).toUpperCase()}
+                                        </div>
+                                        {/* Balance */}
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ fontSize: '16px', fontWeight: '800', color: balColor }}>
+                                                {formatCurrency(Math.abs(sup.balance))}
+                                            </div>
+                                            <div style={{ fontSize: '10px', fontWeight: '700', color: balColor, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>
+                                                {sup.balance < 0 ? '● Borçluyuz' : (sup.balance > 0 ? '● Alacaklıyız' : '● Dengeli')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h3 style={{
+                                        margin: '14px 0 6px 0', fontSize: '17px', fontWeight: '800',
+                                        color: isLight ? L.textMain : 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
                                     }}>
-                                        {sup.name?.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontSize: '16px', fontWeight: 'bold', color: sup.balance < 0 ? '#ef4444' : (sup.balance > 0 ? '#10b981' : '#ccc') }}>
-                                            {formatCurrency(Math.abs(sup.balance))}
-                                        </div>
-                                        <div style={{ fontSize: '11px', color: '#888' }}>
-                                            {sup.balance < 0 ? 'Borçluyuz' : (sup.balance > 0 ? 'Alacaklıyız' : 'Dengeli')}
-                                        </div>
+                                        {sup.name}
+                                    </h3>
+                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                        <span style={{
+                                            fontSize: '11px', fontWeight: '600', padding: '4px 12px', borderRadius: '20px',
+                                            background: isLight ? L.filterBg : 'rgba(255,255,255,0.1)',
+                                            color: isLight ? L.textMuted : '#ccc',
+                                            border: isLight ? `1px solid ${L.border}` : 'none'
+                                        }}>
+                                            {sup.category || 'Genel'}
+                                        </span>
+                                        {sup.isActive === false && (
+                                            <span style={{ fontSize: '11px', color: L.danger, fontWeight: '700' }}>● Pasif</span>
+                                        )}
                                     </div>
                                 </div>
-                                <h3 style={{ margin: '15px 0 5px 0', fontSize: '18px', fontWeight: 'bold', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    {sup.name}
-                                </h3>
-                                <div style={{ fontSize: '12px', color: '#888' }}>
-                                    <span style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>{sup.category || 'Genel'}</span>
-                                    {sup.isActive === false && <span style={{ color: '#ef4444', marginLeft: '10px' }}>● Pasif</span>}
-                                </div>
-                            </div>
 
-                            <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#aaa' }}>
-                                    <span>📞</span> {sup.phone || '-'}
-                                </div>
-                                {sup.contactPerson && (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#aaa' }}>
-                                        <span>👤</span> {sup.contactPerson}
+                                {/* Contact Info */}
+                                <div style={{
+                                    padding: '16px 24px', borderTop: `1px solid ${isLight ? L.border : 'rgba(255,255,255,0.05)'}`,
+                                    background: isLight ? L.filterBg : 'transparent', display: 'flex', flexDirection: 'column', gap: '8px'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: isLight ? L.textMain : '#aaa' }}>
+                                        <span>📞</span> {sup.phone || '-'}
                                     </div>
-                                )}
-                            </div>
+                                    {sup.contactPerson && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: isLight ? L.textMuted : '#aaa' }}>
+                                            <span>👤</span> {sup.contactPerson}
+                                        </div>
+                                    )}
+                                </div>
 
-                            <div style={{ padding: '16px 24px', background: 'rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                    <button
-                                        onClick={() => { setEditSupplier(sup); setIsEditModalOpen(true); }}
-                                        className="btn btn-outline" style={{ fontSize: '12px', padding: '8px', color: '#10b981', borderColor: '#10b981' }}>
-                                        ✏️ Düzenle
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteSupplier(sup)}
-                                        className="btn btn-outline" style={{ fontSize: '12px', padding: '8px', color: '#ef4444', borderColor: '#ef4444' }}>
-                                        🗑️ Sil
-                                    </button>
+                                {/* Actions */}
+                                <div style={{
+                                    padding: '16px 24px', background: isLight ? L.card : 'rgba(0,0,0,0.2)',
+                                    borderTop: `1px solid ${isLight ? L.border : 'rgba(255,255,255,0.05)'}`,
+                                    display: 'flex', flexDirection: 'column', gap: '10px'
+                                }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                        <button onClick={() => { setEditSupplier(sup); setIsEditModalOpen(true); }}
+                                            style={{
+                                                fontSize: '12px', padding: '8px', borderRadius: '8px', cursor: 'pointer',
+                                                border: `1px solid ${L.success}`, background: isLight ? L.successLight : 'transparent', color: L.success
+                                            }}>
+                                            ✏️ Düzenle
+                                        </button>
+                                        <button onClick={() => handleDeleteSupplier(sup)}
+                                            style={{
+                                                fontSize: '12px', padding: '8px', borderRadius: '8px', cursor: 'pointer',
+                                                border: `1px solid ${L.danger}`, background: isLight ? L.dangerLight : 'transparent', color: L.danger
+                                            }}>
+                                            🗑️ Sil
+                                        </button>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                        <button onClick={() => { setSelectedSup(sup); setIsPurchaseModalOpen(true); }}
+                                            style={{
+                                                fontSize: '12px', padding: '8px', borderRadius: '8px', cursor: 'pointer',
+                                                border: `1px solid ${L.primary}`, background: isLight ? L.primaryLight : 'transparent', color: L.primary
+                                            }}>
+                                            🛒 Alış Gir
+                                        </button>
+                                        <button onClick={() => router.push(`/payment?amount=${Math.abs(sup.balance)}&title=${encodeURIComponent(sup.name)}&type=payable&ref=SUP-${sup.id}`)}
+                                            style={{
+                                                fontSize: '12px', padding: '8px', borderRadius: '8px', cursor: 'pointer',
+                                                border: `1px solid ${isLight ? L.border : 'rgba(255,255,255,0.15)'}`,
+                                                background: 'transparent', color: isLight ? L.textMuted : '#aaa'
+                                            }}>
+                                            💸 Ödeme Yap
+                                        </button>
+                                    </div>
+                                    <Link href={`/suppliers/${sup.id}`}
+                                        style={{
+                                            textAlign: 'center', padding: '10px', fontSize: '13px', fontWeight: '700', textDecoration: 'none',
+                                            borderRadius: '10px', display: 'block',
+                                            background: isLight ? L.primary : 'var(--primary)',
+                                            color: 'white', boxShadow: isLight ? '0 4px 12px rgba(36,123,254,0.28)' : undefined
+                                        }}>
+                                        İşlem Detayları &amp; Ekstre
+                                    </Link>
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                    <button
-                                        onClick={() => { setSelectedSup(sup); setIsPurchaseModalOpen(true); }}
-                                        className="btn btn-outline" style={{ fontSize: '12px', padding: '8px', color: '#3b82f6', borderColor: '#3b82f6' }}>
-                                        🛒 Alış Gir
-                                    </button>
-                                    <button
-                                        onClick={() => router.push(`/payment?amount=${Math.abs(sup.balance)}&title=${encodeURIComponent(sup.name)}&type=payable&ref=SUP-${sup.id}`)}
-                                        className="btn btn-outline" style={{ fontSize: '12px', padding: '8px' }}>
-                                        💸 Ödeme Yap
-                                    </button>
-                                </div>
-                                <Link href={`/suppliers/${sup.id}`} className="btn btn-primary" style={{ textAlign: 'center', padding: '10px', fontSize: '13px', textDecoration: 'none' }}>
-                                    İşlem Detayları & Ekstre
-                                </Link>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             ) : (
-                <div className="card glass" style={{ overflow: 'hidden' }}>
+                <div style={isLight
+                    ? { background: L.card, border: `1px solid ${L.border}`, borderRadius: '16px', boxShadow: L.shadow, overflow: 'hidden' }
+                    : { overflow: 'hidden' }}
+                    className={isLight ? '' : 'card glass'}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                         <thead>
-                            <tr style={{ background: 'rgba(255,255,255,0.03)', color: '#888', fontSize: '12px', textTransform: 'uppercase' }}>
-                                <th style={{ padding: '20px' }}>Firma</th>
+                            <tr style={{
+                                background: isLight ? L.filterBg : 'rgba(255,255,255,0.03)',
+                                borderBottom: `1px solid ${isLight ? L.border : 'rgba(255,255,255,0.06)'}`,
+                                fontSize: '11px', fontWeight: '700', letterSpacing: '0.06em',
+                                textTransform: 'uppercase', color: isLight ? L.textSubtle : '#888'
+                            }}>
+                                <th style={{ padding: '16px 20px' }}>Firma</th>
                                 <th>Kategori</th>
                                 <th>İletişim</th>
                                 <th>Bakiye</th>
@@ -404,32 +465,55 @@ export default function SuppliersPage() {
                         </thead>
                         <tbody>
                             {paginatedSuppliers.map(sup => (
-                                <tr key={sup.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s' }} className="hover:bg-white/5">
-                                    <td style={{ padding: '20px' }}>
-                                        <div style={{ fontWeight: '600', color: 'white' }}>{sup.name}</div>
-                                        {sup.isActive === false && <span style={{ fontSize: '10px', color: '#ef4444' }}>Pasif</span>}
+                                <tr key={sup.id}
+                                    style={{
+                                        borderBottom: `1px solid ${isLight ? L.border : 'rgba(255,255,255,0.05)'}`,
+                                        background: isLight ? L.card : 'transparent', transition: 'background 0.15s ease'
+                                    }}
+                                    onMouseEnter={e => { if (isLight) (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(36,123,254,0.04)'; }}
+                                    onMouseLeave={e => { if (isLight) (e.currentTarget as HTMLTableRowElement).style.background = L.card; }}>
+                                    <td style={{ padding: '18px 20px' }}>
+                                        <div style={{ fontWeight: '600', fontSize: '14px', color: isLight ? L.textMain : 'white' }}>{sup.name}</div>
+                                        {sup.isActive === false && <span style={{ fontSize: '10px', color: L.danger, fontWeight: '700' }}>● Pasif</span>}
                                     </td>
                                     <td>
-                                        <span style={{ fontSize: '12px', padding: '4px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', color: '#ccc' }}>
+                                        <span style={{
+                                            fontSize: '12px', padding: '5px 12px', borderRadius: '20px', fontWeight: '600',
+                                            background: isLight ? L.filterBg : 'rgba(255,255,255,0.1)',
+                                            border: isLight ? `1px solid ${L.border}` : 'none',
+                                            color: isLight ? L.textMuted : '#ccc'
+                                        }}>
                                             {sup.category || '-'}
                                         </span>
                                     </td>
                                     <td>
-                                        <div style={{ fontSize: '13px', color: '#ccc' }}>{sup.phone}</div>
-                                        {sup.contactPerson && <div style={{ fontSize: '11px', color: '#666' }}>Yetkili: {sup.contactPerson}</div>}
+                                        <div style={{ fontSize: '13px', color: isLight ? L.textMain : '#ccc' }}>{sup.phone}</div>
+                                        {sup.contactPerson && <div style={{ fontSize: '11px', color: isLight ? L.textMuted : '#666', marginTop: '2px' }}>Yetkili: {sup.contactPerson}</div>}
                                     </td>
-                                    <td style={{ fontWeight: 'bold', color: sup.balance < 0 ? '#ef4444' : (sup.balance > 0 ? '#10b981' : '#ccc') }}>
-                                        {formatCurrency(Math.abs(sup.balance))}
-                                        <div style={{ fontSize: '10px', opacity: 0.7 }}>
+                                    <td>
+                                        <span style={{
+                                            fontWeight: '700', fontSize: '14px',
+                                            color: sup.balance < 0 ? L.danger : (sup.balance > 0 ? L.success : (isLight ? L.textMuted : '#ccc'))
+                                        }}>
+                                            {formatCurrency(Math.abs(sup.balance))}
+                                        </span>
+                                        <div style={{ fontSize: '10px', opacity: 0.7, color: isLight ? L.textMuted : undefined }}>
                                             {sup.balance < 0 ? 'Borçluyuz' : (sup.balance > 0 ? 'Alacaklıyız' : '-')}
                                         </div>
                                     </td>
                                     <td style={{ textAlign: 'right', paddingRight: '20px' }}>
-                                        <div style={{ display: 'flex', gap: '5px', justifyContent: 'flex-end' }}>
-                                            <button onClick={() => { setEditSupplier(sup); setIsEditModalOpen(true); }} className="btn btn-sm btn-outline" style={{ color: '#10b981', borderColor: '#10b981' }}>✏️</button>
-                                            <button onClick={() => handleDeleteSupplier(sup)} className="btn btn-sm btn-outline" style={{ color: '#ef4444', borderColor: '#ef4444' }}>🗑️</button>
-                                            <button onClick={() => { setSelectedSup(sup); setIsPurchaseModalOpen(true); }} className="btn btn-sm btn-outline">🛒</button>
-                                            <Link href={`/suppliers/${sup.id}`} className="btn btn-sm btn-primary" style={{ textDecoration: 'none' }}>Detay</Link>
+                                        <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                                            <button onClick={() => { setEditSupplier(sup); setIsEditModalOpen(true); }}
+                                                style={{ padding: '7px 12px', borderRadius: '8px', border: `1px solid ${L.success}`, background: 'transparent', color: L.success, cursor: 'pointer', fontSize: '13px' }}>✏️</button>
+                                            <button onClick={() => handleDeleteSupplier(sup)}
+                                                style={{ padding: '7px 12px', borderRadius: '8px', border: `1px solid ${L.danger}`, background: 'transparent', color: L.danger, cursor: 'pointer', fontSize: '13px' }}>🗑️</button>
+                                            <button onClick={() => { setSelectedSup(sup); setIsPurchaseModalOpen(true); }}
+                                                style={{ padding: '7px 12px', borderRadius: '8px', border: `1px solid ${L.primary}`, background: 'transparent', color: L.primary, cursor: 'pointer', fontSize: '13px' }}>🛒</button>
+                                            <Link href={`/suppliers/${sup.id}`}
+                                                style={{
+                                                    padding: '7px 14px', borderRadius: '8px', fontSize: '13px', fontWeight: '600', textDecoration: 'none',
+                                                    background: L.primary, color: 'white'
+                                                }}>Detay</Link>
                                         </div>
                                     </td>
                                 </tr>
@@ -439,20 +523,22 @@ export default function SuppliersPage() {
                 </div>
             )}
 
+            {/* Empty state */}
             {paginatedSuppliers.length === 0 && (
-                <div style={{ padding: '60px', textAlign: 'center', color: '#888', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.1)', marginTop: '20px' }}>
+                <div style={{
+                    padding: '60px', textAlign: 'center', marginTop: '20px', borderRadius: '16px',
+                    background: isLight ? L.card : 'rgba(255,255,255,0.02)',
+                    border: `1px dashed ${isLight ? L.border : 'rgba(255,255,255,0.1)'}`,
+                    color: isLight ? L.textMuted : '#888',
+                    boxShadow: isLight ? L.shadow : 'none'
+                }}>
                     <div style={{ fontSize: '48px', marginBottom: '20px', opacity: 0.3 }}>🔍</div>
-                    <h3>Kayıt Bulunamadı</h3>
+                    <h3 style={{ color: isLight ? L.textMain : undefined }}>Kayıt Bulunamadı</h3>
                     <p>Arama kriterlerinize uygun tedarikçi bulunmuyor.</p>
                 </div>
             )}
 
-            {/* PAGINATION CONTROLS */}
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-            />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
             {/* PURCHASE MODAL */}
             {selectedSup && (
@@ -464,34 +550,32 @@ export default function SuppliersPage() {
                 />
             )}
 
-            {/* ADD SUPPLIER MODAL */}
+            {/* ADD MODAL */}
             {isModalOpen && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
-                    <div className="card glass animate-in" style={{ width: '600px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                            <h3 style={{ margin: 0 }}>🏭 Yeni Tedarikçi Ekle</h3>
-                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                <div style={{
+                    position: 'fixed', inset: 0, background: isLight ? 'rgba(15,23,42,0.55)' : 'rgba(0,0,0,0.8)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(6px)'
+                }}>
+                    <div className="card glass animate-in" style={modalCardStyle}>
+                        <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: `1px solid ${isLight ? L.border : 'rgba(255,255,255,0.1)'}` }}>
+                            <h3 style={{ margin: 0, color: isLight ? L.textMain : undefined }}>🏭 Yeni Tedarikçi Ekle</h3>
+                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', color: isLight ? L.textMuted : 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
                         </div>
                         <div className="flex-col gap-4">
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>FİRMA ADI <span style={{ color: 'red' }}>*</span></label>
-                                    <input type="text" value={newSupplier.name} onChange={e => setNewSupplier({ ...newSupplier, name: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newSupplier.name} onChange={e => setNewSupplier({ ...newSupplier, name: e.target.value })} style={inputStyle} />
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>YETKİLİ KİŞİ</label>
-                                    <input type="text" value={newSupplier.contactPerson} onChange={e => setNewSupplier({ ...newSupplier, contactPerson: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newSupplier.contactPerson} onChange={e => setNewSupplier({ ...newSupplier, contactPerson: e.target.value })} style={inputStyle} />
                                 </div>
                             </div>
-
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
-                                    <label className="text-muted" style={{ fontSize: '12px' }}>TEDARİKÇİ SINIFI (KATEGORİ)</label>
-                                    <select
-                                        value={newSupplier.category}
-                                        onChange={e => setNewSupplier({ ...newSupplier, category: e.target.value })}
-                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
-                                    >
+                                    <label className="text-muted" style={{ fontSize: '12px' }}>TEDARİKÇİ SINIFI</label>
+                                    <select value={newSupplier.category} onChange={e => setNewSupplier({ ...newSupplier, category: e.target.value })} style={inputStyle}>
                                         <option value="">Sınıf Seçin...</option>
                                         {(dbSuppClasses.length > 0 ? dbSuppClasses : ['Saha Tedarikçisi', 'Distribütör', 'Yedek Parça', 'Hizmet']).map(cls => (
                                             <option key={cls} value={cls}>{cls}</option>
@@ -500,80 +584,58 @@ export default function SuppliersPage() {
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>ŞUBE <span style={{ color: 'red' }}>*</span></label>
-                                    <select
-                                        value={newSupplier.branch}
-                                        onChange={e => setNewSupplier({ ...newSupplier, branch: e.target.value })}
-                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
-                                    >
-                                        {(branches || []).map(b => (
-                                            <option key={b.name} value={b.name}>{b.name}</option>
-                                        ))}
+                                    <select value={newSupplier.branch} onChange={e => setNewSupplier({ ...newSupplier, branch: e.target.value })} style={inputStyle}>
+                                        {(branches || []).map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
                                     </select>
                                 </div>
                             </div>
-
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>TELEFON</label>
-                                    <input type="text" value={newSupplier.phone} onChange={e => setNewSupplier({ ...newSupplier, phone: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newSupplier.phone} onChange={e => setNewSupplier({ ...newSupplier, phone: e.target.value })} style={inputStyle} />
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>E-POSTA</label>
-                                    <input type="text" value={newSupplier.email} onChange={e => setNewSupplier({ ...newSupplier, email: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newSupplier.email} onChange={e => setNewSupplier({ ...newSupplier, email: e.target.value })} style={inputStyle} />
                                 </div>
                             </div>
-
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ NO</label>
-                                    <input type="text" value={newSupplier.taxNumber} onChange={e => setNewSupplier({ ...newSupplier, taxNumber: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newSupplier.taxNumber} onChange={e => setNewSupplier({ ...newSupplier, taxNumber: e.target.value })} style={inputStyle} />
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ DAİRESİ</label>
-                                    <input type="text" value={newSupplier.taxOffice} onChange={e => setNewSupplier({ ...newSupplier, taxOffice: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={newSupplier.taxOffice} onChange={e => setNewSupplier({ ...newSupplier, taxOffice: e.target.value })} style={inputStyle} />
                                 </div>
                             </div>
-
                             <div>
                                 <label className="text-muted" style={{ fontSize: '12px' }}>IBAN</label>
-                                <input type="text" placeholder="TR..." value={newSupplier.iban} onChange={e => setNewSupplier({ ...newSupplier, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                <input type="text" placeholder="TR..." value={newSupplier.iban} onChange={e => setNewSupplier({ ...newSupplier, iban: e.target.value })} style={inputStyle} />
                             </div>
-
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>ŞEHİR</label>
-                                    <select
-                                        value={newSupplier.city}
-                                        onChange={e => setNewSupplier({ ...newSupplier, city: e.target.value, district: '' })}
-                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
-                                    >
+                                    <select value={newSupplier.city} onChange={e => setNewSupplier({ ...newSupplier, city: e.target.value, district: '' })} style={inputStyle}>
                                         <option value="">Şehir Seçin...</option>
-                                        {TURKISH_CITIES.map(city => (
-                                            <option key={city} value={city}>{city}</option>
-                                        ))}
+                                        {TURKISH_CITIES.map(city => <option key={city} value={city}>{city}</option>)}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>İLÇE</label>
-                                    <select
-                                        value={newSupplier.district}
-                                        onChange={e => setNewSupplier({ ...newSupplier, district: e.target.value })}
-                                        disabled={!newSupplier.city}
-                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
-                                    >
+                                    <select value={newSupplier.district} onChange={e => setNewSupplier({ ...newSupplier, district: e.target.value })} disabled={!newSupplier.city} style={inputStyle}>
                                         <option value="">İlçe Seçin...</option>
-                                        {(TURKISH_DISTRICTS[newSupplier.city] || []).map(district => (
-                                            <option key={district} value={district}>{district}</option>
-                                        ))}
+                                        {(TURKISH_DISTRICTS[newSupplier.city] || []).map(d => <option key={d} value={d}>{d}</option>)}
                                     </select>
                                 </div>
                             </div>
-
                             <div>
                                 <label className="text-muted" style={{ fontSize: '12px' }}>ADRES</label>
-                                <textarea value={newSupplier.address} onChange={e => setNewSupplier({ ...newSupplier, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', minHeight: '80px' }} />
+                                <textarea value={newSupplier.address} onChange={e => setNewSupplier({ ...newSupplier, address: e.target.value })}
+                                    style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} />
                             </div>
-                            <button onClick={handleAddSupplier} disabled={isProcessing} className="btn btn-primary w-full" style={{ padding: '16px', marginTop: '10px' }}>
+                            <button onClick={handleAddSupplier} disabled={isProcessing} className="btn btn-primary w-full"
+                                style={{ padding: '16px', marginTop: '10px', background: isLight ? L.primary : undefined, borderRadius: '12px', fontSize: '15px', fontWeight: '700' }}>
                                 {isProcessing ? 'KAYDEDİLİYOR...' : 'KAYDET'}
                             </button>
                         </div>
@@ -581,108 +643,90 @@ export default function SuppliersPage() {
                 </div>
             )}
 
-            {/* EDIT SUPPLIER MODAL */}
+            {/* EDIT MODAL */}
             {isEditModalOpen && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
-                    <div className="card glass animate-in" style={{ width: '600px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                            <h3 style={{ margin: 0 }}>✏️ Tedarikçi Düzenle</h3>
-                            <button onClick={() => setIsEditModalOpen(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                <div style={{
+                    position: 'fixed', inset: 0, background: isLight ? 'rgba(15,23,42,0.55)' : 'rgba(0,0,0,0.8)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(6px)'
+                }}>
+                    <div className="card glass animate-in" style={modalCardStyle}>
+                        <div className="flex-between mb-6" style={{ paddingBottom: '20px', borderBottom: `1px solid ${isLight ? L.border : 'rgba(255,255,255,0.1)'}` }}>
+                            <h3 style={{ margin: 0, color: isLight ? L.textMain : undefined }}>✏️ Tedarikçi Düzenle</h3>
+                            <button onClick={() => setIsEditModalOpen(false)} style={{ background: 'none', border: 'none', color: isLight ? L.textMuted : 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
                         </div>
                         <div className="flex-col gap-4">
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>FİRMA ADI <span style={{ color: 'red' }}>*</span></label>
-                                    <input type="text" value={editSupplier.name} onChange={e => setEditSupplier({ ...editSupplier, name: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={editSupplier.name} onChange={e => setEditSupplier({ ...editSupplier, name: e.target.value })} style={inputStyle} />
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>YETKİLİ KİŞİ</label>
-                                    <input type="text" value={editSupplier.contactPerson} onChange={e => setEditSupplier({ ...editSupplier, contactPerson: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={editSupplier.contactPerson} onChange={e => setEditSupplier({ ...editSupplier, contactPerson: e.target.value })} style={inputStyle} />
                                 </div>
                             </div>
-
                             <div>
-                                <label className="text-muted" style={{ fontSize: '12px' }}>TEDARİKÇİ SINIFI (KATEGORİ)</label>
-                                <select
-                                    value={editSupplier.category}
-                                    onChange={e => setEditSupplier({ ...editSupplier, category: e.target.value })}
-                                    style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
-                                >
+                                <label className="text-muted" style={{ fontSize: '12px' }}>TEDARİKÇİ SINIFI</label>
+                                <select value={editSupplier.category} onChange={e => setEditSupplier({ ...editSupplier, category: e.target.value })} style={inputStyle}>
                                     <option value="">Sınıf Seçin...</option>
                                     {(dbSuppClasses.length > 0 ? dbSuppClasses : ['Saha Tedarikçisi', 'Distribütör', 'Yedek Parça', 'Hizmet']).map(cls => (
                                         <option key={cls} value={cls}>{cls}</option>
                                     ))}
                                 </select>
                             </div>
-
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>TELEFON</label>
-                                    <input type="text" value={editSupplier.phone} onChange={e => setEditSupplier({ ...editSupplier, phone: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={editSupplier.phone} onChange={e => setEditSupplier({ ...editSupplier, phone: e.target.value })} style={inputStyle} />
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>E-POSTA</label>
-                                    <input type="text" value={editSupplier.email} onChange={e => setEditSupplier({ ...editSupplier, email: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={editSupplier.email} onChange={e => setEditSupplier({ ...editSupplier, email: e.target.value })} style={inputStyle} />
                                 </div>
                             </div>
-
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ NO</label>
-                                    <input type="text" value={editSupplier.taxNumber} onChange={e => setEditSupplier({ ...editSupplier, taxNumber: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={editSupplier.taxNumber} onChange={e => setEditSupplier({ ...editSupplier, taxNumber: e.target.value })} style={inputStyle} />
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>VERGİ DAİRESİ</label>
-                                    <input type="text" value={editSupplier.taxOffice} onChange={e => setEditSupplier({ ...editSupplier, taxOffice: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                    <input type="text" value={editSupplier.taxOffice} onChange={e => setEditSupplier({ ...editSupplier, taxOffice: e.target.value })} style={inputStyle} />
                                 </div>
                             </div>
-
                             <div>
                                 <label className="text-muted" style={{ fontSize: '12px' }}>IBAN</label>
-                                <input type="text" placeholder="TR..." value={editSupplier.iban} onChange={e => setEditSupplier({ ...editSupplier, iban: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                <input type="text" placeholder="TR..." value={editSupplier.iban} onChange={e => setEditSupplier({ ...editSupplier, iban: e.target.value })} style={inputStyle} />
                             </div>
-
                             <div className="grid-cols-2 gap-4" style={{ display: 'grid' }}>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>ŞEHİR</label>
-                                    <select
-                                        value={editSupplier.city}
-                                        onChange={e => setEditSupplier({ ...editSupplier, city: e.target.value, district: '' })}
-                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
-                                    >
+                                    <select value={editSupplier.city} onChange={e => setEditSupplier({ ...editSupplier, city: e.target.value, district: '' })} style={inputStyle}>
                                         <option value="">Şehir Seçin...</option>
-                                        {TURKISH_CITIES.map(city => (
-                                            <option key={city} value={city}>{city}</option>
-                                        ))}
+                                        {TURKISH_CITIES.map(city => <option key={city} value={city}>{city}</option>)}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="text-muted" style={{ fontSize: '12px' }}>İLÇE</label>
-                                    <select
-                                        value={editSupplier.district}
-                                        onChange={e => setEditSupplier({ ...editSupplier, district: e.target.value })}
-                                        disabled={!editSupplier.city}
-                                        style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }}
-                                    >
+                                    <select value={editSupplier.district} onChange={e => setEditSupplier({ ...editSupplier, district: e.target.value })} disabled={!editSupplier.city} style={inputStyle}>
                                         <option value="">İlçe Seçin...</option>
-                                        {(TURKISH_DISTRICTS[editSupplier.city] || []).map(district => (
-                                            <option key={district} value={district}>{district}</option>
-                                        ))}
+                                        {(TURKISH_DISTRICTS[editSupplier.city] || []).map(d => <option key={d} value={d}>{d}</option>)}
                                     </select>
                                 </div>
                             </div>
-
                             <div>
                                 <label className="text-muted" style={{ fontSize: '12px' }}>ADRES</label>
-                                <textarea value={editSupplier.address} onChange={e => setEditSupplier({ ...editSupplier, address: e.target.value })} style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', minHeight: '80px' }} />
+                                <textarea value={editSupplier.address} onChange={e => setEditSupplier({ ...editSupplier, address: e.target.value })}
+                                    style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} />
                             </div>
-                            <button onClick={handleEditSupplier} disabled={isProcessing} className="btn btn-primary w-full" style={{ padding: '16px', marginTop: '10px' }}>
+                            <button onClick={handleEditSupplier} disabled={isProcessing} className="btn btn-primary w-full"
+                                style={{ padding: '16px', marginTop: '10px', background: isLight ? L.primary : undefined, borderRadius: '12px', fontSize: '15px', fontWeight: '700' }}>
                                 {isProcessing ? 'GÜNCELLENİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
-        </div >
+        </div>
     );
 }
