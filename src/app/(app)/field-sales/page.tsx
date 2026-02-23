@@ -223,6 +223,8 @@ export default function FieldSalesAgentDashboard() {
                             })}
                         </div>
                     </div>
+                )}
+
                 {/* Yönetim Paneli - Only for Admin/SuperAdmin */}
                 {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') && (
                     <div className="bg-[#161b22]/50 border border-white/5 p-6 rounded-3xl">
