@@ -64,8 +64,8 @@
   --card-pos: #FFFFFF;
   --text-pos: #0F172A;
   --text-muted-pos: #64748B;
-  --border-pos: #E6EBF0;
-  --shadow-pos: 0 4px 20px -2px rgba(216, 221, 227, 0.4), 0 2px 10px -2px rgba(216, 221, 227, 0.3);
+  --border-pos: #E2E8F0;
+  --shadow-pos: 0 12px 30px -10px rgba(0, 0, 0, 0.04);
 
   --glass-border: 1px solid var(--border-pos);
   --noise-opacity: 0.005;
@@ -87,7 +87,7 @@
   border: 1px solid var(--border-pos) !important;
   box-shadow: var(--shadow-pos) !important;
   color: var(--text-pos) !important;
-  border-radius: 16px !important;
+  border-radius: 24px !important;
   transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 
