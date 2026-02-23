@@ -63,7 +63,7 @@
   --bg-pos: #F7F9FB;
   --card-pos: #FFFFFF;
   --text-pos: #0F172A;
-  --text-muted-pos: #B8C0C8;
+  --text-muted-pos: #64748B;
   --border-pos: #E6EBF0;
   --shadow-pos: 0 4px 20px -2px rgba(216, 221, 227, 0.4), 0 2px 10px -2px rgba(216, 221, 227, 0.3);
 
@@ -103,10 +103,8 @@
   color: var(--text-pos) !important;
 }
 
-[data-pos-theme="light"] .opacity-50,
-[data-pos-theme="light"] .opacity-60,
-[data-pos-theme="light"] .text-muted,
-[data-pos-theme="light"] .text-xs.opacity-50 {
+[data-pos-theme="light"] [class*="opacity-"],
+[data-pos-theme="light"] .text-muted {
   color: var(--text-muted-pos) !important;
   opacity: 1 !important;
 }
