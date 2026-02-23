@@ -1885,6 +1885,7 @@ model PdksDisplay {
   name            String
   isActive        Boolean  @default(true)
   pairingCode     String   @unique // PDKS-XXXX formatı
+  announcement    String?  @db.Text
   lastPublicIp    String?
   lastHeartbeatAt DateTime?
   createdAt       DateTime @default(now())

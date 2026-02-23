@@ -15,70 +15,94 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
     const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
     const scannerId = "reader-container";
 
+    const initCamera = async () => {
+        setCameraError(null);
+        setIsCameraReady(false);
+
+        try {
+            // 1. Basic check for MediaDevices support
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw { name: 'NotSupportedError', message: "Tarayıcınız kamera erişimini desteklemiyor veya bağlantınız (HTTP) güvenli değil." };
+            }
+
+            // 2. Explicitly request permission first to trigger the browser prompt
+            // Using generic video: true is most compatible for the initial permission prompt
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                // We got permission! Now stop it so Html5Qrcode can take over.
+                stream.getTracks().forEach(track => track.stop());
+            } catch (permErr: any) {
+                console.error("Permission request failed:", permErr);
+                if (permErr.name === 'NotAllowedError' || permErr.name === 'PermissionDeniedError' || permErr.message?.includes('denied')) {
+                    throw { name: 'NotAllowedError', message: "Kamera izni verilmedi. Lütfen adres çubuğundaki kilit (veya ayar) simgesine tıklayarak 'Kamera' kullanımına izin verin ve sayfayı yenileyin." };
+                }
+                // If it's another error (like "in use"), we'll try to proceed to Html5Qrcode anyway
+            }
+
+            // 3. Initialize Html5Qrcode
+            if (html5QrCodeRef.current) {
+                await stopScanner();
+            }
+
+            const html5QrCode = new Html5Qrcode(scannerId);
+            html5QrCodeRef.current = html5QrCode;
+
+            const devices = await Html5Qrcode.getCameras();
+
+            if (!devices || devices.length === 0) {
+                throw { name: 'NotFoundError', message: 'Cihazda aktif bir kamera bulunamadı. Lütfen kameranın takılı ve açık olduğundan emin olun.' };
+            }
+
+            // 4. Smart camera selection
+            // On mobile, prefer back camera. On desktop, prefer any available camera.
+            const backCamera = devices.find(device =>
+                device.label.toLowerCase().includes('back') ||
+                device.label.toLowerCase().includes('arka') ||
+                device.label.toLowerCase().includes('environment')
+            );
+
+            const cameraId = backCamera ? backCamera.id : devices[0].id;
+
+            const config = {
+                fps: 20,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0,
+                showTorchButtonIfSupported: true
+            };
+
+            await html5QrCode.start(
+                cameraId,
+                config,
+                (decodedText) => {
+                    onScan(decodedText);
+                    stopScanner();
+                },
+                () => { } // Silent frame error
+            );
+
+            setIsCameraReady(true);
+        } catch (err: any) {
+            console.error("Scanner Error Details:", err);
+            let errorMsg = "Kamera başlatılamadı.";
+
+            if (err?.name === 'NotAllowedError' || err === 'NotAllowedError' || err?.message?.includes('denied')) {
+                errorMsg = "Kamera izni reddedildi. Adres çubuğundaki kilit ikonuna tıklayarak izni 'Açık' konuma getirin ve sayfayı yenileyin.";
+            } else if (err?.name === 'NotSupportedError' || err?.name === 'SecurityError') {
+                errorMsg = "Güvenlik kısıtlaması: Kamera erişimi için HTTPS (SSL) gereklidir.";
+            } else if (err?.name === 'NotFoundError') {
+                errorMsg = "Uygun kamera bulunamadı.";
+            } else if (err?.message) {
+                errorMsg = err.message;
+            }
+
+            setCameraError(errorMsg);
+            toast.error(errorMsg);
+        }
+    };
+
     useEffect(() => {
         if (isOpen) {
-            setCameraError(null);
-            setIsCameraReady(false);
-
-            // Wait for DOM to be fully stable
-            const timer = setTimeout(async () => {
-                try {
-                    const html5QrCode = new Html5Qrcode(scannerId);
-                    html5QrCodeRef.current = html5QrCode;
-
-                    // 1. Requesting cameras typically triggers the browser's permission pop-up
-                    const devices = await Html5Qrcode.getCameras();
-
-                    if (!devices || devices.length === 0) {
-                        throw { name: 'NotFoundError', message: 'Kamera bulunamadı.' };
-                    }
-
-                    // 2. Look for back camera
-                    const backCamera = devices.find(device =>
-                        device.label.toLowerCase().includes('back') ||
-                        device.label.toLowerCase().includes('arka') ||
-                        device.label.toLowerCase().includes('environment')
-                    );
-
-                    const cameraId = backCamera ? backCamera.id : devices[0].id;
-
-                    const config = {
-                        fps: 15,
-                        qrbox: { width: 250, height: 250 },
-                        aspectRatio: 1.0
-                    };
-
-                    // 3. Start scanning with explicit cameraId
-                    await html5QrCode.start(
-                        cameraId,
-                        config,
-                        (decodedText) => {
-                            onScan(decodedText);
-                            stopScanner();
-                        },
-                        () => { } // Silent frame error
-                    );
-
-                    setIsCameraReady(true);
-                } catch (err: any) {
-                    console.error("Scanner Error Details:", err);
-                    let errorMsg = "Kamera başlatılamadı.";
-
-                    if (err?.name === 'NotAllowedError' || err === 'NotAllowedError') {
-                        errorMsg = "Kamera izni reddedildi. Lütfen tarayıcı ayarlarından (adres çubuğundaki kilit ikonu) kamera iznini aktif edin.";
-                    } else if (err?.name === 'NotFoundError') {
-                        errorMsg = "Cihazda uygun bir kamera bulunamadı.";
-                    } else if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-                        errorMsg = "Kamera erişimi için HTTPS güvenli bağlantı gereklidir.";
-                    } else if (err?.message) {
-                        errorMsg = `Hata: ${err.message}`;
-                    }
-
-                    setCameraError(errorMsg);
-                    toast.error(errorMsg);
-                }
-            }, 1000);
-
+            const timer = setTimeout(initCamera, 300);
             return () => {
                 clearTimeout(timer);
                 stopScanner();
@@ -87,9 +111,11 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
     }, [isOpen]);
 
     const stopScanner = async () => {
-        if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
+        if (html5QrCodeRef.current) {
             try {
-                await html5QrCodeRef.current.stop();
+                if (html5QrCodeRef.current.isScanning) {
+                    await html5QrCodeRef.current.stop();
+                }
                 html5QrCodeRef.current = null;
             } catch (err) {
                 console.error("Stop Error:", err);
@@ -137,12 +163,20 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
                             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8 bg-rose-500/10 backdrop-blur-md text-center">
                                 <span className="text-4xl text-rose-500">⚠️</span>
                                 <p className="text-xs font-bold text-rose-400 leading-relaxed">{cameraError}</p>
-                                <button
-                                    onClick={() => window.location.reload()}
-                                    className="mt-4 px-6 py-2 bg-rose-500 text-white text-[10px] font-black uppercase rounded-xl"
-                                >
-                                    SAYFAYI YENİLE
-                                </button>
+                                <div className="flex flex-col gap-2 w-full mt-4">
+                                    <button
+                                        onClick={initCamera}
+                                        className="px-6 py-3 bg-indigo-500 text-white text-[10px] font-black uppercase rounded-xl hover:bg-indigo-600 transition-colors"
+                                    >
+                                        TEKRAR DENE
+                                    </button>
+                                    <button
+                                        onClick={() => window.location.reload()}
+                                        className="px-6 py-3 bg-white/5 text-white/40 text-[10px] font-black uppercase rounded-xl hover:bg-white/10 transition-colors"
+                                    >
+                                        SAYFAYI YENİLE
+                                    </button>
+                                </div>
                             </div>
                         )}
 

@@ -60,7 +60,8 @@ export async function GET(req: Request) {
             success: true,
             qrToken,
             exp,
-            siteName: display.name
+            siteName: display.name,
+            announcement: display.announcement
         });
     } catch (error: any) {
         console.error("[PDKS Display Token Error]:", error);

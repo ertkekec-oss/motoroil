@@ -69,6 +69,35 @@ export async function POST(req: Request) {
     }
 }
 
+export async function PATCH(req: Request) {
+    const auth = await authorize();
+    if (!auth.authorized) return auth.response;
+
+    const effectiveTenantId = auth.user.impersonateTenantId || auth.user.tenantId;
+
+    try {
+        const { id, announcement, isActive, name } = await req.json();
+
+        if (!id) return NextResponse.json({ success: false, error: "ID gerekli" }, { status: 400 });
+
+        const display = await prisma.pdksDisplay.update({
+            where: {
+                id,
+                tenantId: effectiveTenantId
+            },
+            data: {
+                announcement,
+                isActive,
+                name
+            }
+        });
+
+        return NextResponse.json({ success: true, display });
+    } catch (error: any) {
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+}
+
 export async function DELETE(req: Request) {
     const auth = await authorize();
     if (!auth.authorized) return auth.response;
