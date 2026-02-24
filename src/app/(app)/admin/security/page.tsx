@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export default function SecuritySettingsPage() {
     const [words, setWords] = useState<string[]>([]);
@@ -154,8 +154,8 @@ export default function SecuritySettingsPage() {
                 <ul className="text-amber-700 text-sm space-y-2 list-disc ml-5">
                     <li>Sistem sadece <b>Chrome veya Edge</b> tarayıcılarında çalışır.</li>
                     <li>Mikrofon izni gereklidir ve admin panelindeki yüzen mikrofon ikonuna basılarak başlatılır.</li>
-                    <li>Eğer personel yukarıdaki kelimelerden birini söylerse ve <b>son 5 dakikada</b> gerçekleşmiş bir satış bulamazsa "Şüpheli İşlem" alarmı tetiklenir.</li>
-                    <li>Alarmlar hem bildirim olarak düşer hem de "Güvenlik > Şüpheli Olaylar" sayfasında saklanır.</li>
+                    <li>Eğer personel yukarıdaki kelimelerden birini söylerse ve <b>son 5 dakikada</b> gerçekleşmiş bir satış bulamazsa &quot;Şüpheli İşlem&quot; alarmı tetiklenir.</li>
+                    <li>Alarmlar hem bildirim olarak düşer hem de &quot;Güvenlik &gt; Şüpheli Olaylar&quot; sayfasında saklanır.</li>
                 </ul>
             </div>
         </div>

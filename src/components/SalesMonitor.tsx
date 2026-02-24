@@ -307,7 +307,7 @@ export default function SalesMonitor({
                         </div>
                         {detectedText && (
                             <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                                Son: "{detectedText.substring(0, 50)}..."
+                                Son: &quot;{detectedText.substring(0, 50)}...&quot;
                             </div>
                         )}
                     </div>
@@ -336,7 +336,7 @@ export default function SalesMonitor({
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                                             <span style={{ fontWeight: 'bold', color: 'var(--danger)' }}>
-                                                "{event.detectedPhrase}"
+                                                &quot;{event.detectedPhrase}&quot;
                                             </span>
                                             <span style={{ color: 'var(--text-muted)' }}>
                                                 {new Date(event.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
