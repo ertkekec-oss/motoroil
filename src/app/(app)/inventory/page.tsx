@@ -867,6 +867,8 @@ function InventoryContent() {
                 /* Table & Lists */
                 [data-theme="light"] .bg-\[\#0f172a\]\/80,
                 [data-theme="light"] .bg-black\/20,
+                [data-theme="light"] .bg-black\/30,
+                [data-theme="light"] .bg-black\/40,
                 [data-theme="light"] .sticky {
                     background: #F1F5F9 !important;
                     border-bottom: 2px solid #E2E8F0 !important;
@@ -875,13 +877,14 @@ function InventoryContent() {
                 [data-theme="light"] .bg-white\/5,
                 [data-theme="light"] .bg-white\/\[0\.02\],
                 [data-theme="light"] .bg-white\/\[0\.03\],
-                [data-theme="light"] .bg-black\/40 {
+                [data-theme="light"] .bg-white\/10 {
                     background: #F8FAFC !important;
                     border: 1px solid #E2E8F0 !important;
                     color: #0F172A !important;
                 }
                 [data-theme="light"] .hover\:bg-white\/\[0\.03\]:hover,
-                [data-theme="light"] .hover\:bg-white\/\[0\.02\]:hover {
+                [data-theme="light"] .hover\:bg-white\/\[0\.02\]:hover,
+                [data-theme="light"] .hover\:bg-white\/\[0\.08\]:hover {
                     background: #F1F5F9 !important;
                 }
                 [data-theme="light"] .text-white\/90,
@@ -890,6 +893,7 @@ function InventoryContent() {
                 [data-theme="light"] .text-white\/60 { color: #334155 !important; }
                 [data-theme="light"] .text-white\/50,
                 [data-theme="light"] .text-white\/40,
+                [data-theme="light"] .text-white\/35,
                 [data-theme="light"] .text-white\/30 { color: #64748B !important; }
                 [data-theme="light"] .text-white\/20,
                 [data-theme="light"] .text-white\/10 { color: #94A3B8 !important; }
@@ -897,36 +901,38 @@ function InventoryContent() {
                 /* Inputs & Selects */
                 [data-theme="light"] input,
                 [data-theme="light"] select,
+                [data-theme="light"] textarea,
                 [data-theme="light"] .bg-\[\#0f172a\] {
                     background: #FFFFFF !important;
                     border: 1px solid #E2E8F0 !important;
                     color: #0F172A !important;
                 }
                 [data-theme="light"] input::placeholder { color: #94A3B8 !important; }
-
-                /* Status & Colors */
-                [data-theme="light"] .bg-emerald-500\/10 { background: #DCFCE7 !important; color: #16A34A !important; }
-                [data-theme="light"] .bg-blue-500\/10, [data-theme="light"] .bg-blue-500\/5 { background: #EFF6FF !important; border-color: #BFDBFE !important; }
-                [data-theme="light"] .bg-purple-500\/10 { background: #F5F3FF !important; color: #7C3AED !important; }
-                [data-theme="light"] .bg-red-500\/10 { background: #FEF2F2 !important; color: #EF4444 !important; }
-                [data-theme="light"] .text-primary { color: #2563EB !important; }
-                [data-theme="light"] .text-warning { color: #D97706 !important; }
+                [data-theme="light"] option {
+                    background: #FFFFFF !important;
+                    color: #0F172A !important;
+                }
 
                 /* Modals & Overlays */
                 [data-theme="light"] .fixed.inset-0.bg-black\/95,
-                [data-theme="light"] .fixed.inset-0.bg-black\/90 {
-                    background: rgba(15, 23, 42, 0.5) !important;
+                [data-theme="light"] .fixed.inset-0.bg-black\/90,
+                [data-theme="light"] .fixed.inset-0.bg-black\/80 {
+                    background: rgba(15, 23, 42, 0.4) !important;
                     backdrop-filter: blur(12px) !important;
                 }
                 [data-theme="light"] .bg-\[\#0f172a\],
-                [data-theme="light"] .bg-\[\#0a0a0b\] {
+                [data-theme="light"] .bg-\[\#0a0a0b\],
+                [data-theme="light"] .glass-plus,
+                [data-theme="light"] .animate-in {
                     background: #FFFFFF !important;
                     border: 1px solid #E6EBF2 !important;
-                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.20) !important;
+                    backdrop-filter: none !important;
                 }
                 
                 /* Specific Label Fixes */
                 [data-theme="light"] label,
+                [data-theme="light"] span.text-white\/40,
                 [data-theme="light"] .tracking-widest.uppercase,
                 [data-theme="light"] .font-black.uppercase {
                     color: #64748B !important;
