@@ -1,19 +1,25 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
     try {
-        const session = await getSession();
-        if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
+        const { authorized, user, response } = await authorize();
+        if (!authorized) return response;
+
+        const companyId = user.companyId;
+        if (!companyId) throw new Error("Şirket kimliği bulunamadı.");
 
         const { searchParams } = new URL(request.url);
         const branch = searchParams.get('branch');
         const scope = searchParams.get('scope') || 'all';
 
-        const whereClause: any = { deletedAt: null };
+        const whereClause: any = {
+            companyId: companyId,
+            deletedAt: null
+        };
         if (scope !== 'all' && branch) {
             whereClause.branch = branch;
         }
@@ -57,7 +63,10 @@ export async function GET(request: Request) {
         // Instead of N+1 queries, we use a single aggregation query
         const stockData = await prisma.stock.groupBy({
             by: ['productId', 'branch'],
-            where: whereClause.branch ? { branch: whereClause.branch } : {},
+            where: {
+                product: { companyId: companyId },
+                ...(whereClause.branch ? { branch: whereClause.branch } : {})
+            },
             _sum: { quantity: true }
         });
 

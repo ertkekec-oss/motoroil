@@ -88,6 +88,7 @@ model Company {
   expenses           Expense[]
   campaigns          Campaign[]
   locationRequests   CustomerLocationRequest[]
+  securityEvents     SecurityEvent[]    @relation("CompanySecurityEvents")
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -1037,12 +1038,15 @@ model SecurityEvent {
   timestamp         DateTime @default(now())
   detectedPhrase    String
   confidence        Float
-  hasSaleInLast5Min Boolean  @default(false)
-  branch            String
-  staff             String
+  hasSaleInLast5Min Boolean
+  branch            String?
+  staff             String?
   details           String?
   createdAt         DateTime @default(now())
+  companyId         String?
+  company           Company? @relation("CompanySecurityEvents", fields: [companyId], references: [id], onDelete: Cascade)
 
+  @@index([companyId])
   @@index([timestamp])
   @@index([branch])
 }

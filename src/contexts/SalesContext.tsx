@@ -8,6 +8,8 @@ import { useModal } from './ModalContext';
 import { useAuth } from './AuthContext';
 import { apiFetch } from '@/lib/api-client';
 
+import { useApp } from './AppContext';
+
 export interface SuspendedSale {
     id: string;
     label: string;
@@ -32,6 +34,7 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
     const { addTransaction, refreshKasalar, refreshTransactions } = useFinancials();
     const { refreshCustomers } = useCRM();
     const { addNotification } = useModal() as any;
+    const { recordSale } = useApp();
 
     const [suspendedSales, setSuspendedSales] = useState<SuspendedSale[]>([]);
 
@@ -70,6 +73,7 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
     }, [isAuthenticated]);
 
     const processSale = async (saleData: any) => {
+        recordSale();
         const saleBranch = saleData.branch || activeBranchName || 'Merkez';
 
         // Optimistic UI update for products

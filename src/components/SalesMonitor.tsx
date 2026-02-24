@@ -21,8 +21,8 @@ interface SalesMonitorProps {
     onSuspiciousActivity?: (event: SuspiciousEvent) => void;
 }
 
-// Şüpheli kelimeler listesi
-const suspiciousWords = [
+// Fallback words if none set in DB
+const DEFAULT_SUSPICIOUS_WORDS = [
     'hayırlı olsun',
     'hayırlı',
     'kolay gelsin',
@@ -52,8 +52,32 @@ export default function SalesMonitor({
     const [isExpanded, setIsExpanded] = useState(false);
     const [detectedText, setDetectedText] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [dynamicWords, setDynamicWords] = useState<string[]>(DEFAULT_SUSPICIOUS_WORDS);
     const recognitionRef = useRef<any>(null);
     const lastResultTimeRef = useRef<number>(0);
+
+    // Fetch dynamic words on mount and when panel is opened
+    const refreshWords = async () => {
+        try {
+            const res = await fetch('/api/settings');
+            const data = await res.json();
+            if (data.security_suspicious_words && Array.isArray(data.security_suspicious_words)) {
+                setDynamicWords(data.security_suspicious_words);
+            }
+        } catch (e) {
+            console.error('Failed to fetch suspicious words:', e);
+        }
+    };
+
+    useEffect(() => {
+        refreshWords();
+    }, []);
+
+    useEffect(() => {
+        if (isExpanded) {
+            refreshWords();
+        }
+    }, [isExpanded]);
 
     // Persist expansion state
     useEffect(() => {
@@ -123,7 +147,7 @@ export default function SalesMonitor({
                 if (event.results[last].isFinal) {
                     setDetectedText(transcript);
 
-                    const detectedSuspicious = suspiciousWords.find(word =>
+                    const detectedSuspicious = dynamicWords.find(word =>
                         transcript.includes(word)
                     );
 
@@ -226,6 +250,7 @@ export default function SalesMonitor({
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="sales-monitor-btn"
+                title="Kaçak Satış Monitörü"
                 style={{
                     background: isListening ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
                     animation: isListening ? 'pulse 2s infinite' : 'none'

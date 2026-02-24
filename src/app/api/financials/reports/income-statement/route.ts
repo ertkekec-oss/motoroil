@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
     try {
+        const { authorized, user, response } = await authorize();
+        if (!authorized) return response;
+
+        const companyId = user.companyId;
+        if (!companyId) throw new Error("Şirket kimliği bulunamadı.");
+
         const { searchParams } = new URL(req.url);
         const startDate = searchParams.get('startDate');
         const endDate = searchParams.get('endDate');
@@ -24,6 +31,7 @@ export async function GET(req: Request) {
             _sum: { debt: true, credit: true },
             where: {
                 journal: {
+                    companyId: companyId,
                     ...(Object.keys(dateFilter).length > 0 ? { date: dateFilter.date } : {})
                 }
             }
@@ -32,6 +40,7 @@ export async function GET(req: Request) {
         // 2. Fetch Relevant Accounts (6xx and 7xx)
         const accounts = await prisma.account.findMany({
             where: {
+                companyId: companyId,
                 OR: [
                     { code: { startsWith: '6' } },
                     { code: { startsWith: '7' } }

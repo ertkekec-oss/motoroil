@@ -2,10 +2,15 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { authorize } from '@/lib/auth';
+
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+
         const events = await prisma.securityEvent.findMany({
             orderBy: {
                 timestamp: 'desc'
@@ -21,6 +26,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+        const companyId = auth.user.companyId;
+
         const body = await request.json();
         const { detectedPhrase, confidence, hasSaleInLast5Min, branch, staff, details } = body;
 
@@ -31,7 +40,8 @@ export async function POST(request: Request) {
                 hasSaleInLast5Min: Boolean(hasSaleInLast5Min),
                 branch,
                 staff,
-                details
+                details,
+                companyId
             }
         });
 
@@ -43,6 +53,9 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 

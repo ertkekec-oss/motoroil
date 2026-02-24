@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { getSession, authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,16 +9,21 @@ export async function GET(req: Request) {
     const status = searchParams.get('status');
 
     try {
-        const session = await getSession() as any;
-        if (!session) return NextResponse.json({ success: false, error: 'Oturum gerekli' }, { status: 401 });
+        const { authorized, user, response } = await authorize();
+        if (!authorized) return response;
 
-        const where: any = {};
+        const where: any = {
+            companyId: user.companyId
+        };
+
         if (status && status !== 'All') {
             where.status = status;
         }
 
         // Branch Isolation: Only show quotes for this branch by default
-        where.branch = session.branch || 'Merkez';
+        if (user.branch && user.branch !== 'Merkez') {
+            where.branch = user.branch;
+        }
 
         const quotes = await prisma.quote.findMany({
             where,
@@ -39,13 +44,16 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     try {
-        const session = await getSession() as any;
-        if (!session) return NextResponse.json({ success: false, error: 'Oturum gerekli' }, { status: 401 });
+        const { authorized, user, response } = await authorize();
+        if (!authorized) return response;
 
         const body = await req.json();
         const { customerId, items, description, validUntil, subTotal, taxAmount, totalAmount } = body;
 
-        const branch = session.branch || 'Merkez';
+        const companyId = user.companyId;
+        if (!companyId) throw new Error("Şirket kimliği bulunamadı.");
+
+        const branch = user.branch || 'Merkez';
 
         // Generate Quote No (TEK-YYYYMM-001)
         const datePrefix = new Date().toISOString().slice(0, 7).replace('-', '');
@@ -54,7 +62,8 @@ export async function POST(req: Request) {
         const lastQuote = await prisma.quote.findFirst({
             where: {
                 quoteNo: { startsWith: `TEK-${datePrefix}` },
-                branch: branch
+                branch: branch,
+                companyId: companyId
             },
             orderBy: { quoteNo: 'desc' }
         });
@@ -81,7 +90,8 @@ export async function POST(req: Request) {
                 taxAmount: Number(taxAmount) || 0,
                 totalAmount: Number(totalAmount) || 0,
                 status: 'Draft',
-                branch: branch
+                branch: branch,
+                companyId: companyId
             }
         });
 

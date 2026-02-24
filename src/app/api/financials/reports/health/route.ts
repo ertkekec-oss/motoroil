@@ -1,16 +1,31 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
     try {
+        const { authorized, user, response } = await authorize();
+        if (!authorized) return response;
+
+        const companyId = user.companyId;
+        if (!companyId) throw new Error("Şirket kimliği bulunamadı.");
+
         // Fetch all account balances (similar to Trial Balance)
         // Group by Account Code Prefix (1, 2, 3, 10, 60, etc.)
 
         const accounts = await prisma.account.findMany({
+            where: {
+                companyId: companyId
+            },
             include: {
                 journalItems: {
+                    where: {
+                        journal: {
+                            companyId: companyId
+                        }
+                    },
                     select: {
                         debt: true,
                         credit: true

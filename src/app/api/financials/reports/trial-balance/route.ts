@@ -1,21 +1,36 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authorize } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
+        const { authorized, user, response } = await authorize();
+        if (!authorized) return response;
+
+        const companyId = user.companyId;
+        if (!companyId) throw new Error("Şirket kimliği bulunamadı.");
+
         // 1. Hareket Toplamlarını Al
         const groups = await prisma.journalItem.groupBy({
             by: ['accountId'],
             _sum: {
                 debt: true,
                 credit: true
+            },
+            where: {
+                journal: {
+                    companyId: companyId
+                }
             }
         });
 
         // 2. Hesap Tanımlarını Al
         const accounts = await prisma.account.findMany({
+            where: {
+                companyId: companyId
+            },
             orderBy: { code: 'asc' }
         });
 

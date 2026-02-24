@@ -14,7 +14,7 @@ const operationalModels = [
     'marketplaceorderfinance', 'marketplaceproductmap', 'marketplaceproductpnl',
     'marketplacetransactionledger', 'smartpricingrule', 'pricingautopilotconfig',
     'bankconnection', 'banktransaction', 'bankstatement', 'cashflowforecast',
-    'inventorylayer', 'matchingrule', 'externalrequest', 'fintechaudit'
+    'inventorylayer', 'matchingrule', 'externalrequest', 'fintechaudit', 'stock'
 ];
 
 const prismaClientSingleton = () => {
@@ -143,10 +143,16 @@ const prismaClientSingleton = () => {
                                     target.tenantId = effectiveTenantId;
                                 } else if (modelName === 'ticketmessage' || modelName === 'ticketattachment') {
                                     target.ticket = { tenantId: effectiveTenantId };
+                                } else if (modelName === 'journalitem') {
+                                    target.journal = { company: { tenantId: effectiveTenantId } };
+                                } else if (modelName === 'warranty') {
+                                    target.customer = { company: { tenantId: effectiveTenantId } };
+                                } else if (modelName === 'stock') {
+                                    target.product = { company: { tenantId: effectiveTenantId } };
                                 } else if ([
                                     'product', 'customer', 'supplier', 'transaction', 'kasa', 'check', 'order', 'salesinvoice', 'purchaseinvoice',
                                     'servicerecord', 'quote', 'paymentplan', 'stockmovement', 'stocktransfer', 'salesorder', 'route', 'stafftarget',
-                                    'journal', 'journalitem', 'account', 'coupon', 'suspendedsale', 'warranty', 'branch',
+                                    'journal', 'account', 'coupon', 'suspendedsale', 'branch', 'securityevent',
                                     'appsettings', 'campaign', 'expense', 'marketplaceconfig', 'marketplacesettlement',
                                     'marketplaceorderfinance', 'marketplaceproductmap', 'marketplaceproductpnl',
                                     'marketplacetransactionledger', 'smartpricingrule', 'pricingautopilotconfig',
