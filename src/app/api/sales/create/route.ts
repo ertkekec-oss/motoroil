@@ -105,12 +105,17 @@ export async function POST(request: Request) {
         const result = await prisma.$transaction(async (tx) => {
             // A. Enrich Items with product details for history/receipts
             const enrichedItems = [];
-            if (Array.isArray(items)) {
+            if (Array.isArray(items) && items.length > 0) {
+                const productIds = items.map(i => String(i.productId));
+                const products = await tx.product.findMany({
+                    where: { id: { in: productIds } },
+                    select: { id: true, name: true, price: true, salesVat: true }
+                });
+
+                const productMap = new Map(products.map(p => [p.id, p]));
+
                 for (const item of items) {
-                    const p = await tx.product.findUnique({
-                        where: { id: String(item.productId) },
-                        select: { name: true, price: true, salesVat: true }
-                    });
+                    const p = productMap.get(String(item.productId));
                     enrichedItems.push({
                         ...item,
                         name: p?.name || 'Ürün',
@@ -138,46 +143,42 @@ export async function POST(request: Request) {
                 }
             });
 
-            // B. Update Product Stocks
-            if (Array.isArray(items)) {
+            // B. Update Product Stocks (Parallelized)
+            if (Array.isArray(items) && items.length > 0) {
                 const targetBranch = branch || 'Merkez';
-                for (const item of items) {
-                    if (item.productId) {
-                        const qty = Number(item.qty || item.quantity || 1);
+                const stockOps = items.filter(i => i.productId).map(async (item) => {
+                    const qty = Number(item.qty || item.quantity || 1);
+                    const prodId = String(item.productId);
+                    const ops = [];
 
-                        // 1. Update/Upsert Stock Record
-                        await tx.stock.upsert({
-                            where: { productId_branch: { productId: String(item.productId), branch: targetBranch } },
-                            update: { quantity: { decrement: qty } },
-                            create: {
-                                productId: String(item.productId),
-                                branch: targetBranch,
-                                quantity: -qty
-                            }
-                        });
+                    ops.push(tx.stock.upsert({
+                        where: { productId_branch: { productId: prodId, branch: targetBranch } },
+                        update: { quantity: { decrement: qty } },
+                        create: { productId: prodId, branch: targetBranch, quantity: -qty }
+                    }));
 
-                        // 2. Log Movement
-                        await tx.stockMovement.create({
-                            data: {
-                                productId: String(item.productId),
-                                branch: targetBranch,
-                                companyId: companyId,
-                                quantity: -qty,
-                                type: 'SALE',
-                                referenceId: order.id,
-                                price: Number(item.price || 0)
-                            }
-                        });
-
-                        // 3. Sync Legacy Field if Merkez
-                        if (targetBranch === 'Merkez') {
-                            await tx.product.update({
-                                where: { id: String(item.productId) },
-                                data: { stock: { decrement: qty } }
-                            }).catch(e => console.error("Legacy stock sync error:", e));
+                    ops.push(tx.stockMovement.create({
+                        data: {
+                            productId: prodId,
+                            branch: targetBranch,
+                            companyId: companyId,
+                            quantity: -qty,
+                            type: 'SALE',
+                            referenceId: order.id,
+                            price: Number(item.price || 0)
                         }
+                    }));
+
+                    if (targetBranch === 'Merkez') {
+                        ops.push(tx.product.update({
+                            where: { id: prodId },
+                            data: { stock: { decrement: qty } }
+                        }).catch(e => console.error("Legacy stock sync error:", e)));
                     }
-                }
+
+                    return Promise.all(ops);
+                });
+                await Promise.all(stockOps);
             }
 
             // C. Update Kasa
@@ -334,8 +335,8 @@ export async function POST(request: Request) {
             }
         }
 
-        // AUDIT LOG
-        await logActivity({
+        // AUDIT LOG (Don't await to save response time, catch errors silently)
+        logActivity({
             tenantId: (user as any).tenantId || 'PLATFORM_ADMIN',
             userId: (user as any).id,
             userName: (user as any).username,
@@ -346,7 +347,7 @@ export async function POST(request: Request) {
             details: `${result.orderNumber} nolu satış gerçekleştirildi.`,
             userAgent: request.headers.get('user-agent') || undefined,
             ipAddress: request.headers.get('x-forwarded-for') || '0.0.0.0'
-        });
+        }).catch(err => console.error("Sync Audit Error:", err));
 
         return NextResponse.json({
             success: true,

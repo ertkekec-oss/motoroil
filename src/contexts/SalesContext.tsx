@@ -120,7 +120,8 @@ export function SalesProvider({ children, activeBranchName }: { children: React.
 
             const data = await res.json();
             if (data.success) {
-                await Promise.all([refreshKasalar(), refreshCustomers(), refreshTransactions(), refreshProducts()]);
+                // Background update - Don't block the UI
+                Promise.all([refreshKasalar(), refreshCustomers(), refreshTransactions(), refreshProducts()]);
                 return true;
             }
             return false;

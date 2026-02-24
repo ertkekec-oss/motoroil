@@ -5,6 +5,11 @@ import { useCallback } from 'react';
 import { useModal } from '@/contexts/ModalContext';
 import { useRouter } from 'next/navigation';
 
+// Keep a global cache for billing overview to avoid redundant fetches
+let cachedUpsellData: any = null;
+let lastFetchTime: number = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 export function useUpsell() {
     const { showConfirm } = useModal();
     const router = useRouter();
@@ -12,8 +17,15 @@ export function useUpsell() {
     const checkUpsell = useCallback((source: string): Promise<boolean> => {
         return new Promise(async (resolve) => {
             try {
-                const res = await fetch('/api/billing/overview');
-                const data = await res.json();
+                const now = Date.now();
+                let data = cachedUpsellData;
+
+                if (!data || (now - lastFetchTime > CACHE_DURATION)) {
+                    const res = await fetch('/api/billing/overview');
+                    data = await res.json();
+                    cachedUpsellData = data;
+                    lastFetchTime = now;
+                }
 
                 if (data.upsellSignal?.shouldTrigger) {
                     const { type, message, cta, targetPlanId, priority } = data.upsellSignal;

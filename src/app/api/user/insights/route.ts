@@ -3,10 +3,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getRequestContext } from '@/lib/api-context';
 import { calculateUpsellSignal } from '@/lib/upsell-engine';
+import { redisConnection } from '@/lib/queue/redis';
 
 export async function GET(req: NextRequest) {
     try {
         const ctx = await getRequestContext(req);
+
+        // 0. CHECK CACHE
+        const cacheKey = `dashboard_insights:${ctx.tenantId}`;
+        try {
+            const cached = await redisConnection.get(cacheKey);
+            if (cached) {
+                return NextResponse.json(JSON.parse(cached));
+            }
+        } catch (e) {
+            console.warn('Redis Cache Read Error:', e);
+        }
 
         const now = new Date();
         const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -186,7 +198,7 @@ export async function GET(req: NextRequest) {
             severity: 'info'
         });
 
-        return NextResponse.json({
+        const responseData = {
             stats: {
                 thisMonthDocs,
                 lastMonthDocs,
@@ -198,7 +210,17 @@ export async function GET(req: NextRequest) {
             },
             insights,
             upsellSignal // Adding to response for logging/conversion tracking
-        });
+        };
+
+        // SAVE TO CACHE (Background)
+        redisConnection.set(
+            cacheKey,
+            JSON.stringify(responseData),
+            'EX',
+            900 // 15 Minutes
+        ).catch(err => console.error('Redis Cache Write Error:', err));
+
+        return NextResponse.json(responseData);
 
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });

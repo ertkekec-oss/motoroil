@@ -29,24 +29,65 @@ export async function GET(request: Request) {
             }
         }
 
+        const { searchParams } = new URL(request.url);
+        const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
+        const cursor = searchParams.get('cursor');
+
         const products = await prisma.product.findMany({
             where: whereClause,
+            take: limit + 1, // Fetch one extra to know if there's a next page
+            cursor: cursor ? { id: cursor } : undefined,
             orderBy: { createdAt: 'desc' },
-            include: {
-                stocks: true,
+            select: {
+                id: true,
+                name: true,
+                code: true,
+                barcode: true,
+                price: true,
+                category: true,
+                stock: true,
+                status: true,
+                brand: true,
+                type: true,
+                unit: true,
+                imageUrl: true,
+                isParent: true,
+                stocks: {
+                    select: {
+                        branch: true,
+                        quantity: true
+                    }
+                },
                 productPrices: {
-                    include: {
-                        priceList: true
+                    select: {
+                        priceListId: true,
+                        price: true,
+                        priceList: {
+                            select: {
+                                name: true
+                            }
+                        }
                     }
                 }
             }
         });
+
+        let nextCursor: string | undefined = undefined;
+        if (products.length > limit) {
+            const nextItem = products.pop();
+            nextCursor = nextItem?.id as string;
+        }
+
         const formattedProducts = products.map((p: any) => ({
             ...p,
             prices: p.productPrices || []
         }));
 
-        return NextResponse.json({ success: true, products: formattedProducts });
+        return NextResponse.json({
+            success: true,
+            products: formattedProducts,
+            nextCursor
+        });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }

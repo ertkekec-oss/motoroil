@@ -43,6 +43,17 @@ export async function GET(request: Request) {
         const [orders, salesOrders] = await Promise.all([
             prisma.order.findMany({
                 where: whereClause,
+                select: {
+                    id: true,
+                    orderNumber: true,
+                    marketplace: true,
+                    customerName: true,
+                    totalAmount: true,
+                    status: true,
+                    orderDate: true,
+                    items: true,
+                    branch: true
+                },
                 orderBy: {
                     orderDate: 'desc'
                 },
@@ -53,9 +64,20 @@ export async function GET(request: Request) {
                     // Filter field sales by company if whereClause has it, or just show last ones
                     companyId: whereClause.companyId
                 },
-                include: {
+                select: {
+                    id: true,
+                    totalAmount: true,
+                    status: true,
+                    createdAt: true,
+                    customerId: true,
                     customer: { select: { name: true } },
-                    items: true
+                    items: {
+                        select: {
+                            productName: true,
+                            quantity: true,
+                            unitPrice: true
+                        }
+                    }
                 },
                 orderBy: {
                     createdAt: 'desc'

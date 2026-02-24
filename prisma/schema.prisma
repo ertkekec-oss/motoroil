@@ -229,6 +229,8 @@ model Order {
   @@index([orderDate])
   @@index([status])
   @@index([companyId])
+  @@index([companyId, orderDate, status])
+  @@index([companyId, deletedAt, createdAt])
 }
 
 model Product {
@@ -285,6 +287,8 @@ model Product {
   @@index([category])
   @@index([parentId])
   @@index([companyId])
+  @@index([companyId, deletedAt, category])
+  @@index([companyId, isParent, deletedAt])
 }
 
 model VariantAttribute {
@@ -333,6 +337,7 @@ model StockMovement {
   @@index([branch])
   @@index([createdAt])
   @@index([companyId])
+  @@index([companyId, createdAt, type])
 }
 
 model Stock {
@@ -451,6 +456,7 @@ model SalesInvoice {
   @@index([status])
   @@index([companyId])
   @@index([orderId])
+  @@index([companyId, invoiceDate, status])
 }
 
 model Customer {
@@ -705,6 +711,8 @@ model AuditLog {
   @@index([tenantId])
   @@index([userId])
   @@index([createdAt])
+  @@index([tenantId, entity, createdAt])
+  @@index([tenantId, action, createdAt])
 }
 
 model LoginAttempt {
