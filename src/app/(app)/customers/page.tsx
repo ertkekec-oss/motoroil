@@ -10,6 +10,7 @@ import Link from 'next/link';
 import Pagination from '@/components/Pagination';
 import { useSearchParams } from 'next/navigation';
 import { TURKISH_CITIES, TURKISH_DISTRICTS } from '@/lib/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 10;
@@ -23,23 +24,7 @@ export default function CustomersPage() {
     const { showSuccess, showError, showWarning, showConfirm } = useModal();
     const canDelete = hasPermission('delete_records');
 
-    const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('pos-theme') as 'dark' | 'light';
-        if (savedTheme) setPosTheme(savedTheme);
-    }, []);
-    const togglePosTheme = () => {
-        const newTheme = posTheme === 'dark' ? 'light' : 'dark';
-        setPosTheme(newTheme);
-        localStorage.setItem('pos-theme', newTheme);
-        if (newTheme === 'light') {
-            document.body.style.background = '#F7F9FC';
-            document.body.style.color = '#1A1F36';
-        } else {
-            document.body.style.background = 'var(--bg-deep)';
-            document.body.style.color = 'var(--text-main)';
-        }
-    };
+    const { theme } = useTheme();
 
     const [isProcessing, setIsProcessing] = useState(false);
     const [searchTerm, setSearchTerm] = useState(''); // New: Debounced Search
@@ -274,7 +259,7 @@ export default function CustomersPage() {
     }, 0);
     const totalPayable = customers.filter(c => Number(c.balance) < 0).reduce((sum, c) => sum + Math.abs(Number(c.balance)), 0);
 
-    const isLight = posTheme === 'light';
+    const isLight = theme === 'light';
     const L = {
         pageBg: '#F7F9FB',
         card: '#FFFFFF',
@@ -296,7 +281,7 @@ export default function CustomersPage() {
     };
 
     return (
-        <div data-pos-theme={posTheme} className="container" style={{ padding: '30px', maxWidth: '1600px', margin: '0 auto', background: isLight ? L.pageBg : undefined }}>
+        <div data-pos-theme={theme} className="container" style={{ padding: '30px', maxWidth: '1600px', margin: '0 auto', background: isLight ? L.pageBg : undefined }}>
 
             {/* HEADER AREA */}
             <header style={{ marginBottom: '30px' }}>
@@ -312,15 +297,6 @@ export default function CustomersPage() {
                         </p>
                     </div>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                        <button onClick={togglePosTheme} title={isLight ? 'Karanlık Mod' : 'Aydınlık Mod'}
-                            style={{
-                                padding: '10px 14px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                border: isLight ? `1px solid ${L.border}` : '1px solid var(--border-pos)',
-                                background: isLight ? L.card : 'var(--card-pos)',
-                                boxShadow: isLight ? L.shadow : 'none'
-                            }}>
-                            {isLight ? <Moon size={18} color={L.primary} /> : <Sun size={18} color="#F59E0B" />}
-                        </button>
                         <button onClick={() => setIsModalOpen(true)} className="btn btn-primary"
                             style={{
                                 padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px',

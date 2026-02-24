@@ -11,6 +11,7 @@ import SupplierPurchaseModal from '@/components/modals/SupplierPurchaseModal';
 import { formatCurrency } from '@/lib/utils';
 import Pagination from '@/components/Pagination';
 import { TURKISH_CITIES, TURKISH_DISTRICTS } from '@/lib/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 
 export default function SuppliersPage() {
@@ -20,18 +21,7 @@ export default function SuppliersPage() {
     const { showSuccess, showError, showConfirm } = useModal();
 
     // ── Theme ──
-    const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
-    useEffect(() => {
-        const saved = localStorage.getItem('pos-theme') as 'dark' | 'light';
-        if (saved) setPosTheme(saved);
-    }, []);
-    const togglePosTheme = () => {
-        const next = posTheme === 'dark' ? 'light' : 'dark';
-        setPosTheme(next);
-        localStorage.setItem('pos-theme', next);
-        document.body.style.background = next === 'light' ? '#F7F9FB' : 'var(--bg-deep)';
-        document.body.style.color = next === 'light' ? '#1A1F36' : 'var(--text-main)';
-    };
+    const { theme } = useTheme();
 
     // UI States
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -140,7 +130,7 @@ export default function SuppliersPage() {
     };
 
     // ── Design tokens ──
-    const isLight = posTheme === 'light';
+    const isLight = theme === 'light';
     const L = {
         pageBg: '#F7F9FB',
         card: '#FFFFFF',
@@ -180,7 +170,7 @@ export default function SuppliersPage() {
     const tabLabels: Record<string, string> = { all: 'Tümü', debt: 'Borçlular', credit: 'Alacaklılar', passive: 'Pasifler' };
 
     return (
-        <div data-pos-theme={posTheme} className="container"
+        <div data-pos-theme={theme} className="container"
             style={{ padding: '30px', maxWidth: '1600px', margin: '0 auto', background: isLight ? L.pageBg : undefined }}>
 
             {/* HEADER */}
@@ -197,15 +187,6 @@ export default function SuppliersPage() {
                         </p>
                     </div>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                        <button onClick={togglePosTheme} title={isLight ? 'Karanlık Mod' : 'Aydınlık Mod'}
-                            style={{
-                                padding: '10px 14px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                border: isLight ? `1px solid ${L.border}` : '1px solid var(--border-pos)',
-                                background: isLight ? L.card : 'var(--card-pos)',
-                                boxShadow: isLight ? L.shadow : 'none'
-                            }}>
-                            {isLight ? <Moon size={18} color={L.primary} /> : <Sun size={18} color="#F59E0B" />}
-                        </button>
                         <button onClick={() => setIsModalOpen(true)} className="btn btn-primary"
                             style={{
                                 padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px',

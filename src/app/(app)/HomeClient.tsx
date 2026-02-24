@@ -1,4 +1,4 @@
-Ôªø"use client";
+"use client";
 
 import { useState, useEffect, useMemo, Suspense, useCallback, useRef } from 'react';
 import { useApp } from '@/contexts/AppContext';
@@ -14,6 +14,7 @@ import {
   PieChart as RePieChart, Pie, Cell
 } from 'recharts';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useUpsell } from '@/hooks/useUpsell';
 import dynamic from 'next/dynamic';
 import {
@@ -41,7 +42,7 @@ function POSContent() {
   // --- STATES ---
   const [cart, setCart] = useState<any[]>([]);
   const [searchInput, setSearchInput] = useState('');
-  const [selectedCustomer, setSelectedCustomer] = useState('Perakende M√º≈üteri');
+  const [selectedCustomer, setSelectedCustomer] = useState('Perakende M¸˛teri');
   const [paymentMode, setPaymentMode] = useState<'cash' | 'card' | 'transfer' | 'account' | null>(null);
   const [installmentCount, setInstallmentCount] = useState(1);
   const [selectedKasa, setSelectedKasa] = useState<string | number>('');
@@ -68,7 +69,7 @@ function POSContent() {
   const [activePriceListId, setActivePriceListId] = useState<string | null>(null);
   const [activePriceListName, setActivePriceListName] = useState<string | null>(null);
   const [priceMap, setPriceMap] = useState<Record<string, number>>({});
-  const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
+  const { theme } = useTheme();
 
   const getPrice = useCallback((product: any) => {
     if (priceMap[product.id] !== undefined) return priceMap[product.id];
@@ -79,7 +80,7 @@ function POSContent() {
 
   // CSS Fix & Theme Sync
   useEffect(() => {
-    if (posTheme === 'light') {
+    if (theme === 'light') {
       document.body.style.background = '#F7F9FB'; // Updated to specific SaaS neutral bg
       document.body.style.color = '#0F172A';
     } else {
@@ -93,7 +94,7 @@ function POSContent() {
       document.body.style.background = 'var(--bg-deep)';
       document.body.style.color = 'var(--text-main)';
     };
-  }, [posTheme]);
+  }, [theme]);
 
   // Fetch Insights
   useEffect(() => {
@@ -111,12 +112,12 @@ function POSContent() {
   // Handle POS Theme persistence
   useEffect(() => {
     const savedTheme = localStorage.getItem('pos-theme') as 'dark' | 'light';
-    if (savedTheme) setPosTheme(savedTheme);
+    if (savedTheme) settheme(savedTheme);
   }, []);
 
-  const togglePosTheme = () => {
-    const newTheme = posTheme === 'dark' ? 'light' : 'dark';
-    setPosTheme(newTheme);
+  const toggletheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    settheme(newTheme);
     localStorage.setItem('pos-theme', newTheme);
   };
 
@@ -130,7 +131,7 @@ function POSContent() {
     const filtered = (kasalar || []).filter(k =>
       (!k.branch || k.branch === 'Global' || k.branch === activeBranchName) &&
       ((paymentMode === 'cash' && k.type === 'Nakit') ||
-        (paymentMode === 'card' && (k.type === 'Kredi Kartƒ±' || k.type?.includes('POS'))) ||
+        (paymentMode === 'card' && (k.type === 'Kredi Kart˝' || k.type?.includes('POS'))) ||
         (paymentMode === 'transfer' && (k.type === 'Banka' || k.type === 'Havale')))
     );
 
@@ -165,7 +166,7 @@ function POSContent() {
               const newPriceMap = pData.data.priceMap || {};
               setPriceMap(newPriceMap);
 
-              // üîÑ BUG FIX: Update existing cart items with new prices
+              // ?? BUG FIX: Update existing cart items with new prices
               setCart(prevCart => prevCart.map(item => {
                 if (newPriceMap[item.id] !== undefined) {
                   return { ...item, price: newPriceMap[item.id] };
@@ -222,7 +223,7 @@ function POSContent() {
     const prod = products.find(p => p.barcode === searchInput || p.code === searchInput);
     if (prod) addToCart(prod);
     else if (filteredProducts.length === 1) addToCart(filteredProducts[0]);
-    else showWarning("Bulunamadƒ±", "√úr√ºn bulunamadƒ±");
+    else showWarning("Bulunamad˝", "‹r¸n bulunamad˝");
   };
 
   // Calculations
@@ -258,9 +259,9 @@ function POSContent() {
   // --- HANDLERS ---
   const handleFinalize = async () => {
     if (cart.length === 0 || processingRef.current || isProcessing) return;
-    if (!paymentMode) return showWarning("Hata", "L√ºtfen bir √∂deme y√∂ntemi se√ßiniz.");
-    if (paymentMode !== 'account' && !selectedKasa) return showWarning("Hata", "L√ºtfen kasa/banka se√ßiniz.");
-    if (paymentMode === 'account' && selectedCustomer === 'Perakende M√º≈üteri') return showWarning("Hata", "Perakende m√º≈üterisine veresiye satƒ±lamaz.");
+    if (!paymentMode) return showWarning("Hata", "L¸tfen bir ˆdeme yˆntemi seÁiniz.");
+    if (paymentMode !== 'account' && !selectedKasa) return showWarning("Hata", "L¸tfen kasa/banka seÁiniz.");
+    if (paymentMode === 'account' && selectedCustomer === 'Perakende M¸˛teri') return showWarning("Hata", "Perakende m¸˛terisine veresiye sat˝lamaz.");
 
     const canContinue = await checkUpsell('INVOICE_PAGE');
     if (!canContinue) return;
@@ -283,18 +284,18 @@ function POSContent() {
         installments: installmentCount > 1 ? installmentCount : undefined
       });
       if (success) {
-        showSuccess("Ba≈üarƒ±lƒ±", "Satƒ±≈ü tamamlandƒ±");
+        showSuccess("Ba˛ar˝l˝", "Sat˝˛ tamamland˝");
         setCart([]); setPaymentMode(null); setPointsToUse(0); setValidCoupon(null); setDiscountValue(0); setReferenceCode('');
 
         // Redirect to Customer Detail Page if not retail
-        if (selectedCustomer !== 'Perakende M√º≈üteri' && customer?.id) {
+        if (selectedCustomer !== 'Perakende M¸˛teri' && customer?.id) {
           router.push(`/customers/${customer.id}`);
         } else {
           // Reset to Retail if anonymous
-          setSelectedCustomer('Perakende M√º≈üteri');
+          setSelectedCustomer('Perakende M¸˛teri');
         }
       } else {
-        showError("Hata", "Satƒ±≈ü kaydedilemedi.");
+        showError("Hata", "Sat˝˛ kaydedilemedi.");
       }
     } catch (e: any) { showError("Hata", e.message); }
     finally {
@@ -308,41 +309,41 @@ function POSContent() {
     try {
       const res = await fetch(`/api/coupons?code=${couponCode}`);
       const coupon = await res.json();
-      if (!coupon || coupon.error) return showError('Hata', 'Ge√ßersiz kupon.');
+      if (!coupon || coupon.error) return showError('Hata', 'GeÁersiz kupon.');
       setValidCoupon(coupon);
-      showSuccess('Ba≈üarƒ±lƒ±', 'Kupon ba≈üarƒ±yla uygulandƒ±!');
-    } catch (e) { showError('Hata', 'Kupon hatasƒ±.'); }
+      showSuccess('Ba˛ar˝l˝', 'Kupon ba˛ar˝yla uyguland˝!');
+    } catch (e) { showError('Hata', 'Kupon hatas˝.'); }
   };
 
   const handleApplyReference = () => {
     if (!referenceCode) return;
     const referrer = customers.find(c => c.referralCode?.toUpperCase() === referenceCode.toUpperCase());
     if (referrer) {
-      showSuccess("Ge√ßerli", `${referrer.name} referansƒ± uygulandƒ±!`);
+      showSuccess("GeÁerli", `${referrer.name} referans˝ uyguland˝!`);
       if (referralSettings?.refereeGift > 0) {
         setDiscountType('amount');
         setDiscountValue(referralSettings.refereeGift);
       }
-    } else showError("Hata", "Ge√ßersiz kod.");
+    } else showError("Hata", "GeÁersiz kod.");
   };
 
   const handleSuspend = () => {
     if (!suspenseLabel) return showWarning("Hata", "Bir etiket (isim) giriniz.");
     suspendSale(suspenseLabel, cart.map(i => ({ product: i, qty: i.qty })), customer, finalTotal);
     setCart([]); setSuspenseLabel(''); setShowSuspendModal(false);
-    showSuccess("Ba≈üarƒ±lƒ±", "Satƒ±≈ü askƒ±ya alƒ±ndƒ±");
+    showSuccess("Ba˛ar˝l˝", "Sat˝˛ ask˝ya al˝nd˝");
   };
 
   const handleResume = (sale: any) => {
     setCart(sale.items.map((i: any) => ({ ...i.product, qty: i.qty })));
-    setSelectedCustomer(sale.customer?.name || 'Perakende M√º≈üteri');
+    setSelectedCustomer(sale.customer?.name || 'Perakende M¸˛teri');
     removeSuspendedSale(sale.id);
     setShowResumptionModal(false);
   };
 
 
   return (
-    <div data-pos-theme={posTheme} className="flex flex-mobile-col w-full min-h-screen gap-4 p-4 text-pos bg-pos transition-colors duration-300">
+    <div data-pos-theme={theme} className="flex flex-mobile-col w-full min-h-screen gap-4 p-4 text-pos bg-pos transition-colors duration-300">
 
       {/* LEFT MAIN AREA */}
       <div className="flex-1 flex flex-col gap-4 min-w-0">
@@ -351,44 +352,37 @@ function POSContent() {
         <div className="space-y-4">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-black mb-1 flex items-center gap-2">Ho≈ü geldin, <span className={posTheme === 'light' ? "text-primary" : "text-primary"}>{currentUser?.name?.split(' ')[0]}</span></h2>
-              <p className="text-xs opacity-50">Sistemdeki genel durumun ve sana √∂zel ipu√ßlarƒ± a≈üaƒüƒ±da.</p>
+              <h2 className="text-2xl font-black mb-1 flex items-center gap-2">Ho˛ geldin, <span className={theme === 'light' ? "text-primary" : "text-primary"}>{currentUser?.name?.split(' ')[0]}</span></h2>
+              <p className="text-xs opacity-50">Sistemdeki genel durumun ve sana ˆzel ipuÁlar˝ a˛a˝da.</p>
             </div>
             <div className="flex items-center gap-3">
               <NotificationCenter />
-              <button
-                onClick={togglePosTheme}
-                className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all shadow-pos flex items-center justify-center"
-                title={posTheme === 'dark' ? 'Aydƒ±nlƒ±k Mod' : 'Karanlƒ±k Mod'}
-              >
-                {posTheme === 'dark' ? <Sun size={24} className="text-amber-400" /> : <Moon size={24} className="text-primary" />}
-              </button>
             </div>
           </div>
         </div>
 
         {/* ROW 2: CHARTS & NOTIFICATIONS */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full md:h-auto">
-          <div className={posTheme === 'light' ? "lg:col-span-6 card min-h-[160px]" : "lg:col-span-6 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
+          <div className={theme === 'light' ? "lg:col-span-6 card min-h-[160px]" : "lg:col-span-6 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2"><TrendingUp size={18} className="text-primary" /><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Haftalƒ±k Satƒ±≈ü Trendi</span></div>
+              <div className="flex items-center gap-2"><TrendingUp size={18} className="text-primary" /><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Haftal˝k Sat˝˛ Trendi</span></div>
             </div>
             {insightsData?.stats?.weeklyTrend ? (
-              <ResponsiveContainer width="100%" aspect={2.8}><AreaChart data={insightsData.stats.weeklyTrend}><Area type="monotone" dataKey="value" stroke={posTheme === 'light' ? "#247BFE" : "#FF5500"} fill={posTheme === 'light' ? "url(#colorBlue)" : "#FF5500"} fillOpacity={0.1} strokeWidth={2} /><defs><linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#247BFE" stopOpacity={0.3} /><stop offset="95%" stopColor="#247BFE" stopOpacity={0} /></linearGradient></defs></AreaChart></ResponsiveContainer>
-            ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri y√ºkleniyor...</div>}
+              <ResponsiveContainer width="100%" aspect={2.8}><AreaChart data={insightsData.stats.weeklyTrend}><Area type="monotone" dataKey="value" stroke={theme === 'light' ? "#247BFE" : "#FF5500"} fill={theme === 'light' ? "url(#colorBlue)" : "#FF5500"} fillOpacity={0.1} strokeWidth={2} /><defs><linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#247BFE" stopOpacity={0.3} /><stop offset="95%" stopColor="#247BFE" stopOpacity={0} /></linearGradient></defs></AreaChart></ResponsiveContainer>
+            ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri y¸kleniyor...</div>}
           </div>
 
-          <div className={posTheme === 'light' ? "lg:col-span-3 card min-h-[160px]" : "lg:col-span-3 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
+          <div className={theme === 'light' ? "lg:col-span-3 card min-h-[160px]" : "lg:col-span-3 bg-[#0f111a] border border-white/5 rounded-2xl p-4 shadow-2xl min-h-[160px]"}>
             <div className="flex items-center gap-2 mb-4"><PieChart size={18} className="text-primary-purple" /><span className="text-[10px] font-bold tracking-wider opacity-60 uppercase">Kategori Analizi</span></div>
             {insightsData?.stats?.categoryAnalysis ? (
-              <ResponsiveContainer width="100%" height={100}><RePieChart><Pie data={insightsData.stats.categoryAnalysis} innerRadius={25} outerRadius={35} dataKey="value"><Cell fill={posTheme === 'light' ? "#6260FE" : "#FF5500"} /></Pie></RePieChart></ResponsiveContainer>
-            ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri y√ºkleniyor...</div>}
+              <ResponsiveContainer width="100%" height={100}><RePieChart><Pie data={insightsData.stats.categoryAnalysis} innerRadius={25} outerRadius={35} dataKey="value"><Cell fill={theme === 'light' ? "#6260FE" : "#FF5500"} /></Pie></RePieChart></ResponsiveContainer>
+            ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri y¸kleniyor...</div>}
           </div>
 
-          <div className={posTheme === 'light' ? "lg:col-span-3 card flex flex-col justify-center relative cursor-pointer" : "lg:col-span-3 bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/30 rounded-2xl p-4 shadow-lg min-h-[160px] relative cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-center"}>
-            <div className={posTheme === 'light' ? "w-4 h-4 rounded-full bg-emerald-500 mb-4" : "hidden"}></div>
-            <div className={posTheme === 'light' ? "text-4xl font-black text-pos leading-none" : "text-4xl font-black text-amber-500"}>{stats.criticalStock + stats.inTransit}</div>
-            <div className={posTheme === 'light' ? "text-xs font-medium text-muted-pos mt-2" : "text-[10px] opacity-60 mt-2"}>Kritik Stok & Bekleyen</div>
+          <div className={theme === 'light' ? "lg:col-span-3 card flex flex-col justify-center relative cursor-pointer" : "lg:col-span-3 bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/30 rounded-2xl p-4 shadow-lg min-h-[160px] relative cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-center"}>
+            <div className={theme === 'light' ? "w-4 h-4 rounded-full bg-emerald-500 mb-4" : "hidden"}></div>
+            <div className={theme === 'light' ? "text-4xl font-black text-pos leading-none" : "text-4xl font-black text-amber-500"}>{stats.criticalStock + stats.inTransit}</div>
+            <div className={theme === 'light' ? "text-xs font-medium text-muted-pos mt-2" : "text-[10px] opacity-60 mt-2"}>Kritik Stok & Bekleyen</div>
           </div>
         </div>
 
@@ -396,22 +390,22 @@ function POSContent() {
 
         {/* ROW 4: SEARCH + ACTIONS */}
         <div className="flex flex-wrap gap-4">
-          <form onSubmit={handleSearchSubmit} className={posTheme === 'light' ? "flex-1 flex gap-2 card !p-2 !rounded-xl relative items-center min-w-[300px] overflow-hidden" : "flex-1 flex gap-2 bg-white/5 p-1.5 rounded-xl border border-white/5 relative items-center min-w-[300px]"}>
+          <form onSubmit={handleSearchSubmit} className={theme === 'light' ? "flex-1 flex gap-2 card !p-2 !rounded-xl relative items-center min-w-[300px] overflow-hidden" : "flex-1 flex gap-2 bg-white/5 p-1.5 rounded-xl border border-white/5 relative items-center min-w-[300px]"}>
             <Search size={18} className="ml-3 text-muted-pos shrink-0" />
             <input
-              ref={inputRef} type="text" placeholder="Barkod, √ºr√ºn adƒ± veya kod..."
+              ref={inputRef} type="text" placeholder="Barkod, ¸r¸n ad˝ veya kod..."
               value={searchInput} onChange={e => setSearchInput(e.target.value)}
-              className={posTheme === 'light' ? "flex-1 bg-transparent border-none px-2 text-sm text-pos focus:outline-none placeholder:text-muted-pos/50" : "flex-1 bg-transparent border-none px-4 text-sm text-antigravity focus:outline-none"}
+              className={theme === 'light' ? "flex-1 bg-transparent border-none px-2 text-sm text-pos focus:outline-none placeholder:text-muted-pos/50" : "flex-1 bg-transparent border-none px-4 text-sm text-antigravity focus:outline-none"}
             />
-            <button type="submit" className={posTheme === 'light' ? "bg-primary hover:opacity-90 text-white px-6 py-2.5 rounded-lg text-xs font-bold transition-all shadow-md mr-1" : "bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-xs font-bold transition-colors"}>EKLE</button>
+            <button type="submit" className={theme === 'light' ? "bg-primary hover:opacity-90 text-white px-6 py-2.5 rounded-lg text-xs font-bold transition-all shadow-md mr-1" : "bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-xs font-bold transition-colors"}>EKLE</button>
 
             {/* DYNAMIC PRODUCT LIST */}
             {filteredProducts.length > 0 && (
-              <div className={posTheme === 'light' ? "absolute top-full left-0 right-0 mt-2 bg-white border border-border-pos rounded-xl overflow-hidden shadow-pos z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[300px] overflow-y-auto" : "absolute top-full left-0 right-0 mt-2 bg-[#0f111a] border border-white/5 rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[300px] overflow-y-auto"}>
+              <div className={theme === 'light' ? "absolute top-full left-0 right-0 mt-2 bg-white border border-border-pos rounded-xl overflow-hidden shadow-pos z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[300px] overflow-y-auto" : "absolute top-full left-0 right-0 mt-2 bg-[#0f111a] border border-white/5 rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[300px] overflow-y-auto"}>
                 {filteredProducts.map(p => (
                   <div key={p.id} onClick={() => addToCart(p)} className="p-3 border-b border-white/5 flex justify-between hover:bg-white/10 cursor-pointer">
                     <div><div className="font-bold text-sm">{p.name}</div><div className="text-[10px] opacity-50">{p.barcode}</div></div>
-                    <div className="font-bold text-primary">‚Ç∫{Number(getPrice(p)).toLocaleString()}</div>
+                    <div className="font-bold text-primary">?{Number(getPrice(p)).toLocaleString()}</div>
                   </div>
                 ))}
               </div>
@@ -428,37 +422,37 @@ function POSContent() {
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2 flex items-center gap-3 min-w-[120px]">
             <Bell size={20} className="text-red-500" />
             <div className="flex flex-col">
-              <div className="text-[9px] font-bold text-red-500 opacity-80 leading-none mb-1">KRƒ∞Tƒ∞K</div>
+              <div className="text-[9px] font-bold text-red-500 opacity-80 leading-none mb-1">KR›T›K</div>
               <div className="text-xl font-black text-red-500 leading-none">{stats.criticalStock}</div>
             </div>
           </div>
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl px-4 py-2 flex items-center gap-3 min-w-[120px]">
             <Landmark size={20} className="text-blue-500" />
             <div className="flex flex-col">
-              <div className="text-[9px] font-bold text-blue-500 opacity-80 leading-none mb-1">YOLDAKƒ∞</div>
+              <div className="text-[9px] font-bold text-blue-500 opacity-80 leading-none mb-1">YOLDAK›</div>
               <div className="text-xl font-black text-blue-500 leading-none">{stats.inTransit}</div>
             </div>
           </div>
         </div>
 
         {/* CART */}
-        <div className={posTheme === 'light' ? "flex-1 card overflow-y-auto min-h-[300px]" : "flex-1 bg-[#0f111a] rounded-xl border border-white/5 p-2 overflow-y-auto min-h-[300px] shadow-2xl"}>
+        <div className={theme === 'light' ? "flex-1 card overflow-y-auto min-h-[300px]" : "flex-1 bg-[#0f111a] rounded-xl border border-white/5 p-2 overflow-y-auto min-h-[300px] shadow-2xl"}>
           {cart.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center opacity-20"><ShoppingCart size={64} className="mb-4 text-primary" /><span className="text-sm font-bold">Sepet Bo≈ü</span></div>
+            <div className="h-full flex flex-col items-center justify-center opacity-20"><ShoppingCart size={64} className="mb-4 text-primary" /><span className="text-sm font-bold">Sepet Bo˛</span></div>
           ) : (
             <div className="space-y-3">
               {cart.map((item, idx) => (
-                <div key={idx} className={posTheme === 'light' ? "flex items-center gap-4 bg-white p-4 rounded-xl border border-border-pos shadow-sm hover:shadow-md transition-all group" : "flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5"}>
+                <div key={idx} className={theme === 'light' ? "flex items-center gap-4 bg-white p-4 rounded-xl border border-border-pos shadow-sm hover:shadow-md transition-all group" : "flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5"}>
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-sm truncate">{item.name}</div>
                     <div className="text-[10px] opacity-40">{item.barcode}</div>
                   </div>
-                  <div className={posTheme === 'light' ? "flex items-center gap-2 bg-gray-50 rounded-xl p-1.5" : "flex items-center gap-2 bg-black/20 rounded-lg p-1"}>
+                  <div className={theme === 'light' ? "flex items-center gap-2 bg-gray-50 rounded-xl p-1.5" : "flex items-center gap-2 bg-black/20 rounded-lg p-1"}>
                     <button onClick={() => setCart(c => c.map((x, i) => i === idx ? { ...x, qty: Math.max(1, x.qty - 1) } : x))} className="w-7 h-7 hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center"><Minus size={14} /></button>
                     <span className="w-6 text-center font-bold text-sm">{item.qty}</span>
                     <button onClick={() => setCart(c => c.map((x, i) => i === idx ? { ...x, qty: x.qty + 1 } : x))} className="w-7 h-7 hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center"><Plus size={14} /></button>
                   </div>
-                  <div className="font-bold text-primary min-w-[100px] text-right text-lg">‚Ç∫{(item.price * item.qty).toLocaleString()}</div>
+                  <div className="font-bold text-primary min-w-[100px] text-right text-lg">?{(item.price * item.qty).toLocaleString()}</div>
                   <button onClick={() => setCart(c => c.filter((_, i) => i !== idx))} className="text-gray-400 hover:text-red-500 hover:bg-red-50 w-8 h-8 rounded-lg flex items-center justify-center transition-all"><X size={18} /></button>
                 </div>
               ))}
@@ -468,54 +462,54 @@ function POSContent() {
 
         {/* ROW 5: INSIGHTS & FORECAST (Moved below cart) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className={posTheme === 'light' ? "card flex items-center gap-4 relative overflow-hidden group transition-all" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group hover:border-white/10 transition-all cursor-pointer"}>
+          <div className={theme === 'light' ? "card flex items-center gap-4 relative overflow-hidden group transition-all" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group hover:border-white/10 transition-all cursor-pointer"}>
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><FileText size={24} /></div>
             <div>
-              <div className="font-bold text-sm mb-1">E-Fatura'ya Ge√ßin</div>
-              <div className="text-[10px] opacity-60 leading-relaxed">Hen√ºz resmi fatura kesmediniz. Entegrasyonu tamamlayƒ±n.</div>
-              <div className="text-[10px] text-primary font-bold mt-2 group-hover:underline">Entegrasyonu Tamamla ‚ûî</div>
+              <div className="font-bold text-sm mb-1">E-Fatura'ya GeÁin</div>
+              <div className="text-[10px] opacity-60 leading-relaxed">Hen¸z resmi fatura kesmediniz. Entegrasyonu tamamlay˝n.</div>
+              <div className="text-[10px] text-primary font-bold mt-2 group-hover:underline">Entegrasyonu Tamamla ?</div>
             </div>
           </div>
-          <div className={posTheme === 'light' ? "card flex items-center gap-4 relative overflow-hidden" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden"}>
+          <div className={theme === 'light' ? "card flex items-center gap-4 relative overflow-hidden" : "bg-[#0f111a] border border-white/5 p-4 rounded-xl flex items-center gap-4 relative overflow-hidden"}>
             <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500"><Lightbulb size={24} /></div>
             <div>
               <div className="font-bold text-sm mb-1">Verimlilik Saati</div>
-              <div className="text-[10px] opacity-60 leading-relaxed">ƒ∞statistiklerinize g√∂re en verimli saatiniz √∂ƒüleden √∂nce 10:00.</div>
+              <div className="text-[10px] opacity-60 leading-relaxed">›statistiklerinize gˆre en verimli saatiniz ˆleden ˆnce 10:00.</div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className={posTheme === 'light' ? "card flex justify-between items-center relative overflow-hidden" : "bg-gradient-to-br from-indigo-900 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden"}>
-            <div><div className={posTheme === 'light' ? "text-[10px] font-bold text-primary-purple mb-1 uppercase tracking-wider" : "text-[10px] font-bold text-indigo-400 mb-1 uppercase"}>GELECEK HAFTA</div><div className="text-2xl font-black">‚Ç∫{insightsData?.stats?.forecast?.nextWeekRevenue?.toLocaleString() || '0'}</div></div>
-            <div className="text-right"><div className="text-[10px] opacity-50">G√ºven Skoru</div><div className={posTheme === 'light' ? "text-xs font-bold text-pos" : "text-xs font-bold text-white"}>%{insightsData?.stats?.forecast?.confidence || 0}</div></div>
+          <div className={theme === 'light' ? "card flex justify-between items-center relative overflow-hidden" : "bg-gradient-to-br from-indigo-900 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden"}>
+            <div><div className={theme === 'light' ? "text-[10px] font-bold text-primary-purple mb-1 uppercase tracking-wider" : "text-[10px] font-bold text-indigo-400 mb-1 uppercase"}>GELECEK HAFTA</div><div className="text-2xl font-black">?{insightsData?.stats?.forecast?.nextWeekRevenue?.toLocaleString() || '0'}</div></div>
+            <div className="text-right"><div className="text-[10px] opacity-50">G¸ven Skoru</div><div className={theme === 'light' ? "text-xs font-bold text-pos" : "text-xs font-bold text-white"}>%{insightsData?.stats?.forecast?.confidence || 0}</div></div>
           </div>
 
-          <div className={posTheme === 'light' ? "card flex justify-between items-center relative overflow-hidden" : "bg-gradient-to-br from-emerald-900 to-slate-900 border border-emerald-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden"}>
-            <div><div className={posTheme === 'light' ? "text-[10px] font-bold text-teal mb-1 uppercase tracking-wider" : "text-[10px] font-bold text-emerald-400 mb-1 uppercase"}>B√úY√úME HIZI</div><div className="text-2xl font-black">%{insightsData?.stats?.docGrowth || 0}</div></div>
-            <div className="text-right"><div className="text-[10px] opacity-50">Fatura Artƒ±≈üƒ±</div><div className={posTheme === 'light' ? "text-xs font-bold text-pos" : "text-xs font-bold text-white"}>{insightsData?.stats?.thisMonthDocs || 0} Adet</div></div>
+          <div className={theme === 'light' ? "card flex justify-between items-center relative overflow-hidden" : "bg-gradient-to-br from-emerald-900 to-slate-900 border border-emerald-500/30 p-4 rounded-xl flex justify-between items-center relative overflow-hidden"}>
+            <div><div className={theme === 'light' ? "text-[10px] font-bold text-teal mb-1 uppercase tracking-wider" : "text-[10px] font-bold text-emerald-400 mb-1 uppercase"}>B‹Y‹ME HIZI</div><div className="text-2xl font-black">%{insightsData?.stats?.docGrowth || 0}</div></div>
+            <div className="text-right"><div className="text-[10px] opacity-50">Fatura Art˝˛˝</div><div className={theme === 'light' ? "text-xs font-bold text-pos" : "text-xs font-bold text-white"}>{insightsData?.stats?.thisMonthDocs || 0} Adet</div></div>
           </div>
         </div>
       </div>
 
       {/* RIGHT PANEL (Payment) */}
-      <div className={posTheme === 'light' ? "w-[380px] card flex flex-col sticky top-4 h-[calc(100vh-2rem)] !p-6 overflow-hidden" : "w-[380px] bg-[#0f111a] border border-white/5 rounded-2xl p-6 flex flex-col shadow-2xl sticky top-4 h-[calc(100vh-2rem)] overflow-hidden"}>
-        <h2 className="text-xs font-bold opacity-50 mb-6 tracking-widest text-center shrink-0">SATI≈û √ñZETƒ∞</h2>
+      <div className={theme === 'light' ? "w-[380px] card flex flex-col sticky top-4 h-[calc(100vh-2rem)] !p-6 overflow-hidden" : "w-[380px] bg-[#0f111a] border border-white/5 rounded-2xl p-6 flex flex-col shadow-2xl sticky top-4 h-[calc(100vh-2rem)] overflow-hidden"}>
+        <h2 className="text-xs font-bold opacity-50 mb-6 tracking-widest text-center shrink-0">SATIﬁ ÷ZET›</h2>
 
         {/* Scrollable Middle Section (Scrollbar hidden) */}
         <div className="flex-1 overflow-y-auto pr-0 space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {/* Customer */}
           <div className="mb-4">
-            <label className="text-[10px] font-bold opacity-50 block mb-3 uppercase tracking-wider">M√º≈üteri Bilgileri</label>
-            <div onClick={() => setIsCustomerModalOpen(true)} className={posTheme === 'light' ? "flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-border-pos cursor-pointer hover:bg-gray-100 transition-all shadow-sm" : "flex justify-between items-center bg-black/20 p-3 rounded-lg border border-white/5 cursor-pointer hover:border-white/20 transition-all"}>
+            <label className="text-[10px] font-bold opacity-50 block mb-3 uppercase tracking-wider">M¸˛teri Bilgileri</label>
+            <div onClick={() => setIsCustomerModalOpen(true)} className={theme === 'light' ? "flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-border-pos cursor-pointer hover:bg-gray-100 transition-all shadow-sm" : "flex justify-between items-center bg-black/20 p-3 rounded-lg border border-white/5 cursor-pointer hover:border-white/20 transition-all"}>
               <div className="flex items-center gap-3">
-                <div className={posTheme === 'light' ? "w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs text-white shadow-sm" : "w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px]"}>{selectedCustomer.charAt(0)}</div>
+                <div className={theme === 'light' ? "w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs text-white shadow-sm" : "w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px]"}>{selectedCustomer.charAt(0)}</div>
                 <span className="font-bold text-sm truncate max-w-[200px]">{selectedCustomer}</span>
               </div>
               <div className="flex flex-col items-end">
-                <div className="text-[10px] text-primary font-bold tracking-tighter">DEƒûƒ∞≈ûTƒ∞R ‚ñæ</div>
+                <div className="text-[10px] text-primary font-bold tracking-tighter">DE–›ﬁT›R ?</div>
                 {activePriceListName && (
-                  <div className={posTheme === 'light' ? "text-[8px] text-primary font-bold mt-1 bg-white px-2 py-0.5 rounded-full border border-primary/20 uppercase" : "text-[8px] opacity-70 mt-0.5 bg-primary/10 px-1 rounded border border-primary/20 uppercase"}>
+                  <div className={theme === 'light' ? "text-[8px] text-primary font-bold mt-1 bg-white px-2 py-0.5 rounded-full border border-primary/20 uppercase" : "text-[8px] opacity-70 mt-0.5 bg-primary/10 px-1 rounded border border-primary/20 uppercase"}>
                     {activePriceListName}
                   </div>
                 )}
@@ -532,7 +526,7 @@ function POSContent() {
             <div className="space-y-2 bg-black/20 p-2 rounded-lg animate-in slide-in-from-top-2">
               <div className="flex gap-1">
                 <input placeholder="Kupon Kodu" value={couponCode} onChange={e => setCouponCode(e.target.value)} className="flex-1 bg-white/5 rounded px-2 text-xs h-8" />
-                <button onClick={handleValidateCoupon} className="bg-white/10 px-2 text-[10px] rounded">DOƒûRULA</button>
+                <button onClick={handleValidateCoupon} className="bg-white/10 px-2 text-[10px] rounded">DO–RULA</button>
               </div>
               <div className="flex gap-1">
                 <input placeholder="Referans" value={referenceCode} onChange={e => setReferenceCode(e.target.value)} className="flex-1 bg-white/5 rounded px-2 text-xs h-8" />
@@ -544,10 +538,10 @@ function POSContent() {
           {/* Manual Discount & Points */}
           <div className="grid grid-cols-2 gap-2 mt-4">
             <div>
-              <label className="text-[9px] font-bold opacity-50 block mb-1">ƒ∞NDƒ∞Rƒ∞M</label>
+              <label className="text-[9px] font-bold opacity-50 block mb-1">›ND›R›M</label>
               <div className="flex bg-black/20 rounded border border-white/5 overflow-hidden">
                 <input type="number" value={discountValue} onChange={e => setDiscountValue(Number(e.target.value))} className="w-full bg-transparent border-none text-right px-2 text-xs h-8" />
-                <button onClick={() => setDiscountType(t => t === 'percent' ? 'amount' : 'percent')} className="bg-primary px-2 text-[10px] font-bold">{discountType === 'percent' ? '%' : '‚Ç∫'}</button>
+                <button onClick={() => setDiscountType(t => t === 'percent' ? 'amount' : 'percent')} className="bg-primary px-2 text-[10px] font-bold">{discountType === 'percent' ? '%' : '?'}</button>
               </div>
             </div>
             <div>
@@ -558,25 +552,25 @@ function POSContent() {
 
           {/* Totals */}
           <div className="space-y-2 border-t border-white/10 pt-4 mt-4">
-            <div className="flex justify-between text-xs opacity-60"><span>Ara Toplam</span><span>‚Ç∫{subtotal.toLocaleString()}</span></div>
-            {totalDiscount > 0 && <div className="flex justify-between text-xs text-green-400"><span>ƒ∞ndirim</span><span>-‚Ç∫{totalDiscount.toLocaleString()}</span></div>}
-            <div className="flex justify-between text-xs opacity-40"><span>KDV Hari√ß</span><span>‚Ç∫{vatExcludedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+            <div className="flex justify-between text-xs opacity-60"><span>Ara Toplam</span><span>?{subtotal.toLocaleString()}</span></div>
+            {totalDiscount > 0 && <div className="flex justify-between text-xs text-green-400"><span>›ndirim</span><span>-?{totalDiscount.toLocaleString()}</span></div>}
+            <div className="flex justify-between text-xs opacity-40"><span>KDV HariÁ</span><span>?{vatExcludedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
             <div className="flex justify-between items-end pt-2">
               <span className="font-bold text-sm">TOPLAM</span>
-              <span className="text-3xl font-black text-primary">‚Ç∫{finalTotal.toLocaleString()}</span>
+              <span className="text-3xl font-black text-primary">?{finalTotal.toLocaleString()}</span>
             </div>
           </div>
 
           {/* Payment Methods */}
           <div className="pt-4 border-t border-white/10 mt-4 overflow-hidden">
             <div className="flex justify-between items-center text-[10px] font-bold opacity-50 mb-2">
-              <span>√ñDEME Y√ñNTEMƒ∞</span>
+              <span>÷DEME Y÷NTEM›</span>
               {paymentMode && paymentMode !== 'account' && (
                 <select value={selectedKasa} onChange={e => setSelectedKasa(e.target.value)} className="bg-transparent border-none text-right text-[10px] text-primary focus:outline-none max-w-[150px] truncate">
-                  <option value="" className="bg-black">Kasa Se√ßin</option>
+                  <option value="" className="bg-black">Kasa SeÁin</option>
                   {kasalar?.filter(k =>
                     (paymentMode === 'cash' && k.type === 'Nakit') ||
-                    (paymentMode === 'card' && (k.type === 'Kredi Kartƒ±' || k.type.includes('POS'))) ||
+                    (paymentMode === 'card' && (k.type === 'Kredi Kart˝' || k.type.includes('POS'))) ||
                     (paymentMode === 'transfer' && (k.type === 'Banka' || k.type === 'Havale'))
                   ).map(k => (
                     <option key={k.id} value={k.id} className="bg-black">{k.name} ({k.currency || 'TL'})</option>
@@ -586,13 +580,13 @@ function POSContent() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {[{ id: 'cash', l: 'Nakit', i: <Banknote size={24} /> }, { id: 'card', l: 'Kredi Kartƒ±', i: <CreditCard size={24} /> }, { id: 'transfer', l: 'Havale/EFT', i: <Landmark size={24} /> }, { id: 'account', l: 'VERESƒ∞YE', i: <BookOpen size={24} /> }].map(m => (
+              {[{ id: 'cash', l: 'Nakit', i: <Banknote size={24} /> }, { id: 'card', l: 'Kredi Kart˝', i: <CreditCard size={24} /> }, { id: 'transfer', l: 'Havale/EFT', i: <Landmark size={24} /> }, { id: 'account', l: 'VERES›YE', i: <BookOpen size={24} /> }].map(m => (
                 <button
                   key={m.id}
                   onClick={() => setPaymentMode(m.id as any)}
                   className={`p-5 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${paymentMode === m.id
-                    ? (posTheme === 'light' ? 'bg-white border-primary shadow-lg ring-1 ring-primary/20 scale-[1.02] text-primary' : 'bg-white/10 border-primary text-white shadow-lg')
-                    : (posTheme === 'light' ? 'bg-gray-50/50 border-gray-100 hover:bg-white hover:border-gray-200 text-gray-400' : 'bg-black/20 border-white/5 hover:bg-white/5 text-white/50')
+                    ? (theme === 'light' ? 'bg-white border-primary shadow-lg ring-1 ring-primary/20 scale-[1.02] text-primary' : 'bg-white/10 border-primary text-white shadow-lg')
+                    : (theme === 'light' ? 'bg-gray-50/50 border-gray-100 hover:bg-white hover:border-gray-200 text-gray-400' : 'bg-black/20 border-white/5 hover:bg-white/5 text-white/50')
                     }`}
                 >
                   <div className={`transition-transform ${paymentMode === m.id ? 'scale-110' : ''}`}>{m.i}</div>
@@ -603,12 +597,12 @@ function POSContent() {
 
             {paymentMode === 'card' && (
               <div className="mt-4 animate-in slide-in-from-top-2">
-                <label className="text-[9px] font-bold opacity-50 block mb-2">TAKSƒ∞T SE√áENEKLERƒ∞</label>
+                <label className="text-[9px] font-bold opacity-50 block mb-2">TAKS›T SE«ENEKLER›</label>
                 <div className="grid grid-cols-3 gap-2">
                   {/* Dynamic POS Commissions */}
                   {appSettings?.salesExpenses?.posCommissions?.length > 0 ? (
                     appSettings.salesExpenses.posCommissions.map((comm: any, idx: number) => {
-                      const count = comm.installment === 'Tek √áekim' ? 1 : parseInt(comm.installment);
+                      const count = comm.installment === 'Tek «ekim' ? 1 : parseInt(comm.installment);
                       return (
                         <button
                           key={idx}
@@ -646,18 +640,18 @@ function POSContent() {
             onClick={handleFinalize}
             disabled={isProcessing || cart.length === 0}
             className={`w-full py-5 rounded-2xl font-black text-white shadow-xl transition-all duration-300 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed hover:scale-[1.03] active:scale-95 ${cart.length > 0
-              ? (posTheme === 'light' ? 'bg-primary shadow-primary/20' : 'bg-gradient-to-r from-orange-600 to-orange-400 shadow-orange-600/20')
+              ? (theme === 'light' ? 'bg-primary shadow-primary/20' : 'bg-gradient-to-r from-orange-600 to-orange-400 shadow-orange-600/20')
               : 'bg-white/10 border border-white/5 text-white/30'
               }`}
           >
             {isProcessing ? (
               <div className="flex items-center justify-center gap-2">
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                <span>ƒ∞≈ûLENƒ∞YOR...</span>
+                <span>›ﬁLEN›YOR...</span>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-3">
-                <span>√ñDEMEYƒ∞ TAMAMLA</span>
+                <span>÷DEMEY› TAMAMLA</span>
                 <ArrowRight size={22} strokeWidth={3} />
               </div>
             )}
@@ -671,12 +665,12 @@ function POSContent() {
       {/* Customer Modal */}
       {isCustomerModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className={posTheme === 'light' ? "card w-full max-w-lg !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg p-6 shadow-2xl"}>
-            <h3 className="text-xl font-bold mb-4">M√º≈üteri Se√ßimi</h3>
-            <input autoFocus placeholder="M√º≈üteri ara..." value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 mb-4 text-white" />
+          <div className={theme === 'light' ? "card w-full max-w-lg !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg p-6 shadow-2xl"}>
+            <h3 className="text-xl font-bold mb-4">M¸˛teri SeÁimi</h3>
+            <input autoFocus placeholder="M¸˛teri ara..." value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 mb-4 text-white" />
             <div className="max-h-[300px] overflow-y-auto space-y-2">
-              <div onClick={() => { setSelectedCustomer('Perakende M√º≈üteri'); setIsCustomerModalOpen(false); }} className="p-3 bg-white/5 rounded-xl cursor-pointer hover:bg-white/10 border border-white/5">
-                <div className="font-bold text-primary">Perakende M√º≈üteri</div>
+              <div onClick={() => { setSelectedCustomer('Perakende M¸˛teri'); setIsCustomerModalOpen(false); }} className="p-3 bg-white/5 rounded-xl cursor-pointer hover:bg-white/10 border border-white/5">
+                <div className="font-bold text-primary">Perakende M¸˛teri</div>
               </div>
               {filteredCustomers.map(c => (
                 <div key={c.id} onClick={() => { setSelectedCustomer(c.name); setIsCustomerModalOpen(false); }} className="p-3 bg-white/5 rounded-xl cursor-pointer hover:bg-white/10 border border-white/5 flex justify-between items-center">
@@ -693,11 +687,11 @@ function POSContent() {
       {/* Suspend Modal */}
       {showSuspendModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className={posTheme === 'light' ? "card w-full max-w-md !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-md p-6"}>
-            <h3 className="text-xl font-bold mb-4">Satƒ±≈üƒ± Beklemeye Al</h3>
-            <input autoFocus placeholder="Etiket / ƒ∞sim (√ñrn: Masa 5)" value={suspenseLabel} onChange={e => setSuspenseLabel(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 mb-4 text-white" />
+          <div className={theme === 'light' ? "card w-full max-w-md !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-md p-6"}>
+            <h3 className="text-xl font-bold mb-4">Sat˝˛˝ Beklemeye Al</h3>
+            <input autoFocus placeholder="Etiket / ›sim (÷rn: Masa 5)" value={suspenseLabel} onChange={e => setSuspenseLabel(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 mb-4 text-white" />
             <div className="flex gap-2">
-              <button onClick={() => setShowSuspendModal(false)} className="flex-1 bg-white/10 py-3 rounded-xl font-bold">ƒ∞ptal</button>
+              <button onClick={() => setShowSuspendModal(false)} className="flex-1 bg-white/10 py-3 rounded-xl font-bold">›ptal</button>
               <button onClick={handleSuspend} className="flex-1 bg-amber-500 text-black py-3 rounded-xl font-bold">Beklemeye Al</button>
             </div>
           </div>
@@ -707,22 +701,22 @@ function POSContent() {
       {/* Resumption Modal */}
       {showResumptionModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className={posTheme === 'light' ? "card w-full max-w-lg !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg p-6"}>
-            <h3 className="text-xl font-bold mb-4">Bekleyen Satƒ±≈ülar</h3>
+          <div className={theme === 'light' ? "card w-full max-w-lg !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg p-6"}>
+            <h3 className="text-xl font-bold mb-4">Bekleyen Sat˝˛lar</h3>
             {suspendedSales.length === 0 ? (
-              <div className="text-center opacity-50 py-8">Bekleyen satƒ±≈ü yok.</div>
+              <div className="text-center opacity-50 py-8">Bekleyen sat˝˛ yok.</div>
             ) : (
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {suspendedSales.map(sale => (
                   <div key={sale.id} className="p-3 bg-white/5 rounded-xl border border-white/5 flex justify-between items-center">
                     <div>
                       <div className="font-bold text-amber-500">{sale.label}</div>
-                      <div className="text-xs opacity-50">{new Date(sale.timestamp).toLocaleTimeString()} - {sale.items.length} √úr√ºn</div>
+                      <div className="text-xs opacity-50">{new Date(sale.timestamp).toLocaleTimeString()} - {sale.items.length} ‹r¸n</div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="font-bold text-lg">‚Ç∫{sale.total.toLocaleString()}</div>
-                      <button onClick={() => handleResume(sale)} className="bg-primary px-3 py-1 rounded text-xs font-bold ml-2">SE√á</button>
-                      <button onClick={() => removeSuspendedSale(sale.id)} className="bg-red-500/20 text-red-500 px-3 py-1 rounded text-xs font-bold">Sƒ∞L</button>
+                      <div className="font-bold text-lg">?{sale.total.toLocaleString()}</div>
+                      <button onClick={() => handleResume(sale)} className="bg-primary px-3 py-1 rounded text-xs font-bold ml-2">SE«</button>
+                      <button onClick={() => removeSuspendedSale(sale.id)} className="bg-red-500/20 text-red-500 px-3 py-1 rounded text-xs font-bold">S›L</button>
                     </div>
                   </div>
                 ))}
@@ -739,7 +733,7 @@ function POSContent() {
 
 export default function HomeClient() {
   const { isAuthenticated, isLoading } = useAuth();
-  if (isLoading) return <div className="h-screen flex items-center justify-center bg-[var(--bg-deep)] text-white text-2xl">‚è≥</div>;
+  if (isLoading) return <div className="h-screen flex items-center justify-center bg-[var(--bg-deep)] text-white text-2xl">?</div>;
   if (!isAuthenticated) return <LoginPageContent />;
-  return <Suspense fallback={<div>Y√ºkleniyor...</div>}><POSContent /></Suspense>;
+  return <Suspense fallback={<div>Y¸kleniyor...</div>}><POSContent /></Suspense>;
 }

@@ -1045,15 +1045,6 @@ function InventoryContent() {
                             Barkod Tara
                         </button>
 
-                        <button
-                            onClick={toggleTheme}
-                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl border transition-all font-bold text-xs uppercase tracking-wide shadow-sm ${theme === 'light'
-                                ? 'bg-white border-slate-200 text-slate-900 shadow-slate-200/50'
-                                : 'bg-slate-900 border-white/10 text-white shadow-black/50'
-                                }`}
-                        >
-                            <span>{theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}</span>
-                        </button>
                     </div>
                 )}
             </div>

@@ -10,6 +10,7 @@ import { Sun, Moon } from "lucide-react";
 
 import { useSearchParams } from "next/navigation";
 import { useModal } from "@/contexts/ModalContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import AccountingModals from "./components/AccountingModals";
 
 export default function AccountingPage() {
@@ -85,22 +86,10 @@ export default function AccountingPage() {
         }
     };
 
-    const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
-
-    // Theme Sync
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('pos-theme') as 'dark' | 'light';
-        if (savedTheme) setPosTheme(savedTheme);
-    }, []);
-
-    const togglePosTheme = () => {
-        const newTheme = posTheme === 'dark' ? 'light' : 'dark';
-        setPosTheme(newTheme);
-        localStorage.setItem('pos-theme', newTheme);
-    };
+    const { theme } = useTheme();
 
     useEffect(() => {
-        if (posTheme === 'light') {
+        if (theme === 'light') {
             document.body.style.background = '#F7F9FC';
             document.body.style.color = '#1A1F36';
         } else {
@@ -111,7 +100,7 @@ export default function AccountingPage() {
             document.body.style.background = 'var(--bg-deep)';
             document.body.style.color = 'var(--text-main)';
         };
-    }, [posTheme]);
+    }, [theme]);
 
     // Sync activeTab with URL is optional but helpful
     useEffect(() => {
@@ -199,28 +188,21 @@ export default function AccountingPage() {
     ];
 
     return (
-        <div data-pos-theme={posTheme} className="w-full min-h-screen p-6 md:p-8 space-y-8 transition-colors duration-300">
+        <div data-pos-theme={theme} className="w-full min-h-screen p-6 md:p-8 space-y-8 transition-colors duration-300">
             <AccountingModals
                 isOpen={!!modalType}
                 onClose={() => setModalType(null)}
                 type={modalType || ''}
-                posTheme={posTheme}
+                theme={theme}
             />
 
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className={posTheme === 'light' ? "text-3xl font-black text-slate-800 mb-2" : "text-3xl font-bold text-white mb-2"}>Muhasebe & Finans</h1>
-                    <p className={posTheme === 'light' ? "text-slate-500 font-medium" : "text-white/60"}>Nakit akışı, cari hesaplar ve kasa yönetimi</p>
+                    <h1 className={theme === 'light' ? "text-3xl font-black text-slate-800 mb-2" : "text-3xl font-bold text-white mb-2"}>Muhasebe & Finans</h1>
+                    <p className={theme === 'light' ? "text-slate-500 font-medium" : "text-white/60"}>Nakit akışı, cari hesaplar ve kasa yönetimi</p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button
-                        onClick={togglePosTheme}
-                        className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all shadow-pos flex items-center justify-center bg-white/5"
-                        title={posTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}
-                    >
-                        {posTheme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-primary" />}
-                    </button>
                     <button
                         onClick={() => refreshData()}
                         className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-white transition-all active:scale-95"
