@@ -14,6 +14,8 @@ export interface Campaign {
     startDate: string;
     endDate?: string;
     isActive: boolean;
+    targetCustomerCategoryIds?: string[];
+    companyId?: string;
 }
 
 export interface Coupon {
@@ -28,6 +30,8 @@ export interface Coupon {
     expiryDate?: string;
     minPurchaseAmount?: number;
     conditions?: any;
+    campaignName?: string;
+    companyId?: string;
 }
 
 interface SettingsContextType {

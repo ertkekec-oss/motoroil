@@ -3,7 +3,8 @@ import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { sendMail } from '@/lib/mail';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id: ticketId } = await params;
     const session = await getSession();
     if (!session?.tenantId) return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
 
@@ -14,8 +15,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         if (!body) {
             return NextResponse.json({ error: 'Mesaj boş bırakılamaz' }, { status: 400 });
         }
-
-        const ticketId = params.id;
 
         const ticket = await prisma.ticket.findUnique({
             where: { id: ticketId }

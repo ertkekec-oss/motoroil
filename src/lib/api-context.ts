@@ -82,7 +82,7 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
 
     // 1. Önce SaaS kullanıcısı mı diye bak (Tenant bazlı işlemler için)
     // BYPASS TENANT GUARD: Use prismaBase to find user by ID regardless of context
-    let user = await prismaBase.user.findUnique({
+    let user: any = await prismaBase.user.findUnique({
         where: { id: session.id },
         select: { id: true, tenantId: true, role: true, lastActiveAt: true }
     });
@@ -104,7 +104,7 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
                 role: (staff.role || 'Staff').toUpperCase(),
                 lastActiveAt: staff.lastActive,
                 companyId: staff.companyId
-            };
+            } as any;
         }
     }
 

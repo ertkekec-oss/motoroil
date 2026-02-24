@@ -64,6 +64,16 @@ export async function GET(request: Request) {
             })
         ]);
 
+        // Normalize Orders
+        const normalizedOrders = orders.map((o: any) => ({
+            ...o,
+            items: (Array.isArray(o.items) ? o.items : []).map((i: any) => ({
+                name: i.name || i.productName || 'Ürün',
+                qty: i.qty || i.quantity || 1,
+                price: Number(i.price || i.unitPrice || 0)
+            }))
+        }));
+
         // Normalize SalesOrders to match Order structure
         const normalizedSalesOrders = salesOrders.map((so: any) => ({
             id: so.id,
@@ -81,7 +91,7 @@ export async function GET(request: Request) {
             sourceType: 'FIELD_SALE'
         }));
 
-        const combined = [...orders, ...normalizedSalesOrders]
+        const combined = [...normalizedOrders, ...normalizedSalesOrders]
             .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime())
             .slice(0, limit);
 

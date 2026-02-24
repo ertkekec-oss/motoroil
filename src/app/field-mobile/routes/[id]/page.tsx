@@ -301,20 +301,26 @@ export default function MobileRouteDetailPage() {
                                     )}
                                 </div>
 
-                                {!isVisited && !isCurrentVisit && (
+                                {((!isCurrentVisit) && (!activeVisit || !isCurrentVisit)) && (
                                     <div className="space-y-2">
                                         <button
                                             onClick={() => handleCheckIn(stop.id, stop.customer.id)}
                                             disabled={!!activeVisit || actionLoading}
                                             className={`w-full py-3 rounded-lg font-bold text-sm transition-all ${!!activeVisit
                                                 ? 'bg-gray-800 text-gray-500 cursor-not-allowed opacity-50'
-                                                : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
+                                                : isVisited
+                                                    ? 'bg-amber-600/20 border border-amber-500/30 text-amber-400 hover:bg-amber-600/30'
+                                                    : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
                                                 }`}
                                         >
-                                            {!!activeVisit ? 'BAŞKA ZİYARET AKTİF' : 'ZİYARETİ BAŞLAT'}
+                                            {!!activeVisit
+                                                ? 'BAŞKA ZİYARET AKTİF'
+                                                : isVisited
+                                                    ? 'ZİYARETİ TEKRAR BAŞLAT'
+                                                    : 'ZİYARETİ BAŞLAT'}
                                         </button>
 
-                                        {stop.customer?.lat && (
+                                        {(!isVisited || (isVisited)) && stop.customer?.lat && (
                                             <button
                                                 onClick={() => handleRequestLocationUpdate(stop.customer.id)}
                                                 disabled={actionLoading}

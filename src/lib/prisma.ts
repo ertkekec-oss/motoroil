@@ -104,8 +104,8 @@ const prismaClientSingleton = () => {
 
                         // 1. Platform Admin Bypass (Global view)
                         if (isPlatformAdmin && (!impersonateId || (args as any).adminBypass)) {
-                            const newArgs = { ...args };
-                            if ((newArgs as any).adminBypass) delete (newArgs as any).adminBypass;
+                            const newArgs = { ...(args as any) };
+                            if (newArgs.adminBypass) delete newArgs.adminBypass;
                             return query(newArgs);
                         }
 
@@ -118,7 +118,7 @@ const prismaClientSingleton = () => {
                             throw new Error("SECURITY_ERROR: Tenant context missing in session.");
                         }
 
-                        const newArgs = { ...args };
+                        const newArgs = { ...(args as any) };
 
                         // Create operations do NOT take a where clause. 
                         const isNoWhereOp = ['create', 'createMany'].includes(operation);
@@ -160,15 +160,13 @@ const prismaClientSingleton = () => {
                                 }
                             };
 
-                            // Security Rule: Singular operations (findUnique, update, delete) must 
-                            // not be allowed to bypass tenant checks. 
-                            // Prisma findUnique does not support relation filters in 'where'.
-                            // So we skip automatic filtering for findUnique and instead 
-                            // we would ideally convert it to findFirst, but that requires bypass.
-                            // For now, we only add filters to operations that support them.
+                            // Security Rule: Rewrite findUnique to findFirst to allow relation filters (tenant isolation)
                             if (isUniqueRead || isStrictMutation) {
-                                // Strictly validate or skip.
-                                // Note: update/delete/upsert also have restricted where clauses.
+                                if (operation === 'findUnique') {
+                                    applyFilter(newArgs.where);
+                                    return (prisma as any)[model].findFirst(newArgs);
+                                }
+                                applyFilter(newArgs.where);
                             } else {
                                 applyFilter(newArgs.where);
                             }
@@ -207,8 +205,13 @@ const prismaClientSingleton = () => {
     });
 };
 
-type PrismaClientType = ReturnType<typeof prismaClientSingleton>;
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClientType | undefined; };
+// Use a global variable to store the singleton to avoid circularity and hot-reload issues
+const globalForPrisma = globalThis as unknown as {
+    prisma: any;
+};
+
 export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
+
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
 export default prisma;

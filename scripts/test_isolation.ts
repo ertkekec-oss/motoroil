@@ -1,5 +1,5 @@
 
-import { prisma } from './src/lib/prisma';
+import { prisma } from '../src/lib/prisma';
 import { SignJWT } from 'jose';
 import bcrypt from 'bcryptjs';
 

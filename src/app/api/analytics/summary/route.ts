@@ -82,7 +82,7 @@ export async function GET(request: Request) {
             const qty = stock._sum.quantity || 0;
             totalStockCount += qty;
 
-            const product = productMap.get(stock.productId);
+            const product = productMap.get(stock.productId) as any;
             if (product && qty > 0) {
                 // Simplified: Use current buyPrice as approximation
                 // For exact FIFO, consider implementing a materialized view or caching strategy

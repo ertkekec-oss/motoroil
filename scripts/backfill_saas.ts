@@ -76,7 +76,14 @@ async function main() {
 
             // Check AppSettings
             try {
-                const appSettings = await prisma.appSettings.findUnique({ where: { key: 'eFaturaSettings' } });
+                const appSettings = await prisma.appSettings.findUnique({
+                    where: {
+                        companyId_key: {
+                            companyId: company.id,
+                            key: 'eFaturaSettings'
+                        }
+                    }
+                });
                 if (appSettings && appSettings.value) {
                     const val = appSettings.value as any;
                     if (val.apiKey) apiKey = val.apiKey;

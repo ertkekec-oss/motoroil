@@ -125,15 +125,17 @@ export default function AccountingPage() {
 
     // Calculate Stats
     const stats = React.useMemo(() => {
-        // Alacaklar: Tahsil edilmemiş Çekler + Müşteri Bakiyeleri (Pozitif)
+        // Alacaklar: Tahsil edilmemiş Çekler + Müşteri Bakiyeleri (Pozitif) + Tedarikçi Bakiyeleri (Pozitif - Fazla Ödediğimiz)
         const checkReceivables = checks.filter(c => c.type === 'In' && c.status !== 'Tahsil Edildi').reduce((sum, c) => sum + c.amount, 0);
         const customerReceivables = customers.reduce((sum, c) => sum + (Number(c.balance) > 0 ? Number(c.balance) : 0), 0);
-        const totalReceivables = checkReceivables + customerReceivables;
+        const supplierReceivables = suppliers.reduce((sum, s) => sum + (Number(s.balance) > 0 ? Number(s.balance) : 0), 0);
+        const totalReceivables = checkReceivables + customerReceivables + supplierReceivables;
 
-        // Borçlar: Ödenmemiş Çekler + Tedarikçi Bakiyeleri (Pozitif - Borcumuz)
+        // Borçlar: Ödenmemiş Çekler + Tedarikçi Bakiyeleri (Negatif - Borcumuz) + Müşteri Bakiyeleri (Negatif - Alacaklı Müşteri)
         const checkPayables = checks.filter(c => c.type === 'Out' && c.status !== 'Ödendi').reduce((sum, c) => sum + c.amount, 0);
-        const supplierPayables = suppliers.reduce((sum, s) => sum + (Number(s.balance) > 0 ? Number(s.balance) : 0), 0);
-        const totalPayables = checkPayables + supplierPayables;
+        const supplierPayables = suppliers.reduce((sum, s) => sum + (Number(s.balance) < 0 ? Math.abs(Number(s.balance)) : 0), 0);
+        const customerPayables = customers.reduce((sum, c) => sum + (Number(c.balance) < 0 ? Math.abs(Number(c.balance)) : 0), 0);
+        const totalPayables = checkPayables + supplierPayables + customerPayables;
 
         const totalExpenses = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
         const netCash = kasalar.reduce((sum, k) => sum + k.balance, 0);
@@ -308,14 +310,25 @@ export default function AccountingPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
-                                    {/* Müşteri CARİLERİ */}
+                                    {/* Müşteri CARİLERİ (Pozitif) */}
                                     {customers.filter(c => Number(c.balance) > 0).map((customer, i) => (
                                         <tr key={`cust-${i}`} className="hover:bg-white/5">
                                             <td className="py-3 font-bold text-white">{customer.name}</td>
-                                            <td className="py-3"><span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-orange-500/10 text-orange-400 tracking-wide">CARİ HESAP</span></td>
-                                            <td className="py-3 text-center opacity-50 text-xs">Güncel Bakiye</td>
+                                            <td className="py-3"><span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-orange-500/10 text-orange-400 tracking-wide">MÜŞTERİ CARİ</span></td>
+                                            <td className="py-3 text-center opacity-50 text-xs">Açık Hesap</td>
                                             <td className="py-3 text-right font-black text-white">{formatCurrency(customer.balance)}</td>
-                                            <td className="py-3 text-right"><span className="text-[10px] font-bold uppercase text-orange-400">ÖDEME BEKLİYOR</span></td>
+                                            <td className="py-3 text-right"><span className="text-[10px] font-bold uppercase text-orange-400">TAHSİLAT BEKLİYOR</span></td>
+                                        </tr>
+                                    ))}
+
+                                    {/* Tedarikçi CARİLERİ (Pozitif - İade veya Fazla Ödeme) */}
+                                    {suppliers.filter(s => Number(s.balance) > 0).map((supplier, i) => (
+                                        <tr key={`supp-pos-${i}`} className="hover:bg-white/5">
+                                            <td className="py-3 font-bold text-white">{supplier.name}</td>
+                                            <td className="py-3"><span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-blue-500/10 text-blue-400 tracking-wide">TEDARİKÇİ CARİ</span></td>
+                                            <td className="py-3 text-center opacity-50 text-xs">Alacak Bakiyesi</td>
+                                            <td className="py-3 text-right font-black text-emerald-400">{formatCurrency(supplier.balance)}</td>
+                                            <td className="py-3 text-right"><span className="text-[10px] font-bold uppercase text-emerald-400">ALACAĞIMIZ VAR</span></td>
                                         </tr>
                                     ))}
 
@@ -362,15 +375,28 @@ export default function AccountingPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
-                                    {/* Tedarikçi CARİLERİ */}
-                                    {suppliers.filter(s => Number(s.balance) > 0).map((supplier, i) => (
+                                    {/* Tedarikçi CARİLERİ (Negatif) */}
+                                    {suppliers.filter(s => Number(s.balance) < 0).map((supplier, i) => (
                                         <tr key={`supp-${i}`} className="hover:bg-white/5">
                                             <td className="py-3 font-medium text-white">{supplier.name}</td>
-                                            <td className="py-3"><span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-rose-500/10 text-rose-400 tracking-wide">CARİ HESAP</span></td>
-                                            <td className="py-3 text-center opacity-50 text-xs">Güncel Bakiye</td>
-                                            <td className="py-3 text-center font-bold text-rose-400">{formatCurrency(supplier.balance)}</td>
+                                            <td className="py-3"><span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-rose-500/10 text-rose-400 tracking-wide">TEDARİKÇİ CARİ</span></td>
+                                            <td className="py-3 text-center opacity-50 text-xs">Borç Bakiyesi</td>
+                                            <td className="py-3 text-center font-bold text-rose-400">{formatCurrency(Math.abs(Number(supplier.balance)))}</td>
                                             <td className="py-3 text-right">
-                                                <span className="text-[10px] font-bold uppercase text-rose-400">BORÇLUYUZ</span>
+                                                <span className="text-[10px] font-bold uppercase text-rose-400">ÖDEME YAPILACAK</span>
+                                            </td>
+                                        </tr>
+                                    ))}
+
+                                    {/* Müşteri CARİLERİ (Negatif - Alacaklı Müşteri) */}
+                                    {customers.filter(c => Number(c.balance) < 0).map((customer, i) => (
+                                        <tr key={`cust-neg-${i}`} className="hover:bg-white/5">
+                                            <td className="py-3 font-medium text-white">{customer.name}</td>
+                                            <td className="py-3"><span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-amber-500/10 text-amber-400 tracking-wide">MÜŞTERİ CARİ</span></td>
+                                            <td className="py-3 text-center opacity-50 text-xs">Emanet/Bakiye</td>
+                                            <td className="py-3 text-center font-bold text-amber-400">{formatCurrency(Math.abs(Number(customer.balance)))}</td>
+                                            <td className="py-3 text-right">
+                                                <span className="text-[10px] font-bold uppercase text-amber-400">MÜŞTERİ ALACAKLI</span>
                                             </td>
                                         </tr>
                                     ))}

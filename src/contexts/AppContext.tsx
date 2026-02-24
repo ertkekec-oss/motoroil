@@ -19,6 +19,7 @@ export interface Branch {
     name: string;
     type: string;
     city?: string;
+    district?: string;
     address?: string;
     phone?: string;
     manager?: string;

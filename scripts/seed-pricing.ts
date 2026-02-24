@@ -63,14 +63,14 @@ async function main() {
         // 4. Ensure Categories
         const b2c = await prisma.customerCategory.upsert({
             where: { companyId_name: { companyId: company.id, name: 'Genel Müşteri (B2C)' } },
-            create: { companyId: company.id, name: 'Genel Müşteri (B2C)', defaultPriceListId: retailList.id },
-            update: { defaultPriceListId: retailList.id }
+            create: { companyId: company.id, name: 'Genel Müşteri (B2C)', priceListId: retailList.id },
+            update: { priceListId: retailList.id }
         });
 
         const b2b = await prisma.customerCategory.upsert({
             where: { companyId_name: { companyId: company.id, name: 'Toptancı (B2B)' } },
-            create: { companyId: company.id, name: 'Toptancı (B2B)', defaultPriceListId: wholesaleList.id },
-            update: { defaultPriceListId: wholesaleList.id }
+            create: { companyId: company.id, name: 'Toptancı (B2B)', priceListId: wholesaleList.id },
+            update: { priceListId: wholesaleList.id }
         });
 
         console.log(`- Categories ensured.`);

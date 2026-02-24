@@ -115,20 +115,24 @@ export async function GET(request: Request) {
 
         // 3. Etiketi Çek
         console.log('📦 Etiket çekiliyor, shipmentId:', shipmentId);
-        const pdfData = await trendyolService.getCommonLabel(shipmentId);
+        const pdfData = await trendyolService.getCommonLabel(shipmentId) as any;
 
-        if (!pdfData) {
-            console.error('❌ Trendyol API etiket döndürmedi. ShipmentId:', shipmentId);
+        if (!pdfData || pdfData.status !== 'SUCCESS') {
+            console.error('❌ Trendyol API etiket döndürmedi. ShipmentId:', shipmentId, 'Status:', pdfData?.status, 'Error:', pdfData?.error);
             return NextResponse.json({
                 success: false,
-                error: `Etiket bulunamadı. Sipariş ID: ${shipmentId}. Sipariş henüz paketlenmemiş veya etiket oluşturulmamış olabilir.`
-            }, { status: 404 });
+                error: pdfData?.error || `Etiket bulunamadı. Sipariş ID: ${shipmentId}. Sipariş henüz paketlenmemiş veya etiket oluşturulmamış olabilir.`
+            }, { status: pdfData?.status === 'FAILED' ? 400 : 404 });
         }
 
-        console.log('✅ Etiket alındı, boyut:', pdfData.length);
+        console.log('✅ Etiket alındı, status:', pdfData.status);
 
         // 4. Client'a PDF/Base64 dön
-        return NextResponse.json({ success: true, content: pdfData, format: 'PDF' });
+        return NextResponse.json({
+            success: true,
+            content: pdfData.pdfBase64 || pdfData.zpl,
+            format: pdfData.zpl ? 'ZPL' : 'PDF'
+        });
 
     } catch (error: any) {
         console.error('❌❌❌ FATAL ERROR in get-label route:', error);

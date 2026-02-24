@@ -190,7 +190,7 @@ export default function AccountingModals({
                 alignItems: 'center',
                 justifyContent: 'center',
                 zIndex: 2000,
-                backdropBlur: '4px'
+                backdropFilter: 'blur(4px)'
             }}
             data-pos-theme={posTheme}
         >

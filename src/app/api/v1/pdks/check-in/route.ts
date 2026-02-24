@@ -70,8 +70,8 @@ export async function POST(req: NextRequest) {
 
             // QR Validate
             const result = validatePdksToken(qrToken, tenantId, PDKS_QR_SECRET);
-            if (!result.valid) {
-                return NextResponse.json({ success: false, error: `Geçersiz QR: ${result.reason}` }, { status: 400 });
+            if (result.valid === false) {
+                return NextResponse.json({ success: false, error: `Geçersiz QR: ${(result as any).reason}` }, { status: 400 });
             }
 
             const { payload } = result;

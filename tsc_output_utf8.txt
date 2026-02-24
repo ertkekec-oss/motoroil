@@ -1,0 +1,118 @@
+﻿.next/types/validator.ts(837,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/admin/help/topics/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/help/topics/[id]">'.
+  Types of property 'PUT' are incompatible.
+    Type '(req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; topic: any; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(2673,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/support/tickets/[id]/reply/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/support/tickets/[id]/reply">'.
+  Types of property 'POST' are incompatible.
+    Type '(req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; message: any; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+debug_hb_detail.ts(11,13): error TS2339: Property 'merchantId' does not exist on type 'JsonValue'.
+debug_hb_detail.ts(11,25): error TS2339: Property 'password' does not exist on type 'JsonValue'.
+debug_hb_detail.ts(11,35): error TS2339: Property 'username' does not exist on type 'JsonValue'.
+debug_hb_list_raw.ts(17,40): error TS2339: Property 'merchantId' does not exist on type 'JsonValue'.
+  Property 'merchantId' does not exist on type 'string'.
+debug_hb_list_raw.ts(18,38): error TS2339: Property 'username' does not exist on type 'JsonValue'.
+  Property 'username' does not exist on type 'string'.
+debug_hb_list_raw.ts(19,38): error TS2339: Property 'password' does not exist on type 'JsonValue'.
+  Property 'password' does not exist on type 'string'.
+debug_hb_sync.ts(29,49): error TS2339: Property 'merchantId' does not exist on type 'JsonValue'.
+  Property 'merchantId' does not exist on type 'string'.
+debug_hb_sync_v2.ts(34,57): error TS2339: Property '_raw' does not exist on type 'MarketplaceOrder'.
+log_delivered.ts(10,13): error TS2339: Property 'merchantId' does not exist on type 'JsonValue'.
+log_delivered.ts(10,25): error TS2339: Property 'password' does not exist on type 'JsonValue'.
+log_delivered.ts(10,35): error TS2339: Property 'username' does not exist on type 'JsonValue'.
+scripts/backfill_saas.ts(79,75): error TS2322: Type '{ key: string; }' is not assignable to type 'AppSettingsWhereUniqueInput'.
+  Type '{ key: string; }' is not assignable to type '{ id: string | AppSettingsCompanyIdKeyCompoundUniqueInput; companyId_key: string | AppSettingsCompanyIdKeyCompoundUniqueInput; } & { ...; }'.
+    Type '{ key: string; }' is missing the following properties from type '{ id: string | AppSettingsCompanyIdKeyCompoundUniqueInput; companyId_key: string | AppSettingsCompanyIdKeyCompoundUniqueInput; }': id, companyId_key
+scripts/check_link.ts(10,13): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type 'StaffSelect<DefaultArgs>'.
+scripts/check_link.ts(16,64): error TS2339: Property 'userId' does not exist on type '{ id: string; username: string; role: string; tenantId: string; companyId: string; branch: string; permissions: string[]; assignedCategoryIds: string[]; name: string; type: string; deletedAt: Date; ... 28 more ...; dailyWorkingHours: number; }'.
+scripts/seed-pricing.ts(66,75): error TS2353: Object literal may only specify known properties, and 'defaultPriceListId' does not exist in type '(Without<CustomerCategoryCreateInput, CustomerCategoryUncheckedCreateInput> & CustomerCategoryUncheckedCreateInput) | (Without<...> & CustomerCategoryCreateInput)'.
+scripts/seed-pricing.ts(67,23): error TS2353: Object literal may only specify known properties, and 'defaultPriceListId' does not exist in type '(Without<CustomerCategoryUpdateInput, CustomerCategoryUncheckedUpdateInput> & CustomerCategoryUncheckedUpdateInput) | (Without<...> & CustomerCategoryUpdateInput)'.
+scripts/seed-pricing.ts(72,70): error TS2353: Object literal may only specify known properties, and 'defaultPriceListId' does not exist in type '(Without<CustomerCategoryCreateInput, CustomerCategoryUncheckedCreateInput> & CustomerCategoryUncheckedCreateInput) | (Without<...> & CustomerCategoryCreateInput)'.
+scripts/seed-pricing.ts(73,23): error TS2353: Object literal may only specify known properties, and 'defaultPriceListId' does not exist in type '(Without<CustomerCategoryUpdateInput, CustomerCategoryUncheckedUpdateInput> & CustomerCategoryUncheckedUpdateInput) | (Without<...> & CustomerCategoryUpdateInput)'.
+scripts/test_isolation.ts(2,24): error TS2307: Cannot find module './src/lib/prisma' or its corresponding type declarations.
+scripts/update_plan_prices.ts(153,13): error TS2304: Cannot find name 'feat'.
+scripts/update_plan_prices.ts(155,77): error TS2304: Cannot find name 'feat'.
+scripts/update_plan_prices.ts(158,90): error TS2304: Cannot find name 'feat'.
+scripts/wipe-db.ts(56,13): error TS2322: Type '{ name: string; }' is not assignable to type 'CustomerCategoryWhereUniqueInput'.
+  Type '{ name: string; }' is not assignable to type '{ id: string | CustomerCategoryCompanyIdNameCompoundUniqueInput; companyId_name: string | CustomerCategoryCompanyIdNameCompoundUniqueInput; } & { ...; }'.
+    Type '{ name: string; }' is missing the following properties from type '{ id: string | CustomerCategoryCompanyIdNameCompoundUniqueInput; companyId_name: string | CustomerCategoryCompanyIdNameCompoundUniqueInput; }': id, companyId_name
+scripts/wipe-db.ts(58,13): error TS2322: Type '{ name: string; description: string; }' is not assignable to type '(Without<CustomerCategoryCreateInput, CustomerCategoryUncheckedCreateInput> & CustomerCategoryUncheckedCreateInput) | (Without<...> & CustomerCategoryCreateInput)'.
+  Type '{ name: string; description: string; }' is not assignable to type 'Without<CustomerCategoryUncheckedCreateInput, CustomerCategoryCreateInput> & CustomerCategoryCreateInput'.
+    Property 'company' is missing in type '{ name: string; description: string; }' but required in type 'CustomerCategoryCreateInput'.
+scripts/wipe-db.ts(66,13): error TS2322: Type '{ name: string; }' is not assignable to type 'KasaWhereUniqueInput'.
+  Type '{ name: string; }' is not assignable to type '{ id: string | KasaNameBranchCompanyIdCompoundUniqueInput; bankConnectionId: string | KasaNameBranchCompanyIdCompoundUniqueInput; name_branch_companyId: string | KasaNameBranchCompanyIdCompoundUniqueInput; } & { ...; }'.
+    Type '{ name: string; }' is missing the following properties from type '{ id: string | KasaNameBranchCompanyIdCompoundUniqueInput; bankConnectionId: string | KasaNameBranchCompanyIdCompoundUniqueInput; name_branch_companyId: string | KasaNameBranchCompanyIdCompoundUniqueInput; }': id, bankConnectionId, name_branch_companyId
+scripts/wipe-db.ts(68,13): error TS2322: Type '{ name: string; type: string; balance: number; branch: string; }' is not assignable to type '(Without<KasaCreateInput, KasaUncheckedCreateInput> & KasaUncheckedCreateInput) | (Without<...> & KasaCreateInput)'.
+  Type '{ name: string; type: string; balance: number; branch: string; }' is not assignable to type 'Without<KasaUncheckedCreateInput, KasaCreateInput> & KasaCreateInput'.
+    Property 'company' is missing in type '{ name: string; type: string; balance: number; branch: string; }' but required in type 'KasaCreateInput'.
+src/app/(app)/accounting/components/AccountingModals.tsx(193,17): error TS2353: Object literal may only specify known properties, and 'backdropBlur' does not exist in type 'Properties<string | number, string & {}>'.
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(295,13): error TS2304: Cannot find name 'showWarning'.
+src/app/(app)/settings/page.tsx(754,74): error TS2353: Object literal may only specify known properties, and 'district' does not exist in type 'SetStateAction<{ name: string; type: string; city: string; address: string; phone: string; manager: string; status: string; }>'.
+src/app/(app)/settings/page.tsx(947,40): error TS2345: Argument of type '(PaymentMethod | { id: string; label: string; type: string; icon: string; linkedKasaId: string; })[]' is not assignable to parameter of type 'PaymentMethod[]'.
+  Type 'PaymentMethod | { id: string; label: string; type: string; icon: string; linkedKasaId: string; }' is not assignable to type 'PaymentMethod'.
+    Type '{ id: string; label: string; type: string; icon: string; linkedKasaId: string; }' is not assignable to type 'PaymentMethod'.
+      Types of property 'type' are incompatible.
+        Type 'string' is not assignable to type '"card" | "transfer" | "cash"'.
+src/app/(app)/settings/page.tsx(1217,137): error TS2353: Object literal may only specify known properties, and 'district' does not exist in type 'SetStateAction<{ name: string; type: string; city: string; address: string; phone: string; manager: string; status: string; }>'.
+src/app/(app)/settings/page.tsx(1239,107): error TS2353: Object literal may only specify known properties, and 'district' does not exist in type 'SetStateAction<{ name: string; type: string; city: string; address: string; phone: string; manager: string; status: string; }>'.
+src/app/(app)/settings/page.tsx(1251,58): error TS2339: Property 'district' does not exist on type '{ name: string; type: string; city: string; address: string; phone: string; manager: string; status: string; }'.
+src/app/(app)/settings/page.tsx(1252,85): error TS2353: Object literal may only specify known properties, and 'district' does not exist in type 'SetStateAction<{ name: string; type: string; city: string; address: string; phone: string; manager: string; status: string; }>'.
+src/app/(app)/settings/page.tsx(1306,79): error TS2339: Property 'district' does not exist on type '{ docs: number; id: number; name: string; type: string; city?: string; address?: string; phone?: string; manager?: string; status: string; }'.
+src/app/(app)/settings/page.tsx(1306,103): error TS2339: Property 'district' does not exist on type '{ docs: number; id: number; name: string; type: string; city?: string; address?: string; phone?: string; manager?: string; status: string; }'.
+src/app/(app)/settings/page.tsx(2095,86): error TS2345: Argument of type '(PaymentMethod | { id: string; label: string; type: string; icon: string; linkedKasaId: string; })[]' is not assignable to parameter of type 'PaymentMethod[]'.
+  Type 'PaymentMethod | { id: string; label: string; type: string; icon: string; linkedKasaId: string; }' is not assignable to type 'PaymentMethod'.
+    Type '{ id: string; label: string; type: string; icon: string; linkedKasaId: string; }' is not assignable to type 'PaymentMethod'.
+      Types of property 'type' are incompatible.
+        Type 'string' is not assignable to type '"card" | "transfer" | "cash"'.
+src/app/(app)/settings/page.tsx(2132,83): error TS2322: Type 'PaymentMethod | { id: string; label: string; type: string; icon: string; linkedKasaId: string; }' is not assignable to type 'PaymentMethod'.
+  Type '{ id: string; label: string; type: string; icon: string; linkedKasaId: string; }' is not assignable to type 'PaymentMethod'.
+    Types of property 'type' are incompatible.
+      Type 'string' is not assignable to type '"card" | "transfer" | "cash"'.
+src/app/(app)/settings/page.tsx(2132,102): error TS2322: Type '{ id: string; label: string; type: string; icon: string; linkedKasaId: string; }' is not assignable to type 'PaymentMethod'.
+  Types of property 'type' are incompatible.
+    Type 'string' is not assignable to type '"card" | "transfer" | "cash"'.
+src/app/(app)/staff/me/page.tsx(13,5): error TS2305: Module '"@/components/icons/PremiumIcons"' has no exported member 'IconTrash'.
+src/app/api/analytics/summary/route.ts(89,57): error TS2339: Property 'buyPrice' does not exist on type 'unknown'.
+src/app/api/campaigns/route.ts(13,33): error TS2339: Property 'companyId' does not exist on type '{ authorized: boolean; response: Response; user?: undefined; } | { authorized: boolean; user: any; response?: undefined; }'.
+  Property 'companyId' does not exist on type '{ authorized: boolean; response: Response; user?: undefined; }'.
+src/app/api/campaigns/route.ts(32,33): error TS2339: Property 'companyId' does not exist on type '{ authorized: boolean; response: Response; user?: undefined; } | { authorized: boolean; user: any; response?: undefined; }'.
+  Property 'companyId' does not exist on type '{ authorized: boolean; response: Response; user?: undefined; }'.
+src/app/api/campaigns/route.ts(61,42): error TS2339: Property 'companyId' does not exist on type '{ authorized: boolean; response: Response; user?: undefined; } | { authorized: boolean; user: any; response?: undefined; }'.
+  Property 'companyId' does not exist on type '{ authorized: boolean; response: Response; user?: undefined; }'.
+src/app/api/campaigns/route.ts(89,42): error TS2339: Property 'companyId' does not exist on type '{ authorized: boolean; response: Response; user?: undefined; } | { authorized: boolean; user: any; response?: undefined; }'.
+  Property 'companyId' does not exist on type '{ authorized: boolean; response: Response; user?: undefined; }'.
+src/app/api/marketplaces/[marketplace]/orders/[orderId]/actions/route.ts(194,34): error TS2339: Property 'marketplace' does not exist on type 'Promise<{ marketplace: string; orderId: string; }>'.
+src/app/api/marketplaces/[marketplace]/orders/[orderId]/actions/route.ts(195,30): error TS2339: Property 'orderId' does not exist on type 'Promise<{ marketplace: string; orderId: string; }>'.
+src/app/api/orders/get-label/route.ts(128,56): error TS2339: Property 'length' does not exist on type '{ status: "PENDING" | "SUCCESS" | "FAILED"; pdfBase64?: string; zpl?: string; error?: string; httpStatus?: number; }'.
+src/app/api/sales/formal-invoice-send/route.ts(29,27): error TS2345: Argument of type 'string' is not assignable to parameter of type 'RequestContext'.
+src/app/api/v1/pdks/check-in/route.ts(74,90): error TS2339: Property 'reason' does not exist on type '{ valid: true; payload: QRPayload; } | { valid: false; reason: string; }'.
+  Property 'reason' does not exist on type '{ valid: true; payload: QRPayload; }'.
+src/app/field-mobile/profile/page.tsx(28,75): error TS2339: Property 'email' does not exist on type 'User'.
+src/components/admin/MarketplaceOpsPanel.tsx(170,39): error TS2339: Property 'message' does not exist on type '{ ok: true; data: any; status?: undefined; error?: undefined; }'.
+src/components/StaffManagementContent.tsx(920,84): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+src/components/StaffManagementContent.tsx(1690,68): error TS2322: Type '{ type: "password"; Name: string; className: string; placeholder: string; value: string; onChange: (e: ChangeEvent<HTMLInputElement>) => void; }' is not assignable to type 'DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>'.
+  Property 'Name' does not exist on type 'DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>'. Did you mean 'name'?
+src/lib/api-context.ts(106,17): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type '{ id: string; role: string; tenantId: string; lastActiveAt: Date; }'.
+src/lib/pdks/ip.ts(5,24): error TS2339: Property 'ip' does not exist on type 'NextRequest'.
+src/lib/prisma.ts(129,42): error TS2339: Property 'where' does not exist on type '{ select?: TenantSelect<InternalArgs & DefaultArgs>; include?: TenantInclude<InternalArgs & DefaultArgs>; where: TenantWhereUniqueInput; } | ... 1710 more ... | { ...; }'.
+  Property 'where' does not exist on type '{ select?: TenantSelect<InternalArgs & DefaultArgs>; include?: TenantInclude<InternalArgs & DefaultArgs>; data: (Without<...> & TenantUncheckedCreateInput) | (Without<...> & TenantCreateInput); }'.
+src/lib/prisma.ts(129,57): error TS2339: Property 'where' does not exist on type '{ select?: TenantSelect<InternalArgs & DefaultArgs>; include?: TenantInclude<InternalArgs & DefaultArgs>; where: TenantWhereUniqueInput; } | ... 1710 more ... | { ...; }'.
+  Property 'where' does not exist on type '{ select?: TenantSelect<InternalArgs & DefaultArgs>; include?: TenantInclude<InternalArgs & DefaultArgs>; data: (Without<...> & TenantUncheckedCreateInput) | (Without<...> & TenantCreateInput); }'.
+src/lib/prisma.ts(166,57): error TS2339: Property 'where' does not exist on type '{ select?: TenantSelect<InternalArgs & DefaultArgs>; include?: TenantInclude<InternalArgs & DefaultArgs>; where: TenantWhereUniqueInput; } | ... 1710 more ... | { ...; }'.
+  Property 'where' does not exist on type '{ select?: TenantSelect<InternalArgs & DefaultArgs>; include?: TenantInclude<InternalArgs & DefaultArgs>; data: (Without<...> & TenantUncheckedCreateInput) | (Without<...> & TenantCreateInput); }'.
+src/lib/prisma.ts(169,53): error TS2339: Property 'where' does not exist on type '{ select?: TenantSelect<InternalArgs & DefaultArgs>; include?: TenantInclude<InternalArgs & DefaultArgs>; where: TenantWhereUniqueInput; } | ... 1710 more ... | { ...; }'.
+  Property 'where' does not exist on type '{ select?: TenantSelect<InternalArgs & DefaultArgs>; include?: TenantInclude<InternalArgs & DefaultArgs>; data: (Without<...> & TenantUncheckedCreateInput) | (Without<...> & TenantCreateInput); }'.
+src/lib/prisma.ts(171,53): error TS2339: Property 'where' does not exist on type '{ select?: TenantSelect<InternalArgs & DefaultArgs>; include?: TenantInclude<InternalArgs & DefaultArgs>; where: TenantWhereUniqueInput; } | ... 1710 more ... | { ...; }'.
+  Property 'where' does not exist on type '{ select?: TenantSelect<InternalArgs & DefaultArgs>; include?: TenantInclude<InternalArgs & DefaultArgs>; data: (Without<...> & TenantUncheckedCreateInput) | (Without<...> & TenantCreateInput); }'.
+src/lib/prisma.ts(208,6): error TS2456: Type alias 'PrismaClientType' circularly references itself.
+src/lib/prisma.ts(209,52): error TS2502: 'prisma' is referenced directly or indirectly in its own type annotation.
+src/services/marketplaces/actions/providers/trendyol-actions.ts(82,58): error TS2339: Property 'raw' does not exist on type '{ status: "PENDING" | "SUCCESS" | "FAILED"; pdfBase64?: string; zpl?: string; error?: string; httpStatus?: number; }'.
+test_repair.ts(8,30): error TS2554: Expected 2-3 arguments, but got 1.

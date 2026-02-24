@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useModal } from '@/contexts/ModalContext';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useFinancials } from '@/contexts/FinancialContext';
+import { useFinancials, PaymentMethod } from '@/contexts/FinancialContext';
 import { useInventory } from '@/contexts/InventoryContext';
 import { useCRM } from '@/contexts/CRMContext';
 import { useSettings } from '@/contexts/SettingsContext';
@@ -73,7 +73,7 @@ export default function SettingsPage() {
         appSettings, updateAppSetting
     } = useSettings();
 
-    const [newPaymentMethod, setNewPaymentMethod] = useState({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' });
+    const [newPaymentMethod, setNewPaymentMethod] = useState<Partial<PaymentMethod>>({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' });
     const [editingPaymentMethodId, setEditingPaymentMethodId] = useState<string | null>(null);
     const [showKasaDefinitions, setShowKasaDefinitions] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -692,7 +692,7 @@ export default function SettingsPage() {
     // --- 4. ŞUBELER & EVRAK DEPOSU ---
     // --- 4. ŞUBELER & EVRAK DEPOSU ---
     const branches = contextBranches?.map(b => ({ ...b, docs: 0 })) || [];
-    const [newBranch, setNewBranch] = useState({ name: '', type: 'Şube', city: 'İstanbul', address: '', phone: '', manager: '', status: 'Aktif' });
+    const [newBranch, setNewBranch] = useState({ name: '', type: 'Şube', city: 'İstanbul', district: '', address: '', phone: '', manager: '', status: 'Aktif' });
     const [editingBranchId, setEditingBranchId] = useState<number | null>(null);
     const [selectedBranchDocs, setSelectedBranchDocs] = useState<number | null>(null); // Branch ID
 
@@ -940,7 +940,7 @@ export default function SettingsPage() {
         if (!newItemInput) return;
         const id = Math.random().toString(36).substr(2, 9);
         // Default to cash for quick add
-        const newMethod = { id, label: newItemInput, type: 'cash', icon: '💰', linkedKasaId: '' };
+        const newMethod = { id, label: newItemInput, type: 'cash' as const, icon: '💰', linkedKasaId: '' };
         const updatedMethods = [...paymentMethods, newMethod];
 
         try {

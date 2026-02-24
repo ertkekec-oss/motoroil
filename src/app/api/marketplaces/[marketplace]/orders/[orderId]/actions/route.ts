@@ -11,11 +11,14 @@ export async function POST(
     request: Request,
     { params }: { params: Promise<{ marketplace: string; orderId: string }> }
 ) {
+    let marketplace = "";
+    let orderId = "";
     try {
+        const p = await params;
+        marketplace = p.marketplace;
+        orderId = p.orderId;
         const auth = await authorize();
         if (!auth.authorized) return auth.response;
-
-        const { marketplace, orderId } = await params;
 
         // ============================================================================
         // 1. REDIS HEALTH CHECK (DISABLED)
@@ -191,8 +194,8 @@ export async function POST(
             event: 'marketplace_action_critical_error',
             error: error.message,
             stack: error.stack,
-            marketplace: params?.marketplace,
-            orderId: params?.orderId,
+            marketplace: marketplace,
+            orderId: orderId,
         }));
 
         return NextResponse.json(

@@ -103,6 +103,23 @@ export async function POST(request: Request) {
         const finalTotal = parseFloat(total);
 
         const result = await prisma.$transaction(async (tx) => {
+            // A. Enrich Items with product details for history/receipts
+            const enrichedItems = [];
+            if (Array.isArray(items)) {
+                for (const item of items) {
+                    const p = await tx.product.findUnique({
+                        where: { id: String(item.productId) },
+                        select: { name: true, price: true, salesVat: true }
+                    });
+                    enrichedItems.push({
+                        ...item,
+                        name: p?.name || 'Ürün',
+                        price: item.price || p?.price || 0,
+                        vat: p?.salesVat || 20
+                    });
+                }
+            }
+
             const order = await (tx as any).order.create({
                 data: {
                     marketplace: 'POS',
@@ -116,7 +133,7 @@ export async function POST(request: Request) {
                     status: 'Tamamlandı',
                     orderDate: new Date(),
                     branch: branch || 'Merkez',
-                    items: items as any,
+                    items: enrichedItems.length > 0 ? enrichedItems : items,
                     rawData: { targetKasaId, description, paymentMode, referenceCode }
                 }
             });
@@ -216,18 +233,6 @@ export async function POST(request: Request) {
                     await tx.coupon.update({
                         where: { code: couponCode },
                         data: { usedCount: (coupon.usedCount || 0) + 1, usedAt: new Date(), isUsed: true }
-                    });
-                }
-            }
-
-            const enrichedItems = [];
-            if (Array.isArray(items)) {
-                for (const item of items) {
-                    const p = await tx.product.findUnique({ where: { id: String(item.productId) } });
-                    enrichedItems.push({
-                        ...item,
-                        vat: p?.salesVat || 20,
-                        price: p?.price || item.price,
                     });
                 }
             }

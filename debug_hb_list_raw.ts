@@ -14,9 +14,9 @@ async function main() {
     const config = await prisma.marketplaceConfig.findFirst({ where: { companyId: order.companyId, type: 'hepsiburada' } });
     if (!config) return;
 
-    const merchantId = config.settings.merchantId;
-    const username = config.settings.username;
-    const password = config.settings.password;
+    const merchantId = (config.settings as any).merchantId;
+    const username = (config.settings as any).username;
+    const password = (config.settings as any).password;
     const token = Buffer.from(`${merchantId}:${password}`).toString('base64');
     const authHeader = `Basic ${token}`;
 

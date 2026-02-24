@@ -8,15 +8,18 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
     const { id } = use(params);
     const [customer, setCustomer] = useState<any>(null);
     const [statement, setStatement] = useState<any[]>([]);
+    const [activeVisit, setActiveVisit] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [custRes, statRes] = await Promise.all([
+                const [custRes, statRes, visitRes] = await Promise.all([
                     fetch(`/api/customers/${id}`),
-                    fetch(`/api/customers/${id}/statement`)
+                    fetch(`/api/customers/${id}/statement`),
+                    fetch('/api/field-sales/visits/active')
                 ]);
 
                 if (custRes.ok) {
@@ -28,6 +31,11 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                     const data = await statRes.json();
                     setStatement(data.statement || []);
                 }
+
+                if (visitRes.ok) {
+                    const data = await visitRes.json();
+                    setActiveVisit(data.activeVisit);
+                }
             } catch (err) {
                 console.error(err);
             } finally {
@@ -36,6 +44,49 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
         };
         fetchData();
     }, [id]);
+
+    const handleStartVisit = async () => {
+        setActionLoading(true);
+        const performCheckIn = async (location: any = null) => {
+            try {
+                const res = await fetch('/api/field-sales/visits/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customerId: id, location })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setActiveVisit(data);
+                } else {
+                    const error = await res.json();
+                    alert(error.error || 'Ziyaret başlatılamadı.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Bağlantı hatası.');
+            } finally {
+                setActionLoading(false);
+            }
+        };
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => performCheckIn({
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude,
+                    accuracy: Math.round(pos.coords.accuracy)
+                }),
+                (err) => {
+                    console.warn(err);
+                    performCheckIn(null);
+                },
+                { timeout: 8000 }
+            );
+        } else {
+            performCheckIn(null);
+        }
+    };
 
     if (loading) return <div className="p-8 text-center opacity-50">Yükleniyor...</div>;
     if (!customer) return <div className="p-8 text-center">Müşteri bulunamadı.</div>;
@@ -57,9 +108,38 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                    <button className="bg-blue-600 py-3 rounded-xl font-bold text-sm">Sipariş Al</button>
-                    <button className="bg-green-600 py-3 rounded-xl font-bold text-sm">Tahsilat Gir</button>
+                <div className="space-y-3">
+                    {/* Visit Status & Actions */}
+                    {activeVisit ? (
+                        activeVisit.customer?.id === id ? (
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    onClick={() => router.push(`/field-mobile/order/create?visitId=${activeVisit.id}&customerId=${id}&customerName=${customer.name}`)}
+                                    className="bg-blue-600 py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-900/20"
+                                >
+                                    Sipariş Al
+                                </button>
+                                <button
+                                    onClick={() => router.push(`/field-mobile/collection/create?visitId=${activeVisit.id}&customerId=${id}&customerName=${customer.name}`)}
+                                    className="bg-green-600 py-3 rounded-xl font-bold text-sm shadow-lg shadow-green-900/20"
+                                >
+                                    Tahsilat Gir
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="bg-red-500/10 border border-red-500/30 p-3 rounded-xl text-[11px] text-red-400 font-bold text-center">
+                                Başka bir müşteride ({activeVisit.customer?.name}) aktif ziyaretiniz var. İşlem yapmak için önce o ziyareti sonlandırın.
+                            </div>
+                        )
+                    ) : (
+                        <button
+                            onClick={handleStartVisit}
+                            disabled={actionLoading}
+                            className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2"
+                        >
+                            {actionLoading ? 'İŞLENİYOR...' : '📍 ZİYARETİ BAŞLAT'}
+                        </button>
+                    )}
                 </div>
             </div>
 

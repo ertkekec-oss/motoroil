@@ -166,10 +166,10 @@ export function MarketplaceOpsPanel() {
             });
             const resData = await safeJson(res);
 
-            if (resData.ok && resData.data?.success) {
-                toast.success(resData.message);
+            if (resData.ok && (resData.data as any)?.success) {
+                toast.success((resData.data as any).message);
                 fetchData();
-            } else throw new Error(resData.data?.error || resData.error || "İşlem başarısız.");
+            } else throw new Error((resData.data as any)?.error || resData.error || "İşlem başarısız.");
         } catch (err: any) { toast.error(err.message); }
         finally { setProcessingId(null); }
     };

@@ -9,6 +9,7 @@ interface User {
     role: string;
     branch: string;
     name: string;
+    email?: string;
     tenantId: string;
     permissions: string[];
     setupState?: 'PENDING' | 'COMPLETED';

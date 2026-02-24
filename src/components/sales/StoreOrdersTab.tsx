@@ -189,15 +189,20 @@ export function StoreOrdersTab({
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {o.items && Array.isArray(o.items) ? o.items.map((item: any, i: number) => (
-                                                                <tr key={i} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                                                                    <td style={{ padding: '8px 0' }}>{item.name || item.productName || 'Ürün'}</td>
-                                                                    <td align="center">{item.qty || item.quantity || 1}</td>
-                                                                    <td align="right">{(item.price || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
-                                                                    <td align="right">{((item.price || 0) * (item.qty || item.quantity || 1)).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
-                                                                </tr>
-                                                            )) : (
-                                                                <tr><td colSpan={4} className="text-muted text-center py-2">Detay bulunamadı (Eski kayıt)</td></tr>
+                                                            {o.items && Array.isArray(o.items) && o.items.length > 0 ? o.items.map((item: any, i: number) => {
+                                                                const pName = item.name || item.productName || 'Ürün';
+                                                                const pQty = item.qty || item.quantity || 1;
+                                                                const pPrice = Number(item.price || item.unitPrice || 0);
+                                                                return (
+                                                                    <tr key={i} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                        <td style={{ padding: '8px 0' }}>{pName}</td>
+                                                                        <td align="center">{pQty}</td>
+                                                                        <td align="right">{pPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
+                                                                        <td align="right">{(pPrice * pQty).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
+                                                                    </tr>
+                                                                );
+                                                            }) : (
+                                                                <tr><td colSpan={4} className="text-muted text-center py-4">Satış detayları yüklenemedi.</td></tr>
                                                             )}
                                                         </tbody>
                                                     </table>

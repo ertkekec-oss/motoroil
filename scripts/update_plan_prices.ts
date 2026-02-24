@@ -45,7 +45,7 @@ async function main() {
         console.log('Updated Standard Plan: 199 TRY / 50 Docs');
     }
 
-    // 2. Create/Update Pro Plan
+    // 2. Pro Plan
     let proPlan = await prisma.plan.findFirst({ where: { name: 'Pro Plan' } });
     if (!proPlan) {
         proPlan = await prisma.plan.create({
@@ -58,7 +58,6 @@ async function main() {
                 interval: 'MONTHLY'
             }
         });
-        console.log('Created Pro Plan');
     } else {
         await prisma.plan.update({
             where: { id: proPlan.id },
@@ -66,68 +65,35 @@ async function main() {
         });
     }
 
-    // Limits for Pro
     if (proPlan) {
         const upsertLimitPro = async (resource: string, limit: number) => {
             const exists = await prisma.planLimit.findUnique({
-                where: { planId_resource: { planId: proPlan.id, resource } }
+                where: { planId_resource: { planId: proPlan!.id, resource } }
             });
             if (exists) {
                 await prisma.planLimit.update({ where: { id: exists.id }, data: { limit } });
             } else {
-                await prisma.planLimit.create({ data: { planId: proPlan.id, resource, limit } });
+                await prisma.planLimit.create({ data: { planId: proPlan!.id, resource, limit } });
             }
         };
         await upsertLimitPro('monthly_documents', 500);
         await upsertLimitPro('users', 5);
         await upsertLimitPro('companies', 3);
-
-        // Features
-        // Add 'e_invoice' to both? Or maybe Pro has more?
-        // Let's ensure Standard has e_invoice for now as we tested it.
-        // We need Feature 'e_invoice' to exist first.
-        let feat = await prisma.feature.findUnique({ where: { key: 'e_invoice' } });
-        if (!feat) {
-            feat = await prisma.feature.create({
-                data: { key: 'e_invoice', name: 'E-Fatura Entegrasyonu' }
-            });
-        }
-
-        // Assign to Standard
-        if (standardPlan && feat) {
-            const link = await prisma.planFeature.findUnique({
-                where: { planId_featureId: { planId: standardPlan.id, featureId: feat.id } }
-            });
-            if (!link) {
-                await prisma.planFeature.create({ data: { planId: standardPlan.id, featureId: feat.id } });
-            }
-        }
-
-        // Assign to Pro
-        if (proPlan && feat) {
-            const link = await prisma.planFeature.findUnique({
-                where: { planId_featureId: { planId: proPlan.id, featureId: feat.id } }
-            });
-            if (!link) {
-                await prisma.planFeature.create({ data: { planId: proPlan.id, featureId: feat.id } });
-            }
-        }
     }
 
-    // 3. Create Enterprise Plan (Unlimited)
-    let entPlan = await prisma.plan.findFirst({ where: { name: 'Enterprise Plan' } });
+    // 3. Enterprise Plan
+    let entPlan = await prisma.plan.findFirst({ where: { name: 'Enterprise' } });
     if (!entPlan) {
         entPlan = await prisma.plan.create({
             data: {
-                name: 'Enterprise Plan',
-                description: 'Kurumsal ihtiyaçlar ve sınırsız kullanım.',
+                name: 'Enterprise',
+                description: 'Kurumsal çözümler. Sınırsız destek ve özel entegrasyonlar.',
                 isActive: true,
                 price: 1499.00,
                 currency: 'TRY',
                 interval: 'MONTHLY'
             }
         });
-        console.log('Created Enterprise Plan');
     } else {
         await prisma.plan.update({
             where: { id: entPlan.id },
@@ -138,25 +104,54 @@ async function main() {
     if (entPlan) {
         const upsertLimitEnt = async (resource: string, limit: number) => {
             const exists = await prisma.planLimit.findUnique({
-                where: { planId_resource: { planId: entPlan.id, resource } }
+                where: { planId_resource: { planId: entPlan!.id, resource } }
             });
             if (exists) {
                 await prisma.planLimit.update({ where: { id: exists.id }, data: { limit } });
             } else {
-                await prisma.planLimit.create({ data: { planId: entPlan.id, resource, limit } });
+                await prisma.planLimit.create({ data: { planId: entPlan!.id, resource, limit } });
             }
         };
-        await upsertLimitEnt('monthly_documents', -1);
+        await upsertLimitEnt('monthly_documents', 5000);
         await upsertLimitEnt('users', 20);
         await upsertLimitEnt('companies', 10);
+    }
 
-        if (feat) { // e_invoice
-            const link = await prisma.planFeature.findUnique({
-                where: { planId_featureId: { planId: entPlan.id, featureId: feat.id } }
-            });
-            if (!link) {
-                await prisma.planFeature.create({ data: { planId: entPlan.id, featureId: feat.id } });
-            }
+    // 4. Features
+    let feat = await prisma.feature.findUnique({ where: { key: 'e_invoice' } });
+    if (!feat) {
+        feat = await prisma.feature.create({
+            data: { key: 'e_invoice', name: 'E-Fatura Entegrasyonu' }
+        });
+    }
+
+    // Assign to Standard
+    if (standardPlan && feat) {
+        const link = await prisma.planFeature.findUnique({
+            where: { planId_featureId: { planId: standardPlan.id, featureId: feat.id } }
+        });
+        if (!link) {
+            await prisma.planFeature.create({ data: { planId: standardPlan.id, featureId: feat.id } });
+        }
+    }
+
+    // Assign to Pro
+    if (proPlan && feat) {
+        const link = await prisma.planFeature.findUnique({
+            where: { planId_featureId: { planId: proPlan.id, featureId: feat.id } }
+        });
+        if (!link) {
+            await prisma.planFeature.create({ data: { planId: proPlan.id, featureId: feat.id } });
+        }
+    }
+
+    // Assign to Enterprise
+    if (entPlan && feat) {
+        const link = await prisma.planFeature.findUnique({
+            where: { planId_featureId: { planId: entPlan.id, featureId: feat.id } }
+        });
+        if (!link) {
+            await prisma.planFeature.create({ data: { planId: entPlan.id, featureId: feat.id } });
         }
     }
 

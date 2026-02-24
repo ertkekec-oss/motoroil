@@ -10,7 +10,7 @@ export async function GET() {
 
         const campaigns = await prisma.campaign.findMany({
             where: {
-                companyId: auth.companyId,
+                companyId: (auth as any).user.companyId,
                 deletedAt: null
             },
             orderBy: { createdAt: 'desc' }
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
         const data = await request.json();
         const campaign = await prisma.campaign.create({
             data: {
-                companyId: auth.companyId,
+                companyId: (auth as any).user.companyId,
                 name: data.name,
                 type: data.type,
                 description: data.description,
@@ -58,7 +58,7 @@ export async function PUT(request: Request) {
 
         // Verify ownership
         const existing = await prisma.campaign.findFirst({
-            where: { id, companyId: auth.companyId }
+            where: { id, companyId: (auth as any).user.companyId }
         });
         if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
@@ -86,7 +86,7 @@ export async function DELETE(request: Request) {
 
         // Soft delete
         await prisma.campaign.updateMany({
-            where: { id, companyId: auth.companyId },
+            where: { id, companyId: (auth as any).user.companyId },
             data: { deletedAt: new Date() }
         });
 

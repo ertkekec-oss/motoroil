@@ -29,12 +29,10 @@ async function main() {
         if (target.items.length > 0) {
             console.log('First Item:', JSON.stringify(target.items[0], null, 2));
         }
-        // @ts-ignore
-        if (target._raw) {
-            console.log('RAW Keys:', Object.keys(target._raw));
+        if ((target as any)._raw) {
+            console.log('RAW Keys:', Object.keys((target as any)._raw));
             // Check for common item keys in raw
-            // @ts-ignore
-            const raw = target._raw;
+            const raw = (target as any)._raw;
             console.log('Raw items:', !!raw.items, 'Raw lines:', !!raw.lines, 'Raw orderLines:', !!raw.orderLines);
         }
     } else {

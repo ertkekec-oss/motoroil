@@ -50,12 +50,24 @@ async function main() {
 
         console.log('✅ Veriler temizlendi. Temel tanımlar (Seed) yükleniyor...')
 
+        const firstCompany = await prisma.company.findFirst();
+        if (!firstCompany) {
+            console.log('⚠️ Hiç şirket bulunamadı, seed atlanıyor.');
+            return;
+        }
+
         // Yeniden seed yapalım (Merkez Kasa vb. geri gelsin)
         // 1. Genel kategori
-        const generalCategory = await prisma.customerCategory.upsert({
-            where: { name: 'Genel' },
+        await prisma.customerCategory.upsert({
+            where: {
+                companyId_name: {
+                    companyId: firstCompany.id,
+                    name: 'Genel'
+                }
+            },
             update: {},
             create: {
+                companyId: firstCompany.id,
                 name: 'Genel',
                 description: 'Genel perakende ve servis müşterileri'
             }
@@ -63,9 +75,21 @@ async function main() {
 
         // 2. Kasa kayıtları
         await prisma.kasa.upsert({
-            where: { name: 'Merkez Kasa' },
+            where: {
+                name_branch_companyId: {
+                    name: 'Merkez Kasa',
+                    branch: 'Merkez',
+                    companyId: firstCompany.id
+                }
+            },
             update: {},
-            create: { name: 'Merkez Kasa', type: 'Nakit', balance: 0, branch: 'Merkez' }
+            create: {
+                name: 'Merkez Kasa',
+                type: 'Nakit',
+                balance: 0,
+                branch: 'Merkez',
+                companyId: firstCompany.id
+            }
         });
 
         console.log('✨ Sistem sıfırlandı ve hazır.')

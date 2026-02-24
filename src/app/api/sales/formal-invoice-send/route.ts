@@ -26,11 +26,8 @@ export async function POST(req: NextRequest) {
 
         // 1.5 Feature Gate (Golden Template Adım 1.5)
         // Bu özellik sadece 'e_invoice' yetkisi olan planlarda çalışır.
-        await featureGate(ctx.tenantId, 'e_invoice');
-
-        // 1.6 Quota Gate (Golden Template Adım 1.6)
-        // Aylık döküman limitini kontrol et
-        await quotaGate(ctx, 'monthly_documents');
+        await featureGate(ctx as any, 'e_invoice');
+        await quotaGate(ctx as any, 'monthly_documents');
 
         const body = await req.json();
         const { invoiceId } = body;

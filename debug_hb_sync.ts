@@ -26,7 +26,7 @@ async function main() {
         return;
     }
 
-    console.log('Merchant ID:', config.settings.merchantId);
+    console.log('Merchant ID:', (config.settings as any).merchantId);
 
     const service = new HepsiburadaService(config.settings as any);
 

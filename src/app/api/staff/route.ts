@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     const branch = searchParams.get('branch');
 
     // Strict Tenant Isolation for GET
-    const user = auth.user;
+    const user = (auth as any).user;
     const isPlatformAdmin = user.tenantId === 'PLATFORM_ADMIN' || user.role === 'SUPER_ADMIN';
     const effectiveTenantId = user.impersonateTenantId || user.tenantId;
 
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
         // Basic validation
         if (!name) return NextResponse.json({ success: false, error: 'İsim zorunludur' }, { status: 400 });
 
-        const user = auth.user;
+        const user = (auth as any).user;
         const effectiveTenantId = user.impersonateTenantId || user.tenantId || 'PLATFORM_ADMIN';
 
         // 1. Limit Check
@@ -184,7 +184,7 @@ export async function DELETE(req: Request) {
 
         if (!id) return NextResponse.json({ success: false, error: 'ID zorunludur' }, { status: 400 });
 
-        const user = auth.user;
+        const user = (auth as any).user;
         const isPlatformAdmin = user.tenantId === 'PLATFORM_ADMIN' || user.role === 'SUPER_ADMIN';
 
         // Soft delete

@@ -7,7 +7,7 @@ async function main() {
     if (!order) return;
     const config = await prisma.marketplaceConfig.findFirst({ where: { companyId: order.companyId, type: 'hepsiburada' } });
     if (!config) return;
-    const { merchantId, password, username } = config.settings;
+    const { merchantId, password, username } = config.settings as any;
     const token = Buffer.from(`${merchantId}:${password}`).toString('base64');
     const proxy = (process.env.MARKETPLACE_PROXY_URL || '').trim().replace(/\/$/, '');
     const baseUrl = proxy ? `${proxy}/hepsiburada` : 'https://oms-external.hepsiburada.com';

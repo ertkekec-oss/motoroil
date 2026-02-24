@@ -76,10 +76,10 @@ export class TrendyolActionProvider implements MarketplaceActionProvider {
 
                 const labelResult = await service.getCommonLabel(shipmentPackageId);
 
-                // Update audit with raw response for visibility
+                // Update audit with response status for visibility
                 await (prisma as any).marketplaceActionAudit.update({
                     where: { id: audit.id },
-                    data: { responsePayload: labelResult.raw }
+                    data: { responsePayload: { status: labelResult.status, error: labelResult.error } }
                 });
 
                 if (labelResult.status === 'PENDING') {

@@ -7,13 +7,13 @@ async function main() {
         select: {
             id: true,
             name: true,
-            userId: true
+            username: true
         }
     });
 
     console.log('=== PERSONEL USER LİNK KONTROLÜ ===');
     staff.forEach(s => {
-        console.log(`ID: ${s.id}, İsim: ${s.name}, UserId: ${s.userId}`);
+        console.log(`ID: ${s.id}, İsim: ${s.name}, Username: ${s.username}`);
     });
 }
 

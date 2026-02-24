@@ -145,7 +145,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
         } catch (e) { console.error(e); }
     };
 
-    const { showSuccess, showError, showConfirm } = useModal();
+    const { showSuccess, showError, showConfirm, showWarning } = useModal();
     const { currentUser } = useApp();
     const { refreshCustomers } = useCRM();
     const { refreshTransactions, collectCheck, kasalar } = useFinancials();

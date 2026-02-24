@@ -27,8 +27,10 @@ export default function TreasuryPage() {
     }
 
     // Calculations
-    const totalReceivables = customers.reduce((acc, c) => acc + (c.balance > 0 ? c.balance : 0), 0);
-    const totalPayables = suppliers.reduce((acc, s) => acc + (s.balance < 0 ? Math.abs(s.balance) : 0), 0);
+    const totalReceivables = customers.reduce((acc, c) => acc + (c.balance > 0 ? c.balance : 0), 0) +
+        suppliers.reduce((acc, s) => acc + (s.balance > 0 ? s.balance : 0), 0);
+    const totalPayables = suppliers.reduce((acc, s) => acc + (s.balance < 0 ? Math.abs(s.balance) : 0), 0) +
+        customers.reduce((acc, c) => acc + (c.balance < 0 ? Math.abs(c.balance) : 0), 0);
     const inventoryValue = products.reduce((acc, p) => acc + ((p.buyPrice || 0) * (p.stock || 0)), 0);
 
     // Date based expenses

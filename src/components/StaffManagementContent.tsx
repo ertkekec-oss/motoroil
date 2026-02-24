@@ -917,7 +917,7 @@ export default function StaffManagementContent() {
                                     const activeAtt = attendance.find(a => a.staffId === person.id && !a.checkOut);
                                     return (
                                         <button
-                                            onClick={() => handleProcessAttendance(person.id, activeAtt ? 'CHECK_OUT' : 'CHECK_IN')}
+                                            onClick={() => handleProcessAttendance(person.id.toString(), activeAtt ? 'CHECK_OUT' : 'CHECK_IN')}
                                             disabled={isProcessing}
                                             className={`flex-1 py-3 rounded-xl border text-[10px] font-black transition-all ${activeAtt
                                                 ? 'bg-amber-500/10 border-amber-500/30 text-amber-500 hover:bg-amber-500/20'
@@ -1687,7 +1687,7 @@ export default function StaffManagementContent() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Şifre</label>
-                                            <input type="password" Name="password" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="••••••••" value={newStaff.password} onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })} />
+                                            <input type="password" name="password" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-primary/50" placeholder="••••••••" value={newStaff.password} onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">E-Posta</label>
