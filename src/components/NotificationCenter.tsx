@@ -141,6 +141,28 @@ export default function NotificationCenter() {
                             ))
                         )}
                     </div>
+
+                    <div style={{ padding: '12px', borderTop: '1px solid var(--border-light)', textAlign: 'center' }}>
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                window.location.href = '/notifications';
+                            }}
+                            style={{
+                                background: 'var(--primary)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '8px 20px',
+                                borderRadius: '10px',
+                                fontSize: '12px',
+                                fontWeight: '800',
+                                cursor: 'pointer',
+                                width: '100%'
+                            }}
+                        >
+                            Tümünü Gör & Onaylar
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

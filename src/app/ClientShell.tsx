@@ -46,6 +46,7 @@ const permMap: Record<string, { perm?: string, feature?: string }> = {
     '/admin/audit-logs': { perm: 'audit_view' },
     '/security/suspicious': { perm: 'security_access' },
     '/billing': { perm: 'settings_manage' },
+    '/notifications': { perm: 'pos_access' },
 };
 
 function MobileHeader() {

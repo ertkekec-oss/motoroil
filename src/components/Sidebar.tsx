@@ -68,11 +68,13 @@ export default function Sidebar() {
         '/fintech/profitability-heatmap': { perm: 'finance_view', feature: 'pnl_heatmap' },
         '/fintech/open-banking': { perm: 'finance_view' },
         '/fintech/smart-pricing': { perm: 'finance_view', feature: 'smart_pricing' },
+        '/notifications': { perm: 'pos_access' },
     };
 
     const menuItems = [
         { name: 'POS Terminal', href: '/', icon: '🏮' },
         { name: 'Personel Paneli', href: '/staff/me', icon: '👤' },
+        { name: 'Bildirimler & Onaylar', href: '/notifications', icon: '🔔' },
 
         // FINANSAL YÖNETİM GRUBU
         { name: 'Finansal Yönetim', href: '/accounting', icon: '🏛️' },

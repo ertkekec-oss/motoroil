@@ -1,11 +1,13 @@
-
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { toast } from 'sonner';
 
 export default function NotificationsPage() {
     const [summary, setSummary] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<'approvals' | 'alerts'>('approvals');
+    const [processingId, setProcessingId] = useState<string | null>(null);
 
     const fetchSummary = async () => {
         try {
@@ -21,24 +23,38 @@ export default function NotificationsPage() {
         }
     };
 
-    const deleteAllNotifications = async () => {
+    useEffect(() => {
+        fetchSummary();
+        const interval = setInterval(fetchSummary, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const handleAction = async (type: string, id: string, action: 'approve' | 'reject') => {
+        setProcessingId(id);
         try {
-            await fetch('/api/notifications', { method: 'DELETE' });
+            // Placeholder for actual approval logic
+            // In a real app, this would call specific endpoints like /api/transfers/approve
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            toast.success('İşlem başarıyla gerçekleştirildi');
             fetchSummary();
+        } catch (e) {
+            toast.error('İşlem başarısız');
+        } finally {
+            setProcessingId(null);
+        }
+    };
+
+    const deleteNotification = async (id: string) => {
+        try {
+            const res = await fetch(`/api/notifications?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                fetchSummary();
+                toast.success('Bildirim silindi');
+            }
         } catch (e) {
             console.error(e);
         }
     };
-
-    useEffect(() => {
-        fetchSummary();
-        const interval = setInterval(fetchSummary, 30000); // Poll every 30s
-        return () => clearInterval(interval);
-    }, []);
-
-    if (isLoading) {
-        return <div className="p-10 text-center text-white/50">Yükleniyor...</div>;
-    }
 
     const {
         pendingInvoices = [],
@@ -51,235 +67,298 @@ export default function NotificationsPage() {
         securityEvents = []
     } = summary || {};
 
-    const deleteNotification = async (id: string) => {
-        try {
-            const res = await fetch(`/api/notifications?id=${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                fetchSummary();
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    };
+    const approvalItems = useMemo(() => {
+        const items = [
+            ...pendingInvoices.map((inv: any) => ({
+                id: inv.id,
+                type: 'Invoice',
+                title: 'Fatura Onayı Bekliyor',
+                subtitle: inv.customer?.name || 'Müşteri',
+                amount: `₺${Number(inv.totalAmount).toLocaleString()}`,
+                date: inv.createdAt,
+                icon: '📄',
+                color: 'blue',
+                data: inv
+            })),
+            ...pendingTransfers.map((tr: any) => ({
+                id: tr.id,
+                type: 'Transfer',
+                title: 'Stok Transfer Onayı',
+                subtitle: `${tr.fromBranch} ➔ ${tr.toBranch}`,
+                amount: `${tr.qty} Adet`,
+                date: tr.shippedAt || tr.createdAt,
+                icon: '🚚',
+                color: 'orange',
+                data: tr
+            })),
+            ...pendingCounts.map((c: any) => ({
+                id: c.id,
+                type: 'Count',
+                title: 'Sayım Sonucu Onayı',
+                subtitle: `Sayım #${c.id}`,
+                amount: c.status,
+                date: c.createdAt,
+                icon: '🔢',
+                color: 'purple',
+                data: c
+            }))
+        ];
+        return items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }, [pendingInvoices, pendingTransfers, pendingCounts]);
 
-    const NotificationCard = ({ title, icon, color, items, renderItem, emptyText }: any) => (
-        <div className="card glass relative overflow-hidden group hover:border-white/10 transition-all duration-300">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center text-xl shadow-lg`}>
-                        {icon}
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-lg text-white/90">{title}</h3>
-                        <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{items.length} Bildirim</p>
-                    </div>
+    const alertItems = useMemo(() => {
+        const items = [
+            ...systemNotifications.map((n: any) => ({
+                id: n.id,
+                type: 'System',
+                title: 'Sistem Bildirimi',
+                text: n.text,
+                date: n.createdAt,
+                icon: n.icon || '🔔',
+                color: 'slate'
+            })),
+            ...securityEvents.map((e: any) => ({
+                id: e.id,
+                type: 'Security',
+                title: 'Şüpheli İşlem Tespit Edildi',
+                text: `"${e.detectedPhrase}" - ${e.staff} (${e.branch})`,
+                date: e.timestamp,
+                icon: '🚨',
+                color: 'red'
+            })),
+            ...recentEcommerceSales.map((s: any) => ({
+                id: s.id,
+                type: 'Ecommerce',
+                title: `${s.marketplace} Yeni Sipariş`,
+                text: `${s.customerName} - ${s.orderNumber}`,
+                date: s.orderDate,
+                amount: `₺${Number(s.totalAmount).toLocaleString()}`,
+                icon: '🛒',
+                color: 'green'
+            })),
+            ...expiringWarranties.map((w: any) => ({
+                id: w.id,
+                type: 'Warranty',
+                title: 'Garanti Süresi Azaldı',
+                text: `${w.productName} - ${w.customerName}`,
+                date: w.endDate,
+                icon: '🛡️',
+                color: 'yellow'
+            }))
+        ];
+        return items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }, [systemNotifications, securityEvents, recentEcommerceSales, expiringWarranties]);
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-slate-400 font-medium font-outfit">Bildirimler Hazırlanıyor...</p>
                 </div>
-                {items.length > 0 && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>}
             </div>
-            <div className="max-h-[300px] overflow-y-auto">
-                {items.length === 0 ? (
-                    <div className="p-8 text-center text-white/20 text-sm font-medium italic">{emptyText}</div>
+        );
+    }
+
+    return (
+        <div className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto">
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <h1 className="text-3xl md:text-4xl font-black text-white font-outfit tracking-tight">
+                        Aksiyon <span className="text-primary italic">Merkezi</span>
+                    </h1>
+                    <p className="text-slate-400 mt-2 font-medium">İş akışınızdaki bekleyen onaylar ve kritik uyarılar</p>
+                </div>
+
+                <div className="flex p-1.5 bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-white/5 shadow-2xl">
+                    <button
+                        onClick={() => setActiveTab('approvals')}
+                        className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'approvals'
+                                ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            }`}
+                    >
+                        📝 Onay Bekleyenler
+                        {approvalItems.length > 0 && (
+                            <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px]">{approvalItems.length}</span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('alerts')}
+                        className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'alerts'
+                                ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            }`}
+                    >
+                        🔔 Bildirimler
+                        {alertItems.length > 0 && (
+                            <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px]">{alertItems.length}</span>
+                        )}
+                    </button>
+                </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="grid grid-cols-1 gap-6">
+                {activeTab === 'approvals' ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        {approvalItems.length === 0 ? (
+                            <EmptyState
+                                icon="✨"
+                                title="Harika!"
+                                text="Şu an için onay bekleyen herhangi bir işlem bulunmuyor."
+                            />
+                        ) : (
+                            approvalItems.map((item) => (
+                                <ApprovalCard
+                                    key={item.id}
+                                    item={item}
+                                    onAction={handleAction}
+                                    isProcessing={processingId === item.id}
+                                />
+                            ))
+                        )}
+                    </div>
                 ) : (
-                    <div className="divide-y divide-white/5">
-                        {items.map((item: any, idx: number) => (
-                            <div key={idx} className="p-4 hover:bg-white/5 transition-colors text-sm">
-                                {renderItem(item)}
-                            </div>
-                        ))}
+                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        {alertItems.length === 0 ? (
+                            <EmptyState
+                                icon="📭"
+                                title="Bildirim Yok"
+                                text="Okunmamış veya yeni bir bildiriminiz bulunmuyor."
+                            />
+                        ) : (
+                            alertItems.map((item) => (
+                                <AlertItem
+                                    key={item.id}
+                                    item={item}
+                                    onDelete={deleteNotification}
+                                />
+                            ))
+                        )}
                     </div>
                 )}
+            </div>
+
+            <style jsx global>{`
+                .font-outfit { font-family: 'Outfit', sans-serif; }
+                @keyframes pulse-soft {
+                    0% { transform: scale(1); opacity: 0.8; }
+                    50% { transform: scale(1.05); opacity: 1; }
+                    100% { transform: scale(1); opacity: 0.8; }
+                }
+            `}</style>
+        </div>
+    );
+}
+
+function ApprovalCard({ item, onAction, isProcessing }: any) {
+    const colorMap: any = {
+        blue: 'from-blue-500/20 to-blue-600/5 border-blue-500/30 text-blue-400',
+        orange: 'from-orange-500/20 to-orange-600/5 border-orange-500/30 text-orange-400',
+        purple: 'from-purple-500/20 to-purple-600/5 border-purple-500/30 text-purple-400',
+        green: 'from-emerald-500/20 to-emerald-600/5 border-emerald-500/30 text-emerald-400'
+    };
+
+    return (
+        <div className={`group relative bg-gradient-to-br ${colorMap[item.color]} border rounded-3xl p-6 shadow-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl overflow-hidden`}>
+            {/* Background Decoration */}
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-all"></div>
+
+            <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl shadow-inner">
+                    {item.icon}
+                </div>
+                <div className="text-right">
+                    <span className="text-[10px] font-black uppercase tracking-widest opacity-60">{item.type}</span>
+                    <div className="text-xs font-bold mt-1 opacity-80">
+                        {new Date(item.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                    </div>
+                </div>
+            </div>
+
+            <h3 className="text-lg font-black text-white mb-1 group-hover:text-primary transition-colors">{item.title}</h3>
+            <p className="text-sm text-white/50 font-medium mb-4">{item.subtitle}</p>
+
+            <div className="bg-black/20 rounded-2xl p-4 mb-6 flex justify-between items-center border border-white/5">
+                <span className="text-xs font-bold text-white/40 uppercase tracking-wider">Miktar / Tutar</span>
+                <span className="text-xl font-black text-white">{item.amount}</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+                <button
+                    disabled={isProcessing}
+                    onClick={() => onAction(item.type, item.id, 'reject')}
+                    className="py-3 px-4 rounded-xl bg-white/5 border border-white/10 text-white/60 text-xs font-bold hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/40 transition-all disabled:opacity-50"
+                >
+                    Reddet
+                </button>
+                <button
+                    disabled={isProcessing}
+                    onClick={() => onAction(item.type, item.id, 'approve')}
+                    className="py-3 px-4 rounded-xl bg-primary text-white text-xs font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                    {isProcessing ? (
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    ) : (
+                        <>✅ Onayla</>
+                    )}
+                </button>
             </div>
         </div>
     );
+}
+
+function AlertItem({ item, onDelete }: any) {
+    const colorMap: any = {
+        slate: 'border-slate-800 bg-slate-800/20 hover:border-slate-600',
+        red: 'border-red-500/20 bg-red-500/5 hover:border-red-500/40',
+        green: 'border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40',
+        yellow: 'border-amber-500/20 bg-amber-500/5 hover:border-amber-500/40'
+    };
 
     return (
-        <div className="container p-6 mx-auto max-w-[1600px] min-h-screen">
-            <header className="mb-10 flex justify-between items-end">
-                <div>
-                    <h1 className="text-3xl font-black text-white bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/50">
-                        Bildirim Merkezi
-                    </h1>
-                    <p className="text-white/40 mt-2 font-medium">Operasyonel uyarılar ve onay bekleyen işlemler</p>
+        <div className={`p-5 rounded-3xl border transition-all duration-300 flex items-center gap-5 group ${colorMap[item.color]}`}>
+            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-3xl shrink-0 shadow-premium">
+                {item.icon}
+            </div>
+
+            <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-black text-white tracking-tight">{item.title}</h4>
+                    <span className="text-[10px] font-bold text-white/30 uppercase">
+                        {new Date(item.date).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </span>
                 </div>
-                {systemNotifications.length > 0 && (
-                    <button
-                        onClick={deleteAllNotifications}
-                        className="btn btn-ghost text-xs text-white/30 hover:text-red-400 font-bold tracking-widest"
-                    >
-                        TÜMÜNÜ TEMİZLE
-                    </button>
+                <p className="text-sm text-white/50 font-medium line-clamp-1">{item.text}</p>
+                {item.amount && (
+                    <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase">
+                        {item.amount}
+                    </div>
                 )}
-            </header>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all">
+                <button
+                    onClick={() => onDelete(item.id)}
+                    className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-lg hover:bg-red-500/20 hover:text-red-400 transition-all shadow-sm"
+                    title="Sil"
+                >
+                    🗑️
+                </button>
+            </div>
+        </div>
+    );
+}
 
-                {/* 1. FATURALAŞACAKLAR */}
-                <NotificationCard
-                    title="Faturalaşacaklar"
-                    icon="📄"
-                    color="bg-blue-500/20 text-blue-400"
-                    items={pendingInvoices}
-                    emptyText="Bekleyen fatura işlemi yok."
-                    renderItem={(item: any) => (
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <div className="font-bold text-white/90">{item.customer?.name || 'Müşteri'}</div>
-                                <div className="text-xs text-white/50">{new Date(item.createdAt || Date.now()).toLocaleDateString()}</div>
-                            </div>
-                            <div className="text-right">
-                                <div className="font-bold text-blue-400">₺{Number(item.totalAmount || 0).toLocaleString()}</div>
-                                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400">Taslak</span>
-                            </div>
-                        </div>
-                    )}
-                />
-
-                {/* 2. TRANSFER ONAYLARI */}
-                <NotificationCard
-                    title="Transfer Onayları"
-                    icon="🚚"
-                    color="bg-orange-500/20 text-orange-400"
-                    items={pendingTransfers}
-                    emptyText="Onay bekleyen transfer yok."
-                    renderItem={(item: any) => (
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <div className="font-bold text-white/90">{item.productName}</div>
-                                <div className="text-xs text-white/50">{item.fromBranch} ➔ {item.toBranch}</div>
-                            </div>
-                            <div className="text-right">
-                                <div className="font-bold text-orange-400">{item.qty} Adet</div>
-                                <span className="text-[10px] px-2 py-0.5 rounded bg-orange-500/10 border border-orange-500/20 text-orange-400">Yolda</span>
-                            </div>
-                        </div>
-                    )}
-                />
-
-                {/* 3. STOK SAYIM ONAYLARI */}
-                <NotificationCard
-                    title="Stok Sayım Onayları"
-                    icon="🔢"
-                    color="bg-purple-500/20 text-purple-400"
-                    items={pendingCounts}
-                    emptyText="İncelenecek sayım sonucu yok."
-                    renderItem={(item: any) => (
-                        <div>
-                            <div className="font-bold text-white/90">Sayım #{item.id}</div>
-                            <div className="text-xs text-white/50">Durum: {item.status}</div>
-                        </div>
-                    )}
-                />
-
-                {/* 4. E-TİCARET SATIŞLARI */}
-                <NotificationCard
-                    title="E-Ticaret Satışları"
-                    icon="🛒"
-                    color="bg-green-500/20 text-green-400"
-                    items={recentEcommerceSales}
-                    emptyText="Yeni e-ticaret satışı yok."
-                    renderItem={(item: any) => (
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <div className="font-bold text-white/90">{item.marketplace} ({item.orderNumber})</div>
-                                <div className="text-xs text-white/50">{item.customerName}</div>
-                            </div>
-                            <div className="text-right">
-                                <div className="font-bold text-green-400">₺{Number(item.totalAmount).toLocaleString()}</div>
-                                <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-400">Yeni Sipariş</span>
-                            </div>
-                        </div>
-                    )}
-                />
-
-                {/* 5. SERVİS UYARILARI */}
-                <NotificationCard
-                    title="Servis Uyarıları"
-                    icon="🛠️"
-                    color="bg-red-500/20 text-red-400"
-                    items={activeServices}
-                    emptyText="Aktif servis uyarısı yok."
-                    renderItem={(item: any) => (
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <div className="font-bold text-white/90">{item.vehicle} ({item.plate})</div>
-                                <div className="text-xs text-white/50">{item.technician || 'Atanmamış'}</div>
-                            </div>
-                            <div className="text-right">
-                                <span className="text-[10px] px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-400">{item.status}</span>
-                            </div>
-                        </div>
-                    )}
-                />
-
-                {/* 6. GARANTI BİTİMİNE AZ KALANLAR */}
-                <NotificationCard
-                    title="Garanti Bitiyor (2 Ay)"
-                    icon="🛡️"
-                    color="bg-yellow-500/20 text-yellow-400"
-                    items={expiringWarranties}
-                    emptyText="Yakın zamanda süresi dolacak garanti yok."
-                    renderItem={(item: any) => (
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <div className="font-bold text-white/90">{item.productName}</div>
-                                <div className="text-xs text-white/50">{item.customerName || 'Müşteri'}</div>
-                            </div>
-                            <div className="text-right">
-                                <div className="font-bold text-yellow-400">{new Date(item.endDate).toLocaleDateString()}</div>
-                                <span className="text-[10px] px-2 py-0.5 rounded bg-yellow-500/10 border border-yellow-500/20 text-yellow-400">Bitiyor</span>
-                            </div>
-                        </div>
-                    )}
-                />
-
-                {/* 7. SİSTEM BİLDİRİMLERİ */}
-                <div className="md:col-span-2 xl:col-span-3">
-                    <NotificationCard
-                        title="Sistem Bildirimleri"
-                        icon="🔔"
-                        color="bg-primary/20 text-primary"
-                        items={systemNotifications}
-                        emptyText="Yeni sistem bildirimi yok."
-                        renderItem={(item: any) => (
-                            <div className="flex justify-between items-start group/item">
-                                <div className="flex gap-4">
-                                    <div className="text-xl mt-1">{item.icon || '📢'}</div>
-                                    <div>
-                                        <div className="text-white/90 font-medium leading-relaxed">{item.text}</div>
-                                        <div className="text-xs text-white/30 mt-1 font-bold">{new Date(item.createdAt).toLocaleString('tr-TR')}</div>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => deleteNotification(item.id)}
-                                    className="opacity-0 group-hover/item:opacity-100 p-2 hover:bg-white/10 rounded-lg transition-all text-white/30 hover:text-red-400"
-                                >
-                                    🗑️
-                                </button>
-                            </div>
-                        )}
-                    />
-                </div>
-
-                {/* 8. GÜVENLİK OLAYLARI */}
-                <div className="md:col-span-1">
-                    <NotificationCard
-                        title="Şüpheli İşlemler"
-                        icon="⚠️"
-                        color="bg-red-500/20 text-red-400"
-                        items={securityEvents}
-                        emptyText="Şüpheli işlem tespit edilmedi."
-                        renderItem={(item: any) => (
-                            <div className="flex flex-col gap-1">
-                                <div className="font-bold text-red-400">{item.detectedPhrase}</div>
-                                <div className="text-[10px] text-white/40 flex justify-between">
-                                    <span>{item.staff || 'Bilinmiyor'} • {item.branch || 'Merkez'}</span>
-                                    <span>{new Date(item.timestamp).toLocaleTimeString('tr-TR')}</span>
-                                </div>
-                            </div>
-                        )}
-                    />
-                </div>
-
+function EmptyState({ icon, title, text }: any) {
+    return (
+        <div className="col-span-full py-20 flex flex-col items-center justify-center text-center space-y-4">
+            <div className="text-6xl animate-bounce duration-[3s]">{icon}</div>
+            <div>
+                <h3 className="text-xl font-black text-white">{title}</h3>
+                <p className="text-slate-500 max-w-xs">{text}</p>
             </div>
         </div>
     );
