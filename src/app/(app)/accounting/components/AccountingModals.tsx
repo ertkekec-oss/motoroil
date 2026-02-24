@@ -7,12 +7,12 @@ export default function AccountingModals({
     isOpen,
     onClose,
     type, // 'transaction', 'debt', 'collection', 'check', 'account', 'statement'
-    posTheme
+    theme
 }: {
     isOpen: boolean;
     onClose: () => void;
     type: string;
-    posTheme: 'dark' | 'light';
+    theme: 'dark' | 'light';
 }) {
     const { addFinancialTransaction, addCheck, refreshKasalar, kasalar } = useFinancials();
     const { customers, suppliers } = useCRM(); // Get CRM data
@@ -185,19 +185,19 @@ export default function AccountingModals({
             style={{
                 position: 'fixed',
                 inset: 0,
-                background: posTheme === 'light' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.8)',
+                background: theme === 'light' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.8)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 zIndex: 2000,
                 backdropFilter: 'blur(4px)'
             }}
-            data-pos-theme={posTheme}
+            data-pos-theme={theme}
         >
-            <div className={`card glass border border-white/10 p-6 rounded-3xl w-full max-w-lg relative animate-in zoom-in-95 transaction-modal max-h-[90vh] overflow-y-auto ${posTheme === 'light' ? 'bg-white' : 'bg-[#1a1a1a]'}`}>
+            <div className={`card glass border border-white/10 p-6 rounded-3xl w-full max-w-lg relative animate-in zoom-in-95 transaction-modal max-h-[90vh] overflow-y-auto ${theme === 'light' ? 'bg-white' : 'bg-[#1a1a1a]'}`}>
                 <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white">✕</button>
 
-                <h2 className={posTheme === 'light' ? "text-xl font-black text-pos mb-6" : "text-xl font-bold text-white mb-6"}>
+                <h2 className={theme === 'light' ? "text-xl font-black text-pos mb-6" : "text-xl font-bold text-white mb-6"}>
                     {type === 'debt' && 'Ödeme Yap (Borç)'}
                     {type === 'collection' && 'Tahsilat Ekle'}
                     {type === 'check' && 'Çek / Senet Ekle'}
@@ -221,11 +221,11 @@ export default function AccountingModals({
                                 ))}
                             </select>
 
-                            <div className={`border-2 border-dashed ${posTheme === 'light' ? 'border-primary/20 bg-primary/5' : 'border-white/20 bg-white/5'} rounded-2xl p-8 text-center hover:border-primary transition-colors`}>
+                            <div className={`border-2 border-dashed ${theme === 'light' ? 'border-primary/20 bg-primary/5' : 'border-white/20 bg-white/5'} rounded-2xl p-8 text-center hover:border-primary transition-colors`}>
                                 <input type="file" onChange={handleFileUpload} accept=".pdf,.xml" className="hidden" id="file-upload" />
                                 <label htmlFor="file-upload" className="cursor-pointer block">
                                     <div className="text-4xl mb-2">📄</div>
-                                    <div className={posTheme === 'light' ? "text-sm font-black text-pos" : "text-sm font-bold text-white"}>PDF veya XML Ekstre Yükle</div>
+                                    <div className={theme === 'light' ? "text-sm font-black text-pos" : "text-sm font-bold text-white"}>PDF veya XML Ekstre Yükle</div>
                                     <div className="text-[10px] text-gray-500 font-bold uppercase mt-1">Bankanızdan aldığınız PDF veya XML (BizimHesap) ekstrelerini buraya sürükleyin.</div>
                                 </label>
                             </div>
@@ -454,7 +454,7 @@ export default function AccountingModals({
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full ${posTheme === 'light' ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-blue-600'} hover:opacity-90 text-white font-black py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50 mt-4 uppercase tracking-widest text-xs`}
+                            className={`w-full ${theme === 'light' ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-blue-600'} hover:opacity-90 text-white font-black py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50 mt-4 uppercase tracking-widest text-xs`}
                         >
                             {loading ? 'Kaydediliyor...' : 'Kaydet'}
                         </button>

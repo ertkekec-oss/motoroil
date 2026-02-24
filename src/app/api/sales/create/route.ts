@@ -112,7 +112,7 @@ export async function POST(request: Request) {
                     select: { id: true, name: true, price: true, salesVat: true }
                 });
 
-                const productMap = new Map(products.map(p => [p.id, p]));
+                const productMap = new Map<string, any>(products.map(p => [p.id, p]));
 
                 for (const item of (items as any[])) {
                     const p = productMap.get(String(item.productId));
