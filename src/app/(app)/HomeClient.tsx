@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 
 const LoginPageContent = dynamic(() => import('@/components/login/LoginPageContent'), { ssr: false });
+import NotificationCenter from '@/components/NotificationCenter';
 
 function POSContent() {
   const router = useRouter();
@@ -353,13 +354,16 @@ function POSContent() {
               <h2 className="text-2xl font-black mb-1 flex items-center gap-2">Hoş geldin, <span className={posTheme === 'light' ? "text-primary" : "text-primary"}>{currentUser?.name?.split(' ')[0]}</span></h2>
               <p className="text-xs opacity-50">Sistemdeki genel durumun ve sana özel ipuçları aşağıda.</p>
             </div>
-            <button
-              onClick={togglePosTheme}
-              className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all shadow-pos flex items-center justify-center"
-              title={posTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}
-            >
-              {posTheme === 'dark' ? <Sun size={24} className="text-amber-400" /> : <Moon size={24} className="text-primary" />}
-            </button>
+            <div className="flex items-center gap-3">
+              <NotificationCenter />
+              <button
+                onClick={togglePosTheme}
+                className="p-3 rounded-xl glass border border-pos hover:bg-white/10 transition-all shadow-pos flex items-center justify-center"
+                title={posTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}
+              >
+                {posTheme === 'dark' ? <Sun size={24} className="text-amber-400" /> : <Moon size={24} className="text-primary" />}
+              </button>
+            </div>
           </div>
         </div>
 

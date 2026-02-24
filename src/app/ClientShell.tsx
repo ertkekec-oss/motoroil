@@ -15,7 +15,6 @@ import { MobileNav } from "../components/MobileNav";
 import { GrowthBanner } from "../components/GrowthBanner";
 import GlobalErrorScreen from "../components/GlobalErrorScreen";
 import AppSkeleton from "../components/AppSkeleton";
-import ThemeToggle from "../components/ThemeToggle";
 import NotificationCenter from "../components/NotificationCenter";
 
 const permMap: Record<string, { perm?: string, feature?: string }> = {
@@ -245,10 +244,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                                         currentStaff={auth.user.name}
                                     />
                                     <ChatWidget />
-                                    <div style={{ position: 'fixed', bottom: '20px', right: '80px', zIndex: 9999, display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                        <NotificationCenter />
-                                        <ThemeToggle />
-                                    </div>
                                 </>
                             )}
                         </>
