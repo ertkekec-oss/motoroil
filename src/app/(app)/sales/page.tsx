@@ -9,6 +9,7 @@ import { useSales } from '@/contexts/SalesContext';
 import { useFinancials } from '@/contexts/FinancialContext';
 import { useCRM } from '@/contexts/CRMContext';
 import { apiFetch } from '@/lib/api-client';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 
 // New Sub-Components
@@ -24,23 +25,22 @@ export default function SalesPage() {
     const { currentUser, hasFeature, hasPermission } = useApp();
     const router = useRouter();
 
-    const [posTheme, setPosTheme] = useState<'dark' | 'light'>('dark');
+    const { theme, toggleTheme } = useTheme();
+
     useEffect(() => {
-        const savedTheme = localStorage.getItem('pos-theme') as 'dark' | 'light';
-        if (savedTheme) setPosTheme(savedTheme);
-    }, []);
-    const togglePosTheme = () => {
-        const newTheme = posTheme === 'dark' ? 'light' : 'dark';
-        setPosTheme(newTheme);
-        localStorage.setItem('pos-theme', newTheme);
-        if (newTheme === 'light') {
+        if (theme === 'light') {
             document.body.style.background = '#F7F9FC';
             document.body.style.color = '#1A1F36';
         } else {
             document.body.style.background = 'var(--bg-deep)';
             document.body.style.color = 'var(--text-main)';
         }
-    };
+        return () => {
+            // Cleanup on unmount
+            document.body.style.background = '';
+            document.body.style.color = '';
+        };
+    }, [theme]);
     useEffect(() => {
         if (!hasFeature('sales') && currentUser !== null) {
             router.push('/billing?upsell=sales');
@@ -788,38 +788,35 @@ export default function SalesPage() {
     };
 
     return (
-        <div data-pos-theme={posTheme} className="container" style={{ padding: '40px 20px' }}>
+        <div data-pos-theme={theme} className="container" style={{ padding: '40px 20px' }}>
             <header className="flex-between" style={{ marginBottom: '32px' }}>
                 <div>
                     <h1 style={{
                         fontSize: '28px', fontWeight: '800', margin: 0,
-                        color: posTheme === 'light' ? '#1A1F36' : undefined,
-                    }} className={posTheme === 'light' ? '' : 'text-gradient'}>
+                        color: theme === 'light' ? '#1A1F36' : undefined,
+                    }} className={theme === 'light' ? '' : 'text-gradient'}>
                         Satış Yönetimi
                     </h1>
-                    <p style={{ marginTop: '6px', fontSize: '14px', color: posTheme === 'light' ? '#8B95A5' : undefined }} className={posTheme === 'light' ? '' : 'text-muted'}>
+                    <p style={{ marginTop: '6px', fontSize: '14px', color: theme === 'light' ? '#8B95A5' : undefined }} className={theme === 'light' ? '' : 'text-muted'}>
                         E-Ticaret, Mağaza Satışları ve Faturalar
                     </p>
                 </div>
                 <button
-                    onClick={togglePosTheme}
-                    style={{
-                        padding: '10px 14px', borderRadius: '12px', cursor: 'pointer',
-                        border: posTheme === 'light' ? '1px solid #E6EBF0' : '1px solid var(--border-pos)',
-                        background: posTheme === 'light' ? '#FFFFFF' : 'var(--card-pos)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: posTheme === 'light' ? '0 1px 3px rgba(0,0,0,0.06)' : 'none',
-                    }}
-                    title={posTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}
+                    onClick={toggleTheme}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl border transition-all font-bold text-xs uppercase tracking-wide shadow-sm ${theme === 'light'
+                        ? 'bg-white border-blue-100 text-blue-600 shadow-blue-900/5'
+                        : 'bg-[#1e293b] border-white/5 text-amber-500 shadow-black/50'
+                        }`}
                 >
-                    {posTheme === 'dark' ? <Sun size={18} color="#F59E0B" /> : <Moon size={18} color="#247BFE" />}
+                    <span>{theme === 'light' ? '🌙' : '☀️'}</span>
+                    {theme === 'light' ? 'KARANLIK' : 'AYDINLIK'}
                 </button>
             </header>
 
             {/* Tab bar */}
             <div className="pos-tab-bar" style={{
                 display: 'flex', gap: '4px',
-                borderBottom: posTheme === 'light' ? '1px solid #E6EBF0' : '1px solid var(--border-light)',
+                borderBottom: theme === 'light' ? '1px solid #E6EBF0' : '1px solid var(--border-light)',
                 marginBottom: '24px',
             }}>
                 {[
@@ -836,11 +833,11 @@ export default function SalesPage() {
                             padding: '12px 20px', border: 'none', cursor: 'pointer',
                             fontSize: '14px', fontWeight: activeTab === key ? '600' : '400',
                             background: 'transparent',
-                            color: posTheme === 'light'
+                            color: theme === 'light'
                                 ? (activeTab === key ? '#247BFE' : '#8B95A5')
                                 : 'white',
                             borderBottom: activeTab === key
-                                ? `2px solid ${posTheme === 'light' ? '#247BFE' : 'var(--primary)'}`
+                                ? `2px solid ${theme === 'light' ? '#247BFE' : 'var(--primary)'}`
                                 : '2px solid transparent',
                             transition: 'all 0.15s ease',
                         }}
@@ -865,7 +862,7 @@ export default function SalesPage() {
                         isLoadingLabel={isLoadingLabel}
                         showWarning={showWarning}
                         showError={showError}
-                        posTheme={posTheme}
+                        posTheme={theme}
                     />
                 )}
 
@@ -890,7 +887,7 @@ export default function SalesPage() {
                         handleRejectPurchaseInvoice={handleRejectPurchaseInvoice}
                         setView={setView}
                         showWarning={showWarning}
-                        posTheme={posTheme}
+                        posTheme={theme}
                     />
                 )}
 
@@ -906,7 +903,7 @@ export default function SalesPage() {
                         }}
                         handleDeleteStoreSale={handleDeleteStoreSale}
                         isLoadingStore={isLoadingStore}
-                        posTheme={posTheme}
+                        posTheme={theme}
                     />
                 )}
 
