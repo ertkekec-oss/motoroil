@@ -106,7 +106,7 @@ export async function POST(request: Request) {
             // A. Enrich Items with product details for history/receipts
             const enrichedItems = [];
             if (Array.isArray(items) && items.length > 0) {
-                const productIds = items.map(i => String(i.productId));
+                const productIds = (items as any[]).map(i => String(i.productId));
                 const products = await tx.product.findMany({
                     where: { id: { in: productIds } },
                     select: { id: true, name: true, price: true, salesVat: true }
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 
                 const productMap = new Map(products.map(p => [p.id, p]));
 
-                for (const item of items) {
+                for (const item of (items as any[])) {
                     const p = productMap.get(String(item.productId));
                     enrichedItems.push({
                         ...item,

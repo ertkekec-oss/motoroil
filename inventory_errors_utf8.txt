@@ -1,0 +1,24 @@
+﻿src/app/(app)/inventory/components/BulkPriceEntryContent.tsx(3,25): error TS2307: Cannot find module '@/contexts/AppContext' or its corresponding type declarations.
+src/app/(app)/inventory/components/CriticalStockBanner.tsx(3,25): error TS2307: Cannot find module '@/contexts/AppContext' or its corresponding type declarations.
+src/app/(app)/inventory/components/InventoryBulkEditModal.tsx(3,25): error TS2307: Cannot find module '@/contexts/AppContext' or its corresponding type declarations.
+src/app/(app)/inventory/components/InventoryDetailModal.tsx(3,25): error TS2307: Cannot find module '@/contexts/InventoryContext' or its corresponding type declarations.
+src/app/(app)/inventory/components/InventoryDetailModal.tsx(4,34): error TS2307: Cannot find module '@/components/pricing/ProductPricesTab' or its corresponding type declarations.
+src/app/(app)/inventory/components/InventoryTransferModal.tsx(3,25): error TS2307: Cannot find module '@/contexts/AppContext' or its corresponding type declarations.
+src/app/(app)/inventory/components/ProcurementModal.tsx(3,25): error TS2307: Cannot find module '@/contexts/AppContext' or its corresponding type declarations.
+src/app/(app)/inventory/components/TransferTabContent.tsx(3,24): error TS2307: Cannot find module '@/contexts/AppContext' or its corresponding type declarations.
+src/app/(app)/inventory/components/TransferTabContent.tsx(4,54): error TS2307: Cannot find module '@/contexts/InventoryContext' or its corresponding type declarations.
+src/app/(app)/inventory/components/TransferTabContent.tsx(5,26): error TS2307: Cannot find module '@/contexts/ModalContext' or its corresponding type declarations.
+src/app/(app)/inventory/page.tsx(6,24): error TS2307: Cannot find module '@/contexts/AppContext' or its corresponding type declarations.
+src/app/(app)/inventory/page.tsx(7,57): error TS2307: Cannot find module '@/contexts/InventoryContext' or its corresponding type declarations.
+src/app/(app)/inventory/page.tsx(8,29): error TS2307: Cannot find module '@/hooks' or its corresponding type declarations.
+src/app/(app)/inventory/page.tsx(9,26): error TS2307: Cannot find module '@/contexts/ModalContext' or its corresponding type declarations.
+src/app/(app)/inventory/page.tsx(10,29): error TS2307: Cannot find module '@/contexts/SettingsContext' or its corresponding type declarations.
+src/app/(app)/inventory/page.tsx(11,26): error TS2307: Cannot find module '@/contexts/ThemeContext' or its corresponding type declarations.
+src/app/(app)/inventory/page.tsx(20,28): error TS2307: Cannot find module '@/components/BarcodeScanner' or its corresponding type declarations.
+src/app/(app)/inventory/page.tsx(21,24): error TS2307: Cannot find module '@/components/Pagination' or its corresponding type declarations.
+src/app/(app)/inventory/page.tsx(747,20): error TS2322: Type '{ children: string; jsx: true; global: true; }' is not assignable to type 'DetailedHTMLProps<StyleHTMLAttributes<HTMLStyleElement>, HTMLStyleElement>'.
+  Property 'jsx' does not exist on type 'DetailedHTMLProps<StyleHTMLAttributes<HTMLStyleElement>, HTMLStyleElement>'.
+src/app/(app)/inventory/page.tsx(960,20): error TS2322: Type '{ children: string; jsx: true; }' is not assignable to type 'DetailedHTMLProps<StyleHTMLAttributes<HTMLStyleElement>, HTMLStyleElement>'.
+  Property 'jsx' does not exist on type 'DetailedHTMLProps<StyleHTMLAttributes<HTMLStyleElement>, HTMLStyleElement>'.
+src/app/(app)/inventory/page.tsx(1383,17): error TS2322: Type 'unknown[]' is not assignable to type 'string[]'.
+  Type 'unknown' is not assignable to type 'string'.

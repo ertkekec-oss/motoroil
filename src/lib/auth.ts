@@ -132,7 +132,7 @@ export const getSession = cache(async () => {
     } catch {
         return null;
     }
-}
+});
 
 export async function deleteSession() {
     const cookieStore = await cookies();

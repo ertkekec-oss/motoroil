@@ -204,8 +204,8 @@ function InventoryContent() {
         return { buyExt, buyInc, sellExt, sellInc };
     };
 
-    const brands = Array.from(new Set((products || []).map(p => p.brand || 'Belirtilmemiş')));
-    const categories = Array.from(new Set((products || []).map(p => p.category)));
+    const brands = Array.from(new Set((products || []).map(p => String(p.brand || 'Belirtilmemiş'))));
+    const categories = Array.from(new Set((products || []).map(p => String(p.category || 'Belirtilmemiş')))) as string[];
 
     // Debounced search for better performance
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -943,9 +943,6 @@ function InventoryContent() {
                 }
 
                 /* Removal of effects */
-                [data-theme="light"] .bg-\[url\(\.\.\.\] {
-                    display: none !important;
-                }
                 [data-theme="light"] .animate-pulse,
                 [data-theme="light"] .animate-pulsate {
                     animation: none !important;
