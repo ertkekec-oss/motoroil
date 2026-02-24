@@ -74,7 +74,6 @@ export default function Sidebar() {
     const menuItems = [
         { name: 'POS Terminal', href: '/', icon: '🏮' },
         { name: 'Personel Paneli', href: '/staff/me', icon: '👤' },
-        { name: 'Bildirimler & Onaylar', href: '/notifications', icon: '🔔' },
 
         // FINANSAL YÖNETİM GRUBU
         { name: 'Finansal Yönetim', href: '/accounting', icon: '🏛️' },

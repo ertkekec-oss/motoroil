@@ -629,9 +629,7 @@ body::before {
 
 /* Theme Toggle */
 .theme-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+  position: relative;
   z-index: 10000;
   display: flex;
   align-items: center;

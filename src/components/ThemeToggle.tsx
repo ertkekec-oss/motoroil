@@ -31,9 +31,20 @@ export default function ThemeToggle() {
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </svg>
             )}
-            <span className="theme-toggle-text">
+            <span className="theme-text" style={{ fontSize: '12px' }}>
                 {theme === 'dark' ? 'Light' : 'Dark'}
             </span>
+
+            <style jsx>{`
+                @media (max-width: 768px) {
+                    .theme-text {
+                        display: none;
+                    }
+                    :global(.theme-toggle) {
+                        padding: 6px 10px !important;
+                    }
+                }
+            `}</style>
         </button>
     );
 }

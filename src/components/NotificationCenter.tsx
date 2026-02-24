@@ -46,60 +46,75 @@ export default function NotificationCenter() {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    background: 'transparent',
-                    border: 'none',
-                    position: 'relative',
+                    background: 'var(--bg-card)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid var(--primary)',
+                    padding: '8px 16px',
+                    borderRadius: '99px',
+                    color: 'var(--text-main)',
+                    fontWeight: '700',
+                    fontSize: '14px',
                     cursor: 'pointer',
-                    fontSize: '24px',
-                    padding: '8px',
-                    borderRadius: '12px',
-                    transition: '0.3s',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    gap: '8px',
+                    transition: '0.3s'
                 }}
-                className="hover:bg-white/5"
+                className="hover:scale-105 active:scale-95"
             >
-                🔔
+                {unreadCount > 0 ? '🔔' : '🔕'}
+                <span className="notif-text" style={{ fontSize: '12px' }}>Bildirimler</span>
                 {unreadCount > 0 && (
                     <span style={{
-                        position: 'absolute',
-                        top: '5px',
-                        right: '5px',
                         background: '#ef4444',
                         color: 'white',
                         fontSize: '10px',
                         fontWeight: '900',
-                        padding: '2px 5px',
-                        borderRadius: '50%',
-                        border: '2px solid var(--bg-card)'
+                        padding: '1px 6px',
+                        borderRadius: '10px',
                     }}>
                         {unreadCount}
                     </span>
                 )}
             </button>
 
+            <style jsx>{`
+                @media (max-width: 768px) {
+                    .notif-text {
+                        display: none;
+                    }
+                    button {
+                        padding: 6px 10px !important;
+                    }
+                }
+            `}</style>
+
             {isOpen && (
                 <div style={{
                     position: 'absolute',
                     bottom: 'calc(100% + 15px)',
-                    left: '0',
+                    right: '0',
                     width: '320px',
                     maxHeight: '400px',
                     background: 'var(--bg-card)',
-                    border: '1px solid var(--border-light)',
-                    borderRadius: '16px',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-                    zIndex: 3000,
-                    overflow: 'hidden',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid var(--primary)',
+                    borderRadius: '20px',
+                    boxShadow: 'var(--shadow-premium)',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    zIndex: 1000
                 }}>
                     <div style={{ padding: '16px', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: '800', fontSize: '14px' }}>Bildirimler</span>
+                        <div>
+                            <span style={{ fontWeight: '800', fontSize: '14px', display: 'block' }}>🔔 Bildirim Merkezi</span>
+                            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{notifications.length} yeni aksiyon</span>
+                        </div>
                         <button
                             onClick={() => setIsOpen(false)}
-                            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                            style={{ background: 'var(--bg-hover)', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >✕</button>
                     </div>
 
