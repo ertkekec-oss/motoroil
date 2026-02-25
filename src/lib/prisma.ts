@@ -14,7 +14,9 @@ const operationalModels = [
     'marketplaceorderfinance', 'marketplaceproductmap', 'marketplaceproductpnl',
     'marketplacetransactionledger', 'smartpricingrule', 'pricingautopilotconfig',
     'bankconnection', 'banktransaction', 'bankstatement', 'cashflowforecast',
-    'inventorylayer', 'matchingrule', 'externalrequest', 'fintechaudit', 'stock'
+    'inventorylayer', 'matchingrule', 'externalrequest', 'fintechaudit', 'stock',
+    'networkorder', 'networkdemand', 'networkoffer', 'networklisting',
+    'shipment', 'shipmentevent'
 ];
 
 const prismaClientSingleton = () => {
@@ -88,7 +90,7 @@ const prismaClientSingleton = () => {
         query: {
             $allModels: {
                 async $allOperations({ model, operation, args, query }) {
-                    const modelName = model.toLowerCase();
+                    const modelName = (model ?? '').toString().toLowerCase();
                     if (!operationalModels.includes(modelName)) {
                         return query(args);
                     }
@@ -102,11 +104,15 @@ const prismaClientSingleton = () => {
                         const impersonateId = user.impersonateTenantId;
                         const isPlatformAdmin = tenantId === 'PLATFORM_ADMIN' || role === 'SUPER_ADMIN';
 
-                        // 1. Platform Admin Bypass (Global view)
-                        if (isPlatformAdmin && (!impersonateId || (args as any).adminBypass)) {
+                        // 1. Platform Admin veya Internal Bypass Kontrolü
+                        if (isPlatformAdmin && (!impersonateId || (args as any)?.adminBypass)) {
                             const newArgs = { ...(args as any) };
                             if (newArgs.adminBypass) delete newArgs.adminBypass;
                             return query(newArgs);
+                        }
+
+                        if ((args as any)?.adminBypass) {
+                            return query(args);
                         }
 
                         const effectiveTenantId = impersonateId || tenantId;
@@ -118,6 +124,12 @@ const prismaClientSingleton = () => {
                             throw new Error("SECURITY_ERROR: Tenant context missing in session.");
                         }
 
+                        // YENI ÇÖZÜM: DB sorgusu yapma. Session/JWT'den al, yoksa array boş da olsa set'i dön.
+                        const allowedCompanyIds = Array.from(new Set([
+                            user.companyId,
+                            ...(user.accessibleCompanies?.map((ac: any) => typeof ac === 'string' ? ac : ac.companyId) || []),
+                        ].filter(Boolean)));
+
                         const newArgs = { ...(args as any) };
 
                         // Create operations do NOT take a where clause. 
@@ -126,7 +138,7 @@ const prismaClientSingleton = () => {
                         const isUniqueRead = operation === 'findUnique';
 
                         if (!isNoWhereOp) {
-                            if (!newArgs.where) newArgs.where = {};
+                            newArgs.where = newArgs.where ?? {};
 
                             const applyFilter = (target: any) => {
                                 if (modelName === 'company') {
@@ -163,6 +175,52 @@ const prismaClientSingleton = () => {
                                         ...(target.company || {}),
                                         tenantId: effectiveTenantId
                                     };
+                                }
+
+                                // --- YENİ NETWORK LAYER POLICY (COMPANY-BASED ISOLATION) ---
+                                else if (['networklisting', 'networkoffer', 'networkdemand', 'networkorder', 'shipment', 'shipmentevent'].includes(modelName)) {
+                                    let networkCondition: any = {};
+
+                                    if (modelName === 'networklisting' || modelName === 'networkoffer') {
+                                        networkCondition = { sellerCompanyId: { in: allowedCompanyIds } };
+                                    } else if (modelName === 'networkdemand') {
+                                        networkCondition = { buyerCompanyId: { in: allowedCompanyIds } };
+                                    } else if (modelName === 'networkorder') {
+                                        networkCondition = {
+                                            OR: [
+                                                { buyerCompanyId: { in: allowedCompanyIds } },
+                                                { sellerCompanyId: { in: allowedCompanyIds } }
+                                            ]
+                                        };
+                                    } else if (modelName === 'shipment') {
+                                        networkCondition = {
+                                            order: {
+                                                OR: [
+                                                    { buyerCompanyId: { in: allowedCompanyIds } },
+                                                    { sellerCompanyId: { in: allowedCompanyIds } }
+                                                ]
+                                            }
+                                        };
+                                    } else if (modelName === 'shipmentevent') {
+                                        networkCondition = {
+                                            shipment: {
+                                                order: {
+                                                    OR: [
+                                                        { buyerCompanyId: { in: allowedCompanyIds } },
+                                                        { sellerCompanyId: { in: allowedCompanyIds } }
+                                                    ]
+                                                }
+                                            }
+                                        };
+                                    }
+
+                                    if (Object.keys(target).length === 0) {
+                                        Object.assign(target, networkCondition);
+                                    } else {
+                                        target.AND = target.AND
+                                            ? (Array.isArray(target.AND) ? [...target.AND, networkCondition] : [target.AND, networkCondition])
+                                            : [networkCondition];
+                                    }
                                 }
                             };
 
