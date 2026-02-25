@@ -25,9 +25,14 @@ model Tenant {
 }
 
 model Company {
+  networkListings    NetworkListing[]
+  companyProductMaps CompanyProductMap[]
   id                 String                         @id @default(cuid())
   tenantId           String
   name               String
+  type               CompanyType                    @default(BUYER)
+  status             CompanyStatus                  @default(ACTIVE)
+  taxNumber          String
   vkn                String
   taxOffice          String?
   address            String?
@@ -86,9 +91,16 @@ model Company {
   transactions       Transaction[]
   users              UserCompanyAccess[]
   expenses           Expense[]
-  campaigns          Campaign[]
   locationRequests   CustomerLocationRequest[]
   securityEvents     SecurityEvent[]                @relation("CompanySecurityEvents")
+  campaigns          Campaign[]
+
+
+  // Commerce Layer v1
+  erpCategories      ERPProductCategory[]
+  categoryMappings   CategoryMapping[]
+  automationPolicy   SellerAutomationPolicy?
+  auditLogs          CommerceAuditLog[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -234,6 +246,8 @@ model Order {
 }
 
 model Product {
+  networkListings     NetworkListing[]
+  companyProductMaps  CompanyProductMap[]
   id                  String                  @id @default(cuid())
   name                String
   code                String
@@ -2373,3 +2387,474 @@ model ShipmentEventInbox {
   @@index([receivedAt])
   @@index([carrierCode])
 }
+
+enum AttributeType {
+  STRING
+  NUMBER
+  BOOLEAN
+  SELECT
+}
+
+model GlobalProduct {
+  id           String        @id @default(cuid())
+  name         String
+  categoryId   String?
+  description  String?
+  barcode      String?
+  imageUrl     String?
+  status       ProductStatus @default(DRAFT)
+  approvalNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category    GlobalCategory?     @relation(fields: [categoryId], references: [id])
+  listings    NetworkListing[]
+  companyMaps CompanyProductMap[]
+
+  @@index([categoryId])
+  @@index([status])
+}
+
+model GlobalCategory {
+  id       String  @id @default(cuid())
+  name     String
+  parentId String?
+  slug     String  @unique
+  active   Boolean @default(true)
+
+  parent   GlobalCategory?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children GlobalCategory[] @relation("CategoryToCategory")
+
+  attributes CategoryAttribute[]
+  products   GlobalProduct[]
+
+  // Reverse links
+  mappings          CategoryMapping[]
+  listingOverrides  B2BListingCategoryOverride[]
+
+  @@index([parentId])
+}
+
+model CategoryAttribute {
+  id         String        @id @default(cuid())
+  categoryId String
+  name       String
+  type       AttributeType @default(STRING)
+
+  category GlobalCategory    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  options  AttributeOption[]
+
+  @@index([categoryId])
+}
+
+model AttributeOption {
+  id          String @id @default(cuid())
+  attributeId String
+  value       String
+
+  attribute CategoryAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+
+  @@index([attributeId])
+}
+
+model ERPProductCategory {
+  id              String  @id @default(cuid())
+  sellerCompanyId String
+  name            String
+  parentId        String?
+  active          Boolean @default(true)
+
+  company  Company                 @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  parent   ERPProductCategory?     @relation("ERPCategoryToERPCategory", fields: [parentId], references: [id])
+  children ERPProductCategory[]    @relation("ERPCategoryToERPCategory")
+  mappings CategoryMapping[]
+
+  @@index([sellerCompanyId])
+  @@index([parentId])
+}
+
+model CategoryMapping {
+  id               String           @id @default(cuid())
+  sellerCompanyId  String
+  erpCategoryId    String
+  globalCategoryId String
+  confidence       MappingConfidence @default(MANUAL)
+  active           Boolean          @default(true)
+
+  company        Company            @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  erpCategory    ERPProductCategory @relation(fields: [erpCategoryId], references: [id], onDelete: Cascade)
+  globalCategory GlobalCategory     @relation(fields: [globalCategoryId], references: [id], onDelete: Cascade)
+
+  @@index([sellerCompanyId])
+  @@index([erpCategoryId])
+  @@index([globalCategoryId])
+}
+
+model B2BListingCategoryOverride {
+  id               String @id @default(cuid())
+  listingId        String @unique
+  globalCategoryId String
+
+  listing        NetworkListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  globalCategory GlobalCategory  @relation(fields: [globalCategoryId], references: [id], onDelete: Cascade)
+
+  @@index([globalCategoryId])
+}
+
+model B2BSuggestion {
+  id              String           @id @default(cuid())
+  sellerCompanyId String
+  productId       String?          // Direct to Product if simple
+  variantId       String?          // Prefer variants if exist
+  suggestionType  SuggestionType
+  score           Float            @default(0)
+  reasonsJson     Json             // e.g. {"onHand":500,"last30dSales":2,"rule":"OVERSTOCK_SLOW"}
+  status          SuggestionStatus @default(OPEN)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([sellerCompanyId])
+  @@index([status])
+  @@index([productId])
+  @@index([variantId])
+}
+
+model SellerAutomationPolicy {
+  id                     String      @id @default(cuid())
+  sellerCompanyId        String      @unique
+  autoPublishEnabled     Boolean     @default(false)
+  minOnHandThreshold     Int         @default(5)
+  maxReservedRatio       Float       @default(0.2) // e.g. reserved/onHand must be < 0.2
+  minMarginPercent       Float?      // optional if cost exists
+  minListingQualityScore Int         @default(50)
+  defaultVisibility      Visibility  @default(NETWORK)
+  defaultMinOrderQty     Int         @default(1)
+  defaultLeadTimeDays    Int         @default(3)
+  allowAutoPriceAdjust   Boolean     @default(false)
+
+  company Company @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+}
+
+model CommerceAuditLog {
+  id              String   @id @default(cuid())
+  sellerCompanyId String
+  actorType       ActorType
+  action          CommerceAction
+  entityType      String
+  entityId        String
+  payloadJson     Json?
+  createdAt       DateTime @default(now())
+
+  company Company @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+
+  @@index([sellerCompanyId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+enum MappingConfidence {
+  MANUAL
+  AUTO
+}
+
+enum SuggestionType {
+  LIST
+  INCREASE_VISIBILITY
+  ADJUST_PRICE
+  PAUSE
+}
+
+enum SuggestionStatus {
+  OPEN
+  ACCEPTED
+  DISMISSED
+  AUTO_APPLIED
+}
+
+enum Visibility {
+  NETWORK
+  PRIVATE
+}
+
+enum ActorType {
+  ADMIN
+  SELLER
+  SYSTEM
+}
+
+enum CommerceAction {
+  CREATE_LISTING
+  ACTIVATE_LISTING
+  PAUSE_LISTING
+  MAP_CATEGORY
+  AUTO_PUBLISH
+  AUTO_PAUSE
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+}
+
+model NetworkListing {
+  id              String @id @default(cuid())
+  globalProductId String
+  sellerCompanyId String
+  erpProductId    String
+
+  price        Decimal       @db.Decimal(10, 2)
+  availableQty Int           @default(0)
+  minQty       Int           @default(1)
+  leadTimeDays Int           @default(0)
+  status       ListingStatus @default(ACTIVE)
+  visibility   Visibility    @default(NETWORK)
+  packSize     Int?          @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  globalProduct GlobalProduct @relation(fields: [globalProductId], references: [id], onDelete: Cascade)
+  company       Company       @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  erpProduct    Product       @relation(fields: [erpProductId], references: [id], onDelete: Cascade)
+
+  categoryOverride B2BListingCategoryOverride?
+
+  @@unique([sellerCompanyId, erpProductId])
+  @@index([globalProductId])
+  @@index([sellerCompanyId])
+  @@index([status])
+}
+
+model CompanyProductMap {
+  id              String @id @default(cuid())
+  companyId       String
+  globalProductId String
+  erpProductId    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  globalProduct GlobalProduct @relation(fields: [globalProductId], references: [id], onDelete: Cascade)
+  erpProduct    Product       @relation(fields: [erpProductId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, globalProductId])
+  @@unique([companyId, erpProductId])
+  @@index([companyId])
+  @@index([globalProductId])
+}
+
+enum RfqStatus {
+  DRAFT
+  SENT
+  RESPONDED
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+enum OfferStatus {
+  PENDING
+  COUNTERED
+  ACCEPTED
+  REJECTED
+}
+
+model Rfq {
+  id             String    @id @default(cuid())
+  buyerCompanyId String
+  status         RfqStatus @default(DRAFT)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  items  RfqItem[]
+  offers SellerOffer[]
+
+  @@index([buyerCompanyId])
+  @@index([status])
+}
+
+model RfqItem {
+  id              String   @id @default(cuid())
+  rfqId           String
+  productId       String
+  sellerCompanyId String
+  quantity        Int
+  targetPrice     Decimal? @db.Decimal(12, 2)
+
+  rfq Rfq @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+
+  @@index([rfqId])
+  @@index([sellerCompanyId])
+}
+
+model SellerOffer {
+  id              String      @id @default(cuid())
+  rfqId           String
+  sellerCompanyId String
+  status          OfferStatus @default(PENDING)
+  totalPrice      Decimal     @db.Decimal(12, 2)
+  expiresAt       DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  rfq   Rfq               @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  items SellerOfferItem[]
+
+  @@index([rfqId])
+  @@index([sellerCompanyId])
+  @@index([status])
+}
+
+model SellerOfferItem {
+  id            String  @id @default(cuid())
+  sellerOfferId String
+  productId     String
+  quantity      Int
+  unitPrice     Decimal @db.Decimal(12, 2)
+
+  sellerOffer SellerOffer @relation(fields: [sellerOfferId], references: [id], onDelete: Cascade)
+
+  @@index([sellerOfferId])
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+}
+
+enum SettlementCycle {
+  INSTANT
+  WEEKLY
+  MONTHLY
+}
+
+enum RecurringFrequency {
+  WEEKLY
+  MONTHLY
+}
+
+enum OrderSourceType {
+  CART
+  RFQ
+  CONTRACT
+}
+
+model Contract {
+  id              String          @id @default(cuid())
+  buyerCompanyId  String
+  sellerCompanyId String
+  status          ContractStatus  @default(DRAFT)
+  startDate       DateTime?
+  endDate         DateTime?
+  currency        String          @default("TRY")
+  paymentMode     PaymentMode     @default(DIRECT)
+  settlementCycle SettlementCycle @default(INSTANT)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  items           ContractItem[]
+  slas            ContractSLA[]
+  recurringOrders RecurringOrder[]
+
+  @@index([buyerCompanyId])
+  @@index([sellerCompanyId])
+  @@index([status])
+}
+
+model ContractItem {
+  id            String  @id @default(cuid())
+  contractId    String
+  productId     String
+  baseUnitPrice Decimal @db.Decimal(12, 2)
+  minOrderQty   Int     @default(1)
+
+  contract      Contract       @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  tiers         ContractTier[]
+  reservedStock ReservedStock?
+
+  @@index([contractId])
+  @@index([productId])
+}
+
+model ContractTier {
+  id             String  @id @default(cuid())
+  contractItemId String
+  minQty         Int
+  unitPrice      Decimal @db.Decimal(12, 2)
+
+  contractItem ContractItem @relation(fields: [contractItemId], references: [id], onDelete: Cascade)
+
+  @@index([contractItemId])
+}
+
+model ReservedStock {
+  id             String @id @default(cuid())
+  contractItemId String @unique
+  quantity       Int    @default(0)
+  allocated      Int    @default(0)
+
+  contractItem ContractItem @relation(fields: [contractItemId], references: [id], onDelete: Cascade)
+}
+
+model ContractSLA {
+  id                 String  @id @default(cuid())
+  contractId         String
+  maxDeliveryDays    Int
+  latePenaltyPercent Decimal @db.Decimal(5, 2)
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+}
+
+model RecurringOrder {
+  id          String             @id @default(cuid())
+  contractId  String
+  frequency   RecurringFrequency
+  dayOfPeriod Int
+  nextRunAt   DateTime?
+  active      Boolean            @default(true)
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+  @@index([nextRunAt])
+}
+
+model PenaltyLedger {
+  id              String   @id @default(cuid())
+  sellerCompanyId String
+  contractId      String
+  amount          Decimal  @db.Decimal(12, 2)
+  currency        String   @default("TRY")
+  createdAt       DateTime @default(now())
+
+  @@index([contractId])
+}
+
+enum CompanyType {
+  BUYER
+  SELLER
+  PLATFORM
+}
+
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  SUSPENDED
+}
+
+enum ProductStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+
