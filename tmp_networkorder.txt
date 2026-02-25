@@ -1,0 +1,23 @@
+model NetworkOrder {
+  id               String    @id @default(cuid())
+  buyerCompanyId   String
+  sellerCompanyId  String
+  subtotalAmount   Decimal   @db.Decimal(12, 2)
+  shippingAmount   Decimal   @db.Decimal(12, 2)
+  commissionAmount Decimal   @db.Decimal(12, 2)
+  totalAmount      Decimal   @db.Decimal(12, 2)
+  currency         String    @default("TRY")
+  status           String
+  paidAt           DateTime?
+  confirmedAt      DateTime?
+  completedAt      DateTime?
+  completionKey    String?   @unique
+  disputeOpenedAt  DateTime?
+  itemsHash        String
+  items            Json?     @db.JsonB
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  payments  NetworkPayment[]
+  shipments Shipment[]
+}

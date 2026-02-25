@@ -3,6 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { SuggestionType, SuggestionStatus, ProductStatus, Visibility, ActorType, CommerceAction } from "@prisma/client";
 import { calculateAvailableInventory } from "@/lib/inventory";
 import { applySuggestion } from "@/services/network/suggestionService";
+import crypto from 'crypto';
+
+function deterministicBucket(id: string): number {
+    const hash = crypto.createHash('sha256').update(id).digest('hex');
+    return parseInt(hash.substring(0, 8), 16) % 100;
+}
 
 export interface SuggestionEngineOptions {
     companyId: string;
@@ -152,7 +158,13 @@ export async function runSuggestionEngine({ companyId, dryRun = false }: Suggest
                             ? `Stok yüksek (${available}), son 30 gün satış düşük (${sales30d}). %5 indirimle ($${suggestedPrice}) B2B'de yayınlamayı öneriyoruz.`
                             : `Stok yüksek (${available}), ancak aktif fiyat tanımlı değil. Fiyat belirleyip yayınlayın.`
                     },
-                    dedupeKey: `${companyId}:${product.id}:OVERSTOCK_SLOW:${todayStr}`
+                    dedupeKey: `${companyId}:${product.id}:OVERSTOCK_SLOW:${todayStr}`,
+                    _context: {
+                        priceCheck: hasActivePrice,
+                        inventoryCheck: available >= (listing?.minQty || policy.defaultMinOrderQty || 1),
+                        approvalCheck: product.status === "ACTIVE",
+                        reservedRatioCheck: onHand > 0 ? ((Math.max(0, onHand - available)) / onHand < policy.maxReservedRatio) : true
+                    }
                 });
             } else if (listing && listing.status === "ACTIVE") {
                 // Already listed, let's suggest a boost or price adjustment
@@ -169,7 +181,13 @@ export async function runSuggestionEngine({ companyId, dryRun = false }: Suggest
                         suggestedPrice: suggestedPrice,
                         message: `Stok yüksek (${available}) ve ilanınız aktif olmasına rağmen satış yavaş. Görünürlüğünüzü artırabilir veya %5 indirim uygulayabilirsiniz.`
                     },
-                    dedupeKey: `${companyId}:${product.id}:OVERSTOCK_SLOW_ACTIVE:${todayStr}`
+                    dedupeKey: `${companyId}:${product.id}:OVERSTOCK_SLOW_ACTIVE:${todayStr}`,
+                    _context: {
+                        priceCheck: hasActivePrice,
+                        inventoryCheck: available >= (listing?.minQty || policy.defaultMinOrderQty || 1),
+                        approvalCheck: product.status === "ACTIVE",
+                        reservedRatioCheck: onHand > 0 ? ((Math.max(0, onHand - available)) / onHand < policy.maxReservedRatio) : true
+                    }
                 });
             }
         }
@@ -188,7 +206,13 @@ export async function runSuggestionEngine({ companyId, dryRun = false }: Suggest
                         minQty: effectiveMinQty,
                         message: `Mevcut stok (${available}) minimum sipariş miktarının (${effectiveMinQty}) altında. Yayını duraklatmayı öneriyoruz.`
                     },
-                    dedupeKey: `${companyId}:${product.id}:LOW_STOCK:${todayStr}`
+                    dedupeKey: `${companyId}:${product.id}:LOW_STOCK:${todayStr}`,
+                    _context: {
+                        priceCheck: hasActivePrice,
+                        inventoryCheck: available >= (listing?.minQty || policy.defaultMinOrderQty || 1),
+                        approvalCheck: product.status === "ACTIVE",
+                        reservedRatioCheck: onHand > 0 ? ((Math.max(0, onHand - available)) / onHand < policy.maxReservedRatio) : true
+                    }
                 });
             }
         }
@@ -208,7 +232,13 @@ export async function runSuggestionEngine({ companyId, dryRun = false }: Suggest
                     missing,
                     message: `İlan detaylarında eksik alanlar var: ${missing.join(", ")}. Tamamlamanız önerilir.`
                 },
-                dedupeKey: `${companyId}:${product.id}:FIX_LISTING:${todayStr}`
+                dedupeKey: `${companyId}:${product.id}:FIX_LISTING:${todayStr}`,
+                _context: {
+                    priceCheck: hasActivePrice,
+                    inventoryCheck: available >= (listing?.minQty || policy.defaultMinOrderQty || 1),
+                    approvalCheck: product.status === "ACTIVE",
+                    reservedRatioCheck: onHand > 0 ? ((Math.max(0, onHand - available)) / onHand < policy.maxReservedRatio) : true
+                }
             });
         }
 
@@ -222,7 +252,13 @@ export async function runSuggestionEngine({ companyId, dryRun = false }: Suggest
                     rule: "PRICE_MISSING",
                     message: "İlan aktif ancak geçerli bir fiyat tanımlı değil. Alıcılar ürünü göremeyecektir."
                 },
-                dedupeKey: `${companyId}:${product.id}:PRICE_MISSING:${todayStr}`
+                dedupeKey: `${companyId}:${product.id}:PRICE_MISSING:${todayStr}`,
+                _context: {
+                    priceCheck: hasActivePrice,
+                    inventoryCheck: available >= (listing?.minQty || policy.defaultMinOrderQty || 1),
+                    approvalCheck: product.status === "ACTIVE",
+                    reservedRatioCheck: onHand > 0 ? ((Math.max(0, onHand - available)) / onHand < policy.maxReservedRatio) : true
+                }
             });
         }
     }
@@ -265,44 +301,85 @@ export async function runSuggestionEngine({ companyId, dryRun = false }: Suggest
 
         count++;
 
+        // Decision Log & Guardrails
+        const bucket = deterministicBucket(sug.productId);
+        const rolloutCheck = bucket < policy.rolloutPercent;
+
+        const priceCheck = sug._context.priceCheck;
+        const inventoryCheck = sug._context.inventoryCheck;
+        const approvalCheck = sug._context.approvalCheck;
+        const reservedRatioCheck = sug._context.reservedRatioCheck;
+
+        const checksJson = {
+            priceCheck,
+            inventoryCheck,
+            approvalCheck,
+            rolloutCheck,
+            reservedRatioCheck,
+            bucket,
+            rolloutPercent: policy.rolloutPercent
+        };
+
+        let decision = "SKIP_NOT_AUTO_CAPABLE";
+        let shouldAutoApply = false;
+
+        if (policy.autoPublishEnabled && [SuggestionType.LIST, SuggestionType.PAUSE].includes(sug.suggestionType)) {
+            if (dryRun) {
+                decision = "PREVIEW_ONLY";
+                shouldAutoApply = true;
+            } else if (priceCheck && inventoryCheck && approvalCheck && reservedRatioCheck && rolloutCheck) {
+                decision = "AUTO_APPLY";
+                shouldAutoApply = true;
+            } else {
+                decision = "SKIP_FAILED_CHECKS";
+            }
+        }
+
+        await prisma.automationDecisionLog.create({
+            data: {
+                sellerCompanyId: companyId,
+                variantId: sug.productId, // treating product as variant here for simplicity
+                rule: sug.reasonsJson.rule || "UNKNOWN",
+                checksJson,
+                decision
+            }
+        });
+
         // 4. Auto-Apply if enabled
-        if (policy.autoPublishEnabled) {
-            // Safe auto-apply types
-            if ([SuggestionType.LIST, SuggestionType.PAUSE].includes(sug.suggestionType)) {
-                if (dryRun) {
-                    await prisma.b2BSuggestion.update({
-                        where: { id: upserted.id },
-                        data: { status: SuggestionStatus.PREVIEW_ONLY }
-                    });
+        if (shouldAutoApply) {
+            if (dryRun) {
+                await prisma.b2BSuggestion.update({
+                    where: { id: upserted.id },
+                    data: { status: SuggestionStatus.PREVIEW_ONLY }
+                });
+                await prisma.commerceAuditLog.create({
+                    data: {
+                        sellerCompanyId: companyId,
+                        actorType: ActorType.SYSTEM,
+                        action: CommerceAction.AUTO_PUBLISH,
+                        entityType: "B2BSuggestion",
+                        entityId: upserted.id,
+                        payloadJson: { type: sug.suggestionType, productId: sug.productId, dryRun: true }
+                    }
+                });
+                autoAppliedCount++;
+            } else {
+                try {
+                    await applySuggestion(upserted.id, companyId, ActorType.SYSTEM);
+                    autoAppliedCount++;
+                } catch (err: any) {
+                    console.error(`[SuggestionEngine] Auto-apply failed for ${upserted.id}:`, err?.message || err);
+
                     await prisma.commerceAuditLog.create({
                         data: {
                             sellerCompanyId: companyId,
                             actorType: ActorType.SYSTEM,
-                            action: CommerceAction.AUTO_PUBLISH,
+                            action: CommerceAction.AUTO_PUBLISH_ERROR,
                             entityType: "B2BSuggestion",
                             entityId: upserted.id,
-                            payloadJson: { type: sug.suggestionType, productId: sug.productId, dryRun: true }
+                            payloadJson: { error: err?.message || err.toString() }
                         }
                     });
-                    autoAppliedCount++;
-                } else {
-                    try {
-                        await applySuggestion(upserted.id, companyId, ActorType.SYSTEM);
-                        autoAppliedCount++;
-                    } catch (err: any) {
-                        console.error(`[SuggestionEngine] Auto-apply failed for ${upserted.id}:`, err?.message || err);
-
-                        await prisma.commerceAuditLog.create({
-                            data: {
-                                sellerCompanyId: companyId,
-                                actorType: ActorType.SYSTEM,
-                                action: CommerceAction.AUTO_PUBLISH_ERROR,
-                                entityType: "B2BSuggestion",
-                                entityId: upserted.id,
-                                payloadJson: { error: err?.message || err.toString() }
-                            }
-                        });
-                    }
                 }
             }
         }

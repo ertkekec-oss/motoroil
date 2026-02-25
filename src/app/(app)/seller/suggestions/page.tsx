@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { SuggestionStatus, SuggestionType } from "@prisma/client";
 import { acceptSuggestionAction, dismissSuggestionAction } from "@/actions/suggestionActions";
 import Link from "next/link";
+import { getAutomationMetrics } from "@/services/automation/automationMetricsService";
 
 export const dynamic = "force-dynamic";
 
@@ -34,14 +35,15 @@ export default async function SellerSuggestionsPage() {
         }
     });
 
-    // Mocked revenue for Phase D3
-    const automationRevenue = 15450;
+    // Real revenue and KPI from Phase D4
+    const metrics = await getAutomationMetrics(companyId);
 
     const stats = [
         { label: "Yeni Öneriler", value: suggestions.length, color: "text-blue-600" },
         { label: "Uygulananlar", value: acceptedCount, color: "text-emerald-600" },
-        { label: "Zeka Skoru", value: suggestions.length > 0 ? Math.round(suggestions.reduce((a, b) => a + b.score, 0) / suggestions.length) : 0, suffix: "/100", color: "text-purple-600" },
-        { label: "Otomasyon Kazancı", value: `₺${automationRevenue.toLocaleString('tr-TR')}`, color: "text-amber-600", suffix: " (Bu Hafta)" }
+        { label: "Otomasyon Kazancı", value: `₺${metrics.automationRevenueWTD.toLocaleString('tr-TR')}`, color: "text-amber-600", suffix: " (Son 7 Gün)" },
+        { label: "Oto. Sipariş", value: metrics.automationOrdersWTD, color: "text-purple-600" },
+        { label: "Dönüşüm Oranı", value: `%${metrics.automationConversionRateWTD}`, color: "text-pink-600" }
     ];
 
     return (
@@ -63,7 +65,7 @@ export default async function SellerSuggestionsPage() {
                 </div>
 
                 {/* KPI Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     {stats.map((s, idx) => (
                         <div key={idx} className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
                             <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">{s.label}</div>

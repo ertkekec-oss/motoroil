@@ -82,6 +82,7 @@ export async function createOrdersFromCartAction(checkoutAttemptKey: string) {
                 orderItems.push({
                     globalProductId: item.productId,
                     erpProductId: listing.erpProductId,
+                    listingId: listing.id,
                     name: listing.globalProduct?.name || "Unknown Product",
                     price: resolved.unitPrice,
                     qty: item.qty,
@@ -117,6 +118,7 @@ export async function createOrdersFromCartAction(checkoutAttemptKey: string) {
                     status: "INIT",
                     itemsHash,
                     items: orderItems,
+                    networkItems: { create: orderItems },
                     sourceType: hasContractItems ? "CONTRACT" : "CART",
                     sourceId: contractId,
                 }
@@ -126,6 +128,7 @@ export async function createOrdersFromCartAction(checkoutAttemptKey: string) {
             await tx.networkPayment.create({
                 data: {
                     networkOrderId: networkOrder.id,
+
                     provider: "MOCK",
                     mode: "ESCROW",
                     status: "INITIATED",
