@@ -1,0 +1,10 @@
+﻿scripts/run_race_test.ts(12,17): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type '(Without<CompanyCreateInput, CompanyUncheckedCreateInput> & CompanyUncheckedCreateInput) | (Without<...> & CompanyCreateInput)'.
+src/app/api/network/demands/[id]/offers/route.ts(22,47): error TS2339: Property 'errors' does not exist on type 'ZodError<{ price?: number; payload?: Record<any, unknown>; }>'.
+src/app/api/network/demands/route.ts(22,47): error TS2339: Property 'errors' does not exist on type 'ZodError<{ type: "PRODUCT" | "LOGISTICS" | "SERVICE" | "ACCOUNTING"; payload: Record<any, unknown>; globalProductId?: string; }>'.
+src/app/api/network/listings/[id]/route.ts(22,47): error TS2339: Property 'errors' does not exist on type 'ZodError<{ price?: number; availableQty?: number; minQty?: number; leadTimeDays?: number; status?: "ACTIVE" | "PAUSED" | "INACTIVE"; }>'.
+src/app/api/network/listings/route.ts(22,47): error TS2339: Property 'errors' does not exist on type 'ZodError<{ productId: string; availableQty: number; price?: number; minQty?: number; leadTimeDays?: number; }>'.
+src/app/api/network/orders/[id]/payments/init/route.ts(34,42): error TS2339: Property 'errors' does not exist on type 'ZodError<{ mode: "DIRECT" | "ESCROW"; }>'.
+src/app/api/network/orders/route.ts(23,47): error TS2339: Property 'errors' does not exist on type 'ZodError<{ role: "buyer" | "seller"; take: number; status?: "PAID" | "CANCELLED" | "DELIVERED" | "COMPLETED" | "PENDING_PAYMENT" | "SHIPPED" | "DISPUTED" | "RETURNED"; cursor?: string; }>'.
+src/lib/validation/network.ts(34,16): error TS2554: Expected 2-3 arguments, but got 1.
+src/lib/validation/network.ts(48,16): error TS2554: Expected 2-3 arguments, but got 1.
+src/lib/validation/network.ts(56,16): error TS2554: Expected 2-3 arguments, but got 1.

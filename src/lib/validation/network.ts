@@ -31,7 +31,7 @@ export const networkListingUpdateSchema = z.object({
 export const networkDemandCreateSchema = z.object({
     type: z.enum(['PRODUCT', 'LOGISTICS', 'SERVICE', 'ACCOUNTING']),
     globalProductId: z.string().optional(),
-    payload: z.record(z.any()).optional().default({})
+    payload: z.record(z.string(), z.any()).optional().default({})
 }).refine((data) => {
     // If type is PRODUCT, MVP rule: globalProductId must be provided
     if (data.type === 'PRODUCT' && !data.globalProductId) {
@@ -45,7 +45,7 @@ export const networkDemandCreateSchema = z.object({
 
 export const networkDemandUpdateSchema = z.object({
     status: z.enum(['OPEN', 'CLOSED', 'CANCELLED', 'EXPIRED']),
-    payload: z.record(z.any()).optional()
+    payload: z.record(z.string(), z.any()).optional()
 });
 
 // ==========================================
@@ -53,7 +53,7 @@ export const networkDemandUpdateSchema = z.object({
 // ==========================================
 export const networkOfferCreateSchema = z.object({
     price: DecimalConvertible.refine((val) => val > 0, { message: "Offer price must be greater than zero" }),
-    payload: z.record(z.any()).optional()
+    payload: z.record(z.string(), z.any()).optional()
 });
 
 // ==========================================

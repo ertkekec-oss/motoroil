@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
         const parseResult = networkOrderQuerySchema.safeParse(queryParams);
 
         if (!parseResult.success) {
-            return ApiError(parseResult.error.errors[0].message, 400);
+            return ApiError(parseResult.error.issues[0].message, 400);
         }
 
         const data = parseResult.data;

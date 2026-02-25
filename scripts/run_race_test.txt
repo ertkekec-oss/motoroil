@@ -8,9 +8,7 @@ async function main() {
     if (!company) {
         company = await prismaRaw.company.create({
             data: {
-                name: 'Test Company ' + Date.now(),
-                type: 'OTHER',
-                taxNumber: '1234567890'
+                name: 'Test Company ' + Date.now()
             }
         });
     }

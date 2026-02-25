@@ -34,6 +34,7 @@ async function main() {
             tenantId: tenant.id,
             name: 'Merkez Şube',
             vkn: '1111111111',
+            taxNumber: '1111111111',
             address: 'Demo Adres',
             city: 'Istanbul'
         }

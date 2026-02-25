@@ -135,12 +135,12 @@ export async function getRequestContext(req: NextRequest): Promise<RequestContex
     const now = new Date();
     if (!user.lastActiveAt || (now.getTime() - new Date(user.lastActiveAt).getTime() > 60000)) {
         if (isStaff) {
-            (prisma as any).staff.update({
+            (prismaBase as any).staff.update({
                 where: { id: user.id },
                 data: { lastActive: now }
             }).catch((err: any) => console.error("Staff LastActive update failed:", err));
         } else {
-            (prisma as any).user.update({
+            (prismaBase as any).user.update({
                 where: { id: user.id },
                 data: { lastActiveAt: now }
             }).catch((err: any) => console.error("LastActive update failed:", err));

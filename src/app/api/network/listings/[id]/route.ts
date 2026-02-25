@@ -19,7 +19,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         const parseResult = networkListingUpdateSchema.safeParse(body);
 
         if (!parseResult.success) {
-            return ApiError(parseResult.error.errors[0].message, 400);
+            return ApiError(parseResult.error.issues[0].message, 400);
         }
 
         const data = parseResult.data;

@@ -66,6 +66,30 @@ export async function confirmDelivery(orderId: string, buyerCompanyId: string): 
         return { success: true, alreadyConfirmed: true, orderId: order.id, payoutReleased: false, message: 'Race condition mitigated - already confirmed' };
     }
 
+    // Apply SLA Penalties if Contractual
+    if (order.sourceType === "CONTRACT" && order.sourceId) {
+        const sla = await prisma.contractSLA.findFirst({
+            where: { contractId: order.sourceId }
+        });
+
+        if (sla) {
+            const deliveryDays = Math.floor((Date.now() - order.createdAt.getTime()) / (1000 * 60 * 60 * 24));
+            if (deliveryDays > sla.maxDeliveryDays) {
+                // Calculate penalty
+                const amount = (Number(order.totalAmount) * Number(sla.latePenaltyPercent)) / 100;
+                await prisma.penaltyLedger.create({
+                    data: {
+                        sellerCompanyId: order.sellerCompanyId,
+                        contractId: order.sourceId,
+                        amount,
+                        currency: order.currency
+                    }
+                });
+                console.info(`SLA Penalty applied for order ${order.id}. Days: ${deliveryDays}, Penalty: ${amount}`);
+            }
+        }
+    }
+
     console.info(JSON.stringify({
         event: 'order_completed',
         orderId,

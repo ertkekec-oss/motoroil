@@ -43,6 +43,14 @@ export default async function AdminLayout({
                     <NavLink href="/admin/support/tickets" icon="inbox">Destek Talepleri</NavLink>
                     <NavLink href="/admin/tenants/PLATFORM_ADMIN/help" icon="help">Yardım Merkezi</NavLink>
                     <NavLink href="/admin/marketplace/ops" icon="radar">Pazaryeri Operasyonları</NavLink>
+
+                    <div className="pt-4 mt-4 font-semibold text-xs text-slate-500 uppercase tracking-wider px-3 mb-1">B2B Ağ Yönetimi</div>
+                    <NavLink href="/admin/ops/orders" icon="radar">Ağ Siparişleri</NavLink>
+                    <NavLink href="/admin/ops/payments" icon="credit-card">Finans & Escrow</NavLink>
+                    <NavLink href="/admin/ops/shipments" icon="globe">Lojistik & Kargo</NavLink>
+                    <NavLink href="/admin/ops/ledgers" icon="activity">Sistem Ledger (Audit)</NavLink>
+
+                    <div className="pt-4 mt-4 font-semibold text-xs text-slate-500 uppercase tracking-wider px-3 mb-1">Sistem & Güvenlik</div>
                     <NavLink href="/admin/security" icon="shield">Operasyonel Güvenlik</NavLink>
                     <NavLink href="/admin/logs" icon="terminal">Sistem Logları</NavLink>
 

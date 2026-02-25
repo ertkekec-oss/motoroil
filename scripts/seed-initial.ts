@@ -27,6 +27,7 @@ async function main() {
                 tenantId: tenant.id,
                 name: 'Periodya Demo A.Ş.',
                 vkn: '1234567890',
+                taxNumber: '1234567890',
                 city: 'Istanbul'
             }
         });

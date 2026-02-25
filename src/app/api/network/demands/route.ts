@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         const parseResult = networkDemandCreateSchema.safeParse(body);
 
         if (!parseResult.success) {
-            return ApiError(parseResult.error.errors[0].message, 400);
+            return ApiError(parseResult.error.issues[0].message, 400);
         }
 
         const data = parseResult.data;

@@ -20,6 +20,7 @@ export default function Sidebar() {
 
     const [fieldSalesOpen, setFieldSalesOpen] = useState(false);
     const [reportsOpen, setReportsOpen] = useState(false);
+    const [networkOpen, setNetworkOpen] = useState(false);
 
     // Auto-expand if active
     useEffect(() => {
@@ -28,6 +29,9 @@ export default function Sidebar() {
         }
         if (pathname.includes('/reports')) {
             setReportsOpen(true);
+        }
+        if (pathname.includes('/network') || pathname.includes('/admin/ops')) {
+            setNetworkOpen(true);
         }
     }, [pathname]);
 
@@ -69,6 +73,8 @@ export default function Sidebar() {
         '/fintech/open-banking': { perm: 'finance_view' },
         '/fintech/smart-pricing': { perm: 'finance_view', feature: 'smart_pricing' },
         '/notifications': { perm: 'pos_access' },
+        '/network/buyer/orders': { perm: 'supplier_view' },
+        '/network/seller/orders': { perm: 'sales_archive' },
     };
 
     const menuItems = [
@@ -80,6 +86,29 @@ export default function Sidebar() {
         { name: 'Satış Yönetimi', href: '/sales', icon: '🧾' },
         { name: 'Cari Hesaplar', href: '/customers', icon: '🤝' },
         { name: 'Tedarikçi Ağı', href: '/suppliers', icon: '🚚' },
+
+        // B2B AĞI & PAZARYERİ
+        {
+            name: 'B2B & Pazaryeri Ağı',
+            icon: '🌍',
+            isParent: true,
+            id: 'network-parent',
+            subItems: [
+                { name: 'B2B Ürün Kataloğu', href: '/catalog', icon: '🛍️' },
+                { name: '🛒 Sepetim (Cart)', href: '/catalog/cart', icon: '🛒' },
+                { name: 'Pazarlıklı Alımlar (Buyer)', href: '/rfq', icon: '🤝' },
+                { name: 'Sözleşmelerim (Buyer)', href: '/contracts', icon: '📜' },
+                { name: 'Ürün Yayınlama (Seller)', href: '/seller/products', icon: '📢' },
+                { name: 'Gelen Talepler (Seller)', href: '/seller/rfqs', icon: '📈' },
+                { name: 'Tedarik Sözleşmeleri (Seller)', href: '/seller/contracts', icon: '🤝' },
+                { name: 'Alınan Siparişler (Seller)', href: '/network/seller/orders', icon: '🏪' },
+                { name: 'Verilen Siparişler (Buyer)', href: '/network/buyer/orders', icon: '🛒' },
+                { name: 'ADMIN: Kategoriler', href: '/admin/catalog/categories', icon: '📂' },
+                { name: 'ADMIN: Onay Masası', href: '/admin/products', icon: '⚖️' },
+                { name: 'ADMIN: Firmalar', href: '/admin/companies', icon: '🏢' },
+                { name: 'ADMIN: Altyapı', href: '/admin/ops/providers', icon: '⚙️' }
+            ]
+        },
 
         // AKILLI SİSTEMLER GRUBU
         { name: 'Finansal Kontrol Kulesi', href: '/fintech/control-tower', icon: '🗼' },
@@ -283,7 +312,7 @@ export default function Sidebar() {
             }}>
                 {menuItems.map((item: any) => {
                     if (item.isParent) {
-                        const isExpanded = item.id === 'field-sales-parent' ? fieldSalesOpen : (item.id === 'reports-parent' ? reportsOpen : false);
+                        const isExpanded = item.id === 'field-sales-parent' ? fieldSalesOpen : (item.id === 'reports-parent' ? reportsOpen : (item.id === 'network-parent' ? networkOpen : false));
                         const anyChildActive = item.subItems?.some((sub: any) => pathname === sub.href);
 
                         return (
@@ -292,6 +321,7 @@ export default function Sidebar() {
                                     onClick={() => {
                                         if (item.id === 'field-sales-parent') setFieldSalesOpen(!fieldSalesOpen);
                                         if (item.id === 'reports-parent') setReportsOpen(!reportsOpen);
+                                        if (item.id === 'network-parent') setNetworkOpen(!networkOpen);
                                     }}
                                     style={{
                                         display: 'flex', alignItems: 'center', gap: '14px',

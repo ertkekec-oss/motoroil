@@ -1,0 +1,14 @@
+enum PaymentProvider {
+  ODEL
+  IYZICO
+}
+enum PaymentMode {
+  DIRECT
+  ESCROW
+}
+enum PaymentStatus {
+  INITIATED
+  PAID
+  FAILED
+  CANCELLED
+}

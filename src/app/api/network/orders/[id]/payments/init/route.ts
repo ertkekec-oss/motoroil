@@ -31,7 +31,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         const body = await req.json();
         const parsed = paymentInitCreateSchema.safeParse(body);
         if (!parsed.success) {
-            return ApiError(parsed.error.errors[0].message, 400);
+            return ApiError('Geçersiz veri: ' + parsed.error.issues[0].message, 400);
         }
 
         const data = parsed.data;

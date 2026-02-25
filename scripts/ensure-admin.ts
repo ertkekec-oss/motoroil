@@ -38,6 +38,7 @@ async function main() {
                     tenantId: tenant.id,
                     name: 'Periodya HQ',
                     vkn: '1111111111',
+                    taxNumber: '1111111111',
                     city: 'Istanbul'
                 }
             });

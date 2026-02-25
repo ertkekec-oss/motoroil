@@ -90,6 +90,10 @@ const prismaClientSingleton = () => {
         query: {
             $allModels: {
                 async $allOperations({ model, operation, args, query }) {
+                    if (process.env.PRISMA_BYPASS_EXTENSION === "true") {
+                        return query(args);
+                    }
+
                     const modelName = (model ?? '').toString().toLowerCase();
                     if (!operationalModels.includes(modelName)) {
                         return query(args);

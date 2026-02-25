@@ -1,0 +1,27 @@
+model Shipment {
+  id                 String         @id @default(cuid())
+  networkOrderId     String
+  mode               ShipmentMode
+  status             ShipmentStatus @default(CREATED)
+  carrierCode        String
+  trackingNumber     String?
+  labelUrl           String?
+  sequence           Int            @default(1)
+  initKey            String?        @unique
+  deliveryNoteUuid   String?
+  deliveryNoteStatus String?
+
+  items Json? @db.JsonB // For partial shipments, array of item ids/qty
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order  NetworkOrder    @relation(fields: [networkOrderId], references: [id], onDelete: Cascade)
+  events ShipmentEvent[]
+
+  @@unique([networkOrderId, sequence])
+  @@index([carrierCode])
+  @@index([trackingNumber])
+  @@index([networkOrderId])
+  @@index([status])
+}

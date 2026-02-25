@@ -1,0 +1,49 @@
+model NetworkPayment {
+  id                 String          @id @default(cuid())
+  networkOrderId     String
+  provider           PaymentProvider
+  mode               PaymentMode
+  status             PaymentStatus   @default(INITIATED)
+  amount             Decimal         @db.Decimal(12, 2)
+  currency           String          @default("TRY")
+  providerPaymentId  String?
+  providerPaymentKey String?         @unique
+  attemptKey         String?         @unique
+  checkoutUrl        String?
+  rawInit            Json?           @db.JsonB
+  payoutStatus       String          @default("INITIATED")
+  releasedAt         DateTime?
+  releaseAttemptKey  String?         @unique
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  // Order Relation
+  order NetworkOrder @relation(fields: [networkOrderId], references: [id], onDelete: Cascade)
+
+  @@index([networkOrderId])
+  @@index([networkOrderId, status])
+  @@index([status])
+}
+model SellerBalanceLedger {
+  id              String     @id @default(cuid())
+  sellerCompanyId String
+  networkOrderId  String
+  amount          Decimal    @db.Decimal(12, 2)
+  currency        String     @default("TRY")
+  type            LedgerType
+  idempotencyKey  String     @unique
+  createdAt       DateTime   @default(now())
+
+  @@index([sellerCompanyId])
+  @@index([networkOrderId])
+}
+model PlatformCommissionLedger {
+  id             String   @id @default(cuid())
+  networkOrderId String
+  amount         Decimal  @db.Decimal(12, 2)
+  currency       String   @default("TRY")
+  idempotencyKey String   @unique
+  createdAt      DateTime @default(now())
+
+  @@index([networkOrderId])
+}

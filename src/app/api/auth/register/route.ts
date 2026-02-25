@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
                 tenantId: tenant.id,
                 name: companyName,
                 vkn: '9999999999', // Placeholder
+                taxNumber: '9999999999', // Placeholder
                 address: '',
                 city: ''
             }

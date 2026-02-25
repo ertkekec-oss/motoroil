@@ -95,12 +95,12 @@ model Company {
   securityEvents     SecurityEvent[]                @relation("CompanySecurityEvents")
   campaigns          Campaign[]
 
-
   // Commerce Layer v1
-  erpCategories      ERPProductCategory[]
-  categoryMappings   CategoryMapping[]
-  automationPolicy   SellerAutomationPolicy?
-  auditLogs          CommerceAuditLog[]
+  erpCategories    ERPProductCategory[]
+  categoryMappings CategoryMapping[]
+  automationPolicy SellerAutomationPolicy?
+  auditLogs        CommerceAuditLog[]
+  b2bSuggestions   B2BSuggestion[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -247,6 +247,7 @@ model Order {
 
 model Product {
   networkListings     NetworkListing[]
+  b2bSuggestions      B2BSuggestion[]
   companyProductMaps  CompanyProductMap[]
   id                  String                  @id @default(cuid())
   name                String
@@ -2430,8 +2431,8 @@ model GlobalCategory {
   products   GlobalProduct[]
 
   // Reverse links
-  mappings          CategoryMapping[]
-  listingOverrides  B2BListingCategoryOverride[]
+  mappings         CategoryMapping[]
+  listingOverrides B2BListingCategoryOverride[]
 
   @@index([parentId])
 }
@@ -2465,9 +2466,9 @@ model ERPProductCategory {
   parentId        String?
   active          Boolean @default(true)
 
-  company  Company                 @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
-  parent   ERPProductCategory?     @relation("ERPCategoryToERPCategory", fields: [parentId], references: [id])
-  children ERPProductCategory[]    @relation("ERPCategoryToERPCategory")
+  company  Company              @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  parent   ERPProductCategory?  @relation("ERPCategoryToERPCategory", fields: [parentId], references: [id])
+  children ERPProductCategory[] @relation("ERPCategoryToERPCategory")
   mappings CategoryMapping[]
 
   @@index([sellerCompanyId])
@@ -2475,12 +2476,12 @@ model ERPProductCategory {
 }
 
 model CategoryMapping {
-  id               String           @id @default(cuid())
+  id               String            @id @default(cuid())
   sellerCompanyId  String
   erpCategoryId    String
   globalCategoryId String
   confidence       MappingConfidence @default(MANUAL)
-  active           Boolean          @default(true)
+  active           Boolean           @default(true)
 
   company        Company            @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
   erpCategory    ERPProductCategory @relation(fields: [erpCategoryId], references: [id], onDelete: Cascade)
@@ -2497,7 +2498,7 @@ model B2BListingCategoryOverride {
   globalCategoryId String
 
   listing        NetworkListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  globalCategory GlobalCategory  @relation(fields: [globalCategoryId], references: [id], onDelete: Cascade)
+  globalCategory GlobalCategory @relation(fields: [globalCategoryId], references: [id], onDelete: Cascade)
 
   @@index([globalCategoryId])
 }
@@ -2505,14 +2506,19 @@ model B2BListingCategoryOverride {
 model B2BSuggestion {
   id              String           @id @default(cuid())
   sellerCompanyId String
-  productId       String?          // Direct to Product if simple
-  variantId       String?          // Prefer variants if exist
+  productId       String? // Direct to Product if simple
+  variantId       String? // Prefer variants if exist
   suggestionType  SuggestionType
   score           Float            @default(0)
-  reasonsJson     Json             // e.g. {"onHand":500,"last30dSales":2,"rule":"OVERSTOCK_SLOW"}
+  reasonsJson     Json // e.g. {"onHand":500,"last30dSales":2,"rule":"OVERSTOCK_SLOW"}
   status          SuggestionStatus @default(OPEN)
+  dedupeKey       String?          @unique
+  dismissedUntil  DateTime?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  company Company  @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
 
   @@index([sellerCompanyId])
   @@index([status])
@@ -2521,30 +2527,31 @@ model B2BSuggestion {
 }
 
 model SellerAutomationPolicy {
-  id                     String      @id @default(cuid())
-  sellerCompanyId        String      @unique
-  autoPublishEnabled     Boolean     @default(false)
-  minOnHandThreshold     Int         @default(5)
-  maxReservedRatio       Float       @default(0.2) // e.g. reserved/onHand must be < 0.2
-  minMarginPercent       Float?      // optional if cost exists
-  minListingQualityScore Int         @default(50)
-  defaultVisibility      Visibility  @default(NETWORK)
-  defaultMinOrderQty     Int         @default(1)
-  defaultLeadTimeDays    Int         @default(3)
-  allowAutoPriceAdjust   Boolean     @default(false)
+  id                     String     @id @default(cuid())
+  sellerCompanyId        String     @unique
+  autoPublishEnabled     Boolean    @default(false)
+  minOnHandThreshold     Int        @default(100)
+  lowSalesThreshold      Int        @default(3)
+  maxReservedRatio       Float      @default(0.2) // e.g. reserved/onHand must be < 0.2
+  minMarginPercent       Float? // optional if cost exists
+  minListingQualityScore Int        @default(50)
+  defaultVisibility      Visibility @default(NETWORK)
+  defaultMinOrderQty     Int        @default(1)
+  defaultLeadTimeDays    Int        @default(3)
+  allowAutoPriceAdjust   Boolean    @default(false)
 
   company Company @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
 }
 
 model CommerceAuditLog {
-  id              String   @id @default(cuid())
+  id              String         @id @default(cuid())
   sellerCompanyId String
   actorType       ActorType
   action          CommerceAction
   entityType      String
   entityId        String
   payloadJson     Json?
-  createdAt       DateTime @default(now())
+  createdAt       DateTime       @default(now())
 
   company Company @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
 
@@ -2563,6 +2570,8 @@ enum SuggestionType {
   INCREASE_VISIBILITY
   ADJUST_PRICE
   PAUSE
+  FIX_LISTING
+  SET_PRICE
 }
 
 enum SuggestionStatus {
@@ -2570,6 +2579,7 @@ enum SuggestionStatus {
   ACCEPTED
   DISMISSED
   AUTO_APPLIED
+  PREVIEW_ONLY
 }
 
 enum Visibility {
@@ -2590,6 +2600,10 @@ enum CommerceAction {
   MAP_CATEGORY
   AUTO_PUBLISH
   AUTO_PAUSE
+  POLICY_UPDATE
+  SUGGESTION_ACCEPT
+  SUGGESTION_DISMISS
+  AUTO_PUBLISH_ERROR
 }
 
 enum ListingStatus {
@@ -2856,5 +2870,3 @@ enum ProductStatus {
   APPROVED
   REJECTED
 }
-
-

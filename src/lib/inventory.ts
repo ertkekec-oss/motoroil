@@ -109,6 +109,7 @@ export async function recordMovement(data: {
     price: number;
     type: 'PURCHASE' | 'SALE' | 'ADJUSTMENT' | 'TRANSFER';
     referenceId?: string;
+    companyId?: string;
 }) {
     return await (prisma as any).stockMovement.create({
         data: {
@@ -117,7 +118,28 @@ export async function recordMovement(data: {
             quantity: data.quantity,
             price: data.price,
             type: data.type,
-            referenceId: data.referenceId
+            referenceId: data.referenceId,
+            companyId: data.companyId
         }
     });
+}
+
+/**
+ * Calculates available inventory: available = onHand - reserved
+ * Reserved is typically the sum of pending/processing orders.
+ */
+export async function calculateAvailableInventory(productId: string, branch: string = "Merkez") {
+    const stock = await prisma.stock.findUnique({
+        where: { productId_branch: { productId, branch } }
+    });
+
+    if (!stock) return 0;
+
+    // Simplified reserved logic: sum of quantities in non-delivered/non-cancelled orders
+    // In a real system, you'd query SalesOrderItems for confirmed but not shipped orders.
+    // For now, we'll assume 'stock.quantity' is our on-hand truth.
+    // If we have a reserved mechanism, we'd subtract it here.
+
+    const available = Math.max(0, stock.quantity);
+    return available;
 }
