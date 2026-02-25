@@ -1,0 +1,63 @@
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+
+=== Starting Pre-requisite Setup ===
+
+1. Running Consumption Service...
+[ConsumptionService] Computed rates for 0 product-company pairs.
+Consumption Service Output: { success: true, computedRecords: 0 }
+
+2. Running Depletion Scan for cmm2eizuq000164kti1skgw9t...
+Test Error: PrismaClientValidationError: 
+Invalid `prisma.networkListing.findMany()` invocation in
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\services\inventory\depletionService.ts:45:64
+
+  42 
+  43 if (daysRemaining <= thresholdDays) {
+  44     // Check Network for Sellers supplying this GlobalProduct
+→ 45     const networkSellers = await prisma.networkListing.findMany({
+           where: {
+             globalProductId: "clr0xxq4f000108jz7f5v9zzp",
+             status: "ACTIVE",
+             sellerCompanyId: {
+               not: "cmm2eizuq000164kti1skgw9t"
+             }
+           },
+           select: {
+             availableQty: true,
+             minQty: true,
+             sellerCompanyId: true
+           },
+           orderBy: {
+             score: "desc",
+             ~~~~~
+         ?   id?: SortOrder,
+         ?   globalProductId?: SortOrder,
+         ?   sellerCompanyId?: SortOrder,
+         ?   erpProductId?: SortOrder,
+         ?   price?: SortOrder,
+         ?   availableQty?: SortOrder,
+         ?   minQty?: SortOrder,
+         ?   leadTimeDays?: SortOrder,
+         ?   status?: SortOrder,
+         ?   visibility?: SortOrder,
+         ?   packSize?: SortOrder | SortOrderInput,
+         ?   createdAt?: SortOrder,
+         ?   updatedAt?: SortOrder,
+         ?   globalProduct?: GlobalProductOrderByWithRelationInput,
+         ?   company?: CompanyOrderByWithRelationInput,
+         ?   erpProduct?: ProductOrderByWithRelationInput,
+         ?   categoryOverride?: B2BListingCategoryOverrideOrderByWithRelationInput,
+         ?   networkOrderItems?: NetworkOrderItemOrderByRelationAggregateInput
+           }
+         })
+
+Unknown argument `score`. Available options are marked with ?.
+    at wn (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async runDepletionScan (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\services\inventory\depletionService.ts:45:36)
+    at async testF1 (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\scripts\test-f1.ts:43:30) {
+  clientVersion: '5.22.0'
+}

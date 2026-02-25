@@ -25,6 +25,8 @@ model Tenant {
 }
 
 model Company {
+  productConsumptions ProductConsumption[]
+  buySuggestions      BuySuggestion[]
   networkListings    NetworkListing[]
   companyProductMaps CompanyProductMap[]
   id                 String                         @id @default(cuid())
@@ -2567,6 +2569,7 @@ model SellerAutomationPolicy {
   sellerCompanyId        String     @unique
   autoPublishEnabled     Boolean    @default(false)
   rolloutPercent         Int        @default(100)
+  understockThresholdDays Int       @default(7)
   minOnHandThreshold     Int        @default(100)
   lowSalesThreshold      Int        @default(3)
   maxReservedRatio       Float      @default(0.2) // e.g. reserved/onHand must be < 0.2
@@ -2907,4 +2910,35 @@ enum ProductStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+model ProductConsumption {
+  id              String   @id @default(cuid())
+  companyId       String
+  globalProductId String
+  dailyRate       Float
+  lastComputedAt  DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, globalProductId])
+  @@index([companyId])
+}
+
+model BuySuggestion {
+  id              String   @id @default(cuid())
+  buyerCompanyId  String
+  globalProductId String
+  daysRemaining   Float
+  availableQty    Int      @default(0)
+  status          String   @default("OPEN")
+  dedupeKey       String   @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company Company @relation(fields: [buyerCompanyId], references: [id], onDelete: Cascade)
+
+  @@index([buyerCompanyId])
+  @@index([globalProductId])
+  @@index([status])
 }
