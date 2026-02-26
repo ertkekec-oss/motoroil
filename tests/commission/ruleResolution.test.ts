@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import { equal } from 'node:assert';
 import { Prisma } from '@prisma/client';
 import { CommissionRuleMatchType, CommissionRuleScope } from '@prisma/client';
-import { resolveRuleForLine, CommissionRuleSortable } from '../src/services/finance/commission/ruleResolution';
+import { resolveRuleForLine, CommissionRuleSortable } from '../../src/services/finance/commission/ruleResolution';
 
 const baseDate = new Date('2026-02-26T00:00:00.000Z');
 

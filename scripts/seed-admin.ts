@@ -28,7 +28,7 @@ async function main() {
             name: 'Period Tech A.S.',
             vkn: '1234567890',
             address: 'Istanbul Technopark'
-        }
+        } as any
     });
 
     // 3. Create Admin User
@@ -42,7 +42,7 @@ async function main() {
             name: 'Periodya Admin',
             password: hashedPassword,
             role: 'ADMIN'
-        }
+        } as any
     });
 
     // 4. Link User to Company

@@ -55,7 +55,7 @@ export default async function SellerAutomationPage() {
                 </div>
 
                 <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                    <form action={saveAutomationPolicyAction} className="divide-y divide-slate-100">
+                    <form action={saveAutomationPolicyAction as any} className="divide-y divide-slate-100">
                         {/* Status Toggle Block */}
                         <div className="p-6 bg-slate-50/50">
                             <div className="flex items-center justify-between">

@@ -13,7 +13,8 @@
     "restore": "node scripts/restore-backup.js",
     "worker": "tsx src/services/marketplaces/actions/worker.ts",
     "replay-actions": "tsx scripts/replay-market-actions.ts",
-    "test:safety": "tsx scripts/safety-tests.ts"
+    "test:safety": "tsx scripts/safety-tests.ts",
+    "test:shipping": "vitest run tests/shipping"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -34,6 +35,7 @@
     "clsx": "^2.1.1",
     "crypto": "^1.0.1",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.19",
     "dexie": "^4.3.0",
     "dexie-react-hooks": "^4.2.0",
     "fast-xml-parser": "^5.3.3",
@@ -76,6 +78,7 @@
     "tailwindcss": "^4.1.18",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.18"
   }
 }

@@ -1,5 +1,5 @@
 import { PrismaClient, Prisma } from '@prisma/client';
-import { AlreadyRunningError, NotFoundError } from '../finance/commission/errors';
+import { AlreadyRunningError, NotFoundError } from '../services/finance/commission/errors';
 import crypto from 'crypto';
 
 export async function withIdempotency<T>(
@@ -71,14 +71,9 @@ export async function withIdempotency<T>(
 
             return result;
         } catch (error: any) {
-            // 4. Mark failure
-            await tx.idempotencyRecord.update({
-                where: { key },
-                data: {
-                    status: 'FAILED',
-                    completedAt: new Date()
-                }
-            });
+            // The transaction will be aborted, so the idempotency record changes
+            // (e.g., creation or STARTED status) in this transaction will also roll back.
+            // Therefore, we just rethrow the error.
             throw error;
         }
     });

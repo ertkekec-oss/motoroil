@@ -1,0 +1,15 @@
+
+ RUN  v4.0.18 C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil
+
+ ✓ src/services/network/discovery/__tests__/discoveryEngine.test.ts (5 tests) 10113ms
+     ✓ should only return NETWORK visible listings  2688ms
+     ✓ should rank Seller A above Seller D primarily due to Trust Score  502ms
+     ✓ should apply boost rules to Seller A, but prevent boosting Seller D  1230ms
+     ✓ should correctly filter listings based on criteria  672ms
+     ✓ should write DiscoveryImpressions accurately  1645ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  17:05:45
+   Duration  10.75s (transform 174ms, setup 0ms, import 370ms, tests 10.11s, environment 0ms)
+

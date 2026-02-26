@@ -24,7 +24,7 @@ export default async function BuyerRecommendationsPage() {
     const products = await prisma.globalProduct.findMany({
         where: { id: { in: suggestions.map(s => s.globalProductId) } }
     });
-    const productMap = new Map(products.map(p => [p.id, p]));
+    const productMap = new Map<string, any>(products.map(p => [p.id, p]));
 
     // Query seller availability per global product (ignoring own)
     const activeListings = await prisma.networkListing.groupBy({
@@ -39,7 +39,7 @@ export default async function BuyerRecommendationsPage() {
         }
     });
 
-    const sellerCountMap = new Map(activeListings.map(n => [n.globalProductId, n._count.sellerCompanyId]));
+    const sellerCountMap = new Map<string, number>(activeListings.map(n => [n.globalProductId, n._count.sellerCompanyId]));
 
     // KPIs
     const riskCount = suggestions.length;

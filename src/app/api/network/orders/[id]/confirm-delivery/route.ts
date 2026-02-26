@@ -3,7 +3,8 @@ import { getSession } from '@/lib/auth';
 import { confirmDelivery } from '@/services/orders/confirmDelivery';
 import { redisConnection } from '@/lib/queue/redis';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: any) {
+    const params = await context.params;
     try {
         const ip = req.headers.get('x-forwarded-for') || 'unknown';
         const rateLimitKey = `rate:confirm:${params.id}:${ip}`;

@@ -111,6 +111,20 @@ model Company {
   CommissionSnapshot CommissionSnapshot[]
   FinanceAuditLog    FinanceAuditLog[]
 
+  // Ticket System
+  ticketsAsTenant       Ticket[] @relation("TicketTenant")
+  ticketsAsCounterparty Ticket[] @relation("TicketCounterparty")
+  ticketMessages        TicketMessage[]
+
+  // Trust Layer
+  sellerTrustScore    SellerTrustScore?
+  sellerTrustEvents   SellerTrustEvent[]
+  trustScoreRecalcJobs TrustScoreRecalcJob[]
+
+  // Discovery Layer
+  discoveryImpressions DiscoveryImpression[]
+  createdBoostRules    BoostRule[]
+
   @@unique([tenantId, vkn])
   @@index([vkn])
 }
@@ -2053,9 +2067,7 @@ model HelpTopic {
 
   upvotes   Int @default(0)
   downvotes Int @default(0)
-
-  tickets Ticket[] // Bu konu ile ilişkilendirilmiş talepler
-
+  // tickets Ticket[] // Bu konu ile ilişkilendirilmiş talepler
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -2066,98 +2078,7 @@ enum TopicStatus {
   ARCHIVED
 }
 
-// --- DESTEK VE TICKET SİSTEMİ ---
-
-model Ticket {
-  id           String @id @default(cuid())
-  ticketNumber Int    @unique @default(autoincrement())
-
-  subject     String
-  description String         @db.Text
-  category    TicketCategory @default(GENERAL)
-  priority    TicketPriority @default(P3_NORMAL)
-  status      TicketStatus   @default(NEW)
-
-  tenantId        String // Multi-tenant isolation constraint
-  requesterUserId String // Biletin sahibi
-
-  relatedHelpTopicId String?
-  relatedHelpTopic   HelpTopic? @relation(fields: [relatedHelpTopicId], references: [id])
-
-  metadataJson Json? // Browser info, route, app build version vs.
-
-  messages    TicketMessage[]
-  attachments TicketAttachment[]
-
-  assignedToUserId String? // Atanan destek personeli
-  tags             String[] @default([])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model TicketMessage {
-  id       String @id @default(cuid())
-  ticketId String
-  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-
-  authorType AuthorType // Müşteri mi, Admin mi, Sistem Otomasyonu mu?
-  authorId   String // UserID veya AdminID
-
-  body       String  @db.Text
-  isInternal Boolean @default(false) // Sadece Adminlerin Göreceği Notlar
-
-  attachments TicketAttachment[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model TicketAttachment {
-  id       String @id @default(cuid())
-  ticketId String
-  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-
-  messageId String? // Ek, belirli bir yoruma aitse
-  message   TicketMessage? @relation(fields: [messageId], references: [id], onDelete: SetNull)
-
-  fileKey  String // AWS S3 veya R2 storage key
-  fileName String
-  mimeType String
-  size     Int // bytes
-
-  createdAt DateTime @default(now())
-}
-
-enum TicketCategory {
-  GENERAL
-  BILLING
-  TECHNICAL
-  FEATURE_REQUEST
-  BUG
-}
-
-enum TicketPriority {
-  P1_URGENT
-  P2_HIGH
-  P3_NORMAL
-  P4_LOW
-}
-
-enum TicketStatus {
-  NEW
-  IN_PROGRESS
-  WAITING_CUSTOMER
-  RESOLVED
-  CLOSED
-}
-
-enum AuthorType {
-  CUSTOMER
-  ADMIN
-  SYSTEM
-}
-
+// Support and Ticket system removed in favor of Governance Ticket system
 model CustomerLocationRequest {
   id           String   @id @default(cuid())
   customerId   String
@@ -2368,6 +2289,7 @@ model Shipment {
   status             ShipmentStatus @default(CREATED)
   carrierCode        String
   trackingNumber     String?
+  normalizedTracking String?
   labelUrl           String?
   sequence           Int            @default(1)
   initKey            String?        @unique
@@ -2382,8 +2304,12 @@ model Shipment {
   order         NetworkOrder    @relation(fields: [networkOrderId], references: [id], onDelete: Cascade)
   events        ShipmentEvent[]
   sellerEarning SellerEarning?
+  invoiceLines  ShippingInvoiceLine[]
+  allocations   ShipmentCostAllocation[]
 
   @@unique([networkOrderId, sequence])
+  @@unique([carrierCode, trackingNumber])
+  @@index([carrierCode, normalizedTracking])
   @@index([carrierCode])
   @@index([trackingNumber])
   @@index([networkOrderId])
@@ -2684,6 +2610,7 @@ model NetworkListing {
 
   categoryOverride  B2BListingCategoryOverride?
   networkOrderItems NetworkOrderItem[]
+  discoveryImpressions DiscoveryImpression[]
 
   @@unique([sellerCompanyId, erpProductId])
   @@index([globalProductId])
@@ -3138,10 +3065,278 @@ model FinanceAuditLog {
   entityType  String
   payloadJson Json     @db.JsonB
   createdAt   DateTime @default(now())
-
-  company Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company Company @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@index([action])
   @@index([createdAt])
+}
+
+model ShippingInvoice {
+  id          String   @id @default(cuid())
+  carrierId   String
+  invoiceNo   String
+  periodStart DateTime?
+  periodEnd   DateTime?
+  currency    String   @default("TRY")
+  totalAmount Decimal  @db.Decimal(12, 2)
+  rawRef      String?
+  parsedJson  Json?
+  status      String   @default("PARSED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lines       ShippingInvoiceLine[]
+
+  @@unique([carrierId, invoiceNo])
+}
+
+model ShippingInvoiceLine {
+  id                String   @id @default(cuid())
+  shippingInvoiceId String
+  trackingNo        String
+  chargeAmount      Decimal  @db.Decimal(12, 2)
+  taxAmount         Decimal? @db.Decimal(12, 2)
+  serviceLevel      String?
+  matchStatus       String   @default("UNMATCHED")
+  matchReason       String?
+  shipmentId        String?
+  networkOrderId    String?
+  sellerTenantId    String?
+  buyerTenantId     String?
+
+  invoice  ShippingInvoice @relation(fields: [shippingInvoiceId], references: [id], onDelete: Cascade)
+  shipment Shipment?       @relation(fields: [shipmentId], references: [id])
+
+  @@unique([shippingInvoiceId, trackingNo])
+}
+
+model ShipmentCostAllocation {
+  id                    String   @id @default(cuid())
+  shipmentId            String
+  shippingInvoiceLineId String?
+  model                 String   @default("CHARGEBACK_SELLER")
+  sellerShareAmount     Decimal  @db.Decimal(12, 2)
+  platformShareAmount   Decimal  @db.Decimal(12, 2)
+  buyerShareAmount      Decimal  @db.Decimal(12, 2)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([shipmentId, shippingInvoiceLineId])
+}
+
+enum TicketType {
+  SHIPPING_DISPUTE
+  EARNING_DISPUTE
+  RELEASE_REQUEST
+  GENERAL
+}
+
+enum TicketRelatedEntityType {
+  SHIPPING_LINE
+  EARNING
+  ORDER
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+  SLA_BREACH
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TicketSenderRole {
+  BUYER
+  SELLER
+  PLATFORM_ADMIN
+}
+
+enum TicketAuditAction {
+  CREATED
+  STATUS_CHANGED
+  SLA_UPDATED
+  RESOLVED
+  REJECTED
+}
+
+model Ticket {
+  id                    String                  @id @default(cuid())
+  tenantId              String
+  counterpartyTenantId  String?
+  type                  TicketType              @default(GENERAL)
+  relatedEntityType     TicketRelatedEntityType?
+  relatedEntityId       String?
+  status                TicketStatus            @default(OPEN)
+  priority              TicketPriority          @default(LOW)
+  slaDueAt              DateTime?
+  createdAt             DateTime                @default(now())
+  resolvedAt            DateTime?
+  createdByUserId       String?
+  
+  messages              TicketMessage[]
+  auditLogs             TicketAuditLog[]
+
+  // Relations
+  tenant                Company                 @relation("TicketTenant", fields: [tenantId], references: [id], onDelete: Restrict)
+  counterparty          Company?                @relation("TicketCounterparty", fields: [counterpartyTenantId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, status])
+  @@index([relatedEntityType, relatedEntityId])
+}
+
+model TicketMessage {
+  id               String           @id @default(cuid())
+  ticketId         String
+  senderTenantId   String
+  senderRole       TicketSenderRole
+  message          String           @db.Text
+  redactedMessage  String           @db.Text
+  createdAt        DateTime         @default(now())
+
+  ticket           Ticket           @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderTenant     Company          @relation(fields: [senderTenantId], references: [id], onDelete: Restrict)
+
+  @@index([ticketId])
+}
+
+model TicketAuditLog {
+  id            String            @id @default(cuid())
+  ticketId      String
+  action        TicketAuditAction
+  actorTenantId String
+  payloadJson   Json              @db.JsonB
+  createdAt     DateTime          @default(now())
+
+  ticket        Ticket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+// --- F2: SELLER TRUST LAYER ---
+
+enum SellerRiskTier {
+  A
+  B
+  C
+  D
+}
+
+enum TrustEventType {
+  SHIPMENT_DELIVERED_ON_TIME
+  SHIPMENT_DELIVERED_LATE
+  SHIPPING_DISPUTE_OPENED
+  SHIPPING_DISPUTE_RESOLVED
+  SLA_BREACH
+  CHARGEBACK_POSTED
+  RECEIVABLE_CREATED
+  EARNING_MANUAL_OVERRIDE
+  EARNING_RELEASED
+}
+
+enum RecalcJobStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+enum RecalcReason {
+  SCHEDULED
+  EVENT_DRIVEN
+  MANUAL_ADMIN
+}
+
+model SellerTrustScore {
+  id              String         @id @default(cuid())
+  sellerTenantId  String         @unique
+  score           Int            @default(100)
+  tier            SellerRiskTier @default(A)
+  componentsJson  Json           @db.JsonB
+  computedAt      DateTime       @default(now())
+  windowStart     DateTime
+  windowEnd       DateTime
+  version         Int            @default(1)
+
+  sellerCompany   Company        @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+
+  @@index([tier, computedAt])
+}
+
+model SellerTrustEvent {
+  id              String         @id @default(cuid())
+  sellerTenantId  String
+  type            TrustEventType
+  refType         String
+  refId           String
+  weight          Int            @default(1)
+  occurredAt      DateTime
+  createdAt       DateTime       @default(now())
+
+  sellerCompany   Company        @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+
+  @@index([sellerTenantId, occurredAt])
+}
+
+model TrustScoreRecalcJob {
+  id              String          @id @default(cuid())
+  sellerTenantId  String
+  status          RecalcJobStatus @default(PENDING)
+  reason          RecalcReason    @default(EVENT_DRIVEN)
+  idempotencyKey  String          @unique
+  errorText       String?         @db.Text
+  createdAt       DateTime        @default(now())
+  completedAt     DateTime?
+
+  sellerCompany   Company         @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+}
+
+// --- F3: DISCOVERY & BOOST LAYER ---
+
+model DiscoveryImpression {
+  id               String         @id @default(cuid())
+  viewerTenantId   String
+  listingId        String
+  position         Int
+  score            Decimal        @db.Decimal(10, 4)
+  reasonJson       Json           @db.JsonB
+  createdAt        DateTime       @default(now())
+
+  viewerCompany    Company        @relation(fields: [viewerTenantId], references: [id], onDelete: Cascade)
+  listing          NetworkListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([viewerTenantId, createdAt])
+  @@index([listingId, createdAt])
+}
+
+enum BoostScope {
+  LISTING
+  SELLER
+  CATEGORY
+}
+
+model BoostRule {
+  id                String      @id @default(cuid())
+  scope             BoostScope
+  targetId          String
+  multiplier        Decimal     @db.Decimal(10, 2)
+  startsAt          DateTime
+  endsAt            DateTime
+  isActive          Boolean     @default(true)
+  createdByTenantId String
+  createdAt         DateTime    @default(now())
+
+  creatorCompany    Company     @relation(fields: [createdByTenantId], references: [id], onDelete: Cascade)
+
+  @@index([scope, targetId, isActive])
+  @@index([startsAt, endsAt])
 }

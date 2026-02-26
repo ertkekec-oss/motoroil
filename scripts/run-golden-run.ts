@@ -29,7 +29,7 @@ async function main() {
                 name: 'Fintech Test Corp',
                 vkn: '1234567890',
                 address: 'Test Cad. No:1'
-            }
+            } as any
         });
     }
 

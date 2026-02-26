@@ -1,0 +1,12 @@
+
+ RUN  v4.0.18 C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil
+
+ ✓ src/services/finance/trust/__tests__/trustScore.test.ts (3 tests) 5613ms
+     ✓ should run a generic manual recalc idempotently  3236ms
+     ✓ should apply dynamic release policies correctly per tier  806ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  16:01:30
+   Duration  6.71s (transform 312ms, setup 0ms, import 684ms, tests 5.61s, environment 0ms)
+

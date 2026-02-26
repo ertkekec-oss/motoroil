@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
 
         // 4. Güvenli ve Idempotent Gönderim (Golden Template Adım 4)
         // withIdempotency, bu işlemi sarar ve çifte gönderimi engeller.
-        const result = await withIdempotency('NILVERA', idempotencyKey, 'SALES_INVOICE', invoiceId, async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'SALES_INVOICE', ctx.companyId, async () => {
             // Mükellef Kontrolü
             let userCheck = await nilvera.checkUser(customerVkn);
             let isEInvoice = userCheck.isEInvoiceUser;
@@ -196,12 +196,12 @@ export async function POST(req: NextRequest) {
         // Not: withIdempotency zaten başarılı ise buraya gelir.
         // Eğer zaten önceden yapılmışsa 'result.source' = 'CACHE' olur.
         // SalesInvoice durumunu güncellemek idempotency katmanından bağımsız olarak her zaman güvenlidir (idempotenttir).
-        if (result.data.success) {
+        if (result.success) {
             await prisma.salesInvoice.update({
                 where: { id: invoiceId },
-                data: { isFormal: true, formalStatus: 'SENT', formalUuid: result.data.formalId }
+                data: { isFormal: true, formalStatus: 'SENT', formalUuid: result.formalId }
             });
-            return NextResponse.json({ ...result.data, source: result.source });
+            return NextResponse.json({ ...result, source: 'API' });
         } else {
             // Should be unreachable if withIdempotency throws on error
             return NextResponse.json({ success: false, error: "Bilinmeyen hata" }, { status: 500 });

@@ -1,0 +1,31 @@
+[
+  {
+    "assertionResults": [
+      {
+        "ancestorTitles": [
+          "Shipping Chargeback Posting"
+        ],
+        "fullName": "Shipping Chargeback Posting should post chargeback exactly once and adjust balances",
+        "status": "skipped",
+        "title": "should post chargeback exactly once and adjust balances",
+        "failureMessages": [],
+        "meta": {}
+      },
+      {
+        "ancestorTitles": [
+          "Shipping Chargeback Posting"
+        ],
+        "fullName": "Shipping Chargeback Posting should be idempotent and not duplicate deduct",
+        "status": "skipped",
+        "title": "should be idempotent and not duplicate deduct",
+        "failureMessages": [],
+        "meta": {}
+      }
+    ],
+    "startTime": 1772068292837,
+    "endTime": 1772068292837,
+    "status": "failed",
+    "message": "",
+    "name": "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/tests/shipping/postChargeback.test.ts"
+  }
+]

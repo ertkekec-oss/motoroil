@@ -32,7 +32,7 @@ export default function CompanyAdminClient({ companyId, currentStatus, currentTy
             >
                 <option value={CompanyType.BUYER}>BUYER</option>
                 <option value={CompanyType.SELLER}>SELLER</option>
-                <option value={CompanyType.BOTH}>BOTH</option>
+                <option value={CompanyType.PLATFORM}>PLATFORM</option>
             </select>
             <button
                 onClick={toggleStatus}

@@ -1,0 +1,12 @@
+
+ RUN  v4.0.18 C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil
+
+ ❯ tests/shipping/ingest.test.ts (2 tests | 2 skipped) 771ms
+     ↓ should ingest invoice and lines correctly
+     ↓ should be idempotent (return same record on second call)
+
+ Test Files  1 failed (1)
+      Tests  2 skipped (2)
+   Start at  04:09:52
+   Duration  3.59s (transform 1.08s, setup 0ms, import 1.44s, tests 771ms, environment 0ms)
+

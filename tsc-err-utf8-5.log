@@ -1,0 +1,15 @@
+﻿src/app/(app)/admin/companies/CompanyAdminClient.tsx(35,44): error TS2339: Property 'BOTH' does not exist on type '{ BUYER: "BUYER"; SELLER: "SELLER"; PLATFORM: "PLATFORM"; }'.
+src/app/(app)/buyer/recommendations/page.tsx(95,43): error TS2365: Operator '>' cannot be applied to types 'unknown' and 'number'.
+src/app/(app)/buyer/recommendations/page.tsx(101,151): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/(app)/buyer/recommendations/page.tsx(106,123): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/(app)/buyer/recommendations/page.tsx(107,44): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/(app)/buyer/recommendations/page.tsx(111,73): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/app/(app)/catalog/[productId]/page.tsx(136,65): error TS2322: Type '{ productId: any; sellerCompanyId: any; maxQty: any; disabled: any; }' is not assignable to type 'IntrinsicAttributes & { productId: string; sellerCompanyId: string; maxQty: number; }'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & { productId: string; sellerCompanyId: string; maxQty: number; }'.
+src/app/(app)/seller/automation/decisions/page.tsx(83,106): error TS2339: Property 'code' does not exist on type 'unknown'.
+src/app/(app)/seller/automation/decisions/page.tsx(84,100): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/app/(app)/seller/automation/page.tsx(58,27): error TS2322: Type '(formData: FormData) => Promise<{ success: boolean; }>' is not assignable to type 'string | ((formData: FormData) => void | Promise<void>)'.
+  Type '(formData: FormData) => Promise<{ success: boolean; }>' is not assignable to type '(formData: FormData) => void | Promise<void>'.
+    Type 'Promise<{ success: boolean; }>' is not assignable to type 'void | Promise<void>'.
+      Type 'Promise<{ success: boolean; }>' is not assignable to type 'Promise<void>'.
+        Type '{ success: boolean; }' is not assignable to type 'void'.

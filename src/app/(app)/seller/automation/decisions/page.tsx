@@ -31,7 +31,7 @@ export default async function AutomationDecisionsPage() {
         where: { id: { in: productIds } },
         select: { id: true, name: true, code: true }
     });
-    const productMap = new Map(products.map(p => [p.id, p]));
+    const productMap = new Map<string, any>(products.map(p => [p.id, p]));
 
     return (
         <div className="min-h-screen bg-[#F6F7F9] text-slate-900 p-6 font-sans">
@@ -90,8 +90,8 @@ export default async function AutomationDecisionsPage() {
                                             </td>
                                             <td className="p-4">
                                                 <span className={`px-2 py-1 rounded text-xs font-bold border ${log.decision === 'AUTO_APPLY' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                                                        log.decision === 'PREVIEW_ONLY' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                                                            'bg-red-50 text-red-700 border-red-200'
+                                                    log.decision === 'PREVIEW_ONLY' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                                        'bg-red-50 text-red-700 border-red-200'
                                                     }`}>
                                                     {log.decision}
                                                 </span>

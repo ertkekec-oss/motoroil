@@ -8,7 +8,8 @@ const shipmentInitSchema = z.object({
     items: z.array(z.any()).optional()
 });
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: any) {
+    const params = await context.params;
     try {
         const session = await getSession();
         if (!session?.tenantId || !session?.settings?.companyId) {

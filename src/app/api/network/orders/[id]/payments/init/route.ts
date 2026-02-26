@@ -5,7 +5,8 @@ import { initiatePayment } from '@/services/payments/init';
 import { paymentInitCreateSchema } from '@/lib/validation/payments';
 import { prisma } from '@/lib/prisma';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: any) {
+    const params = await context.params;
     try {
         const session: any = await getSession();
         const user = session?.user || session;

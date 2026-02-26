@@ -4,7 +4,8 @@ import { Prisma } from '@prisma/client';
 import { getSession } from '@/lib/auth';
 import { ApiError, ApiSuccess, createCanonicalHash } from '@/services/network/helpers';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: any) {
+    const params = await context.params;
     try {
         const session: any = await getSession();
         const user = session?.user || session;

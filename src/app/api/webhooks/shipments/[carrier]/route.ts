@@ -3,7 +3,8 @@ import { processShipmentEvent } from '@/services/shipment/processEvent';
 import { ShipmentStatus } from '@prisma/client';
 import crypto from 'crypto';
 
-export async function POST(req: NextRequest, { params }: { params: { carrier: string } }) {
+export async function POST(req: NextRequest, context: any) {
+    const params = await context.params;
     try {
         const carrierCode = params.carrier.toUpperCase();
 
