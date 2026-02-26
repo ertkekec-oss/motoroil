@@ -122,19 +122,22 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
         let boostMultiplier = 1.0;
         let isBoosted = false;
 
-        // Check boosts if seller is not Tier D
-        if (tTier !== 'D') {
-            for (const boost of activeBoosts) {
-                let hit = false;
-                if (boost.scope === 'LISTING' && boost.targetId === listing.id) hit = true;
-                if (boost.scope === 'SELLER' && boost.targetId === listing.company.id) hit = true;
-                if (boost.scope === 'CATEGORY' && boost.targetId === listing.globalProduct.categoryId) hit = true;
+        // Evaluate boosts for all
+        for (const boost of activeBoosts) {
+            let hit = false;
+            if (boost.scope === 'LISTING' && boost.targetId === listing.id) hit = true;
+            if (boost.scope === 'SELLER' && boost.targetId === listing.company.id) hit = true;
+            if (boost.scope === 'CATEGORY' && boost.targetId === listing.globalProduct.categoryId) hit = true;
 
-                if (hit) {
-                    boostMultiplier = Math.max(boostMultiplier, Number(boost.multiplier));
-                    isBoosted = true;
-                }
+            if (hit) {
+                boostMultiplier = Math.max(boostMultiplier, Number(boost.multiplier));
+                isBoosted = true;
             }
+        }
+
+        // Cap boost at exactly 1.0 for Tier C and Tier D to prevent exploits
+        if (tTier === 'C' || tTier === 'D') {
+            boostMultiplier = 1.0;
         }
 
         const finalScore = rawBaseScore * boostMultiplier;
@@ -155,7 +158,8 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
                 boosted: isBoosted,
                 boostMultiplier,
                 finalScore,
-                topReasons: reasons.slice(0, 3)
+                topReasons: reasons.slice(0, 3),
+                isSponsored: isBoosted
             }
         };
     });
@@ -193,6 +197,12 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
         minOrderQty: i.listing.minQty,
         leadTimeDays: i.listing.leadTimeDays,
         sellerTier: i.cScore.trustTier,
+        isSponsored: i.cScore.boosted,
+        reasonJson: {
+            isSponsored: i.cScore.boosted,
+            topReasons: i.cScore.topReasons,
+            trustTier: i.cScore.trustTier
+        },
         scoreBreakdown: i.cScore
     }));
 
@@ -203,7 +213,7 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
         finalScore: i.cScore.finalScore,
         breakdown: i.cScore
     }));
-    await logDiscoveryImpressions(viewerTenantId, impressionData);
+    await logDiscoveryImpressions(viewerTenantId, impressionData, params.requestId);
 
     return { results, nextCursor };
 }

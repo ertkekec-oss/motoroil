@@ -2616,6 +2616,7 @@ model NetworkListing {
   @@index([globalProductId])
   @@index([sellerCompanyId])
   @@index([status])
+  @@index([visibility, status])
 }
 
 model CompanyProductMap {
@@ -3269,6 +3270,7 @@ model SellerTrustScore {
 
   sellerCompany   Company        @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
 
+  @@index([sellerTenantId])
   @@index([tier, computedAt])
 }
 
@@ -3310,12 +3312,14 @@ model DiscoveryImpression {
   score            Decimal        @db.Decimal(10, 4)
   reasonJson       Json           @db.JsonB
   createdAt        DateTime       @default(now())
+  requestId        String?
 
   viewerCompany    Company        @relation(fields: [viewerTenantId], references: [id], onDelete: Cascade)
   listing          NetworkListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@index([viewerTenantId, createdAt])
   @@index([listingId, createdAt])
+  @@index([requestId])
 }
 
 enum BoostScope {

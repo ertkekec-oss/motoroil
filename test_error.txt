@@ -1,0 +1,77 @@
+FAIL [22m[49m src
+/services/network/discovery/_
+_tests__/discoveryEngine.test
+.ts[2m > [22mF3 - Discovery
+ & Boost Engine[2m > [22msh
+ould resolve equal finalScore
+s deterministically by listin
+gId asc
+[31m[1mAssertionError[22m:
+ expected 1 to be less than o
+r equal to 0[39m
+[36m [2mÔØ»[22m src/servic
+es/network/discovery/__tests_
+_/discoveryEngine.test.ts:[2
+m222:40[22m[39m
+    [90m220| [39m        [
+35mconst[39m id1 [33m=[39m
+ results[[33mMath[39m[33m.
+[39m[34mmin[39m(idxA[33m,
+[39m idxTwin)][33m.[39mlis
+tingId[33m;[39m
+    [90m221| [39m        [
+35mconst[39m id2 [33m=[39m
+ results[[33mMath[39m[33m.
+[39m[34mmax[39m(idxA[33m,
+[39m idxTwin)][33m.[39mlis
+tingId[33m;[39m
+    [90m222| [39m        [
+34mexpect[39m(id1[33m.[39m
+[34mlocaleCompare[39m(id2))
+[33m.[39m[34mtoBeLessThanO
+rEqual[39m([34m0[39m)[33m
+;[39m
+    [90m   | [39m          
+                             
+[31m^[39m
+    [90m223| [39m    })[33
+m;[39m
+    [90m224| [39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/2]Ô
+Ä»[22m[39m
+
+[41m[1m FAIL [22m[49m src
+/services/network/discovery/_
+_tests__/discoveryEngine.test
+.ts[2m > [22mF3 - Discovery
+ & Boost Engine[2m > [22msh
+ould write DiscoveryImpressio
+ns accurately
+[31m[1mPrismaClientKnownReq
+uestError[22m: 
+Invalid `prisma.discoveryImpr
+ession.findMany()` invocation
+ in
+C:/Users/ertke/OneDrive/Masa├
+╝st├╝/periodya/muhasebeapp/mo
+toroil/src/services/network/d
+iscovery/__tests__/discoveryE
+ngine.test.ts:235:62
+
+  232 // Wait a tick for asyn
+c logging to complete
+  233 await new Promise(r => 
+setTimeout(r, 1000));
+  234 
+ÔåÆ 235 const impressions = a
+wait prisma.discoveryImpressi
+on.findMany(
+The column `DiscoveryImpressi
+on.requestId` does not exist 
+in the current database.[39m
+[90m [2mÔØ»[22m $n.handleR
+equestError node_modules/@pri
+sma/client/runtime/li

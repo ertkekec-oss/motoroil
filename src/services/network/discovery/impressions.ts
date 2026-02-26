@@ -5,7 +5,8 @@ const prisma = new PrismaClient();
 
 export async function logDiscoveryImpressions(
     viewerTenantId: string,
-    items: { listingId: string; position: number; finalScore: number; breakdown: ExplainabilityRecord }[]
+    items: { listingId: string; position: number; finalScore: number; breakdown: ExplainabilityRecord }[],
+    requestId?: string
 ) {
     if (items.length === 0) return;
 
@@ -17,6 +18,7 @@ export async function logDiscoveryImpressions(
                 position: item.position,
                 score: item.finalScore,
                 reasonJson: item.breakdown as any,
+                requestId,
                 createdAt: new Date()
             })),
             skipDuplicates: true

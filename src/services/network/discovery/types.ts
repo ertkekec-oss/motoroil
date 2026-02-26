@@ -18,6 +18,7 @@ export interface RankParams {
     sortMode: SortMode;
     cursor?: string;
     limit?: number;
+    requestId?: string;
 }
 
 export interface BoostMultiplier {
@@ -42,6 +43,7 @@ export interface ExplainabilityRecord {
     boostMultiplier: number;
     finalScore: number;
     topReasons: string[];
+    isSponsored: boolean;
 }
 
 export interface DiscoveryResultItem {
@@ -56,6 +58,8 @@ export interface DiscoveryResultItem {
     minOrderQty: number;
     leadTimeDays: number;
     sellerTier: SellerRiskTier;
+    isSponsored: boolean;
+    reasonJson?: any;
     scoreBreakdown?: ExplainabilityRecord;
 }
 

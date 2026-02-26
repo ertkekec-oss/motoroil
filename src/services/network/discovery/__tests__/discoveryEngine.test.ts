@@ -159,8 +159,9 @@ describe('F3 - Discovery & Boost Engine', () => {
         expect(itemA?.scoreBreakdown?.boosted).toBe(true);
         expect(itemA?.scoreBreakdown?.boostMultiplier).toBe(2.0);
 
-        // Seller D is Tier D so its boost multiplier should remain 1.0 (uncapped safety)
-        expect(itemD?.scoreBreakdown?.boosted).toBe(false);
+        // Seller D is Tier D so its boost multiplier should be capped at 1.0, but still flagged as sponsored conceptually
+        expect(itemD?.scoreBreakdown?.boosted).toBe(true);
+        expect(itemD?.isSponsored).toBe(true);
         expect(itemD?.scoreBreakdown?.boostMultiplier).toBe(1.0);
 
         // Cleanup
@@ -178,6 +179,50 @@ describe('F3 - Discovery & Boost Engine', () => {
         // Since filter is Min B, Seller D should be excluded
         expect(results.some(r => r.listingId === listingDId)).toBe(false);
         expect(results.some(r => r.listingId === listingAId)).toBe(true);
+    });
+
+    it('should resolve equal finalScores deterministically by listingId asc', async () => {
+        // Create twin Product
+        const erpATwin = await prisma.product.create({ data: { id: `ERPA_TWIN_${Date.now()}`, companyId: sellerA, name: 'Prod A Twin', type: 'GOODS', code: `CODE_A_TWIN_${Date.now()}`, price: 100 } });
+
+        // Sync creation time so recency is identical
+        const frozenDate = new Date('2024-01-01T00:00:00.000Z');
+        await prisma.networkListing.update({ where: { id: listingAId }, data: { createdAt: frozenDate } });
+
+        const lATwin = await prisma.networkListing.create({
+            data: {
+                id: `LISTING_A0_TWIN_${Date.now()}`, // Force a specific ID
+                globalProductId: globalProductId1,
+                sellerCompanyId: sellerA,
+                erpProductId: erpATwin.id,
+                price: 100,
+                availableQty: 50,
+                leadTimeDays: 2,
+                visibility: 'NETWORK',
+                status: 'ACTIVE',
+                createdAt: frozenDate
+            }
+        });
+
+        const { results } = await rankNetworkListings({
+            viewerTenantId: viewerCompanyId,
+            filters: {},
+            sortMode: 'RELEVANCE'
+        });
+
+        const idxA = results.findIndex(r => r.listingId === listingAId);
+        const idxTwin = results.findIndex(r => r.listingId === lATwin.id);
+
+        expect(idxA).toBeGreaterThan(-1);
+        expect(idxTwin).toBeGreaterThan(-1);
+
+        // Score should be strictly equal
+        expect(results[idxA].scoreBreakdown?.finalScore).toBeCloseTo(results[idxTwin].scoreBreakdown?.finalScore || 0, 5);
+
+        // Ascending listingId check
+        const id1 = results[Math.min(idxA, idxTwin)].listingId;
+        const id2 = results[Math.max(idxA, idxTwin)].listingId;
+        expect(id1.localeCompare(id2)).toBeLessThanOrEqual(0);
     });
 
     it('should write DiscoveryImpressions accurately', async () => {
