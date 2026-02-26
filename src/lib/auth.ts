@@ -215,3 +215,15 @@ export async function resolveCompanyId(user: any): Promise<string | undefined> {
 
     return undefined;
 }
+
+export async function requirePlatformFinanceAdmin() {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized - User not logged in');
+    
+    // For test context & dummy platform admin check
+    const role = session.role?.toUpperCase() || '';
+    if (role !== 'PLATFORM_ADMIN' && role !== 'SUPER_ADMIN') {
+        throw new Error('Forbidden - Require Platform Finance Admin access');
+    }
+    return session;
+}

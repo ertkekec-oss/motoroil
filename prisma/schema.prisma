@@ -3498,6 +3498,7 @@ enum ProviderPayoutStatus {
   FAILED
   REVERSED
   RECONCILE_REQUIRED
+  QUARANTINED
 }
 
 model ProviderPayout {
@@ -3612,4 +3613,29 @@ model FinanceOpsLog {
   severity    FinanceOpsLogSeverity @default(INFO)
   payloadJson Json?                 @db.JsonB
   createdAt   DateTime              @default(now())
+}
+
+enum OpsHealthSnapshotScope {
+  RUNTIME
+  DAILY
+}
+
+model OpsHealthSnapshot {
+  id          String                 @id @default(cuid())
+  scope       OpsHealthSnapshotScope @default(RUNTIME)
+  createdAt   DateTime               @default(now())
+  payloadJson Json                   @db.JsonB
+
+  @@index([scope, createdAt])
+}
+
+model OpsAlertAck {
+  id                   String   @id @default(cuid())
+  alertType            String
+  alertId              String
+  acknowledgedByUserId String
+  note                 String
+  acknowledgedAt       DateTime @default(now())
+
+  @@unique([alertType, alertId])
 }
