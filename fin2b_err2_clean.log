@@ -1,0 +1,111 @@
+FAIL [22m[49m src
+/services/finance/payout/__te
+sts__/fin2b_iyzico.test.ts[2
+m > [22mFIN-2B: External Pay
+out Orchestration (Iyzico)[2
+m > [22m1) Sub Merchant Onbo
+arding & Outbox Idempotency
+[31m[1mError[22m: Invalid 
+encrypted IBAN format[39m
+[36m [2mÔØ»[22m decryptIba
+n src/services/finance/payout
+/pii.ts:[2m21:35[22m[39m
+    [90m 19| [39m[35mexpor
+t[39m [35mfunction[39m [3
+4mdecryptIban[39m(encryptedI
+ban[33m:[39m string)[33m:
+[39m string {
+    [90m 20| [39m    [35mc
+onst[39m parts [33m=[39m e
+ncryptedIban[33m.[39m[34ms
+plit[39m([32m':'[39m)[33m
+;[39m
+    [90m 21| [39m    if (pa
+rts.length !== 2) throw new E
+rror('Invalid encrypted IBAN 
+foÔÇĞ
+    [90m   | [39m          
+                        [31m
+^[39m
+    [90m 22| [39m
+    [90m 23| [39m    [35mc
+onst[39m iv [33m=[39m [33
+mBuffer[39m[33m.[39m[35mf
+rom[39m(parts[[34m0[39m][
+33m,[39m [32m'hex'[39m)[3
+3m;[39m
+[90m [2mÔØ»[22m createOrUp
+dateSubMerchantForSeller src/
+services/finance/payout/iyzic
+o/onboarding.ts:[2m27:21[22
+m[39m
+[90m [2mÔØ»[22m src/servic
+es/finance/payout/__tests__/f
+in2b_iyzico.test.ts:[2m53:25
+[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/7]Ô
+Ä»[22m[39m
+
+[41m[1m FAIL [22m[49m src
+/services/finance/payout/__te
+sts__/fin2b_iyzico.test.ts[2
+m > [22mFIN-2B: External Pay
+out Orchestration (Iyzico)[2
+m > [22m2) Outbox Sending & 
+Double Send Prevention
+[31m[1mTypeError[22m: Cann
+ot read properties of undefin
+ed (reading 'findMany')[39m
+[36m [2mÔØ»[22m runPayoutO
+utboxCycle src/services/finan
+ce/payout/iyzico/outboxWorker
+.ts:[2m13:48[22m[39m
+    [90m 11| [39m    [35mc
+onst[39m { batchSize [33m=
+[39m [34m10[39m[33m,[39m 
+now [33m=[39m [35mnew[39m
+ [33mDate[39m() } [33m=[3
+9m params[33m;[39m
+    [90m 12| [39m
+    [90m 13| [39m    [35mc
+onst[39m outboxes [33m=[39
+m [35mawait[39m prisma[33m
+.[39mpayoutOutbox[33m.[39m
+[34mfindMany[39m({
+    [90m   | [39m          
+                             
+        [31m^[39m
+    [90m 14| [39m        wh
+ere[33m:[39m {
+    [90m 15| [39m          
+  status[33m:[39m { [35min
+[39m[33m:[39m [[32m'PENDI
+NG'[39m[33m,[39m [32m'FAI
+LED'[39m] }[33m,[39m
+[90m [2mÔØ»[22m src/servic
+es/finance/payout/__tests__/f
+in2b_iyzico.test.ts:[2m86:27
+[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/7]Ô
+Ä»[22m[39m
+
+[41m[1m FAIL [22m[49m src
+/services/finance/payout/__te
+sts__/fin2b_iyzico.test.ts[2
+m > [22mFIN-2B: External Pay
+out Orchestration (Iyzico)[2
+m > [22m3) Webhook Ingest Id
+empotency & Signature Guard
+[31m[1mTypeError[22m: Cann
+ot read properties of undefin
+ed (reading 'create')[39m
+[36m [2mÔØ»[22m ingestWebh
+ook src/services/finance/payo
+ut/iyzico/webhooks.ts:[2m15:
+55[22m[39

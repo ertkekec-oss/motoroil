@@ -1,0 +1,88 @@
+FAIL [22m[49m src
+/services/finance/payout/__te
+sts__/fin2b_iyzico.test.ts[2
+m > [22mFIN-2B: External Pay
+out Orchestration (Iyzico)[2
+m > [22m5) Ledger Finalize E
+xactly Once
+[31m[1mPrismaClientKnownReq
+uestError[22m: 
+Invalid `tx.ledgerEntry.creat
+e()` invocation in
+C:/Users/ertke/OneDrive/Masa├
+╝st├╝/periodya/muhasebeapp/mo
+toroil/src/services/finance/p
+ayout/ledgerFinalize.ts:43:34
+
+  40 // We just create Entrie
+s (no rigid constraint exists
+ preventing creating them)
+  41 
+  42 // Commission
+ÔåÆ 43 await tx.ledgerEntry.c
+reate(
+Foreign key constraint violat
+ed: `LedgerEntry_ledgerAccoun
+tId_fkey (index)`[39m
+[90m [2mÔØ»[22m $n.handleR
+equestError node_modules/@pri
+sma/client/runtime/library.js
+:[2m121:7315[22m[39m
+[90m [2mÔØ»[22m $n.handleA
+ndLogRequestError node_module
+s/@prisma/client/runtime/libr
+ary.js:[2m121:6623[22m[39m
+[90m [2mÔØ»[22m $n.request
+ node_modules/@prisma/client/
+runtime/library.js:[2m121:63
+07[22m[39m
+[90m [2mÔØ»[22m l node_mod
+ules/@prisma/client/runtime/l
+ibrary.js:[2m130:9633[22m[
+39m
+[36m [2mÔØ»[22m catch.succ
+ess src/services/finance/payo
+ut/ledgerFinalize.ts:[2m43:1
+3[22m[39m
+    [90m 41| [39m
+    [90m 42| [39m          
+  [90m// Commission[39m
+    [90m 43| [39m          
+  [35mawait[39m tx[33m.[3
+9mledgerEntry[33m.[39m[34m
+create[39m({
+    [90m   | [39m          
+  [31m^[39m
+    [90m 44| [39m          
+      data[33m:[39m {
+    [90m 45| [39m          
+          tenantId[33m:[39m
+ [32m'PLATFORM'[39m[33m,[
+39m
+[90m [2mÔØ»[22m src/lib/id
+empotency.ts:[2m60:28[22m[
+39m
+[90m [2mÔØ»[22m Proxy._tra
+nsactionWithCallback node_mod
+ules/@prisma/client/runtime/l
+ibrary.js:[2m130:8000[22m[
+39m
+[90m [2mÔØ»[22m withIdempo
+tency src/lib/idempotency.ts:
+[2m15:12[22m[39m
+[90m [2mÔØ»[22m finalizePa
+youtLedger src/services/finan
+ce/payout/ledgerFinalize.ts:
+[2m13:12[22m[39m
+[90m [2mÔØ»[22m src/servic
+es/finance/payout/__tests__/f
+in2b_iyzico.test.ts:[2m135:2
+1[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+[2m   Duration [22m 10.62s[2m (transform 381ms, setup 0ms, import 816ms, tests 9.31s, environment 0ms)[22m
+

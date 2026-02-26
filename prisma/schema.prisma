@@ -32,9 +32,13 @@ model Company {
   releaseWindowPolicy ReleaseWindowPolicy?
   ledgerAccount       LedgerAccount?
   networkListings     NetworkListing[]
-  companyProductMaps  CompanyProductMap[]
-  payoutDestinations  PayoutDestination[]
-  payoutRequests      PayoutRequest[]
+  companyProductMaps   CompanyProductMap[]
+  payoutDestinations   PayoutDestination[]
+  payoutRequests       PayoutRequest[]
+  sellerPaymentProfile SellerPaymentProfile?
+  providerPayments     ProviderPayment[]
+  providerPayouts      ProviderPayout[]
+  payoutOutboxes       PayoutOutbox[] @relation("OutboxCompany")
   id                  String                         @id @default(cuid())
   tenantId            String
   name                String
@@ -3440,4 +3444,125 @@ model PayoutRequest {
 
   @@index([sellerTenantId, status, requestedAt])
   @@index([status, requestedAt])
+}
+
+// --- FIN-2B: EXTERNAL PAYMENT & ENQUEUE (IYZICO) ---
+
+enum SellerPaymentProfileStatus {
+  PENDING
+  ACTIVE
+  DISABLED
+}
+
+model SellerPaymentProfile {
+  id              String                     @id @default(cuid())
+  sellerTenantId  String                     @unique
+  provider        PaymentProvider            @default(IYZICO)
+  subMerchantKey  String
+  status          SellerPaymentProfileStatus @default(PENDING)
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  sellerCompany   Company                    @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+}
+
+enum ProviderPaymentStatus {
+  INIT
+  PAID
+  FAILED
+  REFUNDED
+  CHARGEBACK
+}
+
+model ProviderPayment {
+  id                String                @id @default(cuid())
+  tenantId          String                // Buyer tenant
+  provider          PaymentProvider       @default(IYZICO)
+  providerPaymentId String                @unique
+  networkPaymentId  String                @unique
+  amount            Decimal               @db.Decimal(12, 2)
+  currency          String                @default("TRY")
+  status            ProviderPaymentStatus @default(INIT)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  buyerCompany      Company               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status, createdAt])
+}
+
+enum ProviderPayoutStatus {
+  QUEUED
+  SENT
+  SUCCEEDED
+  FAILED
+  REVERSED
+}
+
+model ProviderPayout {
+  id                 String               @id @default(cuid())
+  sellerTenantId     String
+  provider           PaymentProvider      @default(IYZICO)
+  providerPayoutId   String               @unique
+  payoutRequestId    String?              // Optional generic payout request
+  sellerEarningId    String?              // Or relation to earning
+  shipmentId         String?              // Or relation to shipment
+  grossAmount        Decimal              @db.Decimal(12, 2)
+  commissionAmount   Decimal              @db.Decimal(12, 2)
+  netAmount          Decimal              @db.Decimal(12, 2)
+  currency           String               @default("TRY")
+  status             ProviderPayoutStatus @default(QUEUED)
+  idempotencyKey     String               @unique
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  sellerCompany      Company              @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+
+  @@index([sellerTenantId, status, createdAt])
+  @@index([status, createdAt])
+}
+
+enum PayoutOutboxStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+}
+
+model PayoutOutbox {
+  id               String             @id @default(cuid())
+  provider         PaymentProvider    @default(IYZICO)
+  idempotencyKey   String             @unique
+  sellerTenantId   String
+  payloadJson      Json               @db.JsonB
+  status           PayoutOutboxStatus @default(PENDING)
+  lastError        String?
+  attemptCount     Int                @default(0)
+  nextRetryAt      DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  sellerCompany    Company            @relation("OutboxCompany", fields: [sellerTenantId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextRetryAt])
+}
+
+enum ProviderWebhookStatus {
+  RECEIVED
+  PROCESSED
+  IGNORED
+  FAILED
+}
+
+model ProviderWebhookEvent {
+  id               String                @id @default(cuid())
+  provider         PaymentProvider       @default(IYZICO)
+  externalEventId  String                @unique
+  eventType        String
+  payloadJson      Json                  @db.JsonB
+  receivedAt       DateTime              @default(now())
+  processedAt      DateTime?
+  status           ProviderWebhookStatus @default(RECEIVED)
+
+  @@index([provider, receivedAt])
 }

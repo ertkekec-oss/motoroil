@@ -1,0 +1,48 @@
+FAIL [22m[49m src
+/services/finance/payout/__te
+sts__/fin2b_iyzico.test.ts[2
+m [ src/services/finance/payo
+ut/__tests__/fin2b_iyzico.tes
+t.ts ][22m
+[31m[1mError[22m: Cannot f
+ind package '@/lib/idempotenc
+y' imported from 'C:/Users/er
+tke/OneDrive/Masa├╝st├╝/perio
+dya/muhasebeapp/motoroil/src/
+services/finance/payout/ledge
+rFinalize.ts'[39m
+[36m [2mÔØ»[22m src/servic
+es/finance/payout/ledgerFinal
+ize.ts:[2m2:1[22m[39m
+    [90m  1| [39m[35mimpor
+t[39m { [33mPrismaClient[3
+9m[33m,[39m [33mPrisma[39
+m } [35mfrom[39m [32m'@pri
+sma/client'[39m[33m;[39m
+    [90m  2| [39m[35mimpor
+t[39m { withIdempotency } [
+35mfrom[39m [32m'@/lib/idem
+potency'[39m[33m;[39m
+    [90m   | [39m[31m^[39
+m
+    [90m  3| [39m[35mimpor
+t[39m { [33mPayoutError[39
+m } [35mfrom[39m [32m'./er
+rors'[39m[33m;[39m
+    [90m  4| [39m
+[90m [2mÔØ»[22m src/servic
+es/finance/payout/__tests__/f
+in2b_iyzico.test.ts:[2m7:1[
+22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 23:40:53
+[2m   Duration [22m 1.03s[2m (transform 292ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)[22m
+
