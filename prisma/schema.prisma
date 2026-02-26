@@ -3497,6 +3497,7 @@ enum ProviderPayoutStatus {
   SUCCEEDED
   FAILED
   REVERSED
+  RECONCILE_REQUIRED
 }
 
 model ProviderPayout {
@@ -3565,4 +3566,50 @@ model ProviderWebhookEvent {
   status           ProviderWebhookStatus @default(RECEIVED)
 
   @@index([provider, receivedAt])
+}
+
+// --- FIN-2B.1: PRODUCTION HARDENING ---
+
+enum FinanceIntegrityAlertType {
+  LEDGER_UNBALANCED
+  FINALIZE_MISSING
+  FINALIZE_ORPHAN
+  WALLET_DRIFT
+  OUTBOX_MISSING
+  CRITICAL
+}
+
+enum FinanceIntegrityAlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+model FinanceIntegrityAlert {
+  id          String                        @id @default(cuid())
+  type        FinanceIntegrityAlertType
+  referenceId String?
+  severity    FinanceIntegrityAlertSeverity @default(WARNING)
+  detailsJson Json                          @db.JsonB
+  resolvedAt  DateTime?
+  createdAt   DateTime                      @default(now())
+
+  @@index([type, createdAt])
+}
+
+enum FinanceOpsLogSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+model FinanceOpsLog {
+  id          String                @id @default(cuid())
+  action      String
+  entityType  String
+  entityId    String?
+  severity    FinanceOpsLogSeverity @default(INFO)
+  payloadJson Json?                 @db.JsonB
+  createdAt   DateTime              @default(now())
 }

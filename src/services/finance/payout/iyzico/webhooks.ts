@@ -4,14 +4,35 @@ import { IyzicoProvider } from '../providers/iyzicoProvider';
 const prisma = new PrismaClient();
 const provider = new IyzicoProvider(); // We use the signature verifier from it
 
-export async function ingestWebhook(signature: string, payloadStr: string, eventObj: any) {
-    if (!provider.verifyWebhookSignature(signature, payloadStr)) {
-        throw new Error('Invalid signature');
+import crypto from 'crypto';
+
+export async function ingestWebhook(signature: string, payloadStr: string, eventObj: any, timestampStr?: string, overrides?: { now?: Date }) {
+    const now = overrides?.now || new Date();
+    
+    // 1) Timestamp
+    if (!timestampStr) {
+        const err = new Error('Missing timestamp header');
+        (err as any).statusCode = 401;
+        throw err;
+    }
+    const timestamp = parseInt(timestampStr, 10);
+    if (isNaN(timestamp) || Math.abs(now.getTime() - timestamp) > 5 * 60000) {
+        const err = new Error('Expired timestamp');
+        (err as any).statusCode = 401;
+        throw err;
     }
 
-    const externalId = eventObj.iyziEventType + '_' + eventObj.iyziEventTime;
+    // 2) Signature
+    if (!provider.verifyWebhookSignature(signature, payloadStr)) {
+        const err = new Error('Invalid signature');
+        (err as any).statusCode = 401;
+        throw err;
+    }
 
-    // Idempotent Ingest
+    // 3) Replay Prevention
+    const payloadHash = crypto.createHash('sha256').update(payloadStr + timestampStr).digest('hex');
+    const externalId = eventObj.iyziEventType + '_' + eventObj.iyziEventTime + '_' + payloadHash;
+
     const created = await prisma.providerWebhookEvent.create({
         data: {
             provider: 'IYZICO',
@@ -19,8 +40,20 @@ export async function ingestWebhook(signature: string, payloadStr: string, event
             eventType: eventObj.iyziEventType,
             payloadJson: eventObj,
         }
-    }).catch(e => {
-        if (e.code === 'P2002') return null; // already ingested
+    }).catch(async e => {
+        if (e.code === 'P2002') {
+             await prisma.financeOpsLog.create({
+                  data: {
+                       action: 'WEBHOOK_REPLAY_REJECTED',
+                       entityType: 'Webhook',
+                       severity: 'WARNING',
+                       payloadJson: { hash: payloadHash }
+                  }
+             });
+             const err = new Error('Replayed payload');
+             (err as any).statusCode = 401;
+             throw err;
+        }
         throw e;
     });
 
