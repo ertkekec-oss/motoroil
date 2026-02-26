@@ -234,6 +234,38 @@ export async function runDailyMetricsJob(params: { dayStr?: string, backfillDays
              tenantsData.push(await computeTenantDailyMetrics(day, tenantId));
         }
 
+        // 1.b Compute cohort metrics
+        const cohortTagsRaw = await prisma.pilotCohortTag.findMany({
+             where: { tenantId: { in: Array.from(uniqueTenants) } }
+        });
+        const tenantToCohorts = new Map<string, string[]>();
+        for (const ct of cohortTagsRaw) {
+              if (!tenantToCohorts.has(ct.tenantId)) tenantToCohorts.set(ct.tenantId, []);
+              tenantToCohorts.get(ct.tenantId)!.push(ct.tag);
+        }
+
+        // Aggregate by cohort
+        const cohortDataMap = new Map<string, { gmvGross: number; orderCount: number; payoutVolume: number; takeRevenueCommission: number; chargebackAmount: number }>();
+        
+        for (const tidData of tenantsData) {
+             const cohorts = tenantToCohorts.get(tidData.tenantId) || [];
+             for (const tag of cohorts) {
+                  if (!cohortDataMap.has(tag)) {
+                       cohortDataMap.set(tag, { gmvGross: 0, orderCount: 0, payoutVolume: 0, takeRevenueCommission: 0, chargebackAmount: 0 });
+                  }
+                  const st = cohortDataMap.get(tag)!;
+                  if (tidData.role === 'BUYER' || tidData.role === 'BOTH') {
+                       st.gmvGross += Number(tidData.gmvGross);
+                       st.orderCount += tidData.orderCount;
+                  }
+                  if (tidData.role === 'SELLER' || tidData.role === 'BOTH') {
+                       st.payoutVolume += Number(tidData.payoutReceived);
+                       st.takeRevenueCommission += Number(tidData.commissionPaid);
+                  }
+                  st.chargebackAmount += 0; // Derived chargebacks not fully per-tenant mapped in payload here easily without big query, fallback to 0 for pilot scope mostly 
+             }
+        }
+
         // 2. Commit inside idempotency transaction
         const idempotencyKey = `METRICS_DAILY:${day}`;
         try {
@@ -249,6 +281,14 @@ export async function runDailyMetricsJob(params: { dayStr?: string, backfillDays
                          where: { day_tenantId: { day: tidData.day, tenantId: tidData.tenantId } },
                          update: tidData,
                          create: tidData
+                     });
+                }
+
+                for (const [tag, stats] of cohortDataMap.entries()) {
+                     await tx.platformCohortDailyMetrics.upsert({
+                         where: { day_cohortTag: { day, cohortTag: tag } },
+                         update: { ...stats },
+                         create: { day, cohortTag: tag, ...stats }
                      });
                 }
 

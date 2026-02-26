@@ -64,12 +64,43 @@ export async function computeOpsHealth(params: { now?: Date } = {}) {
         select: { id: true, type: true, referenceId: true, createdAt: true }
     });
 
+    // 9) OPS VISIBILITY FOR PILOT
+    const pilotTenantsRaw = await prisma.tenantRolloutPolicy.findMany({
+         where: { cohort: 'PILOT' },
+         select: { tenantId: true, payoutPaused: true, escrowPaused: true }
+    });
+    let pilotActiveTenantCount = 0;
+    let pilotPausedTenantCount = 0;
+    for (const t of pilotTenantsRaw) {
+         if (t.payoutPaused || t.escrowPaused) pilotPausedTenantCount++;
+         else pilotActiveTenantCount++;
+    }
+
+    const startOfDay = new Date(now);
+    startOfDay.setUTCHours(0,0,0,0);
+    startOfDay.setUTCHours(startOfDay.getUTCHours() - 3); // TZ approx
+    const pilotDailyGmvTotal = await prisma.providerPayment.aggregate({
+         _sum: { amount: true },
+         where: { 
+             tenantId: { in: pilotTenantsRaw.map(t => t.tenantId) }, 
+             status: 'PAID', 
+             createdAt: { gte: startOfDay } 
+         }
+    });
+
+    const pilotStats = {
+         pilotActiveTenantCount,
+         pilotPausedTenantCount,
+         pilotDailyGmvTotal: Number(pilotDailyGmvTotal._sum.amount || 0)
+    };
+
     return {
         timestamp: now.toISOString(),
         counts,
         lagMetrics,
         lastRunTimestamps,
-        topCriticalAlerts
+        topCriticalAlerts,
+        pilotStats
     };
 }
 
