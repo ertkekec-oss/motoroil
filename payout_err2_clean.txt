@@ -1,0 +1,43 @@
+FAIL [22m[49m src
+/services/finance/payout/__te
+sts__/payout.test.ts[2m > [
+22mFIN-2A: Internal Wallet Wi
+thdrawals[2m > [22m5) Insuf
+ficient balances at processin
+g fails safely
+[31m[1mPayoutError[22m: In
+sufficient available balance
+[39m
+[36m [2mÔØ»[22m createPayo
+utRequest src/services/financ
+e/payout/requests.ts:[2m30:1
+5[22m[39m
+    [90m 28| [39m
+    [90m 29| [39m    [35mi
+f[39m ([33mNumber[39m(ledg
+er[33m.[39mavailableBalance
+) [33m<[39m amount) {
+    [90m 30| [39m        th
+row new PayoutError('Insuffic
+ient available balance', 'INS
+UFÔÇĞ
+    [90m   | [39m          
+    [31m^[39m
+    [90m 31| [39m    }
+    [90m 32| [39m
+[90m [2mÔØ»[22m src/servic
+es/finance/payout/__tests__/p
+ayout.test.ts:[2m129:25[22m
+[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (6)[39m
+[2m   Start at [22m 23:13:08
+[2m   Duration [22m 8.84s[2m (transform 291ms, setup 0ms, import 581ms, tests 7.82s, environment 0ms)[22m
+
