@@ -2,6 +2,8 @@ import { PrismaClient, SellerRiskTier, BoostScope } from '@prisma/client';
 import { RankParams, RankResult, DiscoveryResultItem, ExplainabilityRecord } from './types';
 import { fetchActiveBoosts } from './boosts';
 import { logDiscoveryImpressions } from './impressions';
+import { getCategoryMedianPrice, checkChurnPenalty } from './antiGaming';
+import { interleaveListingResults } from './interleave';
 
 const prisma = new PrismaClient();
 
@@ -14,13 +16,27 @@ const W_LEAD = 0.10;
 const W_MATCH = 0.05;
 
 export async function rankNetworkListings(params: RankParams): Promise<RankResult> {
-    const { filters, viewerTenantId, sortMode, limit = 20 } = params;
+    let { filters, viewerTenantId, sortMode, limit = 20 } = params;
 
-    // 1. Prepare Base Query (Safe Tenant Isolation -> ONLY NETWORK VISIBLE)
+    // 1A. Query Budget Guard
+    if (limit > 50) limit = 50;
+
+    const hasFilters = filters.categoryId || filters.brandId || filters.priceMin !== undefined || filters.priceMax !== undefined || filters.leadTimeMax !== undefined || filters.inStockOnly;
+
+    // Base Query (Safe Tenant Isolation -> ONLY NETWORK VISIBLE)
     let whereClause: any = {
         visibility: 'NETWORK',
         status: 'ACTIVE'
     };
+
+    if (!hasFilters) {
+        // If no filters, force limit 20 and recency window (180 days)
+        if (limit > 20) limit = 20;
+        const _180DaysAgo = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
+        whereClause.createdAt = { gte: _180DaysAgo };
+    }
+
+
 
     if (filters.categoryId) {
         whereClause.globalProduct = { ...whereClause.globalProduct, categoryId: filters.categoryId };
@@ -86,7 +102,7 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
     const activeBoosts = await fetchActiveBoosts();
 
     // 5. Score items
-    const scoredItems: { listing: typeof listings[0]; cScore: ExplainabilityRecord }[] = listings.map(listing => {
+    const scoredItems = await Promise.all(listings.map(async (listing: any) => {
         // --- A. Trust Signal
         const tScoreRaw = listing.company.sellerTrustScore?.score || 60; // Default C avg
         const tTier = listing.company.sellerTrustScore?.tier || 'C';
@@ -99,9 +115,20 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
         // --- C. Availability Signal
         const availabilityNorm = listing.availableQty > 0 ? Math.min(1, Math.log10(listing.availableQty) / 4) : 0; // Cap at 10k items
 
-        // --- D. Price Competitiveness
-        // Stub: Normally we calculate category median.
-        const priceCompetitivenessNorm = 0.5;
+        // --- D. Price Competitiveness & Anomaly
+        let priceCompetitivenessNorm = 0.5;
+        const reasons = [];
+
+        const median = await getCategoryMedianPrice(listing.globalProduct.categoryId);
+        const lPrice = Number(listing.price);
+        if (median) {
+            if (lPrice < median * 0.5 || lPrice > median * 2.0) {
+                reasons.push('Price anomaly cap');
+                priceCompetitivenessNorm = 0.5;
+            } else {
+                priceCompetitivenessNorm = 1 - (lPrice / (median * 2));
+            }
+        }
 
         // --- E. Lead Time
         const leadTimeNorm = 1 / (1 + listing.leadTimeDays);
@@ -110,13 +137,27 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
         const matchNorm = 1.0;
 
         // Calculate Base
-        const rawBaseScore =
+        let rawBaseScore =
             (W_TRUST * trustScoreNorm) +
             (W_RECENCY * recencyNorm) +
             (W_AVAILABILITY * availabilityNorm) +
-            (W_PRICE * priceCompetitivenessNorm) +
+            (W_PRICE * Math.max(0, priceCompetitivenessNorm)) +
             (W_LEAD * leadTimeNorm) +
             (W_MATCH * matchNorm);
+
+        // --- Churn Penalty
+        const hasChurnPenalty = await checkChurnPenalty(listing.company.id, listing.id);
+        if (hasChurnPenalty) {
+            rawBaseScore *= 0.9;
+            reasons.push('Churn penalty');
+        }
+
+        // --- Cold Start Fairness (Explore Boost)
+        const listingAgeHours = (Date.now() - listing.createdAt.getTime()) / (1000 * 60 * 60);
+        if (listingAgeHours <= 48 && (tTier === 'A' || tTier === 'B')) {
+            rawBaseScore *= 1.05;
+            reasons.push('New listing boost');
+        }
 
         // --- Boost Calculation
         let boostMultiplier = 1.0;
@@ -125,11 +166,14 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
         // Evaluate boosts for all
         for (const boost of activeBoosts) {
             let hit = false;
+            // Target checks
             if (boost.scope === 'LISTING' && boost.targetId === listing.id) hit = true;
             if (boost.scope === 'SELLER' && boost.targetId === listing.company.id) hit = true;
             if (boost.scope === 'CATEGORY' && boost.targetId === listing.globalProduct.categoryId) hit = true;
 
             if (hit) {
+                // Policy: Check expiry/stacking rule 
+                // We fetch activeBoosts, so expiry check is ideally there. 
                 boostMultiplier = Math.max(boostMultiplier, Number(boost.multiplier));
                 isBoosted = true;
             }
@@ -143,7 +187,6 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
         const finalScore = rawBaseScore * boostMultiplier;
 
         // --- Explainability Strings
-        const reasons = [];
         if (tTier === 'A') reasons.push('Highly Trusted Seller');
         if (isBoosted) reasons.push('Promoted Result');
         if (listing.leadTimeDays === 0) reasons.push('Same Day Dispatch');
@@ -162,7 +205,7 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
                 isSponsored: isBoosted
             }
         };
-    });
+    }));
 
     // 6. Sorting 
     scoredItems.sort((a, b) => {
@@ -185,7 +228,7 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
     const nextCursor = page.length === limit && startIndex + limit < scoredItems.length ? page[page.length - 1].listing.id : undefined;
 
     // 8. Transform to Public Output (No PII / Private Fields)
-    const results: DiscoveryResultItem[] = page.map(i => ({
+    let preInterleaveResults: DiscoveryResultItem[] = page.map(i => ({
         listingId: i.listing.id,
         globalProductId: i.listing.globalProductId,
         title: i.listing.globalProduct.name,
@@ -198,6 +241,8 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
         leadTimeDays: i.listing.leadTimeDays,
         sellerTier: i.cScore.trustTier,
         isSponsored: i.cScore.boosted,
+        boostMultiplierApplied: i.cScore.boostMultiplier,
+        topReasons: i.cScore.topReasons,
         reasonJson: {
             isSponsored: i.cScore.boosted,
             topReasons: i.cScore.topReasons,
@@ -205,6 +250,13 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
         },
         scoreBreakdown: i.cScore
     }));
+
+    // Interleave Sponsored elements
+    const results = interleaveListingResults(page.map((item, idx) => ({
+        item: preInterleaveResults[idx],
+        scoreDesc: item.cScore.finalScore,
+        rawId: item.listing.id
+    })), limit);
 
     // 9. Fire and forget Impression Logic
     const impressionData = page.map((i, idx) => ({

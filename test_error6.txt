@@ -1,0 +1,80 @@
+FAIL [22m[49m src
+/services/network/discovery/_
+_tests__/discoveryHardening.t
+est.ts[2m [ src/services/net
+work/discovery/__tests__/disc
+overyHardening.test.ts ][22m
+[31m[1mPrismaClientValidati
+onError[22m: 
+Invalid `prisma.globalProduct
+.create()` invocation in
+C:/Users/ertke/OneDrive/Masa├
+╝st├╝/periodya/muhasebeapp/mo
+toroil/src/services/network/d
+iscovery/__tests__/discoveryH
+ardening.test.ts:28:43
+
+  25 await prisma.sellerTrust
+Score.create({ data: { seller
+TenantId: cA.id, score: 95, t
+ier: 'A', windowStart: new Da
+te(), windowEnd: new Date(), 
+componentsJson: {} } });
+  26 await prisma.sellerTrust
+Score.create({ data: { seller
+TenantId: cD.id, score: 40, t
+ier: 'D', windowStart: new Da
+te(), windowEnd: new Date(), 
+componentsJson: {} } });
+  27 
+ÔåÆ 28 const gp = await prism
+a.globalProduct.create({
+       data: {
+         name: "F3 Test Prod"
+,
+         category: {
+           create: {
+             id: "CAT_F3_HARD
+1772135149033",
+             name: "CAT",
+             code: "CAT_F3_HA
+RD1772135149033",
+             ~~~~
+             slug: "CAT_F3_HA
+RD1772135149033",
+     ?       active?: Boolean
+,
+     ?       parent?: GlobalC
+ategoryCreateNestedOneWithout
+ChildrenInput,
+     ?       children?: Globa
+lCategoryCreateNestedManyWith
+outParentInput,
+     ?       attributes?: Cat
+egoryAttributeCreateNestedMan
+yWithoutCategoryInput,
+     ?       mappings?: Categ
+oryMappingCreateNestedManyWit
+houtGlobalCategoryInput,
+     ?       listingOverrides
+?: B2BListingCategoryOverride
+CreateNestedManyWithoutGlobal
+CategoryInput
+           }
+         },
+         code: "H_17721351501
+88"
+       }
+     })
+
+Unknown argument `code`. Did 
+you mean `id`? Available opti
+ons are marked with ?.[39m
+[90m [2mÔØ»[22m wn node_mo
+dules/@prisma/client/runtime/
+library.js:[2m29:1363[22m[
+39m
+[90m [2mÔØ»[22m $n.handleR
+equestError node_modules/@pri
+sma/client/runtime/library.js
+:[2m121:6958[22

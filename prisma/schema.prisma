@@ -3329,18 +3329,50 @@ enum BoostScope {
 }
 
 model BoostRule {
-  id                String      @id @default(cuid())
-  scope             BoostScope
-  targetId          String
-  multiplier        Decimal     @db.Decimal(10, 2)
-  startsAt          DateTime
-  endsAt            DateTime
-  isActive          Boolean     @default(true)
-  createdByTenantId String
-  createdAt         DateTime    @default(now())
+  id                   String      @id @default(cuid())
+  scope                BoostScope
+  targetId             String
+  multiplier           Decimal     @db.Decimal(10, 2)
+  priority             Int         @default(0)
+  maxImpressionsPerDay Int?
+  startsAt             DateTime
+  endsAt               DateTime
+  isActive             Boolean     @default(true)
+  createdByTenantId    String
+  createdAt            DateTime    @default(now())
 
-  creatorCompany    Company     @relation(fields: [createdByTenantId], references: [id], onDelete: Cascade)
+  creatorCompany       Company     @relation(fields: [createdByTenantId], references: [id], onDelete: Cascade)
 
-  @@index([scope, targetId, isActive])
+  @@index([scope, targetId, isActive, startsAt, endsAt])
+  @@index([isActive, endsAt])
   @@index([startsAt, endsAt])
+}
+
+model DiscoveryRequestLog {
+  id               String   @id @default(cuid())
+  viewerTenantId   String
+  requestId        String   @unique
+  queryHash        String
+  weightsVersion   String
+  filtersJson      Json     @db.JsonB
+  sortMode         String
+  limit            Int
+  latencyMs        Int
+  dbLatencyMs      Int
+  computeLatencyMs Int
+  resultsCount     Int
+  topResultsJson   Json     @db.JsonB
+  createdAt        DateTime @default(now())
+
+  @@index([viewerTenantId, createdAt])
+}
+
+model ListingPriceSnapshot {
+  id         String   @id @default(cuid())
+  listingId  String
+  price      Decimal  @db.Decimal(10, 2)
+  currency   String   @default("TRY")
+  capturedAt DateTime @default(now())
+
+  @@index([listingId, capturedAt])
 }

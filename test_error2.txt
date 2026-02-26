@@ -1,0 +1,80 @@
+FAIL [22m[49m src
+/services/network/discovery/_
+_tests__/discoveryHardening.t
+est.ts[2m [ src/services/net
+work/discovery/__tests__/disc
+overyHardening.test.ts ][22m
+[31m[1mPrismaClientValidati
+onError[22m: 
+Invalid `prisma.tenant.create
+()` invocation in
+C:/Users/ertke/OneDrive/Masa├
+╝st├╝/periodya/muhasebeapp/mo
+toroil/src/services/network/d
+iscovery/__tests__/discoveryH
+ardening.test.ts:17:36
+
+  14 
+  15 beforeAll(async () => {
+  16     // Basic setup...
+ÔåÆ 17     const tA = await p
+risma.tenant.create({
+           data: {
+             name: "TA",
+             subdomain: "ta-1
+772134134709",
+         +   ownerEmail: Stri
+ng
+           }
+         })
+
+Argument `ownerEmail` is miss
+ing.[39m
+[90m [2mÔØ»[22m wn node_mo
+dules/@prisma/client/runtime/
+library.js:[2m29:1363[22m[
+39m
+[90m [2mÔØ»[22m $n.handleR
+equestError node_modules/@pri
+sma/client/runtime/library.js
+:[2m121:6958[22m[39m
+[90m [2mÔØ»[22m $n.handleA
+ndLogRequestError node_module
+s/@prisma/client/runtime/libr
+ary.js:[2m121:6623[22m[39m
+[90m [2mÔØ»[22m $n.request
+ node_modules/@prisma/client/
+runtime/library.js:[2m121:63
+07[22m[39m
+[90m [2mÔØ»[22m l node_mod
+ules/@prisma/client/runtime/l
+ibrary.js:[2m130:9633[22m[
+39m
+[36m [2mÔØ»[22m src/servic
+es/network/discovery/__tests_
+_/discoveryHardening.test.ts:
+[2m17:16[22m[39m
+    [90m 15| [39m[34mbefor
+eAll[39m([35masync[39m () 
+[33m=>[39m {
+    [90m 16| [39m    [90m/
+/ Basic setup...[39m
+    [90m 17| [39m    const 
+tA = await prisma.tenant.crea
+te({ data: { name: 'TA', subd
+omÔÇĞ
+    [90m   | [39m          
+     [31m^[39m
+    [90m 18| [39m    const 
+tD = await prisma.tenant.crea
+te({ data: { name: 'TD', subd
+omÔÇĞ
+    [90m 19| [39m    seller
+A [33m=[39m tA[33m.[39mid
+[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»[22m[39m
+[31m[1mSerialized Error

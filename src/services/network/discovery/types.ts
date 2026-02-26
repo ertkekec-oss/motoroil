@@ -59,6 +59,8 @@ export interface DiscoveryResultItem {
     leadTimeDays: number;
     sellerTier: SellerRiskTier;
     isSponsored: boolean;
+    boostMultiplierApplied: number;
+    topReasons: string[];
     reasonJson?: any;
     scoreBreakdown?: ExplainabilityRecord;
 }
@@ -66,4 +68,19 @@ export interface DiscoveryResultItem {
 export interface RankResult {
     results: DiscoveryResultItem[];
     nextCursor?: string;
+}
+
+export interface DiscoveryRequestLogData {
+    viewerTenantId: string;
+    requestId: string;
+    queryHash: string;
+    weightsVersion: string;
+    filtersJson: any;
+    sortMode: string;
+    limit: number;
+    latencyMs: number;
+    dbLatencyMs: number;
+    computeLatencyMs: number;
+    resultsCount: number;
+    topResultsJson: any;
 }
