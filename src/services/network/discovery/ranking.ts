@@ -4,6 +4,7 @@ import { fetchActiveBoosts } from './boosts';
 import { logDiscoveryImpressions } from './impressions';
 import { getCategoryMedianPrice, checkChurnPenalty } from './antiGaming';
 import { interleaveListingResults } from './interleave';
+import { hasSponsoredQuota } from '../../billing/boost/quota';
 
 const prisma = new PrismaClient();
 
@@ -172,10 +173,12 @@ export async function rankNetworkListings(params: RankParams): Promise<RankResul
             if (boost.scope === 'CATEGORY' && boost.targetId === listing.globalProduct.categoryId) hit = true;
 
             if (hit) {
-                // Policy: Check expiry/stacking rule 
-                // We fetch activeBoosts, so expiry check is ideally there. 
-                boostMultiplier = Math.max(boostMultiplier, Number(boost.multiplier));
-                isBoosted = true;
+                // Policy: Check expiry/stacking rule and sponsored quota
+                const hasQuota = await hasSponsoredQuota(listing.company.id);
+                if (hasQuota) {
+                    boostMultiplier = Math.max(boostMultiplier, Number(boost.multiplier));
+                    isBoosted = true;
+                }
             }
         }
 

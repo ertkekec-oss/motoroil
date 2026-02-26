@@ -1,9 +1,13 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { rankNetworkListings } from '../ranking';
 import { createBoostRule, deactivateBoostRule } from '../boosts';
 
 const prisma = new PrismaClient();
+
+vi.mock('../../../billing/boost/quota', () => ({
+    hasSponsoredQuota: vi.fn().mockResolvedValue(true)
+}));
 
 describe('F3 - Discovery & Boost Engine', () => {
     let viewerCompanyId: string;
@@ -186,7 +190,7 @@ describe('F3 - Discovery & Boost Engine', () => {
         const erpATwin = await prisma.product.create({ data: { id: `ERPA_TWIN_${Date.now()}`, companyId: sellerA, name: 'Prod A Twin', type: 'GOODS', code: `CODE_A_TWIN_${Date.now()}`, price: 100 } });
 
         // Sync creation time so recency is identical
-        const frozenDate = new Date('2024-01-01T00:00:00.000Z');
+        const frozenDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
         await prisma.networkListing.update({ where: { id: listingAId }, data: { createdAt: frozenDate } });
 
         const lATwin = await prisma.networkListing.create({

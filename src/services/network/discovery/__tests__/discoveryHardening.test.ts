@@ -7,6 +7,10 @@ import { NextRequest } from 'next/server';
 
 const prisma = new PrismaClient();
 
+vi.mock('../../../billing/boost/quota', () => ({
+    hasSponsoredQuota: vi.fn().mockResolvedValue(true)
+}));
+
 // Setup basic fixtures for tests
 let sellerA: string, sellerD: string;
 let lAId: string, lDId: string, lNewId: string;
@@ -25,14 +29,15 @@ beforeAll(async () => {
     await prisma.sellerTrustScore.create({ data: { sellerTenantId: cA.id, score: 95, tier: 'A', windowStart: new Date(), windowEnd: new Date(), componentsJson: {} } });
     await prisma.sellerTrustScore.create({ data: { sellerTenantId: cD.id, score: 40, tier: 'D', windowStart: new Date(), windowEnd: new Date(), componentsJson: {} } });
 
-    const gp = await prisma.globalProduct.create({ data: { name: 'F3 Test Prod', category: { create: { id: categoryId, name: 'CAT', slug: categoryId } }, code: `H_${Date.now()}` } });
+    const gp = await prisma.globalProduct.create({ data: { name: 'F3 Test Prod', category: { create: { id: categoryId, name: 'CAT', slug: categoryId } } } });
 
     const pA = await prisma.product.create({ data: { id: `H_PA_${Date.now()}`, companyId: cA.id, name: 'P', type: 'GOODS', code: `HC_A_${Date.now()}`, price: 100 } });
+    const pA2 = await prisma.product.create({ data: { id: `H_PA2_${Date.now()}`, companyId: cA.id, name: 'P', type: 'GOODS', code: `HC_A2_${Date.now()}`, price: 100 } });
     const pD = await prisma.product.create({ data: { id: `H_PD_${Date.now()}`, companyId: cD.id, name: 'P', type: 'GOODS', code: `HC_D_${Date.now()}`, price: 100 } });
 
     const lA = await prisma.networkListing.create({ data: { globalProductId: gp.id, sellerCompanyId: cA.id, erpProductId: pA.id, price: 100, visibility: 'NETWORK', status: 'ACTIVE', availableQty: 10 } });
     const lD = await prisma.networkListing.create({ data: { globalProductId: gp.id, sellerCompanyId: cD.id, erpProductId: pD.id, price: 100, visibility: 'NETWORK', status: 'ACTIVE', availableQty: 10 } });
-    const lNew = await prisma.networkListing.create({ data: { globalProductId: gp.id, sellerCompanyId: cA.id, erpProductId: pA.id, price: 100, visibility: 'NETWORK', status: 'ACTIVE', availableQty: 10, createdAt: new Date() } }); // Just now
+    const lNew = await prisma.networkListing.create({ data: { globalProductId: gp.id, sellerCompanyId: cA.id, erpProductId: pA2.id, price: 100, visibility: 'NETWORK', status: 'ACTIVE', availableQty: 10, createdAt: new Date() } }); // Just now
 
     // Older listings for A & D
     await prisma.networkListing.update({ where: { id: lA.id }, data: { createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000) } });

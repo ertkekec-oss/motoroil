@@ -25,111 +25,103 @@ model Tenant {
 }
 
 model Company {
-  productConsumptions  ProductConsumption[]
-  buySuggestions       BuySuggestion[]
-  commissionPlans      CommissionPlan[]
-  sellerEarnings       SellerEarning[]
-  releaseWindowPolicy  ReleaseWindowPolicy?
-  ledgerAccount        LedgerAccount?
-  networkListings      NetworkListing[]
-  companyProductMaps   CompanyProductMap[]
-  payoutDestinations   PayoutDestination[]
-  payoutRequests       PayoutRequest[]
-  sellerPaymentProfile SellerPaymentProfile?
-  providerPayments     ProviderPayment[]
-  providerPayouts      ProviderPayout[]
-  payoutOutboxes       PayoutOutbox[]                 @relation("OutboxCompany")
-  id                   String                         @id @default(cuid())
-  tenantId             String
-  name                 String
-  type                 CompanyType                    @default(BUYER)
-  status               CompanyStatus                  @default(ACTIVE)
-  taxNumber            String
-  vkn                  String
-  taxOffice            String?
-  address              String?
-  district             String?
-  city                 String?
-  createdAt            DateTime                       @default(now())
-  updatedAt            DateTime                       @updatedAt
-  accounts             Account[]
-  appSettings          AppSettings[]
-  bankConnections      BankConnection[]
-  bankStatements       BankStatement[]
-  bankTransactions     BankTransaction[]
-  branches             Branch[]
-  cashflowForecasts    CashflowForecast[]
-  checks               Check[]
-  tenant               Tenant                         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  coupons              Coupon[]
-  customers            Customer[]
-  customerCategories   CustomerCategory[]
-  domainEvents         DomainEvent[]
-  externalRequests     ExternalRequest[]
-  fintechAudits        FintechAudit[]
-  integratorSettings   IntegratorSettings?
-  inventoryLayers      InventoryLayer[]
-  Journal              Journal[]
-  journalEntries       JournalEntry[]
-  kasalar              Kasa[]
-  MarketplaceConfig    MarketplaceConfig[]
-  orderFinances        MarketplaceOrderFinance[]
-  productMaps          MarketplaceProductMap[]
-  marketplacePnls      MarketplaceProductPnl[]
-  settlements          MarketplaceSettlement[]
-  transactionLedgers   MarketplaceTransactionLedger[]
-  matchingRules        MatchingRule[]
-  orders               Order[]
-  paymentMatches       PaymentMatch[]
-  paymentPlans         PaymentPlan[]
-  priceLists           PriceList[]
-  autopilotConfigs     PricingAutopilotConfig[]
-  products             Product[]
-  purchaseInvoices     PurchaseInvoice[]
-  quotes               Quote[]
-  routes               Route[]
-  routeTemplates       RouteTemplate[]
-  invoices             SalesInvoice[]
-  salesOrders          SalesOrder[]
-  visits               SalesVisit[]
-  serviceRecords       ServiceRecord[]
-  smartPricingRules    SmartPricingRule[]
-  staff                Staff[]
-  staffTargets         StaffTarget[]
-  stockMovements       StockMovement[]
-  stockTransfers       StockTransfer[]
-  suppliers            Supplier[]
-  suspendedSales       SuspendedSale[]
-  transactions         Transaction[]
-  users                UserCompanyAccess[]
-  expenses             Expense[]
-  locationRequests     CustomerLocationRequest[]
-  securityEvents       SecurityEvent[]                @relation("CompanySecurityEvents")
-  campaigns            Campaign[]
-
-  // Commerce Layer v1
-  erpCategories      ERPProductCategory[]
-  categoryMappings   CategoryMapping[]
-  automationPolicy   SellerAutomationPolicy?
-  auditLogs          CommerceAuditLog[]
-  b2bSuggestions     B2BSuggestion[]
-  decisionLogs       AutomationDecisionLog[]
-  CommissionSnapshot CommissionSnapshot[]
-  FinanceAuditLog    FinanceAuditLog[]
-
-  // Ticket System
-  ticketsAsTenant       Ticket[]        @relation("TicketTenant")
-  ticketsAsCounterparty Ticket[]        @relation("TicketCounterparty")
+  id                    String                         @id @default(cuid())
+  tenantId              String
+  name                  String
+  vkn                   String
+  taxOffice             String?
+  address               String?
+  district              String?
+  city                  String?
+  createdAt             DateTime                       @default(now())
+  updatedAt             DateTime                       @updatedAt
+  status                CompanyStatus                  @default(ACTIVE)
+  taxNumber             String
+  type                  CompanyType                    @default(BUYER)
+  accounts              Account[]
+  appSettings           AppSettings[]
+  decisionLogs          AutomationDecisionLog[]
+  b2bSuggestions        B2BSuggestion[]
+  bankConnections       BankConnection[]
+  bankStatements        BankStatement[]
+  bankTransactions      BankTransaction[]
+  createdBoostRules     BoostRule[]
+  branches              Branch[]
+  buySuggestions        BuySuggestion[]
+  campaigns             Campaign[]
+  cashflowForecasts     CashflowForecast[]
+  categoryMappings      CategoryMapping[]
+  checks                Check[]
+  auditLogs             CommerceAuditLog[]
+  commissionPlans       CommissionPlan[]
+  CommissionSnapshot    CommissionSnapshot[]
+  tenant                Tenant                         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  companyProductMaps    CompanyProductMap[]
+  coupons               Coupon[]
+  customers             Customer[]
+  customerCategories    CustomerCategory[]
+  locationRequests      CustomerLocationRequest[]
+  discoveryImpressions  DiscoveryImpression[]
+  domainEvents          DomainEvent[]
+  erpCategories         ERPProductCategory[]
+  expenses              Expense[]
+  externalRequests      ExternalRequest[]
+  FinanceAuditLog       FinanceAuditLog[]
+  fintechAudits         FintechAudit[]
+  integratorSettings    IntegratorSettings?
+  inventoryLayers       InventoryLayer[]
+  Journal               Journal[]
+  journalEntries        JournalEntry[]
+  kasalar               Kasa[]
+  ledgerAccount         LedgerAccount?
+  MarketplaceConfig     MarketplaceConfig[]
+  orderFinances         MarketplaceOrderFinance[]
+  productMaps           MarketplaceProductMap[]
+  marketplacePnls       MarketplaceProductPnl[]
+  settlements           MarketplaceSettlement[]
+  transactionLedgers    MarketplaceTransactionLedger[]
+  matchingRules         MatchingRule[]
+  networkListings       NetworkListing[]
+  orders                Order[]
+  paymentMatches        PaymentMatch[]
+  paymentPlans          PaymentPlan[]
+  payoutDestinations    PayoutDestination[]
+  payoutOutboxes        PayoutOutbox[]                 @relation("OutboxCompany")
+  payoutRequests        PayoutRequest[]
+  priceLists            PriceList[]
+  autopilotConfigs      PricingAutopilotConfig[]
+  products              Product[]
+  productConsumptions   ProductConsumption[]
+  providerPayments      ProviderPayment[]
+  providerPayouts       ProviderPayout[]
+  purchaseInvoices      PurchaseInvoice[]
+  quotes                Quote[]
+  releaseWindowPolicy   ReleaseWindowPolicy?
+  routes                Route[]
+  routeTemplates        RouteTemplate[]
+  invoices              SalesInvoice[]
+  salesOrders           SalesOrder[]
+  visits                SalesVisit[]
+  securityEvents        SecurityEvent[]                @relation("CompanySecurityEvents")
+  automationPolicy      SellerAutomationPolicy?
+  sellerEarnings        SellerEarning[]
+  sellerPaymentProfile  SellerPaymentProfile?
+  sellerTrustEvents     SellerTrustEvent[]
+  sellerTrustScore      SellerTrustScore?
+  serviceRecords        ServiceRecord[]
+  smartPricingRules     SmartPricingRule[]
+  staff                 Staff[]
+  staffTargets          StaffTarget[]
+  stockMovements        StockMovement[]
+  stockTransfers        StockTransfer[]
+  suppliers             Supplier[]
+  suspendedSales        SuspendedSale[]
+  ticketsAsCounterparty Ticket[]                       @relation("TicketCounterparty")
+  ticketsAsTenant       Ticket[]                       @relation("TicketTenant")
   ticketMessages        TicketMessage[]
-
-  // Trust Layer
-  sellerTrustScore     SellerTrustScore?
-  sellerTrustEvents    SellerTrustEvent[]
-  trustScoreRecalcJobs TrustScoreRecalcJob[]
-
-  // Discovery Layer
-  discoveryImpressions DiscoveryImpression[]
-  createdBoostRules    BoostRule[]
+  transactions          Transaction[]
+  trustScoreRecalcJobs  TrustScoreRecalcJob[]
+  users                 UserCompanyAccess[]
 
   @@unique([tenantId, vkn])
   @@index([vkn])
@@ -258,9 +250,9 @@ model Order {
   updatedAt         DateTime  @updatedAt
   branch            String?   @default("Merkez")
   companyId         String
-  staffId           String?
   shipmentPackageId String?
-  detailsFetchedAt  DateTime? // Tracking for hydration logic
+  detailsFetchedAt  DateTime?
+  staffId           String?
   company           Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   staff             Staff?    @relation("StaffStoreOrders", fields: [staffId], references: [id])
 
@@ -275,9 +267,6 @@ model Order {
 }
 
 model Product {
-  networkListings     NetworkListing[]
-  b2bSuggestions      B2BSuggestion[]
-  companyProductMaps  CompanyProductMap[]
   id                  String                  @id @default(cuid())
   name                String
   code                String
@@ -312,8 +301,11 @@ model Product {
   purchaseCurrency    String                  @default("TRY")
   supplierName        String?
   unit                String?                 @default("Adet")
+  b2bSuggestions      B2BSuggestion[]
+  companyProductMaps  CompanyProductMap[]
   marketplaceMaps     MarketplaceProductMap[]
   marketplacePnls     MarketplaceProductPnl[]
+  networkListings     NetworkListing[]
   company             Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
   parent              Product?                @relation("ProductVariants", fields: [parentId], references: [id])
   variants            Product[]               @relation("ProductVariants")
@@ -372,9 +364,9 @@ model StockMovement {
   price          Decimal  @db.Decimal(10, 2)
   type           String
   referenceId    String?
-  idempotencyKey String?  @unique
   createdAt      DateTime @default(now())
   companyId      String?
+  idempotencyKey String?  @unique
   company        Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
   product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -400,11 +392,11 @@ model Stock {
 
 model MarketplaceProductMap {
   id              String   @id @default(cuid())
-  companyId       String
   marketplace     String
   marketplaceCode String
   productId       String
   createdAt       DateTime @default(now())
+  companyId       String
   company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -479,7 +471,6 @@ model SalesInvoice {
   totalAmount  Decimal   @db.Decimal(10, 2)
   description  String?
   customerId   String
-  orderId      String?
   items        Json
   status       String    @default("Taslak")
   isFormal     Boolean   @default(false)
@@ -492,6 +483,7 @@ model SalesInvoice {
   formalStatus String?
   formalType   String?
   formalUuid   String?   @unique
+  orderId      String?
   company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customer     Customer  @relation(fields: [customerId], references: [id])
 
@@ -527,29 +519,29 @@ model Customer {
   city               String?
   companyId          String
   district           String?
-  lat                Float? // GPS latitude — pinned on first field sales visit
-  lng                Float? // GPS longitude — pinned on first field sales visit
-  locationPinnedAt   DateTime? // when the pin was first set
   isPortalActive     Boolean                   @default(false)
   lastPortalLogin    DateTime?
   portalPassword     String?
+  assignedStaffId    String?
+  lat                Float?
+  lng                Float?
+  locationPinnedAt   DateTime?
   checks             Check[]
   coupons            Coupon[]
+  assignedStaff      Staff?                    @relation("StaffCustomers", fields: [assignedStaffId], references: [id])
   category           CustomerCategory?         @relation(fields: [categoryId], references: [id])
   company            Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   documents          CustomerDocument[]
+  locationRequests   CustomerLocationRequest[]
   quotes             Quote[]
   routeStops         RouteStop[]
+  routeTemplateStops RouteTemplateStop[]
   invoices           SalesInvoice[]
   salesOrders        SalesOrder[]
   visits             SalesVisit[]
   services           ServiceRecord[]
-  routeTemplateStops RouteTemplateStop[]
   transactions       Transaction[]
   warranties         Warranty[]
-  assignedStaffId    String?
-  assignedStaff      Staff?                    @relation("StaffCustomers", fields: [assignedStaffId], references: [id])
-  locationRequests   CustomerLocationRequest[]
 
   @@unique([email, companyId])
   @@index([name])
@@ -601,13 +593,13 @@ model CustomerDocument {
 
 model CustomerCategory {
   id          String     @id @default(cuid())
-  companyId   String
   name        String
   description String?
-  priceListId String?
-  isDefault   Boolean    @default(false)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  isDefault   Boolean    @default(false)
+  priceListId String?
+  companyId   String
   customers   Customer[]
   company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   priceList   PriceList? @relation(fields: [priceListId], references: [id])
@@ -637,15 +629,15 @@ model PriceList {
 
 model ProductPrice {
   id                String    @id @default(cuid())
-  companyId         String
   productId         String
   priceListId       String
   price             Decimal   @db.Decimal(12, 2)
   isManualOverride  Boolean   @default(false)
-  derivedFromListId String?
-  formulaMarkupBps  Int?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+  companyId         String
+  derivedFromListId String?
+  formulaMarkupBps  Int?
   priceList         PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
   product           Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -691,8 +683,8 @@ model Transaction {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   branch       String?     @default("Merkez")
-  visitId      String?
   companyId    String
+  visitId      String?
   company      Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customer     Customer?   @relation(fields: [customerId], references: [id])
   kasa         Kasa?       @relation(fields: [kasaId], references: [id])
@@ -806,7 +798,6 @@ model BranchDocument {
 
 model SuspendedSale {
   id        String   @id @default(cuid())
-  companyId String?
   label     String
   items     Json
   customer  Json?
@@ -814,6 +805,7 @@ model SuspendedSale {
   branch    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  companyId String?
   company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
@@ -838,27 +830,36 @@ model Staff {
   deletedAt           DateTime?
   salary              Decimal?                  @default(17002) @db.Decimal(10, 2)
   address             String?
-  city                String?
-  district            String?
-  birthDate           DateTime?
-  maritalStatus       String?
-  bloodType           String?
-  militaryStatus      String?
-  educationLevel      String?
-  hasDriverLicense    Boolean?                  @default(false)
-  reference           String?
-  relativeName        String?
-  relativePhone       String?
-  healthReport        String?
-  certificate         String?
-  notes               String?
   companyId           String?
   phone               String?
   tenantId            String?                   @default("PLATFORM_ADMIN")
   assignedCategoryIds String[]                  @default([])
+  birthDate           DateTime?
+  bloodType           String?
+  certificate         String?
+  city                String?
+  dailyWorkingHours   Float?                    @default(8)
+  district            String?
+  educationLevel      String?
+  hasDriverLicense    Boolean?                  @default(false)
+  healthReport        String?
+  maritalStatus       String?
+  militaryStatus      String?
+  notes               String?
+  reference           String?
+  relativeName        String?
+  relativePhone       String?
+  shiftTemplate       String?
+  weeklyOffDays       String?                   @default("Sunday")
+  workType            String?                   @default("FULL_TIME")
+  attendance          Attendance[]
+  assignedCustomers   Customer[]                @relation("StaffCustomers")
+  locationRequests    CustomerLocationRequest[]
+  expenses            Expense[]                 @relation("StaffExpenses")
   leaveRequests       LeaveRequest[]
   receivedMessages    Message[]                 @relation("ReceivedMessages")
   sentMessages        Message[]                 @relation("SentMessages")
+  storeOrders         Order[]                   @relation("StaffStoreOrders")
   payrolls            Payroll[]
   routes              Route[]
   salesOrders         SalesOrder[]
@@ -867,17 +868,6 @@ model Staff {
   company             Company?                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   documents           StaffDocument[]
   targets             StaffTarget[]
-  storeOrders         Order[]                   @relation("StaffStoreOrders")
-  attendance          Attendance[]
-  expenses            Expense[]                 @relation("StaffExpenses")
-  assignedCustomers   Customer[]                @relation("StaffCustomers")
-  locationRequests    CustomerLocationRequest[]
-
-  // PDKS & Puantaj Fields
-  workType          String? @default("FULL_TIME") // FULL_TIME, PART_TIME, CONTRACT
-  shiftTemplate     String? // "09:00-18:00" etc.
-  weeklyOffDays     String? @default("Sunday")
-  dailyWorkingHours Float?  @default(8)
 
   @@index([tenantId])
   @@index([companyId])
@@ -951,10 +941,10 @@ model Attendance {
   date         DateTime  @default(now())
   checkIn      DateTime
   checkOut     DateTime?
-  locationIn   String? // GPS coords or Brach name
+  locationIn   String?
   locationOut  String?
   deviceInfo   String?
-  status       String    @default("ON_TIME") // ON_TIME, LATE, EARLY_EXIT, OVERTIME
+  status       String    @default("ON_TIME")
   workingHours Float?    @default(0)
   isPuantajOk  Boolean   @default(false)
   notes        String?
@@ -1058,10 +1048,10 @@ model InventoryAudit {
 
 model AppSettings {
   id        String   @id @default(cuid())
-  companyId String
   key       String
   value     Json
   updatedAt DateTime @updatedAt
+  companyId String
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, key])
@@ -1105,24 +1095,22 @@ model SecurityEvent {
 }
 
 model Campaign {
-  id           String    @id @default(cuid())
-  companyId    String?
-  name         String
-  type         String
-  description  String?
-  conditions   Json
-  discountRate Float?
-  pointsRate   Float?
-  startDate    DateTime  @default(now())
-  endDate      DateTime?
-  isActive     Boolean   @default(true)
-  deletedAt    DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  targetCustomerCategoryIds String[] @default([])
-
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id                        String    @id @default(cuid())
+  name                      String
+  type                      String
+  description               String?
+  conditions                Json
+  discountRate              Float?
+  pointsRate                Float?
+  startDate                 DateTime  @default(now())
+  endDate                   DateTime?
+  isActive                  Boolean   @default(true)
+  deletedAt                 DateTime?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+  companyId                 String?
+  targetCustomerCategoryIds String[]  @default([])
+  company                   Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
   @@index([type])
@@ -1131,7 +1119,6 @@ model Campaign {
 
 model Coupon {
   id                 String    @id @default(cuid())
-  companyId          String?
   code               String    @unique
   type               String
   value              Float
@@ -1148,6 +1135,7 @@ model Coupon {
   startDate          DateTime  @default(now())
   usageLimit         Int       @default(1)
   usedCount          Int       @default(0)
+  companyId          String?
   company            Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customer           Customer? @relation(fields: [customerId], references: [id])
 
@@ -1316,7 +1304,6 @@ model MarketplaceConfig {
 
 model ExternalRequest {
   id              String   @id @default(cuid())
-  companyId       String?
   provider        String
   idempotencyKey  String
   entityType      String
@@ -1325,6 +1312,7 @@ model ExternalRequest {
   responsePayload Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  companyId       String?
   company         Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([provider, idempotencyKey])
@@ -1414,10 +1402,10 @@ model RouteTemplate {
   id        String              @id @default(cuid())
   companyId String
   name      String
-  stops     RouteTemplateStop[]
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
   company   Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  stops     RouteTemplateStop[]
 
   @@index([companyId])
 }
@@ -1427,8 +1415,8 @@ model RouteTemplateStop {
   templateId String
   customerId String
   sequence   Int
-  template   RouteTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
   customer   Customer      @relation(fields: [customerId], references: [id])
+  template   RouteTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
 
   @@index([templateId])
   @@index([customerId])
@@ -1478,17 +1466,17 @@ model SalesVisit {
   checkInLocation  Json?
   checkOutLocation Json?
   notes            String?
-  result           String? // siparis_alindi | ilgilenmedi | beklemede | randevu_alindi | kapali | bilgi_verildi
   photos           String[]
   isOutOfRange     Boolean       @default(false)
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
+  result           String?
   orders           SalesOrder[]
-  transactions     Transaction[]
   company          Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customer         Customer      @relation(fields: [customerId], references: [id])
   stop             RouteStop?    @relation(fields: [routeStopId], references: [id])
   staff            Staff         @relation(fields: [staffId], references: [id])
+  transactions     Transaction[]
 
   @@index([companyId])
   @@index([staffId])
@@ -1545,10 +1533,10 @@ model StaffTarget {
   startDate      DateTime
   endDate        DateTime
   status         String   @default("ACTIVE")
-  commissionRate Decimal? @default(0) @db.Decimal(5, 2)
-  bonusAmount    Decimal? @default(0) @db.Decimal(12, 2)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  bonusAmount    Decimal? @default(0) @db.Decimal(12, 2)
+  commissionRate Decimal? @default(0) @db.Decimal(5, 2)
   company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   staff          Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
 
@@ -1933,20 +1921,18 @@ model MarketplaceLabel {
   @@index([companyId, createdAt])
 }
 
-// --- PDKS MODÜLÜ ---
-
 model PdksDisplay {
   id              String    @id @default(cuid())
   tenantId        String
-  siteId          String // Şube veya Lokasyon ID (Branch, Company vb. ile eşleşebilir)
+  siteId          String
   name            String
   isActive        Boolean   @default(true)
-  pairingCode     String    @unique // PDKS-XXXX formatı
-  announcement    String?   @db.Text
+  pairingCode     String    @unique
   lastPublicIp    String?
   lastHeartbeatAt DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  announcement    String?
 
   @@index([tenantId, siteId])
 }
@@ -1955,7 +1941,7 @@ model PdksEmployeeDevice {
   id          String   @id @default(cuid())
   tenantId    String
   userId      String
-  deviceFp    String // Donanım ID veya Fingerprint hash
+  deviceFp    String
   isActive    Boolean  @default(true)
   firstSeenAt DateTime @default(now())
   lastSeenAt  DateTime @updatedAt
@@ -1965,28 +1951,25 @@ model PdksEmployeeDevice {
 }
 
 model PdksEvent {
-  id       String     @id @default(cuid())
-  tenantId String
-  userId   String
-  siteId   String? // Ofis girişinde hangi şube olduğu
-  type     PdksType
-  mode     PdksMode
-  status   PdksStatus @default(APPROVED)
-
+  id              String     @id @default(cuid())
+  tenantId        String
+  userId          String
+  siteId          String?
+  type            PdksType
+  mode            PdksMode
+  status          PdksStatus @default(APPROVED)
   deviceFp        String
-  requestPublicIp String? // Personelin IP'si
-  displayPublicIp String? // Tabletin IP'si (kanıt için)
-
-  lat      Float?
-  lng      Float?
-  accuracy Float?
-
-  clientTime DateTime
-  serverTime DateTime @default(now())
-  riskScore  Int      @default(0)
-  riskFlags  Json? // ["IP_MISMATCH", "LOW_ACCURACY", "IMPOSSIBLE_SPEED"]
-  offlineId  String?  @unique // Cihazdaki local UUID
-  notes      String?
+  requestPublicIp String?
+  displayPublicIp String?
+  lat             Float?
+  lng             Float?
+  accuracy        Float?
+  clientTime      DateTime
+  serverTime      DateTime   @default(now())
+  riskScore       Int        @default(0)
+  riskFlags       Json?
+  offlineId       String?    @unique
+  notes           String?
 
   @@index([tenantId, userId])
   @@index([tenantId, serverTime])
@@ -2004,45 +1987,25 @@ model PdksIdempotency {
   @@index([tenantId, userId, offlineId])
 }
 
-enum PdksType {
-  SHIFT_START
-  SHIFT_END
-  BREAK_START
-  BREAK_END
-}
-
-enum PdksMode {
-  OFFICE_QR
-  FIELD_GPS
-}
-
-enum PdksStatus {
-  APPROVED
-  PENDING
-  REJECTED
-}
-
 model Expense {
   id          String   @id @default(cuid())
-  type        String // Benzin, Yemek, Konaklama, Diğer
+  type        String
   amount      Decimal  @db.Decimal(12, 2)
   description String?
   date        DateTime @default(now())
   receiptUrl  String?
-  status      String   @default("Beklemede") // Beklemede, Onaylandı, Reddedildi
+  status      String   @default("Beklemede")
   staffId     String
   companyId   String
-  staff       Staff    @relation("StaffExpenses", fields: [staffId], references: [id])
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  staff       Staff    @relation("StaffExpenses", fields: [staffId], references: [id])
 
   @@index([staffId])
   @@index([companyId])
   @@index([date])
 }
-
-// --- YARDIM MERKEZİ (KNOWLEDGE BASE) ---
 
 model HelpCategory {
   id          String      @id @default(cuid())
@@ -2050,41 +2013,28 @@ model HelpCategory {
   slug        String      @unique
   description String?
   order       Int         @default(0)
-  topics      HelpTopic[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  topics      HelpTopic[]
 }
 
 model HelpTopic {
   id         String       @id @default(cuid())
   categoryId String
+  title      String
+  slug       String       @unique
+  excerpt    String?
+  body       String
+  status     TopicStatus  @default(DRAFT)
+  order      Int          @default(0)
+  tenantId   String?
+  upvotes    Int          @default(0)
+  downvotes  Int          @default(0)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
   category   HelpCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  title   String
-  slug    String  @unique
-  excerpt String?
-  body    String  @db.Text // Markdown content
-
-  status TopicStatus @default(DRAFT)
-  order  Int         @default(0)
-
-  // Visibility: NULL = Global (All Tenants), yoksa specific tenant
-  tenantId String?
-
-  upvotes   Int      @default(0)
-  downvotes Int      @default(0)
-  // tickets Ticket[] // Bu konu ile ilişkilendirilmiş talepler
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
-enum TopicStatus {
-  DRAFT
-  PUBLISHED
-  ARCHIVED
-}
-
-// Support and Ticket system removed in favor of Governance Ticket system
 model CustomerLocationRequest {
   id           String   @id @default(cuid())
   customerId   String
@@ -2092,45 +2042,16 @@ model CustomerLocationRequest {
   companyId    String
   requestedLat Float
   requestedLng Float
-  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  status       String   @default("PENDING")
   notes        String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  staff    Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
-  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  staff        Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
   @@index([status])
-}
-
-// ====================================================================
-// ================== NETWORK PAYMENT LAYER MODELLERİ =================
-// ====================================================================
-
-enum PaymentProvider {
-  ODEL
-  IYZICO
-}
-
-enum PaymentMode {
-  DIRECT
-  ESCROW
-}
-
-enum PaymentStatus {
-  INITIATED
-  PAID
-  FAILED
-  CANCELLED
-}
-
-enum PaymentEventStatus {
-  RECEIVED
-  PROCESSED
-  IGNORED
-  FAILED
 }
 
 model NetworkPayment {
@@ -2145,15 +2066,13 @@ model NetworkPayment {
   providerPaymentKey String?         @unique
   attemptKey         String?         @unique
   checkoutUrl        String?
-  rawInit            Json?           @db.JsonB
+  rawInit            Json?
   payoutStatus       String          @default("INITIATED")
   releasedAt         DateTime?
   releaseAttemptKey  String?         @unique
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
-
-  // Order Relation
-  order NetworkOrder @relation(fields: [networkOrderId], references: [id], onDelete: Cascade)
+  order              NetworkOrder    @relation(fields: [networkOrderId], references: [id], onDelete: Cascade)
 
   @@index([networkOrderId])
   @@index([networkOrderId, status])
@@ -2163,10 +2082,10 @@ model NetworkPayment {
 model PaymentEventInbox {
   id                String             @id @default(cuid())
   provider          PaymentProvider
-  providerEventId   String             @unique // Idempotency
+  providerEventId   String             @unique
   providerPaymentId String?
   networkPaymentId  String?
-  raw               Json               @db.JsonB
+  raw               Json
   receivedAt        DateTime           @default(now())
   processedAt       DateTime?
   status            PaymentEventStatus @default(RECEIVED)
@@ -2179,54 +2098,47 @@ model PaymentEventInbox {
 }
 
 model NetworkOrder {
-  id               String             @id @default(cuid())
-  buyerCompanyId   String
-  sellerCompanyId  String
-  subtotalAmount   Decimal            @db.Decimal(12, 2)
-  shippingAmount   Decimal            @db.Decimal(12, 2)
-  commissionAmount Decimal            @db.Decimal(12, 2)
-  totalAmount      Decimal            @db.Decimal(12, 2)
-  currency         String             @default("TRY")
-  status           String
-  paidAt           DateTime?
-  confirmedAt      DateTime?
-  completedAt      DateTime?
-  completionKey    String?            @unique
-  disputeOpenedAt  DateTime?
-  itemsHash        String
-  networkItems     NetworkOrderItem[]
-  items            Json?              @db.JsonB
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-
+  id                 String              @id @default(cuid())
+  buyerCompanyId     String
+  sellerCompanyId    String
+  subtotalAmount     Decimal             @db.Decimal(12, 2)
+  shippingAmount     Decimal             @db.Decimal(12, 2)
+  commissionAmount   Decimal             @db.Decimal(12, 2)
+  totalAmount        Decimal             @db.Decimal(12, 2)
+  currency           String              @default("TRY")
+  status             String
+  paidAt             DateTime?
+  confirmedAt        DateTime?
+  completedAt        DateTime?
+  completionKey      String?             @unique
+  disputeOpenedAt    DateTime?
+  itemsHash          String
+  items              Json?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  commissionSnapshot CommissionSnapshot?
+  networkItems       NetworkOrderItem[]
   payments           NetworkPayment[]
   shipments          Shipment[]
-  commissionSnapshot CommissionSnapshot?
 }
 
 model NetworkOrderItem {
-  id               String   @id @default(cuid())
+  id               String          @id @default(cuid())
   networkOrderId   String
   listingId        String?
   globalProductId  String
   erpProductId     String
   name             String
-  price            Decimal  @db.Decimal(10, 2)
+  price            Decimal         @db.Decimal(10, 2)
   qty              Int
-  total            Decimal  @db.Decimal(12, 2)
-  isContractPriced Boolean  @default(false)
-  createdAt        DateTime @default(now())
-
-  order   NetworkOrder    @relation(fields: [networkOrderId], references: [id], onDelete: Cascade)
-  listing NetworkListing? @relation(fields: [listingId], references: [id])
+  total            Decimal         @db.Decimal(12, 2)
+  isContractPriced Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  listing          NetworkListing? @relation(fields: [listingId], references: [id])
+  order            NetworkOrder    @relation(fields: [networkOrderId], references: [id], onDelete: Cascade)
 
   @@index([networkOrderId])
   @@index([listingId])
-}
-
-enum LedgerType {
-  CREDIT
-  DEBIT
 }
 
 model SellerBalanceLedger {
@@ -2258,12 +2170,1235 @@ model PayoutEventInbox {
   id              String             @id @default(cuid())
   provider        PaymentProvider
   providerEventId String             @unique
-  raw             Json               @db.JsonB
+  raw             Json
   status          PaymentEventStatus @default(RECEIVED)
   createdAt       DateTime           @default(now())
   processedAt     DateTime?
 
   @@index([provider])
+}
+
+model Shipment {
+  id                 String                   @id @default(cuid())
+  networkOrderId     String
+  mode               ShipmentMode
+  status             ShipmentStatus           @default(CREATED)
+  carrierCode        String
+  trackingNumber     String?
+  normalizedTracking String?
+  labelUrl           String?
+  sequence           Int                      @default(1)
+  initKey            String?                  @unique
+  deliveryNoteUuid   String?
+  deliveryNoteStatus String?
+  items              Json?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  sellerEarning      SellerEarning?
+  order              NetworkOrder             @relation(fields: [networkOrderId], references: [id], onDelete: Cascade)
+  allocations        ShipmentCostAllocation[]
+  events             ShipmentEvent[]
+  invoiceLines       ShippingInvoiceLine[]
+
+  @@unique([networkOrderId, sequence])
+  @@unique([carrierCode, trackingNumber])
+  @@index([carrierCode, normalizedTracking])
+  @@index([carrierCode])
+  @@index([trackingNumber])
+  @@index([networkOrderId])
+  @@index([status])
+}
+
+model ShipmentEvent {
+  id          String         @id @default(cuid())
+  shipmentId  String
+  status      ShipmentStatus
+  description String?
+  occurredAt  DateTime       @default(now())
+  shipment    Shipment       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
+  @@index([occurredAt])
+}
+
+model ShipmentEventInbox {
+  id             String              @id @default(cuid())
+  carrierCode    String
+  carrierEventId String              @unique
+  trackingNumber String?
+  shipmentId     String?
+  raw            Json
+  receivedAt     DateTime            @default(now())
+  processedAt    DateTime?
+  status         ShipmentInboxStatus @default(RECEIVED)
+  errorMessage   String?
+
+  @@index([trackingNumber])
+  @@index([shipmentId])
+  @@index([receivedAt])
+  @@index([carrierCode])
+}
+
+model GlobalProduct {
+  id           String              @id @default(cuid())
+  name         String
+  categoryId   String?
+  description  String?
+  barcode      String?
+  imageUrl     String?
+  status       ProductStatus       @default(DRAFT)
+  approvalNote String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  companyMaps  CompanyProductMap[]
+  category     GlobalCategory?     @relation(fields: [categoryId], references: [id])
+  listings     NetworkListing[]
+
+  @@index([categoryId])
+  @@index([status])
+}
+
+model GlobalCategory {
+  id               String                       @id @default(cuid())
+  name             String
+  parentId         String?
+  slug             String                       @unique
+  active           Boolean                      @default(true)
+  listingOverrides B2BListingCategoryOverride[]
+  attributes       CategoryAttribute[]
+  mappings         CategoryMapping[]
+  parent           GlobalCategory?              @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children         GlobalCategory[]             @relation("CategoryToCategory")
+  products         GlobalProduct[]
+
+  @@index([parentId])
+}
+
+model CategoryAttribute {
+  id         String            @id @default(cuid())
+  categoryId String
+  name       String
+  type       AttributeType     @default(STRING)
+  options    AttributeOption[]
+  category   GlobalCategory    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+}
+
+model AttributeOption {
+  id          String            @id @default(cuid())
+  attributeId String
+  value       String
+  attribute   CategoryAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+
+  @@index([attributeId])
+}
+
+model ERPProductCategory {
+  id              String               @id @default(cuid())
+  sellerCompanyId String
+  name            String
+  parentId        String?
+  active          Boolean              @default(true)
+  mappings        CategoryMapping[]
+  parent          ERPProductCategory?  @relation("ERPCategoryToERPCategory", fields: [parentId], references: [id])
+  children        ERPProductCategory[] @relation("ERPCategoryToERPCategory")
+  company         Company              @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+
+  @@index([sellerCompanyId])
+  @@index([parentId])
+}
+
+model CategoryMapping {
+  id               String             @id @default(cuid())
+  sellerCompanyId  String
+  erpCategoryId    String
+  globalCategoryId String
+  confidence       MappingConfidence  @default(MANUAL)
+  active           Boolean            @default(true)
+  erpCategory      ERPProductCategory @relation(fields: [erpCategoryId], references: [id], onDelete: Cascade)
+  globalCategory   GlobalCategory     @relation(fields: [globalCategoryId], references: [id], onDelete: Cascade)
+  company          Company            @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+
+  @@index([sellerCompanyId])
+  @@index([erpCategoryId])
+  @@index([globalCategoryId])
+}
+
+model B2BListingCategoryOverride {
+  id               String         @id @default(cuid())
+  listingId        String         @unique
+  globalCategoryId String
+  globalCategory   GlobalCategory @relation(fields: [globalCategoryId], references: [id], onDelete: Cascade)
+  listing          NetworkListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([globalCategoryId])
+}
+
+model B2BSuggestion {
+  id              String           @id @default(cuid())
+  sellerCompanyId String
+  productId       String?
+  variantId       String?
+  suggestionType  SuggestionType
+  score           Float            @default(0)
+  reasonsJson     Json
+  status          SuggestionStatus @default(OPEN)
+  dedupeKey       String?          @unique
+  dismissedUntil  DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  product         Product?         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  company         Company          @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+
+  @@index([sellerCompanyId])
+  @@index([status])
+  @@index([productId])
+  @@index([variantId])
+}
+
+model AutomationDecisionLog {
+  id              String   @id @default(cuid())
+  sellerCompanyId String
+  variantId       String?
+  rule            String
+  checksJson      Json
+  decision        String
+  createdAt       DateTime @default(now())
+  company         Company  @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+
+  @@index([sellerCompanyId])
+  @@index([variantId])
+}
+
+model SellerAutomationPolicy {
+  id                      String     @id @default(cuid())
+  sellerCompanyId         String     @unique
+  autoPublishEnabled      Boolean    @default(false)
+  rolloutPercent          Int        @default(100)
+  understockThresholdDays Int        @default(7)
+  minOnHandThreshold      Int        @default(100)
+  lowSalesThreshold       Int        @default(3)
+  maxReservedRatio        Float      @default(0.2)
+  minMarginPercent        Float?
+  minListingQualityScore  Int        @default(50)
+  defaultVisibility       Visibility @default(NETWORK)
+  defaultMinOrderQty      Int        @default(1)
+  defaultLeadTimeDays     Int        @default(3)
+  allowAutoPriceAdjust    Boolean    @default(false)
+  company                 Company    @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+}
+
+model CommerceAuditLog {
+  id              String         @id @default(cuid())
+  sellerCompanyId String
+  actorType       ActorType
+  action          CommerceAction
+  entityType      String
+  entityId        String
+  payloadJson     Json?
+  createdAt       DateTime       @default(now())
+  company         Company        @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+
+  @@index([sellerCompanyId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model NetworkListing {
+  id                   String                      @id @default(cuid())
+  globalProductId      String
+  sellerCompanyId      String
+  erpProductId         String
+  price                Decimal                     @db.Decimal(10, 2)
+  availableQty         Int                         @default(0)
+  minQty               Int                         @default(1)
+  leadTimeDays         Int                         @default(0)
+  status               ListingStatus               @default(ACTIVE)
+  visibility           Visibility                  @default(NETWORK)
+  packSize             Int?                        @default(1)
+  createdAt            DateTime                    @default(now())
+  updatedAt            DateTime                    @updatedAt
+  categoryOverride     B2BListingCategoryOverride?
+  discoveryImpressions DiscoveryImpression[]
+  erpProduct           Product                     @relation(fields: [erpProductId], references: [id], onDelete: Cascade)
+  globalProduct        GlobalProduct               @relation(fields: [globalProductId], references: [id], onDelete: Cascade)
+  company              Company                     @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  networkOrderItems    NetworkOrderItem[]
+
+  @@unique([sellerCompanyId, erpProductId])
+  @@index([globalProductId])
+  @@index([sellerCompanyId])
+  @@index([status])
+  @@index([visibility, status])
+}
+
+model CompanyProductMap {
+  id              String        @id @default(cuid())
+  companyId       String
+  globalProductId String
+  erpProductId    String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  company         Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  erpProduct      Product       @relation(fields: [erpProductId], references: [id], onDelete: Cascade)
+  globalProduct   GlobalProduct @relation(fields: [globalProductId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, globalProductId])
+  @@unique([companyId, erpProductId])
+  @@index([companyId])
+  @@index([globalProductId])
+}
+
+model Rfq {
+  id             String        @id @default(cuid())
+  buyerCompanyId String
+  status         RfqStatus     @default(DRAFT)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  items          RfqItem[]
+  offers         SellerOffer[]
+
+  @@index([buyerCompanyId])
+  @@index([status])
+}
+
+model RfqItem {
+  id              String   @id @default(cuid())
+  rfqId           String
+  productId       String
+  sellerCompanyId String
+  quantity        Int
+  targetPrice     Decimal? @db.Decimal(12, 2)
+  rfq             Rfq      @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+
+  @@index([rfqId])
+  @@index([sellerCompanyId])
+}
+
+model SellerOffer {
+  id              String            @id @default(cuid())
+  rfqId           String
+  sellerCompanyId String
+  status          OfferStatus       @default(PENDING)
+  totalPrice      Decimal           @db.Decimal(12, 2)
+  expiresAt       DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  rfq             Rfq               @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  items           SellerOfferItem[]
+
+  @@index([rfqId])
+  @@index([sellerCompanyId])
+  @@index([status])
+}
+
+model SellerOfferItem {
+  id            String      @id @default(cuid())
+  sellerOfferId String
+  productId     String
+  quantity      Int
+  unitPrice     Decimal     @db.Decimal(12, 2)
+  sellerOffer   SellerOffer @relation(fields: [sellerOfferId], references: [id], onDelete: Cascade)
+
+  @@index([sellerOfferId])
+}
+
+model Contract {
+  id              String           @id @default(cuid())
+  buyerCompanyId  String
+  sellerCompanyId String
+  status          ContractStatus   @default(DRAFT)
+  startDate       DateTime?
+  endDate         DateTime?
+  currency        String           @default("TRY")
+  paymentMode     PaymentMode      @default(DIRECT)
+  settlementCycle SettlementCycle  @default(INSTANT)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  items           ContractItem[]
+  slas            ContractSLA[]
+  recurringOrders RecurringOrder[]
+
+  @@index([buyerCompanyId])
+  @@index([sellerCompanyId])
+  @@index([status])
+}
+
+model ContractItem {
+  id            String         @id @default(cuid())
+  contractId    String
+  productId     String
+  baseUnitPrice Decimal        @db.Decimal(12, 2)
+  minOrderQty   Int            @default(1)
+  contract      Contract       @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  tiers         ContractTier[]
+  reservedStock ReservedStock?
+
+  @@index([contractId])
+  @@index([productId])
+}
+
+model ContractTier {
+  id             String       @id @default(cuid())
+  contractItemId String
+  minQty         Int
+  unitPrice      Decimal      @db.Decimal(12, 2)
+  contractItem   ContractItem @relation(fields: [contractItemId], references: [id], onDelete: Cascade)
+
+  @@index([contractItemId])
+}
+
+model ReservedStock {
+  id             String       @id @default(cuid())
+  contractItemId String       @unique
+  quantity       Int          @default(0)
+  allocated      Int          @default(0)
+  contractItem   ContractItem @relation(fields: [contractItemId], references: [id], onDelete: Cascade)
+}
+
+model ContractSLA {
+  id                 String   @id @default(cuid())
+  contractId         String
+  maxDeliveryDays    Int
+  latePenaltyPercent Decimal  @db.Decimal(5, 2)
+  contract           Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+}
+
+model RecurringOrder {
+  id          String             @id @default(cuid())
+  contractId  String
+  frequency   RecurringFrequency
+  dayOfPeriod Int
+  nextRunAt   DateTime?
+  active      Boolean            @default(true)
+  contract    Contract           @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+  @@index([nextRunAt])
+}
+
+model PenaltyLedger {
+  id              String   @id @default(cuid())
+  sellerCompanyId String
+  contractId      String
+  amount          Decimal  @db.Decimal(12, 2)
+  currency        String   @default("TRY")
+  createdAt       DateTime @default(now())
+
+  @@index([contractId])
+}
+
+model ProductConsumption {
+  id              String   @id @default(cuid())
+  companyId       String
+  globalProductId String
+  dailyRate       Float
+  lastComputedAt  DateTime @default(now())
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, globalProductId])
+  @@index([companyId])
+}
+
+model BuySuggestion {
+  id              String   @id @default(cuid())
+  buyerCompanyId  String
+  globalProductId String
+  daysRemaining   Float
+  availableQty    Int      @default(0)
+  status          String   @default("OPEN")
+  dedupeKey       String   @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  company         Company  @relation(fields: [buyerCompanyId], references: [id], onDelete: Cascade)
+
+  @@index([buyerCompanyId])
+  @@index([globalProductId])
+  @@index([status])
+}
+
+model CommissionPlan {
+  id           String           @id @default(cuid())
+  name         String
+  description  String?
+  isDefault    Boolean          @default(false)
+  companyId    String?
+  currency     String           @default("TRY")
+  roundingMode String           @default("HALF_UP")
+  precision    Int              @default(2)
+  taxInclusive Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  archivedAt   DateTime?
+  company      Company?         @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  rules        CommissionRule[]
+
+  @@unique([companyId, isDefault])
+  @@index([companyId])
+}
+
+model CommissionRule {
+  id             String                  @id @default(cuid())
+  planId         String
+  scope          CommissionRuleScope     @default(GLOBAL)
+  matchType      CommissionRuleMatchType @default(DEFAULT)
+  category       String?
+  brand          String?
+  ratePercentage Decimal                 @db.Decimal(5, 2)
+  fixedFee       Decimal                 @default(0) @db.Decimal(12, 2)
+  priority       Int                     @default(0)
+  plan           CommissionPlan          @relation(fields: [planId], references: [id])
+
+  @@index([planId])
+}
+
+model CommissionSnapshot {
+  id              String       @id @default(cuid())
+  tenantId        String
+  networkOrderId  String       @unique
+  planId          String?
+  appliedRate     Decimal      @db.Decimal(5, 2)
+  appliedFixedFee Decimal      @db.Decimal(12, 2)
+  totalCommission Decimal      @db.Decimal(12, 2)
+  calculatedAt    DateTime     @default(now())
+  order           NetworkOrder @relation(fields: [networkOrderId], references: [id])
+  company         Company      @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, networkOrderId])
+}
+
+model SellerEarning {
+  id                String        @id @default(cuid())
+  sellerCompanyId   String
+  shipmentId        String        @unique
+  grossAmount       Decimal       @default(0) @db.Decimal(12, 2)
+  commissionAmount  Decimal       @default(0) @db.Decimal(12, 2)
+  chargebackAmount  Decimal       @default(0) @db.Decimal(12, 2)
+  netAmount         Decimal       @db.Decimal(12, 2)
+  currency          String        @default("TRY")
+  status            EarningStatus @default(PENDING)
+  expectedClearDate DateTime?
+  clearedAt         DateTime?
+  releasedAt        DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  archivedAt        DateTime?
+  company           Company       @relation(fields: [sellerCompanyId], references: [id])
+  shipment          Shipment      @relation(fields: [shipmentId], references: [id])
+
+  @@unique([sellerCompanyId, shipmentId])
+  @@index([sellerCompanyId])
+  @@index([status])
+  @@index([expectedClearDate])
+}
+
+model ReleaseWindowPolicy {
+  id                  String    @id @default(cuid())
+  sellerCompanyId     String    @unique
+  isActiveDefault     Boolean   @default(true)
+  defaultHoldDays     Int       @default(14)
+  allowEarlyRelease   Boolean   @default(false)
+  earlyReleaseFeeRate Decimal?  @db.Decimal(5, 2)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  archivedAt          DateTime?
+  company             Company   @relation(fields: [sellerCompanyId], references: [id])
+
+  @@unique([sellerCompanyId, isActiveDefault])
+}
+
+model LedgerAccount {
+  id               String        @id @default(cuid())
+  companyId        String        @unique
+  availableBalance Decimal       @default(0) @db.Decimal(12, 2)
+  pendingBalance   Decimal       @default(0) @db.Decimal(12, 2)
+  currency         String        @default("TRY")
+  lastReconciledAt DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  archivedAt       DateTime?
+  reservedBalance  Decimal       @default(0) @db.Decimal(12, 2)
+  company          Company       @relation(fields: [companyId], references: [id])
+  entries          LedgerEntry[]
+}
+
+model LedgerGroup {
+  id             String        @id @default(cuid())
+  idempotencyKey String        @unique
+  tenantId       String
+  type           String
+  description    String?
+  createdAt      DateTime      @default(now())
+  entries        LedgerEntry[]
+
+  @@index([tenantId])
+}
+
+model LedgerEntry {
+  id              String        @id @default(cuid())
+  tenantId        String
+  ledgerAccountId String
+  groupId         String
+  accountType     String
+  direction       String
+  amount          Decimal       @db.Decimal(12, 2)
+  currency        String        @default("TRY")
+  refType         String?
+  referenceId     String?
+  createdAt       DateTime      @default(now())
+  group           LedgerGroup   @relation(fields: [groupId], references: [id])
+  account         LedgerAccount @relation(fields: [ledgerAccountId], references: [id])
+
+  @@index([ledgerAccountId])
+  @@index([groupId])
+  @@index([tenantId])
+}
+
+model IdempotencyRecord {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  scope       String
+  tenantId    String
+  status      String
+  lockedAt    DateTime  @default(now())
+  completedAt DateTime?
+  resultHash  String?
+
+  @@index([tenantId])
+}
+
+model FinanceAuditLog {
+  id          String   @id @default(cuid())
+  tenantId    String
+  action      String
+  actor       String
+  entityId    String
+  entityType  String
+  payloadJson Json
+  createdAt   DateTime @default(now())
+  company     Company  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model ShippingInvoice {
+  id          String                @id @default(cuid())
+  carrierId   String
+  invoiceNo   String
+  periodStart DateTime?
+  periodEnd   DateTime?
+  currency    String                @default("TRY")
+  totalAmount Decimal               @db.Decimal(12, 2)
+  rawRef      String?
+  parsedJson  Json?
+  status      String                @default("PARSED")
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  lines       ShippingInvoiceLine[]
+
+  @@unique([carrierId, invoiceNo])
+}
+
+model ShippingInvoiceLine {
+  id                String          @id @default(cuid())
+  shippingInvoiceId String
+  trackingNo        String
+  chargeAmount      Decimal         @db.Decimal(12, 2)
+  taxAmount         Decimal?        @db.Decimal(12, 2)
+  serviceLevel      String?
+  matchStatus       String          @default("UNMATCHED")
+  matchReason       String?
+  shipmentId        String?
+  networkOrderId    String?
+  sellerTenantId    String?
+  buyerTenantId     String?
+  shipment          Shipment?       @relation(fields: [shipmentId], references: [id])
+  invoice           ShippingInvoice @relation(fields: [shippingInvoiceId], references: [id], onDelete: Cascade)
+
+  @@unique([shippingInvoiceId, trackingNo])
+}
+
+model ShipmentCostAllocation {
+  id                    String   @id @default(cuid())
+  shipmentId            String
+  shippingInvoiceLineId String?
+  model                 String   @default("CHARGEBACK_SELLER")
+  sellerShareAmount     Decimal  @db.Decimal(12, 2)
+  platformShareAmount   Decimal  @db.Decimal(12, 2)
+  buyerShareAmount      Decimal  @db.Decimal(12, 2)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  shipment              Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([shipmentId, shippingInvoiceLineId])
+}
+
+model Ticket {
+  id                   String                   @id @default(cuid())
+  priority             TicketPriority           @default(LOW)
+  status               TicketStatus             @default(OPEN)
+  tenantId             String
+  createdAt            DateTime                 @default(now())
+  counterpartyTenantId String?
+  createdByUserId      String?
+  relatedEntityId      String?
+  relatedEntityType    TicketRelatedEntityType?
+  resolvedAt           DateTime?
+  slaDueAt             DateTime?
+  type                 TicketType               @default(GENERAL)
+  counterparty         Company?                 @relation("TicketCounterparty", fields: [counterpartyTenantId], references: [id], onDelete: Restrict)
+  tenant               Company                  @relation("TicketTenant", fields: [tenantId], references: [id])
+  auditLogs            TicketAuditLog[]
+  messages             TicketMessage[]
+
+  @@index([tenantId, status])
+  @@index([relatedEntityType, relatedEntityId])
+}
+
+model TicketMessage {
+  id              String           @id @default(cuid())
+  ticketId        String
+  createdAt       DateTime         @default(now())
+  message         String
+  redactedMessage String
+  senderRole      TicketSenderRole
+  senderTenantId  String
+  senderTenant    Company          @relation(fields: [senderTenantId], references: [id])
+  ticket          Ticket           @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+model TicketAuditLog {
+  id            String            @id @default(cuid())
+  ticketId      String
+  action        TicketAuditAction
+  actorTenantId String
+  payloadJson   Json
+  createdAt     DateTime          @default(now())
+  ticket        Ticket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+model SellerTrustScore {
+  id             String         @id @default(cuid())
+  sellerTenantId String         @unique
+  score          Int            @default(100)
+  tier           SellerRiskTier @default(A)
+  componentsJson Json
+  computedAt     DateTime       @default(now())
+  windowStart    DateTime
+  windowEnd      DateTime
+  version        Int            @default(1)
+  sellerCompany  Company        @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+
+  @@index([sellerTenantId])
+  @@index([tier, computedAt])
+}
+
+model SellerTrustEvent {
+  id             String         @id @default(cuid())
+  sellerTenantId String
+  type           TrustEventType
+  refType        String
+  refId          String
+  weight         Int            @default(1)
+  occurredAt     DateTime
+  createdAt      DateTime       @default(now())
+  sellerCompany  Company        @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+
+  @@index([sellerTenantId, occurredAt])
+}
+
+model TrustScoreRecalcJob {
+  id             String          @id @default(cuid())
+  sellerTenantId String
+  status         RecalcJobStatus @default(PENDING)
+  reason         RecalcReason    @default(EVENT_DRIVEN)
+  idempotencyKey String          @unique
+  errorText      String?
+  createdAt      DateTime        @default(now())
+  completedAt    DateTime?
+  sellerCompany  Company         @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+}
+
+model DiscoveryImpression {
+  id             String         @id @default(cuid())
+  viewerTenantId String
+  listingId      String
+  position       Int
+  score          Decimal        @db.Decimal(10, 4)
+  reasonJson     Json
+  createdAt      DateTime       @default(now())
+  requestId      String?
+  listing        NetworkListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  viewerCompany  Company        @relation(fields: [viewerTenantId], references: [id], onDelete: Cascade)
+
+  @@index([viewerTenantId, createdAt])
+  @@index([listingId, createdAt])
+  @@index([requestId])
+}
+
+model BoostRule {
+  id                   String     @id @default(cuid())
+  scope                BoostScope
+  targetId             String
+  multiplier           Decimal    @db.Decimal(10, 2)
+  startsAt             DateTime
+  endsAt               DateTime
+  isActive             Boolean    @default(true)
+  createdByTenantId    String
+  createdAt            DateTime   @default(now())
+  maxImpressionsPerDay Int?
+  priority             Int        @default(0)
+  creatorCompany       Company    @relation(fields: [createdByTenantId], references: [id], onDelete: Cascade)
+
+  @@index([scope, targetId, isActive, startsAt, endsAt])
+  @@index([isActive, endsAt])
+  @@index([startsAt, endsAt])
+}
+
+model DiscoveryRequestLog {
+  id               String   @id @default(cuid())
+  viewerTenantId   String
+  requestId        String   @unique
+  queryHash        String
+  weightsVersion   String
+  filtersJson      Json
+  sortMode         String
+  limit            Int
+  latencyMs        Int
+  dbLatencyMs      Int
+  computeLatencyMs Int
+  resultsCount     Int
+  topResultsJson   Json
+  createdAt        DateTime @default(now())
+
+  @@index([viewerTenantId, createdAt])
+}
+
+model ListingPriceSnapshot {
+  id         String   @id @default(cuid())
+  listingId  String
+  price      Decimal  @db.Decimal(10, 2)
+  currency   String   @default("TRY")
+  capturedAt DateTime @default(now())
+
+  @@index([listingId, capturedAt])
+}
+
+model PayoutDestination {
+  id               String                  @id @default(cuid())
+  sellerTenantId   String
+  type             PayoutDestinationType
+  ibanMasked       String
+  ibanEncrypted    String
+  holderNameMasked String
+  isDefault        Boolean                 @default(false)
+  status           PayoutDestinationStatus @default(ACTIVE)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  sellerCompany    Company                 @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+
+  @@unique([sellerTenantId, ibanMasked])
+  @@index([sellerTenantId, isDefault])
+}
+
+model PayoutRequest {
+  id               String              @id @default(cuid())
+  sellerTenantId   String
+  destinationId    String
+  amount           Decimal             @db.Decimal(12, 2)
+  currency         String              @default("TRY")
+  status           PayoutRequestStatus @default(REQUESTED)
+  requestedAt      DateTime            @default(now())
+  approvedAt       DateTime?
+  processedAt      DateTime?
+  failureCode      String?
+  failureMessage   String?
+  idempotencyKey   String              @unique
+  createdByUserId  String
+  approvedByUserId String?
+  note             String?
+  sellerCompany    Company             @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+
+  @@index([sellerTenantId, status, requestedAt])
+  @@index([status, requestedAt])
+}
+
+model SellerPaymentProfile {
+  id             String                     @id @default(cuid())
+  sellerTenantId String                     @unique
+  provider       PaymentProvider            @default(IYZICO)
+  subMerchantKey String
+  status         SellerPaymentProfileStatus @default(PENDING)
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  sellerCompany  Company                    @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+}
+
+model ProviderPayment {
+  id                String                @id @default(cuid())
+  tenantId          String
+  provider          PaymentProvider       @default(IYZICO)
+  providerPaymentId String                @unique
+  networkPaymentId  String                @unique
+  amount            Decimal               @db.Decimal(12, 2)
+  currency          String                @default("TRY")
+  status            ProviderPaymentStatus @default(INIT)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  buyerCompany      Company               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status, createdAt])
+}
+
+model ProviderPayout {
+  id               String               @id @default(cuid())
+  sellerTenantId   String
+  provider         PaymentProvider      @default(IYZICO)
+  providerPayoutId String               @unique
+  payoutRequestId  String?
+  sellerEarningId  String?
+  shipmentId       String?
+  grossAmount      Decimal              @db.Decimal(12, 2)
+  commissionAmount Decimal              @db.Decimal(12, 2)
+  netAmount        Decimal              @db.Decimal(12, 2)
+  currency         String               @default("TRY")
+  status           ProviderPayoutStatus @default(QUEUED)
+  idempotencyKey   String               @unique
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  sellerCompany    Company              @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
+
+  @@index([sellerTenantId, status, createdAt])
+  @@index([status, createdAt])
+}
+
+model PayoutOutbox {
+  id             String             @id @default(cuid())
+  provider       PaymentProvider    @default(IYZICO)
+  idempotencyKey String             @unique
+  sellerTenantId String
+  payloadJson    Json
+  status         PayoutOutboxStatus @default(PENDING)
+  lastError      String?
+  attemptCount   Int                @default(0)
+  nextRetryAt    DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  sellerCompany  Company            @relation("OutboxCompany", fields: [sellerTenantId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextRetryAt])
+}
+
+model ProviderWebhookEvent {
+  id              String                @id @default(cuid())
+  provider        PaymentProvider       @default(IYZICO)
+  externalEventId String                @unique
+  eventType       String
+  payloadJson     Json
+  receivedAt      DateTime              @default(now())
+  processedAt     DateTime?
+  status          ProviderWebhookStatus @default(RECEIVED)
+
+  @@index([provider, receivedAt])
+}
+
+model FinanceIntegrityAlert {
+  id          String                        @id @default(cuid())
+  type        FinanceIntegrityAlertType
+  referenceId String?
+  severity    FinanceIntegrityAlertSeverity @default(WARNING)
+  detailsJson Json
+  resolvedAt  DateTime?
+  createdAt   DateTime                      @default(now())
+
+  @@index([type, createdAt])
+}
+
+model FinanceOpsLog {
+  id          String                @id @default(cuid())
+  action      String
+  entityType  String
+  entityId    String?
+  severity    FinanceOpsLogSeverity @default(INFO)
+  payloadJson Json?
+  createdAt   DateTime              @default(now())
+}
+
+model OpsHealthSnapshot {
+  id          String                 @id @default(cuid())
+  scope       OpsHealthSnapshotScope @default(RUNTIME)
+  createdAt   DateTime               @default(now())
+  payloadJson Json
+
+  @@index([scope, createdAt])
+}
+
+model OpsAlertAck {
+  id                   String   @id @default(cuid())
+  alertType            String
+  alertId              String
+  acknowledgedByUserId String
+  note                 String
+  acknowledgedAt       DateTime @default(now())
+
+  @@unique([alertType, alertId])
+}
+
+model PlatformDailyMetrics {
+  id                            String   @id @default(cuid())
+  day                           String   @unique
+  gmvGross                      Decimal  @db.Decimal(12, 2)
+  orderCount                    Int
+  activeBuyerCount              Int
+  activeSellerCount             Int
+  takeRevenueCommission         Decimal  @db.Decimal(12, 2)
+  takeRevenueBoost              Decimal  @db.Decimal(12, 2)
+  takeRate                      Decimal  @db.Decimal(5, 4)
+  escrowFloatEndOfDay           Decimal  @db.Decimal(12, 2)
+  payoutVolume                  Decimal  @db.Decimal(12, 2)
+  payoutCount                   Int
+  avgReleaseTimeHours           Decimal  @db.Decimal(12, 2)
+  chargebackAmount              Decimal  @db.Decimal(12, 2)
+  chargebackCount               Int
+  receivableOutstandingEndOfDay Decimal  @db.Decimal(12, 2)
+  opsCriticalAlertCount         Int
+  createdAt                     DateTime @default(now())
+}
+
+model TenantDailyMetrics {
+  id                    String                 @id @default(cuid())
+  day                   String
+  tenantId              String
+  role                  TenantDailyMetricsRole
+  gmvGross              Decimal                @db.Decimal(12, 2)
+  orderCount            Int
+  commissionPaid        Decimal                @db.Decimal(12, 2)
+  payoutReceived        Decimal                @db.Decimal(12, 2)
+  avgReleaseTimeHours   Decimal                @db.Decimal(12, 2)
+  disputeCount          Int
+  chargebackCount       Int
+  receivableOutstanding Decimal                @db.Decimal(12, 2)
+  discoveryImpressions  Int
+  boostImpressions      Int                    @default(0)
+  boostSpend            Decimal                @default(0) @db.Decimal(12, 2)
+  createdAt             DateTime               @default(now())
+
+  @@unique([day, tenantId])
+  @@index([tenantId, day])
+}
+
+model FeatureFlag {
+  id           String   @id @default(cuid())
+  key          String   @unique
+  description  String
+  defaultValue Boolean
+  createdAt    DateTime @default(now())
+}
+
+model TenantFeatureFlag {
+  id         String   @id @default(cuid())
+  tenantId   String
+  featureKey String
+  enabled    Boolean
+  createdAt  DateTime @default(now())
+
+  @@unique([tenantId, featureKey])
+  @@index([tenantId, featureKey])
+}
+
+model TenantRolloutPolicy {
+  id                   String       @id @default(cuid())
+  tenantId             String       @unique
+  cohort               TenantCohort @default(PILOT)
+  maxDailyGmv          Decimal?     @db.Decimal(12, 2)
+  maxDailyPayout       Decimal?     @db.Decimal(12, 2)
+  maxSingleOrderAmount Decimal?     @db.Decimal(12, 2)
+  holdDaysOverride     Int?
+  earlyReleaseAllowed  Boolean      @default(false)
+  payoutPaused         Boolean      @default(false)
+  escrowPaused         Boolean      @default(false)
+  boostPaused          Boolean      @default(false)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+}
+
+model PilotCohortTag {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tag       String
+  createdAt DateTime @default(now())
+
+  @@unique([tenantId, tag])
+  @@index([tag])
+}
+
+model PlatformCohortDailyMetrics {
+  id                    String   @id @default(cuid())
+  day                   String
+  cohortTag             String
+  gmvGross              Decimal  @db.Decimal(12, 2)
+  orderCount            Int
+  payoutVolume          Decimal  @db.Decimal(12, 2)
+  takeRevenueCommission Decimal  @db.Decimal(12, 2)
+  chargebackAmount      Decimal  @db.Decimal(12, 2)
+  createdAt             DateTime @default(now())
+
+  @@unique([day, cohortTag])
+}
+
+model BoostPlan {
+  id                     String              @id @default(cuid())
+  code                   String              @unique
+  name                   String
+  monthlyPrice           Decimal             @db.Decimal(12, 2)
+  currency               String              @default("TRY")
+  monthlyImpressionQuota Int
+  isActive               Boolean             @default(true)
+  createdAt              DateTime            @default(now())
+  subscriptions          BoostSubscription[]
+}
+
+model BoostSubscription {
+  id                 String                  @id @default(cuid())
+  sellerTenantId     String
+  planId             String
+  status             BoostSubscriptionStatus
+  startAt            DateTime
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  nextRenewalAt      DateTime                @default(now())
+  lastChargedPeriodKey String?
+  autoRenew          Boolean                 @default(true)
+  pausedAt           DateTime?
+  canceledAt         DateTime?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  plan               BoostPlan               @relation(fields: [planId], references: [id])
+  invoices           BoostInvoice[]
+
+  @@index([sellerTenantId, status])
+}
+
+model BoostInvoice {
+  id                String             @id @default(cuid())
+  sellerTenantId    String
+  subscriptionId    String
+  periodKey         String             // "2026-03"
+  amount            Decimal            @db.Decimal(18,2)
+  currency          String             @default("TRY")
+  status            BoostInvoiceStatus
+  issuedAt          DateTime
+  dueAt             DateTime
+  paidAt            DateTime?
+  ledgerGroupId     String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  subscription      BoostSubscription  @relation(fields: [subscriptionId], references: [id])
+
+  @@unique([subscriptionId, periodKey])
+  @@index([sellerTenantId, status])
+}
+
+model BoostUsageDaily {
+  id                   String   @id @default(cuid())
+  sellerTenantId       String
+  day                  String
+  sponsoredImpressions Int      @default(0)
+  billableImpressions  Int      @default(0)
+  periodKey            String
+  createdAt            DateTime @default(now())
+
+  @@unique([sellerTenantId, day])
+  @@index([sellerTenantId, periodKey])
+}
+
+model BoostUsageEvent {
+  id                   String   @id @default(cuid())
+  requestId            String
+  sellerTenantId       String
+  day                  String
+  sponsoredImpressions Int
+  createdAt            DateTime @default(now())
+
+  @@unique([requestId, sellerTenantId])
+}
+
+model BillingLedgerRef {
+  id             String               @id @default(cuid())
+  entityType     BillingLedgerRefType
+  entityId       String
+  idempotencyKey String               @unique
+  ledgerGroupId  String?
+  createdAt      DateTime             @default(now())
+}
+
+model DiscoveryRequestBillingState {
+  id        String    @id @default(cuid())
+  requestId String    @unique
+  meteredAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+enum PdksType {
+  SHIFT_START
+  SHIFT_END
+  BREAK_START
+  BREAK_END
+}
+
+enum PdksMode {
+  OFFICE_QR
+  FIELD_GPS
+}
+
+enum PdksStatus {
+  APPROVED
+  PENDING
+  REJECTED
+}
+
+enum TopicStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PaymentProvider {
+  ODEL
+  IYZICO
+}
+
+enum PaymentMode {
+  DIRECT
+  ESCROW
+}
+
+enum PaymentStatus {
+  INITIATED
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum PaymentEventStatus {
+  RECEIVED
+  PROCESSED
+  IGNORED
+  FAILED
+}
+
+enum LedgerType {
+  CREDIT
+  DEBIT
 }
 
 enum ShipmentMode {
@@ -2288,257 +3423,11 @@ enum ShipmentInboxStatus {
   FAILED
 }
 
-model Shipment {
-  id                 String         @id @default(cuid())
-  networkOrderId     String
-  mode               ShipmentMode
-  status             ShipmentStatus @default(CREATED)
-  carrierCode        String
-  trackingNumber     String?
-  normalizedTracking String?
-  labelUrl           String?
-  sequence           Int            @default(1)
-  initKey            String?        @unique
-  deliveryNoteUuid   String?
-  deliveryNoteStatus String?
-
-  items Json? @db.JsonB // For partial shipments, array of item ids/qty
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  order         NetworkOrder             @relation(fields: [networkOrderId], references: [id], onDelete: Cascade)
-  events        ShipmentEvent[]
-  sellerEarning SellerEarning?
-  invoiceLines  ShippingInvoiceLine[]
-  allocations   ShipmentCostAllocation[]
-
-  @@unique([networkOrderId, sequence])
-  @@unique([carrierCode, trackingNumber])
-  @@index([carrierCode, normalizedTracking])
-  @@index([carrierCode])
-  @@index([trackingNumber])
-  @@index([networkOrderId])
-  @@index([status])
-}
-
-model ShipmentEvent {
-  id          String         @id @default(cuid())
-  shipmentId  String
-  status      ShipmentStatus
-  description String?
-  occurredAt  DateTime       @default(now())
-
-  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
-
-  @@index([shipmentId])
-  @@index([occurredAt])
-}
-
-model ShipmentEventInbox {
-  id             String              @id @default(cuid())
-  carrierCode    String
-  carrierEventId String              @unique // Idempotency
-  trackingNumber String?
-  shipmentId     String?
-  raw            Json                @db.JsonB
-  receivedAt     DateTime            @default(now())
-  processedAt    DateTime?
-  status         ShipmentInboxStatus @default(RECEIVED)
-  errorMessage   String?
-
-  @@index([trackingNumber])
-  @@index([shipmentId])
-  @@index([receivedAt])
-  @@index([carrierCode])
-}
-
 enum AttributeType {
   STRING
   NUMBER
   BOOLEAN
   SELECT
-}
-
-model GlobalProduct {
-  id           String        @id @default(cuid())
-  name         String
-  categoryId   String?
-  description  String?
-  barcode      String?
-  imageUrl     String?
-  status       ProductStatus @default(DRAFT)
-  approvalNote String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  category    GlobalCategory?     @relation(fields: [categoryId], references: [id])
-  listings    NetworkListing[]
-  companyMaps CompanyProductMap[]
-
-  @@index([categoryId])
-  @@index([status])
-}
-
-model GlobalCategory {
-  id       String  @id @default(cuid())
-  name     String
-  parentId String?
-  slug     String  @unique
-  active   Boolean @default(true)
-
-  parent   GlobalCategory?  @relation("CategoryToCategory", fields: [parentId], references: [id])
-  children GlobalCategory[] @relation("CategoryToCategory")
-
-  attributes CategoryAttribute[]
-  products   GlobalProduct[]
-
-  // Reverse links
-  mappings         CategoryMapping[]
-  listingOverrides B2BListingCategoryOverride[]
-
-  @@index([parentId])
-}
-
-model CategoryAttribute {
-  id         String        @id @default(cuid())
-  categoryId String
-  name       String
-  type       AttributeType @default(STRING)
-
-  category GlobalCategory    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  options  AttributeOption[]
-
-  @@index([categoryId])
-}
-
-model AttributeOption {
-  id          String @id @default(cuid())
-  attributeId String
-  value       String
-
-  attribute CategoryAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
-
-  @@index([attributeId])
-}
-
-model ERPProductCategory {
-  id              String  @id @default(cuid())
-  sellerCompanyId String
-  name            String
-  parentId        String?
-  active          Boolean @default(true)
-
-  company  Company              @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
-  parent   ERPProductCategory?  @relation("ERPCategoryToERPCategory", fields: [parentId], references: [id])
-  children ERPProductCategory[] @relation("ERPCategoryToERPCategory")
-  mappings CategoryMapping[]
-
-  @@index([sellerCompanyId])
-  @@index([parentId])
-}
-
-model CategoryMapping {
-  id               String            @id @default(cuid())
-  sellerCompanyId  String
-  erpCategoryId    String
-  globalCategoryId String
-  confidence       MappingConfidence @default(MANUAL)
-  active           Boolean           @default(true)
-
-  company        Company            @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
-  erpCategory    ERPProductCategory @relation(fields: [erpCategoryId], references: [id], onDelete: Cascade)
-  globalCategory GlobalCategory     @relation(fields: [globalCategoryId], references: [id], onDelete: Cascade)
-
-  @@index([sellerCompanyId])
-  @@index([erpCategoryId])
-  @@index([globalCategoryId])
-}
-
-model B2BListingCategoryOverride {
-  id               String @id @default(cuid())
-  listingId        String @unique
-  globalCategoryId String
-
-  listing        NetworkListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  globalCategory GlobalCategory @relation(fields: [globalCategoryId], references: [id], onDelete: Cascade)
-
-  @@index([globalCategoryId])
-}
-
-model B2BSuggestion {
-  id              String           @id @default(cuid())
-  sellerCompanyId String
-  productId       String? // Direct to Product if simple
-  variantId       String? // Prefer variants if exist
-  suggestionType  SuggestionType
-  score           Float            @default(0)
-  reasonsJson     Json // e.g. {"onHand":500,"last30dSales":2,"rule":"OVERSTOCK_SLOW"}
-  status          SuggestionStatus @default(OPEN)
-  dedupeKey       String?          @unique
-  dismissedUntil  DateTime?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-
-  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  company Company  @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
-
-  @@index([sellerCompanyId])
-  @@index([status])
-  @@index([productId])
-  @@index([variantId])
-}
-
-model AutomationDecisionLog {
-  id              String   @id @default(cuid())
-  sellerCompanyId String
-  variantId       String?
-  rule            String
-  checksJson      Json
-  decision        String
-  createdAt       DateTime @default(now())
-
-  company Company @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
-
-  @@index([sellerCompanyId])
-  @@index([variantId])
-}
-
-model SellerAutomationPolicy {
-  id                      String     @id @default(cuid())
-  sellerCompanyId         String     @unique
-  autoPublishEnabled      Boolean    @default(false)
-  rolloutPercent          Int        @default(100)
-  understockThresholdDays Int        @default(7)
-  minOnHandThreshold      Int        @default(100)
-  lowSalesThreshold       Int        @default(3)
-  maxReservedRatio        Float      @default(0.2) // e.g. reserved/onHand must be < 0.2
-  minMarginPercent        Float? // optional if cost exists
-  minListingQualityScore  Int        @default(50)
-  defaultVisibility       Visibility @default(NETWORK)
-  defaultMinOrderQty      Int        @default(1)
-  defaultLeadTimeDays     Int        @default(3)
-  allowAutoPriceAdjust    Boolean    @default(false)
-
-  company Company @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
-}
-
-model CommerceAuditLog {
-  id              String         @id @default(cuid())
-  sellerCompanyId String
-  actorType       ActorType
-  action          CommerceAction
-  entityType      String
-  entityId        String
-  payloadJson     Json?
-  createdAt       DateTime       @default(now())
-
-  company Company @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
-
-  @@index([sellerCompanyId])
-  @@index([action])
-  @@index([createdAt])
 }
 
 enum MappingConfidence {
@@ -2593,57 +3482,6 @@ enum ListingStatus {
   PAUSED
 }
 
-model NetworkListing {
-  id              String @id @default(cuid())
-  globalProductId String
-  sellerCompanyId String
-  erpProductId    String
-
-  price        Decimal       @db.Decimal(10, 2)
-  availableQty Int           @default(0)
-  minQty       Int           @default(1)
-  leadTimeDays Int           @default(0)
-  status       ListingStatus @default(ACTIVE)
-  visibility   Visibility    @default(NETWORK)
-  packSize     Int?          @default(1)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  globalProduct GlobalProduct @relation(fields: [globalProductId], references: [id], onDelete: Cascade)
-  company       Company       @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
-  erpProduct    Product       @relation(fields: [erpProductId], references: [id], onDelete: Cascade)
-
-  categoryOverride     B2BListingCategoryOverride?
-  networkOrderItems    NetworkOrderItem[]
-  discoveryImpressions DiscoveryImpression[]
-
-  @@unique([sellerCompanyId, erpProductId])
-  @@index([globalProductId])
-  @@index([sellerCompanyId])
-  @@index([status])
-  @@index([visibility, status])
-}
-
-model CompanyProductMap {
-  id              String @id @default(cuid())
-  companyId       String
-  globalProductId String
-  erpProductId    String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  globalProduct GlobalProduct @relation(fields: [globalProductId], references: [id], onDelete: Cascade)
-  erpProduct    Product       @relation(fields: [erpProductId], references: [id], onDelete: Cascade)
-
-  @@unique([companyId, globalProductId])
-  @@unique([companyId, erpProductId])
-  @@index([companyId])
-  @@index([globalProductId])
-}
-
 enum RfqStatus {
   DRAFT
   SENT
@@ -2658,64 +3496,6 @@ enum OfferStatus {
   COUNTERED
   ACCEPTED
   REJECTED
-}
-
-model Rfq {
-  id             String    @id @default(cuid())
-  buyerCompanyId String
-  status         RfqStatus @default(DRAFT)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  items  RfqItem[]
-  offers SellerOffer[]
-
-  @@index([buyerCompanyId])
-  @@index([status])
-}
-
-model RfqItem {
-  id              String   @id @default(cuid())
-  rfqId           String
-  productId       String
-  sellerCompanyId String
-  quantity        Int
-  targetPrice     Decimal? @db.Decimal(12, 2)
-
-  rfq Rfq @relation(fields: [rfqId], references: [id], onDelete: Cascade)
-
-  @@index([rfqId])
-  @@index([sellerCompanyId])
-}
-
-model SellerOffer {
-  id              String      @id @default(cuid())
-  rfqId           String
-  sellerCompanyId String
-  status          OfferStatus @default(PENDING)
-  totalPrice      Decimal     @db.Decimal(12, 2)
-  expiresAt       DateTime?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-
-  rfq   Rfq               @relation(fields: [rfqId], references: [id], onDelete: Cascade)
-  items SellerOfferItem[]
-
-  @@index([rfqId])
-  @@index([sellerCompanyId])
-  @@index([status])
-}
-
-model SellerOfferItem {
-  id            String  @id @default(cuid())
-  sellerOfferId String
-  productId     String
-  quantity      Int
-  unitPrice     Decimal @db.Decimal(12, 2)
-
-  sellerOffer SellerOffer @relation(fields: [sellerOfferId], references: [id], onDelete: Cascade)
-
-  @@index([sellerOfferId])
 }
 
 enum ContractStatus {
@@ -2742,99 +3522,6 @@ enum OrderSourceType {
   CONTRACT
 }
 
-model Contract {
-  id              String          @id @default(cuid())
-  buyerCompanyId  String
-  sellerCompanyId String
-  status          ContractStatus  @default(DRAFT)
-  startDate       DateTime?
-  endDate         DateTime?
-  currency        String          @default("TRY")
-  paymentMode     PaymentMode     @default(DIRECT)
-  settlementCycle SettlementCycle @default(INSTANT)
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  items           ContractItem[]
-  slas            ContractSLA[]
-  recurringOrders RecurringOrder[]
-
-  @@index([buyerCompanyId])
-  @@index([sellerCompanyId])
-  @@index([status])
-}
-
-model ContractItem {
-  id            String  @id @default(cuid())
-  contractId    String
-  productId     String
-  baseUnitPrice Decimal @db.Decimal(12, 2)
-  minOrderQty   Int     @default(1)
-
-  contract      Contract       @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  tiers         ContractTier[]
-  reservedStock ReservedStock?
-
-  @@index([contractId])
-  @@index([productId])
-}
-
-model ContractTier {
-  id             String  @id @default(cuid())
-  contractItemId String
-  minQty         Int
-  unitPrice      Decimal @db.Decimal(12, 2)
-
-  contractItem ContractItem @relation(fields: [contractItemId], references: [id], onDelete: Cascade)
-
-  @@index([contractItemId])
-}
-
-model ReservedStock {
-  id             String @id @default(cuid())
-  contractItemId String @unique
-  quantity       Int    @default(0)
-  allocated      Int    @default(0)
-
-  contractItem ContractItem @relation(fields: [contractItemId], references: [id], onDelete: Cascade)
-}
-
-model ContractSLA {
-  id                 String  @id @default(cuid())
-  contractId         String
-  maxDeliveryDays    Int
-  latePenaltyPercent Decimal @db.Decimal(5, 2)
-
-  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-
-  @@index([contractId])
-}
-
-model RecurringOrder {
-  id          String             @id @default(cuid())
-  contractId  String
-  frequency   RecurringFrequency
-  dayOfPeriod Int
-  nextRunAt   DateTime?
-  active      Boolean            @default(true)
-
-  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-
-  @@index([contractId])
-  @@index([nextRunAt])
-}
-
-model PenaltyLedger {
-  id              String   @id @default(cuid())
-  sellerCompanyId String
-  contractId      String
-  amount          Decimal  @db.Decimal(12, 2)
-  currency        String   @default("TRY")
-  createdAt       DateTime @default(now())
-
-  @@index([contractId])
-}
-
 enum CompanyType {
   BUYER
   SELLER
@@ -2855,59 +3542,6 @@ enum ProductStatus {
   REJECTED
 }
 
-model ProductConsumption {
-  id              String   @id @default(cuid())
-  companyId       String
-  globalProductId String
-  dailyRate       Float
-  lastComputedAt  DateTime @default(now())
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@unique([companyId, globalProductId])
-  @@index([companyId])
-}
-
-model BuySuggestion {
-  id              String   @id @default(cuid())
-  buyerCompanyId  String
-  globalProductId String
-  daysRemaining   Float
-  availableQty    Int      @default(0)
-  status          String   @default("OPEN")
-  dedupeKey       String   @unique
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  company Company @relation(fields: [buyerCompanyId], references: [id], onDelete: Cascade)
-
-  @@index([buyerCompanyId])
-  @@index([globalProductId])
-  @@index([status])
-}
-
-model CommissionPlan {
-  id           String    @id @default(cuid())
-  name         String
-  description  String?
-  isDefault    Boolean   @default(false)
-  companyId    String? // Null if global plan, string if company-specific override
-  currency     String    @default("TRY")
-  roundingMode String    @default("HALF_UP")
-  precision    Int       @default(2)
-  taxInclusive Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  archivedAt   DateTime?
-
-  rules   CommissionRule[]
-  // the company this plan is FOR (override)
-  company Company?         @relation(fields: [companyId], references: [id], onDelete: Restrict)
-
-  @@unique([companyId, isDefault]) // 1 default rule per company or platform global
-  @@index([companyId])
-}
-
 enum CommissionRuleScope {
   GLOBAL
   COMPANY_OVERRIDE
@@ -2920,219 +3554,11 @@ enum CommissionRuleMatchType {
   DEFAULT
 }
 
-model CommissionRule {
-  id             String                  @id @default(cuid())
-  planId         String
-  scope          CommissionRuleScope     @default(GLOBAL)
-  matchType      CommissionRuleMatchType @default(DEFAULT)
-  category       String?
-  brand          String?
-  ratePercentage Decimal                 @db.Decimal(5, 2)
-  fixedFee       Decimal                 @default(0) @db.Decimal(12, 2)
-  priority       Int                     @default(0)
-
-  plan CommissionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
-
-  @@index([planId])
-}
-
-model CommissionSnapshot {
-  id              String   @id @default(cuid())
-  tenantId        String
-  networkOrderId  String   @unique
-  planId          String?
-  appliedRate     Decimal  @db.Decimal(5, 2)
-  appliedFixedFee Decimal  @db.Decimal(12, 2)
-  totalCommission Decimal  @db.Decimal(12, 2)
-  calculatedAt    DateTime @default(now())
-
-  // Note: we link to NetworkOrder since snapshots are on the whole order
-  company Company      @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  order   NetworkOrder @relation(fields: [networkOrderId], references: [id], onDelete: Restrict)
-
-  @@unique([tenantId, networkOrderId])
-}
-
 enum EarningStatus {
   PENDING
   CLEARED
   RELEASED
   REFUNDED
-}
-
-model SellerEarning {
-  id                String        @id @default(cuid())
-  sellerCompanyId   String
-  shipmentId        String        @unique
-  grossAmount       Decimal       @default(0) @db.Decimal(12, 2)
-  commissionAmount  Decimal       @default(0) @db.Decimal(12, 2)
-  chargebackAmount  Decimal       @default(0) @db.Decimal(12, 2)
-  netAmount         Decimal       @db.Decimal(12, 2)
-  currency          String        @default("TRY")
-  status            EarningStatus @default(PENDING)
-  expectedClearDate DateTime?
-  clearedAt         DateTime?
-  releasedAt        DateTime?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  archivedAt        DateTime?
-
-  company  Company  @relation(fields: [sellerCompanyId], references: [id], onDelete: Restrict)
-  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
-
-  @@unique([sellerCompanyId, shipmentId])
-  @@index([sellerCompanyId])
-  @@index([status])
-  @@index([expectedClearDate])
-}
-
-model ReleaseWindowPolicy {
-  id                  String    @id @default(cuid())
-  sellerCompanyId     String    @unique
-  isActiveDefault     Boolean   @default(true)
-  defaultHoldDays     Int       @default(14)
-  allowEarlyRelease   Boolean   @default(false)
-  earlyReleaseFeeRate Decimal?  @db.Decimal(5, 2)
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  archivedAt          DateTime?
-
-  company Company @relation(fields: [sellerCompanyId], references: [id], onDelete: Restrict)
-
-  @@unique([sellerCompanyId, isActiveDefault])
-}
-
-model LedgerAccount {
-  id               String    @id @default(cuid())
-  companyId        String    @unique
-  availableBalance Decimal   @default(0) @db.Decimal(12, 2)
-  pendingBalance   Decimal   @default(0) @db.Decimal(12, 2)
-  reservedBalance  Decimal   @default(0) @db.Decimal(12, 2)
-  currency         String    @default("TRY")
-  lastReconciledAt DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  archivedAt       DateTime?
-
-  company Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
-  entries LedgerEntry[]
-}
-
-model LedgerGroup {
-  id             String        @id @default(cuid())
-  idempotencyKey String        @unique
-  tenantId       String
-  type           String
-  description    String?
-  createdAt      DateTime      @default(now())
-  entries        LedgerEntry[]
-
-  @@index([tenantId])
-}
-
-model LedgerEntry {
-  id              String   @id @default(cuid())
-  tenantId        String
-  ledgerAccountId String
-  groupId         String
-  accountType     String // e.g., ESCROW_LIABILITY, SELLER_PAYABLE
-  direction       String // DEBIT or CREDIT
-  amount          Decimal  @db.Decimal(12, 2)
-  currency        String   @default("TRY")
-  refType         String?
-  referenceId     String?
-  createdAt       DateTime @default(now())
-
-  account LedgerAccount @relation(fields: [ledgerAccountId], references: [id], onDelete: Restrict)
-  group   LedgerGroup   @relation(fields: [groupId], references: [id], onDelete: Restrict)
-
-  @@index([ledgerAccountId])
-  @@index([groupId])
-  @@index([tenantId])
-}
-
-model IdempotencyRecord {
-  id          String    @id @default(cuid())
-  key         String    @unique
-  scope       String
-  tenantId    String
-  status      String
-  lockedAt    DateTime  @default(now())
-  completedAt DateTime?
-  resultHash  String?
-
-  @@index([tenantId])
-}
-
-model FinanceAuditLog {
-  id          String   @id @default(cuid())
-  tenantId    String
-  action      String
-  actor       String
-  entityId    String
-  entityType  String
-  payloadJson Json     @db.JsonB
-  createdAt   DateTime @default(now())
-  company     Company  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId])
-  @@index([action])
-  @@index([createdAt])
-}
-
-model ShippingInvoice {
-  id          String    @id @default(cuid())
-  carrierId   String
-  invoiceNo   String
-  periodStart DateTime?
-  periodEnd   DateTime?
-  currency    String    @default("TRY")
-  totalAmount Decimal   @db.Decimal(12, 2)
-  rawRef      String?
-  parsedJson  Json?
-  status      String    @default("PARSED")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  lines ShippingInvoiceLine[]
-
-  @@unique([carrierId, invoiceNo])
-}
-
-model ShippingInvoiceLine {
-  id                String   @id @default(cuid())
-  shippingInvoiceId String
-  trackingNo        String
-  chargeAmount      Decimal  @db.Decimal(12, 2)
-  taxAmount         Decimal? @db.Decimal(12, 2)
-  serviceLevel      String?
-  matchStatus       String   @default("UNMATCHED")
-  matchReason       String?
-  shipmentId        String?
-  networkOrderId    String?
-  sellerTenantId    String?
-  buyerTenantId     String?
-
-  invoice  ShippingInvoice @relation(fields: [shippingInvoiceId], references: [id], onDelete: Cascade)
-  shipment Shipment?       @relation(fields: [shipmentId], references: [id])
-
-  @@unique([shippingInvoiceId, trackingNo])
-}
-
-model ShipmentCostAllocation {
-  id                    String   @id @default(cuid())
-  shipmentId            String
-  shippingInvoiceLineId String?
-  model                 String   @default("CHARGEBACK_SELLER")
-  sellerShareAmount     Decimal  @db.Decimal(12, 2)
-  platformShareAmount   Decimal  @db.Decimal(12, 2)
-  buyerShareAmount      Decimal  @db.Decimal(12, 2)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-
-  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
-
-  @@unique([shipmentId, shippingInvoiceLineId])
 }
 
 enum TicketType {
@@ -3177,61 +3603,6 @@ enum TicketAuditAction {
   REJECTED
 }
 
-model Ticket {
-  id                   String                   @id @default(cuid())
-  tenantId             String
-  counterpartyTenantId String?
-  type                 TicketType               @default(GENERAL)
-  relatedEntityType    TicketRelatedEntityType?
-  relatedEntityId      String?
-  status               TicketStatus             @default(OPEN)
-  priority             TicketPriority           @default(LOW)
-  slaDueAt             DateTime?
-  createdAt            DateTime                 @default(now())
-  resolvedAt           DateTime?
-  createdByUserId      String?
-
-  messages  TicketMessage[]
-  auditLogs TicketAuditLog[]
-
-  // Relations
-  tenant       Company  @relation("TicketTenant", fields: [tenantId], references: [id], onDelete: Restrict)
-  counterparty Company? @relation("TicketCounterparty", fields: [counterpartyTenantId], references: [id], onDelete: Restrict)
-
-  @@index([tenantId, status])
-  @@index([relatedEntityType, relatedEntityId])
-}
-
-model TicketMessage {
-  id              String           @id @default(cuid())
-  ticketId        String
-  senderTenantId  String
-  senderRole      TicketSenderRole
-  message         String           @db.Text
-  redactedMessage String           @db.Text
-  createdAt       DateTime         @default(now())
-
-  ticket       Ticket  @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  senderTenant Company @relation(fields: [senderTenantId], references: [id], onDelete: Restrict)
-
-  @@index([ticketId])
-}
-
-model TicketAuditLog {
-  id            String            @id @default(cuid())
-  ticketId      String
-  action        TicketAuditAction
-  actorTenantId String
-  payloadJson   Json              @db.JsonB
-  createdAt     DateTime          @default(now())
-
-  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-
-  @@index([ticketId])
-}
-
-// --- F2: SELLER TRUST LAYER ---
-
 enum SellerRiskTier {
   A
   B
@@ -3264,127 +3635,11 @@ enum RecalcReason {
   MANUAL_ADMIN
 }
 
-model SellerTrustScore {
-  id             String         @id @default(cuid())
-  sellerTenantId String         @unique
-  score          Int            @default(100)
-  tier           SellerRiskTier @default(A)
-  componentsJson Json           @db.JsonB
-  computedAt     DateTime       @default(now())
-  windowStart    DateTime
-  windowEnd      DateTime
-  version        Int            @default(1)
-
-  sellerCompany Company @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
-
-  @@index([sellerTenantId])
-  @@index([tier, computedAt])
-}
-
-model SellerTrustEvent {
-  id             String         @id @default(cuid())
-  sellerTenantId String
-  type           TrustEventType
-  refType        String
-  refId          String
-  weight         Int            @default(1)
-  occurredAt     DateTime
-  createdAt      DateTime       @default(now())
-
-  sellerCompany Company @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
-
-  @@index([sellerTenantId, occurredAt])
-}
-
-model TrustScoreRecalcJob {
-  id             String          @id @default(cuid())
-  sellerTenantId String
-  status         RecalcJobStatus @default(PENDING)
-  reason         RecalcReason    @default(EVENT_DRIVEN)
-  idempotencyKey String          @unique
-  errorText      String?         @db.Text
-  createdAt      DateTime        @default(now())
-  completedAt    DateTime?
-
-  sellerCompany Company @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
-}
-
-// --- F3: DISCOVERY & BOOST LAYER ---
-
-model DiscoveryImpression {
-  id             String   @id @default(cuid())
-  viewerTenantId String
-  listingId      String
-  position       Int
-  score          Decimal  @db.Decimal(10, 4)
-  reasonJson     Json     @db.JsonB
-  createdAt      DateTime @default(now())
-  requestId      String?
-
-  viewerCompany Company        @relation(fields: [viewerTenantId], references: [id], onDelete: Cascade)
-  listing       NetworkListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-
-  @@index([viewerTenantId, createdAt])
-  @@index([listingId, createdAt])
-  @@index([requestId])
-}
-
 enum BoostScope {
   LISTING
   SELLER
   CATEGORY
 }
-
-model BoostRule {
-  id                   String     @id @default(cuid())
-  scope                BoostScope
-  targetId             String
-  multiplier           Decimal    @db.Decimal(10, 2)
-  priority             Int        @default(0)
-  maxImpressionsPerDay Int?
-  startsAt             DateTime
-  endsAt               DateTime
-  isActive             Boolean    @default(true)
-  createdByTenantId    String
-  createdAt            DateTime   @default(now())
-
-  creatorCompany Company @relation(fields: [createdByTenantId], references: [id], onDelete: Cascade)
-
-  @@index([scope, targetId, isActive, startsAt, endsAt])
-  @@index([isActive, endsAt])
-  @@index([startsAt, endsAt])
-}
-
-model DiscoveryRequestLog {
-  id               String   @id @default(cuid())
-  viewerTenantId   String
-  requestId        String   @unique
-  queryHash        String
-  weightsVersion   String
-  filtersJson      Json     @db.JsonB
-  sortMode         String
-  limit            Int
-  latencyMs        Int
-  dbLatencyMs      Int
-  computeLatencyMs Int
-  resultsCount     Int
-  topResultsJson   Json     @db.JsonB
-  createdAt        DateTime @default(now())
-
-  @@index([viewerTenantId, createdAt])
-}
-
-model ListingPriceSnapshot {
-  id         String   @id @default(cuid())
-  listingId  String
-  price      Decimal  @db.Decimal(10, 2)
-  currency   String   @default("TRY")
-  capturedAt DateTime @default(now())
-
-  @@index([listingId, capturedAt])
-}
-
-// --- FIN-2A: PAYOUTS & INTERNAL WALLET ---
 
 enum PayoutDestinationType {
   IBAN
@@ -3405,65 +3660,10 @@ enum PayoutRequestStatus {
   FAILED
 }
 
-model PayoutDestination {
-  id               String                  @id @default(cuid())
-  sellerTenantId   String
-  type             PayoutDestinationType
-  ibanMasked       String
-  ibanEncrypted    String
-  holderNameMasked String
-  isDefault        Boolean                 @default(false)
-  status           PayoutDestinationStatus @default(ACTIVE)
-  createdAt        DateTime                @default(now())
-  updatedAt        DateTime                @updatedAt
-
-  sellerCompany Company @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
-
-  @@unique([sellerTenantId, ibanMasked])
-  @@index([sellerTenantId, isDefault])
-}
-
-model PayoutRequest {
-  id               String              @id @default(cuid())
-  sellerTenantId   String
-  destinationId    String
-  amount           Decimal             @db.Decimal(12, 2)
-  currency         String              @default("TRY")
-  status           PayoutRequestStatus @default(REQUESTED)
-  requestedAt      DateTime            @default(now())
-  approvedAt       DateTime?
-  processedAt      DateTime?
-  failureCode      String?
-  failureMessage   String?
-  idempotencyKey   String              @unique
-  createdByUserId  String
-  approvedByUserId String?
-  note             String?
-
-  sellerCompany Company @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
-
-  @@index([sellerTenantId, status, requestedAt])
-  @@index([status, requestedAt])
-}
-
-// --- FIN-2B: EXTERNAL PAYMENT & ENQUEUE (IYZICO) ---
-
 enum SellerPaymentProfileStatus {
   PENDING
   ACTIVE
   DISABLED
-}
-
-model SellerPaymentProfile {
-  id             String                     @id @default(cuid())
-  sellerTenantId String                     @unique
-  provider       PaymentProvider            @default(IYZICO)
-  subMerchantKey String
-  status         SellerPaymentProfileStatus @default(PENDING)
-  createdAt      DateTime                   @default(now())
-  updatedAt      DateTime                   @updatedAt
-
-  sellerCompany Company @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
 }
 
 enum ProviderPaymentStatus {
@@ -3472,23 +3672,6 @@ enum ProviderPaymentStatus {
   FAILED
   REFUNDED
   CHARGEBACK
-}
-
-model ProviderPayment {
-  id                String                @id @default(cuid())
-  tenantId          String // Buyer tenant
-  provider          PaymentProvider       @default(IYZICO)
-  providerPaymentId String                @unique
-  networkPaymentId  String                @unique
-  amount            Decimal               @db.Decimal(12, 2)
-  currency          String                @default("TRY")
-  status            ProviderPaymentStatus @default(INIT)
-  createdAt         DateTime              @default(now())
-  updatedAt         DateTime              @updatedAt
-
-  buyerCompany Company @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, status, createdAt])
 }
 
 enum ProviderPayoutStatus {
@@ -3501,52 +3684,11 @@ enum ProviderPayoutStatus {
   QUARANTINED
 }
 
-model ProviderPayout {
-  id               String               @id @default(cuid())
-  sellerTenantId   String
-  provider         PaymentProvider      @default(IYZICO)
-  providerPayoutId String               @unique
-  payoutRequestId  String? // Optional generic payout request
-  sellerEarningId  String? // Or relation to earning
-  shipmentId       String? // Or relation to shipment
-  grossAmount      Decimal              @db.Decimal(12, 2)
-  commissionAmount Decimal              @db.Decimal(12, 2)
-  netAmount        Decimal              @db.Decimal(12, 2)
-  currency         String               @default("TRY")
-  status           ProviderPayoutStatus @default(QUEUED)
-  idempotencyKey   String               @unique
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
-
-  sellerCompany Company @relation(fields: [sellerTenantId], references: [id], onDelete: Cascade)
-
-  @@index([sellerTenantId, status, createdAt])
-  @@index([status, createdAt])
-}
-
 enum PayoutOutboxStatus {
   PENDING
   SENDING
   SENT
   FAILED
-}
-
-model PayoutOutbox {
-  id             String             @id @default(cuid())
-  provider       PaymentProvider    @default(IYZICO)
-  idempotencyKey String             @unique
-  sellerTenantId String
-  payloadJson    Json               @db.JsonB
-  status         PayoutOutboxStatus @default(PENDING)
-  lastError      String?
-  attemptCount   Int                @default(0)
-  nextRetryAt    DateTime?
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
-
-  sellerCompany Company @relation("OutboxCompany", fields: [sellerTenantId], references: [id], onDelete: Cascade)
-
-  @@index([status, nextRetryAt])
 }
 
 enum ProviderWebhookStatus {
@@ -3555,21 +3697,6 @@ enum ProviderWebhookStatus {
   IGNORED
   FAILED
 }
-
-model ProviderWebhookEvent {
-  id              String                @id @default(cuid())
-  provider        PaymentProvider       @default(IYZICO)
-  externalEventId String                @unique
-  eventType       String
-  payloadJson     Json                  @db.JsonB
-  receivedAt      DateTime              @default(now())
-  processedAt     DateTime?
-  status          ProviderWebhookStatus @default(RECEIVED)
-
-  @@index([provider, receivedAt])
-}
-
-// --- FIN-2B.1: PRODUCTION HARDENING ---
 
 enum FinanceIntegrityAlertType {
   LEDGER_UNBALANCED
@@ -3586,18 +3713,6 @@ enum FinanceIntegrityAlertSeverity {
   CRITICAL
 }
 
-model FinanceIntegrityAlert {
-  id          String                        @id @default(cuid())
-  type        FinanceIntegrityAlertType
-  referenceId String?
-  severity    FinanceIntegrityAlertSeverity @default(WARNING)
-  detailsJson Json                          @db.JsonB
-  resolvedAt  DateTime?
-  createdAt   DateTime                      @default(now())
-
-  @@index([type, createdAt])
-}
-
 enum FinanceOpsLogSeverity {
   INFO
   WARNING
@@ -3605,62 +3720,9 @@ enum FinanceOpsLogSeverity {
   CRITICAL
 }
 
-model FinanceOpsLog {
-  id          String                @id @default(cuid())
-  action      String
-  entityType  String
-  entityId    String?
-  severity    FinanceOpsLogSeverity @default(INFO)
-  payloadJson Json?                 @db.JsonB
-  createdAt   DateTime              @default(now())
-}
-
 enum OpsHealthSnapshotScope {
   RUNTIME
   DAILY
-}
-
-model OpsHealthSnapshot {
-  id          String                 @id @default(cuid())
-  scope       OpsHealthSnapshotScope @default(RUNTIME)
-  createdAt   DateTime               @default(now())
-  payloadJson Json                   @db.JsonB
-
-  @@index([scope, createdAt])
-}
-
-model OpsAlertAck {
-  id                   String   @id @default(cuid())
-  alertType            String
-  alertId              String
-  acknowledgedByUserId String
-  note                 String
-  acknowledgedAt       DateTime @default(now())
-
-  @@unique([alertType, alertId])
-}
-
-// --- METRICS LAYER ---
-
-model PlatformDailyMetrics {
-  id                            String   @id @default(cuid())
-  day                           String   @unique // YYYY-MM-DD
-  gmvGross                      Decimal  @db.Decimal(12, 2)
-  orderCount                    Int
-  activeBuyerCount              Int
-  activeSellerCount             Int
-  takeRevenueCommission         Decimal  @db.Decimal(12, 2)
-  takeRevenueBoost              Decimal  @db.Decimal(12, 2)
-  takeRate                      Decimal  @db.Decimal(5, 4)
-  escrowFloatEndOfDay           Decimal  @db.Decimal(12, 2)
-  payoutVolume                  Decimal  @db.Decimal(12, 2)
-  payoutCount                   Int
-  avgReleaseTimeHours           Decimal  @db.Decimal(12, 2)
-  chargebackAmount              Decimal  @db.Decimal(12, 2)
-  chargebackCount               Int
-  receivableOutstandingEndOfDay Decimal  @db.Decimal(12, 2)
-  opsCriticalAlertCount         Int
-  createdAt                     DateTime @default(now())
 }
 
 enum TenantDailyMetricsRole {
@@ -3669,90 +3731,27 @@ enum TenantDailyMetricsRole {
   BOTH
 }
 
-model TenantDailyMetrics {
-  id                    String                 @id @default(cuid())
-  day                   String
-  tenantId              String
-  role                  TenantDailyMetricsRole
-  gmvGross              Decimal                @db.Decimal(12, 2)
-  orderCount            Int
-  commissionPaid        Decimal                @db.Decimal(12, 2)
-  payoutReceived        Decimal                @db.Decimal(12, 2)
-  avgReleaseTimeHours   Decimal                @db.Decimal(12, 2)
-  disputeCount          Int
-  chargebackCount       Int
-  receivableOutstanding Decimal                @db.Decimal(12, 2)
-  discoveryImpressions  Int
-  boostImpressions      Int                    @default(0)
-  createdAt             DateTime               @default(now())
-
-  @@unique([day, tenantId])
-  @@index([tenantId, day])
-}
-
-// --- PILOT LAUNCH & CONTROL LAYER ---
-
-model FeatureFlag {
-  id           String   @id @default(cuid())
-  key          String   @unique
-  description  String
-  defaultValue Boolean
-  createdAt    DateTime @default(now())
-}
-
-model TenantFeatureFlag {
-  id         String   @id @default(cuid())
-  tenantId   String
-  featureKey String
-  enabled    Boolean
-  createdAt  DateTime @default(now())
-
-  @@unique([tenantId, featureKey])
-  @@index([tenantId, featureKey])
-}
-
 enum TenantCohort {
   PILOT
   GENERAL
   INTERNAL
 }
 
-model TenantRolloutPolicy {
-  id                   String       @id @default(cuid())
-  tenantId             String       @unique
-  cohort               TenantCohort @default(PILOT)
-  maxDailyGmv          Decimal?     @db.Decimal(12, 2)
-  maxDailyPayout       Decimal?     @db.Decimal(12, 2)
-  maxSingleOrderAmount Decimal?     @db.Decimal(12, 2)
-  holdDaysOverride     Int?
-  earlyReleaseAllowed  Boolean      @default(false)
-  payoutPaused         Boolean      @default(false)
-  escrowPaused         Boolean      @default(false)
-  boostPaused          Boolean      @default(false)
-  createdAt            DateTime     @default(now())
-  updatedAt            DateTime     @updatedAt
+enum BoostSubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELED
+  EXPIRED
 }
 
-model PilotCohortTag {
-  id        String   @id @default(cuid())
-  tenantId  String
-  tag       String
-  createdAt DateTime @default(now())
-
-  @@unique([tenantId, tag])
-  @@index([tag])
+enum BillingLedgerRefType {
+  BOOST_SUBSCRIPTION_CHARGE
+  BOOST_OVERAGE
 }
 
-model PlatformCohortDailyMetrics {
-  id                    String   @id @default(cuid())
-  day                   String // YYYY-MM-DD
-  cohortTag             String
-  gmvGross              Decimal  @db.Decimal(12, 2)
-  orderCount            Int
-  payoutVolume          Decimal  @db.Decimal(12, 2)
-  takeRevenueCommission Decimal  @db.Decimal(12, 2)
-  chargebackAmount      Decimal  @db.Decimal(12, 2)
-  createdAt             DateTime @default(now())
-
-  @@unique([day, cohortTag])
+enum BoostInvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  VOID
 }

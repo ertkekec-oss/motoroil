@@ -47,8 +47,17 @@ export async function computePlatformDailyMetrics(dayStr: string) {
             createdAt: { gte: start, lt: end }
         }
     });
+    const ledgerBoostRaw = await prisma.ledgerEntry.aggregate({
+        _sum: { amount: true },
+        where: {
+            tenantId: 'PLATFORM',
+            direction: 'CREDIT',
+            accountType: 'BOOST_REVENUE', 
+            createdAt: { gte: start, lt: end }
+        }
+    });
     const takeRevenueCommission = Number(ledgerCommRaw._sum.amount || 0);
-    const takeRevenueBoost = 0; 
+    const takeRevenueBoost = Number(ledgerBoostRaw._sum.amount || 0); 
     const takeRate = gmvGross > 0 ? takeRevenueCommission / gmvGross : 0;
 
     let totalReleaseHours = 0;
@@ -171,6 +180,20 @@ export async function computeTenantDailyMetrics(dayStr: string, tenantId: string
     });
     const receivableOutstanding = Number(recEodRaw._sum.amount || 0) - Number(recEodCreditsRaw._sum.amount || 0);
 
+    // Boost Impressions
+    const boostImpRaw = await prisma.boostUsageDaily.aggregate({
+         _sum: { sponsoredImpressions: true },
+         where: { sellerTenantId: tenantId, day: dayStr }
+    });
+    const boostImpressions = boostImpRaw._sum.sponsoredImpressions || 0;
+
+    // Boost Spend (Invoices issued today)
+    const boostInvoicesRaw = await prisma.boostInvoice.aggregate({
+         _sum: { amount: true },
+         where: { sellerTenantId: tenantId, issuedAt: { gte: start, lt: end } }
+    });
+    const boostSpend = Number(boostInvoicesRaw._sum.amount || 0);
+
     let role: 'BUYER' | 'SELLER' | 'BOTH' = 'BUYER';
     if (isBuyer && isSeller) role = 'BOTH';
     else if (isSeller) role = 'SELLER';
@@ -188,7 +211,8 @@ export async function computeTenantDailyMetrics(dayStr: string, tenantId: string
         chargebackCount,
         receivableOutstanding,
         discoveryImpressions,
-        boostImpressions: 0
+        boostImpressions,
+        boostSpend
     };
 }
 
