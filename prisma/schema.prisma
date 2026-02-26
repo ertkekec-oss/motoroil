@@ -3639,3 +3639,53 @@ model OpsAlertAck {
 
   @@unique([alertType, alertId])
 }
+
+// --- METRICS LAYER ---
+
+model PlatformDailyMetrics {
+  id                            String   @id @default(cuid())
+  day                           String   @unique // YYYY-MM-DD
+  gmvGross                      Decimal  @db.Decimal(12, 2)
+  orderCount                    Int
+  activeBuyerCount              Int
+  activeSellerCount             Int
+  takeRevenueCommission         Decimal  @db.Decimal(12, 2)
+  takeRevenueBoost              Decimal  @db.Decimal(12, 2)
+  takeRate                      Decimal  @db.Decimal(5, 4)
+  escrowFloatEndOfDay           Decimal  @db.Decimal(12, 2)
+  payoutVolume                  Decimal  @db.Decimal(12, 2)
+  payoutCount                   Int
+  avgReleaseTimeHours           Decimal  @db.Decimal(12, 2)
+  chargebackAmount              Decimal  @db.Decimal(12, 2)
+  chargebackCount               Int
+  receivableOutstandingEndOfDay Decimal  @db.Decimal(12, 2)
+  opsCriticalAlertCount         Int
+  createdAt                     DateTime @default(now())
+}
+
+enum TenantDailyMetricsRole {
+  BUYER
+  SELLER
+  BOTH
+}
+
+model TenantDailyMetrics {
+  id                    String                 @id @default(cuid())
+  day                   String
+  tenantId              String
+  role                  TenantDailyMetricsRole
+  gmvGross              Decimal                @db.Decimal(12, 2)
+  orderCount            Int
+  commissionPaid        Decimal                @db.Decimal(12, 2)
+  payoutReceived        Decimal                @db.Decimal(12, 2)
+  avgReleaseTimeHours   Decimal                @db.Decimal(12, 2)
+  disputeCount          Int
+  chargebackCount       Int
+  receivableOutstanding Decimal                @db.Decimal(12, 2)
+  discoveryImpressions  Int
+  boostImpressions      Int                    @default(0)
+  createdAt             DateTime               @default(now())
+
+  @@unique([day, tenantId])
+  @@index([tenantId, day])
+}
