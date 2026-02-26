@@ -3030,11 +3030,15 @@ model SellerEarning {
   id                String        @id @default(cuid())
   sellerCompanyId   String
   shipmentId        String        @unique
+  grossAmount       Decimal       @default(0) @db.Decimal(12, 2)
+  commissionAmount  Decimal       @default(0) @db.Decimal(12, 2)
+  chargebackAmount  Decimal       @default(0) @db.Decimal(12, 2)
   netAmount         Decimal       @db.Decimal(12, 2)
   currency          String        @default("TRY")
   status            EarningStatus @default(PENDING)
   expectedClearDate DateTime?
   clearedAt         DateTime?
+  releasedAt        DateTime?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   archivedAt        DateTime?
@@ -3082,18 +3086,25 @@ model LedgerAccount {
 model LedgerGroup {
   id             String        @id @default(cuid())
   idempotencyKey String        @unique
+  tenantId       String
+  type           String
   description    String?
   createdAt      DateTime      @default(now())
   entries        LedgerEntry[]
+  
+  @@index([tenantId])
 }
 
 model LedgerEntry {
   id              String   @id @default(cuid())
+  tenantId        String
   ledgerAccountId String
   groupId         String
+  accountType     String   // e.g., ESCROW_LIABILITY, SELLER_PAYABLE
+  direction       String   // DEBIT or CREDIT
   amount          Decimal  @db.Decimal(12, 2)
   currency        String   @default("TRY")
-  type            String
+  refType         String?
   referenceId     String?
   createdAt       DateTime @default(now())
 
@@ -3102,7 +3113,7 @@ model LedgerEntry {
 
   @@index([ledgerAccountId])
   @@index([groupId])
-  @@index([type])
+  @@index([tenantId])
 }
 
 model IdempotencyRecord {
