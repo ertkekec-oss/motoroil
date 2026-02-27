@@ -104,8 +104,10 @@ export default function ClientDashboard() {
     const { setIsSidebarOpen } = useApp();
     const [summary, setSummary] = useState<DashboardSummary | null>(null);
     const [loading, setLoading] = useState(true);
+    const [mounted, setMounted] = useState(false);
 
     const trackEvent = async (eventName: string, properties?: any) => {
+        if (!mounted) return;
         try {
             await fetch("/api/metrics/track", {
                 method: "POST",
@@ -116,8 +118,8 @@ export default function ClientDashboard() {
     };
 
     useEffect(() => {
+        setMounted(true);
         setIsSidebarOpen(false);
-        trackEvent("CONTROL_HUB_VIEWED");
 
         async function fetchSummary() {
             try {
@@ -141,6 +143,10 @@ export default function ClientDashboard() {
         }
         fetchSummary();
     }, [setIsSidebarOpen]);
+
+    useEffect(() => {
+        if (mounted) trackEvent("CONTROL_HUB_VIEWED");
+    }, [mounted]);
 
     const userRole = (user?.role || "GUEST").toUpperCase();
     const setupNeeded = summary?.setup ? (!summary.setup.hasCompanyProfile || (!summary.setup.hasAnyProduct && !summary.setup.hasAnyRFQ)) : false;
@@ -242,22 +248,28 @@ export default function ClientDashboard() {
 
                 {/* FLAT PREMIUM GRID */}
                 <div className="mt-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                        {allowedFeatures.map(feat => (
-                            <button
-                                key={feat.id}
-                                onClick={() => {
-                                    trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
-                                    router.push(feat.href);
-                                }}
-                                className="group flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-900 rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 cursor-pointer"
-                            >
-                                <div className={`p-4 rounded-[18px] mb-4 transition-transform duration-300 group-hover:-translate-y-1 ${feat.color}`}>
-                                    {feat.icon}
-                                </div>
-                                <h4 className="text-[13px] font-bold text-slate-700 dark:text-slate-300 text-center uppercase tracking-wider">{feat.title}</h4>
-                            </button>
-                        ))}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                        {!mounted || loading ? (
+                            Array.from({ length: 15 }).map((_, i) => (
+                                <div key={i} className="h-32 bg-slate-200 dark:bg-slate-800 rounded-[20px] animate-pulse"></div>
+                            ))
+                        ) : (
+                            allowedFeatures.map(feat => (
+                                <button
+                                    key={feat.id}
+                                    onClick={() => {
+                                        trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
+                                        router.push(feat.href);
+                                    }}
+                                    className="group flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-900 rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 cursor-pointer"
+                                >
+                                    <div className={`p-4 rounded-[18px] mb-4 transition-transform duration-300 group-hover:-translate-y-1 ${feat.color}`}>
+                                        {feat.icon}
+                                    </div>
+                                    <h4 className="text-[13px] font-bold text-slate-700 dark:text-slate-300 text-center uppercase tracking-wider">{feat.title}</h4>
+                                </button>
+                            ))
+                        )}
                     </div>
                 </div>
 
