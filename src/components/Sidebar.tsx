@@ -373,7 +373,7 @@ export default function Sidebar() {
                                 item.id === 'catalog-parent' ? catalogOpen :
                                     item.id === 'field-sales-parent' ? fieldSalesOpen :
                                         item.id === 'reports-parent' ? reportsOpen :
-                                            item.id === 'buyer-parent' ? buyerOpen :
+                                            item.id === 'purchasing-parent' ? buyerOpen :
                                                 item.id === 'seller-parent' ? sellerOpen :
                                                     item.id === 'growth-parent' ? growthOpen :
                                                         item.id === 'net-fin-parent' ? netFinOpen :
@@ -389,7 +389,7 @@ export default function Sidebar() {
                                         if (item.id === 'catalog-parent') setCatalogOpen(!catalogOpen);
                                         if (item.id === 'field-sales-parent') setFieldSalesOpen(!fieldSalesOpen);
                                         if (item.id === 'reports-parent') setReportsOpen(!reportsOpen);
-                                        if (item.id === 'buyer-parent') setBuyerOpen(!buyerOpen);
+                                        if (item.id === 'purchasing-parent') setBuyerOpen(!buyerOpen);
                                         if (item.id === 'seller-parent') setSellerOpen(!sellerOpen);
                                         if (item.id === 'growth-parent') setGrowthOpen(!growthOpen);
                                         if (item.id === 'net-fin-parent') setNetFinOpen(!netFinOpen);
