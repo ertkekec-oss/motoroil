@@ -273,31 +273,34 @@ export default function ClientDashboard() {
 
                     {/* Setup Notification (Compact Timeline) */}
                     {setupNeeded && !loading && mounted && (
-                        <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-900/30 rounded-[20px] p-5 shadow-sm flex flex-col lg:flex-row lg:items-center gap-5 mb-8">
-                            <div className="flex items-center gap-3 lg:w-1/3 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800 pb-4 lg:pb-0 lg:pr-5">
-                                <div className="p-2.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded-xl">
-                                    <Zap className="w-5 h-5" />
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/10 rounded-2xl shadow-sm flex flex-col md:flex-row items-center gap-1 mb-8">
+                            <div className="flex items-center justify-center gap-3 p-4 px-6 md:border-r border-slate-100 dark:border-slate-800">
+                                <div className="p-2 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded-lg">
+                                    <Zap className="w-4 h-4" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <h3 className="text-[15px] font-extrabold text-[#0F172A] dark:text-white tracking-tight">Kurulum Merkezi</h3>
-                                    <p className="text-xs font-semibold text-slate-500 mt-0.5">Sistemi otonomlaştırın</p>
+                                    <h3 className="text-[14px] font-bold text-[#0F172A] dark:text-white leading-tight">Kurulum Merkezi</h3>
+                                    <p className="text-[11px] font-semibold text-slate-500">Sistemi otonomlaştırın</p>
                                 </div>
                             </div>
-                            <div className="flex-1 flex flex-col sm:flex-row gap-4 items-center w-full">
-                                <div className="flex items-center gap-3 w-full sm:w-auto flex-1 bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                                    <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">1</div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-bold text-[#0F172A] dark:text-slate-200 truncate">Şirket Profili</div>
+
+                            <div className="flex-1 flex flex-col sm:flex-row items-center justify-center gap-2 p-2 w-full">
+                                <Link href="/settings/company" className="flex items-center justify-between sm:justify-start gap-4 w-full sm:w-auto p-2 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[11px] font-black">1</div>
+                                        <span className="text-[13px] font-bold text-[#0F172A] dark:text-slate-200">Şirket Profili</span>
                                     </div>
-                                    <Link href="/settings/company" className="px-5 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition shadow-sm shrink-0">Tamamla</Link>
-                                </div>
-                                <div className="hidden sm:block w-8 h-[2px] bg-slate-100 dark:bg-slate-700 shrink-0"></div>
-                                <div className="flex items-center gap-3 w-full sm:w-auto flex-1 p-2.5 opacity-60 pointer-events-none">
-                                    <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 flex items-center justify-center text-xs font-black shrink-0">2</div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">Katalog Aktarımı</div>
+                                    <span className="px-4 py-1.5 bg-blue-600 text-white text-[11px] font-bold rounded-lg ml-auto hover:bg-blue-700 hover:shadow-sm">Tamamla</span>
+                                </Link>
+
+                                <div className="hidden sm:block w-8 h-[1px] bg-slate-200 dark:bg-slate-700"></div>
+
+                                <div className="flex items-center justify-between sm:justify-start gap-4 w-full sm:w-auto p-2 px-4 rounded-xl opacity-50 pointer-events-none">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center text-[11px] font-black">2</div>
+                                        <span className="text-[13px] font-bold text-slate-600 dark:text-slate-400">Katalog Aktarımı</span>
                                     </div>
-                                    <div className="px-5 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 text-xs font-bold rounded-lg shrink-0">Kilitli</div>
+                                    <span className="px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[11px] font-bold rounded-lg ml-auto">Kilitli</span>
                                 </div>
                             </div>
                         </div>
