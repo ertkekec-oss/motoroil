@@ -18,20 +18,31 @@ export default function Sidebar() {
         activeTenantId, setActiveTenantId, availableTenants
     } = useApp();
 
-    const [fieldSalesOpen, setFieldSalesOpen] = useState(false);
-    const [reportsOpen, setReportsOpen] = useState(false);
-    const [networkOpen, setNetworkOpen] = useState(false);
+    const [buyerOpen, setBuyerOpen] = useState(false);
+    const [sellerOpen, setSellerOpen] = useState(false);
+    const [growthOpen, setGrowthOpen] = useState(false);
+    const [netFinOpen, setNetFinOpen] = useState(false);
+    const [supportOpen, setSupportOpen] = useState(false);
 
     // Auto-expand if active
     useEffect(() => {
-        if (pathname.includes('/field-sales')) {
-            setFieldSalesOpen(true);
+        if (pathname.includes('/field-sales')) setFieldSalesOpen(true);
+        if (pathname.includes('/reports')) setReportsOpen(true);
+
+        if (pathname.includes('/catalog') || pathname.includes('/rfq') || pathname.includes('/contracts') || pathname.includes('/network/buyer')) {
+            setBuyerOpen(true);
         }
-        if (pathname.includes('/reports')) {
-            setReportsOpen(true);
+        if (pathname.includes('/seller/products') || pathname.includes('/network/seller') || pathname.includes('/seller/rfqs') || pathname.includes('/seller/contracts') || pathname.includes('/seller/boost')) {
+            setSellerOpen(true);
         }
-        if (pathname.includes('/network') || pathname.includes('/admin/ops')) {
-            setNetworkOpen(true);
+        if (pathname.includes('/network/trust-score') || pathname.includes('/network/stock-risks')) {
+            setGrowthOpen(true);
+        }
+        if (pathname.includes('/network/earnings') || pathname.includes('/network/payouts') || pathname.includes('/billing/boost-invoices') || pathname.includes('/network/payments')) {
+            setNetFinOpen(true);
+        }
+        if (pathname.includes('/support/tickets')) {
+            setSupportOpen(true);
         }
     }, [pathname]);
 
@@ -89,24 +100,61 @@ export default function Sidebar() {
 
         // B2B AĞI & PAZARYERİ
         {
-            name: 'B2B & Pazaryeri Ağı',
-            icon: '🌍',
+            name: 'Keşif & Alım (Buyer)',
+            icon: '🔍',
             isParent: true,
-            id: 'network-parent',
+            id: 'buyer-parent',
             subItems: [
                 { name: 'B2B Ürün Kataloğu', href: '/catalog', icon: '🛍️' },
-                { name: '🛒 Sepetim (Cart)', href: '/catalog/cart', icon: '🛒' },
-                { name: 'Pazarlıklı Alımlar (Buyer)', href: '/rfq', icon: '🤝' },
-                { name: 'Sözleşmelerim (Buyer)', href: '/contracts', icon: '📜' },
-                { name: 'Ürün Yayınlama (Seller)', href: '/seller/products', icon: '📢' },
-                { name: 'Gelen Talepler (Seller)', href: '/seller/rfqs', icon: '📈' },
-                { name: 'Tedarik Sözleşmeleri (Seller)', href: '/seller/contracts', icon: '🤝' },
-                { name: 'Alınan Siparişler (Seller)', href: '/network/seller/orders', icon: '🏪' },
-                { name: 'Verilen Siparişler (Buyer)', href: '/network/buyer/orders', icon: '🛒' },
-                { name: 'ADMIN: Kategoriler', href: '/admin/catalog/categories', icon: '📂' },
-                { name: 'ADMIN: Onay Masası', href: '/admin/products', icon: '⚖️' },
-                { name: 'ADMIN: Firmalar', href: '/admin/companies', icon: '🏢' },
-                { name: 'ADMIN: Altyapı', href: '/admin/ops/providers', icon: '⚙️' }
+                { name: 'Sepetim', href: '/catalog/cart', icon: '🛒' },
+                { name: 'Verilen Siparişler', href: '/network/buyer/orders', icon: '🛒' },
+                { name: 'Pazarlıklı Alımlar', href: '/rfq', icon: '🤝' },
+                { name: 'Sözleşmelerim', href: '/contracts', icon: '📜' }
+            ]
+        },
+        {
+            name: 'Satış & Yayın (Seller)',
+            icon: '🏪',
+            isParent: true,
+            id: 'seller-parent',
+            subItems: [
+                { name: 'Ürün Yayınlama', href: '/seller/products', icon: '📢' },
+                { name: 'Alınan Siparişler', href: '/network/seller/orders', icon: '🏪' },
+                { name: 'Gelen Talepler', href: '/seller/rfqs', icon: '📈' },
+                { name: 'Tedarik Sözleşmeleri', href: '/seller/contracts', icon: '🤝' }
+            ]
+        },
+        {
+            name: 'Büyüme & Güven',
+            icon: '📊',
+            isParent: true,
+            id: 'growth-parent',
+            subItems: [
+                { name: 'Güven Skorum', href: '/network/trust-score', icon: '⭐' },
+                { name: 'Boost', href: '/seller/boost', icon: '🚀' },
+                { name: 'Boost Performansı', href: '/seller/boost/analytics', icon: '📈' },
+                { name: 'Stok Riskleri', href: '/network/stock-risks', icon: '⚠️' }
+            ]
+        },
+        {
+            name: 'Ağ Finansı',
+            icon: '💰',
+            isParent: true,
+            id: 'net-fin-parent',
+            subItems: [
+                { name: 'Ağ Kazançları', href: '/network/earnings', icon: '💵' },
+                { name: 'Para Çek', href: '/network/payouts', icon: '💳' },
+                { name: 'Boost Faturaları', href: '/billing/boost-invoices', icon: '🧾' },
+                { name: 'Ödeme Durumu', href: '/network/payments', icon: '📊' }
+            ]
+        },
+        {
+            name: 'Destek',
+            icon: '🎫',
+            isParent: true,
+            id: 'support-parent',
+            subItems: [
+                { name: 'Taleplerim', href: '/support/tickets', icon: '📝' }
             ]
         },
 
@@ -312,7 +360,15 @@ export default function Sidebar() {
             }}>
                 {menuItems.map((item: any) => {
                     if (item.isParent) {
-                        const isExpanded = item.id === 'field-sales-parent' ? fieldSalesOpen : (item.id === 'reports-parent' ? reportsOpen : (item.id === 'network-parent' ? networkOpen : false));
+                        const isExpanded =
+                            item.id === 'field-sales-parent' ? fieldSalesOpen :
+                                item.id === 'reports-parent' ? reportsOpen :
+                                    item.id === 'buyer-parent' ? buyerOpen :
+                                        item.id === 'seller-parent' ? sellerOpen :
+                                            item.id === 'growth-parent' ? growthOpen :
+                                                item.id === 'net-fin-parent' ? netFinOpen :
+                                                    item.id === 'support-parent' ? supportOpen :
+                                                        false;
                         const anyChildActive = item.subItems?.some((sub: any) => pathname === sub.href);
 
                         return (
@@ -321,7 +377,11 @@ export default function Sidebar() {
                                     onClick={() => {
                                         if (item.id === 'field-sales-parent') setFieldSalesOpen(!fieldSalesOpen);
                                         if (item.id === 'reports-parent') setReportsOpen(!reportsOpen);
-                                        if (item.id === 'network-parent') setNetworkOpen(!networkOpen);
+                                        if (item.id === 'buyer-parent') setBuyerOpen(!buyerOpen);
+                                        if (item.id === 'seller-parent') setSellerOpen(!sellerOpen);
+                                        if (item.id === 'growth-parent') setGrowthOpen(!growthOpen);
+                                        if (item.id === 'net-fin-parent') setNetFinOpen(!netFinOpen);
+                                        if (item.id === 'support-parent') setSupportOpen(!supportOpen);
                                     }}
                                     style={{
                                         display: 'flex', alignItems: 'center', gap: '14px',

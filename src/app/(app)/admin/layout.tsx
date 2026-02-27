@@ -45,10 +45,17 @@ export default async function AdminLayout({
                     <NavLink href="/admin/marketplace/ops" icon="radar">Pazaryeri Operasyonları</NavLink>
 
                     <div className="pt-4 mt-4 font-semibold text-xs text-slate-500 uppercase tracking-wider px-3 mb-1">B2B Ağ Yönetimi</div>
+                    <NavLink href="/admin/catalog/categories" icon="dashboard">Kategoriler</NavLink>
+                    <NavLink href="/admin/products" icon="shield">Onay Masası</NavLink>
+                    <NavLink href="/admin/companies" icon="users">Firmalar</NavLink>
+                    <NavLink href="/admin/ops/providers" icon="globe">Altyapı</NavLink>
                     <NavLink href="/admin/ops/orders" icon="radar">Ağ Siparişleri</NavLink>
                     <NavLink href="/admin/ops/payments" icon="credit-card">Finans & Escrow</NavLink>
                     <NavLink href="/admin/ops/shipments" icon="globe">Lojistik & Kargo</NavLink>
                     <NavLink href="/admin/ops/ledgers" icon="activity">Sistem Ledger (Audit)</NavLink>
+                    <NavLink href="/admin/platform-finance" icon="credit-card">Platform Finans</NavLink>
+                    <NavLink href="/admin/trust-monitor" icon="activity">Trust Monitor</NavLink>
+                    <NavLink href="/admin/payouts" icon="credit-card">Payout Kontrol</NavLink>
 
                     <div className="pt-4 mt-4 font-semibold text-xs text-slate-500 uppercase tracking-wider px-3 mb-1">Sistem & Güvenlik</div>
                     <NavLink href="/admin/security" icon="shield">Operasyonel Güvenlik</NavLink>
