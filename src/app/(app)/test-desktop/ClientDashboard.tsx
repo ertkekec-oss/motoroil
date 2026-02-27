@@ -8,7 +8,7 @@ import {
     Activity, Percent, Info, AlertTriangle, ShieldCheck, PieChart, Banknote, Store, Receipt, MapPin, SearchCheck,
     Box, CheckSquare, BarChart3, Fingerprint, Settings, HelpCircle, FileText, FileBarChart2,
     ChevronRight, ArrowDownRight, FileDown, FileUp, BoxSelect, Bell,
-    Truck, Zap, AlertCircle
+    Truck, Zap, AlertCircle, Check, Lock
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from '@/contexts/AuthContext';
@@ -271,40 +271,100 @@ export default function ClientDashboard() {
                         </div>
                     </div>
 
-                    {/* Setup Notification (Compact Timeline) */}
-                    {setupNeeded && !loading && mounted && (
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/10 rounded-2xl shadow-sm flex flex-col md:flex-row items-center gap-1 mb-8">
-                            <div className="flex items-center justify-center gap-3 p-4 px-6 md:border-r border-slate-100 dark:border-slate-800">
-                                <div className="p-2 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded-lg">
-                                    <Zap className="w-4 h-4" />
+                    {/* Setup Notification (Executive Timeline) */}
+                    {setupNeeded && !loading && mounted && (() => {
+                        const isS1Complete = !!summary?.setup?.hasCompanyProfile;
+                        const isS2Complete = !!summary?.setup?.hasAnyProduct;
+                        const isS3Complete = !!summary?.setup?.hasAtLeastOneOrder;
+                        const isS4Complete = false;
+
+                        const steps = [
+                            { id: 1, title: "Şirket Profili", desc: "Temel işletme bilgileri", status: isS1Complete ? 'completed' : 'active', href: "/settings/company" },
+                            { id: 2, title: "Katalog Aktarımı", desc: "Ürün ve fiyat listeleri", status: isS2Complete ? 'completed' : (isS1Complete ? 'active' : 'locked'), href: "/seller/products" },
+                            { id: 3, title: "İlk Sipariş", desc: "Test veya gerçek sipariş", status: isS3Complete ? 'completed' : (isS2Complete ? 'active' : 'locked'), href: "/network/seller/orders" },
+                            { id: 4, title: "Otonom İşlemler", desc: "Akıllı süreç eşleşmesi", status: isS4Complete ? 'completed' : (isS3Complete ? 'active' : 'locked'), href: "/fintech/control-tower" },
+                        ];
+                        const completedNodesCount = steps.filter(s => s.status === 'completed').length;
+                        const progressPercent = Math.round((completedNodesCount / steps.length) * 100);
+
+                        return (
+                            <div className="bg-white dark:bg-[#080911] border border-slate-100 dark:border-white/5 rounded-[24px] p-[40px] shadow-[0_15px_60px_-15px_rgba(0,0,0,0.05)] select-none w-full mb-10 min-h-[160px] flex flex-col justify-between relative overflow-hidden group">
+                                {/* Header Strip */}
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12 w-full z-10">
+                                    <div className="flex items-start gap-4">
+                                        <div className="p-2.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded-xl hidden md:flex">
+                                            <Zap className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-[20px] font-extrabold text-[#0F172A] dark:text-white leading-tight">Kurulum Merkezi</h3>
+                                            <p className="text-[14px] font-semibold text-slate-500 mt-1">İşletme aktivasyon sürecinizi tamamlayın</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col md:items-end w-full md:w-48">
+                                        <div className="text-[14px] font-black text-[#0F172A] dark:text-slate-200 mb-2.5">%{progressPercent} Tamamlandı</div>
+                                        <div className="w-full h-[6px] bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                            <div className="h-full bg-blue-600 rounded-full transition-all duration-1000" style={{ width: `${progressPercent}%` }}></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex flex-col">
-                                    <h3 className="text-[14px] font-bold text-[#0F172A] dark:text-white leading-tight">Kurulum Merkezi</h3>
-                                    <p className="text-[11px] font-semibold text-slate-500">Sistemi otonomlaştırın</p>
+
+                                {/* Horizontal Timeline */}
+                                <div className="relative w-full z-10 mt-2">
+                                    {/* Line Container (Centered between the first and last node) */}
+                                    <div className="absolute top-[21px] left-[12.5%] right-[12.5%] h-[2px] bg-slate-100 dark:bg-slate-800 z-0 rounded-full">
+                                        <div className="absolute top-0 left-0 h-full bg-blue-600 z-0 transition-all duration-1000 rounded-full" style={{ width: `${Math.min(100, Math.max(0, ((completedNodesCount) / (steps.length - 1)) * 100))}%` }}></div>
+                                    </div>
+
+                                    {/* Nodes Flex */}
+                                    <div className="flex justify-between w-full relative z-10">
+                                        {steps.map((step, idx) => (
+                                            <div key={step.id}
+                                                className={`flex flex-col items-center text-center w-[25%] transition-transform duration-300 ${step.status === 'active' || step.status === 'completed' ? 'cursor-pointer hover:-translate-y-1' : ''}`}
+                                                onClick={() => step.status === 'active' || step.status === 'completed' ? router.push(step.href) : null}>
+
+                                                {/* Node Circle */}
+                                                <div className={`w-[44px] h-[44px] rounded-full flex items-center justify-center mb-4 transition-all duration-300 z-10 relative bg-white dark:bg-[#080911] 
+                                                    ${step.status === 'completed' ? 'bg-blue-600 border-[3px] border-blue-600 text-white shadow-md'
+                                                        : step.status === 'active' ? 'border-[3px] border-blue-600 text-blue-600 shadow-md ring-4 ring-blue-50 dark:ring-blue-900/20'
+                                                            : 'border-[3px] border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600'}`
+                                                }>
+                                                    {step.status === 'completed' ? <Check className="w-5 h-5 stroke-[3]" /> : <span className="text-[17px] font-black">{step.id}</span>}
+                                                </div>
+
+                                                {/* Title & Desc */}
+                                                <div className="px-2 w-full flex flex-col items-center">
+                                                    <h4 className={`text-[15px] max-w-[150px] font-extrabold mb-1.5 transition-colors line-clamp-1
+                                                            ${step.status === 'completed' ? 'text-slate-800 dark:text-white'
+                                                            : step.status === 'active' ? 'text-blue-700 dark:text-blue-400'
+                                                                : 'text-slate-400 dark:text-slate-600'}`
+                                                    }>
+                                                        {step.title}
+                                                    </h4>
+                                                    <p className="text-[12px] font-semibold text-slate-500 line-clamp-1 max-w-[140px] leading-relaxed hidden sm:block">
+                                                        {step.desc}
+                                                    </p>
+                                                </div>
+
+                                                {/* Status Action / Badge */}
+                                                <div className="mt-3.5 h-7 flex items-center justify-center">
+                                                    {step.status === 'active' && (
+                                                        <div className="text-[12px] font-black text-blue-600 hover:text-white hover:bg-blue-600 transition-colors bg-blue-50 dark:bg-blue-900/30 dark:hover:bg-blue-600 px-4 py-1.5 rounded-full whitespace-nowrap">
+                                                            Tamamla
+                                                        </div>
+                                                    )}
+                                                    {step.status === 'locked' && (
+                                                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">
+                                                            <Lock className="w-3.5 h-3.5" /> Kilitli
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-
-                            <div className="flex-1 flex flex-col sm:flex-row items-center justify-center gap-2 p-2 w-full">
-                                <Link href="/settings/company" className="flex items-center justify-between sm:justify-start gap-4 w-full sm:w-auto p-2 px-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[11px] font-black">1</div>
-                                        <span className="text-[13px] font-bold text-[#0F172A] dark:text-slate-200">Şirket Profili</span>
-                                    </div>
-                                    <span className="px-4 py-1.5 bg-blue-600 text-white text-[11px] font-bold rounded-lg ml-auto hover:bg-blue-700 hover:shadow-sm">Tamamla</span>
-                                </Link>
-
-                                <div className="hidden sm:block w-8 h-[1px] bg-slate-200 dark:bg-slate-700"></div>
-
-                                <div className="flex items-center justify-between sm:justify-start gap-4 w-full sm:w-auto p-2 px-4 rounded-xl opacity-50 pointer-events-none">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center text-[11px] font-black">2</div>
-                                        <span className="text-[13px] font-bold text-slate-600 dark:text-slate-400">Katalog Aktarımı</span>
-                                    </div>
-                                    <span className="px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[11px] font-bold rounded-lg ml-auto">Kilitli</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                        );
+                    })()}
 
                     {/* WIDGET GRID */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
