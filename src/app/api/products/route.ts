@@ -46,7 +46,6 @@ export async function GET(request: Request) {
                 price: true,
                 category: true,
                 stock: true,
-                status: true,
                 brand: true,
                 type: true,
                 unit: true,
@@ -267,6 +266,10 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, product });
     } catch (error: any) {
         console.error('Product create error:', error);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        let errorMessage = error.message;
+        if (error.code === 'P2002') {
+            errorMessage = 'Belirttiğiniz ürün kodu (veya barkod) zaten sistemde kayıtlı. Lütfen benzersiz bir stok kodu girin.';
+        }
+        return NextResponse.json({ success: false, error: errorMessage }, { status: error.code === 'P2002' ? 400 : 500 });
     }
 }
