@@ -132,9 +132,33 @@ export async function markBoostInvoicePaid({
              where: { id: inv.id },
              data: {
                  status: 'PAID',
-                 paidAt: new Date()
-             }
+                 paidAt: new Date(),
+                 collectionStatus: 'CURRENT'
+             },
+             include: { subscription: true }
          });
+
+         if (updatedInv.subscription?.billingBlocked) {
+             await tx.boostSubscription.update({
+                  where: { id: updatedInv.subscription.id },
+                  data: { billingBlocked: false, status: 'ACTIVE', blockedAt: null }
+             });
+             
+             await tx.tenantRolloutPolicy.updateMany({
+                  where: { tenantId: updatedInv.sellerTenantId },
+                  data: { boostPaused: false }
+             });
+
+             await tx.financeOpsLog.create({
+                 data: {
+                     action: 'BOOST_SUBSCRIPTION_UNBLOCKED',
+                     entityType: 'BoostSubscription',
+                     entityId: updatedInv.subscription.id,
+                     severity: 'INFO',
+                     payloadJson: { adminUserId, invoiceId: inv.id }
+                 }
+             });
+         }
 
          // 3. Audit
          await tx.financeOpsLog.create({

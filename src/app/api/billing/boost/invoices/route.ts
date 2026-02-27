@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { requireUserContext } from '../../../../lib/auth/requireUserContext';
+import { getRequestContext } from '@/lib/api-context';
 
 const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
-    const { tenantId } = requireUserContext(req);
+    const ctx = await getRequestContext(req);
+    const tenantId = ctx.tenantId;
     
     try {
         const invoices = await prisma.boostInvoice.findMany({

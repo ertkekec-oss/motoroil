@@ -3142,6 +3142,15 @@ model OpsHealthSnapshot {
   @@index([scope, createdAt])
 }
 
+model BillingHealthSnapshot {
+  id                       String   @id @default(cuid())
+  day                      String   @unique
+  totalOutstandingAR       Decimal  @db.Decimal(18,2)
+  overdueInvoiceCount      Int
+  blockedSubscriptionCount Int
+  createdAt                DateTime @default(now())
+}
+
 model OpsAlertAck {
   id                   String   @id @default(cuid())
   alertType            String
@@ -3278,6 +3287,8 @@ model BoostSubscription {
   nextRenewalAt      DateTime                @default(now())
   lastChargedPeriodKey String?
   autoRenew          Boolean                 @default(true)
+  billingBlocked     Boolean                 @default(false)
+  blockedAt          DateTime?
   pausedAt           DateTime?
   canceledAt         DateTime?
   createdAt          DateTime                @default(now())
@@ -3300,6 +3311,9 @@ model BoostInvoice {
   dueAt             DateTime
   paidAt            DateTime?
   ledgerGroupId     String?
+  graceEndsAt       DateTime?
+  overdueAt         DateTime?
+  collectionStatus  BoostInvoiceCollectionStatus @default(CURRENT)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   subscription      BoostSubscription  @relation(fields: [subscriptionId], references: [id])
@@ -3742,6 +3756,13 @@ enum BoostSubscriptionStatus {
   PAUSED
   CANCELED
   EXPIRED
+}
+
+enum BoostInvoiceCollectionStatus {
+  CURRENT
+  GRACE
+  OVERDUE
+  COLLECTION_BLOCKED
 }
 
 enum BillingLedgerRefType {

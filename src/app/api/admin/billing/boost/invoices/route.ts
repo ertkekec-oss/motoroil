@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { issueBoostInvoice, markBoostInvoicePaid } from '../../../../services/billing/boost/invoices';
-import { requirePlatformFinanceAdmin } from '../../../../lib/auth/financeGuard';
+import { issueBoostInvoice, markBoostInvoicePaid } from '@/services/billing/boost/invoices';
+import { requirePlatformFinanceAdmin } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
     try {
-        await requirePlatformFinanceAdmin(req);
+        await requirePlatformFinanceAdmin();
         
         const { action, subscriptionId, periodKey, invoiceId } = await req.json();
         

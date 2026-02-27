@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { runBoostSubscriptionRolloverCycle } from '../../../../../services/billing/boost/rollover';
-import { requirePlatformFinanceAdmin } from '../../../../../lib/auth/financeGuard';
+import { runBoostSubscriptionRolloverCycle } from '@/services/billing/boost/rollover';
+import { requirePlatformFinanceAdmin } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
     try {
-        await requirePlatformFinanceAdmin(req);
+        await requirePlatformFinanceAdmin();
         const results = await runBoostSubscriptionRolloverCycle('API_ADMIN_MANUAL_RUN');
         return NextResponse.json({ success: true, results });
     } catch(e) {

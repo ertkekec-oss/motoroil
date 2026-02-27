@@ -31,8 +31,7 @@ export async function POST(req: NextRequest, { params }: { params: { shipmentId:
                 action: 'PAYOUT_ENQUEUED' as any,
                 entityId: payout.id,
                 entityType: 'ProviderPayout',
-                userId: session.userId,
-                payloadJson: { note: 'Manual Admin Trigger', shipmentId: params.shipmentId }
+                payloadJson: { note: 'Manual Admin Trigger', shipmentId: params.shipmentId, userId: session.userId || session.id }
             }
         });
 

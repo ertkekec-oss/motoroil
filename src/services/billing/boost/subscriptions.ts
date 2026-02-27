@@ -132,11 +132,17 @@ export async function cancelBoostSubscription(params: {
 
 export async function getActiveBoostSubscription(sellerTenantId: string) {
     const sub = await prisma.boostSubscription.findFirst({
-         where: { sellerTenantId, status: 'ACTIVE' },
+         where: { sellerTenantId, status: 'ACTIVE', billingBlocked: false },
          include: { plan: true }
     });
 
     if (!sub) return null;
+
+    const overdueInvoice = await prisma.boostInvoice.findFirst({
+         where: { sellerTenantId, collectionStatus: 'OVERDUE' }
+    });
+
+    if (overdueInvoice) return null;
 
     const periodKey = `${sub.currentPeriodStart.getUTCFullYear()}-${String(sub.currentPeriodStart.getUTCMonth()+1).padStart(2,'0')}`;
     

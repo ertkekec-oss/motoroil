@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requirePlatformFinanceAdmin } from "@/lib/auth";
-import { processPayoutOutbox } from "@/services/finance/payout/iyzico/outboxWorker";
+import { runPayoutOutboxCycle } from "@/services/finance/payout/iyzico/outboxWorker";
 import { OPS_SCHEDULES } from "@/services/ops/schedules";
 import { PrismaClient } from '@prisma/client';
 
@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
     try {
         const session = await requirePlatformFinanceAdmin();
-        const res = await processPayoutOutbox(OPS_SCHEDULES.payoutOutbox.batchSize);
+        const res = await runPayoutOutboxCycle({ batchSize: OPS_SCHEDULES.payoutOutbox.batchSize });
         
         await prisma.financeOpsLog.create({
             data: {
