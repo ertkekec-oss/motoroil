@@ -16,6 +16,43 @@ export interface DashboardSummary {
         hasAnyRFQ: boolean;
         hasAtLeastOneOrder: boolean;
     };
+    cashDetails: {
+        creditCard: number;
+        cash: number;
+        wire: number;
+    };
+    stockHealth: {
+        totalSku: number;
+        lowStock: number;
+        overStock: number;
+        inShipment: number;
+        noShipment: number;
+    };
+    invoiceStatus: {
+        incoming: number;
+        outgoing: number;
+        pending: number;
+    };
+    serviceDesk: {
+        enteredToday: number;
+        currentlyInService: number;
+    };
+    pdksRules: {
+        currentStaffCount: number;
+        checkedInCount: number;
+        notCheckedInCount: number;
+        lateCount: number;
+    };
+    autonomous: {
+        updatedProducts: number;
+        avgMarginChange: number;
+        riskyDeviation: number;
+    };
+    notificationsApp: {
+        pendingApprovals: number;
+        newNotifications: number;
+        criticalAlerts: number;
+    };
 }
 
 export function whereCompany(session: any, fieldName: string = "companyId") {
@@ -135,6 +172,49 @@ export class PrismaSummaryProvider implements IDashboardSummaryProvider {
                 hasAnyProduct,
                 hasAnyRFQ,
                 hasAtLeastOneOrder
+            },
+            // TODO: Ledger Source of Truth (Cash details currently stubbed)
+            cashDetails: {
+                creditCard: 125400,
+                cash: 14500,
+                wire: 45000
+            },
+            // TODO: Filtered queries from inventory + shipment tables
+            stockHealth: {
+                totalSku: 1420,
+                lowStock: 24,
+                overStock: 112,
+                inShipment: 45,
+                noShipment: 1375
+            },
+            invoiceStatus: {
+                incoming: 28,
+                outgoing: 145,
+                pending: 12
+            },
+            // TODO: Filtered queries from service_records table
+            serviceDesk: {
+                enteredToday: 8,
+                currentlyInService: 23
+            },
+            // TODO: Filtered queries from attendance + staff tables
+            pdksRules: {
+                currentStaffCount: 124,
+                checkedInCount: 118,
+                notCheckedInCount: 6,
+                lateCount: 3
+            },
+            // TODO: Filtered from Fintech Control Tower Autopilot
+            autonomous: {
+                updatedProducts: 142,
+                avgMarginChange: 2.4,
+                riskyDeviation: 3
+            },
+            // TODO: Filtered Event Summary (Tenant Isolations)
+            notificationsApp: {
+                pendingApprovals: 14,
+                newNotifications: 8,
+                criticalAlerts: 2
             }
         };
     }
@@ -158,7 +238,14 @@ export class LedgerSummaryProvider implements IDashboardSummaryProvider {
                 hasAnyProduct: true,
                 hasAnyRFQ: true,
                 hasAtLeastOneOrder: true
-            }
+            },
+            cashDetails: { creditCard: 0, cash: 0, wire: 0 },
+            stockHealth: { totalSku: 0, lowStock: 0, overStock: 0, inShipment: 0, noShipment: 0 },
+            invoiceStatus: { incoming: 0, outgoing: 0, pending: 0 },
+            serviceDesk: { enteredToday: 0, currentlyInService: 0 },
+            pdksRules: { currentStaffCount: 0, checkedInCount: 0, notCheckedInCount: 0, lateCount: 0 },
+            autonomous: { updatedProducts: 0, avgMarginChange: 0, riskyDeviation: 0 },
+            notificationsApp: { pendingApprovals: 0, newNotifications: 0, criticalAlerts: 0 }
         };
     }
 }

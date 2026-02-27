@@ -7,7 +7,8 @@ import {
     ArrowUpRight, Clock, ShieldAlert, Search,
     Activity, Percent, Info, AlertTriangle, ShieldCheck, PieChart, Banknote, Store, Receipt, MapPin, SearchCheck,
     Box, CheckSquare, BarChart3, Fingerprint, Settings, HelpCircle, FileText, FileBarChart2,
-    ChevronRight, ArrowDownRight, FileDown, FileUp, BoxSelect
+    ChevronRight, ArrowDownRight, FileDown, FileUp, BoxSelect, Bell,
+    Truck, Zap, AlertCircle
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,8 +16,8 @@ import { useApp } from '@/contexts/AppContext';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-// Utility for currency formatting
 const formatter = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 0 });
+const pFormatter = new Intl.NumberFormat('tr-TR', { style: 'percent', minimumFractionDigits: 1 });
 
 interface DashboardSummary {
     gmvTotal: number;
@@ -34,37 +35,72 @@ interface DashboardSummary {
         hasAnyRFQ: boolean;
         hasAtLeastOneOrder: boolean;
     };
+    cashDetails: {
+        creditCard: number;
+        cash: number;
+        wire: number;
+    };
+    stockHealth: {
+        totalSku: number;
+        lowStock: number;
+        overStock: number;
+        inShipment: number;
+        noShipment: number;
+    };
+    invoiceStatus: {
+        incoming: number;
+        outgoing: number;
+        pending: number;
+    };
+    serviceDesk: {
+        enteredToday: number;
+        currentlyInService: number;
+    };
+    pdksRules: {
+        currentStaffCount: number;
+        checkedInCount: number;
+        notCheckedInCount: number;
+        lateCount: number;
+    };
+    autonomous: {
+        updatedProducts: number;
+        avgMarginChange: number;
+        riskyDeviation: number;
+    };
+    notificationsApp: {
+        pendingApprovals: number;
+        newNotifications: number;
+        criticalAlerts: number;
+    };
 }
 
 const ALL_MODULES = [
-    { id: "terminal", title: "POS Terminal", desc: "Hızlı Perakende Satış", href: "/terminal", icon: <ShoppingCart className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "FINANCE"], color: "bg-orange-50 text-orange-600" },
-    { id: "b2b_network", title: "B2B Network", desc: "Global Ağa Bağlanın", href: "/dashboard", icon: <Building2 className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "BUYER", "SELLER"], color: "bg-blue-50 text-blue-600" },
-    { id: "orders", title: "Orders", desc: "Sipariş Merkezi", href: "/network/seller/orders", icon: <Send className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-indigo-50 text-indigo-600" },
-    { id: "catalog", title: "Catalog", desc: "Katalog & Ürünler", href: "/seller/products", icon: <Box className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-emerald-50 text-emerald-600" },
-    { id: "finance_b2b", title: "Finance (B2B)", desc: "Ağ İçi Finans & Escrow", href: "/network/finance", icon: <Banknote className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "SELLER"], color: "bg-rose-50 text-rose-600" },
-    { id: "growth", title: "Growth (Seller)", desc: "Boost & Güven Skoru", href: "/network/trust-score", icon: <TrendingUp className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "SELLER"], color: "bg-amber-50 text-amber-600" },
-    { id: "purchasing", title: "Purchasing (Buyer)", desc: "Sözleşme & RFQ", href: "/rfq", icon: <Briefcase className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "BUYER"], color: "bg-cyan-50 text-cyan-600" },
-    { id: "staff", title: "Personel Paneli", desc: "Kişisel Portalınız", href: "/staff/me", icon: <Users className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER", "BUYER", "FINANCE", "GROWTH", "RISK"], color: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200" },
-    { id: "accounting", title: "Finansal Yönetim", desc: "Kasa & Banka Bütçe", href: "/accounting", icon: <Landmark className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"], color: "bg-rose-50 text-rose-600" },
-    { id: "sales", title: "Satış Yönetimi", desc: "Fatura ve Ciro İzleme", href: "/sales", icon: <Receipt className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "SELLER"], color: "bg-rose-50 text-rose-600" },
-    { id: "customers", title: "Cari Hesaplar", desc: "Müşteri Bakiyeleri", href: "/customers", icon: <CheckSquare className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"], color: "bg-rose-50 text-rose-600" },
-    { id: "suppliers", title: "Tedarikçi Ağı", desc: "Tedarikçi İlişkileri", href: "/suppliers", icon: <Building2 className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "BUYER"], color: "bg-emerald-50 text-emerald-600" },
-    { id: "control_tower", title: "Finansal Kontrol Kulesi", desc: "Limit & Risk İzleme", href: "/fintech/control-tower", icon: <Activity className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"], color: "bg-purple-50 text-purple-600" },
-    { id: "inventory", title: "Envanter & Depo", desc: "Stok Kontrol & Depolar", href: "/inventory", icon: <PackageSearch className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-sky-50 text-sky-600" },
-    { id: "field_sales", title: "Saha Satış Yönetimi", desc: "Rota ve Canlı Takip", href: "/field-sales", icon: <MapPin className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-fuchsia-50 text-fuchsia-600" },
-    { id: "quotes", title: "Teklifler", desc: "Özel Müşteri Fiyatları", href: "/quotes", icon: <FileText className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-fuchsia-50 text-fuchsia-600" },
-    { id: "service", title: "Servis Masası", desc: "Bakım & Onarım Hizmeti", href: "/service", icon: <HeadphonesIcon className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF"], color: "bg-teal-50 text-teal-600" },
-    { id: "analytics", title: "İş Zekası & Analiz", desc: "CEO Metrikleri & Veri", href: "/reports/ceo", icon: <LineChart className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "FINANCE"], color: "bg-slate-800 text-white dark:bg-slate-700 dark:text-blue-100" },
-    { id: "pdks", title: "PDKS Yönetimi", desc: "Vardiya ve Giriş/Çıkış", href: "/staff/pdks", icon: <Fingerprint className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200" },
-    { id: "audit_logs", title: "Denetim Kayıtları", desc: "Sistem ve İşlem Logları", href: "/admin/audit-logs", icon: <SearchCheck className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "RISK"], color: "bg-red-50 text-red-600" },
-    { id: "suspicious", title: "Kaçak Satış Tespit", desc: "Şüpheli İşlem Uyarıları", href: "/security/suspicious", icon: <ShieldAlert className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "RISK"], color: "bg-red-50 text-red-600" },
-    { id: "support_tickets", title: "Destek Talepleri", desc: "Kullanıcı İletişim Merkezi", href: "/support/tickets", icon: <HelpCircle className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER", "BUYER"], color: "bg-teal-50 text-teal-600" },
-    { id: "advisor", title: "Mali Müşavir", desc: "E-Fatura & Beyanname", href: "/advisor", icon: <Briefcase className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200" },
-    { id: "settings", title: "Sistem Ayarları", desc: "Altyapı ve Yapılandırma", href: "/settings", icon: <Settings className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200" },
-    { id: "team", title: "Ekip & Yetki", desc: "Rol ve Kullanıcı Ata", href: "/staff", icon: <Users className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200" },
-    { id: "billing", title: "Abonelik & Planlar", desc: "Lisans ve Faturalar", href: "/billing", icon: <PieChart className="w-5 h-5" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-amber-50 text-amber-600" },
-    { id: "support_inbox", title: "Destek Masası (Inbox)", desc: "Platform Gelen Kutusu", href: "/admin/support/tickets", icon: <Search className="w-5 h-5" />, roles: ["SUPER_ADMIN"], color: "bg-orange-50 text-orange-600" },
-    { id: "knowledge", title: "Bilgi Bankası Yönetimi", desc: "Yardım Makaleleri", href: "/admin/tenants/PLATFORM_ADMIN/help", icon: <FileText className="w-5 h-5" />, roles: ["SUPER_ADMIN"], color: "bg-orange-50 text-orange-600" },
+    { id: "terminal", title: "POS Terminal", desc: "Hızlı Perakende Satış", href: "/terminal", icon: <ShoppingCart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "FINANCE"], color: "bg-orange-50 text-orange-600 border-orange-100" },
+    { id: "b2b_network", title: "B2B Network", desc: "Global Ağa Bağlanın", href: "/dashboard", icon: <Building2 className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "BUYER", "SELLER"], color: "bg-blue-50 text-blue-600 border-blue-100" },
+    { id: "orders", title: "Siparişler", desc: "Sipariş Merkezi", href: "/network/seller/orders", icon: <Send className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-indigo-50 text-indigo-600 border-indigo-100" },
+    { id: "catalog", title: "Katalog", desc: "Ürün Yönetimi", href: "/seller/products", icon: <Box className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
+    { id: "finance_b2b", title: "Finans (B2B)", desc: "Ağ İçi Finans", href: "/network/finance", icon: <Banknote className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "SELLER"], color: "bg-rose-50 text-rose-600 border-rose-100" },
+    { id: "growth", title: "Büyüme & Güven", desc: "Performans İzleme", href: "/network/trust-score", icon: <TrendingUp className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "SELLER"], color: "bg-amber-50 text-amber-600 border-amber-100" },
+    { id: "purchasing", title: "Satınalma", desc: "Tedarik ve Sözleşme", href: "/rfq", icon: <Briefcase className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "BUYER"], color: "bg-cyan-50 text-cyan-600 border-cyan-100" },
+    { id: "staff", title: "Personel Paneli", desc: "Kişisel Portalınız", href: "/staff/me", icon: <Users className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER", "BUYER", "FINANCE", "GROWTH", "RISK"], color: "bg-slate-100 text-slate-800 border-slate-200" },
+    { id: "accounting", title: "Mali İşler", desc: "Kasa & Banka Bütçe", href: "/accounting", icon: <Landmark className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"], color: "bg-rose-50 text-rose-600 border-rose-100" },
+    { id: "sales", title: "Satış İşlemleri", desc: "Fatura ve Ciro", href: "/sales", icon: <Receipt className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "SELLER"], color: "bg-rose-50 text-rose-600 border-rose-100" },
+    { id: "customers", title: "Cari Hesaplar", desc: "Bakiye Yönetimi", href: "/customers", icon: <CheckSquare className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"], color: "bg-rose-50 text-rose-600 border-rose-100" },
+    { id: "suppliers", title: "Tedarikçiler", desc: "Kurumsal İlişkiler", href: "/suppliers", icon: <Building2 className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "BUYER"], color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
+    { id: "control_tower", title: "Kontrol Kulesi", desc: "Otonom Finans", href: "/fintech/control-tower", icon: <Activity className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"], color: "bg-purple-50 text-purple-600 border-purple-100" },
+    { id: "inventory", title: "Depo & Envanter", desc: "Stok Kontrolü", href: "/inventory", icon: <PackageSearch className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-sky-50 text-sky-600 border-sky-100" },
+    { id: "field_sales", title: "Saha Satış", desc: "Rota & Takip", href: "/field-sales", icon: <MapPin className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-fuchsia-50 text-fuchsia-600 border-fuchsia-100" },
+    { id: "quotes", title: "Teklifler", desc: "Fiyatlamalar", href: "/quotes", icon: <FileText className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-fuchsia-50 text-fuchsia-600 border-fuchsia-100" },
+    { id: "service", title: "Servis Masası", desc: "Müşteri Hizmetleri", href: "/service", icon: <HeadphonesIcon className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF"], color: "bg-teal-50 text-teal-600 border-teal-100" },
+    { id: "analytics", title: "İş Zekası", desc: "Analiz & Raporlar", href: "/reports/ceo", icon: <LineChart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "FINANCE"], color: "bg-slate-800 text-white border-slate-700" },
+    { id: "pdks", title: "PDKS Yönetimi", desc: "Vardiya & Giriş", href: "/staff/pdks", icon: <Fingerprint className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200" },
+    { id: "audit_logs", title: "Denetim Logları", desc: "Sistem İzleme", href: "/admin/audit-logs", icon: <SearchCheck className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "RISK"], color: "bg-red-50 text-red-600 border-red-100" },
+    { id: "suspicious", title: "Kaçak Tespiti", desc: "Güvenlik Uyarıları", href: "/security/suspicious", icon: <ShieldAlert className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "RISK"], color: "bg-red-100 text-red-700 border-red-200" },
+    { id: "support_tickets", title: "Destek Talepleri", desc: "Ticket Yönetimi", href: "/support/tickets", icon: <HelpCircle className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER", "BUYER"], color: "bg-teal-50 text-teal-600 border-teal-100" },
+    { id: "advisor", title: "Mali Müşavir", desc: "E-Beyanname", href: "/advisor", icon: <Briefcase className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200" },
+    { id: "settings", title: "Ayarlar", desc: "Sistem Yapılandırma", href: "/settings", icon: <Settings className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200" },
+    { id: "team", title: "Ekip Yönetimi", desc: "Kullanıcı Profilleri", href: "/staff", icon: <Users className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200" },
+    { id: "billing", title: "Abonelik", desc: "Lisans Planları", href: "/billing", icon: <PieChart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-amber-50 text-amber-600 border-amber-100" },
 ];
 
 export default function ClientDashboard() {
@@ -130,228 +166,374 @@ export default function ClientDashboard() {
     const allowedFeatures = ALL_MODULES.filter(f => isAuthorized(f.roles));
     const filteredFeatures = allowedFeatures.filter(f => f.title.toLowerCase().includes(searchQuery.toLowerCase()) || f.desc.toLowerCase().includes(searchQuery.toLowerCase()));
 
+    // Safe read helpers
+    const d = summary || undefined;
+
     return (
         <div className="flex h-screen overflow-hidden bg-[#F8FAFC] dark:bg-[#0B1120] font-sans">
 
-            {/* L E F T   P A N E L  (MODULE LİSTESİ) */}
-            <div className="w-[340px] xl:w-[380px] flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/60 dark:border-white/5 flex flex-col h-full z-10 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.03)] hidden md:flex">
-                <div className="p-6 pb-4">
-                    <h2 className="text-xl font-bold tracking-tight text-[#0F172A] dark:text-white mb-4">Modüller</h2>
+            {/* L E F T   P A N E L  (MODÜL GRID) */}
+            <div className="w-[360px] xl:w-[480px] flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/50 dark:border-white/5 flex flex-col h-full z-10 shadow-[8px_0_30px_-15px_rgba(0,0,0,0.05)] hidden md:flex overflow-hidden">
+                <div className="p-8 pb-6 bg-gradient-to-b from-white to-white/90 dark:from-slate-900 dark:to-slate-900/90 backdrop-blur-md z-20">
+                    <h2 className="text-2xl font-extrabold tracking-tight text-[#0F172A] dark:text-white mb-5">Sistem Modülleri</h2>
                     <div className="relative">
-                        <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                             type="text"
-                            placeholder="Modül ara..."
+                            placeholder="Arama yap..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/50 rounded-2xl text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all placeholder:text-slate-400"
+                            className="w-full pl-12 pr-4 py-4 bg-slate-100/70 hover:bg-slate-100 focus:bg-white dark:bg-slate-800/50 border border-transparent focus:border-blue-500/30 rounded-2xl text-base font-medium text-slate-800 dark:text-slate-200 transition-all focus:shadow-[0_4px_20px_-5px_rgba(37,99,235,0.15)] focus:outline-none placeholder:text-slate-400"
                         />
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-4 pb-10 space-y-1.5 custom-scrollbar">
-                    {!mounted ? (
-                        Array.from({ length: 10 }).map((_, i) => (
-                            <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse" />
-                        ))
-                    ) : (
-                        filteredFeatures.map(feat => (
-                            <button
-                                key={feat.id}
-                                onClick={() => {
-                                    trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
-                                    router.push(feat.href);
-                                }}
-                                className="w-full text-left group flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-2xl transition-all duration-200 border border-transparent hover:border-slate-200/50 dark:hover:border-slate-700/50 cursor-pointer min-h-[64px]"
-                            >
-                                <div className={`p-2.5 rounded-xl transition-transform duration-200 group-hover:scale-105 shrink-0 ${feat.color}`}>
-                                    {feat.icon}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h4 className="text-[14px] font-bold text-slate-800 dark:text-slate-200 tracking-tight truncate">{feat.title}</h4>
-                                    <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">{feat.desc}</p>
-                                </div>
-                                <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-slate-400 dark:group-hover:text-slate-400 transition-colors shrink-0 mr-1" />
-                            </button>
-                        ))
-                    )}
-                    {mounted && filteredFeatures.length === 0 && (
-                        <div className="text-center py-10">
-                            <BoxSelect className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                            <p className="text-sm text-slate-500 font-medium">Eşleşen modül bulunamadı.</p>
-                        </div>
-                    )}
+                {/* Hide Scrollbar, Touch-first padding, Two-column Grid Layout */}
+                <div className="flex-1 overflow-y-auto px-8 pb-12" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
+                    <div className="grid grid-cols-2 gap-4">
+                        {!mounted ? (
+                            Array.from({ length: 12 }).map((_, i) => (
+                                <div key={i} className="h-32 bg-slate-50 dark:bg-slate-800/50 rounded-2xl animate-pulse" />
+                            ))
+                        ) : (
+                            filteredFeatures.map(feat => (
+                                <button
+                                    key={feat.id}
+                                    onClick={() => {
+                                        trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
+                                        router.push(feat.href);
+                                    }}
+                                    className={`text-left flex flex-col items-start p-5 rounded-3xl transition-transform active:scale-95 border ${feat.color.split(' ')[0]} border-transparent hover:${feat.color.split(' ')[2]} focus:outline-none shadow-sm hover:shadow-md cursor-pointer`}
+                                    style={{ background: 'var(--bg-hover, #F8FAFC)' }}
+                                >
+                                    <div className={`p-3 rounded-2xl mb-4 shadow-sm ${feat.color.replace('border-', 'border border-')}`}>
+                                        {feat.icon}
+                                    </div>
+                                    <h4 className="text-[15px] font-extrabold text-slate-800 tracking-tight leading-tight">{feat.title}</h4>
+                                    <p className="text-[12px] font-semibold text-slate-500 mt-1 line-clamp-2 leading-snug">{feat.desc}</p>
+                                </button>
+                            ))
+                        )}
+                        {mounted && filteredFeatures.length === 0 && (
+                            <div className="col-span-2 text-center py-16">
+                                <BoxSelect className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+                                <p className="text-base text-slate-500 font-bold">Modül bulunamadı.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            {/* R I G H T   P A N E L  (DASHBOARD) */}
-            <div className="flex-1 overflow-y-auto w-full p-4 sm:p-8 relative custom-scrollbar">
-                <div className="max-w-[1200px] mx-auto space-y-8 pb-20">
+            {/* R I G H T   P A N E L  (DASHBOARD CARDS) */}
+            <div className="flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative" style={{ scrollbarWidth: 'none' }}>
+                <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
+                <div className="max-w-[1400px] mx-auto space-y-8 pb-24">
 
                     {/* Header Info */}
-                    <div>
-                        <h2 className="text-3xl font-extrabold tracking-tight text-[#0F172A] dark:text-white">Workspace Dashboard</h2>
-                        <p className="text-sm text-[#64748B] dark:text-slate-400 mt-2">Finansal rotanızı ve operasyon ağınızı buradan izleyin.</p>
+                    <div className="mb-10">
+                        <h2 className="text-4xl font-extrabold tracking-tight text-[#0F172A] dark:text-white">Workspace Overview</h2>
+                        <p className="text-base font-medium text-[#64748B] dark:text-slate-400 mt-2 tracking-wide">Tüm ağın veri doğruluk merkezi (Ledger SoT) destekli finans ve operasyon özetiniz.</p>
                     </div>
 
                     {/* Setup Notification */}
                     {setupNeeded && !loading && mounted && (
-                        <div className="bg-gradient-to-r from-blue-50/80 to-white dark:from-slate-800/80 dark:to-slate-900 border border-blue-200/60 dark:border-blue-900/40 rounded-2xl p-6 shadow-[0_4px_24px_-8px_rgba(37,99,235,0.1)] flex items-start gap-5">
-                            <div className="p-3 bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 rounded-xl">
-                                <Info className="w-6 h-6" />
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 border-none rounded-3xl p-8 shadow-[0_10px_40px_-10px_rgba(37,99,235,0.15)] flex flex-col sm:flex-row sm:items-center gap-6">
+                            <div className="p-4 bg-white dark:bg-slate-900 text-blue-600 rounded-2xl shadow-sm">
+                                <Zap className="w-8 h-8" />
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-lg font-bold text-[#0F172A] dark:text-white mb-1">Kurulum Bekleniyor</h3>
-                                <p className="text-sm text-[#64748B] dark:text-slate-400 mb-4">Sistemin avantajlarından tam yararlanmak için öncelikli adımları tamamlayın.</p>
-                                <div className="flex flex-wrap gap-3">
-                                    <Link href="/settings/company" onClick={() => trackEvent("SETUP_ACTION_CLICKED", { which: 'company_profile' })} className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition shadow-sm">
-                                        Şirket Bilgileri
-                                    </Link>
-                                    <Link href="/seller/products" onClick={() => trackEvent("SETUP_ACTION_CLICKED", { which: 'import_products' })} className="px-5 py-2.5 bg-white border border-slate-200/60 dark:bg-slate-800 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition shadow-sm">
-                                        Ürünleri Ekle
-                                    </Link>
-                                </div>
+                                <h3 className="text-xl font-black text-[#0F172A] dark:text-white mb-2">Workspace Kurulum Merkezi</h3>
+                                <p className="text-[#64748B] dark:text-slate-400 font-medium text-sm sm:text-base">Sistemi otonom olarak kullanabilmeniz için aşağıdaki doğrulama adımlarını tamamlayın.</p>
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
+                                <Link href="/settings/company" className="px-6 py-4 bg-blue-600 text-white text-center font-bold rounded-2xl hover:bg-blue-700 hover:shadow-lg transition">Şirket Profilini Tamamla</Link>
+                                <Link href="/seller/products" className="px-6 py-4 bg-white text-slate-800 text-center font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 transition">Katalog İçeriğini Aktar</Link>
                             </div>
                         </div>
                     )}
 
-                    {/* DASHBOARD KUTULARI (PREMIUM SOFTNESS) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {/* WIDGET GRID */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
 
-                        {/* 1. SİPARİŞLER KUTUSU */}
-                        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-6 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] dark:shadow-none hover:shadow-[0_8px_30px_-8px_rgba(0,0,0,0.1)] transition-shadow duration-300">
-                            <div className="flex justify-between items-start mb-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl">
-                                        <Send className="w-5 h-5" />
+                        {/* 1. NAKİT AKIŞI & ÖDEMELER KARTI (LEDGER SOT) */}
+                        <div className="group overflow-hidden rounded-[24px] bg-slate-900 border border-slate-800 p-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.4)] transition-all flex flex-col">
+                            <div className="flex justify-between items-start mb-8">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-white/10 text-white rounded-2xl backdrop-blur-xl">
+                                        <Wallet className="w-6 h-6" />
                                     </div>
-                                    <h3 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">Eşzamanlı Siparişler</h3>
+                                    <h3 className="text-[17px] font-bold text-white tracking-tight">Finans & Likidite</h3>
                                 </div>
-                                <div className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-xl flex items-center gap-1">
-                                    <Activity className="w-3.5 h-3.5" /> Canlı
+                                <span className="px-3 py-1.5 bg-indigo-500/20 text-indigo-300 text-[10px] font-black tracking-widest uppercase rounded-lg border border-indigo-500/20">Ledger SoT</span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6 mb-8 mt-auto">
+                                <div>
+                                    <p className="text-[13px] text-slate-400 font-bold mb-2 flex items-center gap-2"><ArrowDownRight className="w-4 h-4 text-emerald-400" /> Yaklaşan Tahsilat</p>
+                                    <h4 className="text-2xl font-black text-white">{loading ? "..." : formatter.format(d?.escrowPending || 0)}</h4>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-[13px] text-slate-400 font-bold mb-2 flex items-center gap-2 justify-end"><ArrowUpRight className="w-4 h-4 text-rose-400" /> Yaklaşan Ödeme</p>
+                                    <h4 className="text-2xl font-black text-rose-400">{loading ? "..." : formatter.format((d?.escrowPending || 0) * 0.4)}</h4>
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-800/50 rounded-2xl p-5 border border-slate-700/50">
+                                <h5 className="text-[11px] font-black text-slate-500 tracking-widest uppercase mb-4">Kasa Durumları</h5>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-slate-300 text-sm font-semibold">Nakit Kasa</span>
+                                        <span className="text-sm font-bold text-white">{loading ? "..." : formatter.format(d?.cashDetails?.cash || 0)}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-slate-300 text-sm font-semibold">Kredi Kartı Bekleyen</span>
+                                        <span className="text-sm font-bold text-white">{loading ? "..." : formatter.format(d?.cashDetails?.creditCard || 0)}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-slate-300 text-sm font-semibold">Havale / EFT Hesapları</span>
+                                        <span className="text-sm font-bold text-white">{loading ? "..." : formatter.format(d?.cashDetails?.wire || 0)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 2. STOK & DEPO SAĞLIĞI */}
+                        <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col">
+                            <div className="flex justify-between items-start mb-8">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">
+                                        <PackageSearch className="w-6 h-6" />
+                                    </div>
+                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Depo & Stok Sağlığı</h3>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between items-end mb-8 mt-auto px-2">
+                                <div>
+                                    <p className="text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Aktif SKU</p>
+                                    <h1 className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white">
+                                        {loading ? "..." : d?.stockHealth?.totalSku || 0}
+                                    </h1>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Yoldaki Ürünler</p>
+                                    <h2 className="text-2xl font-black text-indigo-600">
+                                        {loading ? "..." : d?.stockHealth?.inShipment || 0}
+                                    </h2>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="text-slate-500 font-medium whitespace-nowrap">Pazaryeri & B2B Ağ:</span>
-                                    <span className="font-bold text-slate-800 dark:text-slate-200">{loading ? "..." : (summary?.rfqActive || 0) + 14}</span>
+                                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+                                    <span className="font-semibold text-sm text-slate-600 dark:text-slate-300">Stok Fazlası (Otonom)</span>
+                                    <span className="font-bold text-sm text-slate-900">{loading ? "..." : d?.stockHealth?.overStock || 0} Adet</span>
                                 </div>
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="text-slate-500 font-medium whitespace-nowrap">Mağaza (POS):</span>
-                                    <span className="font-bold text-slate-800 dark:text-slate-200">{loading ? "..." : (summary?.dailyTxCount || 0) + 42}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="text-slate-500 font-medium whitespace-nowrap">Saha Satış / Rota:</span>
-                                    <span className="font-bold text-slate-800 dark:text-slate-200">{loading ? "..." : 8}</span>
-                                </div>
-                                <div className="pt-3 mt-3 border-t border-slate-100/80 dark:border-slate-800 flex justify-between items-center text-sm">
-                                    <span className="text-slate-500 font-medium">Aktif Bayi Siparişi:</span>
-                                    <span className="font-bold text-emerald-600 dark:text-emerald-400">3 Adet</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 2. STOK DURUMU KUTUSU */}
-                        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-6 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] dark:shadow-none hover:shadow-[0_8px_30px_-8px_rgba(0,0,0,0.1)] transition-shadow duration-300">
-                            <div className="flex justify-between items-start mb-6">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2.5 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl">
-                                        <PackageSearch className="w-5 h-5" />
+                                    <div className="flex-1 flex items-center justify-between p-4 bg-rose-50 text-rose-700 rounded-2xl border border-rose-100">
+                                        <span className="font-bold text-sm">Kritik Stok</span>
+                                        <span className="font-black text-base">{loading ? "..." : d?.stockHealth?.lowStock || 0}</span>
                                     </div>
-                                    <h3 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">Stok & Depo Sağlığı</h3>
-                                </div>
-                            </div>
-
-                            <div className="flex items-end gap-3 mb-6">
-                                <h1 className="text-4xl font-extrabold tracking-tighter text-slate-900 dark:text-white">
-                                    {loading ? "..." : "84%"}
-                                </h1>
-                                <p className="text-sm text-slate-500 font-medium mb-1">Mevcut Doluluk</p>
-                            </div>
-
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="text-slate-500 font-medium">Toplam SKU:</span>
-                                    <span className="font-bold text-slate-800 dark:text-slate-200">{loading ? "..." : "1,420"}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-sm px-3 py-2 bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400 rounded-xl">
-                                    <span className="font-bold">Stoğu Azalan (Riskli):</span>
-                                    <span className="font-extrabold">24 Ürün</span>
+                                    <div className="flex-1 flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                        <span className="font-bold text-sm text-slate-600">Sevkiyat Yok</span>
+                                        <span className="font-black text-base text-slate-800">{loading ? "..." : d?.stockHealth?.noShipment || 0}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* 3. TAHSİLAT & FİNANS KUTUSU */}
-                        <div className="relative overflow-hidden rounded-2xl bg-slate-900 dark:bg-slate-950 border border-slate-800 dark:border-white/5 p-6 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-8px_rgba(0,0,0,0.4)] transition-shadow duration-300 text-white">
-                            <div className="flex justify-between items-start mb-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2.5 bg-white/10 text-slate-100 rounded-xl border border-white/10">
-                                        <Wallet className="w-5 h-5" />
+                        {/* 3. BİLDİRİMLER VE ONAYLAR */}
+                        <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col">
+                            <div className="flex justify-between items-start mb-8">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-red-50 text-red-600 rounded-2xl">
+                                        <Bell className="w-6 h-6" />
                                     </div>
-                                    <h3 className="text-[15px] font-bold tracking-tight">Nakit Akışı & Ödemeler</h3>
+                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Onaylar & Alarmlar</h3>
                                 </div>
+                                {(d?.notificationsApp?.criticalAlerts || 0) > 0 && (
+                                    <div className="px-3 py-1 bg-red-500 text-white text-[11px] font-black tracking-widest uppercase rounded-lg flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                                        <AlertTriangle className="w-3 h-3" /> Kritik
+                                    </div>
+                                )}
                             </div>
 
-                            <div className="space-y-5">
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <p className="text-xs text-slate-400 font-medium mb-1 flex items-center gap-1.5"><ArrowDownRight className="w-3.5 h-3.5 text-emerald-400" /> Yaklaşan Tahsilat</p>
-                                        <h4 className="text-lg font-bold text-emerald-400">{loading ? "..." : formatter.format(summary?.escrowPending || 0)}</h4>
+                            <div className="mt-auto space-y-4">
+                                <div className="p-5 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                            <CheckSquare className="w-5 h-5 text-amber-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-amber-900 text-[15px]">Bekleyen Onaylar</p>
+                                            <p className="font-medium text-amber-700/70 text-[12px]">Fatura, Escrow ve Sözleşme</p>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-xs text-slate-400 font-medium mb-1 flex items-center gap-1.5 justify-end"><ArrowUpRight className="w-3.5 h-3.5 text-rose-400" /> Yaklaşan Ödeme</p>
-                                        <h4 className="text-lg font-bold text-rose-400">{loading ? "..." : formatter.format((summary?.escrowPending || 0) * 0.4)}</h4>
-                                    </div>
+                                    <div className="text-2xl font-black text-amber-600">{loading ? "..." : d?.notificationsApp?.pendingApprovals || 0}</div>
                                 </div>
 
-                                <div className="h-px bg-white/10 w-full my-4"></div>
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-slate-400 text-sm font-medium">Bugünkü Giderler:</span>
-                                    <span className="text-sm font-bold opacity-90">{loading ? "..." : formatter.format(2450)}</span>
+                                <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                            <MessageCircle className="w-5 h-5 text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-blue-900 text-[15px]">Okunmamış Bildirim</p>
+                                            <p className="font-medium text-blue-700/70 text-[12px]">Sistem güncelleme ve mesajlar</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-2xl font-black text-blue-600">{loading ? "..." : d?.notificationsApp?.newNotifications || 0}</div>
                                 </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-slate-400 text-sm font-medium">Toplam Kasa Durumu:</span>
-                                    <span className="text-base font-bold text-white">{loading ? "..." : formatter.format((summary?.collectedThisMonth || 0) + 150000)}</span>
+
+                                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-3 text-slate-600 font-bold text-[14px]">
+                                        <AlertCircle className="w-5 h-5 opacity-70" /> Kaçak İşlem ve Kritik Alert:
+                                    </div>
+                                    <span className="font-black text-slate-800 text-[16px]">{loading ? "..." : d?.notificationsApp?.criticalAlerts || 0}</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* 4. FATURAlAR VE İRSALİYELER */}
-                        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-6 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] dark:shadow-none hover:shadow-[0_8px_30px_-8px_rgba(0,0,0,0.1)] transition-shadow duration-300">
-                            <div className="flex justify-between items-start mb-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl">
-                                        <FileText className="w-5 h-5" />
+                        {/* 4. PDKS & PERSONEL ÖZETİ */}
+                        {(isAuthorized(["SUPER_ADMIN", "ADMIN", "HR", "RISK"])) && (
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col">
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl"><Fingerprint className="w-6 h-6" /></div>
+                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Vardiya & PDKS Durumu</h3>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 mt-auto">
+                                    <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                                        <h4 className="text-3xl font-black text-slate-800">{loading ? "..." : d?.pdksRules?.currentStaffCount || 0}</h4>
+                                        <p className="text-sm font-bold text-slate-500 mt-1">Aktif Personel</p>
                                     </div>
-                                    <h3 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">Faturalar & İrsaliyeler</h3>
+                                    <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
+                                        <h4 className="text-3xl font-black text-emerald-700">{loading ? "..." : d?.pdksRules?.checkedInCount || 0}</h4>
+                                        <p className="text-sm font-bold text-emerald-600 mt-1">Giriş Yapan</p>
+                                    </div>
+                                    <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center px-6 col-span-2">
+                                        <span className="font-bold text-sm text-slate-600">Henüz Gelmeyen / İzinli:</span>
+                                        <span className="font-black text-base text-slate-800">{loading ? "..." : d?.pdksRules?.notCheckedInCount || 0}</span>
+                                    </div>
+                                    <div className="p-5 bg-rose-50 rounded-2xl border border-rose-100 flex justify-between items-center px-6 col-span-2">
+                                        <span className="font-bold text-sm text-rose-700">Geç Kalan İhlali:</span>
+                                        <span className="font-black text-base text-rose-700">{loading ? "..." : d?.pdksRules?.lateCount || 0}</span>
+                                    </div>
                                 </div>
                             </div>
+                        )}
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                                    <FileDown className="w-5 h-5 text-emerald-500 mb-2" />
-                                    <h4 className="text-2xl font-bold text-slate-800 dark:text-slate-200">28</h4>
-                                    <p className="text-xs text-slate-500 mt-0.5 font-medium">Gelen (Bu Hafta)</p>
+                        {/* 5. SERVİS MASASI */}
+                        {(isAuthorized(["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER"])) && (
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col">
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className="p-3 bg-cyan-50 text-cyan-600 rounded-2xl"><HeadphonesIcon className="w-6 h-6" /></div>
+                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Servis & Bakım Ağı</h3>
                                 </div>
-                                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                                    <FileUp className="w-5 h-5 text-indigo-500 mb-2" />
-                                    <h4 className="text-2xl font-bold text-slate-800 dark:text-slate-200">145</h4>
-                                    <p className="text-xs text-slate-500 mt-0.5 font-medium">Giden (Bu Hafta)</p>
+                                <div className="mt-auto space-y-4">
+                                    <div className="relative p-6 bg-slate-900 text-white rounded-3xl overflow-hidden shadow-lg border border-slate-800 flex items-center justify-between">
+                                        <div className="relative z-10">
+                                            <p className="text-[13px] text-slate-400 font-bold uppercase tracking-wider mb-2">Şu an Serviste Olan</p>
+                                            <h1 className="text-5xl font-black text-cyan-400">{loading ? "..." : d?.serviceDesk?.currentlyInService || 0}</h1>
+                                        </div>
+                                        <Activity className="absolute right-0 top-1/2 -translate-y-1/2 w-40 h-40 text-white opacity-5 pointer-events-none" />
+                                    </div>
+                                    <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center">
+                                        <span className="font-bold text-sm text-slate-600">Bugün Yeni Giren Kayıt:</span>
+                                        <span className="font-black text-lg text-slate-800">+{loading ? "..." : d?.serviceDesk?.enteredToday || 0}</span>
+                                    </div>
                                 </div>
                             </div>
+                        )}
 
-                            <div className="mt-4 flex items-center justify-between px-4 py-3 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 rounded-xl">
-                                <span className="text-sm font-bold flex items-center gap-2"><Clock className="w-4 h-4" /> Onay Bekleyen:</span>
-                                <span className="text-base font-extrabold">12 Adet</span>
+                        {/* 6. FATURALAR VE İRSALİYELER */}
+                        {(isAuthorized(["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"])) && (
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col">
+                                <div className="flex justify-between items-start mb-8">
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><FileText className="w-6 h-6" /></div>
+                                        <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">E-Belge İşlemleri</h3>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 mt-auto">
+                                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                        <FileDown className="w-6 h-6 text-emerald-500 mb-4" />
+                                        <h4 className="text-3xl font-black text-slate-800">{loading ? "..." : d?.invoiceStatus?.incoming || 0}</h4>
+                                        <p className="text-[13px] text-slate-500 mt-1 font-bold">Gelen (Bu Hafta)</p>
+                                    </div>
+                                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                        <FileUp className="w-6 h-6 text-indigo-500 mb-4" />
+                                        <h4 className="text-3xl font-black text-slate-800">{loading ? "..." : d?.invoiceStatus?.outgoing || 0}</h4>
+                                        <p className="text-[13px] text-slate-500 mt-1 font-bold">Giden (Bu Hafta)</p>
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex items-center justify-between px-6 py-4 bg-amber-50 text-amber-700 rounded-2xl border border-amber-100">
+                                    <span className="text-sm font-bold flex items-center gap-2"><Clock className="w-4 h-4" /> Onaylanacak Belgeler:</span>
+                                    <span className="text-lg font-black">{loading ? "..." : d?.invoiceStatus?.pending || 0} Adet</span>
+                                </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* 7. OTONOM FİYATLANDIRMA ÖZETİ */}
+                        {(isAuthorized(["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"])) && (
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col relative">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-fuchsia-400"></div>
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl"><Activity className="w-6 h-6" /></div>
+                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Otonom Fiyatlandırma</h3>
+                                </div>
+                                <div className="mt-auto space-y-4">
+                                    <div className="p-5 bg-purple-50 rounded-2xl border border-purple-100 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                                <LineChart className="w-5 h-5 text-purple-600" />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-purple-900 text-[14px]">Otonom Güncellenen SKU</p>
+                                                <p className="font-semibold text-purple-700/60 text-[11px] uppercase tracking-wide">Bugün</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-2xl font-black text-purple-600">{loading ? "..." : d?.autonomous?.updatedProducts || 0}</div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                            <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-widest mb-1">Ort. Marj</p>
+                                            <div className="text-xl font-black text-emerald-600">+{loading ? "..." : d?.autonomous?.avgMarginChange || 0}%</div>
+                                        </div>
+                                        <div className="p-4 bg-rose-50 rounded-2xl border border-rose-100">
+                                            <div className="flex justify-between items-start">
+                                                <p className="text-[11px] font-bold text-rose-800 uppercase tracking-widest mb-1">Riskli Sapma</p>
+                                                <AlertTriangle className="w-4 h-4 text-rose-500" />
+                                            </div>
+                                            <div className="text-xl font-black text-rose-600">{loading ? "..." : d?.autonomous?.riskyDeviation || 0} <span className="text-xs font-bold text-rose-500/70">Ürün</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                     </div>
-                    {/* DASHBOARD KUTULARI SONU */}
                 </div>
             </div>
         </div>
     );
+}
+
+// Simple icon addition for the above code
+function MessageCircle(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+        </svg>
+    )
 }
