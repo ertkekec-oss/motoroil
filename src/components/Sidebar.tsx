@@ -90,116 +90,63 @@ export default function Sidebar() {
         '/network/seller/orders': { perm: 'sales_archive' },
     };
 
+    // @ts-ignore
+    const isBuyer = isSystemAdmin || hasPermission('supplier_view') || currentUser?.type === 'buying';
+    // @ts-ignore
+    const isSeller = isSystemAdmin || hasPermission('sales_archive') || currentUser?.type === 'selling';
+
     const menuItems = [
-        { name: 'POS Terminal', href: '/', icon: '🏮' },
-        { name: 'Personel Paneli', href: '/staff/me', icon: '👤' },
+        { name: 'Dashboard', href: '/dashboard', icon: '📊' },
 
-        // FINANSAL YÖNETİM GRUBU
-        { name: 'Finansal Yönetim', href: '/accounting', icon: '🏛️' },
-        { name: 'Satış Yönetimi', href: '/sales', icon: '🧾' },
-        { name: 'Cari Hesaplar', href: '/customers', icon: '🤝' },
-        { name: 'Tedarikçi Ağı', href: '/suppliers', icon: '🚚' },
-
-        // B2B AĞI & PAZARYERİ
         {
-            name: 'Keşif & Alım (Buyer)',
-            icon: '🔍',
+            name: 'Orders',
+            icon: '🛒',
             isParent: true,
-            id: 'buyer-parent',
+            id: 'orders-parent',
             subItems: [
-                { name: 'B2B Ürün Kataloğu', href: '/catalog', icon: '🛍️' },
-                { name: 'Sepetim', href: '/catalog/cart', icon: '🛒' },
-                { name: 'Verilen Siparişler', href: '/network/buyer/orders', icon: '🛒' },
-                { name: 'Pazarlıklı Alımlar', href: '/rfq', icon: '🤝' },
-                { name: 'Sözleşmelerim', href: '/contracts', icon: '📜' }
+                ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/network/seller/orders', icon: '🏪' }] : []),
+                ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders', icon: '🛍️' }] : [])
             ]
         },
+
         {
-            name: 'Satış & Yayın (Seller)',
-            icon: '🏪',
+            name: 'Catalog',
+            icon: '📦',
             isParent: true,
-            id: 'seller-parent',
+            id: 'catalog-parent',
             subItems: [
-                { name: 'Ürün Yayınlama', href: '/seller/products', icon: '📢' },
-                { name: 'Alınan Siparişler', href: '/network/seller/orders', icon: '🏪' },
-                { name: 'Gelen Talepler', href: '/seller/rfqs', icon: '📈' },
-                { name: 'Tedarik Sözleşmeleri', href: '/seller/contracts', icon: '🤝' }
+                ...(isSeller ? [{ name: 'Ürünlerim', href: '/seller/products', icon: '📢' }] : []),
+                ...(isBuyer ? [{ name: 'B2B Keşfet', href: '/catalog', icon: '🔍' }] : [])
             ]
         },
-        {
-            name: 'Büyüme & Güven',
-            icon: '📊',
+
+        { name: 'Finance', href: '/network/finance', icon: '💰' },
+
+        ...(isSeller ? [{
+            name: 'Growth (Seller)',
+            icon: '🚀',
             isParent: true,
             id: 'growth-parent',
             subItems: [
-                { name: 'Güven Skorum', href: '/network/trust-score', icon: '⭐' },
-                { name: 'Boost', href: '/seller/boost', icon: '🚀' },
+                { name: 'Boost Yönetimi', href: '/seller/boost', icon: '⭐' },
                 { name: 'Boost Performansı', href: '/seller/boost/analytics', icon: '📈' },
-                { name: 'Stok Riskleri', href: '/network/stock-risks', icon: '⚠️' }
+                { name: 'Güven Skoru', href: '/network/trust-score', icon: '🛡️' }
             ]
-        },
-        {
-            name: 'Ağ Finansı',
-            icon: '💰',
-            isParent: true,
-            id: 'net-fin-parent',
-            subItems: [
-                { name: 'Ağ Kazançları', href: '/network/earnings', icon: '💵' },
-                { name: 'Para Çek', href: '/network/payouts', icon: '💳' },
-                { name: 'Boost Faturaları', href: '/billing/boost-invoices', icon: '🧾' },
-                { name: 'Ödeme Durumu', href: '/network/payments', icon: '📊' }
-            ]
-        },
-        {
-            name: 'Destek',
-            icon: '🎫',
-            isParent: true,
-            id: 'support-parent',
-            subItems: [
-                { name: 'Taleplerim', href: '/support/tickets', icon: '📝' }
-            ]
-        },
+        }] : []),
 
-        // AKILLI SİSTEMLER GRUBU
-        { name: 'Finansal Kontrol Kulesi', href: '/fintech/control-tower', icon: '🗼' },
-
-        // OPERASYON GRUBU
-        { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
-        {
-            name: 'Saha Satış Yönetimi',
-            icon: '🗺️',
+        ...(isBuyer ? [{
+            name: 'Purchasing (Buyer)',
+            icon: '🤝',
             isParent: true,
-            id: 'field-sales-parent',
+            id: 'purchasing-parent',
             subItems: [
-                { name: 'Yönetim Paneli', href: '/field-sales/admin/routes', icon: '⚙️' },
-                { name: 'Saha Satış Paneli', href: '/field-sales', icon: '📍' },
-                { name: 'Canlı Saha Takibi', href: '/field-sales/admin/live', icon: '🛰️' },
+                { name: 'Sözleşmelerim', href: '/contracts', icon: '📜' },
+                { name: 'Pazarlıklı Alımlar (RFQ)', href: '/rfq', icon: '🤝' }
             ]
-        },
-        { name: 'Teklifler', href: '/quotes', icon: '📋' },
-        { name: 'Servis Masası', href: '/service', icon: '🛠️' },
+        }] : []),
 
-        // ANALİZ & DENETİM
-        {
-            name: 'İş Zekası & Analiz',
-            icon: '🧠',
-            isParent: true,
-            id: 'reports-parent',
-            subItems: [
-                { name: 'İş Zekası (CEO)', href: '/reports/ceo', icon: '🧠' },
-                { name: 'Veri Analizi', href: '/reports', icon: '📊' },
-            ]
-        },
-        { name: 'PDKS Yönetimi', href: '/staff/pdks', icon: '🛡️' },
-        { name: 'Denetim Kayıtları', href: '/admin/audit-logs', icon: '🔍' },
-        { name: 'Kaçak Satış Tespit', href: '/security/suspicious', icon: '🚨' },
+        { name: 'Support', href: '/support/tickets', icon: '🎫' },
 
-        // SİSTEM & AYARLAR
-        { name: 'Mali Müşavir', href: '/advisor', icon: '💼' },
-        { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
-        { name: 'Ekip & Yetki', href: '/staff', icon: '👥' },
-        { name: 'Abonelik & Planlar', href: '/billing', icon: '💎' },
-        { name: 'Yardım & Kılavuz', href: '/help', icon: '❓' },
         ...(isPlatformAdmin ? [
             { name: 'Destek Masası (Inbox)', href: '/admin/support/tickets', icon: '📥' },
             { name: 'Bilgi Bankası Yönetimi', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: '📚' }

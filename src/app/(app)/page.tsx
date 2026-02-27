@@ -34,12 +34,9 @@ export const metadata: Metadata = {
  * Bu yapı, istemci bileşenini (HomeClient) sarmalayarak HTML kaynağına 
  * SEO içeriği (SeoContent) ve JSON-LD şemalarını (SeoSchema) SSR olarak basar.
  */
+import { redirect } from 'next/navigation';
+
 export default function Page() {
-    return (
-        <>
-            <SeoSchema />
-            <HomeClient />
-            <SeoContent />
-        </>
-    );
+    redirect('/dashboard');
+    return null;
 }
