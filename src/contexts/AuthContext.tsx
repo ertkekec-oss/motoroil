@@ -108,9 +108,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     // Redirect based on setupState and permissions
                     if (userData.setupState === 'PENDING') {
                         router.push('/onboarding');
+                    } else if (process.env.NEXT_PUBLIC_CONTROL_HUB_ENABLED === 'true') {
+                        // FEATURE FLAG ROUTING
+                        router.push('/test-desktop');
                     } else {
                         // ADMIN role always goes to main dashboard
-                        if (userData.role === 'ADMIN') {
+                        if (userData.role === 'ADMIN' || userData.role === 'SUPER_ADMIN') {
                             router.push('/');
                         } else {
                             // For non-admin users, check permissions
