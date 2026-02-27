@@ -17,12 +17,12 @@ export default function TrustScorePage() {
                         score: data.score.value,
                         tier: data.score.tier,
                         lastCalculatedAt: data.score.computedAt,
-                        components: data.components || {
-                            onTimeRatio: { value: "100%", weight: 40, status: "EXCELLENT" },
-                            disputeRate: { value: "0%", weight: 30, status: "EXCELLENT" },
-                            slaBreachCount: { value: 0, weight: 10, status: "EXCELLENT" },
-                            chargebackRate: { value: "0%", weight: 20, status: "EXCELLENT" },
-                            overrideCount: { value: 0, weight: 0, status: "NEUTRAL" }
+                        components: {
+                            onTimeRatio: data.components?.onTimeRatio || { value: "100%", weight: 40, status: "EXCELLENT" },
+                            disputeRate: data.components?.disputeRate || { value: "0%", weight: 30, status: "EXCELLENT" },
+                            slaBreachCount: data.components?.slaBreachCount || { value: 0, weight: 10, status: "EXCELLENT" },
+                            chargebackRate: data.components?.chargebackRate || { value: "0%", weight: 20, status: "EXCELLENT" },
+                            overrideCount: data.components?.overrideCount || { value: 0, weight: 0, status: "NEUTRAL" }
                         }
                     });
                 } else {
@@ -33,7 +33,14 @@ export default function TrustScorePage() {
             .finally(() => setLoading(false));
     }, []);
 
-    const formatDate = (dateString: string) => new Intl.DateTimeFormat("tr-TR", { dateStyle: "long", timeStyle: "short" }).format(new Date(dateString));
+    const formatDate = (dateString: string | null | undefined) => {
+        if (!dateString) return "Bilinmiyor";
+        try {
+            return new Intl.DateTimeFormat("tr-TR", { dateStyle: "long", timeStyle: "short" }).format(new Date(dateString));
+        } catch {
+            return "Geçersiz Tarih";
+        }
+    };
 
     const getTierBadge = (tier: string) => {
         switch (tier) {
