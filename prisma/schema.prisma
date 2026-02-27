@@ -3776,3 +3776,87 @@ enum BoostInvoiceStatus {
   PAID
   VOID
 }
+
+enum DisputeStatus {
+  OPEN
+  NEEDS_INFO
+  IN_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+enum DisputeSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum EscrowActionState {
+  NONE
+  HELD
+  PARTIALLY_RELEASED
+  RELEASED
+  REFUNDED
+}
+
+enum DisputeResolutionCode {
+  DELIVERY_FAILED
+  QUALITY_ISSUE
+  NOT_AS_DESCRIBED
+  BILLING_ERROR
+  FRAUD_SUSPECTED
+  OTHER
+}
+
+enum DisputeActionType {
+  HOLD_ESCROW
+  PARTIAL_RELEASE
+  FULL_RELEASE
+  REFUND
+  FLAG_CHARGEBACK
+  REQUEST_INFO
+  CHANGE_SEVERITY
+  CHANGE_STATUS
+  ADD_INTERNAL_NOTE
+}
+
+model DisputeCase {
+  id                    String                 @id @default(cuid())
+  ticketId              String                 @unique
+  status                DisputeStatus          @default(OPEN)
+  severity              DisputeSeverity        @default(LOW)
+  escrowActionState     EscrowActionState      @default(NONE)
+  referencedShipmentId  String?
+  referencedOrderId     String?
+  buyerTenantId         String
+  sellerTenantId        String
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  resolvedAt            DateTime?
+  resolutionSummary     String?                @db.Text
+  resolutionCode        DisputeResolutionCode?
+  actions               DisputeAction[]
+
+  @@index([status])
+  @@index([severity])
+  @@index([updatedAt])
+}
+
+model DisputeAction {
+  id              String            @id @default(cuid())
+  disputeCaseId   String
+  actionType      DisputeActionType
+  actorUserId     String
+  actorRole       String
+  amount          Decimal?          @db.Decimal(12, 2)
+  reason          String
+  payloadJson     Json
+  idempotencyKey  String            @unique
+  createdAt       DateTime          @default(now())
+  disputeCase     DisputeCase       @relation(fields: [disputeCaseId], references: [id], onDelete: Restrict)
+
+  @@index([disputeCaseId])
+  @@index([actionType])
+  @@index([createdAt])
+}
