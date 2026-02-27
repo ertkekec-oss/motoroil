@@ -8,7 +8,7 @@ import {
     Activity, Percent, Info, AlertTriangle, ShieldCheck, PieChart, Banknote, Store, Receipt, MapPin, SearchCheck,
     Box, CheckSquare, BarChart3, Fingerprint, Settings, HelpCircle, FileText, FileBarChart2,
     ChevronRight, ArrowDownRight, FileDown, FileUp, BoxSelect, Bell,
-    Truck, Zap, AlertCircle, Check, Lock
+    Truck, Zap, AlertCircle, Check, Lock, ArrowRight
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from '@/contexts/AuthContext';
@@ -120,6 +120,9 @@ export default function ClientDashboard() {
     const [announcementIdx, setAnnouncementIdx] = useState(0);
     const [isHoveringAnnouncements, setIsHoveringAnnouncements] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+    const [completionPhase, setCompletionPhase] = useState<'none' | 'micro' | 'executive' | 'completed'>('none');
+    const [isFullyDismissed, setIsFullyDismissed] = useState(false);
 
     useEffect(() => {
         if (isHoveringAnnouncements) return;
@@ -333,8 +336,8 @@ export default function ClientDashboard() {
 
                     </div>
 
-                    {/* Setup Notification (Executive Timeline) */}
-                    {setupNeeded && !loading && mounted && (() => {
+                    {/* Compact Onboarding Strip (Premium & Minimal) */}
+                    {setupNeeded && !loading && mounted && !isFullyDismissed && (() => {
                         const isS1Complete = !!summary?.setup?.hasCompanyProfile;
                         const isS2Complete = !!summary?.setup?.hasAnyProduct;
                         const isS3Complete = !!summary?.setup?.hasAtLeastOneOrder;
@@ -349,82 +352,150 @@ export default function ClientDashboard() {
                         const completedNodesCount = steps.filter(s => s.status === 'completed').length;
                         const progressPercent = Math.round((completedNodesCount / steps.length) * 100);
 
+                        // If simulated completion phase is active, we force progress to 100
+                        const displayPercent = (completionPhase === 'micro' || completionPhase === 'executive') ? 100 : progressPercent;
+
                         return (
-                            <div className="bg-white dark:bg-[#080911] border border-slate-100 dark:border-white/5 rounded-[24px] p-[40px] shadow-[0_15px_60px_-15px_rgba(0,0,0,0.05)] select-none w-full mb-10 min-h-[160px] flex flex-col justify-between relative overflow-hidden group">
-                                {/* Header Strip */}
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12 w-full z-10">
-                                    <div className="flex items-start gap-4">
-                                        <div className="p-2.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded-xl hidden md:flex">
-                                            <Zap className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-[20px] font-extrabold text-[#0F172A] dark:text-white leading-tight">Kurulum Merkezi</h3>
-                                            <p className="text-[14px] font-semibold text-slate-500 mt-1">İşletme aktivasyon sürecinizi tamamlayın</p>
+                            <>
+                                {/* Floating Modal */}
+                                {showOnboardingModal && (
+                                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                        <div
+                                            className="absolute inset-0 bg-[#0F172A]/[0.35] backdrop-blur-[6px] transition-opacity duration-200"
+                                            style={{ opacity: showOnboardingModal ? 1 : 0 }}
+                                            onClick={() => completionPhase === 'none' && setShowOnboardingModal(false)}
+                                        ></div>
+
+                                        <div
+                                            className={`relative bg-white dark:bg-[#080911] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] rounded-[24px] p-[32px] w-full max-w-[760px] flex flex-col items-center justify-center transition-all duration-300 transform ${showOnboardingModal ? 'scale-100 opacity-100' : 'scale-[0.97] opacity-0'} ${completionPhase === 'micro' ? 'scale-[1.03]' : completionPhase === 'executive' ? 'scale-100' : ''}`}
+                                        >
+                                            {completionPhase === 'none' && (
+                                                <button
+                                                    className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
+                                                    onClick={() => setShowOnboardingModal(false)}
+                                                >
+                                                    <span className="sr-only">Kapat</span>
+                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                </button>
+                                            )}
+
+                                            {/* Normal Timeline Content */}
+                                            {completionPhase === 'none' || completionPhase === 'micro' ? (
+                                                <div className="w-full">
+                                                    <div className="text-center mb-10">
+                                                        <h3 className="text-[22px] font-bold text-[#0F172A] dark:text-white leading-tight mb-2">Kurulum Merkezi</h3>
+                                                        <p className="text-[14px] font-medium text-slate-500">İşletme aktivasyon sürecinizi tamamlayın</p>
+                                                    </div>
+
+                                                    <div className="space-y-4 w-full">
+                                                        {steps.map((step, idx) => (
+                                                            <div key={step.id} className={`flex items-center p-4 rounded-2xl border transition-all ${step.status === 'completed' ? 'bg-slate-50 dark:bg-white/[0.02] border-transparent' : step.status === 'active' ? 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20 shadow-sm' : 'bg-white dark:bg-[#080911] border-slate-100 dark:border-slate-800/60 opacity-60'}`}>
+                                                                <div className={`w-[32px] h-[32px] rounded-full flex flex-shrink-0 items-center justify-center font-bold text-[13px] mr-4 
+                                                                    ${step.status === 'completed' ? 'bg-emerald-500 text-white shadow-sm' : step.status === 'active' ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
+                                                                    {step.status === 'completed' ? <Check className="w-4 h-4 stroke-[3]" /> : step.id}
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <div className={`font-bold text-[15px] ${step.status === 'completed' ? 'text-[#0F172A] dark:text-white line-through opacity-70' : step.status === 'active' ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500'}`}>
+                                                                        {step.title}
+                                                                    </div>
+                                                                    <div className="text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                                                                        {step.desc}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex-shrink-0 ml-4">
+                                                                    {step.status === 'active' && (
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                router.push(step.href);
+                                                                                setShowOnboardingModal(false);
+                                                                            }}
+                                                                            className="px-4 py-2 bg-[#0F172A] hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white text-[13px] font-bold rounded-xl transition-all shadow-sm active:scale-95"
+                                                                        >
+                                                                            Adımı Tamamla
+                                                                        </button>
+                                                                    )}
+                                                                    {step.status === 'completed' && <span className="text-[12px] font-bold text-emerald-600 dark:text-emerald-400 tracking-wide">TAMAMLANDI</span>}
+                                                                    {step.status === 'locked' && <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-widest"><Lock className="w-3.5 h-3.5" /> Kilitli</span>}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+
+                                                    {/* Demo Button to trigger completion manually (Remove in prod) */}
+                                                    <div className="mt-8 flex justify-center">
+                                                        <button
+                                                            className="text-[11px] font-bold text-slate-300 hover:text-slate-400 transition-colors"
+                                                            onClick={() => {
+                                                                setCompletionPhase('micro');
+                                                                setTimeout(() => setCompletionPhase('executive'), 800);
+                                                            }}
+                                                        >
+                                                            [Simulate Completion]
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                /* Executive Success State */
+                                                <div className="w-full flex flex-col items-center text-center py-10 animate-in fade-in zoom-in-95 duration-500 relative">
+                                                    <div className="absolute inset-0 bg-blue-500/5 dark:bg-blue-400/5 rounded-full blur-[80px] -z-10"></div>
+
+                                                    <div className="w-20 h-20 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center mb-6 ring-8 ring-emerald-50/50 dark:ring-emerald-500/5 animate-in slide-in-from-bottom-4 duration-700">
+                                                        <Check className="w-10 h-10 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
+                                                    </div>
+
+                                                    <h2 className="text-[28px] font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight mb-3 animate-in slide-in-from-bottom-2 duration-700 delay-100">Kurulum Tamamlandı</h2>
+                                                    <p className="text-[15px] font-medium text-slate-500 dark:text-slate-400 mb-10 max-w-[320px] animate-in slide-in-from-bottom-2 duration-700 delay-200">Sisteminiz artık tam kapasiteyle çalışmaya hazır.</p>
+
+                                                    <button
+                                                        className="px-8 py-3.5 bg-[#0F172A] hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white text-[15px] font-bold rounded-2xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95 animate-in slide-in-from-bottom-2 duration-700 delay-300"
+                                                        onClick={() => {
+                                                            setShowOnboardingModal(false);
+                                                            setTimeout(() => {
+                                                                setIsFullyDismissed(true);
+                                                                setCompletionPhase('completed');
+                                                            }, 300);
+                                                        }}
+                                                    >
+                                                        Dashboard'a Geç
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                    <div className="flex flex-col md:items-end w-full md:w-48">
-                                        <div className="text-[14px] font-black text-[#0F172A] dark:text-slate-200 mb-2.5">%{progressPercent} Tamamlandı</div>
-                                        <div className="w-full h-[6px] bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                            <div className="h-full bg-blue-600 rounded-full transition-all duration-1000" style={{ width: `${progressPercent}%` }}></div>
+                                )}
+
+                                {/* Compact Strip */}
+                                <div
+                                    className={`mb-10 w-full h-[60px] rounded-[20px] px-6 bg-white dark:bg-[#080911] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_4px_14px_rgba(15,23,42,0.04)] flex items-center cursor-pointer transition-all duration-300 hover:shadow-[0_6px_20px_rgba(15,23,42,0.06)] group ${showOnboardingModal ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}
+                                    onClick={() => setShowOnboardingModal(true)}
+                                >
+                                    {/* Left */}
+                                    <div className="flex items-center gap-3 flex-shrink-0 w-[180px]">
+                                        <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                        <div className="flex flex-col">
+                                            <span className="text-[13px] font-bold text-[#0F172A] dark:text-white">Kurulum Merkezi</span>
+                                            <span className="text-[10px] font-semibold text-slate-500 tracking-wide uppercase">%{displayPercent} Tamamlandı</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Center Progress */}
+                                    <div className="flex-1 mx-8 flex items-center justify-center">
+                                        <div className="w-full max-w-[300px] h-[4px] bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-blue-600 dark:bg-blue-500 rounded-full transition-all duration-700 ease-out"
+                                                style={{ width: `${displayPercent}%` }}
+                                            ></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Right */}
+                                    <div className="flex items-center flex-shrink-0 w-[120px] justify-end">
+                                        <div className="text-[12px] font-bold text-slate-400 dark:text-slate-500 group-hover:text-[#0F172A] dark:group-hover:text-white transition-colors flex items-center gap-1">
+                                            Devam Et <ArrowRight className="w-3.5 h-3.5" />
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Horizontal Timeline */}
-                                <div className="relative w-full z-10 mt-2">
-                                    {/* Line Container (Centered between the first and last node) */}
-                                    <div className="absolute top-[21px] left-[12.5%] right-[12.5%] h-[2px] bg-slate-100 dark:bg-slate-800 z-0 rounded-full">
-                                        <div className="absolute top-0 left-0 h-full bg-blue-600 z-0 transition-all duration-1000 rounded-full" style={{ width: `${Math.min(100, Math.max(0, ((completedNodesCount) / (steps.length - 1)) * 100))}%` }}></div>
-                                    </div>
-
-                                    {/* Nodes Flex */}
-                                    <div className="flex justify-between w-full relative z-10">
-                                        {steps.map((step, idx) => (
-                                            <div key={step.id}
-                                                className={`flex flex-col items-center text-center w-[25%] transition-transform duration-300 ${step.status === 'active' || step.status === 'completed' ? 'cursor-pointer hover:-translate-y-1' : ''}`}
-                                                onClick={() => step.status === 'active' || step.status === 'completed' ? router.push(step.href) : null}>
-
-                                                {/* Node Circle */}
-                                                <div className={`w-[44px] h-[44px] rounded-full flex items-center justify-center mb-4 transition-all duration-300 z-10 relative bg-white dark:bg-[#080911] 
-                                                    ${step.status === 'completed' ? 'bg-blue-600 border-[3px] border-blue-600 text-white shadow-md'
-                                                        : step.status === 'active' ? 'border-[3px] border-blue-600 text-blue-600 shadow-md ring-4 ring-blue-50 dark:ring-blue-900/20'
-                                                            : 'border-[3px] border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600'}`
-                                                }>
-                                                    {step.status === 'completed' ? <Check className="w-5 h-5 stroke-[3]" /> : <span className="text-[17px] font-black">{step.id}</span>}
-                                                </div>
-
-                                                {/* Title & Desc */}
-                                                <div className="px-2 w-full flex flex-col items-center">
-                                                    <h4 className={`text-[15px] max-w-[150px] font-extrabold mb-1.5 transition-colors line-clamp-1
-                                                            ${step.status === 'completed' ? 'text-slate-800 dark:text-white'
-                                                            : step.status === 'active' ? 'text-blue-700 dark:text-blue-400'
-                                                                : 'text-slate-400 dark:text-slate-600'}`
-                                                    }>
-                                                        {step.title}
-                                                    </h4>
-                                                    <p className="text-[12px] font-semibold text-slate-500 line-clamp-1 max-w-[140px] leading-relaxed hidden sm:block">
-                                                        {step.desc}
-                                                    </p>
-                                                </div>
-
-                                                {/* Status Action / Badge */}
-                                                <div className="mt-3.5 h-7 flex items-center justify-center">
-                                                    {step.status === 'active' && (
-                                                        <div className="text-[12px] font-black text-blue-600 hover:text-white hover:bg-blue-600 transition-colors bg-blue-50 dark:bg-blue-900/30 dark:hover:bg-blue-600 px-4 py-1.5 rounded-full whitespace-nowrap">
-                                                            Tamamla
-                                                        </div>
-                                                    )}
-                                                    {step.status === 'locked' && (
-                                                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">
-                                                            <Lock className="w-3.5 h-3.5" /> Kilitli
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
+                            </>
                         );
                     })()}
 
