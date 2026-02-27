@@ -33,7 +33,7 @@ export default async function AdminLayout({
                 </div>
 
                 <nav className="flex-1 p-4 space-y-1">
-                    <NavLink href="/admin/dashboard" icon="dashboard">Dashboard</NavLink>
+                    <NavLink href="/admin/dashboard" icon="dashboard">🧭 Executive Dashboard</NavLink>
                     <NavLink href="/admin/tenants" icon="users">Müşteriler (Tenants)</NavLink>
                     <NavLink href="/admin/website" icon="globe">Website Yönetimi (CMS)</NavLink>
                     <NavLink href="/admin/sales-radar" icon="radar">Satış Radarı (Upsell)</NavLink>
