@@ -429,7 +429,7 @@ export default function Sidebar() {
                                 </div>
 
                                 {isExpanded && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '12px', borderLeft: '2px solid var(--border-light)', marginLeft: '26px', marginTop: '4px', marginBottom: '8px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: isDesktopSidebarCollapsed ? '0' : '12px', borderLeft: isDesktopSidebarCollapsed ? 'none' : '2px solid var(--border-light)', marginLeft: isDesktopSidebarCollapsed ? '0' : '26px', marginTop: '4px', marginBottom: '8px' }}>
                                         {item.subItems.map((sub: any) => {
                                             const isSubActive = pathname === sub.href;
                                             return (
@@ -476,9 +476,9 @@ export default function Sidebar() {
                                 className="sidebar-link"
                             >
                                 <span style={{ fontSize: '18px', filter: isActive ? 'none' : 'grayscale(100%) opacity(0.5)' }}>{item.icon}</span>
-                                <span style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1 }}>{item.name}</span>
+                                <span className="sidebar-text" style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1, whiteSpace: 'nowrap' }}>{item.name}</span>
                                 {item.href === '/security/suspicious' && suspiciousEvents.length > 0 && (
-                                    <span style={{
+                                    <span className="sidebar-badge" style={{
                                         background: '#FF416C',
                                         color: 'white',
                                         fontSize: '10px',
@@ -513,7 +513,7 @@ export default function Sidebar() {
                     }}>
                         {(displayUser.role?.includes('Admin') || currentUser === null) ? '⚡' : '👤'}
                     </div>
-                    <div style={{ flex: 1 }}>
+                    <div className="user-profile-info" style={{ flex: 1, overflow: 'hidden' }}>
                         <div style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             {displayUser.name}
                             {hasPermission('settings_manage') && (
@@ -544,7 +544,7 @@ export default function Sidebar() {
                         e.currentTarget.style.color = '#FF4444';
                     }}
                 >
-                    🔚 Çıkış Yap
+                    <span style={{ fontSize: '18px' }}>🔚</span> <span className="sidebar-text" style={{ whiteSpace: 'nowrap' }}>Çıkış Yap</span>
                 </button>
 
             </div>

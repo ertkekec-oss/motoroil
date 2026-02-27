@@ -463,31 +463,33 @@ body::before {
 
 @media (min-width: 769px) {
   .sidebar-fixed.desktop-collapsed {
-    width: 76px;
-    min-width: 76px;
+    width: 76px !important;
+    min-width: 76px !important;
   }
 
   .sidebar-fixed.desktop-collapsed .sidebar-text,
   .sidebar-fixed.desktop-collapsed .sidebar-chevron,
-  .sidebar-fixed.desktop-collapsed .sidebar-subtext {
-    opacity: 0;
-    width: 0;
-    pointer-events: none;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    display: none;
+  .sidebar-fixed.desktop-collapsed .sidebar-subtext,
+  .sidebar-fixed.desktop-collapsed .sidebar-badge,
+  .sidebar-fixed.desktop-collapsed .user-profile-info {
+    opacity: 0 !important;
+    width: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: none !important;
   }
 
   .sidebar-fixed.desktop-collapsed .logo-container,
   .sidebar-fixed.desktop-collapsed .selector-container {
-    opacity: 0;
-    width: 0;
-    height: 0;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    display: none;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: none !important;
   }
 
   .sidebar-fixed.desktop-collapsed .sidebar-link {
