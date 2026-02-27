@@ -56,6 +56,7 @@ export default function Sidebar() {
     // UI mapping for permissions
     const permMap: Record<string, { perm?: string, feature?: string }> = {
         '/': { perm: 'pos_access', feature: 'pos' },
+        '/terminal': { perm: 'pos_access', feature: 'pos' },
         '/accounting': { perm: 'finance_view', feature: 'financials' },
         '/customers': { perm: 'customer_view', feature: 'current_accounts' },
         '/suppliers': { perm: 'supplier_view', feature: 'suppliers' },
@@ -96,7 +97,7 @@ export default function Sidebar() {
     const isSeller = isSystemAdmin || hasPermission('sales_archive') || currentUser?.type === 'selling';
 
     const menuItems = [
-        { name: 'POS Terminal', href: '/pos', icon: '🏮' },
+        { name: 'POS Terminal', href: '/terminal', icon: '🏮' },
         { name: 'B2B Network', href: '/dashboard', icon: '📊' },
 
         {

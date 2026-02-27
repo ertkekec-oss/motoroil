@@ -9,6 +9,7 @@ export interface NavRoute {
 }
 
 export const tenantRoutes: NavRoute[] = [
+    { label: 'POS Terminal', href: '/terminal', keywords: ['pos', 'terminal', 'satış', 'sepet', 'kasa'], icon: 'Monitor' },
     { label: 'Dashboard', href: '/dashboard', keywords: ['home', 'dashboard', 'panel', 'ana sayfa'], icon: 'Home' },
     { label: 'Orders (Alınan)', href: '/network/seller/orders', keywords: ['orders', 'siparişler', 'satış', 'alınan'], roles: ['SELLER'], icon: 'ShoppingCart' },
     { label: 'Orders (Verilen)', href: '/network/buyer/orders', keywords: ['orders', 'siparişler', 'alış', 'verilen'], roles: ['BUYER'], icon: 'ShoppingBag' },
