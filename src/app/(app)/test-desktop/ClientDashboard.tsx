@@ -4,7 +4,7 @@ import {
     Building2, ShoppingCart, Send, LayoutList,
     Wallet, TrendingUp, Briefcase, Users,
     PackageSearch, LineChart, HeadphonesIcon, Landmark,
-    ArrowUpRight, Clock, ShieldAlert,
+    ArrowUpRight, Clock, ShieldAlert, Search,
     Activity, Percent, Info, AlertTriangle, ShieldCheck, PieChart, Banknote, Store, Receipt, MapPin, SearchCheck,
     Box, CheckSquare, BarChart3, Fingerprint, Settings, HelpCircle, FileText, FileBarChart2
 } from "lucide-react";
