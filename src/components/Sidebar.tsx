@@ -23,6 +23,8 @@ export default function Sidebar() {
     const [growthOpen, setGrowthOpen] = useState(false);
     const [netFinOpen, setNetFinOpen] = useState(false);
     const [supportOpen, setSupportOpen] = useState(false);
+    const [fieldSalesOpen, setFieldSalesOpen] = useState(false);
+    const [reportsOpen, setReportsOpen] = useState(false);
 
     // Auto-expand if active
     useEffect(() => {
