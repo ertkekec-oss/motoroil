@@ -247,55 +247,55 @@ export default function ClientDashboard() {
                 <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
                 <div className="max-w-[1400px] mx-auto space-y-8 pb-24">
 
-                    {/* Header Info & Dual Announcements Strip */}
-                    <div className="mb-10 flex flex-col xl:flex-row xl:justify-between xl:items-end gap-10">
-                        {/* Title Section */}
-                        <div className="flex-shrink-0 pt-4">
-                            <h2 className="text-[32px] sm:text-[40px] font-[700] tracking-tight text-[#0F172A] dark:text-white leading-tight mb-2">PERİODYA DASHBOARD</h2>
-                            <p className="text-[14px] font-semibold text-slate-500 tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis max-w-full">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti</p>
-                        </div>
+                    {/* Header Info */}
+                    <div className="mb-6 xl:mb-8">
+                        <h2 className="text-[32px] sm:text-[40px] font-[700] tracking-tight text-[#0F172A] dark:text-white leading-tight mb-1">PERİODYA DASHBOARD</h2>
+                        <p className="text-[14px] font-semibold text-slate-500 tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full opacity-80">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti</p>
+                    </div>
 
-                        {/* Dual Announcement Strips */}
-                        <div className="flex flex-col md:flex-row gap-4 w-full xl:max-w-[700px] xl:w-full">
+                    {/* Premium Executive Broadcast Strip */}
+                    <div className="bg-white dark:bg-[#080911] border border-[#0F172A]/[0.06] dark:border-white/5 rounded-[24px] p-[32px] shadow-[0_8px_30px_-10px_rgba(0,0,0,0.04)] w-full mb-12 flex flex-col md:flex-row gap-8 relative overflow-hidden select-none cursor-default">
 
-                            {/* DYNAMIC PUBLICATIONS TILE */}
-                            <div
-                                className="flex-1 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-[20px] p-5 sm:p-6 lg:p-7 relative overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] cursor-pointer"
-                                onMouseEnter={() => setIsHoveringAnnouncements(true)}
-                                onMouseLeave={() => setIsHoveringAnnouncements(false)}
-                            >
-                                <div className="relative w-full overflow-hidden h-14 flex items-center">
-                                    {MOCK_ANNOUNCEMENTS.map((ann, idx) => (
-                                        <div
-                                            key={ann.id}
-                                            className={`absolute inset-0 flex items-center transition-all duration-300 ease-in-out ${idx === announcementIdx ? 'opacity-100 translate-y-0 relative' : 'opacity-0 translate-y-4 pointer-events-none absolute'}`}
-                                        >
-                                            <div className="flex flex-col gap-1.5 w-full">
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded border ${ann.color.includes('blue') ? 'bg-blue-50 text-blue-600 border-blue-100' : ann.color.includes('emerald') ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-600 border-slate-200'} dark:bg-transparent dark:border-white/10`}>
-                                                        {ann.tag}
-                                                    </span>
-                                                    <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">{ann.title}</span>
-                                                </div>
-                                                <div className="text-[12px] font-medium text-slate-500 dark:text-slate-400 line-clamp-1">{ann.msg}</div>
-                                            </div>
+                        {/* LEFT: Live Broadcast Flow (65%) */}
+                        <div
+                            className="flex-[0.65] flex flex-col justify-center"
+                            onMouseEnter={() => setIsHoveringAnnouncements(true)}
+                            onMouseLeave={() => setIsHoveringAnnouncements(false)}
+                        >
+                            {/* Live Badge */}
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-slate-800 dark:bg-white opacity-40 animate-[pulse_3s_ease-in-out_infinite]"></div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0F172A] dark:text-white opacity-40">CANLI SİSTEM AKIŞI</span>
+                            </div>
+
+                            {/* Rotating Message */}
+                            <div className="relative w-full min-h-[60px] flex items-center">
+                                {MOCK_ANNOUNCEMENTS.map((ann, idx) => (
+                                    <div
+                                        key={ann.id}
+                                        className={`absolute inset-0 flex flex-col justify-center transition-all duration-300 ease-in-out ${idx === announcementIdx ? 'opacity-100 translate-y-0 relative' : 'opacity-0 translate-y-2 pointer-events-none absolute'}`}
+                                    >
+                                        <div className="text-[17px] xl:text-[18px] font-semibold text-[#0F172A] dark:text-white leading-snug line-clamp-1 mb-1.5">
+                                            {ann.title}
                                         </div>
-                                    ))}
-                                </div>
+                                        <div className="text-[13px] font-medium text-slate-500 dark:text-slate-400 line-clamp-1">
+                                            {ann.msg}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-
-                            {/* STATIC STRATEGIC TILE */}
-                            <div className="flex-1 bg-[#F8FAFC] dark:bg-slate-800/40 border border-slate-200/40 dark:border-slate-700/50 rounded-[20px] p-5 sm:p-6 lg:p-7 relative hidden sm:flex flex-col justify-center">
-                                <div className="flex items-center gap-2 mb-1.5">
-                                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded border bg-purple-50 text-purple-600 border-purple-100 dark:bg-transparent dark:border-purple-500/20 dark:text-purple-400">
-                                        STRATEJİK
-                                    </span>
-                                    <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200">Otonom Fiyatlandırma Aktif</span>
-                                </div>
-                                <div className="text-[12px] font-medium text-slate-500 dark:text-slate-400 line-clamp-1">Platform geneli kur bazlı fiyatlandırma optimizasyonu devereye alındı.</div>
-                            </div>
-
                         </div>
+
+                        {/* VERTICAL DIVIDER */}
+                        <div className="hidden md:block w-[1px] bg-[#0F172A]/[0.06] dark:bg-white/5 flex-shrink-0 mx-2"></div>
+                        <div className="md:hidden h-[1px] w-full bg-[#0F172A]/[0.06] dark:bg-white/5 my-1"></div>
+
+                        {/* RIGHT: Strategic Announcement (35%) */}
+                        <div className="flex-[0.35] flex flex-col justify-center p-5 -my-5 rounded-[20px] bg-slate-50/50 dark:bg-white/[0.02]">
+                            <h4 className="text-[16px] font-bold text-[#0F172A] dark:text-white leading-tight mb-2">Otonom Fiyatlandırma Aktif</h4>
+                            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed opacity-90">Platform geneli kur bazlı fiyatlandırma optimizasyonu devereye alındı.</p>
+                        </div>
+
                     </div>
 
                     {/* Setup Notification (Executive Timeline) */}
