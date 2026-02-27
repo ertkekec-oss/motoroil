@@ -24,20 +24,20 @@ interface DashboardSummary {
 }
 
 const ALL_FEATURES = [
-    { id: "pos", title: "POS Terminal", icon: <ShoppingCart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "seller", "finance"] },
-    { id: "b2b_network", title: "B2B Ağı", icon: <Building2 className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "growth", "seller", "buyer"] },
-    { id: "orders", title: "Siparişler", icon: <Send className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "seller", "buyer"] },
-    { id: "catalog", title: "Katalog", icon: <LayoutList className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "seller"] },
-    { id: "finance_b2b", title: "Tahsilat (B2B)", icon: <Wallet className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "finance"] },
-    { id: "growth", title: "GMV & Büyüme", icon: <TrendingUp className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "growth", "seller"] },
-    { id: "purchasing", title: "Satın Alma (Alıcı)", icon: <Briefcase className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "buyer"] },
-    { id: "staff", title: "Personel Paneli", icon: <Users className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "staff", "seller", "buyer", "finance", "growth", "risk"] },
-    { id: "inventory", title: "Envanter & Depo", icon: <PackageSearch className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "seller"] },
-    { id: "intelligence", title: "İş Zekası & Analiz", icon: <LineChart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "growth", "finance"] },
-    { id: "service_desk", title: "Servis Masası", icon: <HeadphonesIcon className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "staff"] },
-    { id: "fraud_tower", title: "Finansal Kontrol Kulesi", icon: <Landmark className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "finance", "risk"] },
-    { id: "disputes", title: "Dispute Center", icon: <AlertTriangle className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "risk"] },
-    { id: "audit", title: "Denetim Kayıtları", icon: <ShieldCheck className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "risk"] },
+    { id: "pos", title: "POS Terminal", icon: <ShoppingCart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "seller", "finance"], href: "/terminal" },
+    { id: "b2b_network", title: "B2B Ağı", icon: <Building2 className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "growth", "seller", "buyer"], href: "/catalog" },
+    { id: "orders", title: "Siparişler", icon: <Send className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "seller", "buyer"], href: "/network/seller/orders" },
+    { id: "catalog", title: "Katalog", icon: <LayoutList className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "seller"], href: "/seller/products" },
+    { id: "finance_b2b", title: "Tahsilat (B2B)", icon: <Wallet className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "finance"], href: "/accounting" },
+    { id: "growth", title: "GMV & Büyüme", icon: <TrendingUp className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "growth", "seller"], href: "/network/trust-score" },
+    { id: "purchasing", title: "Satın Alma (Alıcı)", icon: <Briefcase className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "buyer"], href: "/rfq" },
+    { id: "staff", title: "Personel Paneli", icon: <Users className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "staff", "seller", "buyer", "finance", "growth", "risk"], href: "/staff/me" },
+    { id: "inventory", title: "Envanter & Depo", icon: <PackageSearch className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "seller"], href: "/seller/products" },
+    { id: "intelligence", title: "İş Zekası & Analiz", icon: <LineChart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "growth", "finance"], href: "/admin/ceo-metrics" },
+    { id: "service_desk", title: "Servis Masası", icon: <HeadphonesIcon className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "staff"], href: "/support/tickets" },
+    { id: "fraud_tower", title: "Finansal Kontrol Kulesi", icon: <Landmark className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "finance", "risk"], href: "/admin/dashboard" },
+    { id: "disputes", title: "Dispute Center", icon: <AlertTriangle className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "risk"], href: "/disputes" },
+    { id: "audit", title: "Denetim Kayıtları", icon: <ShieldCheck className="w-6 h-6" />, roles: ["SUPER_ADMIN", "admin", "risk"], href: "/admin/audit" },
 ];
 
 export default function ClientDashboard() {
@@ -174,7 +174,7 @@ export default function ClientDashboard() {
                                 <button
                                     key={idx}
                                     type="button"
-                                    onClick={() => authorized && console.log(`${feat.title} modülüne git`)}
+                                    onClick={() => authorized && router.push(feat.href)}
                                     disabled={!authorized}
                                     className={`group flex flex-col items-center justify-center p-6 rounded-xl border transition-all cursor-pointer focus:outline-none relative
                                         ${authorized

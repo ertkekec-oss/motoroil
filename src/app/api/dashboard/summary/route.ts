@@ -48,7 +48,7 @@ export async function GET(req: Request) {
             where: {
                 ...whereBuyerCompany,
                 status: {
-                    in: ["DRAFT", "PUBLISHED", "PENDING_OFFERS"] // Assuming these states exist
+                    in: ["DRAFT", "SENT", "RESPONDED"] // Only valid RfqStatus enums
                 }
             }
         });
