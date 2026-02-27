@@ -21,6 +21,12 @@ interface DashboardSummary {
     boostDeltaPct: number;
     reconciliation: { matched: number; pending: number; disputed: number };
     dailyTxCount: number;
+    setup: {
+        hasCompanyProfile: boolean;
+        hasAnyProduct: boolean;
+        hasAnyRFQ: boolean;
+        hasAtLeastOneOrder: boolean;
+    };
 }
 
 const ALL_FEATURES = [
@@ -46,13 +52,30 @@ export default function ClientDashboard() {
     const [summary, setSummary] = useState<DashboardSummary | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const trackEvent = async (eventName: string, properties?: any) => {
+        try {
+            await fetch("/api/metrics/track", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ eventName, properties })
+            });
+        } catch (err) { }
+    };
+
     useEffect(() => {
+        trackEvent("CONTROL_HUB_VIEWED");
+
         async function fetchSummary() {
             try {
                 const res = await fetch("/api/dashboard/summary");
                 if (res.ok) {
                     const data = await res.json();
                     setSummary(data);
+
+                    const isNew = data.setup && (!data.setup.hasCompanyProfile || !data.setup.hasAnyProduct || !data.setup.hasAtLeastOneOrder);
+                    if (isNew) {
+                        trackEvent("SETUP_CHECKLIST_SHOWN");
+                    }
                 } else {
                     console.error("Failed to fetch dashboard summary");
                 }
@@ -66,7 +89,7 @@ export default function ClientDashboard() {
     }, []);
 
     const userRole = user?.role || "GUEST";
-    const setupNeeded = summary && summary.gmvTotal === 0 && summary.rfqActive === 0;
+    const setupNeeded = summary?.setup ? (!summary.setup.hasCompanyProfile || (!summary.setup.hasAnyProduct && !summary.setup.hasAnyRFQ)) : false;
 
     const formatter = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 0 });
 
@@ -123,13 +146,13 @@ export default function ClientDashboard() {
                                 <h2 className="text-xl font-bold text-[#0F172A] dark:text-white border-b border-slate-100 dark:border-slate-700 pb-2">Kurulum Kontrol Listesi</h2>
                                 <p className="text-[#64748B] dark:text-gray-400 mt-2 text-sm">Ağa henüz tam entegre olmadınız. Sistemin avantajlarından yararlanmak için aşağıdaki adımları tamamlayın.</p>
                                 <div className="mt-4 flex flex-wrap gap-4">
-                                    <Link href="/settings/company" className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm font-semibold rounded-md hover:bg-slate-200 transition-colors">
+                                    <Link href="/settings/company" onClick={() => trackEvent("SETUP_ACTION_CLICKED", { which: 'company_profile' })} className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm font-semibold rounded-md hover:bg-slate-200 transition-colors">
                                         1. Şirket Bilgilerini Tamamla
                                     </Link>
-                                    <Link href="/seller/products" className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm font-semibold rounded-md hover:bg-slate-200 transition-colors">
+                                    <Link href="/seller/products" onClick={() => trackEvent("SETUP_ACTION_CLICKED", { which: 'import_products' })} className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm font-semibold rounded-md hover:bg-slate-200 transition-colors">
                                         2. İlk Ürünleri İçe Aktar
                                     </Link>
-                                    <Link href="/rfq" className="px-4 py-2 bg-[#2563EB] text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition-colors">
+                                    <Link href="/rfq" onClick={() => trackEvent("SETUP_ACTION_CLICKED", { which: 'create_rfq' })} className="px-4 py-2 bg-[#2563EB] text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition-colors">
                                         3. İlk RFQ'yu Oluştur
                                     </Link>
                                 </div>
@@ -174,7 +197,12 @@ export default function ClientDashboard() {
                                 <button
                                     key={idx}
                                     type="button"
-                                    onClick={() => authorized && router.push(feat.href)}
+                                    onClick={() => {
+                                        if (authorized) {
+                                            trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
+                                            router.push(feat.href);
+                                        }
+                                    }}
                                     disabled={!authorized}
                                     className={`group flex flex-col items-center justify-center p-6 rounded-xl border transition-all cursor-pointer focus:outline-none relative
                                         ${authorized
