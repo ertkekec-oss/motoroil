@@ -9,22 +9,28 @@ export default function TrustScorePage() {
 
     useEffect(() => {
         setLoading(true);
-        // Mock API
-        setTimeout(() => {
-            setScoreData({
-                score: 85,
-                tier: "A" as "A" | "B" | "C" | "D",
-                lastCalculatedAt: "2026-02-27T00:00:00Z",
-                components: {
-                    onTimeRatio: { value: "98%", weight: 40, status: "EXCELLENT" },
-                    disputeRate: { value: "0.5%", weight: 30, status: "GOOD" },
-                    slaBreachCount: { value: 1, weight: 10, status: "AVERAGE" },
-                    chargebackRate: { value: "0%", weight: 20, status: "EXCELLENT" },
-                    overrideCount: { value: 0, weight: 0, status: "NEUTRAL" }
+        fetch("/api/network/trust-score")
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data && data.score) {
+                    setScoreData({
+                        score: data.score.value,
+                        tier: data.score.tier,
+                        lastCalculatedAt: data.score.computedAt,
+                        components: data.components || {
+                            onTimeRatio: { value: "100%", weight: 40, status: "EXCELLENT" },
+                            disputeRate: { value: "0%", weight: 30, status: "EXCELLENT" },
+                            slaBreachCount: { value: 0, weight: 10, status: "EXCELLENT" },
+                            chargebackRate: { value: "0%", weight: 20, status: "EXCELLENT" },
+                            overrideCount: { value: 0, weight: 0, status: "NEUTRAL" }
+                        }
+                    });
+                } else {
+                    setScoreData(null);
                 }
-            });
-            setLoading(false);
-        }, 500);
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
     }, []);
 
     const formatDate = (dateString: string) => new Intl.DateTimeFormat("tr-TR", { dateStyle: "long", timeStyle: "short" }).format(new Date(dateString));
@@ -57,6 +63,10 @@ export default function TrustScorePage() {
             {loading ? (
                 <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
                     Skor verileriniz yükleniyor...
+                </div>
+            ) : !scoreData ? (
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
+                    Henüz güven skorunuz hesaplanmamış. İlerleyen günlerde tekrar kontrol ediniz.
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

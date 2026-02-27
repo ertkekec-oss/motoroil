@@ -8,26 +8,39 @@ export default function NetworkEarningsPage() {
     const { currentUser } = useApp();
     const [activeTab, setActiveTab] = useState("pending");
     const [earnings, setEarnings] = useState<any[]>([]);
+    const [kpis, setKpis] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    // Mock initial fetch
     useEffect(() => {
         setLoading(true);
-        // Fallback mock data
         fetch("/api/network/earnings")
-            .then(res => res.json())
-            .then(data => {
-                if (data.earnings) setEarnings(data.earnings);
-                else throw new Error("No data");
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to fetch earnings");
+                return res.json();
             })
-            .catch(() => {
-                // Mock data if no endpoint
-                setEarnings([
-                    { id: "e1", createdAt: "2026-02-25T10:00:00Z", refId: "SHP-109041", gross: 12500, commission: 250, net: 12250, status: "PENDING", expectedClearDate: "2026-03-10T10:00:00Z" },
-                    { id: "e2", createdAt: "2026-02-24T14:30:00Z", refId: "SHP-108992", gross: 8400, commission: 168, net: 8232, status: "CLEARED", expectedClearDate: "2026-02-28T14:30:00Z" },
-                    { id: "e3", createdAt: "2026-02-20T09:15:00Z", refId: "SHP-107551", gross: 45000, commission: 900, net: 44100, status: "RELEASED", expectedClearDate: "2026-02-25T09:15:00Z" },
-                    { id: "e4", createdAt: "2026-02-15T16:45:00Z", refId: "SHP-105122", gross: 3200, commission: 64, net: 3136, status: "REFUNDED", expectedClearDate: null }
-                ]);
+            .then(data => {
+                if (data.page && data.page.items) {
+                    setEarnings(data.page.items.map((e: any) => ({
+                        id: e.id,
+                        createdAt: e.createdAt,
+                        refId: e.reference?.orderId || "-",
+                        gross: e.grossAmount,
+                        commission: e.commissionAmount,
+                        net: e.netAmount,
+                        status: e.status,
+                        expectedClearDate: e.expectedClearDate
+                    })));
+                } else {
+                    setEarnings([]);
+                }
+
+                if (data.kpis) {
+                    setKpis(data.kpis);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setEarnings([]);
             })
             .finally(() => setLoading(false));
     }, []);
@@ -61,22 +74,22 @@ export default function NetworkEarningsPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <p className="text-sm font-semibold text-slate-500 mb-1">Toplam Bekleyen Kazanç</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatMoney(20482)}</p>
+                    <p className="text-2xl font-bold text-slate-900">{formatMoney(kpis?.pendingNetTotal || 0)}</p>
                     <div className="text-xs text-orange-600 mt-2 font-medium bg-orange-50 inline-block px-2 py-1 rounded">PENDING & CLEARED</div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <p className="text-sm font-semibold text-slate-500 mb-1">Serbest Bırakılacak (7 Gün)</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatMoney(8232)}</p>
+                    <p className="text-2xl font-bold text-slate-900">{formatMoney(kpis?.releasingNext7dNetTotal || 0)}</p>
                     <div className="text-xs text-blue-600 mt-2 font-medium bg-blue-50 inline-block px-2 py-1 rounded">KESİNLEŞTİ</div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <p className="text-sm font-semibold text-slate-500 mb-1">Serbest Bırakılan (30 Gün)</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatMoney(124500)}</p>
+                    <p className="text-2xl font-bold text-slate-900">{formatMoney(kpis?.releasedLast30dNetTotal || 0)}</p>
                     <div className="text-xs text-green-600 mt-2 font-medium bg-green-50 inline-block px-2 py-1 rounded">ÖDENDİ</div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <p className="text-sm font-semibold text-slate-500 mb-1">Ortalama Release Süresi</p>
-                    <p className="text-2xl font-bold text-slate-900">14.2 Gün</p>
+                    <p className="text-2xl font-bold text-slate-900">{kpis?.avgReleaseTimeHours ? (kpis.avgReleaseTimeHours / 24).toFixed(1) : "0"} Gün</p>
                     <div className="text-xs text-slate-600 mt-2 font-medium bg-slate-100 inline-block px-2 py-1 rounded">Sektör Ort.: 15.0 Gün</div>
                 </div>
             </div>

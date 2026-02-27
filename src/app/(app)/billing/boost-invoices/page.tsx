@@ -11,16 +11,21 @@ export default function BoostInvoicesPage() {
 
     useEffect(() => {
         setLoading(true);
-        // Mock API load
-        setTimeout(() => {
-            setBillingHealth("GRACE");
-            setGraceDaysRemaining(3);
-            setInvoices([
-                { id: "inv-002", period: "2026-02", amount: 1500, status: "GRACE", dueAt: "2026-02-25T23:59:59Z", paidAt: null, groupId: "lg_5932a" },
-                { id: "inv-001", period: "2026-01", amount: 1250, status: "PAID", dueAt: "2026-01-25T23:59:59Z", paidAt: "2026-01-24T14:15:00Z", groupId: "lg_1234b" }
-            ]);
-            setLoading(false);
-        }, 600);
+        fetch("/api/billing/boost-invoices")
+            .then(res => res.ok ? res.json() : { items: [], health: { status: "CURRENT", graceEndsAt: null, overdueSince: null } })
+            .then(data => {
+                const h = data.health || { status: "CURRENT" };
+                setBillingHealth(h.status);
+                if (h.graceEndsAt) {
+                    const diff = new Date(h.graceEndsAt).getTime() - Date.now();
+                    setGraceDaysRemaining(Math.max(0, Math.ceil(diff / (1000 * 3600 * 24))));
+                } else {
+                    setGraceDaysRemaining(0);
+                }
+                setInvoices(data.items || []);
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
     }, []);
 
     const formatMoney = (amount: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(amount);

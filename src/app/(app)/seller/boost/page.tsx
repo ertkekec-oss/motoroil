@@ -10,18 +10,24 @@ export default function BoostPage() {
 
     useEffect(() => {
         setLoading(true);
-        // Mock API
-        setTimeout(() => {
-            setBoostData({
-                planName: "Pro Boost Katmanı",
-                status: "ACTIVE", // ACTIVE | BILLING_PAUSED | ADMIN_PAUSED
-                quotaMax: 100000,
-                quotaUsed: 78500,
-                renewalDate: "2026-03-01T00:00:00Z",
-                price: 1500
-            });
-            setLoading(false);
-        }, 500);
+        fetch("/api/seller/boost")
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data && data.subscription) {
+                    setBoostData({
+                        planName: data.subscription.planName || "Bilinmeyen Plan",
+                        status: data.subscription.status,
+                        quotaMax: data.subscription.quotaTotal || 0,
+                        quotaUsed: data.subscription.quotaUsed || 0,
+                        renewalDate: data.subscription.renewsAt || new Date().toISOString(),
+                        price: data.subscription.price || 0
+                    });
+                } else {
+                    setBoostData(null);
+                }
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
     }, []);
 
     const formatMoney = (amount: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(amount);
@@ -40,6 +46,10 @@ export default function BoostPage() {
             {loading ? (
                 <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
                     Abonelik detaylarınız yükleniyor...
+                </div>
+            ) : !boostData ? (
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
+                    Aktif bir Boost aboneliğiniz bulunmuyor. Yeni bir plan seçerek hemen başlayın.
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

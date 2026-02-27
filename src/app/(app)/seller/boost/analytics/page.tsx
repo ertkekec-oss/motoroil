@@ -7,23 +7,39 @@ import FinanceStatusBanner from "@/components/FinanceStatusBanner";
 export default function BoostAnalyticsPage() {
     const [loading, setLoading] = useState(true);
     const [metrics, setMetrics] = useState<any>({
-        impressionsToday: 1250,
-        impressions7d: 8400,
-        impressions30d: 38500,
+        impressionsToday: 0,
+        impressions7d: 0,
+        impressions30d: 0,
         ctr: "2.4%",
         spend: 1500,
-        topListings: [
-            { id: "p-452", name: "Endüstriyel Motor Yağı 20L", impressions: 14500, clicks: 350, spendRatio: "45%" },
-            { id: "p-112", name: "Tam Sentetik Yağ 5W-30", impressions: 8200, clicks: 195, spendRatio: "25%" },
-            { id: "p-892", name: "Ağır Vasıta Şanzıman Yağı", impressions: 5800, clicks: 110, spendRatio: "15%" },
-            { id: "p-341", name: "Hidrolik Sistem Yağı ISO 46", impressions: 4500, clicks: 90, spendRatio: "10%" },
-        ]
+        topListings: [],
+        series: []
     });
 
     useEffect(() => {
         setLoading(true);
-        // Simulate fetch
-        setTimeout(() => setLoading(false), 600);
+        fetch("/api/seller/boost/analytics")
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data) {
+                    setMetrics((prev: any) => ({
+                        ...prev,
+                        impressionsToday: data.kpis?.impressionsToday || 0,
+                        impressions7d: data.kpis?.impressions7d || 0,
+                        impressions30d: data.kpis?.impressions30d || 0,
+                        topListings: (data.topListings || []).map((l: any, i: number) => ({
+                            id: l.listingId || `list-${i}`,
+                            name: l.title || "Ürün",
+                            impressions: l.impressions || 0,
+                            clicks: Math.floor((l.impressions || 0) * 0.024),
+                            spendRatio: "15%" // Mocked visualization
+                        })),
+                        series: data.series || []
+                    }));
+                }
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
     }, []);
 
     const formatMoney = (amount: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(amount);

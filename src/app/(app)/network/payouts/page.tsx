@@ -6,23 +6,25 @@ import FinanceStatusBanner from "@/components/FinanceStatusBanner";
 export default function PayoutsPage() {
     const [destinations, setDestinations] = useState<any[]>([]);
     const [requests, setRequests] = useState<any[]>([]);
+    const [balances, setBalances] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setLoading(true);
-        // Mock API
-        setTimeout(() => {
-            setDestinations([
-                { id: "d1", bankName: "Garanti BBVA", iban: "TR00 ************ 1234", holder: "ERT****** K***", status: "ACTIVE" },
-                { id: "d2", bankName: "Akbank", iban: "TR00 ************ 9876", holder: "ERT****** K***", status: "DISABLED" },
-            ]);
-            setRequests([
-                { id: "req1", amount: 12500, createdAt: "2026-02-26T14:30:00Z", status: "PROCESSING", destination: "Garanti BBVA (...1234)" },
-                { id: "req2", amount: 45000, createdAt: "2026-02-15T09:15:00Z", status: "PAID", destination: "Garanti BBVA (...1234)" },
-            ]);
-            setLoading(false);
-        }, 500);
+        Promise.all([
+            fetch("/api/network/payouts/summary").then(r => r.ok ? r.json() : {} as any),
+            fetch("/api/network/payouts/destinations").then(r => r.ok ? r.json() : []),
+            fetch("/api/network/payouts/requests").then(r => r.ok ? r.json() : { items: [] })
+        ])
+            .then(([summaryData, destinationsData, requestsData]) => {
+                if (summaryData.balances) setBalances(summaryData.balances);
+                if (Array.isArray(destinationsData)) setDestinations(destinationsData);
+                if (requestsData.items) setRequests(requestsData.items);
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
     }, []);
+
 
     const formatMoney = (amount: number) => new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(amount);
     const formatDate = (dateString: string) => new Intl.DateTimeFormat("tr-TR", { dateStyle: "short", timeStyle: "short" }).format(new Date(dateString));
@@ -45,17 +47,17 @@ export default function PayoutsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white p-5 rounded-xl border border-blue-200 shadow-sm shadow-blue-50">
                     <p className="text-sm font-semibold text-slate-500 mb-1">Çekilebilir Bakiye (Available)</p>
-                    <p className="text-3xl font-bold text-blue-700">{formatMoney(8232)}</p>
+                    <p className="text-3xl font-bold text-blue-700">{formatMoney(balances?.availableBalance || 0)}</p>
                     <button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Para Çek Talebi Oluştur</button>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm opacity-80">
                     <p className="text-sm font-semibold text-slate-500 mb-1">Bekleyen Kazanç (Pending)</p>
-                    <p className="text-2xl font-bold text-slate-700">{formatMoney(20482)}</p>
+                    <p className="text-2xl font-bold text-slate-700">{formatMoney(balances?.pendingBalance || 0)}</p>
                     <div className="text-xs text-orange-600 mt-2 font-medium bg-orange-50 inline-block px-2 py-1 rounded">Müşteri onayında / Escrow'da</div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm opacity-80">
                     <p className="text-sm font-semibold text-slate-500 mb-1">Rezerve Edilmiş (Reserved)</p>
-                    <p className="text-2xl font-bold text-slate-700">{formatMoney(1500)}</p>
+                    <p className="text-2xl font-bold text-slate-700">{formatMoney(balances?.reservedBalance || 0)}</p>
                     <div className="text-xs text-slate-500 mt-2 font-medium bg-slate-100 inline-block px-2 py-1 rounded">İhtilaf / İade teminatı</div>
                 </div>
             </div>
@@ -74,15 +76,15 @@ export default function PayoutsPage() {
                             {destinations.map(d => (
                                 <div key={d.id} className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm flex flex-col group hover:border-blue-300 transition-colors">
                                     <div className="flex justify-between items-start mb-2">
-                                        <span className="font-bold text-slate-800 text-sm">{d.bankName}</span>
+                                        <span className="font-bold text-slate-800 text-sm">Banka Hesabı</span>
                                         {d.status === "ACTIVE" ?
                                             <span className="h-2 w-2 rounded-full bg-green-500 mt-1.5" title="Aktif"></span> :
                                             <span className="h-2 w-2 rounded-full bg-slate-300 mt-1.5" title="Pasif"></span>
                                         }
                                     </div>
-                                    <span className="font-mono text-xs text-slate-500 tracking-wider bg-slate-100 p-1.5 rounded">{d.iban}</span>
+                                    <span className="font-mono text-xs text-slate-500 tracking-wider bg-slate-100 p-1.5 rounded">{d.ibanMasked}</span>
                                     <div className="flex justify-between items-center mt-3">
-                                        <span className="text-xs text-slate-400 font-medium uppercase">{d.holder}</span>
+                                        <span className="text-xs text-slate-400 font-medium uppercase">{d.holderNameMasked}</span>
                                         {d.status === "ACTIVE" && <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-bold cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">Varsayılan Yap</span>}
                                     </div>
                                 </div>

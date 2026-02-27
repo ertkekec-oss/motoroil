@@ -12,22 +12,33 @@ export default function SupportTicketsPage() {
 
     useEffect(() => {
         setLoading(true);
-        // Mock API
-        setTimeout(() => {
-            setTickets([
-                { id: "T-0091", type: "PAYOUT", status: "OPEN", subject: "Para Çekim Gecikmesi", orderRef: null, createdAt: "2026-02-27T10:00:00Z", slaDue: "2026-02-28T10:00:00Z", slaBreach: false, messages: [{ sender: "USER", text: "Merhaba, hesabıma halen para geçmedi." }] },
-                { id: "T-0084", type: "SHIPPING_DISPUTE", status: "SLA_BREACH", subject: "Ürün kargoda kayboldu alıcı parayı istiyor", orderRef: "ORD-99124", createdAt: "2026-02-24T14:30:00Z", slaDue: "2026-02-26T14:30:00Z", slaBreach: true, messages: [{ sender: "USER", text: "Alıcı iade istiyor ancak pazarama kargosu kayıp." }, { sender: "SYSTEM", text: "Talebiniz incelenmektedir. Escrow askıya alınmıştır." }] },
-                { id: "T-0071", type: "BILLING", status: "RESOLVED", subject: "Boost Faturası İtiraz", orderRef: null, createdAt: "2026-02-15T09:15:00Z", slaDue: "2026-02-17T09:15:00Z", slaBreach: false, messages: [{ sender: "USER", text: "Faturamda yanlışlık var inceler misiniz?" }, { sender: "AGENT", text: "[PII REDACTED] Faturanız başarıyla düzeltilmiştir ve mahsuplaşılmıştır." }] },
-            ]);
-            setLoading(false);
-        }, 500);
-    }, []);
+        fetch(`/api/support/tickets?status=${filterStatus}&type=${filterType}`)
+            .then(res => res.ok ? res.json() : { items: [] })
+            .then(data => {
+                setTickets(data.items || []);
+                // If a ticket was selected, we might want to refresh it or close it, sticking to simple:
+                setSelectedTicket(null);
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
+    }, [filterStatus, filterType]);
 
-    const filteredTickets = tickets.filter(t => {
-        if (filterStatus !== "ALL" && t.status !== filterStatus) return false;
-        if (filterType !== "ALL" && t.type !== filterType) return false;
-        return true;
-    });
+    const handleSelectTicket = async (ticketId: string) => {
+        try {
+            const res = await fetch(`/api/support/tickets/${ticketId}`);
+            if (res.ok) {
+                const data = await res.json();
+                setSelectedTicket(data);
+            }
+        } catch (e) {
+            console.error("Failed to load ticket details", e);
+        }
+    };
+
+    // Filter is done on backend now, but to keep the UI intact if any local filtering is needed:
+    const filteredTickets = tickets;
+
+
 
     const formatDate = (dateString: string) => new Intl.DateTimeFormat("tr-TR", { dateStyle: "short", timeStyle: "short" }).format(new Date(dateString));
 
@@ -99,7 +110,7 @@ export default function SupportTicketsPage() {
                             filteredTickets.map(ticket => (
                                 <div
                                     key={ticket.id}
-                                    onClick={() => setSelectedTicket(ticket)}
+                                    onClick={() => handleSelectTicket(ticket.id)}
                                     className={`p-5 hover:bg-slate-50 cursor-pointer transition-colors ${selectedTicket?.id === ticket.id ? 'bg-indigo-50/50 border-l-4 border-indigo-500 pl-4' : 'border-l-4 border-transparent pl-4'}`}
                                 >
                                     <div className="flex justify-between items-start mb-2">
@@ -109,11 +120,11 @@ export default function SupportTicketsPage() {
                                         </div>
                                         <span className="text-xs text-slate-400 font-medium">{formatDate(ticket.createdAt)}</span>
                                     </div>
-                                    <h3 className="text-sm font-bold text-slate-900 mb-1 leading-snug">{ticket.subject}</h3>
+                                    <h3 className="text-sm font-bold text-slate-900 mb-1 leading-snug truncate">{ticket.id} Nolu Talep</h3>
                                     <div className="flex items-center gap-4 text-xs font-medium text-slate-500 mt-3">
                                         <span className="bg-slate-100 px-2 py-1 rounded">{getTypeIcon(ticket.type)}</span>
-                                        {ticket.orderRef && <span className="text-blue-600 bg-blue-50 px-2 py-1 rounded">Ref: {ticket.orderRef}</span>}
-                                        {ticket.slaBreach && <span className="text-red-600 bg-red-50 px-2 py-1 rounded">Destek Süresi Aşıldı!</span>}
+                                        {ticket.relatedEntityId && <span className="text-blue-600 bg-blue-50 px-2 py-1 rounded">Ref: {ticket.relatedEntityId}</span>}
+                                        {ticket.status === 'SLA_BREACH' && <span className="text-red-600 bg-red-50 px-2 py-1 rounded">Destek Süresi Aşıldı!</span>}
                                     </div>
                                 </div>
                             ))
@@ -127,14 +138,14 @@ export default function SupportTicketsPage() {
                         <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col sticky top-6 max-h-[calc(100vh-120px)]">
                             <div className="px-5 py-4 border-b border-slate-100 bg-slate-50 rounded-t-xl">
                                 <h3 className="font-bold text-slate-800 text-sm mb-1">{selectedTicket.id} Nolu Talep Detayı</h3>
-                                <p className="text-xs font-medium text-slate-500">{selectedTicket.subject}</p>
+                                <p className="text-xs font-medium text-slate-500">Durum: <span className="font-bold text-slate-700">{selectedTicket.status}</span></p>
                             </div>
                             <div className="p-5 flex-1 overflow-y-auto space-y-4 bg-slate-50/50">
-                                {selectedTicket.messages.map((msg: any, idx: number) => (
-                                    <div key={idx} className={`flex flex-col ${msg.sender === 'USER' ? 'items-end' : 'items-start'}`}>
-                                        <span className="text-[10px] font-bold uppercase text-slate-400 mb-1 ml-1 mr-1">{msg.sender === 'USER' ? 'Siz' : (msg.sender === 'SYSTEM' ? 'Sistem' : 'Müşteri Temsilcisi')}</span>
-                                        <div className={`p-3 rounded-2xl text-sm max-w-[85%] ${msg.sender === 'USER' ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-white border text-slate-700 border-slate-200 rounded-tl-sm shadow-sm'}`}>
-                                            {msg.text}
+                                {selectedTicket.messages?.map((msg: any, idx: number) => (
+                                    <div key={idx} className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
+                                        <span className="text-[10px] font-bold uppercase text-slate-400 mb-1 ml-1 mr-1">{msg.isMe ? 'Siz' : msg.senderRole}</span>
+                                        <div className={`p-3 rounded-2xl text-sm max-w-[85%] ${msg.isMe ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-white border text-slate-700 border-slate-200 rounded-tl-sm shadow-sm'}`}>
+                                            {msg.message}
                                         </div>
                                     </div>
                                 ))}
