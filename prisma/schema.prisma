@@ -3860,3 +3860,40 @@ model DisputeAction {
   @@index([actionType])
   @@index([createdAt])
 }
+
+
+
+model BoostPolicyConfig {
+  id                        String    @id @default("GLOBAL")
+  multiplierMin             Decimal   @default(1.0) @db.Decimal(5, 2)
+  multiplierMax             Decimal   @default(3.0) @db.Decimal(5, 2)
+  sponsoredInventoryCapPct  Int       @default(20)
+  interleavePatternJson     Json
+  graceDays                 Int       @default(5)
+  maxRuleDurationDays       Int       @default(90)
+  cTierBoostAllowed         Boolean   @default(true)
+  dTierBoostAllowed         Boolean   @default(false)
+  updatedAt                 DateTime  @updatedAt
+}
+
+model BoostBillingHealthSnapshot {
+  id                            String    @id @default(cuid())
+  asOfDate                      String    @unique
+  outstandingArTotal            Decimal   @default(0) @db.Decimal(12, 2)
+  overdueCount                  Int       @default(0)
+  graceCount                    Int       @default(0)
+  blockedSubscriptionsCount     Int       @default(0)
+  topOverdueTenantsJson         Json
+  createdAt                     DateTime  @default(now())
+
+  @@index([asOfDate])
+}
+
+model BoostTenantEnforcement {
+  tenantId          String    @id
+  boostPaused       Boolean   @default(false)
+  boostBanReason    String?   @db.Text
+  quotaCapOverride  Int?
+  effectiveFrom     DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}

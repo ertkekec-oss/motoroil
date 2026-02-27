@@ -67,6 +67,13 @@ export default async function AdminLayout({
                     <NavLink href="/admin/disputes" icon="radar">Dispute Queue</NavLink>
                     <NavLink href="/admin/disputes/policies" icon="shield">Resolution Policies</NavLink>
 
+                    <div className="pt-4 mt-4 font-semibold text-xs text-slate-500 uppercase tracking-wider px-3 mb-1">📣 Growth & Monetization</div>
+                    <NavLink href="/admin/growth/boost-rules" icon="tag">Boost Rules</NavLink>
+                    <NavLink href="/admin/growth/subscriptions" icon="users">Hub Subscriptions</NavLink>
+                    <NavLink href="/admin/growth/billing-health" icon="activity">Billing Health</NavLink>
+                    <NavLink href="/admin/growth/revenue" icon="dashboard">Revenue Analytics</NavLink>
+                    <NavLink href="/admin/growth/audit" icon="shield">Growth Audit</NavLink>
+
                     <div className="pt-4 mt-4 font-semibold text-xs text-slate-500 uppercase tracking-wider px-3 mb-1">Sistem & Güvenlik</div>
                     <NavLink href="/admin/security" icon="shield">Operasyonel Güvenlik</NavLink>
                     <NavLink href="/admin/logs" icon="terminal">Sistem Logları</NavLink>
