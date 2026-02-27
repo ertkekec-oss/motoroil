@@ -96,7 +96,8 @@ export default function Sidebar() {
     const isSeller = isSystemAdmin || hasPermission('sales_archive') || currentUser?.type === 'selling';
 
     const menuItems = [
-        { name: 'Dashboard', href: '/dashboard', icon: '📊' },
+        { name: 'POS Terminal', href: '/pos', icon: '🏮' },
+        { name: 'B2B Network', href: '/dashboard', icon: '📊' },
 
         {
             name: 'Orders',
@@ -120,7 +121,7 @@ export default function Sidebar() {
             ]
         },
 
-        { name: 'Finance', href: '/network/finance', icon: '💰' },
+        { name: 'Finance (B2B)', href: '/network/finance', icon: '💰' },
 
         ...(isSeller ? [{
             name: 'Growth (Seller)',
@@ -145,7 +146,55 @@ export default function Sidebar() {
             ]
         }] : []),
 
-        { name: 'Support', href: '/support/tickets', icon: '🎫' },
+        { name: 'Personel Paneli', href: '/staff/me', icon: '👤' },
+
+        // FINANSAL YÖNETİM GRUBU
+        { name: 'Finansal Yönetim', href: '/accounting', icon: '🏛️' },
+        { name: 'Satış Yönetimi', href: '/sales', icon: '🧾' },
+        { name: 'Cari Hesaplar', href: '/customers', icon: '🤝' },
+        { name: 'Tedarikçi Ağı', href: '/suppliers', icon: '🚚' },
+
+        // AKILLI SİSTEMLER GRUBU
+        { name: 'Finansal Kontrol Kulesi', href: '/fintech/control-tower', icon: '🗼' },
+
+        // OPERASYON GRUBU
+        { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
+        {
+            name: 'Saha Satış Yönetimi',
+            icon: '🗺️',
+            isParent: true,
+            id: 'field-sales-parent',
+            subItems: [
+                { name: 'Yönetim Paneli', href: '/field-sales/admin/routes', icon: '⚙️' },
+                { name: 'Saha Satış Paneli', href: '/field-sales', icon: '📍' },
+                { name: 'Canlı Saha Takibi', href: '/field-sales/admin/live', icon: '🛰️' },
+            ]
+        },
+        { name: 'Teklifler', href: '/quotes', icon: '📋' },
+        { name: 'Servis Masası', href: '/service', icon: '🛠️' },
+
+        // ANALİZ & DENETİM
+        {
+            name: 'İş Zekası & Analiz',
+            icon: '🧠',
+            isParent: true,
+            id: 'reports-parent',
+            subItems: [
+                { name: 'İş Zekası (CEO)', href: '/reports/ceo', icon: '🧠' },
+                { name: 'Veri Analizi', href: '/reports', icon: '📊' },
+            ]
+        },
+        { name: 'PDKS Yönetimi', href: '/staff/pdks', icon: '🛡️' },
+        { name: 'Denetim Kayıtları', href: '/admin/audit-logs', icon: '🔍' },
+        { name: 'Kaçak Satış Tespit', href: '/security/suspicious', icon: '🚨' },
+
+        { name: 'Destek Talepleri', href: '/support/tickets', icon: '🎫' },
+
+        // SİSTEM & AYARLAR
+        { name: 'Mali Müşavir', href: '/advisor', icon: '💼' },
+        { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
+        { name: 'Ekip & Yetki', href: '/staff', icon: '👥' },
+        { name: 'Abonelik & Planlar', href: '/billing', icon: '💎' },
 
         ...(isPlatformAdmin ? [
             { name: 'Destek Masası (Inbox)', href: '/admin/support/tickets', icon: '📥' },
