@@ -299,26 +299,33 @@ export default function Sidebar() {
 
             {/* LOGO & SELECTORS */}
             <div style={{ flexShrink: 0 }}>
-                <div style={{ padding: '32px 24px 20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div className="logo-container" style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '24px 24px 20px 24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {/* DESKTOP COLLAPSE TOGGLE (ABOVE LOGO) */}
+                    <div style={{ display: 'flex', justifyContent: isDesktopSidebarCollapsed ? 'center' : 'flex-end', width: '100%' }}>
+                        <button
+                            className="hide-mobile"
+                            onClick={() => setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
+                            style={{
+                                background: 'var(--bg-hover)', border: '1px solid var(--border-light)', color: 'var(--text-muted)',
+                                cursor: 'pointer', padding: '6px', borderRadius: '10px', display: 'flex',
+                                transition: '0.3s hover:scale-105'
+                            }}
+                            title={isDesktopSidebarCollapsed ? 'Menüyü Genişlet' : 'Menüyü Daralt'}
+                        >
+                            <span style={{ fontSize: '14px', transform: isDesktopSidebarCollapsed ? 'rotate(180deg)' : 'none', transition: '0.3s' }}>{isDesktopSidebarCollapsed ? '➡️' : '⬅️'}</span>
+                        </button>
+                    </div>
+
+                    {/* MAIN LOGO / COLLAPSED LOGO */}
+                    <div className="logo-container" style={{ display: isDesktopSidebarCollapsed ? 'none' : 'flex', flexDirection: 'column', overflow: 'hidden', marginTop: '4px' }}>
                         <h1 className="logo-text" style={{ fontSize: '26px', fontWeight: '900', letterSpacing: '-1.5px', marginBottom: '4px', whiteSpace: 'nowrap' }}>
                             PERIOD<span style={{ color: 'var(--primary)', opacity: 0.9 }}>YA</span>
                         </h1>
                         <div className="logo-subtext" style={{ fontSize: '11px', fontWeight: '800', color: 'var(--primary)', letterSpacing: '2px', opacity: 0.6, whiteSpace: 'nowrap' }}>SYSTEM V3.0</div>
                     </div>
-                    {/* DESKTOP COLLAPSE TOGGLE */}
-                    <button
-                        className="hide-mobile"
-                        onClick={() => setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
-                        style={{
-                            background: 'transparent', border: 'none', color: 'var(--text-muted)',
-                            cursor: 'pointer', padding: '4px', borderRadius: '8px', display: 'flex'
-                        }}
-                    >
-                        <span style={{ fontSize: '18px', transform: isDesktopSidebarCollapsed ? 'rotate(180deg)' : 'none', transition: '0.3s' }}>{isDesktopSidebarCollapsed ? '➡️' : '⬅️'}</span>
-                    </button>
-                    <div className="collapsed-logo-icon" style={{ display: isDesktopSidebarCollapsed ? 'block' : 'none', fontSize: '24px', fontWeight: '900', color: 'var(--primary)', textAlign: 'center', width: '100%' }}>
-                        P<span style={{ color: 'var(--text-main)' }}>Y</span>
+
+                    <div className="collapsed-logo-icon" style={{ display: isDesktopSidebarCollapsed ? 'flex' : 'none', justifyContent: 'center', alignItems: 'center', fontSize: '28px', fontWeight: '900', color: 'var(--primary)', width: '100%', marginTop: '8px' }}>
+                        P
                     </div>
                 </div>
 
@@ -422,10 +429,11 @@ export default function Sidebar() {
                                         border: anyChildActive ? '1px solid rgba(255, 85, 0, 0.1)' : '1px solid transparent'
                                     }}
                                     className="sidebar-link"
+                                    title={isDesktopSidebarCollapsed ? item.name : undefined}
                                 >
                                     <span style={{ fontSize: '18px', filter: anyChildActive ? 'none' : 'grayscale(100%) opacity(0.5)' }}>{item.icon}</span>
-                                    <span className="sidebar-text" style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1, whiteSpace: 'nowrap' }}>{item.name}</span>
-                                    <span className="sidebar-chevron" style={{ fontSize: '10px', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: '0.3s' }}>▼</span>
+                                    <span className="sidebar-text" style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1, whiteSpace: 'nowrap', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>{item.name}</span>
+                                    <span className="sidebar-chevron" style={{ fontSize: '10px', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: '0.3s', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>▼</span>
                                 </div>
 
                                 {isExpanded && (
@@ -441,12 +449,14 @@ export default function Sidebar() {
                                                         color: isSubActive ? 'white' : 'var(--text-muted)',
                                                         transition: '0.2s',
                                                         fontWeight: '700',
-                                                        fontSize: '13px'
+                                                        fontSize: '13px',
+                                                        justifyContent: isDesktopSidebarCollapsed ? 'center' : 'flex-start'
                                                     }}
                                                         className="sidebar-sublink"
+                                                        title={isDesktopSidebarCollapsed ? sub.name : undefined}
                                                     >
                                                         <span>{sub.icon}</span>
-                                                        <span className="sidebar-subtext" style={{ whiteSpace: 'nowrap' }}>{sub.name}</span>
+                                                        <span className="sidebar-subtext" style={{ whiteSpace: 'nowrap', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>{sub.name}</span>
                                                     </div>
                                                 </Link>
                                             );
@@ -474,9 +484,10 @@ export default function Sidebar() {
                                 boxShadow: isActive ? '0 10px 20px -10px rgba(255, 85, 0, 0.4)' : 'none'
                             }}
                                 className="sidebar-link"
+                                title={isDesktopSidebarCollapsed ? item.name : undefined}
                             >
                                 <span style={{ fontSize: '18px', filter: isActive ? 'none' : 'grayscale(100%) opacity(0.5)' }}>{item.icon}</span>
-                                <span className="sidebar-text" style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1, whiteSpace: 'nowrap' }}>{item.name}</span>
+                                <span className="sidebar-text" style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1, whiteSpace: 'nowrap', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>{item.name}</span>
                                 {item.href === '/security/suspicious' && suspiciousEvents.length > 0 && (
                                     <span className="sidebar-badge" style={{
                                         background: '#FF416C',
@@ -513,7 +524,7 @@ export default function Sidebar() {
                     }}>
                         {(displayUser.role?.includes('Admin') || currentUser === null) ? '⚡' : '👤'}
                     </div>
-                    <div className="user-profile-info" style={{ flex: 1, overflow: 'hidden' }}>
+                    <div className="user-profile-info" style={{ flex: 1, overflow: 'hidden', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>
                         <div style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             {displayUser.name}
                             {hasPermission('settings_manage') && (
@@ -528,12 +539,13 @@ export default function Sidebar() {
 
                 <button
                     onClick={logout}
+                    title={isDesktopSidebarCollapsed ? "Çıkış Yap" : undefined}
                     style={{
                         width: '100%', padding: '12px',
                         background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)',
                         borderRadius: '12px', color: '#FF4444',
                         fontSize: '13px', fontWeight: '800', cursor: 'pointer', transition: '0.3s',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
+                        display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', gap: isDesktopSidebarCollapsed ? '0' : '10px'
                     }}
                     onMouseOver={(e) => {
                         e.currentTarget.style.background = '#FF4444';
@@ -544,7 +556,7 @@ export default function Sidebar() {
                         e.currentTarget.style.color = '#FF4444';
                     }}
                 >
-                    <span style={{ fontSize: '18px' }}>🔚</span> <span className="sidebar-text" style={{ whiteSpace: 'nowrap' }}>Çıkış Yap</span>
+                    <span style={{ fontSize: '18px' }}>🔚</span> <span className="sidebar-text" style={{ whiteSpace: 'nowrap', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>Çıkış Yap</span>
                 </button>
 
             </div>
