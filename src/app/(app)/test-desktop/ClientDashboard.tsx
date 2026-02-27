@@ -263,64 +263,74 @@ export default function ClientDashboard() {
                         <p className="text-[14px] font-semibold text-slate-500 tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full opacity-80">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti</p>
                     </div>
 
-                    {/* Dual Signal Bar Structure (Smart Collapse) */}
-                    <div className="flex flex-col gap-3.5 mb-10 transition-all duration-300 relative z-40">
-                        {/* 1. CANLI SİSTEM AKIŞI BAR */}
+                    {/* Dual Side-by-Side Signal Bar V3 (Enterprise Polish) */}
+                    <div className="flex flex-col lg:flex-row gap-4 mb-10 transition-all duration-300 relative z-40 w-full items-start">
+
+                        {/* 1. CANLI SİSTEM AKIŞI BAR (60%) */}
                         <div
-                            className={`flex items-center gap-4 bg-white dark:bg-[#080911] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.03)] transition-all duration-300 ease-in-out overflow-hidden ${isScrolled ? 'h-[44px] rounded-[16px] px-5 bg-white/70 dark:bg-[#080911]/80 backdrop-blur-xl sticky top-4 z-50 ring-1 ring-[#0F172A]/[0.02] dark:ring-white/5 shadow-md -translate-y-4' : 'h-[64px] xl:h-[72px] rounded-[20px] px-6'}`}
-                            style={isScrolled ? { width: 'calc(100% - 32px)', margin: '0 auto' } : {}}
+                            className={`bg-white dark:bg-[#080911] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] transition-all duration-250 ease-in-out overflow-hidden flex flex-col justify-center relative flex-shrink-0
+                                ${isScrolled
+                                    ? 'h-[42px] rounded-[16px] px-5 bg-white/80 dark:bg-[#080911]/80 backdrop-blur-xl sticky top-2 z-[60] ring-1 ring-[#0F172A]/[0.04] dark:ring-white/10 shadow-lg -translate-y-4'
+                                    : 'h-[72px] rounded-[22px] px-6 py-[16px] lg:w-[60%] w-full'}`}
+                            style={isScrolled ? { width: '100%', maxWidth: '600px', margin: '0 auto' } : {}}
                             onMouseEnter={() => setIsHoveringAnnouncements(true)}
                             onMouseLeave={() => setIsHoveringAnnouncements(false)}
                         >
-                            <div className="flex items-center gap-2.5 flex-shrink-0">
-                                <div className={`rounded-full bg-slate-800 dark:bg-white opacity-40 animate-[pulse_3s_ease-in-out_infinite] transition-all ${isScrolled ? 'w-1 h-1' : 'w-1.5 h-1.5'}`}></div>
-                                <span className={`font-black uppercase tracking-[0.2em] text-[#0F172A] dark:text-white opacity-40 transition-all ${isScrolled ? 'text-[9px]' : 'text-[10px]'}`}>
-                                    CANLI {isScrolled ? '' : <span className="hidden sm:inline">SİSTEM AKIŞI</span>}
-                                </span>
-                            </div>
-
-                            <div className={`w-[1px] bg-[#0F172A]/[0.08] dark:bg-white/10 hidden sm:block transition-all ${isScrolled ? 'h-2' : 'h-3'}`}></div>
-
-                            <div className="relative flex-1 overflow-hidden h-full flex items-center">
-                                {MOCK_ANNOUNCEMENTS.map((ann, idx) => (
-                                    <div
-                                        key={ann.id}
-                                        className={`absolute inset-0 flex items-center transition-opacity duration-300 ease-in-out ${idx === announcementIdx ? 'opacity-100 relative' : 'opacity-0 pointer-events-none absolute'}`}
-                                    >
-                                        <div className={`font-semibold text-[#0F172A] dark:text-white line-clamp-1 transition-all ${isScrolled ? 'text-[13px] opacity-80' : 'text-[14px] xl:text-[15px]'}`}>
-                                            {isScrolled ? `${ann.title} - ${ann.msg}` : ann.title}
-                                            {!isScrolled && <span className="ml-2.5 font-medium text-slate-500 dark:text-slate-400 hidden lg:inline">{ann.msg}</span>}
-                                        </div>
+                            {!isScrolled ? (
+                                <div className="flex flex-col justify-center w-full h-full">
+                                    <div className="flex items-center gap-2 mb-1.2 opacity-90">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-700 dark:bg-slate-300 animate-pulse" style={{ animationDuration: '1.5s' }}></div>
+                                        <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">CANLI SİSTEM AKIŞI</span>
                                     </div>
-                                ))}
-                            </div>
-
-                            {!isScrolled && (
-                                <div className="hidden md:flex items-center flex-shrink-0">
-                                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wide">YENİ</span>
+                                    <div className="relative w-full h-[24px]">
+                                        {MOCK_ANNOUNCEMENTS.map((ann, idx) => (
+                                            <div
+                                                key={ann.id}
+                                                className={`absolute inset-0 flex items-center justify-between transition-opacity duration-300 ease-in-out ${idx === announcementIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
+                                            >
+                                                <div className="text-[15px] xl:text-[16px] font-[600] text-[#0F172A] dark:text-white line-clamp-1 pr-4">
+                                                    {ann.title}
+                                                </div>
+                                                <div className="flex-shrink-0">
+                                                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-50 dark:bg-slate-800 text-slate-500 border border-slate-100 dark:border-slate-700/50 hidden sm:inline-block tracking-wide">YENİ</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2.5 w-full h-full animate-in fade-in duration-300">
+                                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-slate-700 dark:bg-slate-300 animate-pulse" style={{ animationDuration: '1.5s' }}></div>
+                                    <div className="text-[13px] font-[600] text-[#0F172A] dark:text-white line-clamp-1 flex-1">
+                                        <span className="text-slate-500 dark:text-slate-400 uppercase tracking-widest text-[10px] font-black mr-2 opacity-80">CANLI</span>
+                                        {MOCK_ANNOUNCEMENTS[announcementIdx]?.title}
+                                    </div>
                                 </div>
                             )}
                         </div>
 
-                        {/* 2. STRATEJİK DUYURU BAR */}
-                        <div className={`flex items-center gap-4 bg-white dark:bg-[#080911] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.03)] transition-all duration-300 ease-in-out overflow-hidden ${isScrolled ? 'h-0 opacity-0 border-none px-6 m-0 !mt-[-14px] scale-y-0 transform origin-top' : 'h-[64px] xl:h-[72px] rounded-[20px] px-6 opacity-100 scale-y-100 mt-0'}`}>
-                            <div className="flex items-center flex-shrink-0">
-                                <span className="text-[10px] font-black uppercase tracking-[0.1em] text-purple-600 dark:text-purple-400">STRATEJİK</span>
-                            </div>
-
-                            <div className="w-[1px] h-3 bg-[#0F172A]/[0.08] dark:bg-white/10 hidden sm:block"></div>
-
-                            <div className="flex-1 flex items-center h-full">
-                                <div className="text-[14px] xl:text-[15px] font-bold text-[#0F172A] dark:text-white line-clamp-1">
-                                    Otonom Fiyatlandırma Aktif
-                                    <span className="ml-2.5 font-medium text-slate-500 dark:text-slate-400 hidden lg:inline">Platform geneli kur bazlı fiyatlandırma optimizasyonu devereye alındı.</span>
+                        {/* 2. STRATEJİK DUYURU BAR (40%) */}
+                        <div
+                            className={`bg-[#FBFCFE] dark:bg-white/[0.012] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.03)] transition-all duration-300 ease-in-out overflow-hidden flex flex-col justify-center flex-shrink-0
+                                ${isScrolled
+                                    ? 'h-0 opacity-0 border-none px-0 py-0 m-0 scale-y-0 origin-top xl:w-0 w-0 hidden'
+                                    : 'h-[72px] rounded-[22px] px-6 py-[16px] lg:w-[40%] w-full opacity-100 scale-y-100'}`}
+                        >
+                            <div className="flex flex-col justify-center w-full h-full relative">
+                                <div className="flex items-center gap-2 mb-1.2 opacity-90">
+                                    <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">STRATEJİK</span>
+                                </div>
+                                <div className="flex items-center justify-between w-full h-[24px]">
+                                    <div className="text-[15px] xl:text-[16px] font-[700] text-[#0F172A] dark:text-white line-clamp-1 pr-16 w-full">
+                                        Otonom Fiyatlandırma Aktif
+                                    </div>
+                                    <div className="flex-shrink-0 absolute right-0">
+                                        <Link href="#" className="text-[12px] font-bold text-slate-400 hover:text-[#0F172A] dark:text-slate-300 transition-colors">Detaylar →</Link>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div className="hidden md:flex items-center flex-shrink-0">
-                                <Link href="#" className="text-[12px] font-bold text-slate-400 hover:text-[#0F172A] dark:text-slate-500 dark:hover:text-white transition-colors">Detaylar →</Link>
-                            </div>
                         </div>
+
                     </div>
 
                     {/* Setup Notification (Executive Timeline) */}
