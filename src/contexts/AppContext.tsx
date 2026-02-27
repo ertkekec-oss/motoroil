@@ -92,6 +92,8 @@ interface AppContextType {
     // UI state
     isSidebarOpen: boolean;
     setIsSidebarOpen: (open: boolean) => void;
+    isDesktopSidebarCollapsed: boolean;
+    setIsDesktopSidebarCollapsed: (collapsed: boolean) => void;
     isInitialLoading: boolean;
 
     // Impersonation (Platform Admin Only)
@@ -106,6 +108,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const { showError } = useModal();
     const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
     const isAdminPath = pathname?.startsWith('/admin');
@@ -436,7 +439,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             branches, activeBranchName, setActiveBranchName: handleSetActiveBranchName, refreshBranches,
             notifications, addNotification, removeNotification,
             suspiciousEvents, addSuspiciousEvent, clearSuspiciousEvents, lastSaleTime, recordSale,
-            isSidebarOpen, setIsSidebarOpen, isInitialLoading,
+            isSidebarOpen, setIsSidebarOpen, isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed, isInitialLoading,
             activeTenantId, setActiveTenantId, availableTenants
         }}>
             <InventoryProvider>

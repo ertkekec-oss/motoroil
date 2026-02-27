@@ -458,6 +458,50 @@ body::before {
   background: var(--bg-card);
   border-right: 1px solid var(--border-light);
   z-index: 100;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 769px) {
+  .sidebar-fixed.desktop-collapsed {
+    width: 76px;
+    min-width: 76px;
+  }
+
+  .sidebar-fixed.desktop-collapsed .sidebar-text,
+  .sidebar-fixed.desktop-collapsed .sidebar-chevron,
+  .sidebar-fixed.desktop-collapsed .sidebar-subtext {
+    opacity: 0;
+    width: 0;
+    pointer-events: none;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    display: none;
+  }
+
+  .sidebar-fixed.desktop-collapsed .logo-container,
+  .sidebar-fixed.desktop-collapsed .selector-container {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: none;
+  }
+
+  .sidebar-fixed.desktop-collapsed .sidebar-link {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .sidebar-fixed.desktop-collapsed .sidebar-sublink {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: -20px;
+  }
 }
 
 /* Desktop Content: Takes the remaining space */

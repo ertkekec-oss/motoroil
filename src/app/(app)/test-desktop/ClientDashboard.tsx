@@ -70,7 +70,7 @@ const ALL_MODULES = [
 export default function ClientDashboard() {
     const { user } = useAuth();
     const router = useRouter();
-    const { setIsSidebarOpen } = useApp();
+    const { setIsSidebarOpen, setIsDesktopSidebarCollapsed } = useApp();
     const [summary, setSummary] = useState<DashboardSummary | null>(null);
     const [loading, setLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
@@ -90,6 +90,7 @@ export default function ClientDashboard() {
     useEffect(() => {
         setMounted(true);
         setIsSidebarOpen(false);
+        setIsDesktopSidebarCollapsed(true);
 
         async function fetchSummary() {
             try {
@@ -112,7 +113,7 @@ export default function ClientDashboard() {
             }
         }
         fetchSummary();
-    }, [setIsSidebarOpen]);
+    }, [setIsSidebarOpen, setIsDesktopSidebarCollapsed]);
 
     useEffect(() => {
         if (mounted) trackEvent("CONTROL_HUB_VIEWED");

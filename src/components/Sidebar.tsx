@@ -14,6 +14,7 @@ export default function Sidebar() {
         currentUser, hasPermission, hasFeature, subscription,
         branches, activeBranchName, setActiveBranchName,
         suspiciousEvents, isSidebarOpen, setIsSidebarOpen,
+        isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed,
         isInitialLoading,
         activeTenantId, setActiveTenantId, availableTenants
     } = useApp();
@@ -262,7 +263,7 @@ export default function Sidebar() {
 
     return (
         <aside
-            className={`sidebar-fixed ${isSidebarOpen ? 'active' : ''}`}
+            className={`sidebar-fixed ${isSidebarOpen ? 'active' : ''} ${isDesktopSidebarCollapsed ? 'desktop-collapsed' : ''}`}
             style={{
                 background: 'var(--bg-card)',
                 backdropFilter: 'blur(30px) saturate(150%)',
@@ -298,14 +299,30 @@ export default function Sidebar() {
 
             {/* LOGO & SELECTORS */}
             <div style={{ flexShrink: 0 }}>
-                <div style={{ padding: '32px 24px 20px 24px' }}>
-                    <h1 style={{ fontSize: '26px', fontWeight: '900', letterSpacing: '-1.5px', marginBottom: '4px' }}>
-                        PERIOD<span style={{ color: 'var(--primary)', opacity: 0.9 }}>YA</span>
-                    </h1>
-                    <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--primary)', letterSpacing: '2px', opacity: 0.6 }}>SYSTEM V3.0</div>
+                <div style={{ padding: '32px 24px 20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div className="logo-container" style={{ overflow: 'hidden' }}>
+                        <h1 className="logo-text" style={{ fontSize: '26px', fontWeight: '900', letterSpacing: '-1.5px', marginBottom: '4px', whiteSpace: 'nowrap' }}>
+                            PERIOD<span style={{ color: 'var(--primary)', opacity: 0.9 }}>YA</span>
+                        </h1>
+                        <div className="logo-subtext" style={{ fontSize: '11px', fontWeight: '800', color: 'var(--primary)', letterSpacing: '2px', opacity: 0.6, whiteSpace: 'nowrap' }}>SYSTEM V3.0</div>
+                    </div>
+                    {/* DESKTOP COLLAPSE TOGGLE */}
+                    <button
+                        className="hide-mobile"
+                        onClick={() => setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
+                        style={{
+                            background: 'transparent', border: 'none', color: 'var(--text-muted)',
+                            cursor: 'pointer', padding: '4px', borderRadius: '8px', display: 'flex'
+                        }}
+                    >
+                        <span style={{ fontSize: '18px', transform: isDesktopSidebarCollapsed ? 'rotate(180deg)' : 'none', transition: '0.3s' }}>{isDesktopSidebarCollapsed ? '➡️' : '⬅️'}</span>
+                    </button>
+                    <div className="collapsed-logo-icon" style={{ display: isDesktopSidebarCollapsed ? 'block' : 'none', fontSize: '24px', fontWeight: '900', color: 'var(--primary)', textAlign: 'center', width: '100%' }}>
+                        P<span style={{ color: 'var(--text-main)' }}>Y</span>
+                    </div>
                 </div>
 
-                <div style={{ padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <div className="selector-container" style={{ padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     {/* TENANT SELECTOR (IMPERSONATION) */}
                     {isPlatformAdmin && (
                         <div>
@@ -407,8 +424,8 @@ export default function Sidebar() {
                                     className="sidebar-link"
                                 >
                                     <span style={{ fontSize: '18px', filter: anyChildActive ? 'none' : 'grayscale(100%) opacity(0.5)' }}>{item.icon}</span>
-                                    <span style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1 }}>{item.name}</span>
-                                    <span style={{ fontSize: '10px', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: '0.3s' }}>▼</span>
+                                    <span className="sidebar-text" style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1, whiteSpace: 'nowrap' }}>{item.name}</span>
+                                    <span className="sidebar-chevron" style={{ fontSize: '10px', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: '0.3s' }}>▼</span>
                                 </div>
 
                                 {isExpanded && (
@@ -429,7 +446,7 @@ export default function Sidebar() {
                                                         className="sidebar-sublink"
                                                     >
                                                         <span>{sub.icon}</span>
-                                                        <span>{sub.name}</span>
+                                                        <span className="sidebar-subtext" style={{ whiteSpace: 'nowrap' }}>{sub.name}</span>
                                                     </div>
                                                 </Link>
                                             );
