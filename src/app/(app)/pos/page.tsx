@@ -17,9 +17,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUpsell } from '@/hooks/useUpsell';
 import CashflowForecastChart from '@/components/CashflowForecastChart';
 import AnomalyAlert from '@/components/AnomalyAlert';
-// End of imports
 
-export default function DashboardPage() {
+export default function PosTerminalPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { currentUser, activeBranchName } = useApp();
@@ -55,14 +54,7 @@ export default function DashboardPage() {
   const [insightsData, setInsightsData] = useState<any>(null);
 
   const { isAuthenticated } = useAuth();
-  // Removed useUpsell since it was causing error or not imported. 
-  // Wait, useUpsell was imported in original file.
-  // In Step 464, line 55 says: const { checkUpsell } = useUpsell();
-  // But line 55 lint error said: Cannot find name 'useUpsell'.
-  // Ah, I removed the import in Step 461.
-  // I need to add the import back!
-
-  // Re-adding import: import { useUpsell } from '@/hooks/useUpsell';
+  const { checkUpsell } = useUpsell();
 
   // --- FETCH INSIGHTS ---
   useEffect(() => {
@@ -315,17 +307,12 @@ export default function DashboardPage() {
     if (cart.length === 0) return;
     if (!paymentMode) return showWarning("Hata", "Lütfen bir ödeme yöntemi seçiniz.");
 
-    // This hook is missing from imports in Step 461 but used here?
-    // I need to add import useUpsell.
-    // It is used here.
-    const canContinue = true; // Placeholder if hook is missing, but I will add import.
-    // await checkUpsell('INVOICE_PAGE');
-
-    // Correction: I am adding useUpsell to imports below.
-
     if (paymentMode !== 'account' && !selectedKasa) {
       return showWarning("Hata", `Lütfen işlem yapılacak ${paymentMode === 'cash' ? 'kasayı' : (paymentMode === 'card' ? 'POS hesabını' : 'bankayı')} seçiniz.`);
     }
+
+    const canContinue = await checkUpsell('INVOICE_PAGE');
+    if (!canContinue) return;
 
     if (paymentMode === 'account' && selectedCustomer === 'Perakende Müşteri') {
       return showWarning("Hata", "Perakende müşterisine veresiye satış yapılamaz. Lütfen cari seçiniz.");

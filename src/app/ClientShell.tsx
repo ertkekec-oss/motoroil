@@ -19,7 +19,8 @@ import NotificationCenter from "../components/NotificationCenter";
 import CommandPalette from "../components/CommandPalette";
 
 const permMap: Record<string, { perm?: string, feature?: string }> = {
-    '/': { perm: 'pos_access', feature: 'pos' },
+    '/': { perm: 'pos_access' },
+    '/pos': { perm: 'pos_access', feature: 'pos' },
     '/accounting': { perm: 'finance_view', feature: 'financials' },
     '/customers': { perm: 'customer_view', feature: 'current_accounts' },
     '/suppliers': { perm: 'supplier_view', feature: 'suppliers' },
@@ -56,8 +57,9 @@ function MobileHeader() {
     const pathname = usePathname();
 
     const getTitle = (path: string) => {
-        if (path === '/') return 'POS Terminal';
-        if (path === '/dashboard') return 'POS Terminal';
+        if (path === '/') return 'Kontrol Paneli';
+        if (path === '/pos') return 'POS Terminal';
+        if (path === '/dashboard') return 'B2B Network';
         if (path === '/accounting') return 'Finans';
         if (path === '/inventory') return 'Envanter';
         if (path === '/customers') return 'Cariler';
