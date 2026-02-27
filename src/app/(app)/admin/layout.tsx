@@ -57,6 +57,12 @@ export default async function AdminLayout({
                     <NavLink href="/admin/trust-monitor" icon="activity">Trust Monitor</NavLink>
                     <NavLink href="/admin/payouts" icon="credit-card">Payout Kontrol</NavLink>
 
+                    <div className="pt-4 mt-4 font-semibold text-xs text-slate-500 uppercase tracking-wider px-3 mb-1">Payments & Escrow Governance</div>
+                    <NavLink href="/admin/payments-escrow/policies" icon="shield">Escrow Policies</NavLink>
+                    <NavLink href="/admin/payments-escrow/commissions" icon="tag">Commission Rules</NavLink>
+                    <NavLink href="/admin/payments-escrow/providers" icon="globe">Payment Providers</NavLink>
+                    <NavLink href="/admin/payments-escrow/audit" icon="activity">Governance Audit</NavLink>
+
                     <div className="pt-4 mt-4 font-semibold text-xs text-slate-500 uppercase tracking-wider px-3 mb-1">Sistem & Güvenlik</div>
                     <NavLink href="/admin/security" icon="shield">Operasyonel Güvenlik</NavLink>
                     <NavLink href="/admin/logs" icon="terminal">Sistem Logları</NavLink>
