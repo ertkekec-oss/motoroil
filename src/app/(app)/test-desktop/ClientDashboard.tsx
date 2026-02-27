@@ -266,67 +266,52 @@ export default function ClientDashboard() {
                         <p className="text-[14px] font-semibold text-slate-500 tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full opacity-80">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti</p>
                     </div>
 
-                    {/* COMMAND CENTER SYSTEM SURFACE */}
-                    <div
-                        className={`w-full border-b border-[#0F172A]/[0.08] dark:border-white/[0.08] flex items-center transition-all duration-300 z-50 bg-white/95 dark:bg-[#080911]/95 backdrop-blur-md mb-10
-                            ${isScrolled
-                                ? 'h-[48px] sticky top-0 px-4 sm:px-8 xl:px-12 -mx-4 sm:-mx-8 xl:-mx-12 shadow-sm'
-                                : 'h-[64px]'}`}
-                        onMouseEnter={() => setIsHoveringAnnouncements(true)}
-                        onMouseLeave={() => setIsHoveringAnnouncements(false)}
-                    >
-                        {/* 1. CANLI SİSTEM (40%) */}
-                        <div className={`flex-[0.4] flex flex-col justify-center h-full pr-4 relative overflow-hidden`}>
-                            <div className="flex items-center gap-2 mb-0.5 opacity-80">
-                                <div className="w-1.5 h-1.5 rounded-full bg-slate-800 dark:bg-white flex-shrink-0"></div>
-                                <span className={`font-black uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 transition-all ${isScrolled ? 'text-[9px]' : 'text-[10px]'}`}>CANLI</span>
+                    {/* EXECUTIVE BROADCAST LAYER (CONDITIONAL) */}
+                    {MOCK_ANNOUNCEMENTS.length > 0 && (
+                        <div
+                            className={`w-full border-b border-[#0F172A]/[0.08] dark:border-white/[0.08] bg-[#F8FAFC] dark:bg-[#0f111a] flex items-center transition-all duration-300 z-50 mb-10 overflow-hidden
+                                ${isScrolled
+                                    ? 'h-[52px] sticky top-0 px-4 sm:px-8 xl:px-12 -mx-4 sm:-mx-8 xl:-mx-12 shadow-sm'
+                                    : 'h-[72px]'}`}
+                            onMouseEnter={() => setIsHoveringAnnouncements(true)}
+                            onMouseLeave={() => setIsHoveringAnnouncements(false)}
+                        >
+                            {/* 1. DUYURU TÜRÜ (15%) */}
+                            <div className="flex-[0.15] min-w-[120px] flex items-center gap-2 pr-4">
+                                <span className={`font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 transition-all ${isScrolled ? 'text-[10px]' : 'text-[11px]'}`}>
+                                    {MOCK_ANNOUNCEMENTS[announcementIdx]?.tag === "BAKIM" ? "DUYURU" : MOCK_ANNOUNCEMENTS[announcementIdx]?.tag || "CANLI"}
+                                </span>
+                                <div className="w-1.5 h-1.5 rounded-full bg-slate-800 dark:bg-slate-300 flex-shrink-0"></div>
                             </div>
-                            <div className="relative w-full h-[20px] lg:h-[22px]">
+
+                            {/* 2. ANA MESAJ (70%) */}
+                            <div className="flex-[0.7] relative h-[24px] overflow-hidden">
                                 {MOCK_ANNOUNCEMENTS.map((ann, idx) => (
                                     <div
                                         key={ann.id}
-                                        className={`absolute inset-0 flex items-center transition-opacity duration-300 ease-in-out ${idx === announcementIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
+                                        className={`absolute inset-0 flex items-center transition-opacity duration-250 ease-in-out ${idx === announcementIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
                                     >
-                                        <div className={`font-[700] text-[#0F172A] dark:text-white line-clamp-1 transition-all ${isScrolled ? 'text-[13px]' : 'text-[14px] lg:text-[15px]'}`}>
-                                            {ann.title}
+                                        <div className={`font-[600] text-[#0F172A] dark:text-white truncate transition-all ${isScrolled ? 'text-[14px]' : 'text-[15px] lg:text-[16px]'}`}>
+                                            {ann.title} — <span className="font-medium text-slate-600 dark:text-slate-400">{ann.msg}</span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        </div>
 
-                        {/* Divider */}
-                        <div className="w-[1px] h-8 bg-[#0F172A]/[0.08] dark:bg-white/10 hidden sm:block"></div>
-
-                        {/* 2. STRATEJİK DURUM (40%) */}
-                        <div className={`hidden sm:flex flex-[0.4] flex-col justify-center h-full px-6 lg:px-8 relative`}>
-                            <div className="flex items-center mb-0.5 opacity-80">
-                                <span className={`font-black uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 transition-all ${isScrolled ? 'text-[9px]' : 'text-[10px]'}`}>STRATEJİK</span>
-                            </div>
-                            <div className="flex items-center w-full">
-                                <div className={`font-[700] text-[#0F172A] dark:text-white line-clamp-1 transition-all ${isScrolled ? 'text-[13px]' : 'text-[14px] lg:text-[15px]'}`}>
-                                    Otonom Fiyatlandırma Aktif
-                                </div>
+                            {/* 3. AKSİYON (15%) */}
+                            <div className="flex-[0.15] min-w-[100px] flex items-center justify-end pl-4 gap-4">
+                                <Link
+                                    href={MOCK_ANNOUNCEMENTS[announcementIdx]?.link || "#"}
+                                    className={`font-semibold text-slate-500 hover:text-[#0F172A] dark:text-slate-400 dark:hover:text-white transition-colors ${isScrolled ? 'text-[12px]' : 'text-[13px]'}`}
+                                >
+                                    Detaylar →
+                                </Link>
+                                <button className="p-1.5 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
                             </div>
                         </div>
-
-                        {/* Divider */}
-                        <div className="w-[1px] h-8 bg-[#0F172A]/[0.08] dark:bg-white/10 hidden sm:block"></div>
-
-                        {/* 3. SYSTEM STATUS (20%) */}
-                        <div className={`hidden sm:flex flex-[0.2] flex-col justify-center h-full pl-6 lg:pl-8 relative items-end sm:items-start`}>
-                            <div className="flex items-center mb-0.5 opacity-80">
-                                <span className={`font-black uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 transition-all ${isScrolled ? 'text-[9px]' : 'text-[10px]'}`}>SYSTEM STATUS</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 w-full justify-end sm:justify-start">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></div>
-                                <div className={`font-[700] text-emerald-600 dark:text-emerald-400 line-clamp-1 transition-all ${isScrolled ? 'text-[13px]' : 'text-[14px] lg:text-[15px]'}`}>
-                                    Normal
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                    )}
 
                     {/* Compact Onboarding Strip (Premium & Minimal) */}
                     {setupNeeded && !loading && mounted && !isFullyDismissed && (() => {
