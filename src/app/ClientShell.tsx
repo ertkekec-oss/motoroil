@@ -16,6 +16,7 @@ import { GrowthBanner } from "../components/GrowthBanner";
 import GlobalErrorScreen from "../components/GlobalErrorScreen";
 import AppSkeleton from "../components/AppSkeleton";
 import NotificationCenter from "../components/NotificationCenter";
+import CommandPalette from "../components/CommandPalette";
 
 const permMap: Record<string, { perm?: string, feature?: string }> = {
     '/': { perm: 'pos_access', feature: 'pos' },
@@ -251,6 +252,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 </main>
                 {showSidebar && <MobileNav />}
             </div>
+            {auth.isAuthenticated && <CommandPalette isAdmin={isAdminPage} />}
         </div>
     );
 }
