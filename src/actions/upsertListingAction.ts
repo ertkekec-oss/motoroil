@@ -12,7 +12,7 @@ export async function upsertListingAction(formData: FormData) {
         throw new Error("Unauthorized");
     }
 
-    const companyId = user.companyId || session?.companyId;
+    let companyId = user.companyId || session?.companyId || session?.settings?.companyId;
 
     const erpProductId = formData.get("erpProductId") as string;
     const priceStr = formData.get("price") as string;
@@ -35,7 +35,19 @@ export async function upsertListingAction(formData: FormData) {
         where: { id: erpProductId }
     });
 
-    if (!erpProduct || erpProduct.companyId !== companyId) {
+    if (!erpProduct) {
+        throw new Error("Product not found");
+    }
+
+    if (!companyId) {
+        if (user.role === "SUPER_ADMIN" || user.role === "admin" || user.tenantId === erpProduct.tenantId) {
+            companyId = erpProduct.companyId;
+        } else {
+            throw new Error("Missing company context");
+        }
+    }
+
+    if (erpProduct.companyId !== companyId && user.role !== "SUPER_ADMIN" && user.role !== "admin") {
         throw new Error("Product not found or unauthorized");
     }
 

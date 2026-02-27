@@ -11,12 +11,17 @@ export default async function SellerProductsPage() {
 
     if (!user) redirect("/login");
 
-    const companyId = user.companyId || session?.companyId;
-    if (!companyId) redirect("/403");
+    const companyId = user.companyId || session?.companyId || session?.settings?.companyId;
+    if (!companyId && user.role !== "SUPER_ADMIN" && user.role !== "admin") redirect("/403");
+
+    const whereClause: any = { deletedAt: null };
+    if (companyId) {
+        whereClause.companyId = companyId;
+    }
 
     // Fetch all products of this seller and their NetworkListings
     const products = await prisma.product.findMany({
-        where: { companyId, deletedAt: null },
+        where: whereClause,
         include: {
             networkListings: true,
         },

@@ -14,10 +14,18 @@ export default async function SellerProductEditPage({ params }: { params: { id: 
         redirect("/login");
     }
 
-    const companyId = user.companyId || session?.companyId;
+    const companyId = user.companyId || session?.companyId || session?.settings?.companyId;
+    if (!companyId && user.role !== "SUPER_ADMIN" && user.role !== "admin") {
+        redirect("/403");
+    }
 
-    const erpProduct = await prisma.product.findUnique({
-        where: { id: params.id, companyId, deletedAt: null },
+    const whereClause: any = { id: params.id, deletedAt: null };
+    if (companyId) {
+        whereClause.companyId = companyId;
+    }
+
+    const erpProduct = await prisma.product.findFirst({
+        where: whereClause,
         include: {
             networkListings: true,
         },
