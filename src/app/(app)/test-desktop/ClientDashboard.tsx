@@ -103,6 +103,12 @@ const ALL_MODULES = [
     { id: "billing", title: "Abonelik", desc: "Lisans Planları", href: "/billing", icon: <PieChart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-amber-50 text-amber-600 border-amber-100" },
 ];
 
+const MOCK_ANNOUNCEMENTS = [
+    { id: 1, title: "Sistem Güncellemesi", msg: "Q1 finansal kapanışları için yeni ledger modülü aktif edildi.", link: "/settings/updates", tag: "DUYURU", color: "text-blue-600 bg-blue-100" },
+    { id: 2, title: "Otonom Fiyatlandırma", msg: "B2B Ağında otomatik fiyatlama motoru yayına alındı. Ayarları inceleyin.", link: "/fintech/control-tower", tag: "YENİ", color: "text-emerald-600 bg-emerald-100" },
+    { id: 3, title: "Bakım Çalışması", msg: "Cumartesi gece 03:00'da kısa süreli altyapı bakımı yapılacaktır.", link: "#", tag: "BAKIM", color: "text-amber-600 bg-amber-100" },
+];
+
 export default function ClientDashboard() {
     const { user } = useAuth();
     const router = useRouter();
@@ -111,6 +117,14 @@ export default function ClientDashboard() {
     const [loading, setLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [announcementIdx, setAnnouncementIdx] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setAnnouncementIdx((prev) => (prev + 1) % MOCK_ANNOUNCEMENTS.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, []);
 
     const trackEvent = async (eventName: string, properties?: any) => {
         if (!mounted) return;
@@ -204,13 +218,12 @@ export default function ClientDashboard() {
                                         trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
                                         router.push(feat.href);
                                     }}
-                                    className={`text-left flex flex-col items-start p-5 rounded-3xl transition-transform active:scale-95 border ${feat.color.split(' ')[0]} border-transparent hover:${feat.color.split(' ')[2]} focus:outline-none shadow-sm hover:shadow-md cursor-pointer`}
-                                    style={{ background: 'var(--bg-hover, #F8FAFC)' }}
+                                    className="text-left flex flex-col items-start p-5 rounded-[20px] transition-transform active:scale-95 border border-slate-200/60 hover:border-slate-300 dark:border-slate-700/50 dark:hover:border-slate-600 focus:outline-none shadow-sm hover:shadow-md cursor-pointer bg-white dark:bg-slate-800 group"
                                 >
                                     <div className={`p-3 rounded-2xl mb-4 shadow-sm ${feat.color.replace('border-', 'border border-')}`}>
                                         {feat.icon}
                                     </div>
-                                    <h4 className="text-[15px] font-extrabold text-slate-800 tracking-tight leading-tight">{feat.title}</h4>
+                                    <h4 className="text-[15px] font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight">{feat.title}</h4>
                                     <p className="text-[12px] font-semibold text-slate-500 mt-1 line-clamp-2 leading-snug">{feat.desc}</p>
                                 </button>
                             ))
@@ -230,25 +243,62 @@ export default function ClientDashboard() {
                 <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
                 <div className="max-w-[1400px] mx-auto space-y-8 pb-24">
 
-                    {/* Header Info */}
-                    <div className="mb-10">
-                        <h2 className="text-4xl font-extrabold tracking-tight text-[#0F172A] dark:text-white">Workspace Overview</h2>
-                        <p className="text-base font-medium text-[#64748B] dark:text-slate-400 mt-2 tracking-wide">Tüm ağın veri doğruluk merkezi (Ledger SoT) destekli finans ve operasyon özetiniz.</p>
+                    {/* Header Info & Announcements */}
+                    <div className="mb-10 flex flex-col xl:flex-row xl:justify-between xl:items-end gap-6">
+                        <div>
+                            <h2 className="text-4xl font-extrabold tracking-tight text-[#0F172A] dark:text-white mb-2">Workspace Overview</h2>
+                            <p className="text-sm font-semibold text-[#64748B] dark:text-slate-400 tracking-wide uppercase">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti (Ledger SoT)</p>
+                        </div>
+
+                        {/* Süper Admin Duyuruları (Slider) */}
+                        <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 flex items-center gap-4 xl:max-w-md w-full relative overflow-hidden shadow-sm">
+                            <div className="relative w-full overflow-hidden h-12 flex items-center">
+                                {MOCK_ANNOUNCEMENTS.map((ann, idx) => (
+                                    <div
+                                        key={ann.id}
+                                        className={`absolute inset-0 flex items-center transition-all duration-700 ease-in-out ${idx === announcementIdx ? 'opacity-100 translate-y-0 relative' : 'opacity-0 translate-y-4 pointer-events-none absolute'}`}
+                                    >
+                                        <div className="flex flex-col">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${ann.color}`}>{ann.tag}</span>
+                                                <span className="text-sm font-bold text-slate-900 dark:text-white">{ann.title}</span>
+                                            </div>
+                                            <Link href={ann.link} className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-1">{ann.msg}</Link>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Setup Notification */}
+                    {/* Setup Notification (Compact Timeline) */}
                     {setupNeeded && !loading && mounted && (
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 border-none rounded-3xl p-8 shadow-[0_10px_40px_-10px_rgba(37,99,235,0.15)] flex flex-col sm:flex-row sm:items-center gap-6">
-                            <div className="p-4 bg-white dark:bg-slate-900 text-blue-600 rounded-2xl shadow-sm">
-                                <Zap className="w-8 h-8" />
+                        <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-900/30 rounded-[20px] p-5 shadow-sm flex flex-col lg:flex-row lg:items-center gap-5 mb-8">
+                            <div className="flex items-center gap-3 lg:w-1/3 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800 pb-4 lg:pb-0 lg:pr-5">
+                                <div className="p-2.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded-xl">
+                                    <Zap className="w-5 h-5" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <h3 className="text-[15px] font-extrabold text-[#0F172A] dark:text-white tracking-tight">Kurulum Merkezi</h3>
+                                    <p className="text-xs font-semibold text-slate-500 mt-0.5">Sistemi otonomlaştırın</p>
+                                </div>
                             </div>
-                            <div className="flex-1">
-                                <h3 className="text-xl font-black text-[#0F172A] dark:text-white mb-2">Workspace Kurulum Merkezi</h3>
-                                <p className="text-[#64748B] dark:text-slate-400 font-medium text-sm sm:text-base">Sistemi otonom olarak kullanabilmeniz için aşağıdaki doğrulama adımlarını tamamlayın.</p>
-                            </div>
-                            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
-                                <Link href="/settings/company" className="px-6 py-4 bg-blue-600 text-white text-center font-bold rounded-2xl hover:bg-blue-700 hover:shadow-lg transition">Şirket Profilini Tamamla</Link>
-                                <Link href="/seller/products" className="px-6 py-4 bg-white text-slate-800 text-center font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 transition">Katalog İçeriğini Aktar</Link>
+                            <div className="flex-1 flex flex-col sm:flex-row gap-4 items-center w-full">
+                                <div className="flex items-center gap-3 w-full sm:w-auto flex-1 bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                    <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">1</div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-sm font-bold text-[#0F172A] dark:text-slate-200 truncate">Şirket Profili</div>
+                                    </div>
+                                    <Link href="/settings/company" className="px-5 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition shadow-sm shrink-0">Tamamla</Link>
+                                </div>
+                                <div className="hidden sm:block w-8 h-[2px] bg-slate-100 dark:bg-slate-700 shrink-0"></div>
+                                <div className="flex items-center gap-3 w-full sm:w-auto flex-1 p-2.5 opacity-60 pointer-events-none">
+                                    <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 flex items-center justify-center text-xs font-black shrink-0">2</div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">Katalog Aktarımı</div>
+                                    </div>
+                                    <div className="px-5 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 text-xs font-bold rounded-lg shrink-0">Kilitli</div>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -342,57 +392,7 @@ export default function ClientDashboard() {
                             </div>
                         </div>
 
-                        {/* 3. BİLDİRİMLER VE ONAYLAR */}
-                        <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col">
-                            <div className="flex justify-between items-start mb-8">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-red-50 text-red-600 rounded-2xl">
-                                        <Bell className="w-6 h-6" />
-                                    </div>
-                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Onaylar & Alarmlar</h3>
-                                </div>
-                                {(d?.notificationsApp?.criticalAlerts || 0) > 0 && (
-                                    <div className="px-3 py-1 bg-red-500 text-white text-[11px] font-black tracking-widest uppercase rounded-lg flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
-                                        <AlertTriangle className="w-3 h-3" /> Kritik
-                                    </div>
-                                )}
-                            </div>
 
-                            <div className="mt-auto space-y-4">
-                                <div className="p-5 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
-                                            <CheckSquare className="w-5 h-5 text-amber-600" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-amber-900 text-[15px]">Bekleyen Onaylar</p>
-                                            <p className="font-medium text-amber-700/70 text-[12px]">Fatura, Escrow ve Sözleşme</p>
-                                        </div>
-                                    </div>
-                                    <div className="text-2xl font-black text-amber-600">{loading ? "..." : d?.notificationsApp?.pendingApprovals || 0}</div>
-                                </div>
-
-                                <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
-                                            <MessageCircle className="w-5 h-5 text-blue-600" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-blue-900 text-[15px]">Okunmamış Bildirim</p>
-                                            <p className="font-medium text-blue-700/70 text-[12px]">Sistem güncelleme ve mesajlar</p>
-                                        </div>
-                                    </div>
-                                    <div className="text-2xl font-black text-blue-600">{loading ? "..." : d?.notificationsApp?.newNotifications || 0}</div>
-                                </div>
-
-                                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-3 text-slate-600 font-bold text-[14px]">
-                                        <AlertCircle className="w-5 h-5 opacity-70" /> Kaçak İşlem ve Kritik Alert:
-                                    </div>
-                                    <span className="font-black text-slate-800 text-[16px]">{loading ? "..." : d?.notificationsApp?.criticalAlerts || 0}</span>
-                                </div>
-                            </div>
-                        </div>
 
                         {/* 4. PDKS & PERSONEL ÖZETİ */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "HR", "RISK"])) && (
@@ -510,6 +510,64 @@ export default function ClientDashboard() {
                                 </div>
                             </div>
                         )}
+
+                        {/* 8. BİLDİRİMLER VE ONAYLAR (GENİŞLETİLMİŞ) */}
+                        <div className="md:col-span-full lg:col-span-2 2xl:col-span-3 overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col">
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-red-50 text-red-600 rounded-2xl">
+                                        <Bell className="w-6 h-6" />
+                                    </div>
+                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Onaylar & Alarmlar</h3>
+                                </div>
+                                {(d?.notificationsApp?.criticalAlerts || 0) > 0 && (
+                                    <div className="px-3 py-1 bg-red-500 text-white text-[11px] font-black tracking-widest uppercase rounded-lg flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                                        <AlertTriangle className="w-3 h-3" /> Kritik Uyarı Var
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="p-5 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
+                                            <CheckSquare className="w-5 h-5 text-amber-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-amber-900 text-[15px]">Bekleyen Onaylar</p>
+                                            <p className="font-medium text-amber-700/70 text-[12px] line-clamp-1">Fatura, Escrow ve Sözleşme</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-2xl font-black text-amber-600 ml-4">{loading ? "..." : d?.notificationsApp?.pendingApprovals || 0}</div>
+                                </div>
+
+                                <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
+                                            <MessageCircle className="w-5 h-5 text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-blue-900 text-[15px]">Okunmamış Bildirim</p>
+                                            <p className="font-medium text-blue-700/70 text-[12px] line-clamp-1">Sistem güncelleme / Uyarı</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-2xl font-black text-blue-600 ml-4">{loading ? "..." : d?.notificationsApp?.newNotifications || 0}</div>
+                                </div>
+
+                                <div className="p-5 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
+                                            <ShieldAlert className="w-5 h-5 text-rose-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-rose-900 text-[15px]">Kaçak / Riskli İşlem</p>
+                                            <p className="font-medium text-rose-700/70 text-[12px] line-clamp-1">Kritik güvenlik sekmesi</p>
+                                        </div>
+                                    </div>
+                                    <span className="font-black text-rose-600 text-2xl ml-4">{loading ? "..." : d?.notificationsApp?.criticalAlerts || 0}</span>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
