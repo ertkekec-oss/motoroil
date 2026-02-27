@@ -6,7 +6,8 @@ import CounterClient from "./CounterClient";
 
 export const dynamic = "force-dynamic";
 
-export default async function SellerRfqDetailPage({ params }: { params: { id: string } }) {
+export default async function SellerRfqDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session: any = await getSession();
     const user = session?.user || session;
 
@@ -14,7 +15,7 @@ export default async function SellerRfqDetailPage({ params }: { params: { id: st
     const sellerCompanyId = user.companyId || session?.companyId;
 
     const rfq = await prisma.rfq.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             items: {
                 where: { sellerCompanyId },

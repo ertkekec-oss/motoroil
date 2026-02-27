@@ -6,7 +6,8 @@ import RfqDetailClient from "./RfqDetailClient";
 
 export const dynamic = "force-dynamic";
 
-export default async function BuyerRfqPage({ params }: { params: { id: string } }) {
+export default async function BuyerRfqPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session: any = await getSession();
     const user = session?.user || session;
 
@@ -14,7 +15,7 @@ export default async function BuyerRfqPage({ params }: { params: { id: string } 
     const buyerCompanyId = user.companyId || session?.companyId;
 
     const rfq = await prisma.rfq.findUnique({
-        where: { id: params.id, buyerCompanyId },
+        where: { id, buyerCompanyId },
         include: {
             items: {
                 include: {

@@ -6,7 +6,8 @@ import SellerProductForm from "./SellerProductForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function SellerProductEditPage({ params }: { params: { id: string } }) {
+export default async function SellerProductEditPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session: any = await getSession();
     const user = session?.user || session;
 
@@ -19,7 +20,7 @@ export default async function SellerProductEditPage({ params }: { params: { id: 
         redirect("/403");
     }
 
-    const whereClause: any = { id: params.id, deletedAt: null };
+    const whereClause: any = { id, deletedAt: null };
     if (companyId) {
         whereClause.companyId = companyId;
     }

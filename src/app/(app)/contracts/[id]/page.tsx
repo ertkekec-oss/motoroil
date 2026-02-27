@@ -6,7 +6,8 @@ import ContractDetailClient from "./ContractDetailClient";
 
 export const dynamic = "force-dynamic";
 
-export default async function BuyerContractDetailPage({ params }: { params: { id: string } }) {
+export default async function BuyerContractDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session: any = await getSession();
     const user = session?.user || session;
 
@@ -14,7 +15,7 @@ export default async function BuyerContractDetailPage({ params }: { params: { id
     const buyerCompanyId = user.companyId || session?.companyId;
 
     const contract = await prisma.contract.findUnique({
-        where: { id: params.id, buyerCompanyId },
+        where: { id, buyerCompanyId },
         include: {
             items: {
                 include: { tiers: { orderBy: { minQty: 'asc' } } }
