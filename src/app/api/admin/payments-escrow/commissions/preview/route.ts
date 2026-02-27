@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
-import { resolveCommissionRule, calculateCommission } from '@/services/finance/commission/ruleResolution';
+import { resolveRuleForLine } from '../../../../../../services/finance/commission/ruleResolution';
+import { calculateLineCommission } from '../../../../../../services/finance/commission/calculator';
+import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,11 +44,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'No active commission plan found' }, { status: 404 });
         }
 
-        const rule = resolveCommissionRule(activePlan.rules, {
-            category: categoryId,
-            brand: brandId,
-            sellerCompanyId: companyId
-        });
+        const rule = resolveRuleForLine(
+            categoryId || null,
+            brandId || null,
+            activePlan.rules
+        );
 
         if (!rule) {
             return NextResponse.json({
@@ -55,7 +57,16 @@ export async function POST(request: Request) {
             });
         }
 
-        const breakdown = calculateCommission(rule, Number(grossAmount), activePlan);
+        const commissionAmount = calculateLineCommission(
+            new Prisma.Decimal(Number(grossAmount)),
+            1,
+            rule.ratePercentage,
+            rule.fixedFee,
+            activePlan.precision,
+            activePlan.roundingMode
+        );
+
+        const breakdown = { total: Number(commissionAmount) };
 
         return NextResponse.json({
             success: true,

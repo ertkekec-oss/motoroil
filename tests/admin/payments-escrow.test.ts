@@ -27,17 +27,17 @@ vi.mock('@/lib/prisma', () => ({
     }
 }));
 
-vi.mock('@/services/finance/commission/ruleResolution', () => ({
-    resolveCommissionRule: vi.fn((rules, context) => {
-        if (context.category === 'cat-1') return rules.find((r: any) => r.matchType === 'CATEGORY');
+vi.mock('../../src/services/finance/commission/ruleResolution', () => ({
+    resolveRuleForLine: vi.fn((category, brand, rules) => {
+        if (category === 'cat-1') return rules.find((r: any) => r.matchType === 'CATEGORY');
         return rules.find((r: any) => r.matchType === 'DEFAULT');
-    }),
-    calculateCommission: vi.fn((rule, gross, plan) => ({
-        rateAmount: (gross * rule.ratePercentage) / 100,
-        fixedFee: rule.fixedFee,
-        total: ((gross * rule.ratePercentage) / 100) + rule.fixedFee,
-        tax: 0
-    }))
+    })
+}));
+
+vi.mock('../../src/services/finance/commission/calculator', () => ({
+    calculateLineCommission: vi.fn((unitPrice, qty, rate, fixed) => {
+        return Number(unitPrice) * (Number(rate) / 100) + Number(fixed);
+    })
 }));
 
 vi.mock('@/lib/auth', () => ({
