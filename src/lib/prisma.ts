@@ -231,20 +231,36 @@ const prismaClientSingleton = () => {
                             // Security Rule: Rewrite findUnique to findFirst to allow relation filters (tenant isolation)
                             if (isUniqueRead || isStrictMutation) {
                                 if (operation === 'findUnique') {
+                                    // UNROLL COMPOSITE KEYS FOR findFirst COMPATIBILITY
+                                    for (const k in newArgs.where) {
+                                        if (typeof newArgs.where[k] === 'object' && newArgs.where[k] !== null && k.includes('_')) {
+                                            const isComposite = Object.values(newArgs.where[k]).every(
+                                                v => typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'
+                                            );
+                                            if (isComposite) {
+                                                Object.assign(newArgs.where, newArgs.where[k]);
+                                                delete newArgs.where[k];
+                                            }
+                                        }
+                                    }
                                     applyFilter(newArgs.where);
                                     return (prisma as any)[model].findFirst(newArgs);
                                 }
-                                applyFilter(newArgs.where);
+
+                                // Prisma upsert does not support non-unique relationship filters
+                                if (operation !== 'upsert') {
+                                    applyFilter(newArgs.where);
+                                }
                             } else {
                                 applyFilter(newArgs.where);
                             }
                         }
 
                         // Mutation Protection for creation
-                        if (['create', 'createMany'].includes(operation)) {
+                        if (['create', 'createMany', 'upsert'].includes(operation)) {
                             const bypass = ['company', 'user', 'tenant', 'subscription', 'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic', 'loginattempt'];
                             if (!bypass.includes(modelName)) {
-                                const data = (newArgs as any).data;
+                                const data = operation === 'upsert' ? (newArgs as any).create : (newArgs as any).data;
                                 if (data && !isPlatformAdmin) {
                                     const validateItem = (item: any) => {
                                         if (!item.companyId && !item.company?.connect?.id) {
