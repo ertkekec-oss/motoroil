@@ -25,11 +25,20 @@ export default function Sidebar() {
     const [supportOpen, setSupportOpen] = useState(false);
     const [fieldSalesOpen, setFieldSalesOpen] = useState(false);
     const [reportsOpen, setReportsOpen] = useState(false);
+    const [ordersOpen, setOrdersOpen] = useState(false);
+    const [catalogOpen, setCatalogOpen] = useState(false);
 
     // Auto-expand if active
     useEffect(() => {
         if (pathname.includes('/field-sales')) setFieldSalesOpen(true);
         if (pathname.includes('/reports')) setReportsOpen(true);
+
+        if (pathname.includes('orders') || pathname.includes('/network/seller/orders') || pathname.includes('/network/buyer/orders')) {
+            setOrdersOpen(true);
+        }
+        if (pathname.includes('/seller/products') || pathname.includes('/catalog')) {
+            setCatalogOpen(true);
+        }
 
         if (pathname.includes('/catalog') || pathname.includes('/rfq') || pathname.includes('/contracts') || pathname.includes('/network/buyer')) {
             setBuyerOpen(true);
@@ -360,20 +369,24 @@ export default function Sidebar() {
                 {menuItems.map((item: any) => {
                     if (item.isParent) {
                         const isExpanded =
-                            item.id === 'field-sales-parent' ? fieldSalesOpen :
-                                item.id === 'reports-parent' ? reportsOpen :
-                                    item.id === 'buyer-parent' ? buyerOpen :
-                                        item.id === 'seller-parent' ? sellerOpen :
-                                            item.id === 'growth-parent' ? growthOpen :
-                                                item.id === 'net-fin-parent' ? netFinOpen :
-                                                    item.id === 'support-parent' ? supportOpen :
-                                                        false;
+                            item.id === 'orders-parent' ? ordersOpen :
+                                item.id === 'catalog-parent' ? catalogOpen :
+                                    item.id === 'field-sales-parent' ? fieldSalesOpen :
+                                        item.id === 'reports-parent' ? reportsOpen :
+                                            item.id === 'buyer-parent' ? buyerOpen :
+                                                item.id === 'seller-parent' ? sellerOpen :
+                                                    item.id === 'growth-parent' ? growthOpen :
+                                                        item.id === 'net-fin-parent' ? netFinOpen :
+                                                            item.id === 'support-parent' ? supportOpen :
+                                                                false;
                         const anyChildActive = item.subItems?.some((sub: any) => pathname === sub.href);
 
                         return (
                             <div key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                 <div
                                     onClick={() => {
+                                        if (item.id === 'orders-parent') setOrdersOpen(!ordersOpen);
+                                        if (item.id === 'catalog-parent') setCatalogOpen(!catalogOpen);
                                         if (item.id === 'field-sales-parent') setFieldSalesOpen(!fieldSalesOpen);
                                         if (item.id === 'reports-parent') setReportsOpen(!reportsOpen);
                                         if (item.id === 'buyer-parent') setBuyerOpen(!buyerOpen);
