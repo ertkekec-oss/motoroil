@@ -788,67 +788,46 @@ export default function SalesPage() {
     };
 
     return (
-        <div data-pos-theme={theme} className="container" style={{ padding: '40px 20px' }}>
-            <header className="flex-between" style={{ marginBottom: '32px' }}>
+        <div data-pos-theme={theme} className="w-full min-h-[100vh] px-8 py-8 space-y-6 transition-colors duration-300 font-sans">
+            <header className="flex justify-between items-center">
                 <div>
-                    <h1 style={{
-                        fontSize: '28px', fontWeight: '800', margin: 0,
-                        color: theme === 'light' ? '#1A1F36' : undefined,
-                    }} className={theme === 'light' ? '' : 'text-gradient'}>
-                        Satış Yönetimi
+                    <h1 className={`text-[22px] font-semibold tracking-tight ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
+                        Sales Control Console
                     </h1>
-                    <p style={{ marginTop: '6px', fontSize: '14px', color: theme === 'light' ? '#8B95A5' : undefined }} className={theme === 'light' ? '' : 'text-muted'}>
+                    <p className={`mt-1 text-[13px] font-medium ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
                         E-Ticaret, Mağaza Satışları ve Faturalar
                     </p>
                 </div>
-                <button
-                    onClick={toggleTheme}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl border transition-all font-bold text-xs uppercase tracking-wide shadow-sm ${theme === 'light'
-                        ? 'bg-white border-blue-100 text-blue-600 shadow-blue-900/5'
-                        : 'bg-[#1e293b] border-white/5 text-amber-500 shadow-black/50'
-                        }`}
-                >
-                    <span>{theme === 'light' ? '🌙' : '☀️'}</span>
-                    {theme === 'light' ? 'KARANLIK' : 'AYDINLIK'}
-                </button>
             </header>
 
-            {/* Tab bar */}
-            <div className="pos-tab-bar" style={{
-                display: 'flex', gap: '4px',
-                borderBottom: theme === 'light' ? '1px solid #E6EBF0' : '1px solid var(--border-light)',
-                marginBottom: '24px',
-            }}>
+            {/* Premium Minimal Tab Navigation */}
+            <div className={`flex gap-6 border-b pb-[1px] ${theme === 'light' ? 'border-slate-200' : 'border-slate-800'}`}>
                 {[
                     { key: 'online', label: 'E-Ticaret', onClick: () => setActiveTab('online') },
                     { key: 'store', label: 'Mağaza Satışları', onClick: () => setActiveTab('store') },
                     { key: 'invoices', label: 'Faturalar', onClick: () => { setActiveTab('invoices'); setInvoiceSubTab('sales'); } },
                     { key: 'wayslips', label: 'e-İrsaliyeler', onClick: () => { setActiveTab('wayslips'); setInvoiceSubTab('wayslips'); } },
-                ].map(({ key, label, onClick }) => (
-                    <button
-                        key={key}
-                        onClick={onClick}
-                        className={activeTab === key ? 'pos-tab-active' : ''}
-                        style={{
-                            padding: '12px 20px', border: 'none', cursor: 'pointer',
-                            fontSize: '14px', fontWeight: activeTab === key ? '600' : '400',
-                            background: 'transparent',
-                            color: theme === 'light'
-                                ? (activeTab === key ? '#247BFE' : '#8B95A5')
-                                : 'white',
-                            borderBottom: activeTab === key
-                                ? `2px solid ${theme === 'light' ? '#247BFE' : 'var(--primary)'}`
-                                : '2px solid transparent',
-                            transition: 'all 0.15s ease',
-                        }}
-                    >
-                        {label}
-                    </button>
-                ))}
+                ].map(({ key, label, onClick }) => {
+                    const isActive = activeTab === key;
+                    return (
+                        <button
+                            key={key}
+                            onClick={onClick}
+                            className={`pb-3 text-[14px] font-semibold transition-colors relative -mb-[2px]`}
+                            style={{
+                                color: isActive
+                                    ? (theme === 'light' ? '#2563EB' : '#60A5FA')
+                                    : (theme === 'light' ? '#64748B' : '#94A3B8'),
+                                borderBottom: isActive ? `2px solid ${theme === 'light' ? '#2563EB' : '#60A5FA'}` : '2px solid transparent'
+                            }}
+                        >
+                            {label}
+                        </button>
+                    );
+                })}
             </div>
 
-
-            <div className="card glass">
+            <div className="w-full">
                 {activeTab === 'online' && (
                     <OnlineOrdersTab
                         onlineOrders={onlineOrders}

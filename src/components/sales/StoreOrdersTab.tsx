@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, Fragment, useEffect } from 'react';
@@ -19,6 +18,8 @@ export function StoreOrdersTab({
     isLoadingStore,
     posTheme = 'dark'
 }: StoreOrdersTabProps) {
+    const isLight = posTheme === 'light';
+
     const [turnoverFilter, setTurnoverFilter] = useState('TODAY');
     const [turnoverCustomStart, setTurnoverCustomStart] = useState('');
     const [turnoverCustomEnd, setTurnoverCustomEnd] = useState('');
@@ -70,29 +71,44 @@ export function StoreOrdersTab({
     const totalPages = Math.ceil(storeOrders.length / ordersPerPage);
     const paginatedOrders = storeOrders.slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage);
 
+    const cardClass = isLight
+        ? "bg-white border border-slate-200 shadow-sm"
+        : "bg-slate-900 border border-slate-800";
+
+    const textLabelClass = isLight ? "text-slate-500" : "text-slate-400";
+    const textValueClass = isLight ? "text-slate-900" : "text-white";
+
     return (
-        <div>
-            <div className="flex-between mb-4">
-                <h3>Mağaza Satış Geçmişi (POS)</h3>
-                <button onClick={fetchStoreOrders} className="btn btn-outline" style={{ fontSize: '12px' }}>🔄 Yenile</button>
+        <div className="space-y-8 font-sans">
+            <div className="flex justify-between items-center">
+                <h3 className={`text-[18px] font-semibold ${textValueClass}`}>Mağaza Satış Geçmişi (POS)</h3>
+                <button
+                    onClick={fetchStoreOrders}
+                    className={`h-[40px] px-4 items-center justify-center flex gap-2 rounded-[12px] font-medium text-[13px] border transition-colors ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                        }`}
+                >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    Yenile
+                </button>
             </div>
 
             {/* Store Stats Summary */}
-            <div className="grid-cols-4" style={{ marginBottom: '32px', gap: '20px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
-                <div className="card glass">
-                    <div className="text-muted" style={{ fontSize: '12px' }}>TOPLAM İŞLEM</div>
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--primary)', marginTop: '8px' }}>
-                        {storeOrders.length} Adet
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className={`p-5 rounded-[14px] ${cardClass}`}>
+                    <div className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>TOPLAM İŞLEM</div>
+                    <div className={`text-[28px] font-semibold mt-2 tracking-tight ${isLight ? 'text-blue-600' : 'text-blue-500'}`}>
+                        {storeOrders.length} <span className={`text-[14px] font-medium ml-1 ${textLabelClass}`}>Adet</span>
                     </div>
-                    <div style={{ fontSize: '12px', marginTop: '4px' }}>Tüm zamanlar</div>
+                    <div className={`text-[12px] mt-1 ${textLabelClass}`}>Tüm zamanlar</div>
                 </div>
-                <div className="card glass" style={{ position: 'relative' }}>
-                    <div className="flex-between">
-                        <div className="text-muted" style={{ fontSize: '12px' }}>{getTurnoverTitle()}</div>
+                <div className={`p-5 rounded-[14px] ${cardClass}`}>
+                    <div className="flex justify-between items-center">
+                        <div className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>{getTurnoverTitle()}</div>
                         <select
                             value={turnoverFilter}
                             onChange={(e) => setTurnoverFilter(e.target.value)}
-                            style={{ fontSize: '10px', padding: '2px', background: 'var(--bg-deep)', color: 'white', border: 'none', borderRadius: '4px' }}
+                            className={`text-[11px] font-medium border rounded-[6px] px-2 py-1 outline-none ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-300'
+                                }`}
                         >
                             <option value="TODAY">Bugün</option>
                             <option value="WEEK">1 Hafta</option>
@@ -101,122 +117,138 @@ export function StoreOrdersTab({
                         </select>
                     </div>
                     {turnoverFilter === 'CUSTOM' && (
-                        <div className="flex-center gap-1 mt-1" style={{ fontSize: '10px' }}>
-                            <input type="date" value={turnoverCustomStart} onChange={e => setTurnoverCustomStart(e.target.value)} style={{ padding: '2px', width: '80px', background: 'var(--bg-deep)', color: 'white', border: 'none' }} />
-                            <span>-</span>
-                            <input type="date" value={turnoverCustomEnd} onChange={e => setTurnoverCustomEnd(e.target.value)} style={{ padding: '2px', width: '80px', background: 'var(--bg-deep)', color: 'white', border: 'none' }} />
+                        <div className="flex gap-2 mt-2 text-[11px]">
+                            <input type="date" value={turnoverCustomStart} onChange={e => setTurnoverCustomStart(e.target.value)} className={`px-2 py-1 rounded-[6px] border ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`} />
+                            <span className={textLabelClass}>–</span>
+                            <input type="date" value={turnoverCustomEnd} onChange={e => setTurnoverCustomEnd(e.target.value)} className={`px-2 py-1 rounded-[6px] border ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`} />
                         </div>
                     )}
 
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--success)', marginTop: '8px' }}>
+                    <div className={`text-[28px] font-semibold mt-2 tracking-tight ${isLight ? 'text-emerald-600' : 'text-emerald-500'}`}>
                         ₺ {calculateTurnover(storeOrders).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
-                    <div style={{ fontSize: '12px', marginTop: '4px' }}>Mağaza cirosu</div>
+                    <div className={`text-[12px] mt-1 ${textLabelClass}`}>Mağaza cirosu</div>
                 </div>
-                <div className="card glass">
-                    <div className="text-muted" style={{ fontSize: '12px' }}>ORTALAMA SEPET</div>
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', marginTop: '8px' }}>
+                <div className={`p-5 rounded-[14px] ${cardClass}`}>
+                    <div className={`text-[11px] font-semibold uppercase tracking-wide ${textLabelClass}`}>ORTALAMA SEPET</div>
+                    <div className={`text-[28px] font-semibold mt-2 tracking-tight ${textValueClass}`}>
                         ₺ {storeOrders.length > 0 ? (storeOrders.reduce((acc, curr) => acc + (parseFloat(curr.totalAmount) || 0), 0) / storeOrders.length).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00'}
                     </div>
-                    <div style={{ fontSize: '12px', marginTop: '4px' }}>İşlem başına</div>
+                    <div className={`text-[12px] mt-1 ${textLabelClass}`}>İşlem başına</div>
                 </div>
             </div>
 
             {isLoadingStore ? (
-                <p className="text-muted mt-4">Yükleniyor...</p>
+                <div className={`text-[14px] py-8 font-medium ${textLabelClass}`}>Yükleniyor...</div>
             ) : storeOrders.length === 0 ? (
-                <p className="text-muted mt-4">Henüz kayıtlı mağaza satışı bulunmuyor.</p>
+                <div className={`text-[14px] py-8 text-center font-medium ${textLabelClass}`}>Henüz kayıtlı mağaza satışı bulunmuyor.</div>
             ) : (
-                <table style={{ width: '100%', marginTop: '16px', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead className="text-muted" style={{ fontSize: '12px' }}>
-                        <tr>
-                            <th style={{ padding: '12px' }}>Sipariş No</th>
-                            <th>Tarih</th>
-                            <th>Müşteri</th>
-                            <th>Tutar</th>
-                            <th>Ödeme</th>
-                            <th>Durum</th>
-                            <th style={{ textAlign: 'center' }}>İşlem</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {paginatedOrders.map(o => {
-                            const isExpanded = expandedStoreOrderId === o.id;
-                            return (
-                                <Fragment key={o.id}>
-                                    <tr
-                                        style={{ borderTop: isExpanded ? 'none' : '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent' }}
-                                        onClick={() => toggleStoreExpand(o.id)}
-                                    >
-                                        <td style={{ padding: '16px' }}>{o.orderNumber || o.id.substring(0, 8)}</td>
-                                        <td>{new Date(o.orderDate || o.date).toLocaleString('tr-TR')}</td>
-                                        <td>{o.customerName || 'Davetsiz Müşteri'}</td>
-                                        <td style={{ fontWeight: 'bold' }}>{parseFloat(o.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {o.currency || 'TL'}</td>
-                                        <td>
-                                            <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>
-                                                {o.sourceType === 'INVOICE' || o.rawData?.paymentMode === 'account' ? 'Cari / Veresiye' : (o.rawData?.paymentMode === 'cash' ? 'Nakit' : o.rawData?.paymentMode === 'credit_card' ? 'Kredi Kartı' : o.rawData?.paymentMode === 'bank_transfer' ? 'Havale/EFT' : (o.rawData?.paymentMode || 'Nakit').toUpperCase())}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span style={{
-                                                padding: '4px 8px', borderRadius: '4px', fontSize: '12px',
-                                                background: 'var(--success)', color: 'white'
-                                            }}>
-                                                {o.status || 'Tamamlandı'}
-                                            </span>
-                                        </td>
-                                        <td style={{ textAlign: 'center' }}>
-                                            <div className="flex-center gap-2" onClick={e => e.stopPropagation()}>
-                                                <button onClick={() => toggleStoreExpand(o.id)} className="btn btn-ghost" style={{ fontSize: '12px', padding: '4px 8px' }}>
-                                                    {isExpanded ? '▲' : 'v'}
-                                                </button>
-                                                <button onClick={() => handleDeleteStoreSale(o.id)} className="btn btn-outline" style={{ fontSize: '11px', padding: '6px 10px', color: '#ff4444', borderColor: '#ff4444' }}>Sil</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {isExpanded && (
-                                        <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
-                                            <td colSpan={7} style={{ padding: '0 20px 20px 20px' }}>
-                                                <div style={{ padding: '16px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-                                                    <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px' }}>🛍️ Satış Detayları</h4>
-                                                    <table style={{ width: '100%', fontSize: '13px' }}>
-                                                        <thead className="text-muted">
-                                                            <tr>
-                                                                <th align="left">Ürün</th>
-                                                                <th align="center">Adet</th>
-                                                                <th align="right">Birim Fiyat</th>
-                                                                <th align="right">Toplam</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {o.items && Array.isArray(o.items) && o.items.length > 0 ? o.items.map((item: any, i: number) => {
-                                                                const pName = item.name || item.productName || 'Ürün';
-                                                                const pQty = item.qty || item.quantity || 1;
-                                                                const pPrice = Number(item.price || item.unitPrice || 0);
-                                                                return (
-                                                                    <tr key={i} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                                                                        <td style={{ padding: '8px 0' }}>{pName}</td>
-                                                                        <td align="center">{pQty}</td>
-                                                                        <td align="right">{pPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
-                                                                        <td align="right">{(pPrice * pQty).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
+                <div className={`rounded-[16px] border p-6 overflow-hidden ${cardClass}`}>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse min-w-[800px]">
+                            <thead className="sticky top-0 bg-transparent">
+                                <tr className={`border-b ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
+                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Sipariş No</th>
+                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tarih</th>
+                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Müşteri</th>
+                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tutar</th>
+                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Ödeme</th>
+                                    <th className={`h-[48px] px-4 text-left text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Durum</th>
+                                    <th className={`h-[48px] px-4 text-center text-[11px] uppercase tracking-wide font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800/50'}`}>
+                                {paginatedOrders.map(o => {
+                                    const isExpanded = expandedStoreOrderId === o.id;
+                                    return (
+                                        <Fragment key={o.id}>
+                                            <tr
+                                                onClick={() => toggleStoreExpand(o.id)}
+                                                className={`h-[52px] cursor-pointer transition-colors ${isExpanded
+                                                        ? (isLight ? 'bg-blue-50/30' : 'bg-blue-900/10')
+                                                        : (isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-800/50')
+                                                    }`}
+                                            >
+                                                <td className={`px-4 align-middle font-medium text-[13px] ${textValueClass}`}>{o.orderNumber || o.id.substring(0, 8)}</td>
+                                                <td className={`px-4 align-middle text-[12px] ${textLabelClass}`}>{new Date(o.orderDate || o.date).toLocaleString('tr-TR')}</td>
+                                                <td className={`px-4 align-middle text-[13px] font-medium ${textValueClass}`}>{o.customerName || 'Davetsiz Müşteri'}</td>
+                                                <td className={`px-4 align-middle text-[13px] font-semibold ${textValueClass}`}>
+                                                    {parseFloat(o.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className={`text-[11px] font-normal ${textLabelClass}`}>{o.currency || 'TL'}</span>
+                                                </td>
+                                                <td className="px-4 align-middle">
+                                                    <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${isLight ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-slate-800 border-slate-700 text-slate-300'}`}>
+                                                        {o.sourceType === 'INVOICE' || o.rawData?.paymentMode === 'account' ? 'Cari / Veresiye' : (o.rawData?.paymentMode === 'cash' ? 'Nakit' : o.rawData?.paymentMode === 'credit_card' ? 'Kredi Kartı' : o.rawData?.paymentMode === 'bank_transfer' ? 'Havale/EFT' : (o.rawData?.paymentMode || 'Nakit').toUpperCase())}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 align-middle">
+                                                    <span className={`px-2 py-1 text-[11px] font-medium border rounded-[6px] inline-block ${isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
+                                                        {o.status || 'Tamamlandı'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 align-middle text-center">
+                                                    <div className="flex gap-2 items-center justify-center" onClick={e => e.stopPropagation()}>
+                                                        <div className={`p-1.5 cursor-pointer rounded-[6px] ${isLight ? 'text-slate-400 hover:bg-slate-100' : 'text-slate-500 hover:bg-slate-800'}`} onClick={() => toggleStoreExpand(o.id)}>
+                                                            {isExpanded ? '▲' : '▼'}
+                                                        </div>
+                                                        <button
+                                                            onClick={() => handleDeleteStoreSale(o.id)}
+                                                            className={`px-3 py-1.5 rounded-[8px] text-[12px] font-medium transition-colors border ${isLight ? 'border-red-200 text-red-600 bg-red-50 hover:bg-red-100' : 'border-red-500/30 text-red-400 bg-red-500/10 hover:bg-red-500/20'
+                                                                }`}
+                                                        >
+                                                            Sil
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {isExpanded && (
+                                                <tr className={`border-b-0 ${isLight ? 'bg-blue-50/20' : 'bg-blue-900/5'}`}>
+                                                    <td colSpan={7} className="p-4">
+                                                        <div className={`p-5 rounded-[12px] border ${isLight ? 'bg-white border-blue-100' : 'bg-slate-900 border-blue-900/50'}`}>
+                                                            <h4 className={`text-[14px] font-semibold mb-3 pb-3 border-b ${isLight ? 'text-slate-800 border-slate-100' : 'text-slate-200 border-slate-800'}`}>
+                                                                Sipariş İçeriği
+                                                            </h4>
+                                                            <table className="w-full text-left font-medium text-[13px]">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th className={`pb-2 text-[11px] uppercase tracking-wide font-semibold ${textLabelClass}`}>Ürün Adı</th>
+                                                                        <th className={`pb-2 text-[11px] uppercase tracking-wide font-semibold text-center ${textLabelClass}`}>Adet</th>
+                                                                        <th className={`pb-2 text-[11px] uppercase tracking-wide font-semibold text-right ${textLabelClass}`}>Birim Fiyat</th>
+                                                                        <th className={`pb-2 text-[11px] uppercase tracking-wide font-semibold text-right ${textLabelClass}`}>Tutar</th>
                                                                     </tr>
-                                                                );
-                                                            }) : (
-                                                                <tr><td colSpan={4} className="text-muted text-center py-4">Satış detayları yüklenemedi.</td></tr>
-                                                            )}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </Fragment>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                                                                </thead>
+                                                                <tbody className={`divide-y ${isLight ? 'divide-slate-100' : 'divide-slate-800'}`}>
+                                                                    {o.items && Array.isArray(o.items) && o.items.length > 0 ? o.items.map((item: any, i: number) => {
+                                                                        const pName = item.name || item.productName || 'Ürün';
+                                                                        const pQty = item.qty || item.quantity || 1;
+                                                                        const pPrice = Number(item.price || item.unitPrice || 0);
+                                                                        return (
+                                                                            <tr key={i}>
+                                                                                <td className={`py-2 ${textValueClass}`}>{pName}</td>
+                                                                                <td className={`py-2 text-center ${textValueClass}`}>{pQty}</td>
+                                                                                <td className={`py-2 text-right ${textValueClass}`}>{pPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
+                                                                                <td className={`py-2 text-right font-bold ${textValueClass}`}>{(pPrice * pQty).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>
+                                                                            </tr>
+                                                                        );
+                                                                    }) : (
+                                                                        <tr><td colSpan={4} className={`text-center py-4 ${textLabelClass}`}>Satış detayları yüklenemedi.</td></tr>
+                                                                    )}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </Fragment>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             )}
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            <div className={`pt-4 border-t ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
+                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            </div>
         </div>
     );
 }
