@@ -213,7 +213,7 @@ export default function ClientDashboard() {
                 {/* Hide Scrollbar, Touch-first padding, Two-column Grid Layout */}
                 <div className="flex-1 overflow-y-auto px-8 pb-12" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                     <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4 pdy-grid-tight">
                         {!mounted ? (
                             Array.from({ length: 12 }).map((_, i) => (
                                 <div key={i} className="h-32 bg-slate-50 dark:bg-slate-800/50 rounded-2xl animate-pulse" />
@@ -259,10 +259,10 @@ export default function ClientDashboard() {
                 }}
             >
                 <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
-                <div className="max-w-[1400px] mx-auto space-y-8 pb-24 pdy-grid">
+                <div className="pdy-content-container max-w-[1400px] mx-auto space-y-8 pb-24 pdy-stack">
 
                     {/* Header Info */}
-                    <div className="mb-6 xl:mb-8">
+                    <div className="mb-6 xl:mb-8 pdy-title">
                         <h2 className="text-[32px] sm:text-[40px] font-[700] tracking-tight text-[#0F172A] dark:text-white leading-tight mb-1">PERİODYA DASHBOARD</h2>
                         <p className="text-[14px] font-semibold text-slate-500 tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full opacity-80">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti</p>
                     </div>
@@ -349,7 +349,7 @@ export default function ClientDashboard() {
                                         >
                                             {completionPhase === 'none' && (
                                                 <button
-                                                    className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
+                                                    className= pdy-card"absolute top-6 right-6 p-2 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
                                                     onClick={() => setShowOnboardingModal(false)}
                                                 >
                                                     <span className="sr-only">Kapat</span>
@@ -365,7 +365,7 @@ export default function ClientDashboard() {
                                                         <p className="text-[14px] font-medium text-slate-500">İşletme aktivasyon sürecinizi tamamlayın</p>
                                                     </div>
 
-                                                    <div className="space-y-4 w-full">
+                                                    <div className="space-y-4 pdy-stack w-full">
                                                         {steps.map((step, idx) => (
                                                             <div key={step.id} className={`flex items-center p-4 rounded-2xl border transition-all ${step.status === 'completed' ? 'bg-slate-50 dark:bg-white/[0.02] border-transparent' : step.status === 'active' ? 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20 shadow-sm' : 'bg-white dark:bg-[#080911] border-slate-100 dark:border-slate-800/60 opacity-60'}`}>
                                                                 <div className={`w-[32px] h-[32px] rounded-full flex flex-shrink-0 items-center justify-center font-bold text-[13px] mr-4 
@@ -492,20 +492,20 @@ export default function ClientDashboard() {
                                 <span className="px-3 py-1.5 bg-indigo-500/20 text-indigo-300 text-[10px] font-black tracking-widest uppercase rounded-lg border border-indigo-500/20">Ledger SoT</span>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-6 mb-8 mt-auto">
+                            <div className="grid grid-cols-2 gap-6 pdy-grid-tight mb-8 mt-auto">
                                 <div>
                                     <p className="text-[13px] text-slate-400 font-bold mb-2 flex items-center gap-2"><ArrowDownRight className="w-4 h-4 text-emerald-400" /> Yaklaşan Tahsilat</p>
-                                    <h4 className="text-2xl font-black text-white">{loading ? "..." : formatter.format(d?.escrowPending || 0)}</h4>
+                                    <h4 className="text-2xl font-black text-white pdy-kpi">{loading ? "..." : formatter.format(d?.escrowPending || 0)}</h4>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[13px] text-slate-400 font-bold mb-2 flex items-center gap-2 justify-end"><ArrowUpRight className="w-4 h-4 text-rose-400" /> Yaklaşan Ödeme</p>
-                                    <h4 className="text-2xl font-black text-rose-400">{loading ? "..." : formatter.format((d?.escrowPending || 0) * 0.4)}</h4>
+                                    <h4 className="text-2xl font-black text-rose-400 pdy-kpi">{loading ? "..." : formatter.format((d?.escrowPending || 0) * 0.4)}</h4>
                                 </div>
                             </div>
 
                             <div className="bg-slate-800/50 rounded-2xl p-5 border border-slate-700/50">
                                 <h5 className="text-[11px] font-black text-slate-500 tracking-widest uppercase mb-4">Kasa Durumları</h5>
-                                <div className="space-y-3">
+                                <div className="space-y-3 pdy-stack">
                                     <div className="flex justify-between items-center">
                                         <span className="text-slate-300 text-sm font-semibold">Nakit Kasa</span>
                                         <span className="text-sm font-bold text-white">{loading ? "..." : formatter.format(d?.cashDetails?.cash || 0)}</span>
@@ -536,19 +536,19 @@ export default function ClientDashboard() {
                             <div className="flex justify-between items-end mb-8 mt-auto px-2">
                                 <div>
                                     <p className="text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Aktif SKU</p>
-                                    <h1 className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white">
+                                    <h1 className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white pdy-kpi">
                                         {loading ? "..." : d?.stockHealth?.totalSku || 0}
                                     </h1>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Yoldaki Ürünler</p>
-                                    <h2 className="text-2xl font-black text-indigo-600">
+                                    <h2 className="text-2xl font-black text-indigo-600 pdy-kpi">
                                         {loading ? "..." : d?.stockHealth?.inShipment || 0}
                                     </h2>
                                 </div>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-4 pdy-stack">
                                 <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50">
                                     <span className="font-semibold text-sm text-slate-600 dark:text-slate-300">Stok Fazlası (Otonom)</span>
                                     <span className="font-bold text-sm text-slate-900">{loading ? "..." : d?.stockHealth?.overStock || 0} Adet</span>
@@ -575,13 +575,13 @@ export default function ClientDashboard() {
                                     <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl"><Fingerprint className="w-6 h-6" /></div>
                                     <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Vardiya & PDKS Durumu</h3>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4 mt-auto">
+                                <div className="grid grid-cols-2 gap-4 pdy-grid-tight mt-auto">
                                     <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
-                                        <h4 className="text-3xl font-black text-slate-800">{loading ? "..." : d?.pdksRules?.currentStaffCount || 0}</h4>
+                                        <h4 className="text-3xl font-black text-slate-800 pdy-kpi">{loading ? "..." : d?.pdksRules?.currentStaffCount || 0}</h4>
                                         <p className="text-sm font-bold text-slate-500 mt-1">Aktif Personel</p>
                                     </div>
                                     <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
-                                        <h4 className="text-3xl font-black text-emerald-700">{loading ? "..." : d?.pdksRules?.checkedInCount || 0}</h4>
+                                        <h4 className="text-3xl font-black text-emerald-700 pdy-kpi">{loading ? "..." : d?.pdksRules?.checkedInCount || 0}</h4>
                                         <p className="text-sm font-bold text-emerald-600 mt-1">Giriş Yapan</p>
                                     </div>
                                     <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center px-6 col-span-2">
@@ -598,16 +598,16 @@ export default function ClientDashboard() {
 
                         {/* 5. SERVİS MASASI */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER"])) && (
-                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col">
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col pdy-card">
                                 <div className="flex items-center gap-4 mb-8">
                                     <div className="p-3 bg-cyan-50 text-cyan-600 rounded-2xl"><HeadphonesIcon className="w-6 h-6" /></div>
                                     <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Servis & Bakım Ağı</h3>
                                 </div>
-                                <div className="mt-auto space-y-4">
+                                <div className="mt-auto space-y-4 pdy-stack">
                                     <div className="relative p-6 bg-slate-900 text-white rounded-3xl overflow-hidden shadow-lg border border-slate-800 flex items-center justify-between">
                                         <div className="relative z-10">
                                             <p className="text-[13px] text-slate-400 font-bold uppercase tracking-wider mb-2">Şu an Serviste Olan</p>
-                                            <h1 className="text-5xl font-black text-cyan-400">{loading ? "..." : d?.serviceDesk?.currentlyInService || 0}</h1>
+                                            <h1 className="text-5xl font-black text-cyan-400 pdy-kpi">{loading ? "..." : d?.serviceDesk?.currentlyInService || 0}</h1>
                                         </div>
                                         <Activity className="absolute right-0 top-1/2 -translate-y-1/2 w-40 h-40 text-white opacity-5 pointer-events-none" />
                                     </div>
@@ -621,22 +621,22 @@ export default function ClientDashboard() {
 
                         {/* 6. FATURALAR VE İRSALİYELER */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"])) && (
-                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col">
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col pdy-card">
                                 <div className="flex justify-between items-start mb-8">
                                     <div className="flex items-center gap-4">
                                         <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><FileText className="w-6 h-6" /></div>
                                         <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">E-Belge İşlemleri</h3>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4 mt-auto">
+                                <div className="grid grid-cols-2 gap-4 pdy-grid-tight mt-auto">
                                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                                         <FileDown className="w-6 h-6 text-emerald-500 mb-4" />
-                                        <h4 className="text-3xl font-black text-slate-800">{loading ? "..." : d?.invoiceStatus?.incoming || 0}</h4>
+                                        <h4 className="text-3xl font-black text-slate-800 pdy-kpi">{loading ? "..." : d?.invoiceStatus?.incoming || 0}</h4>
                                         <p className="text-[13px] text-slate-500 mt-1 font-bold">Gelen (Bu Hafta)</p>
                                     </div>
                                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                                         <FileUp className="w-6 h-6 text-indigo-500 mb-4" />
-                                        <h4 className="text-3xl font-black text-slate-800">{loading ? "..." : d?.invoiceStatus?.outgoing || 0}</h4>
+                                        <h4 className="text-3xl font-black text-slate-800 pdy-kpi">{loading ? "..." : d?.invoiceStatus?.outgoing || 0}</h4>
                                         <p className="text-[13px] text-slate-500 mt-1 font-bold">Giden (Bu Hafta)</p>
                                     </div>
                                 </div>
@@ -649,13 +649,13 @@ export default function ClientDashboard() {
 
                         {/* 7. OTONOM FİYATLANDIRMA ÖZETİ */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"])) && (
-                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col relative">
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col relative pdy-card">
                                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-fuchsia-400"></div>
                                 <div className="flex items-center gap-4 mb-8">
                                     <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl"><Activity className="w-6 h-6" /></div>
                                     <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Otonom Fiyatlandırma</h3>
                                 </div>
-                                <div className="mt-auto space-y-4">
+                                <div className="mt-auto space-y-4 pdy-stack">
                                     <div className="p-5 bg-purple-50 rounded-2xl border border-purple-100 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
@@ -666,7 +666,7 @@ export default function ClientDashboard() {
                                                 <p className="font-semibold text-purple-700/60 text-[11px] uppercase tracking-wide">Bugün</p>
                                             </div>
                                         </div>
-                                        <div className="text-2xl font-black text-purple-600">{loading ? "..." : d?.autonomous?.updatedProducts || 0}</div>
+                                        <div className="text-2xl font-black text-purple-600 pdy-kpi">{loading ? "..." : d?.autonomous?.updatedProducts || 0}</div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
@@ -686,7 +686,7 @@ export default function ClientDashboard() {
                         )}
 
                         {/* 8. BİLDİRİMLER VE ONAYLAR (GENİŞLETİLMİŞ) */}
-                        <div className="md:col-span-full lg:col-span-2 2xl:col-span-3 overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col">
+                        <div className="md:col-span-full lg:col-span-2 2xl:col-span-3 overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col pdy-card">
                             <div className="flex justify-between items-start mb-6">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-red-50 text-red-600 rounded-2xl">
@@ -701,7 +701,7 @@ export default function ClientDashboard() {
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pdy-grid">
                                 <div className="p-5 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-between">
                                     <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
@@ -712,7 +712,7 @@ export default function ClientDashboard() {
                                             <p className="font-medium text-amber-700/70 text-[12px] line-clamp-1">Fatura, Escrow ve Sözleşme</p>
                                         </div>
                                     </div>
-                                    <div className="text-2xl font-black text-amber-600 ml-4">{loading ? "..." : d?.notificationsApp?.pendingApprovals || 0}</div>
+                                    <div className="text-2xl font-black text-amber-600 ml-4 pdy-kpi">{loading ? "..." : d?.notificationsApp?.pendingApprovals || 0}</div>
                                 </div>
 
                                 <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-between">
@@ -725,7 +725,7 @@ export default function ClientDashboard() {
                                             <p className="font-medium text-blue-700/70 text-[12px] line-clamp-1">Sistem güncelleme / Uyarı</p>
                                         </div>
                                     </div>
-                                    <div className="text-2xl font-black text-blue-600 ml-4">{loading ? "..." : d?.notificationsApp?.newNotifications || 0}</div>
+                                    <div className="text-2xl font-black text-blue-600 ml-4 pdy-kpi">{loading ? "..." : d?.notificationsApp?.newNotifications || 0}</div>
                                 </div>
 
                                 <div className="p-5 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-between">
