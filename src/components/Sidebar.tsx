@@ -5,7 +5,12 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { useApp } from "../contexts/AppContext";
-
+import {
+    Terminal, Globe, ShoppingCart, Package, Briefcase, TrendingUp, Handshake,
+    UserCircle, Landmark, Receipt, Users, Truck, Activity, Box, Map, FileText,
+    Wrench, BarChart2, Clock, Search, ShieldAlert, LifeBuoy, Settings, CreditCard,
+    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut
+} from "lucide-react";
 
 export default function Sidebar() {
     const pathname = usePathname();
@@ -15,46 +20,54 @@ export default function Sidebar() {
         branches, activeBranchName, setActiveBranchName,
         suspiciousEvents, isSidebarOpen, setIsSidebarOpen,
         isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed,
-        isInitialLoading,
         activeTenantId, setActiveTenantId, availableTenants
     } = useApp();
 
-    const [buyerOpen, setBuyerOpen] = useState(false);
-    const [sellerOpen, setSellerOpen] = useState(false);
-    const [growthOpen, setGrowthOpen] = useState(false);
-    const [netFinOpen, setNetFinOpen] = useState(false);
-    const [supportOpen, setSupportOpen] = useState(false);
-    const [fieldSalesOpen, setFieldSalesOpen] = useState(false);
-    const [reportsOpen, setReportsOpen] = useState(false);
-    const [ordersOpen, setOrdersOpen] = useState(false);
-    const [catalogOpen, setCatalogOpen] = useState(false);
+    const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+    // Retrieve collapsed state memory
+    useEffect(() => {
+        const saved = localStorage.getItem('pdy_sidebar_collapsed');
+        if (saved !== null) {
+            setIsDesktopSidebarCollapsed(saved === 'true');
+        }
+    }, [setIsDesktopSidebarCollapsed]);
+
+    const handleCollapseToggle = () => {
+        const newVal = !isDesktopSidebarCollapsed;
+        setIsDesktopSidebarCollapsed(newVal);
+        localStorage.setItem('pdy_sidebar_collapsed', newVal.toString());
+    };
+
+    const toggleSection = (id: string) => {
+        setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
+    };
 
     // Auto-expand if active
     useEffect(() => {
-        if (pathname.includes('/field-sales')) setFieldSalesOpen(true);
-        if (pathname.includes('/reports')) setReportsOpen(true);
+        const expandMap: Record<string, string[]> = {
+            'orders-parent': ['/orders', '/network/seller/orders', '/network/buyer/orders'],
+            'catalog-parent': ['/seller/products', '/catalog'],
+            'growth-parent': ['/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics'],
+            'purchasing-parent': ['/rfq', '/contracts', '/network/buyer'],
+            'field-sales-parent': ['/field-sales'],
+            'reports-parent': ['/reports'],
+        };
 
-        if (pathname.includes('orders') || pathname.includes('/network/seller/orders') || pathname.includes('/network/buyer/orders')) {
-            setOrdersOpen(true);
-        }
-        if (pathname.includes('/seller/products') || pathname.includes('/catalog')) {
-            setCatalogOpen(true);
-        }
+        const newOpen = { ...openSections };
+        let changed = false;
 
-        if (pathname.includes('/catalog') || pathname.includes('/rfq') || pathname.includes('/contracts') || pathname.includes('/network/buyer')) {
-            setBuyerOpen(true);
-        }
-        if (pathname.includes('/seller/products') || pathname.includes('/network/seller') || pathname.includes('/seller/rfqs') || pathname.includes('/seller/contracts') || pathname.includes('/seller/boost')) {
-            setSellerOpen(true);
-        }
-        if (pathname.includes('/network/trust-score') || pathname.includes('/network/stock-risks')) {
-            setGrowthOpen(true);
-        }
-        if (pathname.includes('/network/earnings') || pathname.includes('/network/payouts') || pathname.includes('/billing/boost-invoices') || pathname.includes('/network/payments')) {
-            setNetFinOpen(true);
-        }
-        if (pathname.includes('/support/tickets')) {
-            setSupportOpen(true);
+        Object.entries(expandMap).forEach(([id, paths]) => {
+            if (paths.some(p => pathname.includes(p))) {
+                if (!newOpen[id]) {
+                    newOpen[id] = true;
+                    changed = true;
+                }
+            }
+        });
+
+        if (changed) {
+            setOpenSections(newOpen);
         }
     }, [pathname]);
 
@@ -91,7 +104,7 @@ export default function Sidebar() {
         '/security/suspicious': { perm: 'security_access' },
         '/billing': { perm: 'settings_manage' },
         '/field-mobile/routes': { perm: 'field_sales_access' },
-        '/staff/me': { perm: 'pos_access' }, // Herkes erişebilir genelde POS yetkisi olanlar
+        '/staff/me': { perm: 'pos_access' },
         '/fintech/control-tower': { perm: 'finance_view', feature: 'fintech_tower' },
         '/fintech/profitability-heatmap': { perm: 'finance_view', feature: 'pnl_heatmap' },
         '/fintech/open-banking': { perm: 'finance_view' },
@@ -106,150 +119,157 @@ export default function Sidebar() {
     // @ts-ignore
     const isSeller = isSystemAdmin || hasPermission('sales_archive') || currentUser?.type === 'selling';
 
-    const menuItems = [
-        { name: 'POS Terminal', href: '/terminal', icon: '🏮' },
-        { name: 'B2B Network', href: '/dashboard', icon: '📊' },
-
+    const menuGroups = [
         {
-            name: 'Orders',
-            icon: '🛒',
-            isParent: true,
-            id: 'orders-parent',
-            subItems: [
-                ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/network/seller/orders', icon: '🏪' }] : []),
-                ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders', icon: '🛍️' }] : [])
+            group: "Workspace",
+            items: [
+                { name: 'POS Terminal', href: '/terminal', icon: Terminal },
+                { name: 'B2B Network', href: '/dashboard', icon: Globe },
+                {
+                    name: 'Siparişler',
+                    icon: ShoppingCart,
+                    isParent: true,
+                    id: 'orders-parent',
+                    subItems: [
+                        ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/network/seller/orders' }] : []),
+                        ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders' }] : [])
+                    ]
+                },
+                {
+                    name: 'Katalog',
+                    icon: Package,
+                    isParent: true,
+                    id: 'catalog-parent',
+                    subItems: [
+                        ...(isSeller ? [{ name: 'Ürünlerim', href: '/seller/products' }] : []),
+                        ...(isBuyer ? [{ name: 'B2B Keşfet', href: '/catalog' }] : [])
+                    ]
+                },
             ]
         },
-
         {
-            name: 'Catalog',
-            icon: '📦',
-            isParent: true,
-            id: 'catalog-parent',
-            subItems: [
-                ...(isSeller ? [{ name: 'Ürünlerim', href: '/seller/products', icon: '📢' }] : []),
-                ...(isBuyer ? [{ name: 'B2B Keşfet', href: '/catalog', icon: '🔍' }] : [])
+            group: "Ticari İstihbarat",
+            items: [
+                { name: 'Finance (B2B)', href: '/network/finance', icon: Briefcase },
+                ...(isSeller ? [{
+                    name: 'Growth (Satıcı)',
+                    icon: TrendingUp,
+                    isParent: true,
+                    id: 'growth-parent',
+                    subItems: [
+                        { name: 'Boost Yönetimi', href: '/seller/boost' },
+                        { name: 'Boost Analiz', href: '/seller/boost/analytics' },
+                        { name: 'Güven Skoru', href: '/network/trust-score' }
+                    ]
+                }] : []),
+                ...(isBuyer ? [{
+                    name: 'Satınalma (Alıcı)',
+                    icon: Handshake,
+                    isParent: true,
+                    id: 'purchasing-parent',
+                    subItems: [
+                        { name: 'Sözleşmeler', href: '/contracts' },
+                        { name: 'RFQ Talepleri', href: '/rfq' }
+                    ]
+                }] : [])
             ]
         },
-
-        { name: 'Finance (B2B)', href: '/network/finance', icon: '💰' },
-
-        ...(isSeller ? [{
-            name: 'Growth (Seller)',
-            icon: '🚀',
-            isParent: true,
-            id: 'growth-parent',
-            subItems: [
-                { name: 'Boost Yönetimi', href: '/seller/boost', icon: '⭐' },
-                { name: 'Boost Performansı', href: '/seller/boost/analytics', icon: '📈' },
-                { name: 'Güven Skoru', href: '/network/trust-score', icon: '🛡️' }
-            ]
-        }] : []),
-
-        ...(isBuyer ? [{
-            name: 'Purchasing (Buyer)',
-            icon: '🤝',
-            isParent: true,
-            id: 'purchasing-parent',
-            subItems: [
-                { name: 'Sözleşmelerim', href: '/contracts', icon: '📜' },
-                { name: 'Pazarlıklı Alımlar (RFQ)', href: '/rfq', icon: '🤝' }
-            ]
-        }] : []),
-
-        { name: 'Personel Paneli', href: '/staff/me', icon: '👤' },
-
-        // FINANSAL YÖNETİM GRUBU
-        { name: 'Finansal Yönetim', href: '/accounting', icon: '🏛️' },
-        { name: 'Satış Yönetimi', href: '/sales', icon: '🧾' },
-        { name: 'Cari Hesaplar', href: '/customers', icon: '🤝' },
-        { name: 'Tedarikçi Ağı', href: '/suppliers', icon: '🚚' },
-
-        // AKILLI SİSTEMLER GRUBU
-        { name: 'Finansal Kontrol Kulesi', href: '/fintech/control-tower', icon: '🗼' },
-
-        // OPERASYON GRUBU
-        { name: 'Envanter & Depo', href: '/inventory', icon: '📥' },
         {
-            name: 'Saha Satış Yönetimi',
-            icon: '🗺️',
-            isParent: true,
-            id: 'field-sales-parent',
-            subItems: [
-                { name: 'Yönetim Paneli', href: '/field-sales/admin/routes', icon: '⚙️' },
-                { name: 'Saha Satış Paneli', href: '/field-sales', icon: '📍' },
-                { name: 'Canlı Saha Takibi', href: '/field-sales/admin/live', icon: '🛰️' },
+            group: "Operasyonlar",
+            items: [
+                { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
+                { name: 'Muhasebe', href: '/accounting', icon: Landmark },
+                { name: 'Satış', href: '/sales', icon: Receipt },
+                { name: 'Cari Hesaplar', href: '/customers', icon: Users },
+                { name: 'Tedarikçiler', href: '/suppliers', icon: Truck },
+                { name: 'Fintech Tower', href: '/fintech/control-tower', icon: Activity },
+                { name: 'Envanter', href: '/inventory', icon: Box },
+                {
+                    name: 'Saha Satış',
+                    icon: Map,
+                    isParent: true,
+                    id: 'field-sales-parent',
+                    subItems: [
+                        { name: 'Saha Yönetimi', href: '/field-sales/admin/routes' },
+                        { name: 'Rota & Müşteri', href: '/field-sales' },
+                        { name: 'Canlı Takip', href: '/field-sales/admin/live' },
+                    ]
+                },
+                { name: 'Teklifler', href: '/quotes', icon: FileText },
+                { name: 'Servis', href: '/service', icon: Wrench },
             ]
         },
-        { name: 'Teklifler', href: '/quotes', icon: '📋' },
-        { name: 'Servis Masası', href: '/service', icon: '🛠️' },
-
-        // ANALİZ & DENETİM
         {
-            name: 'İş Zekası & Analiz',
-            icon: '🧠',
-            isParent: true,
-            id: 'reports-parent',
-            subItems: [
-                { name: 'İş Zekası (CEO)', href: '/reports/ceo', icon: '🧠' },
-                { name: 'Veri Analizi', href: '/reports', icon: '📊' },
+            group: "Analitik & Yönetim",
+            items: [
+                {
+                    name: 'İş Zekası',
+                    icon: BarChart2,
+                    isParent: true,
+                    id: 'reports-parent',
+                    subItems: [
+                        { name: 'CEO Tablosu', href: '/reports/ceo' },
+                        { name: 'Detaylı Analiz', href: '/reports' },
+                    ]
+                },
+                { name: 'PDKS', href: '/staff/pdks', icon: Clock },
+                { name: 'Denetim', href: '/admin/audit-logs', icon: Search },
+                { name: 'Anomaliler', href: '/security/suspicious', icon: ShieldAlert, alertCount: suspiciousEvents.length },
+                { name: 'Destek', href: '/support/tickets', icon: LifeBuoy },
             ]
         },
-        { name: 'PDKS Yönetimi', href: '/staff/pdks', icon: '🛡️' },
-        { name: 'Denetim Kayıtları', href: '/admin/audit-logs', icon: '🔍' },
-        { name: 'Kaçak Satış Tespit', href: '/security/suspicious', icon: '🚨' },
-
-        { name: 'Destek Talepleri', href: '/support/tickets', icon: '🎫' },
-
-        // SİSTEM & AYARLAR
-        { name: 'Mali Müşavir', href: '/advisor', icon: '💼' },
-        { name: 'Sistem Ayarları', href: '/settings', icon: '⚙️' },
-        { name: 'Ekip & Yetki', href: '/staff', icon: '👥' },
-        { name: 'Abonelik & Planlar', href: '/billing', icon: '💎' },
-
-        ...(isPlatformAdmin ? [
-            { name: 'Destek Masası (Inbox)', href: '/admin/support/tickets', icon: '📥' },
-            { name: 'Bilgi Bankası Yönetimi', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: '📚' }
-        ] : []),
-    ].filter(item => {
-        const config = permMap[item.href];
-        if (!config) return true; // default public items
-
-        // Auditor specific logic
-        if (isAuditor) {
-            return ['/admin/audit-logs', '/reports', '/advisor'].includes(item.href);
+        {
+            group: "Sistem",
+            items: [
+                { name: 'Mali Müşavir', href: '/advisor', icon: Briefcase },
+                { name: 'Ayarlar', href: '/settings', icon: Settings },
+                { name: 'Ekipler', href: '/staff', icon: Users },
+                { name: 'Abonelik', href: '/billing', icon: CreditCard },
+                ...(isPlatformAdmin ? [
+                    { name: 'Support Inbox', href: '/admin/support/tickets', icon: Inbox },
+                    { name: 'Bilgi Bankası', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: Library }
+                ] : []),
+            ]
         }
+    ];
 
-        // 1. Feature Check (Subscription Plan)
-        if (config.feature && !hasFeature(config.feature)) {
-            return false;
-        }
+    const filteredGroups = menuGroups.map(group => {
+        const items = group.items.filter(item => {
+            const config = permMap[item.href || ''];
+            if (!config && !item.isParent) return true;
+            if (isAuditor) {
+                return ['/admin/audit-logs', '/reports', '/advisor'].includes(item.href || '');
+            }
+            if (config?.feature && !hasFeature(config.feature)) return false;
+            if (isSystemAdmin) return true;
+            if (config?.perm) return hasPermission(config.perm);
+            return true;
+        }).map(item => {
+            if (item.subItems) {
+                return {
+                    ...item,
+                    subItems: item.subItems.filter(sub => {
+                        const subConfig = permMap[sub.href];
+                        if (!subConfig) return true;
+                        if (subConfig.feature && !hasFeature(subConfig.feature)) return false;
+                        if (isSystemAdmin) return true;
+                        if (subConfig.perm) return hasPermission(subConfig.perm);
+                        return true;
+                    })
+                };
+            }
+            return item;
+        });
 
-        // 2. Admin users bypass permissions (but NOT features)
-        if (isSystemAdmin) return true;
+        // Filter out parent items that have no authorized subItems
+        const validItems = items.filter(item => {
+            if (item.isParent && (!item.subItems || item.subItems.length === 0)) return false;
+            return true;
+        });
 
-        // 3. Permission Check (User Role)
-        if (config.perm) {
-            return hasPermission(config.perm);
-        }
+        return { ...group, items: validItems };
+    }).filter(g => g.items.length > 0);
 
-        return true;
-    }).map(item => {
-        if (item.subItems) {
-            return {
-                ...item,
-                subItems: item.subItems.filter(sub => {
-                    const subConfig = permMap[sub.href];
-                    if (!subConfig) return true;
-                    if (subConfig.feature && !hasFeature(subConfig.feature)) return false;
-                    if (isSystemAdmin) return true;
-                    if (subConfig.perm) return hasPermission(subConfig.perm);
-                    return true;
-                })
-            };
-        }
-        return item;
-    });
 
     const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setActiveBranchName(e.target.value);
@@ -263,110 +283,76 @@ export default function Sidebar() {
 
     return (
         <aside
-            className={`sidebar-fixed ${isSidebarOpen ? 'active' : ''} ${isDesktopSidebarCollapsed ? 'desktop-collapsed' : ''}`}
-            style={{
-                background: 'var(--bg-card)',
-                backdropFilter: 'blur(30px) saturate(150%)',
-                borderRight: '1px solid var(--border-light)',
-                display: 'flex',
-                flexDirection: 'column',
-                zIndex: 2000,
-                overflow: 'hidden',
-                fontFamily: "'Outfit', sans-serif",
-                transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                flexShrink: 0
-            }}>
+            className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[width] fixed lg:relative z-[2000] border-r border-slate-200/60 dark:border-white/5 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] dark:from-[#080911] dark:to-[#0A0D14] h-screen
+            ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            ${isDesktopSidebarCollapsed ? 'w-[72px]' : 'w-[260px]'}`}
+        >
             {/* MOBILE CLOSE BUTTON */}
             <button
-                className="show-mobile"
+                className="lg:hidden absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-lg bg-slate-900/5 text-slate-500 hover:text-slate-800 transition-colors"
                 onClick={() => setIsSidebarOpen(false)}
-                style={{
-                    position: 'absolute',
-                    top: '20px',
-                    right: '20px',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid var(--border-light)',
-                    color: 'white',
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    zIndex: 2001,
-                    cursor: 'pointer'
-                }}
             >
                 ✕
             </button>
 
-            {/* LOGO & SELECTORS */}
-            <div style={{ flexShrink: 0 }}>
-                <div style={{ padding: '24px 24px 20px 24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {/* DESKTOP COLLAPSE TOGGLE (ABOVE LOGO) */}
-                    <div style={{ display: 'flex', justifyContent: isDesktopSidebarCollapsed ? 'center' : 'flex-end', width: '100%' }}>
-                        <button
-                            className="hide-mobile"
-                            onClick={() => setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
-                            style={{
-                                background: 'var(--bg-hover)', border: '1px solid var(--border-light)', color: 'var(--text-muted)',
-                                cursor: 'pointer', padding: '6px', borderRadius: '10px', display: 'flex',
-                                transition: '0.3s hover:scale-105'
-                            }}
-                            title={isDesktopSidebarCollapsed ? 'Menüyü Genişlet' : 'Menüyü Daralt'}
-                        >
-                            <span style={{ fontSize: '14px', transform: isDesktopSidebarCollapsed ? 'rotate(180deg)' : 'none', transition: '0.3s' }}>{isDesktopSidebarCollapsed ? '➡️' : '⬅️'}</span>
-                        </button>
-                    </div>
-
-                    {/* MAIN LOGO / COLLAPSED LOGO */}
-                    <div className="logo-container" style={{ display: isDesktopSidebarCollapsed ? 'none' : 'flex', flexDirection: 'column', overflow: 'hidden', marginTop: '4px' }}>
-                        <h1 className="logo-text" style={{ fontSize: '26px', fontWeight: '900', letterSpacing: '-1.5px', marginBottom: '4px', whiteSpace: 'nowrap' }}>
-                            PERIOD<span style={{ color: 'var(--primary)', opacity: 0.9 }}>YA</span>
-                        </h1>
-                        <div className="logo-subtext" style={{ fontSize: '11px', fontWeight: '800', color: 'var(--primary)', letterSpacing: '2px', opacity: 0.6, whiteSpace: 'nowrap' }}>SYSTEM V3.0</div>
-                    </div>
-
-                    <div className="collapsed-logo-icon" style={{ display: isDesktopSidebarCollapsed ? 'flex' : 'none', justifyContent: 'center', alignItems: 'center', fontSize: '28px', fontWeight: '900', color: 'var(--primary)', width: '100%', marginTop: '8px' }}>
-                        P
-                    </div>
-                </div>
-
-                <div className="selector-container" style={{ padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    {/* TENANT SELECTOR (IMPERSONATION) */}
-                    {isPlatformAdmin && (
-                        <div>
-                            <div style={{ fontSize: '9px', fontWeight: '900', color: 'var(--text-muted)', opacity: 0.5, letterSpacing: '1.5px', marginBottom: '8px', textTransform: 'uppercase' }}>Hangi Şirket?</div>
-                            <select
-                                value={activeTenantId || 'null'}
-                                onChange={handleTenantChange}
-                                style={{
-                                    width: '100%', padding: '12px 14px',
-                                    background: activeTenantId ? 'rgba(255, 85, 0, 0.1)' : 'var(--bg-hover)',
-                                    border: activeTenantId ? '1px solid var(--primary)' : '1px solid var(--border-light)',
-                                    borderRadius: '12px', color: 'var(--text-main)', cursor: 'pointer', outline: 'none',
-                                    fontSize: '13px', fontWeight: '700', transition: '0.3s'
-                                }}>
-                                <option value="null">🏢 TÜM SİSTEM</option>
-                                {availableTenants.map(t => (
-                                    <option key={t.id} value={t.id}>
-                                        👥 {t.name?.toUpperCase()}
-                                    </option>
-                                ))}
-                            </select>
+            {/* LOGO & BRANDING */}
+            <div className="flex-shrink-0 p-5 pb-3">
+                <div className={`flex items-center ${isDesktopSidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
+                    {!isDesktopSidebarCollapsed && (
+                        <div className="flex flex-col">
+                            <h1 className="text-[22px] font-[900] tracking-[-1px] text-[#0F172A] dark:text-white leading-none">
+                                PERIOD<span className="text-blue-600">YA</span>
+                            </h1>
+                            <span className="text-[10px] font-bold text-blue-600 tracking-[1.5px] uppercase mt-1 opacity-80">
+                                ENTERPRISE
+                            </span>
                         </div>
                     )}
 
-                    {/* BRANCH SELECTOR */}
-                    <div>
-                        <div style={{ fontSize: '9px', fontWeight: '900', color: 'var(--text-muted)', opacity: 0.5, letterSpacing: '1.5px', marginBottom: '8px', textTransform: 'uppercase' }}>Operasyonel Şube</div>
+                    {isDesktopSidebarCollapsed && (
+                        <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-600 text-white font-[900] text-xl cursor-pointer hover:bg-blue-700 transition-colors" onClick={handleCollapseToggle}>
+                            P
+                        </div>
+                    )}
+
+                    {!isDesktopSidebarCollapsed && (
+                        <button
+                            onClick={handleCollapseToggle}
+                            className="hidden lg:flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 dark:hover:text-slate-300 dark:hover:bg-slate-800 transition-transform hover:scale-105"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* CONTEXT SELECTORS */}
+            <div className="px-5 pb-4 space-y-3 flex-shrink-0">
+                {isPlatformAdmin && !isDesktopSidebarCollapsed && (
+                    <div className="flex flex-col">
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1.5 px-0.5">Yönetilen Alan</span>
+                        <select
+                            value={activeTenantId || 'null'}
+                            onChange={handleTenantChange}
+                            className={`w-full px-3 py-2.5 rounded-xl font-bold text-[13px] outline-none cursor-pointer transition-colors border ${activeTenantId ? 'bg-blue-50/50 border-blue-200 text-blue-800' : 'bg-slate-100/50 border-slate-200 text-slate-700'}`}
+                        >
+                            <option value="null">🌐 TÜM SİSTEM</option>
+                            {availableTenants.map(t => (
+                                <option key={t.id} value={t.id}>{t.name?.toUpperCase()}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
+                {!isDesktopSidebarCollapsed && (
+                    <div className="flex flex-col">
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1.5 px-0.5">Operasyonel Şube</span>
                         <select
                             disabled={(hasPermission('branch_isolation') && !isSystemAdmin) || (isPlatformAdmin && !activeTenantId && branches.length === 0)}
                             value={activeBranchName}
                             onChange={handleBranchChange}
-                            style={{
-                                width: '100%', padding: '12px 14px',
-                                background: 'var(--bg-hover)', border: '1px solid var(--border-light)',
-                                borderRadius: '12px', color: 'var(--text-main)', cursor: 'pointer', outline: 'none',
-                                fontSize: '13px', fontWeight: '700', transition: '0.3s'
-                            }}>
+                            className="w-full px-3 py-2.5 rounded-xl font-semibold text-[13px] bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-white/5 text-[#0F172A] dark:text-slate-200 outline-none cursor-pointer transition-colors hover:bg-slate-200/50"
+                        >
                             {branches.length > 0 ? (
                                 branches.map(b => (
                                     <option key={b.id} value={b.name}>
@@ -374,216 +360,192 @@ export default function Sidebar() {
                                     </option>
                                 ))
                             ) : (
-                                <option value="">{activeTenantId ? 'ŞUBE YÜKLENİYOR...' : 'ÖNCE ŞİRKET SEÇİN'}</option>
+                                <option value="">{activeTenantId ? 'Yükleniyor...' : 'Seçim Yapın'}</option>
                             )}
                         </select>
                     </div>
-                </div>
-            </div>
+                )}
 
-            {/* Menu Links */}
-            <nav className="sidebar-scroll" style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '6px',
-                padding: '0 16px 20px 16px',
-                flex: 1,
-                overflowY: 'auto'
-            }}>
-                {menuItems.map((item: any) => {
-                    if (item.isParent) {
-                        const isExpanded =
-                            item.id === 'orders-parent' ? ordersOpen :
-                                item.id === 'catalog-parent' ? catalogOpen :
-                                    item.id === 'field-sales-parent' ? fieldSalesOpen :
-                                        item.id === 'reports-parent' ? reportsOpen :
-                                            item.id === 'purchasing-parent' ? buyerOpen :
-                                                item.id === 'seller-parent' ? sellerOpen :
-                                                    item.id === 'growth-parent' ? growthOpen :
-                                                        item.id === 'net-fin-parent' ? netFinOpen :
-                                                            item.id === 'support-parent' ? supportOpen :
-                                                                false;
-                        const anyChildActive = item.subItems?.some((sub: any) => pathname === sub.href);
-
-                        return (
-                            <div key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                <div
-                                    onClick={() => {
-                                        if (item.id === 'orders-parent') setOrdersOpen(!ordersOpen);
-                                        if (item.id === 'catalog-parent') setCatalogOpen(!catalogOpen);
-                                        if (item.id === 'field-sales-parent') setFieldSalesOpen(!fieldSalesOpen);
-                                        if (item.id === 'reports-parent') setReportsOpen(!reportsOpen);
-                                        if (item.id === 'purchasing-parent') setBuyerOpen(!buyerOpen);
-                                        if (item.id === 'seller-parent') setSellerOpen(!sellerOpen);
-                                        if (item.id === 'growth-parent') setGrowthOpen(!growthOpen);
-                                        if (item.id === 'net-fin-parent') setNetFinOpen(!netFinOpen);
-                                        if (item.id === 'support-parent') setSupportOpen(!supportOpen);
-                                    }}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: '14px',
-                                        padding: '12px 18px', borderRadius: '14px',
-                                        background: anyChildActive ? 'rgba(255, 85, 0, 0.05)' : 'transparent',
-                                        color: anyChildActive ? 'var(--primary)' : 'var(--text-muted)',
-                                        transition: '0.3s', cursor: 'pointer',
-                                        fontWeight: '800',
-                                        border: anyChildActive ? '1px solid rgba(255, 85, 0, 0.1)' : '1px solid transparent'
-                                    }}
-                                    className="sidebar-link"
-                                    title={isDesktopSidebarCollapsed ? item.name : undefined}
-                                >
-                                    <span style={{ fontSize: '18px', filter: anyChildActive ? 'none' : 'grayscale(100%) opacity(0.5)' }}>{item.icon}</span>
-                                    <span className="sidebar-text" style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1, whiteSpace: 'nowrap', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>{item.name}</span>
-                                    <span className="sidebar-chevron" style={{ fontSize: '10px', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: '0.3s', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>▼</span>
-                                </div>
-
-                                {isExpanded && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: isDesktopSidebarCollapsed ? '0' : '12px', borderLeft: isDesktopSidebarCollapsed ? 'none' : '2px solid var(--border-light)', marginLeft: isDesktopSidebarCollapsed ? '0' : '26px', marginTop: '4px', marginBottom: '8px' }}>
-                                        {item.subItems.map((sub: any) => {
-                                            const isSubActive = pathname === sub.href;
-                                            return (
-                                                <Link key={sub.href} href={sub.href} style={{ textDecoration: 'none' }}>
-                                                    <div style={{
-                                                        display: 'flex', alignItems: 'center', gap: '10px',
-                                                        padding: '10px 14px', borderRadius: '10px',
-                                                        background: isSubActive ? 'var(--primary)' : 'transparent',
-                                                        color: isSubActive ? 'white' : 'var(--text-muted)',
-                                                        transition: '0.2s',
-                                                        fontWeight: '700',
-                                                        fontSize: '13px',
-                                                        justifyContent: isDesktopSidebarCollapsed ? 'center' : 'flex-start'
-                                                    }}
-                                                        className="sidebar-sublink"
-                                                        title={isDesktopSidebarCollapsed ? sub.name : undefined}
-                                                    >
-                                                        <span>{sub.icon}</span>
-                                                        <span className="sidebar-subtext" style={{ whiteSpace: 'nowrap', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>{sub.name}</span>
-                                                    </div>
-                                                </Link>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    }
-
-                    const isActive = pathname === item.href;
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            style={{ textDecoration: 'none' }}
-                        >
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: '14px',
-                                padding: '12px 18px', borderRadius: '14px',
-                                background: isActive ? '#FF5500' : 'transparent',
-                                color: isActive ? 'white' : 'var(--text-muted)',
-                                transition: '0.3s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'pointer',
-                                fontWeight: '700',
-                                boxShadow: isActive ? '0 10px 20px -10px rgba(255, 85, 0, 0.4)' : 'none'
-                            }}
-                                className="sidebar-link"
-                                title={isDesktopSidebarCollapsed ? item.name : undefined}
-                            >
-                                <span style={{ fontSize: '18px', filter: isActive ? 'none' : 'grayscale(100%) opacity(0.5)' }}>{item.icon}</span>
-                                <span className="sidebar-text" style={{ fontSize: '14px', letterSpacing: '0.1px', flex: 1, whiteSpace: 'nowrap', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>{item.name}</span>
-                                {item.href === '/security/suspicious' && suspiciousEvents.length > 0 && (
-                                    <span className="sidebar-badge" style={{
-                                        background: '#FF416C',
-                                        color: 'white',
-                                        fontSize: '10px',
-                                        padding: '2px 6px',
-                                        borderRadius: '6px',
-                                        fontWeight: '900',
-                                        boxShadow: '0 0 10px rgba(255, 65, 108, 0.4)'
-                                    }}>
-                                        {suspiciousEvents.length}
-                                    </span>
-                                )}
-                            </div>
-                        </Link>
-                    );
-                })}
-            </nav>
-
-            {/* USER CARD (Fixed Bottom) */}
-            <div style={{
-                flexShrink: 0,
-                padding: '24px',
-                borderTop: '1px solid var(--border-light)',
-                background: 'var(--bg-hover)'
-            }}>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px' }}>
-                    <div style={{
-                        width: '40px', height: '40px', borderRadius: '14px',
-                        background: (displayUser.role?.includes('Admin') || currentUser === null) ? 'var(--primary)' : 'var(--success)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0,
-                        boxShadow: 'var(--shadow-premium)'
-                    }}>
-                        {(displayUser.role?.includes('Admin') || currentUser === null) ? '⚡' : '👤'}
-                    </div>
-                    <div className="user-profile-info" style={{ flex: 1, overflow: 'hidden', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>
-                        <div style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            {displayUser.name}
-                            {hasPermission('settings_manage') && (
-                                <Link href="/settings" title="Ayarlar" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '14px', marginLeft: '5px' }}>
-                                    ⚙️
-                                </Link>
-                            )}
+                {isDesktopSidebarCollapsed && (
+                    <div className="flex justify-center mt-2 group relative">
+                        <div className="w-10 h-10 rounded-xl bg-slate-100/80 hover:bg-slate-200 border border-slate-200/60 flex items-center justify-center cursor-pointer">
+                            <Store className="w-5 h-5 text-slate-600" />
                         </div>
-                        <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{displayUser.role || 'Personel'}</div>
                     </div>
-                </div>
-
-                <button
-                    onClick={logout}
-                    title={isDesktopSidebarCollapsed ? "Çıkış Yap" : undefined}
-                    style={{
-                        width: '100%', padding: '12px',
-                        background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)',
-                        borderRadius: '12px', color: '#FF4444',
-                        fontSize: '13px', fontWeight: '800', cursor: 'pointer', transition: '0.3s',
-                        display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', gap: isDesktopSidebarCollapsed ? '0' : '10px'
-                    }}
-                    onMouseOver={(e) => {
-                        e.currentTarget.style.background = '#FF4444';
-                        e.currentTarget.style.color = 'white';
-                    }}
-                    onMouseOut={(e) => {
-                        e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
-                        e.currentTarget.style.color = '#FF4444';
-                    }}
-                >
-                    <span style={{ fontSize: '18px' }}>🔚</span> <span className="sidebar-text" style={{ whiteSpace: 'nowrap', display: isDesktopSidebarCollapsed ? 'none' : 'block' }}>Çıkış Yap</span>
-                </button>
-
+                )}
             </div>
 
+            {/* SCROLLABLE NAVIGATION */}
+            <div className="flex-1 overflow-y-auto px-3 pb-8 custom-scrollbar space-y-5">
+                {filteredGroups.map((group, gIdx) => (
+                    <div key={gIdx} className="nav-group flex flex-col gap-1">
+                        {!isDesktopSidebarCollapsed && (
+                            <div className="px-3 mb-1 mt-1 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-400">
+                                {group.group}
+                            </div>
+                        )}
+
+                        {group.items.map((item) => {
+                            const Icon = item.icon;
+
+                            if (item.isParent) {
+                                const isOpen = openSections[item.id!];
+                                const hasActiveChild = item.subItems!.some(child => pathname === child.href);
+
+                                return (
+                                    <div key={item.id} className="flex flex-col relative group/parent">
+                                        {/* Parent Trigger */}
+                                        <button
+                                            onClick={() => {
+                                                if (isDesktopSidebarCollapsed) {
+                                                    // optionally expand sidebar when clicking a parent in collapsed mode
+                                                    setIsDesktopSidebarCollapsed(false);
+                                                }
+                                                toggleSection(item.id!);
+                                            }}
+                                            className={`relative flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer overflow-hidden
+                                                ${hasActiveChild ? 'text-blue-600 bg-blue-600/5 font-semibold' : 'text-slate-600 hover:text-[#0F172A] hover:bg-slate-200/40 hover:translate-x-[2px] font-medium'}
+                                            `}
+                                        >
+                                            <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
+                                                <Icon className={`w-5 h-5 ${hasActiveChild ? 'opacity-100' : 'opacity-70 group-hover/parent:opacity-100'}`} strokeWidth={1.5} />
+                                            </div>
+
+                                            {!isDesktopSidebarCollapsed && (
+                                                <>
+                                                    <span className="text-[14px] flex-1 text-left">{item.name}</span>
+                                                    <ChevronRight className={`w-4 h-4 opacity-50 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
+                                                </>
+                                            )}
+
+                                            {isDesktopSidebarCollapsed && hasActiveChild && (
+                                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-1/2 bg-blue-600 rounded-r-md"></div>
+                                            )}
+                                        </button>
+
+                                        {/* Children Dropdown */}
+                                        <div
+                                            className={`flex flex-col gap-1 overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
+                                                ${isOpen && !isDesktopSidebarCollapsed ? 'max-h-[300px] mt-1' : 'max-h-0'}
+                                            `}
+                                        >
+                                            {item.subItems!.map(child => {
+                                                const isActive = pathname === child.href;
+                                                return (
+                                                    <Link key={child.href} href={child.href} className="group/child relative">
+                                                        <div className={`flex items-center mx-2 pl-9 pr-3 py-[7px] rounded-lg transition-all duration-200 outline-none
+                                                            ${isActive
+                                                                ? 'text-blue-700 bg-blue-600/5 font-semibold'
+                                                                : 'text-slate-500 hover:text-[#0F172A] hover:bg-slate-200/40 hover:translate-x-[2px]'}
+                                                        `}>
+                                                            <span className="text-[13px]">{child.name}</span>
+
+                                                            {/* Dynamic Left Accent for active child */}
+                                                            {isActive && (
+                                                                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-600"></div>
+                                                            )}
+                                                        </div>
+                                                    </Link>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                )
+                            }
+
+                            const isActive = pathname === item.href;
+
+                            return (
+                                <Link key={item.href} href={item.href || '#'} className="relative group/link">
+                                    <div className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 overflow-hidden
+                                        ${isActive ? 'text-blue-700 bg-blue-600/5 font-semibold' : 'text-slate-600 hover:text-[#0F172A] hover:bg-slate-200/40 hover:translate-x-[2px] font-medium'}
+                                    `}>
+                                        <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
+                                            <Icon className={`w-5 h-5 ${isActive ? 'opacity-100' : 'opacity-70 group-hover/link:opacity-100'}`} strokeWidth={1.5} />
+                                        </div>
+
+                                        {!isDesktopSidebarCollapsed && (
+                                            <span className="text-[14px] flex-1">{item.name}</span>
+                                        )}
+
+                                        {/* Active Left Indicator Bar */}
+                                        {isActive && (
+                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-[60%] bg-blue-600 rounded-r-md"></div>
+                                        )}
+
+                                        {/* Alerts / Badges */}
+                                        {!isDesktopSidebarCollapsed && item.alertCount && item.alertCount > 0 && (
+                                            <span className="px-2 py-[2px] rounded-md bg-rose-50 text-rose-600 text-[10px] font-bold border border-rose-100">
+                                                {item.alertCount}
+                                            </span>
+                                        )}
+                                    </div>
+                                </Link>
+                            )
+                        })}
+                    </div>
+                ))}
+            </div>
+
+            {/* USER PROFILE FOOTER */}
+            <div className={`p-4 border-t border-slate-200/60 dark:border-white/5 flex-shrink-0 transition-opacity duration-300 ${isDesktopSidebarCollapsed ? 'items-center flex flex-col' : ''}`}>
+                <div className={`flex items-center ${isDesktopSidebarCollapsed ? 'justify-center mx-auto' : 'gap-3 mb-4'} w-full`}>
+                    <div className="w-9 h-9 flex-shrink-0 rounded-xl bg-slate-200 flex items-center justify-center text-slate-500 font-bold overflow-hidden shadow-sm">
+                        {displayUser?.name?.charAt(0) || 'U'}
+                    </div>
+
+                    {!isDesktopSidebarCollapsed && (
+                        <div className="flex flex-col flex-1 min-w-0">
+                            <span className="text-[13px] font-bold text-[#0F172A] truncate">
+                                {displayUser?.name}
+                            </span>
+                            <div className="flex items-center">
+                                <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase bg-slate-100 px-1.5 py-0.5 rounded">
+                                    {displayUser?.role || 'Kullanıcı'}
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {!isDesktopSidebarCollapsed && (
+                    <button
+                        onClick={logout}
+                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors text-[13px] font-semibold group"
+                    >
+                        <LogOut className="w-4 h-4 opacity-70 group-hover:opacity-100" />
+                        Çıkış Yap
+                    </button>
+                )}
+
+                {isDesktopSidebarCollapsed && (
+                    <button
+                        onClick={logout}
+                        className="mt-4 w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                        title="Çıkış Yap"
+                    >
+                        <LogOut className="w-5 h-5" />
+                    </button>
+                )}
+            </div>
+
+            {/* Injected Micro CSS for smooth scrolling and animations */}
             <style jsx>{`
-                .sidebar-link:not(.active):hover {
-                    background: var(--bg-hover);
-                    color: var(--text-main) !important;
-                    transform: translateX(5px);
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 6px;
                 }
-                .sidebar-link:not(.active):hover span:first-child {
-                    filter: none !important;
-                }
-                
-                /* Tematik İnce Scrollbar */
-                .sidebar-scroll::-webkit-scrollbar {
-                    width: 4px;
-                }
-                .sidebar-scroll::-webkit-scrollbar-track {
+                .custom-scrollbar::-webkit-scrollbar-track {
                     background: transparent;
                 }
-                .sidebar-scroll::-webkit-scrollbar-thumb {
-                    background: var(--border-rich);
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: rgba(148, 163, 184, 0.2);
                     border-radius: 10px;
                 }
-                .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-                    background: var(--text-muted);
+                .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+                    background: rgba(148, 163, 184, 0.4);
+                }
+                aside {
+                    box-shadow: 1px 0 20px rgba(0,0,0,0.01);
                 }
             `}</style>
         </aside>
