@@ -68,7 +68,7 @@ export default function OnboardingPage() {
                 updateUser({ setupState: 'COMPLETED' });
                 showSuccess('Başarılı', 'Kurulum tamamlandı! Sisteme yönlendiriliyorsunuz...');
                 setTimeout(() => {
-                    router.push('/');
+                    router.push('/dashboard');
                 }, 2000);
             } else {
                 showError('Hata', result.error || 'Bir hata oluştu');

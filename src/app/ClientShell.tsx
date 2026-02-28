@@ -162,7 +162,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
                 // 3. Permission Check (only for non-admin users)
                 if (config.perm && !app.hasPermission(config.perm)) {
-                    const targetFallback = app.hasPermission('pos_access') ? '/' : '/field-mobile/routes';
+                    const targetFallback = app.hasPermission('pos_access') ? '/dashboard' : '/field-mobile/routes';
                     router.push(targetFallback);
                 }
             }

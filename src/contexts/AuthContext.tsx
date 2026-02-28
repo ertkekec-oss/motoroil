@@ -114,19 +114,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     } else {
                         // ADMIN role always goes to main dashboard
                         if (userData.role === 'ADMIN' || userData.role === 'SUPER_ADMIN') {
-                            router.push('/');
+                            router.push('/dashboard');
                         } else {
                             // For non-admin users, check permissions
                             const hasPOS = userData.permissions?.includes('pos_access');
                             const hasFieldSales = userData.permissions?.includes('field_sales_access');
 
                             if (hasPOS) {
-                                router.push('/');
+                                router.push('/dashboard');
                             } else if (hasFieldSales) {
                                 router.push('/field-sales');
                             } else {
                                 // Default fallback
-                                router.push('/');
+                                router.push('/dashboard');
                             }
                         }
                     }

@@ -107,7 +107,7 @@ export default function SetupWizard() {
     };
 
     const handleFinish = () => {
-        router.push('/');
+        router.push('/dashboard');
     };
 
     return (
