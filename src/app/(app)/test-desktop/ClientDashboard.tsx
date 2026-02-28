@@ -13,7 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
-import "./density-90.css";
+import "./density-80.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -194,29 +194,29 @@ export default function ClientDashboard() {
     return (
         <div className={`flex h-screen overflow-hidden bg-[#F8FAFC] dark:bg-[#0B1120] font-sans`}>
 
-            {/* L E F T   P A N E L  (MODÜL GRID) */}
-            <div className="w-[360px] xl:w-[480px] flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/50 dark:border-white/5 flex flex-col h-full z-10 shadow-[8px_0_30px_-15px_rgba(0,0,0,0.05)] hidden md:flex overflow-hidden">
-                <div className="p-8 pb-6 bg-gradient-to-b from-white to-white/90 dark:from-slate-900 dark:to-slate-900/90 backdrop-blur-md z-20">
-                    <h2 className="text-2xl font-extrabold tracking-tight text-[#0F172A] dark:text-white mb-5">Sistem Modülleri</h2>
+            {/* L E F T   P A N E L  (MODÜL GRID - 80% Scaled Down) */}
+            <div className="w-[280px] xl:w-[360px] flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/50 dark:border-white/5 flex flex-col h-full z-10 shadow-[8px_0_30px_-15px_rgba(0,0,0,0.05)] hidden md:flex overflow-hidden">
+                <div className="p-6 pb-4 bg-gradient-to-b from-white to-white/90 dark:from-slate-900 dark:to-slate-900/90 backdrop-blur-md z-20">
+                    <h2 className="text-[20px] font-extrabold tracking-tight text-[#0F172A] dark:text-white mb-4">Sistem Modülleri</h2>
                     <div className="relative">
-                        <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                             type="text"
                             placeholder="Arama yap..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-4 py-4 bg-slate-100/70 hover:bg-slate-100 focus:bg-white dark:bg-slate-800/50 border border-transparent focus:border-blue-500/30 rounded-2xl text-base font-medium text-slate-800 dark:text-slate-200 transition-all focus:shadow-[0_4px_20px_-5px_rgba(37,99,235,0.15)] focus:outline-none placeholder:text-slate-400"
+                            className="w-full pl-10 pr-3 py-3 bg-slate-100/70 hover:bg-slate-100 focus:bg-white dark:bg-slate-800/50 border border-transparent focus:border-blue-500/30 rounded-xl text-sm font-medium text-slate-800 dark:text-slate-200 transition-all focus:shadow-[0_4px_20px_-5px_rgba(37,99,235,0.15)] focus:outline-none placeholder:text-slate-400"
                         />
                     </div>
                 </div>
 
                 {/* Hide Scrollbar, Touch-first padding, Two-column Grid Layout */}
-                <div className="flex-1 overflow-y-auto px-8 pb-12" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div className="flex-1 overflow-y-auto px-6 pb-8" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                     <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
-                    <div className="grid grid-cols-2 gap-4 pdy-grid-tight">
+                    <div className="grid grid-cols-2 gap-3 pdy-grid-tight">
                         {!mounted ? (
                             Array.from({ length: 12 }).map((_, i) => (
-                                <div key={i} className="h-32 bg-slate-50 dark:bg-slate-800/50 rounded-2xl animate-pulse" />
+                                <div key={i} className="h-24 bg-slate-50 dark:bg-slate-800/50 rounded-2xl animate-pulse" />
                             ))
                         ) : (
                             filteredFeatures.map(feat => (
@@ -226,29 +226,31 @@ export default function ClientDashboard() {
                                         trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
                                         router.push(feat.href);
                                     }}
-                                    className="text-left flex flex-col items-start p-5 rounded-[20px] transition-transform active:scale-95 border border-slate-200/60 hover:border-slate-300 dark:border-slate-700/50 dark:hover:border-slate-600 focus:outline-none shadow-sm hover:shadow-md cursor-pointer bg-white dark:bg-slate-800 group"
+                                    className="text-left flex flex-col items-start p-4 rounded-[16px] transition-transform active:scale-95 border border-slate-200/60 hover:border-slate-300 dark:border-slate-700/50 dark:hover:border-slate-600 focus:outline-none shadow-sm hover:shadow-md cursor-pointer bg-white dark:bg-slate-800 group"
                                 >
-                                    <div className={`p-3 rounded-2xl mb-4 shadow-sm ${feat.color.replace('border-', 'border border-')}`}>
-                                        {feat.icon}
+                                    <div className={`p-2.5 rounded-xl mb-3 shadow-sm ${feat.color.replace('border-', 'border border-')}`}>
+                                        <div className="scale-75 origin-top-left -mx-1 -my-1">
+                                            {feat.icon}
+                                        </div>
                                     </div>
-                                    <h4 className="text-[15px] font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight">{feat.title}</h4>
-                                    <p className="text-[12px] font-semibold text-slate-500 mt-1 line-clamp-2 leading-snug">{feat.desc}</p>
+                                    <h4 className="text-[13px] font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight">{feat.title}</h4>
+                                    <p className="text-[10px] font-semibold text-slate-500 mt-1 line-clamp-2 leading-snug">{feat.desc}</p>
                                 </button>
                             ))
                         )}
                         {mounted && filteredFeatures.length === 0 && (
-                            <div className="col-span-2 text-center py-16">
-                                <BoxSelect className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                                <p className="text-base text-slate-500 font-bold">Modül bulunamadı.</p>
+                            <div className="col-span-2 text-center py-10">
+                                <BoxSelect className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+                                <p className="text-sm text-slate-500 font-bold">Modül bulunamadı.</p>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* R I G H T   P A N E L  (DASHBOARD CARDS) */}
+            {/* R I G H T   P A N E L  (DASHBOARD CARDS 80% SCALED TOKENS) */}
             <div
-                className={`flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative pdy-section pdy-density-90`}
+                className={`flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative pdy-section pdy-density-80`}
                 style={{ scrollbarWidth: 'none' }}
                 onScroll={(e) => {
                     if (e.currentTarget.scrollTop > 120) {

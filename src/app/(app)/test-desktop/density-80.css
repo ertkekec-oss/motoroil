@@ -1,43 +1,43 @@
 /* ========================================================================= */
 /* PERIODYA - PAGE-SCOPED DENSITY TOKENS (NO SCALING)                        */
-/* Target: /test-desktop ONLY. True 90% permanent density.                   */
+/* Target: /test-desktop ONLY. True 80% permanent density.                   */
 /* ========================================================================= */
 
 @media (min-width: 1024px) {
-    .pdy-density-90 {
-        --pdy-font: 0.92;
-        --pdy-space: 0.88;
-        --pdy-gap: 0.75;
-        --pdy-shadow: 0.75;
-        --pdy-border: 0.08;
+    .pdy-density-80 {
+        --pdy-font: 0.82;
+        --pdy-space: 0.75;
+        --pdy-gap: 0.65;
+        --pdy-shadow: 0.50;
+        --pdy-border: 0.10;
     }
 
     /* Grid Reductions */
-    .pdy-density-90 .pdy-grid {
+    .pdy-density-80 .pdy-grid {
         gap: calc(24px * var(--pdy-gap)) !important;
     }
 
-    .pdy-density-90 .pdy-grid-tight {
+    .pdy-density-80 .pdy-grid-tight {
         gap: calc(16px * var(--pdy-gap)) !important;
     }
 
-    .pdy-density-90 .pdy-stack {
+    .pdy-density-80 .pdy-stack {
         gap: calc(16px * var(--pdy-gap)) !important;
     }
 
     /* Section / Container Adjustments */
-    .pdy-density-90 .pdy-section {
+    .pdy-density-80 .pdy-section {
         padding-top: calc(32px * var(--pdy-space)) !important;
         padding-bottom: calc(32px * var(--pdy-space)) !important;
     }
 
-    .pdy-density-90 .pdy-content-container {
-        max-width: 1480px !important;
+    .pdy-density-80 .pdy-content-container {
+        max-width: 1600px !important;
         /* Increase width for more compact visual packing */
     }
 
     /* Card Reductions */
-    .pdy-density-90 .pdy-card {
+    .pdy-density-80 .pdy-card {
         padding: calc(32px * var(--pdy-space)) !important;
         /* Default was p-8 (32px) */
         border-color: rgba(15, 23, 42, var(--pdy-border)) !important;
@@ -45,25 +45,25 @@
     }
 
     /* Dark Mode specific card border adjustments for density */
-    .dark .pdy-density-90 .pdy-card {
-        border-color: rgba(255, 255, 255, 0.06) !important;
+    .dark .pdy-density-80 .pdy-card {
+        border-color: rgba(255, 255, 255, 0.08) !important;
     }
 
     /* Typography Compression */
-    .pdy-density-90 .pdy-title h2,
-    .pdy-density-90 .pdy-card h3 {
+    .pdy-density-80 .pdy-title h2,
+    .pdy-density-80 .pdy-card h3 {
         font-size: calc(100% * var(--pdy-font)) !important;
-        line-height: 1.2 !important;
+        line-height: 1.15 !important;
         letter-spacing: -0.01em !important;
     }
 
-    .pdy-density-90 .pdy-card p,
-    .pdy-density-90 .pdy-card span {
+    .pdy-density-80 .pdy-card p,
+    .pdy-density-80 .pdy-card span {
         font-size: calc(100% * var(--pdy-font)) !important;
         line-height: 1.25 !important;
     }
 
-    .pdy-density-90 .pdy-kpi {
+    .pdy-density-80 .pdy-kpi {
         font-size: calc(100% * var(--pdy-font)) !important;
         line-height: 1.05 !important;
     }
