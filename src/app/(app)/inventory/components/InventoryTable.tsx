@@ -47,9 +47,9 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
     };
 
     return (
-        <div className="card glass p-0 overflow-hidden border border-white/10 shadow-2xl relative z-0" style={{ height: 'calc(100vh - 300px)', minHeight: '600px' }}>
+        <div className="bg-[#0a0a0b]/80 backdrop-blur-xl rounded-2xl p-0 overflow-hidden border border-white/5 shadow-[0_0_40px_rgba(0,0,0,0.5)] relative z-0" style={{ height: 'calc(100vh - 300px)', minHeight: '600px' }}>
             {/* Header Sticky Container */}
-            <div className="shrink-0 bg-[#0f172a]/80 backdrop-blur-md border-b border-white/5 px-6 h-12 flex items-center text-[11px] font-bold text-white/50 z-20 uppercase tracking-wider">
+            <div className="shrink-0 bg-white/[0.02] backdrop-blur-xl border-b border-white/5 px-6 h-12 flex items-center text-[10px] font-black text-white/40 z-20 uppercase tracking-[0.2em]">
                 <div className="w-12">
                     <input
                         type="checkbox"
@@ -97,8 +97,8 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                     key={item.id}
                                     onClick={() => onProductClick(item)}
                                     className={`
-                                        flex items-center min-h-[64px] px-4 rounded-lg border border-transparent transition-all cursor-pointer group hover:bg-white/[0.03]
-                                        ${isSelected ? 'bg-primary/10 border-primary/20' : 'hover:border-white/5'}
+                                        flex items-center min-h-[64px] px-4 border-b border-white/5 transition-all duration-300 cursor-pointer group hover:bg-white/[0.03]
+                                        ${isSelected ? 'bg-primary/10 border-primary/20 shadow-inner' : ''}
                                     `}
                                 >
                                     {/* 1. Selection */}
@@ -113,7 +113,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
 
                                     {/* 2. Main Info */}
                                     <div className="flex-[2] px-4 overflow-hidden">
-                                        <div className="font-bold text-[13px] text-white/90 group-hover:text-primary transition-colors truncate mb-0.5">{item.name}</div>
+                                        <div className="font-bold text-[13px] text-white/90 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 truncate mb-0.5">{item.name}</div>
                                         <div className="flex items-center gap-2">
                                             <span className="text-[10px] bg-white/5 px-1.5 py-0.5 rounded text-white/50 font-mono tracking-wide">{item.code}</span>
                                             {item.brand && <span className="text-[10px] text-white/40 font-medium">{item.brand}</span>}
@@ -199,8 +199,8 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                                 )}
                                             </div>
                                             <div className="w-24 px-4 text-right">
-                                                <button className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all ml-auto">
-                                                    <span className="text-lg leading-none mb-0.5">›</span>
+                                                <button className="w-8 h-8 rounded-xl bg-white/5 hover:bg-primary/20 flex items-center justify-center text-white/30 group-hover:text-primary transition-all duration-300 ml-auto group-hover:scale-110">
+                                                    <span className="text-lg leading-none mb-0.5">→</span>
                                                 </button>
                                             </div>
                                         </>

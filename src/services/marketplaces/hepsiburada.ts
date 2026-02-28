@@ -7,7 +7,6 @@ export class HepsiburadaService implements IMarketplaceService {
 
     constructor(config: HepsiburadaConfig) {
         this.config = config;
-        const proxy = (process.env.MARKETPLACE_PROXY_URL || '').trim().replace(/\/$/, '');
         const isTest =
             this.config.isTest ||
             this.config.merchantId === '18c17301-9348-4937-b5c0-6912f54eb142';
@@ -16,18 +15,13 @@ export class HepsiburadaService implements IMarketplaceService {
             ? 'oms-external-sit.hepsiburada.com'
             : 'oms-external.hepsiburada.com';
 
-        if (proxy) {
-            // Option B: Reverse Proxy Mode (Path-based)
-            // Normalize: remove trailing /proxy if it exists to avoid double /proxy/proxy
-            const baseHost = proxy.replace(/\/proxy$/, '');
-            // We use /proxy/hepsiburada path which must be configured in Nginx
-            this.baseUrl = isTest ? `${baseHost}/proxy/hepsiburada-sit` : `${baseHost}/proxy/hepsiburada`;
-        } else {
-            // Option A: Direct Mode
-            this.baseUrl = `https://${this.targetHost}`;
-        }
-
+        this.baseUrl = `https://${this.targetHost}`;
         console.log(`[HB_INIT] baseUrl=${this.baseUrl} | Target: ${this.targetHost}`);
+    }
+
+    private getFetchUrl(targetUrl: string): string {
+        const proxy = (process.env.MARKETPLACE_PROXY_URL || '').trim();
+        return proxy ? `${proxy}?url=${encodeURIComponent(targetUrl)}` : targetUrl;
     }
 
     private getAuthHeader(): string {
@@ -46,7 +40,8 @@ export class HepsiburadaService implements IMarketplaceService {
             'Authorization': this.getAuthHeader(),
             'User-Agent': (this.config.username || 'Periodya-Integration').trim(),
             'Accept': 'application/json',
-            'Host': this.targetHost, // CRITICAL: Explicitly set target Host
+            // CRITICAL: Cannot explicitly set Host header when using a ?url= fetch proxy
+            // as it overrides the Host expected by the proxy itself, causing 403 Forbidden.
             ...extra
         };
 
@@ -96,9 +91,10 @@ export class HepsiburadaService implements IMarketplaceService {
     }
 
     private async safeFetchJson(url: string, options: any = {}): Promise<{ data: any; status: number; raw?: string }> {
-        console.log(`[HB_FETCH_REQ] URL: ${url}`);
+        const fetchUrl = this.getFetchUrl(url);
+        console.log(`[HB_FETCH_REQ] Target URL: ${url} | Proxy URL: ${fetchUrl}`);
 
-        const res = await fetch(url, options);
+        const res = await fetch(fetchUrl, options);
         const status = res.status;
         const text = await res.text();
         const trimmed = text.trim();
@@ -135,9 +131,10 @@ export class HepsiburadaService implements IMarketplaceService {
                 'Accept': '*/*, application/pdf, application/json'
             });
 
-            console.log(`[HB_LABEL_REQ] URL: ${url}`);
+            const fetchUrl = this.getFetchUrl(url);
+            console.log(`[HB_LABEL_REQ] Target URL: ${url} | Proxy URL: ${fetchUrl}`);
 
-            const res = await fetch(url, { headers });
+            const res = await fetch(fetchUrl, { headers });
             const status = res.status;
             const contentType = (res.headers.get('content-type') || '').toLowerCase();
             const proxyTrace = res.headers.get('x-proxy-route');

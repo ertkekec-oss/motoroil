@@ -1,7 +1,8 @@
-
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { TrendyolService } from '@/services/marketplaces/trendyol';
+import fs from 'fs';
+import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
@@ -117,6 +118,14 @@ export async function GET(request: Request) {
         console.log('📦 Etiket çekiliyor, shipmentId:', shipmentId);
         const pdfData = await trendyolService.getCommonLabel(shipmentId) as any;
 
+        try {
+            const debugPath = path.join(process.cwd(), 'etiket_response_debug.txt');
+            fs.writeFileSync(debugPath, JSON.stringify(pdfData, null, 2), 'utf8');
+            console.log('📝 Dev debug: API Response etiketi etiket_response_debug.txt dosyasına yazıldı.');
+        } catch (e) {
+            console.error('❌ Debug dosyasına yazılamadı:', e);
+        }
+
         if (!pdfData || pdfData.status !== 'SUCCESS') {
             console.error('❌ Trendyol API etiket döndürmedi. ShipmentId:', shipmentId, 'Status:', pdfData?.status, 'Error:', pdfData?.error);
             return NextResponse.json({
@@ -131,7 +140,8 @@ export async function GET(request: Request) {
         return NextResponse.json({
             success: true,
             content: pdfData.pdfBase64 || pdfData.zpl,
-            format: pdfData.zpl ? 'ZPL' : 'PDF'
+            format: pdfData.zpl ? 'ZPL' : 'PDF',
+            debugPayload: pdfData, // <-- Veriyi Vercel logları veya Browser Console'undan izlemek için
         });
 
     } catch (error: any) {

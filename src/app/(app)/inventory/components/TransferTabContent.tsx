@@ -180,9 +180,9 @@ export default function TransferTabContent({
             {isTransferMode ? (
                 <div className="grid grid-cols-2 gap-8">
                     {/* LEFT: SEARCH & ADD */}
-                    <div className="card glass h-[600px] flex flex-col p-6">
-                        <h3 className="mb-6 text-base font-black border-b border-white/10 pb-4 flex items-center gap-2">
-                            <span className="text-primary text-xl">1.</span> Ürün Seçimi
+                    <div className="bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] h-[600px] flex flex-col p-8 rounded-3xl">
+                        <h3 className="mb-6 text-lg font-black border-b border-white/5 pb-4 flex items-center gap-3">
+                            <span className="text-primary text-2xl">1.</span> Ürün Seçimi
                         </h3>
 
                         <input
@@ -190,7 +190,7 @@ export default function TransferTabContent({
                             placeholder="Ürün Ara (Ad, Kod, Barkod)..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-[#0f172a] border border-white/10 p-4 rounded-2xl mb-6 text-sm outline-none focus:border-primary transition-all"
+                            className="w-full bg-white/[0.02] border border-white/10 p-4 rounded-2xl mb-6 text-sm outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all duration-300 shadow-inner font-bold text-white placeholder-white/30"
                             autoFocus
                         />
 
@@ -219,9 +219,9 @@ export default function TransferTabContent({
                     </div>
 
                     {/* RIGHT: CART & CONFIRM */}
-                    <div className="card glass h-[600px] flex flex-col border-l-4 border-l-primary p-6">
-                        <h3 className="mb-6 text-base font-black border-b border-white/10 pb-4 flex items-center gap-2">
-                            <span className="text-primary text-xl">2.</span> Sevkiyat Detayları
+                    <div className="bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/5 border-l-4 border-l-primary shadow-[0_20px_50px_rgba(0,0,0,0.5)] h-[600px] flex flex-col p-8 rounded-3xl">
+                        <h3 className="mb-6 text-lg font-black border-b border-white/5 pb-4 flex items-center gap-3">
+                            <span className="text-primary text-2xl">2.</span> Sevkiyat Detayları
                         </h3>
 
                         {/* Source/Target Selection */}
@@ -229,7 +229,7 @@ export default function TransferTabContent({
                             <div className="flex flex-col gap-2">
                                 <label className="text-white/40 text-[9px] font-black tracking-widest uppercase">ÇIKIŞ DEPOSU (KAYNAK)</label>
                                 <select
-                                    className="p-3 bg-[#0f172a] rounded-xl border border-white/10 text-sm font-bold"
+                                    className="p-4 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 rounded-xl border border-white/10 text-sm font-black text-white outline-none cursor-pointer focus:border-primary/50 focus:ring-2 focus:ring-primary/20 shadow-inner"
                                     value={transferData.from}
                                     onChange={(e) => setTransferData({ ...transferData, from: e.target.value })}
                                 >
@@ -239,7 +239,7 @@ export default function TransferTabContent({
                             <div className="flex flex-col gap-2">
                                 <label className="text-white/40 text-[9px] font-black tracking-widest uppercase">VARIŞ DEPOSU (HEDEF)</label>
                                 <select
-                                    className="p-3 bg-[#0f172a] rounded-xl border border-white/10 text-sm font-bold text-primary"
+                                    className="p-4 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 rounded-xl border border-white/10 text-sm font-black text-primary outline-none cursor-pointer focus:border-primary/50 focus:ring-2 focus:ring-primary/20 shadow-inner"
                                     value={transferData.to}
                                     onChange={(e) => setTransferData({ ...transferData, to: e.target.value })}
                                 >

@@ -50,6 +50,9 @@ export default function SalesPage() {
     const [activeTab, setActiveTab] = useState('online');
     const [view, setView] = useState<'list' | 'new_wayslip'>('list');
 
+    // DEBUG MODAL STATE
+    const [debugLabelData, setDebugLabelData] = useState<any>(null);
+
     // REAL DATA
     const [onlineOrders, setOnlineOrders] = useState<any[]>([]);
     const [storeOrders, setStoreOrders] = useState<any[]>([]);
@@ -734,39 +737,21 @@ export default function SalesPage() {
                 format: data.format,
                 error: data.error
             });
+            console.log('📝 [FRONTEND] RAW JSON RESP DUMP:', JSON.stringify(data.debugPayload, null, 2));
 
-            if (data.success && data.content) {
-                console.log('✅ [FRONTEND] Etiket verisi alındı, PDF oluşturuluyor...');
-                try {
-                    // Base64 decode
-                    const byteCharacters = atob(data.content);
-                    const byteNumbers = new Array(byteCharacters.length);
-                    for (let i = 0; i < byteCharacters.length; i++) {
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }
-                    const byteArray = new Uint8Array(byteNumbers);
-                    const blob = new Blob([byteArray], { type: 'application/pdf' });
-                    console.log('📦 [FRONTEND] Blob oluşturuldu, boyut:', blob.size, 'bytes');
-
-                    // PDF'i yeni sekmede aç
-                    const url = window.URL.createObjectURL(blob);
-                    const newWindow = window.open(url, '_blank');
-
-                    if (!newWindow) {
-                        showWarning('Popup Engellendi', '⚠️ Pop-up engelleyici PDF\'i engelledi!\n\nLütfen pop-up engelleyiciyi devre dışı bırakın.');
-                    } else {
-                        console.log('✅ [FRONTEND] Etiket PDF yeni sekmede açıldı!');
-                    }
-
-                    // Biraz bekle ve temizle
-                    setTimeout(() => {
-                        window.URL.revokeObjectURL(url);
-                    }, 2000);
-
-                } catch (decodeError: any) {
-                    console.error('❌ [FRONTEND] Base64 decode hatası:', decodeError);
-                    showError('Hata', `❌ Etiket decode edilemedi!\n\nHata: ${decodeError.message}\n\nFormat hatası olabilir.`);
-                }
+            // YENİ AKIŞ: Hemen alert vermek veya pdf açmak yerine ekrana Modal basıyoruz
+            if (data.debugPayload) {
+                setDebugLabelData({
+                    payload: data.debugPayload,
+                    pdfBase64: data.content,
+                    success: data.success
+                });
+            } else if (data.success && data.content) {
+                setDebugLabelData({
+                    payload: { message: "Raw payload yok, ama base64 var." },
+                    pdfBase64: data.content,
+                    success: data.success
+                });
             } else {
                 // Eğer API'den gelmediyse ve link varsa eski yöntemi dene (fallback)
                 const order = onlineOrders.find(o => o.id === orderId);
@@ -917,6 +902,60 @@ export default function SalesPage() {
                     handleFinalSendDespatch={handleFinalSendDespatch}
                     isSendingDespatch={isSendingDespatch}
                 />
+
+                {/* DEBUG LABEL MODAL */}
+                {debugLabelData && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                        <div className={`w-[800px] max-w-full rounded-[16px] overflow-hidden flex flex-col max-h-[90vh] ${theme === 'light' ? 'bg-white shadow-2xl' : 'bg-[#0f111a] border border-[#1e2332] shadow-2xl'}`}>
+                            <div className="flex justify-between items-center p-6 border-b border-[#1e2332] dark:border-white/5">
+                                <h3 className={`text-[16px] font-semibold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
+                                    Trendyol API Ham Yanıtı (İnceleme)
+                                </h3>
+                                <button onClick={() => setDebugLabelData(null)} className="text-slate-400 hover:text-white transition-colors">
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div className="p-6 overflow-y-auto custom-scroll" style={{ maxHeight: '60vh' }}>
+                                <pre className={`p-4 rounded-[10px] text-[12px] font-mono overflow-x-auto ${theme === 'light' ? 'bg-slate-50 text-slate-800 border border-slate-200' : 'bg-black/40 text-emerald-400 border border-emerald-900/30'}`}>
+                                    {JSON.stringify(debugLabelData.payload, null, 2)}
+                                </pre>
+                            </div>
+                            <div className="p-6 border-t border-[#1e2332] dark:border-white/5 flex justify-end gap-3 bg-slate-50 dark:bg-black/20">
+                                <button
+                                    onClick={() => setDebugLabelData(null)}
+                                    className={`px-4 py-2 rounded-[8px] text-[13px] font-medium transition-colors ${theme === 'light' ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-[#1e2332] text-white hover:bg-[#2a3142]'}`}
+                                >
+                                    Kapat
+                                </button>
+                                {debugLabelData.pdfBase64 && debugLabelData.success && (
+                                    <button
+                                        onClick={() => {
+                                            try {
+                                                const byteCharacters = atob(debugLabelData.pdfBase64);
+                                                const byteNumbers = new Array(byteCharacters.length);
+                                                for (let i = 0; i < byteCharacters.length; i++) {
+                                                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                                                }
+                                                const byteArray = new Uint8Array(byteNumbers);
+                                                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                                                const url = window.URL.createObjectURL(blob);
+                                                window.open(url, '_blank');
+                                                setTimeout(() => window.URL.revokeObjectURL(url), 2000);
+                                            } catch (decodeError: any) {
+                                                showError('Hata', `❌ Etiket decode edilemedi!\n\nHata: ${decodeError.message}`);
+                                            }
+                                        }}
+                                        className="px-6 py-2 rounded-[8px] text-[13px] font-medium bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-lg shadow-blue-500/20"
+                                    >
+                                        Etiketi Yazdır (PDF)
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

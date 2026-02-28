@@ -46,14 +46,14 @@ export default function InventoryFilterBar({
     return (
         <div className="relative flex gap-3 items-center z-20">
             {/* SEARCH BAR */}
-            <div className="relative group w-[220px]">
+            <div className="relative group w-[240px]">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:opacity-100 transition-opacity text-sm">🔍</span>
                 <input
                     type="text"
-                    placeholder="Ara..."
+                    placeholder="Envanterde Ara..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    className="w-full bg-white/[0.03] border border-white/10 py-2.5 pl-10 pr-3 rounded-xl text-white/90 text-[13px] font-medium placeholder-white/20 outline-none transition-all duration-300 focus:border-primary/40 focus:bg-white/[0.06] focus:ring-4 focus:ring-primary/5 shadow-sm"
+                    className="w-full bg-[#0a0a0b]/60 backdrop-blur-xl border border-white/10 py-3 pl-10 pr-4 rounded-xl text-white/90 text-xs font-bold placeholder-white/20 outline-none transition-all duration-500 focus:border-primary/50 focus:bg-white/[0.04] focus:ring-4 focus:ring-primary/10 shadow-lg"
                 />
             </div>
 
@@ -62,28 +62,28 @@ export default function InventoryFilterBar({
                 <button
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
                     className={`
-                        flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-[11px] tracking-wide transition-all duration-300 shadow-sm
+                        flex items-center gap-2 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-500 shadow-xl
                         ${isFilterOpen
-                            ? 'bg-primary text-white shadow-primary/25 ring-2 ring-primary/20'
-                            : 'bg-white/[0.03] border border-white/10 text-white/70 hover:text-white hover:bg-white/[0.08] hover:border-white/20'
+                            ? 'bg-primary text-white shadow-primary/25 ring-2 ring-primary/20 scale-105'
+                            : 'bg-[#0a0a0b]/60 backdrop-blur-xl border border-white/10 text-white/70 hover:text-white hover:bg-white/[0.08] hover:border-white/30'
                         }
                     `}
                 >
                     <span className="text-sm">⚡</span>
                     <span>Filtre</span>
-                    <span className={`transform transition-transform duration-300 text-[9px] opacity-60 ${isFilterOpen ? 'rotate-180' : ''}`}>▼</span>
+                    <span className={`transform transition-transform duration-500 text-[10px] opacity-60 ${isFilterOpen ? 'rotate-180' : ''}`}>▼</span>
                 </button>
 
                 {/* DROPDOWN MENU */}
                 {isFilterOpen && (
-                    <div className="animate-in absolute top-[60px] right-0 w-[400px] glass-plus rounded-2xl p-6 z-[1000] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10">
+                    <div className="animate-in fade-in slide-in-from-top-4 duration-500 absolute top-[60px] right-0 w-[400px] bg-[#0a0a0b]/95 backdrop-blur-2xl rounded-2xl p-6 z-[1000] shadow-[0_30px_60px_rgba(0,0,0,0.7)] border border-white/10">
                         <div className="flex flex-col gap-6">
                             {/* Category Select */}
                             <div className="flex flex-col gap-2">
                                 <label className="text-white/50 text-[11px] font-semibold uppercase tracking-wider px-1">Kategori</label>
                                 <div className="relative">
                                     <select
-                                        className="w-full bg-black/20 hover:bg-black/30 p-3 pr-10 rounded-lg border border-white/5 text-sm font-medium text-white outline-none appearance-none cursor-pointer focus:border-primary/40 transition-all"
+                                        className="w-full bg-white/[0.02] hover:bg-white/[0.06] p-3 pr-10 rounded-xl border border-white/10 text-sm font-bold text-white outline-none appearance-none cursor-pointer focus:border-primary/50 transition-all duration-300"
                                         value={filterCategory}
                                         onChange={e => { setFilterCategory(e.target.value); setIsFilterOpen(false); }}
                                     >
@@ -100,7 +100,7 @@ export default function InventoryFilterBar({
                                 <label className="text-white/50 text-[11px] font-semibold uppercase tracking-wider px-1">Marka</label>
                                 <div className="relative">
                                     <select
-                                        className="w-full bg-black/20 hover:bg-black/30 p-3 pr-10 rounded-lg border border-white/5 text-sm font-medium text-white outline-none appearance-none cursor-pointer focus:border-primary/40 transition-all"
+                                        className="w-full bg-white/[0.02] hover:bg-white/[0.06] p-3 pr-10 rounded-xl border border-white/10 text-sm font-bold text-white outline-none appearance-none cursor-pointer focus:border-primary/50 transition-all duration-300"
                                         value={filterBrand}
                                         onChange={e => { setFilterBrand(e.target.value); setIsFilterOpen(false); }}
                                     >
@@ -141,7 +141,7 @@ export default function InventoryFilterBar({
                                 <label className="text-white/50 text-[11px] font-semibold uppercase tracking-wider px-1">Akıllı Filtre</label>
                                 <div className="relative">
                                     <select
-                                        className="w-full bg-black/20 hover:bg-black/30 p-3 pr-10 rounded-lg border border-white/5 text-sm font-medium text-white outline-none appearance-none cursor-pointer focus:border-primary/40 transition-all"
+                                        className="w-full bg-white/[0.02] hover:bg-white/[0.06] p-3 pr-10 rounded-xl border border-white/10 text-sm font-bold text-white outline-none appearance-none cursor-pointer focus:border-primary/50 transition-all duration-300"
                                         value={specialFilter}
                                         onChange={e => { setSpecialFilter(e.target.value as any); setIsFilterOpen(false); }}
                                     >

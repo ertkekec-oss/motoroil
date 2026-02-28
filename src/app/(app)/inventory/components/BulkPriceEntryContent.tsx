@@ -71,7 +71,7 @@ export default function BulkPriceEntryContent({
     return (
         <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Wizard Box */}
-            <div className="bg-white/5 border border-white/10 rounded-[32px] p-8 backdrop-blur-xl shadow-2xl">
+            <div className="bg-[#0a0a0b]/80 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
                 <div className="flex flex-wrap items-center gap-6 justify-between">
                     <div className="flex flex-col">
                         <h3 className="text-xl font-black text-white flex items-center gap-2">
@@ -82,9 +82,9 @@ export default function BulkPriceEntryContent({
                         </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-4 bg-black/40 p-2 rounded-2xl border border-white/5">
+                    <div className="flex flex-wrap items-center gap-4 bg-white/[0.02] p-2 rounded-2xl border border-white/10">
                         <select
-                            className="bg-transparent text-white/80 text-xs font-black uppercase tracking-wider px-4 py-2 outline-none cursor-pointer"
+                            className="bg-transparent text-white/80 text-[11px] font-black uppercase tracking-[0.2em] px-4 py-2 outline-none cursor-pointer"
                             value={adjTarget}
                             onChange={e => setAdjTarget(e.target.value as any)}
                         >
@@ -94,7 +94,7 @@ export default function BulkPriceEntryContent({
                         </select>
                         <div className="w-px h-6 bg-white/10"></div>
                         <select
-                            className="bg-transparent text-white/80 text-xs font-black uppercase tracking-wider px-4 py-2 outline-none cursor-pointer"
+                            className="bg-transparent text-white/80 text-[11px] font-black uppercase tracking-[0.2em] px-4 py-2 outline-none cursor-pointer"
                             value={adjType}
                             onChange={e => setAdjType(e.target.value as any)}
                         >
@@ -105,13 +105,13 @@ export default function BulkPriceEntryContent({
                         <input
                             type="number"
                             placeholder="Değer..."
-                            className="bg-white/5 border border-white/10 w-24 px-4 py-2 rounded-xl text-sm font-black text-center text-white focus:border-primary outline-none transition-all"
+                            className="bg-[#0a0a0b]/60 border border-white/10 w-24 px-4 py-2 rounded-xl text-sm font-black text-center text-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all duration-300 shadow-inner"
                             value={adjValue || ''}
                             onChange={e => setAdjValue(parseFloat(e.target.value) || 0)}
                         />
                         <button
                             onClick={applyWizard}
-                            className="bg-primary hover:bg-primary/80 text-white px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20"
+                            className="bg-primary hover:bg-transparent hover:text-primary hover:border-primary border border-transparent text-white px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]"
                         >
                             UYGULA
                         </button>
@@ -120,7 +120,7 @@ export default function BulkPriceEntryContent({
             </div>
 
             {/* Price Table */}
-            <div className="bg-white/5 border border-white/10 rounded-[32px] overflow-hidden shadow-2xl backdrop-blur-xl">
+            <div className="bg-[#0a0a0b]/80 border border-white/5 rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -136,13 +136,13 @@ export default function BulkPriceEntryContent({
                             {products.map(product => {
                                 const current = priceData[product.id] || {};
                                 return (
-                                    <tr key={product.id} className="hover:bg-white/[0.02] transition-all group">
+                                    <tr key={product.id} className="border-b border-white/[0.02] hover:bg-white/[0.04] transition-all duration-300 group">
                                         <td className="p-6">
-                                            <div className="font-bold text-white text-sm mb-1 group-hover:text-primary transition-colors">{product.name}</div>
+                                            <div className="font-bold text-white text-sm mb-1 group-hover:text-primary group-hover:translate-x-1 transition-all duration-300">{product.name}</div>
                                             <div className="text-[10px] text-white/30 font-mono flex items-center gap-2">
-                                                <span>{product.code}</span>
-                                                <span className="w-1 h-1 rounded-full bg-white/10"></span>
-                                                <span>{product.category}</span>
+                                                <span className="bg-white/5 px-1.5 rounded">{product.code}</span>
+                                                <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                                                <span className="tracking-wider uppercase text-[9px] font-bold">{product.category}</span>
                                             </div>
                                         </td>
                                         <td className="p-6">
@@ -151,7 +151,7 @@ export default function BulkPriceEntryContent({
                                                     type="number"
                                                     value={current.buyPrice || ''}
                                                     onChange={e => handleUpdate(product.id, 'buyPrice', parseFloat(e.target.value) || 0)}
-                                                    className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm font-bold text-white focus:border-white/30 outline-none transition-all pr-12"
+                                                    className="w-full bg-white/[0.02] group-hover:bg-[#0a0a0b]/60 border border-white/10 rounded-xl p-3 text-sm font-bold text-white focus:border-white/30 focus:ring-2 focus:ring-white/10 shadow-inner outline-none transition-all duration-300 pr-12"
                                                 />
                                                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 text-xs font-bold pointer-events-none group-focus-within/input:text-white/40 transition-colors">₺</span>
                                             </div>
@@ -170,8 +170,8 @@ export default function BulkPriceEntryContent({
                                                 <button
                                                     onClick={() => handleUpdate(product.id, 'purchaseVatIncluded', !current.purchaseVatIncluded)}
                                                     className={`px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${current.purchaseVatIncluded
-                                                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                                            : 'bg-white/5 text-white/30 border border-white/5'
+                                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                                        : 'bg-white/5 text-white/30 border border-white/5'
                                                         }`}
                                                 >
                                                     {current.purchaseVatIncluded ? 'KDV DAHİL' : 'KDV HARİÇ'}
@@ -184,7 +184,7 @@ export default function BulkPriceEntryContent({
                                                     type="number"
                                                     value={current.price || ''}
                                                     onChange={e => handleUpdate(product.id, 'price', parseFloat(e.target.value) || 0)}
-                                                    className="w-full bg-primary/5 border border-primary/20 rounded-xl p-3 text-sm font-black text-primary focus:border-primary outline-none transition-all pr-12 placeholder:text-primary/20"
+                                                    className="w-full bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded-xl p-3 text-sm font-black text-primary focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 pr-12 placeholder:text-primary/20 shadow-inner"
                                                 />
                                                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/30 text-xs font-black pointer-events-none group-focus-within/input:text-primary/60 transition-colors">₺</span>
                                             </div>
@@ -203,8 +203,8 @@ export default function BulkPriceEntryContent({
                                                 <button
                                                     onClick={() => handleUpdate(product.id, 'salesVatIncluded', !current.salesVatIncluded)}
                                                     className={`px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${current.salesVatIncluded
-                                                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                                            : 'bg-white/5 text-white/30 border border-white/5'
+                                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                                        : 'bg-white/5 text-white/30 border border-white/5'
                                                         }`}
                                                 >
                                                     {current.salesVatIncluded ? 'KDV DAHİL' : 'KDV HARİÇ'}
@@ -227,7 +227,7 @@ export default function BulkPriceEntryContent({
 
             {/* Footer Save Area */}
             <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[4000] w-full max-w-4xl px-4 animate-in slide-in-from-bottom-10 duration-700">
-                <div className="bg-[#080911]/90 border border-white/10 rounded-[30px] p-6 shadow-[0_40px_100px_rgba(0,0,0,0.8)] backdrop-blur-3xl flex items-center justify-between">
+                <div className="bg-[#0a0a0b]/95 border border-white/10 rounded-[30px] p-6 shadow-[0_40px_100px_rgba(0,0,0,0.8)] backdrop-blur-3xl flex items-center justify-between">
                     <div className="flex flex-col">
                         <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Bekleyen Değişiklikler</span>
                         <div className="text-white text-lg font-black">

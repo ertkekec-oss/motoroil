@@ -102,7 +102,16 @@ export function MarketplaceActionButton({
                         duration: 6000
                     });
                 } else {
-                    throw new Error(data.errorMessage || "İşlem başlatılamadı");
+                    try {
+                        const parsed = JSON.parse(data.errorMessage);
+                        alert("Hata Detayı (İnceleme İçin):\n\n" + JSON.stringify(parsed.debug || parsed, null, 2));
+                        throw new Error(parsed.message || "İşlem başlatılamadı");
+                    } catch (e: any) {
+                        if (e.message !== "Unexpected token" && !e.message.includes("JSON")) {
+                            throw e; // Rethrow if it's our parsed error
+                        }
+                        throw new Error(data.errorMessage || "İşlem başlatılamadı");
+                    }
                 }
             }
         } catch (err: any) {
@@ -141,7 +150,13 @@ export function MarketplaceActionButton({
                     setTimeout(() => setStatus("IDLE"), 2000);
                 } else if (data.status === "FAILED") {
                     setStatus("FAILED");
-                    toast.error(data.errorMessage || "İşlem başarısız oldu");
+                    try {
+                        const parsed = JSON.parse(data.errorMessage);
+                        alert("Hata Detayı (İnceleme İçin):\n\n" + JSON.stringify(parsed.debug || parsed, null, 2));
+                        toast.error(parsed.message || "İşlem başarısız oldu");
+                    } catch (e: any) {
+                        toast.error(data.errorMessage || "İşlem başarısız oldu");
+                    }
                 } else {
                     // Continue polling with exponential backoff
                     attempt++;
