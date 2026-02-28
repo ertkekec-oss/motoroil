@@ -46,8 +46,7 @@ export default function Sidebar() {
     // Auto-expand if active
     useEffect(() => {
         const expandMap: Record<string, string[]> = {
-            'orders-parent': ['/orders', '/network/seller/orders', '/network/buyer/orders'],
-            'catalog-parent': ['/seller/products', '/catalog'],
+            'b2b-global-parent': ['/dashboard', '/network/seller/orders', '/network/buyer/orders', '/seller/products', '/catalog'],
             'growth-parent': ['/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics'],
             'purchasing-parent': ['/rfq', '/contracts', '/network/buyer'],
             'field-sales-parent': ['/field-sales'],
@@ -121,28 +120,20 @@ export default function Sidebar() {
 
     const menuGroups = [
         {
-            group: "B2B Global",
+            group: "Workspace",
             items: [
                 { name: 'POS Terminal', href: '/terminal', icon: Terminal },
-                { name: 'B2B Network', href: '/dashboard', icon: Globe },
                 {
-                    name: 'Siparişler',
-                    icon: ShoppingCart,
+                    name: 'B2B Global',
+                    icon: Globe,
                     isParent: true,
-                    id: 'orders-parent',
+                    id: 'b2b-global-parent',
                     subItems: [
+                        { name: 'B2B Dashboard', href: '/dashboard' },
                         ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/network/seller/orders' }] : []),
-                        ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders' }] : [])
-                    ]
-                },
-                {
-                    name: 'Katalog',
-                    icon: Package,
-                    isParent: true,
-                    id: 'catalog-parent',
-                    subItems: [
-                        ...(isSeller ? [{ name: 'Ürünlerim', href: '/seller/products' }] : []),
-                        ...(isBuyer ? [{ name: 'B2B Keşfet', href: '/catalog' }] : [])
+                        ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders' }] : []),
+                        ...(isSeller ? [{ name: 'Ürünlerim (Katalog)', href: '/seller/products' }] : []),
+                        ...(isBuyer ? [{ name: 'B2B Keşfet (Katalog)', href: '/catalog' }] : [])
                     ]
                 },
             ]
