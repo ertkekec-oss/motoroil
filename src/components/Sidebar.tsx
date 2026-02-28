@@ -287,15 +287,6 @@ export default function Sidebar() {
             ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             ${isDesktopSidebarCollapsed ? 'w-[72px]' : 'w-[260px]'}`}
         >
-            {/* MOBILE CLOSE BUTTON */}
-            <button
-                className="lg:hidden absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                style={{ color: 'var(--sb-muted)' }}
-                onClick={() => setIsSidebarOpen(false)}
-            >
-                ✕
-            </button>
-
             {/* LOGO & BRANDING */}
             <div className="flex-shrink-0 p-5 pb-3">
                 <div className={`flex items-center ${isDesktopSidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
