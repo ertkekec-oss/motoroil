@@ -15,23 +15,20 @@ export default function CriticalStockBanner({ products, onFilterCritical, onProc
     if (criticalProducts.length === 0) return null;
 
     return (
-        <div className="mb-8 p-6 bg-gradient-to-r from-red-500/10 via-amber-500/5 to-transparent rounded-3xl border border-red-500/20 shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
-                <span className="text-8xl">🚨</span>
-            </div>
-
+        <div className="mb-8 p-6 rounded-2xl border bg-red-50/50 border-red-200 dark:bg-red-950/20 dark:border-red-900/40 relative overflow-hidden group">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-                <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-red-500 flex items-center justify-center text-2xl shadow-lg shadow-red-500/40 shrink-0">
-                        ⚠️
+                <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 flex flex-shrink-0 items-center justify-center text-red-600 dark:text-red-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-white mb-1">
-                            Akıllı Kritik Stok Uyarı Sistemi
+                        <h3 className="text-[15px] font-semibold text-slate-900 dark:text-slate-100 mb-0.5">
+                            Kritik Stok Uyarı Sistemi
                         </h3>
-                        <p className="text-[13px] text-white/50 font-medium max-w-xl leading-relaxed">
-                            <span className="text-red-400 font-bold">{criticalProducts.length} ürün</span> kritik seviyenin altında, bunlardan <span className="text-red-400 font-bold">{outOfStock.length} tanesi</span> tamamen tükenmiş durumda.
-                            Satış kaybını önlemek için tedarik sürecini başlatmanız önerilir.
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 max-w-xl">
+                            <span className="font-semibold text-slate-700 dark:text-slate-300">{criticalProducts.length} ürün</span> kritik seviyenin altında, bunlardan <span className="font-semibold text-slate-700 dark:text-slate-300">{outOfStock.length} tanesi</span> tamamen tükenmiş durumda.
                         </p>
                     </div>
                 </div>
@@ -39,25 +36,17 @@ export default function CriticalStockBanner({ products, onFilterCritical, onProc
                 <div className="flex flex-wrap items-center gap-3">
                     <button
                         onClick={onFilterCritical}
-                        className="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[13px] font-black transition-all flex items-center gap-2"
+                        className="px-4 h-[36px] rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-transparent hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 text-[13px] font-medium transition-colors"
                     >
-                        🔍 KRİTİK ÜRÜNLERİ LİSTELE
+                        Listele
                     </button>
                     <button
                         onClick={onProcurement}
-                        className="px-6 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white text-[13px] font-black transition-all shadow-lg shadow-red-500/20 flex items-center gap-2 active:scale-95"
+                        className="px-4 h-[36px] rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[13px] font-medium transition-colors shadow-sm"
                     >
-                        📋 TEDARİK LİSTESİ OLUŞTUR
+                        Tedarik Listesi Oluştur
                     </button>
                 </div>
-            </div>
-
-            {/* Micro Pulse Indicators */}
-            <div className="absolute bottom-4 left-24 flex gap-1.5 opacity-40">
-                {criticalProducts.slice(0, 10).map((_, i) => (
-                    <span key={i} className="w-1 h-3 rounded-full bg-red-500 animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}></span>
-                ))}
-                {criticalProducts.length > 10 && <span className="text-[9px] font-black text-red-500 ml-1">+{criticalProducts.length - 10}</span>}
             </div>
         </div>
     );

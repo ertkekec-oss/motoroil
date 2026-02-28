@@ -1302,12 +1302,10 @@ function InventoryContent() {
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="group relative px-6 py-2.5 rounded-xl bg-[#FF5500] hover:bg-[#FF6600] overflow-hidden shadow-lg shadow-[#FF5500]/30 hover:shadow-[#FF5500]/50 hover:scale-[1.02] transition-all"
+              className="group relative px-6 h-[42px] rounded-xl bg-blue-600 hover:bg-blue-700 shadow-sm transition-all"
             >
-              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
-              <div className="relative flex items-center gap-2 text-white font-black text-xs uppercase tracking-wide">
-                <span className="text-sm leading-none">+</span>
-                <span>YENİ ÜRÜN</span>
+              <div className="relative flex items-center justify-center gap-2 text-white font-semibold text-[13px] tracking-wide">
+                <span>Yeni Ürün</span>
               </div>
             </button>
 
@@ -1323,80 +1321,41 @@ function InventoryContent() {
       </div>
 
       {/* --- DASHBOARD STATS (Premium Command Center) --- */}
+      {/* --- DASHBOARD STATS (Horizontal Metrics Strip) --- */}
       {!isCounting && activeTab === "all" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-          <div className="group relative bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 overflow-hidden hover:border-white/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full -mr-8 -mt-8 transition-transform duration-700 group-hover:bg-primary/20 group-hover:scale-110 blur-2xl"></div>
-            <div className="relative z-10 flex flex-col h-full justify-between">
-              <div>
-                <div className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                  Toplam Ürün
-                </div>
-                <div className="text-4xl font-black text-white tracking-tight mt-2">
-                  {(products || []).length}
-                </div>
-              </div>
-              <div className="text-[11px] text-white/50 font-medium mt-6 flex justify-between items-center border-t border-white/5 pt-4">
-                <span>{(products || []).filter((p) => !p.category).length} kategorisiz</span>
-                <span className="text-primary group-hover:translate-x-1 transition-transform">→</span>
+        <div className="mb-8 p-6 rounded-2xl border bg-gradient-to-b from-[#ffffff]/96 to-[#f8fafc]/88 border-[#0f172a]/5 dark:from-[#0f172a]/75 dark:to-[#0f172a]/55 dark:border-blue-400/15">
+          <div className="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-black/5 dark:divide-white/5">
+            {/* Toplam Ürün */}
+            <div className="px-4 py-2 md:py-0">
+              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.08em] mb-2">Toplam Ürün</div>
+              <div className="text-[28px] md:text-[32px] font-semibold text-slate-900 dark:text-slate-100">
+                {(products || []).length}
               </div>
             </div>
-          </div>
 
-          <div className="group relative bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 overflow-hidden hover:border-white/20 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform duration-700 group-hover:bg-emerald-500/20 group-hover:scale-110 blur-2xl"></div>
-            <div className="relative z-10 flex flex-col h-full justify-between">
-              <div>
-                <div className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Depo Değeri (Alış)
-                </div>
-                <div className="text-4xl font-black text-emerald-400 tracking-tight mt-2 flex items-baseline">
-                  <span className="text-xl text-emerald-500/50 mr-1">₺</span>
-                  {Number(inventoryValueResult().buyExt).toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
-                </div>
-              </div>
-              <div className="text-[11px] text-white/50 font-medium mt-6 flex justify-between items-center border-t border-white/5 pt-4">
-                <span>+KDV Dahil: {Number(inventoryValueResult().buyInc).toLocaleString("tr-TR", { maximumFractionDigits: 0 })} ₺</span>
+            {/* Depo Değeri */}
+            <div className="px-4 py-2 md:py-0">
+              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.08em] mb-2">Depo Değeri</div>
+              <div className="text-[28px] md:text-[32px] font-semibold text-blue-500">
+                <span className="text-xl font-normal opacity-50 mr-1">₺</span>
+                {Number(inventoryValueResult().buyExt).toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
               </div>
             </div>
-          </div>
 
-          <div className="group relative bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 overflow-hidden hover:border-white/20 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-1">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform duration-700 group-hover:bg-purple-500/20 group-hover:scale-110 blur-2xl"></div>
-            <div className="relative z-10 flex flex-col h-full justify-between">
-              <div>
-                <div className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                  Satış Potansiyeli
-                </div>
-                <div className="text-4xl font-black text-purple-400 tracking-tight mt-2 flex items-baseline">
-                  <span className="text-xl text-purple-500/50 mr-1">₺</span>
-                  {Number(inventoryValueResult().sellInc).toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
-                </div>
-              </div>
-              <div className="text-[11px] text-white/50 font-medium mt-6 flex justify-between items-center border-t border-white/5 pt-4">
-                <span>Tahmini Kâr: {Number(inventoryValueResult().sellInc - inventoryValueResult().buyInc).toLocaleString("tr-TR", { maximumFractionDigits: 0 })} ₺</span>
+            {/* Satış Potansiyeli */}
+            <div className="px-4 py-2 md:py-0">
+              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.08em] mb-2">Satış Potansiyeli</div>
+              <div className="text-[28px] md:text-[32px] font-semibold text-emerald-500">
+                <span className="text-xl font-normal opacity-50 mr-1">₺</span>
+                {Number(inventoryValueResult().sellInc).toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
               </div>
             </div>
-          </div>
 
-          <div className="group relative bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 overflow-hidden hover:border-red-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-1">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform duration-700 group-hover:bg-red-500/20 group-hover:scale-110 blur-2xl"></div>
-            <div className="relative z-10 flex flex-col h-full justify-between">
-              <div>
-                <div className="text-red-500/70 text-[10px] font-black uppercase tracking-widest mb-1 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                  Kritik Stok
-                </div>
-                <div className="text-4xl font-black text-white tracking-tight mt-2">
-                  {mappedProducts.filter((p) => (p.stock || 0) <= (p.minStock || 5)).length}
-                </div>
-              </div>
-              <div className="text-[11px] text-white/50 font-medium mt-6 flex justify-between items-center border-t border-white/5 pt-4">
-                <span className="text-red-400">{mappedProducts.filter((p) => (p.stock || 0) <= 0).length} ürün tükendi</span>
-                <span className="text-red-500 group-hover:translate-x-1 transition-transform">→</span>
+            {/* Kritik Stok */}
+            <div className="px-4 py-2 md:py-0">
+              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.08em] mb-2">Kritik Stok</div>
+              <div className="text-[28px] md:text-[32px] font-semibold text-red-500">
+                {mappedProducts.filter((p) => (p.stock || 0) <= (p.minStock || 5)).length}
               </div>
             </div>
           </div>
@@ -1428,26 +1387,23 @@ function InventoryContent() {
         <div className="flex flex-col xl:flex-row items-center justify-between gap-6 mb-8 z-20 relative">
           {/* Left: Scrollable Tabs */}
           <div className="flex-shrink-0 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0 scrollbar-hide">
-            <div className="flex p-1.5 bg-[#0a0a0b]/60 backdrop-blur-xl rounded-2xl border border-white/5 whitespace-nowrap w-max shadow-xl">
+            <div className="flex p-1 rounded-xl border border-slate-200 dark:border-white/10 whitespace-nowrap w-max h-[40px] items-center">
               <button
                 onClick={() => setActiveTab("all")}
-                className={`px-6 py-2.5 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 flex items-center gap-2 ${activeTab === "all" ? "bg-white text-black shadow-lg shadow-white/10" : "text-white/40 hover:text-white hover:bg-white/5"}`}
+                className={`px-4 h-full rounded-lg text-[13px] font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === "all" ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5"}`}
               >
-                <span>📦</span>
                 Envanter Listesi
               </button>
               <button
                 onClick={() => setActiveTab("transfers")}
-                className={`px-6 py-2.5 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 flex items-center gap-2 ${activeTab === "transfers" ? "bg-white text-black shadow-lg shadow-white/10" : "text-white/40 hover:text-white hover:bg-white/5"}`}
+                className={`px-4 h-full rounded-lg text-[13px] font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === "transfers" ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5"}`}
               >
-                <span>🚛</span>
                 Transfer & Sevkiyat
               </button>
               <button
                 onClick={() => setActiveTab("bulk-price")}
-                className={`px-6 py-2.5 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 flex items-center gap-2 ${activeTab === "bulk-price" ? "bg-white text-black shadow-lg shadow-white/10" : "text-white/40 hover:text-white hover:bg-white/5"}`}
+                className={`px-4 h-full rounded-lg text-[13px] font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === "bulk-price" ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5"}`}
               >
-                <span>💰</span>
                 Fiyat Girişi
               </button>
             </div>
@@ -1593,36 +1549,23 @@ function InventoryContent() {
         <div
           style={{
             position: "fixed",
-            bottom: "20px",
+            bottom: "24px",
             left: "50%",
             transform: "translateX(-50%)",
             zIndex: 99999,
-            display: "flex",
-            alignItems: "center",
-            gap: "40px",
-            padding: "20px 40px",
-            borderRadius: "30px",
-            background: "rgba(8, 9, 17, 0.95)",
-            border: "1px solid var(--primary)",
-            boxShadow:
-              "0 30px 60px -12px rgba(0,0,0,0.8), 0 0 40px rgba(255, 85, 0, 0.15)",
-            backdropFilter: "blur(30px)",
-            animation: "slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
           }}
+          className="flex items-center gap-6 px-6 py-3 rounded-full bg-slate-900 dark:bg-slate-800 border border-slate-700/50 dark:border-white/10 shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-8 duration-500"
         >
-          <div className="flex flex-col">
-            <span className="text-[10px] font-black text-primary tracking-widest uppercase mb-1">
-              Seçim
-            </span>
-            <div className="text-2xl font-black text-white leading-none">
-              {selectedIds.length}{" "}
-              <span className="text-xs font-normal opacity-50">Adet</span>
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-600 text-white text-[13px] font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-inner">
+              {selectedIds.length}
             </div>
+            <span className="text-[13px] font-medium text-slate-300">
+              Ürün Seçili
+            </span>
           </div>
 
-          <div className="w-px h-12 bg-white/10"></div>
-
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             {[
               { id: "category", icon: "🏷️", label: "Kategori" },
               { id: "vat", icon: "🏛️", label: "KDV" },
@@ -1630,11 +1573,11 @@ function InventoryContent() {
             ].map((action) => (
               <button
                 key={action.id}
-                className="flex flex-col items-center gap-1.5 px-4 py-2 rounded-2xl hover:bg-white/5 transition-all text-white/70 hover:text-primary"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-800 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white"
                 onClick={() => handleBulkAction(action.id as any)}
               >
-                <span className="text-xl">{action.icon}</span>
-                <span className="text-[11px] font-bold uppercase tracking-tight">
+                <span className="text-[14px] grayscale opacity-70 group-hover:opacity-100">{action.icon}</span>
+                <span className="text-[12px] font-medium hidden sm:inline-block">
                   {action.label}
                 </span>
               </button>
@@ -1642,24 +1585,24 @@ function InventoryContent() {
 
             {canDelete && (
               <button
-                className="flex flex-col items-center gap-1.5 px-4 py-2 rounded-2xl hover:bg-red-500/10 transition-all text-red-400/70 hover:text-red-400"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-red-900/40 transition-colors text-red-400/80 hover:text-red-400"
                 onClick={() => handleBulkAction("delete")}
               >
-                <span className="text-xl">🗑️</span>
-                <span className="text-[11px] font-bold uppercase tracking-tight">
-                  SİL
+                <span className="text-[14px]">🗑️</span>
+                <span className="text-[12px] font-medium hidden sm:inline-block">
+                  Sil
                 </span>
               </button>
             )}
           </div>
 
-          <div className="w-px h-12 bg-white/10"></div>
-
           <button
             onClick={() => setSelectedIds([])}
-            className="bg-white/10 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-primary transition-colors text-xl font-light"
+            className="text-slate-500 hover:text-white ml-2 transition-colors p-1"
           >
-            &times;
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
       )}
@@ -2343,8 +2286,8 @@ function InventoryContent() {
                           }
                         }}
                         className={`px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wide border transition-all ${selectedAttributes.includes(attr.id)
-                            ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
-                            : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                          ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                          : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
                           }`}
                       >
                         {attr.name}
@@ -2527,8 +2470,8 @@ function InventoryContent() {
                       <td className="p-4 text-center">
                         <span
                           className={`px-2 py-1 rounded-md text-xs font-black ${item.diff > 0
-                              ? "bg-emerald-500/10 text-emerald-400"
-                              : "bg-red-500/10 text-red-500"
+                            ? "bg-emerald-500/10 text-emerald-400"
+                            : "bg-red-500/10 text-red-500"
                             }`}
                         >
                           {item.diff > 0 ? "+" : ""}

@@ -47,41 +47,41 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
     };
 
     return (
-        <div className="bg-[#0a0a0b]/80 backdrop-blur-xl rounded-2xl p-0 overflow-hidden border border-white/5 shadow-[0_0_40px_rgba(0,0,0,0.5)] relative z-0" style={{ height: 'calc(100vh - 300px)', minHeight: '600px' }}>
+        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-sm relative z-0" style={{ height: 'calc(100vh - 300px)', minHeight: '600px' }}>
             {/* Header Sticky Container */}
-            <div className="shrink-0 bg-white/[0.02] backdrop-blur-xl border-b border-white/5 px-6 h-12 flex items-center text-[10px] font-black text-white/40 z-20 uppercase tracking-[0.2em]">
-                <div className="w-12">
+            <div className="shrink-0 bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/10 px-4 h-11 flex items-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 z-20 uppercase tracking-[0.08em] sticky top-0 rounded-t-xl">
+                <div className="w-10">
                     <input
                         type="checkbox"
-                        className="w-4 h-4 rounded border-white/10 bg-white/5 checked:bg-primary transition-all cursor-pointer opacity-50 hover:opacity-100"
+                        className="w-4 h-4 rounded border-slate-300 dark:border-white/20 bg-white dark:bg-white/5 checked:bg-blue-600 transition-all cursor-pointer"
                         onChange={handleHeaderCheckboxChange}
                         checked={selectedIds.length === products.length && products.length > 0}
                     />
                 </div>
-                <div className="flex-[2] px-4">Ürün Detayı</div>
-                <div className="flex-1 px-4">Kategori</div>
+                <div className="flex-[2] px-3">Ürün Detayı</div>
+                <div className="flex-1 px-3">Kategori</div>
                 {isCounting ? (
                     <>
-                        <div className="w-32 px-4">Sistem Stok</div>
-                        <div className="w-48 px-4 text-warning">Sayılan</div>
+                        <div className="w-32 px-3">Sistem Stok</div>
+                        <div className="w-48 px-3 text-amber-600 dark:text-amber-500">Sayılan</div>
                     </>
                 ) : (
                     <>
-                        <div className="flex-1 px-4">Şube Stokları</div>
-                        <div className="w-44 px-4 text-right">Fiyat</div>
-                        <div className="w-24 px-4 text-right">İşlem</div>
+                        <div className="flex-1 px-3">Şube Stokları</div>
+                        <div className="w-40 px-3 text-right">Fiyat</div>
+                        <div className="w-20 px-3 text-right">İşlem</div>
                     </>
                 )}
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 overflow-y-auto custom-scroll p-4">
+            <div className="flex-1 overflow-y-auto custom-scroll mt-2">
                 {products.length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center opacity-30 py-32 space-y-6">
-                        <div className="text-6xl grayscale opacity-50">📦</div>
+                    <div className="h-full flex flex-col items-center justify-center opacity-40 py-24 space-y-4">
+                        <div className="text-4xl text-slate-400">📦</div>
                         <div className="text-center">
-                            <h3 className="text-lg font-bold text-white/70">Kayıt Bulunamadı</h3>
-                            <p className="text-xs font-medium text-white/40 mt-2">Arama kriterlerinize uygun ürün yok.</p>
+                            <h3 className="text-[14px] font-semibold text-slate-700 dark:text-slate-300">Kayıt Bulunamadı</h3>
+                            <p className="text-[13px] text-slate-500 mt-1">Arama kriterlerinize uygun ürün yok.</p>
                         </div>
                     </div>
                 ) : (
@@ -97,111 +97,89 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                     key={item.id}
                                     onClick={() => onProductClick(item)}
                                     className={`
-                                        flex items-center min-h-[64px] px-4 border-b border-white/5 transition-all duration-300 cursor-pointer group hover:bg-white/[0.03]
-                                        ${isSelected ? 'bg-primary/10 border-primary/20 shadow-inner' : ''}
+                                        flex items-center min-h-[52px] px-4 border-b border-slate-100 dark:border-white/5 transition-colors cursor-pointer group hover:bg-slate-50/50 dark:hover:bg-white/5
+                                        ${isSelected ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}
                                     `}
                                 >
                                     {/* 1. Selection */}
-                                    <div className="w-12 shrink-0 flex justify-center" onClick={e => e.stopPropagation()}>
+                                    <div className="w-10 shrink-0 flex items-center" onClick={e => e.stopPropagation()}>
                                         <input
                                             type="checkbox"
-                                            className="w-4 h-4 rounded border-white/10 bg-white/5 checked:bg-primary transition-all cursor-pointer opacity-50 hover:opacity-100"
+                                            className="w-4 h-4 rounded border-slate-300 dark:border-white/20 bg-white dark:bg-white/5 checked:bg-blue-600 transition-all cursor-pointer"
                                             checked={isSelected}
                                             onChange={() => isSelected ? onSelectionChange(selectedIds.filter(id => id !== item.id)) : onSelectionChange([...selectedIds, item.id])}
                                         />
                                     </div>
 
                                     {/* 2. Main Info */}
-                                    <div className="flex-[2] px-4 overflow-hidden">
-                                        <div className="font-bold text-[13px] text-white/90 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 truncate mb-0.5">{item.name}</div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[10px] bg-white/5 px-1.5 py-0.5 rounded text-white/50 font-mono tracking-wide">{item.code}</span>
-                                            {item.brand && <span className="text-[10px] text-white/40 font-medium">{item.brand}</span>}
+                                    <div className="flex-[2] px-3 overflow-hidden">
+                                        <div className="font-medium text-[14px] text-slate-900 dark:text-slate-100 truncate">{item.name}</div>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{item.code}</span>
+                                            {item.brand && <span className="text-[11px] text-slate-400 dark:text-slate-500">• {item.brand}</span>}
                                         </div>
                                     </div>
 
                                     {/* 3. Category */}
-                                    <div className="flex-1 px-4 overflow-hidden">
-                                        <div className="text-[12px] font-medium text-white/70 truncate">{item.category || '-'}</div>
-                                        {item.type && <div className="text-[9px] text-white/30 truncate mt-0.5">{item.type}</div>}
+                                    <div className="flex-1 px-3 overflow-hidden">
+                                        <div className="text-[13px] text-slate-700 dark:text-slate-300 truncate">{item.category || '-'}</div>
+                                        {item.type && <div className="text-[11px] text-slate-500 dark:text-slate-500 truncate">{item.type}</div>}
                                     </div>
 
                                     {/* 4. Action Specific */}
                                     {isCounting ? (
                                         <>
-                                            <div className="w-32 px-4 flex flex-col justify-center">
-                                                <div className="text-[10px] text-white/30 uppercase font-black mb-1">SİSTEM</div>
-                                                <div className="text-lg font-bold text-white/50 tabular-nums">{item.stock} {item.unit || 'Adet'}</div>
+                                            <div className="w-32 px-3 flex flex-col justify-center">
+                                                <div className="text-[10px] text-slate-500 uppercase tracking-wide font-semibold mb-0.5">Sistem</div>
+                                                <div className="text-[14px] font-medium text-slate-700 dark:text-slate-300 tabular-nums">{item.stock} <span className="text-[11px] text-slate-400">{item.unit || 'Adet'}</span></div>
                                             </div>
-                                            <div className="w-64 px-4" onClick={e => e.stopPropagation()}>
+                                            <div className="w-64 px-3" onClick={e => e.stopPropagation()}>
                                                 <div className="relative group/input">
                                                     <input
                                                         type="number" min="0" autoFocus={isSelected}
                                                         value={countValues[item.id] !== undefined ? countValues[item.id] : ''}
                                                         onChange={(e) => onCountChange(item.id, parseInt(e.target.value) || 0)}
-                                                        placeholder="Miktar Girin"
+                                                        placeholder="Miktar"
                                                         className={`
-                                                            w-full bg-white/[0.02] border rounded-xl px-4 py-3 text-white font-black text-xl text-center outline-none transition-all
-                                                            ${countValues[item.id] !== undefined ? 'border-primary/50 bg-primary/5 shadow-[0_0_20px_rgba(255,85,0,0.1)]' : 'border-white/10 focus:border-white/30'}
+                                                            w-full bg-white dark:bg-[#0f172a] border rounded-lg px-3 py-2 text-slate-900 dark:text-white font-medium text-[14px] outline-none transition-colors
+                                                            ${countValues[item.id] !== undefined ? 'border-amber-400 focus:border-amber-500 dark:border-amber-500/50' : 'border-slate-300 dark:border-white/20 focus:border-blue-500'}
                                                         `}
                                                     />
-                                                    {countValues[item.id] !== undefined && (
-                                                        <div className={`absolute -right-2 -top-2 w-6 h-6 rounded-full flex items-center justify-center text-[10px] shadow-lg ${countValues[item.id] === item.stock ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'
-                                                            }`}>
-                                                            {countValues[item.id] === item.stock ? '✓' : '!'}
-                                                        </div>
-                                                    )}
                                                 </div>
-                                            </div>
-                                            <div className="w-24 px-4 text-right">
-                                                {countValues[item.id] !== undefined && (
-                                                    <div className={`text-xs font-bold ${countValues[item.id] - item.stock === 0 ? 'text-emerald-500/50' : (countValues[item.id] - item.stock > 0 ? 'text-emerald-500' : 'text-red-500')}`}>
-                                                        {countValues[item.id] - item.stock > 0 ? '+' : ''}{countValues[item.id] - item.stock}
-                                                    </div>
-                                                )}
                                             </div>
                                         </>
                                     ) : (
                                         <>
-                                            <div className="flex-1 px-4">
-                                                <div className="flex flex-col gap-1.5">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className={`w-1.5 h-1.5 rounded-full ${item.stock <= 0 ? 'bg-red-500' :
-                                                            item.stock <= (item.minStock || 5) ? 'bg-amber-500' : 'bg-emerald-500'
-                                                            }`}></div>
-                                                        <span className="text-[12px] font-medium text-white/80">{item.stock} {item.unit || 'Adet'}</span>
-                                                        <span className="text-[10px] text-white/30 ml-1">{item.branch || 'Merkez'}</span>
-                                                    </div>
-                                                    {branchStocks.length > 0 && (
-                                                        <div className="flex flex-wrap gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                                                            {branchStocks.map((bs, idx) => (
-                                                                <span key={idx} className="text-[9px] bg-white/5 px-1.5 rounded-[3px] text-white/40">
-                                                                    {bs.branch}: {bs.stock}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-                                                    )}
+                                            <div className="flex-1 px-3">
+                                                <div className="flex items-center gap-1.5">
+                                                    <div className={`w-2 h-2 rounded-full ${item.stock <= 0 ? 'bg-red-500' :
+                                                        item.stock <= (item.minStock || 5) ? 'bg-amber-500' : 'bg-emerald-500'
+                                                        }`}></div>
+                                                    <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300 tabular-nums">{item.stock} <span className="text-slate-400 text-[11px]">{item.unit || 'Adet'}</span></span>
+                                                    <span className="text-[11px] text-slate-400 dark:text-slate-500 ml-1 truncate max-w-[80px]">{item.branch || 'Merkez'}</span>
                                                 </div>
                                             </div>
-                                            <div className="w-44 px-4 text-right">
+                                            <div className="w-40 px-3 text-right">
                                                 {item._restricted ? (
-                                                    <span className="text-[10px] text-white/20 italic">Gizli</span>
+                                                    <span className="text-[11px] text-slate-400 italic">Gizli</span>
                                                 ) : (
                                                     <div className="flex flex-col items-end">
-                                                        <div className="text-white/90 font-bold text-[14px] tabular-nums">
+                                                        <div className="text-slate-900 dark:text-slate-100 font-medium text-[14px] tabular-nums">
                                                             {Number(item.price).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
-                                                            <span className="ml-1 text-xs opacity-70">
+                                                            <span className="ml-1 text-[11px] text-slate-500">
                                                                 {item.currency === 'USD' ? '$' : item.currency === 'EUR' ? '€' : item.currency === 'GBP' ? '£' : '₺'}
                                                             </span>
                                                         </div>
-                                                        {item.salesVat > 0 && <div className="text-[9px] text-white/30 tabular-nums">+{item.salesVat}% KDV</div>}
+                                                        {item.salesVat > 0 && <div className="text-[10px] text-slate-400 dark:text-slate-500 tabular-nums">+{item.salesVat}% KDV</div>}
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="w-24 px-4 text-right">
-                                                <button className="w-8 h-8 rounded-xl bg-white/5 hover:bg-primary/20 flex items-center justify-center text-white/30 group-hover:text-primary transition-all duration-300 ml-auto group-hover:scale-110">
-                                                    <span className="text-lg leading-none mb-0.5">→</span>
-                                                </button>
+                                            <div className="w-20 px-3 text-right">
+                                                <div className="w-8 h-8 rounded-lg bg-transparent hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-slate-400 group-hover:text-blue-600 dark:text-slate-500 dark:group-hover:text-blue-400 transition-colors ml-auto">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </div>
                                             </div>
                                         </>
                                     )}
