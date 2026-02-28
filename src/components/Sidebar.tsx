@@ -121,7 +121,7 @@ export default function Sidebar() {
 
     const menuGroups = [
         {
-            group: "Workspace",
+            group: "B2B Global",
             items: [
                 { name: 'POS Terminal', href: '/terminal', icon: Terminal },
                 { name: 'B2B Network', href: '/dashboard', icon: Globe },
