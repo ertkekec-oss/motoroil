@@ -349,7 +349,7 @@ export default function ClientDashboard() {
                                         >
                                             {completionPhase === 'none' && (
                                                 <button
-                                                    className= pdy-card"absolute top-6 right-6 p-2 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
+                                                    className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
                                                     onClick={() => setShowOnboardingModal(false)}
                                                 >
                                                     <span className="sr-only">Kapat</span>
