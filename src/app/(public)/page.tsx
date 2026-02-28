@@ -1,4 +1,4 @@
-import LandingPage from '@/components/LandingPage';
+import LoginPageContent from '@/components/login/LoginPageContent';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     twitter: {
         card: "summary_large_image",
         title: "Periodya Enterprise ERP",
-        description: "İşletme yönetimi için modern ve güçlü ERP çözümü.",
+        description: "İşletme management için modern ve güçlü ERP çözümü.",
     },
     robots: {
         index: true,
@@ -27,6 +27,6 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    // Render the Landing Page directly for the root '/' route
-    return <LandingPage />;
+    // Render the Login/Landing Content for the root '/' route
+    return <LoginPageContent />;
 }
