@@ -46,9 +46,7 @@ export default function Sidebar() {
     // Auto-expand if active
     useEffect(() => {
         const expandMap: Record<string, string[]> = {
-            'b2b-global-parent': ['/dashboard', '/network/seller/orders', '/network/buyer/orders', '/seller/products', '/catalog'],
-            'growth-parent': ['/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics'],
-            'purchasing-parent': ['/rfq', '/contracts', '/network/buyer'],
+            'b2b-global-parent': ['/dashboard', '/network/seller/orders', '/network/buyer/orders', '/seller/products', '/catalog', '/network/finance', '/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics', '/rfq', '/contracts', '/network/buyer'],
             'field-sales-parent': ['/field-sales'],
             'reports-parent': ['/reports'],
         };
@@ -133,36 +131,20 @@ export default function Sidebar() {
                         ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/network/seller/orders' }] : []),
                         ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders' }] : []),
                         ...(isSeller ? [{ name: 'Ürünlerim (Katalog)', href: '/seller/products' }] : []),
-                        ...(isBuyer ? [{ name: 'B2B Keşfet (Katalog)', href: '/catalog' }] : [])
+                        ...(isBuyer ? [{ name: 'B2B Keşfet (Katalog)', href: '/catalog' }] : []),
+                        // Ticari İstihbarat Servisleri:
+                        { name: 'Finance (B2B)', href: '/network/finance' },
+                        ...(isSeller ? [
+                            { name: 'Growth: Boost Yönetimi', href: '/seller/boost' },
+                            { name: 'Growth: Boost Analiz', href: '/seller/boost/analytics' },
+                            { name: 'Growth: Güven Skoru', href: '/network/trust-score' }
+                        ] : []),
+                        ...(isBuyer ? [
+                            { name: 'Satınalma: Sözleşmeler', href: '/contracts' },
+                            { name: 'Satınalma: RFQ Talepleri', href: '/rfq' }
+                        ] : [])
                     ]
                 },
-            ]
-        },
-        {
-            group: "Ticari İstihbarat",
-            items: [
-                { name: 'Finance (B2B)', href: '/network/finance', icon: Briefcase },
-                ...(isSeller ? [{
-                    name: 'Growth (Satıcı)',
-                    icon: TrendingUp,
-                    isParent: true,
-                    id: 'growth-parent',
-                    subItems: [
-                        { name: 'Boost Yönetimi', href: '/seller/boost' },
-                        { name: 'Boost Analiz', href: '/seller/boost/analytics' },
-                        { name: 'Güven Skoru', href: '/network/trust-score' }
-                    ]
-                }] : []),
-                ...(isBuyer ? [{
-                    name: 'Satınalma (Alıcı)',
-                    icon: Handshake,
-                    isParent: true,
-                    id: 'purchasing-parent',
-                    subItems: [
-                        { name: 'Sözleşmeler', href: '/contracts' },
-                        { name: 'RFQ Talepleri', href: '/rfq' }
-                    ]
-                }] : [])
             ]
         },
         {
