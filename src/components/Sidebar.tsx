@@ -46,11 +46,13 @@ export default function Sidebar() {
     // Auto-expand if active
     useEffect(() => {
         const expandMap: Record<string, string[]> = {
-            'b2b-global-parent': ['/dashboard', '/support/tickets'],
-            'orders-parent': ['/network/seller/orders', '/network/buyer/orders'],
-            'catalog-parent': ['/seller/products', '/catalog'],
-            'finance-parent': ['/network/finance', '/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics'],
-            'purchasing-parent': ['/rfq', '/contracts', '/network/buyer'],
+            'b2b-global-parent': [
+                '/dashboard', '/support/tickets',
+                '/network/seller/orders', '/network/buyer/orders',
+                '/seller/products', '/catalog',
+                '/network/finance', '/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics',
+                '/rfq', '/contracts', '/network/buyer'
+            ],
             'field-sales-parent': ['/field-sales'],
             'reports-parent': ['/reports'],
         };
@@ -132,53 +134,31 @@ export default function Sidebar() {
                     id: 'b2b-global-parent',
                     subItems: [
                         { name: 'Uyuşmazlık Çözüm Merkezi', href: '/support/tickets' },
-                        { name: 'B2B Dashboard', href: '/dashboard' }
-                    ]
-                },
-                {
-                    name: 'Siparişler',
-                    icon: ShoppingCart,
-                    isParent: true,
-                    id: 'orders-parent',
-                    subItems: [
+                        { name: 'B2B Dashboard', href: '/dashboard' },
+
+                        { name: 'SİPARİŞLER', href: '' },
                         ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/network/seller/orders' }] : []),
-                        ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders' }] : [])
-                    ]
-                },
-                {
-                    name: 'Katalog',
-                    icon: Package,
-                    isParent: true,
-                    id: 'catalog-parent',
-                    subItems: [
+                        ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders' }] : []),
+
+                        { name: 'KATALOG', href: '' },
                         ...(isSeller ? [{ name: 'Katalog (Ürünlerim)', href: '/seller/products' }] : []),
-                        ...(isBuyer ? [{ name: 'Katalog (B2B Keşfet)', href: '/catalog' }] : [])
-                    ]
-                },
-                {
-                    name: 'Finans',
-                    icon: TrendingUp,
-                    isParent: true,
-                    id: 'finance-parent',
-                    subItems: [
+                        ...(isBuyer ? [{ name: 'Katalog (B2B Keşfet)', href: '/catalog' }] : []),
+
+                        { name: 'FİNANS', href: '' },
                         { name: 'Finance (B2B)', href: '/network/finance' },
                         ...(isSeller ? [
                             { name: 'Growth: Boost Yönetimi', href: '/seller/boost' },
                             { name: 'Growth: Boost Analiz', href: '/seller/boost/analytics' },
                             { name: 'Growth: Güven Skoru', href: '/network/trust-score' }
+                        ] : []),
+
+                        ...(isBuyer ? [
+                            { name: 'SATIN ALMA', href: '' },
+                            { name: 'Satınalma: RFQ', href: '/rfq' },
+                            { name: 'Satınalma: Sözleşmeler', href: '/contracts' }
                         ] : [])
                     ]
                 },
-                ...(isBuyer ? [{
-                    name: 'Satın Alma',
-                    icon: Handshake,
-                    isParent: true,
-                    id: 'purchasing-parent',
-                    subItems: [
-                        { name: 'Satınalma: RFQ', href: '/rfq' },
-                        { name: 'Satınalma: Sözleşmeler', href: '/contracts' }
-                    ]
-                }] : [])
             ]
         },
         {
@@ -434,10 +414,17 @@ export default function Sidebar() {
                                         {/* Children Dropdown */}
                                         <div
                                             className={`flex flex-col gap-1 overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]
-                                                ${isOpen && !isDesktopSidebarCollapsed ? 'max-h-[300px] mt-1' : 'max-h-0'}
+                                                ${isOpen && !isDesktopSidebarCollapsed ? 'max-h-[1000px] mt-1' : 'max-h-0'}
                                             `}
                                         >
-                                            {item.subItems!.map(child => {
+                                            {item.subItems!.map((child, idx) => {
+                                                if (!child.href) {
+                                                    return (
+                                                        <div key={`header-${idx}`} className="mx-2 mt-3 mb-1 px-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider">
+                                                            {child.name}
+                                                        </div>
+                                                    )
+                                                }
                                                 const isActive = pathname === child.href;
                                                 return (
                                                     <Link key={child.href} href={child.href} className="group/child relative">
