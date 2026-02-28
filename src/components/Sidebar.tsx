@@ -46,7 +46,11 @@ export default function Sidebar() {
     // Auto-expand if active
     useEffect(() => {
         const expandMap: Record<string, string[]> = {
-            'b2b-global-parent': ['/dashboard', '/network/seller/orders', '/network/buyer/orders', '/seller/products', '/catalog', '/network/finance', '/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics', '/rfq', '/contracts', '/network/buyer', '/support/tickets'],
+            'b2b-global-parent': ['/dashboard', '/support/tickets'],
+            'orders-parent': ['/network/seller/orders', '/network/buyer/orders'],
+            'catalog-parent': ['/seller/products', '/catalog'],
+            'finance-parent': ['/network/finance', '/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics'],
+            'purchasing-parent': ['/rfq', '/contracts', '/network/buyer'],
             'field-sales-parent': ['/field-sales'],
             'reports-parent': ['/reports'],
         };
@@ -127,26 +131,54 @@ export default function Sidebar() {
                     isParent: true,
                     id: 'b2b-global-parent',
                     subItems: [
-                        { name: 'B2B Dashboard', href: '/dashboard' },
+                        { name: 'Uyuşmazlık Çözüm Merkezi', href: '/support/tickets' },
+                        { name: 'B2B Dashboard', href: '/dashboard' }
+                    ]
+                },
+                {
+                    name: 'Siparişler',
+                    icon: ShoppingCart,
+                    isParent: true,
+                    id: 'orders-parent',
+                    subItems: [
                         ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/network/seller/orders' }] : []),
-                        ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders' }] : []),
-                        ...(isSeller ? [{ name: 'Ürünlerim (Katalog)', href: '/seller/products' }] : []),
-                        ...(isBuyer ? [{ name: 'B2B Keşfet (Katalog)', href: '/catalog' }] : []),
-                        // Ticari İstihbarat Servisleri:
+                        ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders' }] : [])
+                    ]
+                },
+                {
+                    name: 'Katalog',
+                    icon: Package,
+                    isParent: true,
+                    id: 'catalog-parent',
+                    subItems: [
+                        ...(isSeller ? [{ name: 'Katalog (Ürünlerim)', href: '/seller/products' }] : []),
+                        ...(isBuyer ? [{ name: 'Katalog (B2B Keşfet)', href: '/catalog' }] : [])
+                    ]
+                },
+                {
+                    name: 'Finans',
+                    icon: TrendingUp,
+                    isParent: true,
+                    id: 'finance-parent',
+                    subItems: [
                         { name: 'Finance (B2B)', href: '/network/finance' },
                         ...(isSeller ? [
                             { name: 'Growth: Boost Yönetimi', href: '/seller/boost' },
                             { name: 'Growth: Boost Analiz', href: '/seller/boost/analytics' },
                             { name: 'Growth: Güven Skoru', href: '/network/trust-score' }
-                        ] : []),
-                        ...(isBuyer ? [
-                            { name: 'Satınalma: Sözleşmeler', href: '/contracts' },
-                            { name: 'Satınalma: RFQ Talepleri', href: '/rfq' }
-                        ] : []),
-                        // Dispute Resolution / Support tickets moved under B2B Global:
-                        { name: 'İhtilaf Çözümü', href: '/support/tickets' }
+                        ] : [])
                     ]
                 },
+                ...(isBuyer ? [{
+                    name: 'Satın Alma',
+                    icon: Handshake,
+                    isParent: true,
+                    id: 'purchasing-parent',
+                    subItems: [
+                        { name: 'Satınalma: RFQ', href: '/rfq' },
+                        { name: 'Satınalma: Sözleşmeler', href: '/contracts' }
+                    ]
+                }] : [])
             ]
         },
         {
