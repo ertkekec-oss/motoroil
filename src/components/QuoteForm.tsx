@@ -131,17 +131,19 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Top Section: Document Info - Horizontal Layout */}
-            <div className="card glass-plus p-6 border border-white/10 shadow-xl">
-                <h3 className="font-black mb-4 text-lg tracking-tight">📄 BELGE ÖZETİ</h3>
+            <div className="bg-[#0a0a0b]/80 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                <h3 className="font-black mb-6 flex items-center gap-3 text-lg">
+                    <span className="text-2xl text-primary">📄</span> BELGE ÖZETİ
+                </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Customer Selection */}
                     <div className="form-control md:col-span-2">
-                        <label className="label-text text-[10px] font-bold text-muted uppercase tracking-widest mb-2">
+                        <label className="label-text text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-2 block">
                             Cari / Müşteri
                         </label>
                         <select
-                            className="select select-bordered select-sm w-full bg-black/40 border-white/20"
+                            className="w-full bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 rounded-xl p-3.5 text-sm font-bold text-white focus:border-primary/50 focus:ring-2 focus:ring-primary/20 shadow-inner outline-none transition-all duration-300 cursor-pointer appearance-none"
                             value={formData.customerId}
                             onChange={e => setFormData({ ...formData, customerId: e.target.value })}
                             required
@@ -162,12 +164,12 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
 
                     {/* Date */}
                     <div className="form-control">
-                        <label className="label-text text-[10px] font-bold text-muted uppercase tracking-widest mb-2">
+                        <label className="label-text text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-2 block">
                             Tarih
                         </label>
                         <input
                             type="date"
-                            className="input input-bordered input-sm bg-black/40 border-white/20"
+                            className="w-full bg-[#0a0a0b]/60 border border-white/10 rounded-xl p-3.5 text-sm font-bold text-white/80 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 shadow-inner outline-none transition-all duration-300"
                             value={formData.date}
                             onChange={e => setFormData({ ...formData, date: e.target.value })}
                             required
@@ -176,12 +178,12 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
 
                     {/* Valid Until */}
                     <div className="form-control">
-                        <label className="label-text text-[10px] font-bold text-muted uppercase tracking-widest mb-2">
+                        <label className="label-text text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-2 block">
                             Geçerlilik
                         </label>
                         <input
                             type="date"
-                            className="input input-bordered input-sm bg-black/40 border-white/20"
+                            className="w-full bg-[#0a0a0b]/60 border border-white/10 rounded-xl p-3.5 text-sm font-bold text-white/80 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 shadow-inner outline-none transition-all duration-300"
                             value={formData.validUntil}
                             onChange={e => setFormData({ ...formData, validUntil: e.target.value })}
                         />
@@ -190,11 +192,11 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                     {/* Status (only when editing) */}
                     {initialData && (
                         <div className="form-control md:col-span-2">
-                            <label className="label-text text-[10px] font-bold text-muted uppercase tracking-widest mb-2">
+                            <label className="label-text text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-2 block">
                                 Teklif Durumu
                             </label>
                             <select
-                                className="select select-bordered select-sm w-full bg-black/40 border-white/20 font-bold"
+                                className="w-full bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 rounded-xl p-3.5 text-sm font-bold text-white focus:border-primary/50 focus:ring-2 focus:ring-primary/20 shadow-inner outline-none transition-all duration-300 cursor-pointer appearance-none"
                                 value={formData.status}
                                 onChange={e => setFormData({ ...formData, status: e.target.value })}
                             >
@@ -208,19 +210,19 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                     )}
 
                     {/* Totals Summary */}
-                    <div className={`${initialData ? 'md:col-span-2' : 'md:col-span-4'} bg-primary/5 p-4 rounded-lg border border-primary/20`}>
-                        <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className={`${initialData ? 'md:col-span-2' : 'md:col-span-4'} bg-primary/5 p-6 rounded-2xl border border-primary/20 shadow-inner flex flex-col justify-center`}>
+                        <div className="grid grid-cols-3 gap-4 text-center items-center">
                             <div>
-                                <div className="text-[9px] text-muted font-bold uppercase tracking-widest mb-1">Ara Toplam</div>
-                                <div className="text-sm font-bold">{totals.subTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                                <div className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em] mb-2">Ara Toplam</div>
+                                <div className="text-sm font-black tabular-nums">{totals.subTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span className="text-[10px] text-white/50">₺</span></div>
                             </div>
                             <div>
-                                <div className="text-[9px] text-muted font-bold uppercase tracking-widest mb-1">KDV</div>
-                                <div className="text-sm font-bold">{totals.taxAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                                <div className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em] mb-2">KDV Tutarı</div>
+                                <div className="text-sm font-black tabular-nums">{totals.taxAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span className="text-[10px] text-white/50">₺</span></div>
                             </div>
                             <div>
-                                <div className="text-[9px] text-primary font-bold uppercase tracking-widest mb-1">Genel Toplam</div>
-                                <div className="text-lg font-black text-primary">{totals.totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                                <div className="text-[10px] text-primary font-black uppercase tracking-[0.2em] mb-2">Genel Toplam</div>
+                                <div className="text-2xl font-black text-primary tabular-nums">{totals.totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span className="text-sm text-primary/60">₺</span></div>
                             </div>
                         </div>
                     </div>
@@ -228,28 +230,30 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
             </div>
 
             {/* Items Table */}
-            <div className="card glass-plus p-0 overflow-hidden border border-white/10 shadow-xl">
-                <div className="p-4 bg-white/5 border-b border-white/5 flex justify-between items-center">
-                    <h3 className="font-black text-lg flex items-center gap-2">
-                        <span className="text-primary">📦</span> Hizmet ve Ürün Detayları
+            <div className="bg-[#0a0a0b]/80 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                <div className="p-6 bg-white/[0.02] border-b border-white/5 flex justify-between items-center">
+                    <h3 className="font-black text-lg flex items-center gap-3">
+                        <span className="text-primary text-2xl">📦</span> Hizmet ve Ürün Detayları
                     </h3>
-                    <button type="button" onClick={addItem} className="btn btn-sm btn-primary">+ Kalem Ekle</button>
+                    <button type="button" onClick={addItem} className="bg-primary hover:bg-transparent hover:text-primary hover:border-primary border border-transparent text-white px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+                        + Kalem Ekle
+                    </button>
                 </div>
 
                 <div className="overflow-x-auto min-h-[300px]">
                     <table className="w-full text-left text-sm">
-                        <thead className="text-[10px] uppercase font-bold text-muted bg-black/20">
+                        <thead className="bg-[#0a0a0b]/80">
                             <tr>
-                                <th className="p-4 w-12 text-center">#</th>
-                                <th className="p-4">Ürün / Hizmet Tanımı</th>
-                                <th className="p-4 w-20 text-center">Miktar</th>
-                                <th className="p-4 w-32 text-right">Birim Fiyat</th>
-                                <th className="p-4 w-20 text-center">KDV %</th>
-                                <th className="p-4 w-32 text-right">Toplam</th>
-                                <th className="p-4 w-12"></th>
+                                <th className="p-5 w-12 text-center text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">#</th>
+                                <th className="p-5 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Ürün / Hizmet Tanımı</th>
+                                <th className="p-5 w-24 text-center text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Miktar</th>
+                                <th className="p-5 w-36 text-right text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Birim Fiyat</th>
+                                <th className="p-5 w-24 text-center text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">KDV %</th>
+                                <th className="p-5 w-36 text-right text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Toplam</th>
+                                <th className="p-5 w-12 text-center text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">İşlem</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-white/[0.02]">
                             {formData.items.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="p-12 text-center text-muted italic font-medium">
@@ -258,12 +262,12 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                                 </tr>
                             ) : (
                                 formData.items.map((item, i) => (
-                                    <tr key={i} className="hover:bg-white/5 transition-colors group">
-                                        <td className="p-4 text-center font-mono text-xs opacity-40">{i + 1}</td>
+                                    <tr key={i} className="hover:bg-white/[0.04] transition-colors duration-300 group">
+                                        <td className="p-4 text-center font-mono text-xs opacity-40 tabular-nums">{i + 1}</td>
                                         <td className="p-4">
-                                            <div className="flex flex-col gap-1.5">
+                                            <div className="flex flex-col gap-2">
                                                 <select
-                                                    className="select select-bordered select-sm w-full bg-black/40 text-xs border-white/5"
+                                                    className="w-full bg-white/[0.02] hover:bg-[#0a0a0b]/60 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-white focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all outline-none"
                                                     value={item.productId}
                                                     onChange={e => updateItem(i, 'productId', e.target.value)}
                                                 >
@@ -275,7 +279,7 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                                                 <input
                                                     type="text"
                                                     placeholder="Örn: Motor Yağı Değişimi veya Ürün Adı"
-                                                    className="input input-ghost input-sm w-full bg-transparent border-b border-white/5 rounded-none px-0 h-6 text-sm"
+                                                    className="w-full bg-transparent border-b border-white/10 focus:border-primary/50 text-sm font-bold text-white px-2 py-1 outline-none transition-all placeholder-white/20"
                                                     value={item.name}
                                                     onChange={e => updateItem(i, 'name', e.target.value)}
                                                     required
@@ -285,7 +289,7 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                                         <td className="p-4">
                                             <input
                                                 type="number"
-                                                className="input input-bordered input-sm w-full text-center bg-black/40 border-white/5"
+                                                className="w-full bg-white/[0.02] hover:bg-[#0a0a0b]/60 border border-white/10 rounded-xl px-0 text-center py-2 text-xs font-black text-white focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all outline-none tabular-nums"
                                                 value={item.quantity}
                                                 onChange={e => updateItem(i, 'quantity', e.target.value)}
                                                 min="0.1"
@@ -297,32 +301,34 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                                             <div className="relative">
                                                 <input
                                                     type="number"
-                                                    className="input input-bordered input-sm w-full text-right bg-black/40 border-white/5 pr-4"
+                                                    className="w-full bg-white/[0.02] hover:bg-[#0a0a0b]/60 border border-white/10 rounded-xl pl-3 pr-7 py-2 text-xs font-black text-white text-right focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all outline-none tabular-nums"
                                                     value={item.price}
                                                     onChange={e => updateItem(i, 'price', e.target.value)}
                                                     step="0.01"
                                                     required
                                                 />
-                                                <span className="absolute right-1 top-1.5 text-[10px] opacity-30">₺</span>
+                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase font-black text-white/30 pointer-events-none">₺</span>
                                             </div>
                                         </td>
                                         <td className="p-4">
                                             <select
-                                                className="select select-bordered select-sm w-full text-xs bg-black/40 border-white/5"
+                                                className="w-full bg-white/[0.02] hover:bg-[#0a0a0b]/60 border border-white/10 rounded-xl px-2 py-2 text-xs font-bold text-white text-center focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all outline-none appearance-none"
                                                 value={item.taxRate}
                                                 onChange={e => updateItem(i, 'taxRate', e.target.value)}
                                             >
-                                                <option value="0">0%</option>
-                                                <option value="1">1%</option>
-                                                <option value="10">10%</option>
-                                                <option value="20">20%</option>
+                                                <option value="0">%0</option>
+                                                <option value="1">%1</option>
+                                                <option value="10">%10</option>
+                                                <option value="20">%20</option>
                                             </select>
                                         </td>
-                                        <td className="p-4 text-right font-mono font-bold text-white">
-                                            {(Number(item.quantity) * Number(item.price)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+                                        <td className="p-4 text-right font-black text-white tabular-nums">
+                                            {(Number(item.quantity) * Number(item.price)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span className="text-[10px] text-white/40">₺</span>
                                         </td>
-                                        <td className="p-4 text-right">
-                                            <button type="button" onClick={() => removeItem(i)} className="btn btn-square btn-ghost btn-xs text-red-500 hover:bg-red-500/10">✕</button>
+                                        <td className="p-4 text-center">
+                                            <button type="button" onClick={() => removeItem(i)} className="w-8 h-8 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 flex items-center justify-center transition-all duration-300 mx-auto" title="Kaldır">
+                                                <span className="text-sm">🗑️</span>
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -335,12 +341,12 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
             {/* Notes and Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Notes - Takes 2 columns */}
-                <div className="lg:col-span-2 card glass-plus p-6 border border-white/10 shadow-xl">
-                    <h3 className="font-bold mb-4 flex items-center gap-2 text-sm uppercase tracking-widest text-muted">
-                        📝 Teklif Notları ve Açıklamalar
+                <div className="lg:col-span-2 bg-[#0a0a0b]/80 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                    <h3 className="font-black mb-4 flex items-center gap-3 text-lg">
+                        <span className="text-2xl text-primary">📝</span> Teklif Notları
                     </h3>
                     <textarea
-                        className="textarea textarea-bordered w-full h-32 bg-black/40 border-white/20 focus:border-primary transition-all text-sm leading-relaxed"
+                        className="w-full bg-[#0a0a0b]/60 border border-white/10 rounded-xl p-4 text-sm font-bold text-white/90 placeholder-white/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 shadow-inner outline-none transition-all duration-300 min-h-[120px] resize-y"
                         placeholder="Müşteriye özel notlar, garanti şartları veya ödeme koşulları..."
                         value={formData.description}
                         onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -348,11 +354,11 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                 </div>
 
                 {/* Action Buttons - Takes 1 column */}
-                <div className="card glass-plus p-6 border border-white/10 shadow-xl flex flex-col justify-center gap-3">
-                    <button type="submit" className="btn btn-primary w-full shadow-lg shadow-primary/20 h-12">
+                <div className="bg-[#0a0a0b]/80 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col justify-center gap-4">
+                    <button type="submit" className="w-full bg-primary hover:bg-transparent hover:text-primary hover:border-primary border border-transparent text-white py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] text-center">
                         {initialData ? 'DEĞİŞİKLİKLERİ KAYDET' : 'TEKLİFİ OLUŞTUR'}
                     </button>
-                    <button type="button" onClick={onCancel} className="btn btn-ghost btn-sm text-muted hover:text-white">
+                    <button type="button" onClick={onCancel} className="w-full bg-white/[0.02] hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 text-white/50 hover:text-red-500 py-3.5 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 text-center">
                         İptal Et
                     </button>
                 </div>
