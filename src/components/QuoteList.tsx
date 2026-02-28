@@ -57,34 +57,33 @@ export default function QuoteList({ onEdit, onPreview, initialQuotes, isLoading,
     };
 
     const getStatusBadge = (status: string) => {
-        const base = "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ";
+        const base = "px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wider inline-flex items-center justify-center ";
         switch (status) {
-            case 'Draft': return <span className={base + "bg-white/10 text-white"}>Taslak</span>;
-            case 'Sent': return <span className={base + "bg-blue-500/20 text-blue-400"}>Gönderildi</span>;
-            case 'Accepted': return <span className={base + "bg-green-500/20 text-green-400"}>Onaylandı</span>;
-            case 'Rejected': return <span className={base + "bg-red-500/20 text-red-400"}>Reddedildi</span>;
-            case 'Converted': return <span className={base + "bg-purple-500/20 text-purple-400"}>Faturalandı</span>;
-            default: return <span className={base + "bg-white/5 text-muted"}>{status}</span>;
+            case 'Draft': return <span className={base + "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300"}>Taslak</span>;
+            case 'Sent': return <span className={base + "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400"}>Gönderildi</span>;
+            case 'Accepted': return <span className={base + "bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400"}>Onaylandı</span>;
+            case 'Rejected': return <span className={base + "bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400"}>Reddedildi</span>;
+            case 'Converted': return <span className={base + "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400"}>Faturalandı</span>;
+            default: return <span className={base + "bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400"}>{status}</span>;
         }
     };
 
     if (isLoading) {
         return (
-            <div className="bg-[#0a0a0b]/80 border border-white/5 rounded-3xl p-20 flex flex-col items-center justify-center gap-4 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
-                <div className="absolute inset-0 bg-primary/5 animate-pulse"></div>
-                <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin z-10"></div>
-                <div className="text-white/40 font-black tracking-[0.2em] uppercase text-xs z-10">Teklifler Yükleniyor...</div>
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[16px] p-20 flex flex-col items-center justify-center gap-4 shadow-sm relative overflow-hidden">
+                <div className="w-10 h-10 border-4 border-slate-200 dark:border-white/10 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin z-10"></div>
+                <div className="text-slate-500 dark:text-slate-400 font-medium tracking-wider uppercase text-[11px] z-10">Teklifler Yükleniyor...</div>
             </div>
         );
     }
 
     if (filteredQuotes.length === 0) {
         return (
-            <div className="bg-[#0a0a0b]/80 border border-white/5 rounded-3xl p-16 text-center flex flex-col items-center gap-6 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                <div className="text-6xl opacity-20 filter grayscale">📂</div>
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[16px] p-16 text-center flex flex-col items-center gap-6 shadow-sm">
+                <div className="text-5xl opacity-40 grayscale">📂</div>
                 <div className="max-w-md">
-                    <h3 className="text-xl font-black mb-2 text-white">Kayıt Bulunamadı</h3>
-                    <p className="text-white/40 text-sm font-bold">Arama kriterlerinize uygun teklif kaydı bulunmuyor. Lütfen filtreleri değiştirin veya yeni bir kayıt oluşturun.</p>
+                    <h3 className="text-[16px] font-semibold mb-2 text-slate-900 dark:text-white">Kayıt Bulunamadı</h3>
+                    <p className="text-slate-500 dark:text-slate-400 text-[13px]">Arama kriterlerinize uygun teklif kaydı bulunmuyor. Lütfen filtreleri değiştirin veya yeni bir kayıt oluşturun.</p>
                 </div>
             </div>
         );
@@ -93,60 +92,69 @@ export default function QuoteList({ onEdit, onPreview, initialQuotes, isLoading,
     return (
         <div className="grid grid-cols-1 gap-4">
             {/* Desktop Table */}
-            <div className="hidden md:block bg-[#0a0a0b]/80 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative z-0">
+            <div className="hidden md:block bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[16px] overflow-hidden shadow-sm relative z-0">
                 <table className="w-full text-left">
-                    <thead>
-                        <tr className="bg-white/[0.02]">
-                            <th className="p-6 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Teklif Detayı</th>
-                            <th className="p-6 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Müşteri</th>
-                            <th className="p-6 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] text-center">Durum</th>
-                            <th className="p-6 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] text-right">Tutar</th>
-                            <th className="p-6 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] text-right">İşlemler</th>
+                    <thead className="bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/10">
+                        <tr>
+                            <th className="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Teklif Detayı</th>
+                            <th className="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Müşteri</th>
+                            <th className="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center">Durum</th>
+                            <th className="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-right">Tutar</th>
+                            <th className="px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-right">İşlemler</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/[0.02]">
+                    <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                         {filteredQuotes.map((quote) => (
-                            <tr key={quote.id} className="hover:bg-white/[0.04] transition-all duration-300 group">
-                                <td className="p-6">
-                                    <div className="font-mono text-primary font-black tracking-wider text-sm mb-1">{quote.quoteNo}</div>
-                                    <div className="text-[10px] text-white/40 font-bold tracking-widest uppercase flex items-center gap-2">
+                            <tr key={quote.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors duration-200 group">
+                                <td className="px-6 py-4">
+                                    <div className="font-mono text-blue-600 dark:text-blue-400 font-medium tracking-wide text-[13px] mb-1">{quote.quoteNo}</div>
+                                    <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
                                         <span>{new Date(quote.date).toLocaleDateString('tr-TR')}</span>
                                         {quote.validUntil && (
                                             <>
-                                                <span className="w-1 h-1 rounded-full bg-white/20"></span>
-                                                <span className="text-amber-500/80">Vade: {new Date(quote.validUntil).toLocaleDateString('tr-TR')}</span>
+                                                <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20"></span>
+                                                <span className="text-amber-600 dark:text-amber-500/80">Vade: {new Date(quote.validUntil).toLocaleDateString('tr-TR')}</span>
                                             </>
                                         )}
                                     </div>
                                 </td>
-                                <td className="p-6">
-                                    <div className="font-bold text-white text-sm group-hover:text-primary transition-colors duration-300">{quote.customer?.name}</div>
-                                    <div className="text-[11px] text-white/40 font-medium mt-0.5 tracking-wider">{quote.customer?.phone || 'İletişim yok'}</div>
+                                <td className="px-6 py-4">
+                                    <div className="font-medium text-slate-900 dark:text-white text-[13px] group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">{quote.customer?.name}</div>
+                                    <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{quote.customer?.phone || 'İletişim yok'}</div>
                                 </td>
-                                <td className="p-6 text-center">
+                                <td className="px-6 py-4 text-center">
                                     {getStatusBadge(quote.status)}
                                 </td>
-                                <td className="p-6 text-right">
-                                    <div className="font-black text-lg text-white tabular-nums">
-                                        {Number(quote.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span className="text-[10px] ml-0.5 text-white/40">₺</span>
+                                <td className="px-6 py-4 text-right">
+                                    <div className="font-semibold text-[14px] text-slate-900 dark:text-white tabular-nums">
+                                        {Number(quote.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span className="text-[11px] ml-0.5 text-slate-500">₺</span>
                                     </div>
-                                    <div className="text-[9px] text-primary/60 uppercase font-black tracking-widest">KDV Dahil</div>
+                                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">KDV Dahil</div>
                                 </td>
-                                <td className="p-6 text-right">
-                                    <div className="flex justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300 transform sm:translate-x-4 group-hover:translate-x-0">
-                                        <button onClick={() => onPreview(quote)} className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white flex items-center justify-center transition-all duration-300" title="Görüntüle">
-                                            <span className="text-sm">👁️</span>
+                                <td className="px-6 py-4 text-right">
+                                    <div className="flex justify-end gap-1.5 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 transform sm:translate-x-2 group-hover:translate-x-0">
+                                        <button onClick={() => onPreview(quote)} className="w-8 h-8 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white flex items-center justify-center transition-colors" title="Görüntüle">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
                                         </button>
-                                        <button onClick={() => onEdit(quote)} className="w-10 h-10 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 flex items-center justify-center transition-all duration-300" title="Düzenle">
-                                            <span className="text-sm">✏️</span>
+                                        <button onClick={() => onEdit(quote)} className="w-8 h-8 rounded-lg text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 flex items-center justify-center transition-colors" title="Düzenle">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                                            </svg>
                                         </button>
                                         {quote.status !== 'Converted' && (
-                                            <button onClick={() => handleConvert(quote)} className="w-10 h-10 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 flex items-center justify-center transition-all duration-300" title="Faturaya Dönüştür">
-                                                <span className="text-sm">⚡</span>
+                                            <button onClick={() => handleConvert(quote)} className="w-8 h-8 rounded-lg text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 flex items-center justify-center transition-colors" title="Faturaya Dönüştür">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                                                </svg>
                                             </button>
                                         )}
-                                        <button onClick={() => handleDelete(quote.id)} className="w-10 h-10 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 flex items-center justify-center transition-all duration-300" title="Sil">
-                                            <span className="text-sm">🗑️</span>
+                                        <button onClick={() => handleDelete(quote.id)} className="w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center justify-center transition-colors" title="Sil">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                            </svg>
                                         </button>
                                     </div>
                                 </td>
@@ -157,22 +165,22 @@ export default function QuoteList({ onEdit, onPreview, initialQuotes, isLoading,
             </div>
 
             {/* Mobile View */}
-            <div className="md:hidden space-y-4">
+            <div className="md:hidden flex flex-col gap-3">
                 {filteredQuotes.map((quote) => (
-                    <div key={quote.id} className="bg-[#0a0a0b]/80 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-all duration-300" onClick={() => onEdit(quote)}>
-                        <div className="flex justify-between items-start mb-4">
+                    <div key={quote.id} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[14px] p-5 hover:border-blue-500/30 transition-colors shadow-sm cursor-pointer" onClick={() => onEdit(quote)}>
+                        <div className="flex justify-between items-start mb-3">
                             <div>
-                                <div className="text-primary font-mono font-black tracking-wider text-xs mb-1">{quote.quoteNo}</div>
-                                <div className="text-sm font-bold text-white">{quote.customer?.name}</div>
+                                <div className="text-blue-600 dark:text-blue-400 font-mono font-medium tracking-wide text-[12px] mb-1">{quote.quoteNo}</div>
+                                <div className="text-[14px] font-semibold text-slate-900 dark:text-white">{quote.customer?.name}</div>
                             </div>
                             {getStatusBadge(quote.status)}
                         </div>
-                        <div className="flex justify-between items-end border-t border-white/[0.02] pt-4 mt-2">
-                            <div className="text-[11px] text-white/40 font-bold tracking-widest uppercase">
+                        <div className="flex justify-between items-end border-t border-slate-100 dark:border-white/5 pt-3 mt-1">
+                            <div className="text-[11px] text-slate-500 uppercase tracking-wider">
                                 {new Date(quote.date).toLocaleDateString('tr-TR')}
                             </div>
-                            <div className="text-lg font-black text-white tabular-nums">
-                                {Number(quote.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span className="text-[10px] text-white/30">₺</span>
+                            <div className="text-[16px] font-semibold text-slate-900 dark:text-white tabular-nums">
+                                {Number(quote.totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span className="text-[11px] text-slate-400">₺</span>
                             </div>
                         </div>
                     </div>

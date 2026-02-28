@@ -48,21 +48,32 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6 md:p-10 no-print">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
 
-            <div className="bg-[#121212] border border-white/10 rounded-3xl w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl relative animate-in zoom-in-95 duration-300">
+            <div className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/10 w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
                 {/* MODAL HEADER */}
-                <div className="flex-none p-6 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-3xl">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary text-xl">
-                            📄
+                <div className="flex-none px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                            </svg>
                         </div>
                         <div>
-                            <h2 className="text-xl font-black text-white">Teklif Önizleme</h2>
-                            <p className="text-[10px] text-muted font-bold uppercase tracking-widest">{quote.quoteNo} • {formatDate(quote.date)}</p>
+                            <h2 className="text-[16px] font-semibold text-slate-900 dark:text-white">Teklif Önizleme</h2>
+                            <p className="text-[12px] text-slate-500 font-medium">{quote.quoteNo} • {formatDate(quote.date)}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button onClick={handlePrint} className="btn btn-primary btn-sm rounded-xl">🖨️ Yazdır / PDF</button>
-                        <button onClick={onClose} className="btn btn-square btn-ghost btn-sm rounded-xl text-white/50 hover:text-white hover:bg-white/10">✕</button>
+                        <button onClick={handlePrint} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-white px-4 h-9 rounded-lg text-[13px] font-medium transition-colors shadow-sm flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.724.092m6.524-4.316A8.962 8.962 0 0112 21c-2.392 0-4.576-.935-6.196-2.459m.064-10.825c.24-.03.48-.062.724-.092m6.524 4.316A8.962 8.962 0 0112 3c2.392 0 4.576.935 6.196 2.459M12 12v9m0-18v9" />
+                            </svg>
+                            Yazdır / PDF
+                        </button>
+                        <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-white/10 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
 

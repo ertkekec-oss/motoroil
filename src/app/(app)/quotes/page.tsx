@@ -88,25 +88,25 @@ export default function QuotesPage() {
 
     return (
         <div className="p-4 sm:p-6 pb-32 animate-fade-in-up">
-            {/* Header & Stats Dashboard */}
-            <div className="flex flex-col lg:flex-row justify-between items-start gap-6 mb-8">
+            {/* Minimal Header Strip & Stats Dashboard */}
+            <div className="flex flex-col lg:flex-row justify-between items-end gap-6 mb-6 pb-6 border-b border-slate-200 dark:border-white/10">
                 <div className="flex-1">
-                    <h1 className="text-3xl font-black mb-2 flex items-center gap-3">
-                        <span className="text-primary text-4xl">📋</span> Teklif Yönetimi
+                    <h1 className="text-[20px] sm:text-[22px] font-semibold text-slate-900 dark:text-white mb-1 tracking-tight">
+                        Teklif Yönetimi
                     </h1>
-                    <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-1">Müşterilerinize profesyonel teklifler sunun ve satış süreçlerinizi optimize edin.</p>
+                    <p className="text-[13px] text-slate-500 font-medium">Satış süreçlerinizi yönetin ve profesyonel finansal belgeler hazırlayın.</p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full lg:w-auto">
+                <div className="flex flex-wrap gap-3 w-full lg:w-auto">
                     {[
-                        { label: 'Toplam', val: stats.total, color: 'text-white' },
-                        { label: 'Onaylanan', val: stats.accepted, color: 'text-emerald-400' },
-                        { label: 'Bekleyen', val: stats.pending, color: 'text-blue-400' },
-                        { label: 'Dönüşüm', val: `%${stats.convRate.toFixed(1)}`, color: 'text-purple-400' }
+                        { label: 'TOPLAM', val: stats.total, color: 'text-slate-900 dark:text-white' },
+                        { label: 'ONAYLANAN', val: stats.accepted, color: 'text-green-600 dark:text-green-400' },
+                        { label: 'BEKLEYEN', val: stats.pending, color: 'text-blue-600 dark:text-blue-400' },
+                        { label: 'DÖNÜŞÜM', val: `%${stats.convRate.toFixed(1)}`, color: 'text-slate-700 dark:text-slate-300' }
                     ].map((s, idx) => (
-                        <div key={idx} className="bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/5 p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] min-w-[140px] hover:border-white/10 transition-all duration-300 group">
-                            <div className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-black mb-1 group-hover:text-white/60 transition-colors">{s.label}</div>
-                            <div className={`text-2xl font-black ${s.color}`}>{s.val}</div>
+                        <div key={idx} className="bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/10 h-[56px] px-4 rounded-[14px] min-w-[120px] flex flex-col justify-center">
+                            <div className="text-[11px] uppercase tracking-wider text-slate-500 font-medium mb-0.5">{s.label}</div>
+                            <div className={`text-[20px] font-semibold leading-none ${s.color}`}>{s.val}</div>
                         </div>
                     ))}
                 </div>
@@ -114,37 +114,48 @@ export default function QuotesPage() {
 
             {/* Action Bar */}
             {activeTab === 'list' && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sticky top-0 z-20 bg-[#0a0a0b]/90 backdrop-blur-2xl p-4 -mx-4 rounded-3xl border border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                    <div className="flex items-center gap-3 w-full sm:w-auto">
-                        <div className="relative group w-full sm:w-72">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:opacity-100 transition-opacity text-sm">🔍</span>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                    <div className="flex items-center gap-3 w-full sm:w-auto flex-1 max-w-2xl">
+                        <div className="relative w-full sm:w-80">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </span>
                             <input
                                 type="text"
                                 placeholder="Teklif no veya müşteri ara..."
-                                className="w-full bg-white/[0.03] border border-white/10 py-3 pl-10 pr-4 rounded-xl text-white/90 text-xs font-bold placeholder-white/20 outline-none transition-all duration-500 focus:border-primary/50 focus:bg-white/[0.06] focus:ring-4 focus:ring-primary/10 shadow-lg"
+                                className="w-full h-[40px] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 pl-9 pr-4 rounded-lg text-slate-900 dark:text-white text-[13px] placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-colors focus:border-blue-500"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <select
-                            className="bg-white/[0.02] hover:bg-white/[0.06] py-3 px-4 rounded-xl border border-white/10 text-xs font-bold text-white outline-none cursor-pointer focus:border-primary/50 transition-all duration-300 w-40"
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <option value="All">Tüm Durumlar</option>
-                            <option value="Draft">Taslak</option>
-                            <option value="Sent">Gönderildi</option>
-                            <option value="Accepted">Onaylandı</option>
-                            <option value="Rejected">Reddedildi</option>
-                            <option value="Converted">Faturalandı</option>
-                        </select>
+                        <div className="relative w-40">
+                            <select
+                                className="w-full h-[40px] bg-slate-50 dark:bg-[#1e293b] pr-8 pl-3 rounded-lg border border-slate-200 dark:border-white/10 text-[13px] text-slate-900 dark:text-white outline-none cursor-pointer focus:border-blue-500 transition-colors appearance-none font-medium"
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                            >
+                                <option value="All">Tüm Durumlar</option>
+                                <option value="Draft">Taslak</option>
+                                <option value="Sent">Gönderildi</option>
+                                <option value="Accepted">Onaylandı</option>
+                                <option value="Rejected">Reddedildi</option>
+                                <option value="Converted">Faturalandı</option>
+                            </select>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
 
                     <button
                         onClick={() => { setEditingQuote(null); setActiveTab('create'); }}
-                        className="bg-primary hover:bg-transparent hover:text-primary hover:border-primary border border-transparent text-white px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] w-full sm:w-auto flex items-center justify-center gap-2"
+                        className="bg-blue-600 hover:bg-blue-700 text-white h-[42px] px-5 rounded-xl text-[13px] font-medium transition-colors shadow-sm w-full sm:w-auto"
                     >
-                        ✨ Yeni Teklif Oluştur
+                        Yeni Teklif Oluştur
                     </button>
                 </div>
             )}
@@ -162,19 +173,21 @@ export default function QuotesPage() {
                         refreshList={fetchQuotes}
                     />
                 ) : (
-                    <div className="animate-in slide-in-from-right-4 fade-in duration-500 max-w-7xl mx-auto">
-                        <div className="flex items-center gap-4 mb-6 bg-[#0a0a0b]/80 border border-white/5 p-6 rounded-3xl backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                    <div className="animate-in fade-in slide-in-from-right-4 duration-500 max-w-6xl mx-auto">
+                        <div className="flex items-center gap-4 mb-6">
                             <button
                                 onClick={() => { setActiveTab('list'); setEditingQuote(null); }}
-                                className="w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all duration-300 text-white/50 hover:text-white"
+                                className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-slate-500 dark:text-slate-400 disabled:opacity-50"
                             >
-                                ←
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                                </svg>
                             </button>
                             <div>
-                                <h2 className="text-2xl font-black flex items-center gap-3">
-                                    <span className="text-primary text-3xl">✨</span> {activeTab === 'create' ? 'Yeni Teklif Oluştur' : 'Teklifi Düzenle'}
+                                <h2 className="text-[20px] font-semibold text-slate-900 dark:text-white tracking-tight">
+                                    {activeTab === 'create' ? 'Yeni Teklif Oluştur' : 'Teklifi Düzenle'}
                                 </h2>
-                                <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Sektörel Standartlarda Profesyonel Belge</p>
+                                <p className="text-[13px] text-slate-500 mt-0.5">Sektörel standartlarda profesyonel belge detayları.</p>
                             </div>
                         </div>
 
