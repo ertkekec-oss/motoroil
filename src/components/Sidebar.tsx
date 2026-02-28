@@ -283,13 +283,14 @@ export default function Sidebar() {
 
     return (
         <aside
-            className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[width] fixed lg:relative z-[2000] border-r border-slate-200/60 dark:border-white/5 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] dark:from-[#080911] dark:to-[#0A0D14] h-screen
+            className={`pdy-sidebar flex flex-col flex-shrink-0 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[width] fixed lg:relative z-[2000] h-screen
             ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             ${isDesktopSidebarCollapsed ? 'w-[72px]' : 'w-[260px]'}`}
         >
             {/* MOBILE CLOSE BUTTON */}
             <button
-                className="lg:hidden absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-lg bg-slate-900/5 text-slate-500 hover:text-slate-800 transition-colors"
+                className="lg:hidden absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                style={{ color: 'var(--sb-muted)' }}
                 onClick={() => setIsSidebarOpen(false)}
             >
                 ✕
@@ -300,17 +301,21 @@ export default function Sidebar() {
                 <div className={`flex items-center ${isDesktopSidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
                     {!isDesktopSidebarCollapsed && (
                         <div className="flex flex-col">
-                            <h1 className="text-[22px] font-[900] tracking-[-1px] text-[#0F172A] dark:text-white leading-none">
-                                PERIOD<span className="text-blue-600">YA</span>
+                            <h1 className="text-[22px] font-[900] tracking-[-1px] leading-none" style={{ color: 'var(--sb-text)' }}>
+                                PERIOD<span style={{ color: 'var(--sb-accent)' }}>YA</span>
                             </h1>
-                            <span className="text-[10px] font-bold text-blue-600 tracking-[1.5px] uppercase mt-1 opacity-80">
+                            <span className="text-[10px] font-bold tracking-[1.5px] uppercase mt-1 opacity-80" style={{ color: 'var(--sb-accent)' }}>
                                 ENTERPRISE
                             </span>
                         </div>
                     )}
 
                     {isDesktopSidebarCollapsed && (
-                        <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-600 text-white font-[900] text-xl cursor-pointer hover:bg-blue-700 transition-colors" onClick={handleCollapseToggle}>
+                        <div
+                            className="w-10 h-10 flex items-center justify-center rounded-xl text-white font-[900] text-xl cursor-pointer transition-colors hover:brightness-110"
+                            style={{ background: 'var(--sb-accent)' }}
+                            onClick={handleCollapseToggle}
+                        >
                             P
                         </div>
                     )}
@@ -318,7 +323,7 @@ export default function Sidebar() {
                     {!isDesktopSidebarCollapsed && (
                         <button
                             onClick={handleCollapseToggle}
-                            className="hidden lg:flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 dark:hover:text-slate-300 dark:hover:bg-slate-800 transition-transform hover:scale-105"
+                            className="hidden lg:flex items-center justify-center w-7 h-7 rounded-md transition-transform hover:scale-105 pdy-sb-collapse-btn"
                         >
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
                         </button>
@@ -330,11 +335,12 @@ export default function Sidebar() {
             <div className="px-5 pb-4 space-y-3 flex-shrink-0">
                 {isPlatformAdmin && !isDesktopSidebarCollapsed && (
                     <div className="flex flex-col">
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1.5 px-0.5">Yönetilen Alan</span>
+                        <span className="text-[10px] uppercase font-bold tracking-wider mb-1.5 px-0.5" style={{ color: 'var(--sb-muted)' }}>Yönetilen Alan</span>
                         <select
                             value={activeTenantId || 'null'}
                             onChange={handleTenantChange}
-                            className={`w-full px-3 py-2.5 rounded-xl font-bold text-[13px] outline-none cursor-pointer transition-colors border ${activeTenantId ? 'bg-blue-50/50 border-blue-200 text-blue-800' : 'bg-slate-100/50 border-slate-200 text-slate-700'}`}
+                            className="w-full px-3 py-2.5 rounded-xl font-bold text-[13px] outline-none cursor-pointer transition-colors pdy-sb-select"
+                            style={activeTenantId ? { background: 'var(--sb-active)', borderColor: 'var(--sb-accent)', color: 'var(--sb-text)' } : {}}
                         >
                             <option value="null">🌐 TÜM SİSTEM</option>
                             {availableTenants.map(t => (
@@ -346,12 +352,12 @@ export default function Sidebar() {
 
                 {!isDesktopSidebarCollapsed && (
                     <div className="flex flex-col">
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1.5 px-0.5">Operasyonel Şube</span>
+                        <span className="text-[10px] uppercase font-bold tracking-wider mb-1.5 px-0.5" style={{ color: 'var(--sb-muted)' }}>Operasyonel Şube</span>
                         <select
                             disabled={(hasPermission('branch_isolation') && !isSystemAdmin) || (isPlatformAdmin && !activeTenantId && branches.length === 0)}
                             value={activeBranchName}
                             onChange={handleBranchChange}
-                            className="w-full px-3 py-2.5 rounded-xl font-semibold text-[13px] bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-white/5 text-[#0F172A] dark:text-slate-200 outline-none cursor-pointer transition-colors hover:bg-slate-200/50"
+                            className="w-full px-3 py-2.5 rounded-[14px] font-semibold text-[13px] outline-none cursor-pointer transition-colors pdy-sb-select"
                         >
                             {branches.length > 0 ? (
                                 branches.map(b => (
@@ -368,8 +374,8 @@ export default function Sidebar() {
 
                 {isDesktopSidebarCollapsed && (
                     <div className="flex justify-center mt-2 group relative">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100/80 hover:bg-slate-200 border border-slate-200/60 flex items-center justify-center cursor-pointer">
-                            <Store className="w-5 h-5 text-slate-600" />
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer pdy-sb-avatar">
+                            <Store className="w-5 h-5" />
                         </div>
                     </div>
                 )}
@@ -380,7 +386,7 @@ export default function Sidebar() {
                 {filteredGroups.map((group, gIdx) => (
                     <div key={gIdx} className="nav-group flex flex-col gap-1">
                         {!isDesktopSidebarCollapsed && (
-                            <div className="px-3 mb-1 mt-1 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-400">
+                            <div className="px-3 mb-1 mt-1 text-[11px] font-bold uppercase tracking-[0.08em] sb-header">
                                 {group.group}
                             </div>
                         )}
@@ -403,12 +409,12 @@ export default function Sidebar() {
                                                 }
                                                 toggleSection(item.id!);
                                             }}
-                                            className={`relative flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer overflow-hidden
-                                                ${hasActiveChild ? 'text-blue-600 bg-blue-600/5 font-semibold' : 'text-slate-600 hover:text-[#0F172A] hover:bg-slate-200/40 hover:translate-x-[2px] font-medium'}
+                                            className={`sb-item relative flex items-center gap-3 px-3 py-2 rounded-[14px] transition-all duration-200 cursor-pointer overflow-hidden
+                                                ${hasActiveChild ? 'sb-active font-semibold' : 'sb-default hover:translate-x-[2px] font-medium'}
                                             `}
                                         >
                                             <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
-                                                <Icon className={`w-5 h-5 ${hasActiveChild ? 'opacity-100' : 'opacity-70 group-hover/parent:opacity-100'}`} strokeWidth={1.5} />
+                                                <Icon className={`w-5 h-5 sb-icon ${hasActiveChild ? 'opacity-100' : 'opacity-60 group-hover/parent:opacity-100'}`} strokeWidth={1.5} />
                                             </div>
 
                                             {!isDesktopSidebarCollapsed && (
@@ -419,7 +425,7 @@ export default function Sidebar() {
                                             )}
 
                                             {isDesktopSidebarCollapsed && hasActiveChild && (
-                                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-1/2 bg-blue-600 rounded-r-md"></div>
+                                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-1/2 rounded-r-md" style={{ background: 'var(--sb-accent)' }}></div>
                                             )}
                                         </button>
 
@@ -433,16 +439,16 @@ export default function Sidebar() {
                                                 const isActive = pathname === child.href;
                                                 return (
                                                     <Link key={child.href} href={child.href} className="group/child relative">
-                                                        <div className={`flex items-center mx-2 pl-9 pr-3 py-[7px] rounded-lg transition-all duration-200 outline-none
+                                                        <div className={`sb-item flex items-center mx-2 pl-9 pr-3 py-[7px] rounded-[10px] transition-all duration-200 outline-none
                                                             ${isActive
-                                                                ? 'text-blue-700 bg-blue-600/5 font-semibold'
-                                                                : 'text-slate-500 hover:text-[#0F172A] hover:bg-slate-200/40 hover:translate-x-[2px]'}
+                                                                ? 'sb-active font-semibold'
+                                                                : 'sb-default hover:translate-x-[2px]'}
                                                         `}>
                                                             <span className="text-[13px]">{child.name}</span>
 
                                                             {/* Dynamic Left Accent for active child */}
                                                             {isActive && (
-                                                                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-600"></div>
+                                                                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full" style={{ background: 'var(--sb-accent)' }}></div>
                                                             )}
                                                         </div>
                                                     </Link>
@@ -457,11 +463,11 @@ export default function Sidebar() {
 
                             return (
                                 <Link key={item.href} href={item.href || '#'} className="relative group/link">
-                                    <div className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 overflow-hidden
-                                        ${isActive ? 'text-blue-700 bg-blue-600/5 font-semibold' : 'text-slate-600 hover:text-[#0F172A] hover:bg-slate-200/40 hover:translate-x-[2px] font-medium'}
+                                    <div className={`sb-item flex items-center gap-3 px-3 py-2 rounded-[14px] transition-all duration-200 overflow-hidden
+                                        ${isActive ? 'sb-active font-semibold' : 'sb-default hover:translate-x-[2px] font-medium'}
                                     `}>
                                         <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
-                                            <Icon className={`w-5 h-5 ${isActive ? 'opacity-100' : 'opacity-70 group-hover/link:opacity-100'}`} strokeWidth={1.5} />
+                                            <Icon className={`w-5 h-5 sb-icon ${isActive ? 'opacity-100' : 'opacity-60 group-hover/link:opacity-100'}`} strokeWidth={1.5} />
                                         </div>
 
                                         {!isDesktopSidebarCollapsed && (
@@ -470,7 +476,7 @@ export default function Sidebar() {
 
                                         {/* Active Left Indicator Bar */}
                                         {isActive && (
-                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-[60%] bg-blue-600 rounded-r-md"></div>
+                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-[60%] rounded-r-md" style={{ background: 'var(--sb-accent)' }}></div>
                                         )}
 
                                         {/* Alerts / Badges */}
@@ -488,19 +494,19 @@ export default function Sidebar() {
             </div>
 
             {/* USER PROFILE FOOTER */}
-            <div className={`p-4 border-t border-slate-200/60 dark:border-white/5 flex-shrink-0 transition-opacity duration-300 ${isDesktopSidebarCollapsed ? 'items-center flex flex-col' : ''}`}>
+            <div className={`p-4 border-t flex-shrink-0 transition-opacity duration-300 ${isDesktopSidebarCollapsed ? 'items-center flex flex-col' : ''}`} style={{ borderColor: 'var(--sb-border)' }}>
                 <div className={`flex items-center ${isDesktopSidebarCollapsed ? 'justify-center mx-auto' : 'gap-3 mb-4'} w-full`}>
-                    <div className="w-9 h-9 flex-shrink-0 rounded-xl bg-slate-200 flex items-center justify-center text-slate-500 font-bold overflow-hidden shadow-sm">
+                    <div className="w-9 h-9 flex-shrink-0 rounded-[12px] flex items-center justify-center font-bold overflow-hidden shadow-sm pdy-sb-avatar">
                         {displayUser?.name?.charAt(0) || 'U'}
                     </div>
 
                     {!isDesktopSidebarCollapsed && (
                         <div className="flex flex-col flex-1 min-w-0">
-                            <span className="text-[13px] font-bold text-[#0F172A] truncate">
+                            <span className="text-[13px] font-bold truncate" style={{ color: 'var(--sb-text)' }}>
                                 {displayUser?.name}
                             </span>
-                            <div className="flex items-center">
-                                <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase bg-slate-100 px-1.5 py-0.5 rounded">
+                            <div className="flex items-center mt-0.5">
+                                <span className="text-[10px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded pdy-sb-badge">
                                     {displayUser?.role || 'Kullanıcı'}
                                 </span>
                             </div>
@@ -511,7 +517,7 @@ export default function Sidebar() {
                 {!isDesktopSidebarCollapsed && (
                     <button
                         onClick={logout}
-                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors text-[13px] font-semibold group"
+                        className="w-full flex items-center justify-center gap-2 py-2 rounded-[10px] transition-colors text-[13px] font-semibold group pdy-sb-logout"
                     >
                         <LogOut className="w-4 h-4 opacity-70 group-hover:opacity-100" />
                         Çıkış Yap
@@ -521,7 +527,7 @@ export default function Sidebar() {
                 {isDesktopSidebarCollapsed && (
                     <button
                         onClick={logout}
-                        className="mt-4 w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                        className="mt-4 w-9 h-9 rounded-[10px] flex items-center justify-center transition-colors pdy-sb-logout"
                         title="Çıkış Yap"
                     >
                         <LogOut className="w-5 h-5" />
@@ -529,23 +535,120 @@ export default function Sidebar() {
                 )}
             </div>
 
-            {/* Injected Micro CSS for smooth scrolling and animations */}
+            {/* Injected Micro CSS for Sidebar Surface Typography and Animations */}
             <style jsx>{`
+                .pdy-sidebar {
+                    --sb-bg: #F8FAFF;
+                    --sb-bg2: #F3F6FF;
+                    --sb-tint: rgba(37,99,235,0.04);
+                    --sb-border: rgba(15,23,42,0.06);
+                    --sb-text: #0F172A;
+                    --sb-muted: #64748B;
+                    --sb-hover: rgba(37,99,235,0.06);
+                    --sb-active: rgba(37,99,235,0.10);
+                    --sb-accent: #2563EB;
+
+                    background: linear-gradient(180deg, var(--sb-bg) 0%, var(--sb-bg2) 100%);
+                    border-right: 1px solid var(--sb-border);
+                }
+
+                :global(.dark) .pdy-sidebar {
+                    --sb-bg: #0B1220;
+                    --sb-bg2: #0E1628;
+                    --sb-tint: rgba(96,165,250,0.06);
+                    --sb-border: rgba(148,163,184,0.10);
+                    --sb-text: #E5E7EB;
+                    --sb-muted: #94A3B8;
+                    --sb-hover: rgba(96,165,250,0.08);
+                    --sb-active: rgba(96,165,250,0.14);
+                    --sb-accent: #60A5FA;
+
+                    background: linear-gradient(180deg, var(--sb-bg) 0%, var(--sb-bg2) 100%);
+                    border-right: 1px solid var(--sb-border);
+                    box-shadow: inset -1px 0 0 rgba(96,165,250,0.08);
+                }
+
+                @supports (backdrop-filter: blur(6px)) {
+                    :global(.dark) .pdy-sidebar {
+                        background: linear-gradient(180deg, rgba(11,18,32,0.6) 0%, rgba(14,22,40,0.85) 100%);
+                        backdrop-filter: blur(6px);
+                    }
+                }
+
+                .pdy-sb-collapse-btn {
+                    color: var(--sb-muted);
+                }
+                .pdy-sb-collapse-btn:hover {
+                    color: var(--sb-text);
+                    background: var(--sb-hover);
+                }
+
+                .pdy-sb-select {
+                    background: transparent;
+                    border: 1px solid var(--sb-border);
+                    color: var(--sb-text);
+                }
+                .pdy-sb-select:hover {
+                    background: var(--sb-hover);
+                }
+                .pdy-sb-select option {
+                    background: var(--sb-bg);
+                    color: var(--sb-text);
+                }
+
+                .pdy-sb-avatar {
+                    background: var(--sb-hover);
+                    color: var(--sb-text);
+                    border: 1px solid var(--sb-border);
+                }
+
+                .pdy-sb-badge {
+                    background: var(--sb-hover);
+                    color: var(--sb-muted);
+                }
+
+                .pdy-sb-logout {
+                    color: var(--sb-muted);
+                }
+                .pdy-sb-logout:hover {
+                    color: #EF4444;       
+                    background: rgba(239, 68, 68, 0.08);
+                }
+
+                .sb-header {
+                    color: var(--sb-muted);
+                }
+
+                .sb-item.sb-default {
+                    color: var(--sb-muted);
+                }
+                .sb-item.sb-default:hover {
+                    background: var(--sb-hover);
+                    color: var(--sb-text);
+                }
+                .sb-item.sb-active {
+                    background: var(--sb-active);
+                    color: var(--sb-text);
+                }
+                .sb-item.sb-active .sb-icon {
+                    color: var(--sb-accent);
+                }
+
                 .custom-scrollbar::-webkit-scrollbar {
-                    width: 6px;
+                    width: 8px;
                 }
                 .custom-scrollbar::-webkit-scrollbar-track {
                     background: transparent;
                 }
                 .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(148, 163, 184, 0.2);
+                    background: rgba(15, 23, 42, 0.12);
                     border-radius: 10px;
                 }
-                .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-                    background: rgba(148, 163, 184, 0.4);
+                :global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: rgba(148, 163, 184, 0.18);
                 }
-                aside {
-                    box-shadow: 1px 0 20px rgba(0,0,0,0.01);
+                :global(.dark) .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+                    background: rgba(148, 163, 184, 0.25);
                 }
             `}</style>
         </aside>
