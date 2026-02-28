@@ -1,0 +1,95 @@
+/* ========================================================================= */
+/* PERIODYA - TRUE 90% DENSITY MODE (PAGE-SCOPED)                            */
+/* Target: /test-desktop ONLY. No scaling/zoom hacks. Hardcoded %10 reduction*/
+/* ========================================================================= */
+
+@media (min-width: 1024px) {
+
+    /* TYPOGRAPHY COMPRESSION (~10% reduction except h1) */
+    .pdy-density-90 h2,
+    .pdy-density-90 h3,
+    .pdy-density-90 h4 {
+        font-size: calc(1em * 0.9) !important;
+        letter-spacing: -0.01em !important;
+    }
+
+    .pdy-density-90 p,
+    .pdy-density-90 span,
+    .pdy-density-90 div.text-sm,
+    .pdy-density-90 div.text-xs {
+        font-size: calc(1em * 0.92) !important;
+        line-height: 1.4 !important;
+    }
+
+    /* LARGE STAT NUMBERS */
+    .pdy-density-90 .text-\[48px\],
+    .pdy-density-90 .text-\[40px\],
+    .pdy-density-90 .text-4xl,
+    .pdy-density-90 .text-3xl {
+        font-size: calc(1em * 0.85) !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.03em !important;
+    }
+
+    /* LABELS & METATEXT (Uppercase tags) */
+    .pdy-density-90 .tracking-\[0\.2em\] {
+        letter-spacing: 0.15em !important;
+        font-size: 10px !important;
+    }
+
+    /* SPACING / PADDING COMPRESSION (~12% reduction for cards) */
+    .pdy-density-90 .pdy-card {
+        padding: 20px !important;
+        /* from typical 24px */
+        min-height: auto !important;
+    }
+
+    .pdy-density-90 .pdy-section {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    /* CONTAINERS EXPANSION */
+    /* To fit more items horizontally and effectively increase density */
+    .pdy-density-90 .max-w-\[1280px\] {
+        max-width: 1440px !important;
+    }
+
+    /* GRID GAP COMPRESSION */
+    .pdy-density-90 .pdy-grid {
+        gap: 16px !important;
+        /* from 24px */
+    }
+
+    .pdy-density-90 .pdy-grid-tight {
+        gap: 12px !important;
+        /* from 16px or 20px */
+    }
+
+    /* SHADOW & BORDER REFINEMENT (gives a tighter, less fluffy look) */
+    .pdy-density-90 .pdy-card {
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
+        /* Reduced blur */
+        border-color: rgba(15, 23, 42, 0.08) !important;
+        /* slightly more contrast */
+    }
+
+    /* KPI METRICS (Vertical block margins) */
+    .pdy-density-90 .pdy-kpi {
+        margin-top: 6px !important;
+        margin-bottom: 6px !important;
+    }
+
+    /* HEIGHT COMPRESSIONS FOR SPECIFIC BARS (like System Status Surface) */
+    .pdy-density-90 .h-\[72px\] {
+        height: 60px !important;
+    }
+
+    .pdy-density-90 .h-\[64px\] {
+        height: 56px !important;
+    }
+
+    .pdy-density-90 .h-\[60px\] {
+        height: 52px !important;
+    }
+}
