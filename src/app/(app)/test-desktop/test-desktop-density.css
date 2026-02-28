@@ -1,25 +1,27 @@
 /* DENSITY: COMPACT */
 .density-compact {
     /* Spacing Scale Reductions */
-    --gap-large: 1.75rem;
-    /* ~28px instead of 32-40px */
-    --gap-medium: 1.125rem;
-    /* ~18px instead of 24px */
-    --card-padding: 1.5rem;
-    /* 24px instead of 32px */
+    --gap-large: 1.5rem;
+    /* ~24px -> 16px (gap-16 down from gap-24) */
+    --gap-medium: 1.0rem;
+    /* ~16px -> 14px (gap-14 down from gap-20) */
+    --card-padding-y: 1.25rem;
+    /* ~15% less vertical padding */
+    --card-padding-x: 1.5rem;
+    /* maintain horizontal structural padding or slight reduce */
 
-    /* Typography Scale Reductions (~8-10%) */
+    /* Typography Scale Reductions */
     --text-hero: 2.25rem;
-    /* 36px instead of 40px */
     --text-section: 1.25rem;
-    /* 20px instead of 24px */
     --text-card-title: 0.95rem;
-    /* ~15px instead of 16-17px */
     --text-card-val: 1.35rem;
-    /* ~22px instead of 24px */
     --text-metric: 1.6rem;
-    /* for big numbers */
+
+    /* Micro Tuning */
     --line-height-tight: 1.15;
+    --tracking-tight: -0.02em;
+    --font-weight-display: 600;
+    /* down from 700 */
 }
 
 /* DENSITY: COMFORT */
@@ -53,22 +55,63 @@
 }
 
 .density-compact .p-8 {
-    padding: var(--card-padding) !important;
+    padding-top: var(--card-padding-y) !important;
+    padding-bottom: var(--card-padding-y) !important;
+    padding-left: var(--card-padding-x) !important;
+    padding-right: var(--card-padding-x) !important;
+}
+
+/* Modüle tile içindeki p-5'i de hafif kısalım */
+.density-compact .p-5 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
 }
 
 .density-compact .gap-6,
-.density-compact .gap-8 {
+.density-compact .gap-8,
+.density-compact .gap-24 {
+    /* if using tw gap-24 equivalent */
+    gap: var(--gap-large) !important;
+}
+
+.density-compact .gap-20,
+.density-compact .grid-cols-2.gap-4 {
+    /* Modül grid */
     gap: var(--gap-medium) !important;
 }
 
+/* CONTAINER GENİŞLET */
 .density-compact .max-w-\[1400px\] {
-    max-width: 1550px !important;
-    /* more room for smaller items */
+    max-width: 1480px !important;
+    /* CRITICAL: 1480px to fit more content visually */
 }
 
-/* KPI Cards */
+/* SIDEBAR SPACE OPTIMIZATION */
+.density-compact .xl\:p-12,
+.density-compact .sm\:p-8 {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+    /* hafif daraltma */
+}
+
+/* KPI Cards (Vertical Compression) */
 .density-compact .min-h-\[160px\] {
-    min-height: 140px !important;
+    min-height: 144px !important;
+    /* %10 less */
+}
+
+/* Shadow Compression */
+.density-compact .shadow-\[0_8px_30px_rgb\(0\,0\,0\,0\.04\)\] {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
+.density-compact .shadow-\[0_6px_18px_rgba\(15\,23\,42\,0\.04\)\] {
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Border Contrast Arttır */
+.density-compact .border-\[\#0F172A\]\/\[0\.06\] {
+    border-color: rgba(15, 23, 42, 0.08) !important;
 }
 
 /* Executive Broadcast Strip */
@@ -82,11 +125,14 @@
 .density-compact .text-4xl {
     font-size: var(--text-hero) !important;
     line-height: var(--line-height-tight) !important;
+    font-weight: var(--font-weight-display) !important;
+    letter-spacing: var(--tracking-tight) !important;
 }
 
 .density-compact h3.text-2xl,
 .density-compact h3.text-\[20px\] {
     font-size: var(--text-section) !important;
+    font-weight: var(--font-weight-display) !important;
 }
 
 .density-compact h3.text-\[17px\] {
@@ -96,6 +142,8 @@
 .density-compact h4.text-2xl,
 .density-compact h4.text-\[24px\] {
     font-size: var(--text-metric) !important;
+    font-weight: var(--font-weight-display) !important;
+    letter-spacing: var(--tracking-tight) !important;
 }
 
 /* -------------------------------------
