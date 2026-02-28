@@ -1,0 +1,122 @@
+/* DENSITY SCALED TOKENS (Scoped to .pdy-density) */
+@media (min-width: 1024px) {
+    .pdy-density-compact {
+        /* Base Scales */
+        --pdy-font-scale: 0.92;
+        --pdy-space-scale: 0.88;
+        --pdy-gap-scale: 0.75;
+        --pdy-shadow-scale: 0.75;
+        --pdy-radius-scale: 0.92;
+
+        /* Typography overrides */
+        --pdy-line-height-adj: 0.95;
+    }
+
+    /* 3.1 Typography */
+    .pdy-density h1,
+    .pdy-density h2,
+    .pdy-density h3,
+    .pdy-density h4,
+    .pdy-density .card-title,
+    .pdy-density .kpi-value {
+        font-size: calc(1em * var(--pdy-font-scale, 1)) !important;
+        line-height: calc(1.2 * var(--pdy-line-height-adj, 1)) !important;
+    }
+
+    /* Target absolute inline font classes if possible, or use standard overrides */
+    .pdy-density .text-\[40px\] {
+        font-size: calc(40px * var(--pdy-font-scale, 1)) !important;
+    }
+
+    .pdy-density .text-\[32px\] {
+        font-size: calc(32px * var(--pdy-font-scale, 1)) !important;
+    }
+
+    .pdy-density .text-\[28px\] {
+        font-size: calc(28px * var(--pdy-font-scale, 1)) !important;
+    }
+
+    .pdy-density .text-3xl {
+        font-size: calc(1.875rem * var(--pdy-font-scale, 1)) !important;
+    }
+
+    .pdy-density .text-2xl {
+        font-size: calc(1.5rem * var(--pdy-font-scale, 1)) !important;
+    }
+
+    .pdy-density .text-\[24px\] {
+        font-size: calc(24px * var(--pdy-font-scale, 1)) !important;
+    }
+
+    .pdy-density .text-\[22px\] {
+        font-size: calc(22px * var(--pdy-font-scale, 1)) !important;
+    }
+
+    .pdy-density .text-\[17px\] {
+        font-size: calc(17px * var(--pdy-font-scale, 1)) !important;
+    }
+
+    .pdy-density .text-\[16px\] {
+        font-size: calc(16px * var(--pdy-font-scale, 1)) !important;
+    }
+
+    .pdy-density .text-\[15px\] {
+        font-size: calc(15px * var(--pdy-font-scale, 1)) !important;
+    }
+
+    .pdy-density .text-\[14px\] {
+        font-size: calc(14px * var(--pdy-font-scale, 1)) !important;
+    }
+
+    /* 3.2 Spacing / Padding */
+    /* Section Padding */
+    .pdy-density.pdy-section,
+    .pdy-density .pdy-section {
+        padding-top: calc(32px * var(--pdy-space-scale, 1)) !important;
+        padding-bottom: calc(32px * var(--pdy-space-scale, 1)) !important;
+    }
+
+    /* Card Padding */
+    .pdy-density .pdy-card {
+        padding: calc(28px * var(--pdy-space-scale, 1)) !important;
+        /* Radius Micro-tune */
+        border-radius: calc(24px * var(--pdy-radius-scale, 1)) !important;
+    }
+
+    /* 3.3 Grid Gaps */
+    /* Main Dashboard Grid Gap */
+    .pdy-density .pdy-grid {
+        gap: calc(24px * var(--pdy-gap-scale, 1)) !important;
+        /* ~18px or 16px */
+    }
+
+    /* Modul/Sub Grid Gap */
+    .pdy-density .pdy-grid-tight {
+        gap: calc(20px * var(--pdy-gap-scale, 1)) !important;
+        /* ~14px */
+    }
+
+    /* 3.4 Container Width */
+    .pdy-density .max-w-\[1400px\] {
+        max-width: 1440px !important;
+    }
+
+    /* 3.5 Shadow Size Reduction */
+    .pdy-density .pdy-card {
+        box-shadow: 0 calc(10px * var(--pdy-shadow-scale, 1)) calc(30px * var(--pdy-shadow-scale, 1)) -15px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* 3.6 Border Contrast */
+    .pdy-density .pdy-card {
+        border-color: rgba(15, 23, 42, 0.08) !important;
+    }
+
+    .dark .pdy-density .pdy-card {
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* KPI Blocks Margin bottom etc */
+    .pdy-density .pdy-kpi {
+        margin-bottom: calc(8px * var(--pdy-space-scale, 1)) !important;
+    }
+}

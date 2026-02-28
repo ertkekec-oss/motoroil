@@ -13,7 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
-import "./test-desktop-density.css";
+import "./density.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -192,7 +192,7 @@ export default function ClientDashboard({ density = "standard" }: { density?: st
     const d = summary || undefined;
 
     return (
-        <div className={`flex h-screen overflow-hidden bg-[#F8FAFC] dark:bg-[#0B1120] font-sans density density-${density}`}>
+        <div className={`flex h-screen overflow-hidden bg-[#F8FAFC] dark:bg-[#0B1120] font-sans`}>
             {/* Density Debug Pill */}
             {process.env.NODE_ENV === 'development' && (
                 <div className="fixed bottom-4 right-4 z-[9999] bg-slate-800 text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-lg tracking-widest uppercase opacity-50 hover:opacity-100 transition-opacity">
@@ -254,7 +254,7 @@ export default function ClientDashboard({ density = "standard" }: { density?: st
 
             {/* R I G H T   P A N E L  (DASHBOARD CARDS) */}
             <div
-                className="flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative"
+                className={`flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative pdy-section ${density === 'compact' ? 'pdy-density pdy-density-compact' : ''}`}
                 style={{ scrollbarWidth: 'none' }}
                 onScroll={(e) => {
                     if (e.currentTarget.scrollTop > 120) {
@@ -265,7 +265,7 @@ export default function ClientDashboard({ density = "standard" }: { density?: st
                 }}
             >
                 <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
-                <div className="max-w-[1400px] mx-auto space-y-8 pb-24">
+                <div className="max-w-[1400px] mx-auto space-y-8 pb-24 pdy-grid">
 
                     {/* Header Info */}
                     <div className="mb-6 xl:mb-8">
@@ -484,10 +484,10 @@ export default function ClientDashboard({ density = "standard" }: { density?: st
                     })()}
 
                     {/* WIDGET GRID */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6 pdy-grid">
 
                         {/* 1. NAKİT AKIŞI & ÖDEMELER KARTI (LEDGER SOT) */}
-                        <div className="group overflow-hidden rounded-[24px] bg-slate-900 border border-slate-800 p-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.4)] transition-all flex flex-col">
+                        <div className="group overflow-hidden rounded-[24px] bg-slate-900 border border-slate-800 p-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.4)] transition-all flex flex-col pdy-card">
                             <div className="flex justify-between items-start mb-8">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-white/10 text-white rounded-2xl backdrop-blur-xl">
@@ -529,7 +529,7 @@ export default function ClientDashboard({ density = "standard" }: { density?: st
                         </div>
 
                         {/* 2. STOK & DEPO SAĞLIĞI */}
-                        <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col">
+                        <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col pdy-card">
                             <div className="flex justify-between items-start mb-8">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">
@@ -576,7 +576,7 @@ export default function ClientDashboard({ density = "standard" }: { density?: st
 
                         {/* 4. PDKS & PERSONEL ÖZETİ */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "HR", "RISK"])) && (
-                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col">
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col pdy-card">
                                 <div className="flex items-center gap-4 mb-8">
                                     <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl"><Fingerprint className="w-6 h-6" /></div>
                                     <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Vardiya & PDKS Durumu</h3>
