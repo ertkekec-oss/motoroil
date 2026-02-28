@@ -9,7 +9,7 @@ import {
     Terminal, Globe, ShoppingCart, Package, Briefcase, TrendingUp, Handshake,
     UserCircle, Landmark, Receipt, Users, Truck, Activity, Box, Map, FileText,
     Wrench, BarChart2, Clock, Search, ShieldAlert, LifeBuoy, Settings, CreditCard,
-    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut
+    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -46,7 +46,7 @@ export default function Sidebar() {
     // Auto-expand if active
     useEffect(() => {
         const expandMap: Record<string, string[]> = {
-            'b2b-global-parent': ['/dashboard', '/network/seller/orders', '/network/buyer/orders', '/seller/products', '/catalog', '/network/finance', '/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics', '/rfq', '/contracts', '/network/buyer'],
+            'b2b-global-parent': ['/dashboard', '/network/seller/orders', '/network/buyer/orders', '/seller/products', '/catalog', '/network/finance', '/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics', '/rfq', '/contracts', '/network/buyer', '/support/tickets'],
             'field-sales-parent': ['/field-sales'],
             'reports-parent': ['/reports'],
         };
@@ -142,7 +142,9 @@ export default function Sidebar() {
                         ...(isBuyer ? [
                             { name: 'Satınalma: Sözleşmeler', href: '/contracts' },
                             { name: 'Satınalma: RFQ Talepleri', href: '/rfq' }
-                        ] : [])
+                        ] : []),
+                        // Dispute Resolution / Support tickets moved under B2B Global:
+                        { name: 'İhtilaf Çözümü', href: '/support/tickets' }
                     ]
                 },
             ]
@@ -153,10 +155,11 @@ export default function Sidebar() {
                 { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
                 { name: 'Muhasebe', href: '/accounting', icon: Landmark },
                 { name: 'Satış', href: '/sales', icon: Receipt },
-                { name: 'Cari Hesaplar', href: '/customers', icon: Users },
+                { name: 'Cari Hesaplar (Müşteriler)', href: '/customers', icon: Users },
                 { name: 'Tedarikçiler', href: '/suppliers', icon: Truck },
-                { name: 'Fintech Tower', href: '/fintech/control-tower', icon: Activity },
                 { name: 'Envanter', href: '/inventory', icon: Box },
+                { name: 'Teklifler', href: '/quotes', icon: FileText },
+                { name: 'Servis', href: '/service', icon: Wrench },
                 {
                     name: 'Saha Satış',
                     icon: Map,
@@ -168,8 +171,8 @@ export default function Sidebar() {
                         { name: 'Canlı Takip', href: '/field-sales/admin/live' },
                     ]
                 },
-                { name: 'Teklifler', href: '/quotes', icon: FileText },
-                { name: 'Servis', href: '/service', icon: Wrench },
+                { name: 'PDKS', href: '/staff/pdks', icon: Clock },
+                { name: 'Ekipler (İnsan Kaynakları)', href: '/staff', icon: Users },
             ]
         },
         {
@@ -185,23 +188,26 @@ export default function Sidebar() {
                         { name: 'Detaylı Analiz', href: '/reports' },
                     ]
                 },
-                { name: 'PDKS', href: '/staff/pdks', icon: Clock },
-                { name: 'Denetim', href: '/admin/audit-logs', icon: Search },
+                { name: 'Fintech Tower', href: '/fintech/control-tower', icon: Activity },
+                { name: 'Mali Müşavir', href: '/advisor', icon: Briefcase },
                 { name: 'Anomaliler', href: '/security/suspicious', icon: ShieldAlert, alertCount: suspiciousEvents.length },
-                { name: 'Destek', href: '/support/tickets', icon: LifeBuoy },
+                ...(isPlatformAdmin ? [
+                    { name: 'Bilgi Bankası', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: Library }
+                ] : []),
             ]
         },
         {
             group: "Sistem",
             items: [
-                { name: 'Mali Müşavir', href: '/advisor', icon: Briefcase },
-                { name: 'Ayarlar', href: '/settings', icon: Settings },
-                { name: 'Ekipler', href: '/staff', icon: Users },
+                { name: 'Yardım Merkezi', href: '/help', icon: LifeBuoy },
+                { name: 'Denetim', href: '/admin/audit-logs', icon: Search },
+                { name: 'Destek', href: '/support', icon: HelpCircle },
+                { name: 'Sistem', href: '/settings/branch', icon: Terminal },
                 { name: 'Abonelik', href: '/billing', icon: CreditCard },
                 ...(isPlatformAdmin ? [
-                    { name: 'Support Inbox', href: '/admin/support/tickets', icon: Inbox },
-                    { name: 'Bilgi Bankası', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: Library }
+                    { name: 'Support Inbox', href: '/admin/support/tickets', icon: Inbox }
                 ] : []),
+                { name: 'Ayarlar', href: '/settings', icon: Settings },
             ]
         }
     ];
