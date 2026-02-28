@@ -551,7 +551,7 @@ export default function Sidebar() {
                     border-right: 1px solid var(--sb-border);
                 }
 
-                :global(.dark) .pdy-sidebar {
+                :global([data-theme="dark"]) .pdy-sidebar {
                     --sb-bg: #0B1220;
                     --sb-bg2: #0E1628;
                     --sb-surface: rgba(15,23,42,0.55);
@@ -594,7 +594,7 @@ export default function Sidebar() {
                     border: 1px solid var(--sb-border);
                     backdrop-filter: blur(6px);
                 }
-                :global(.dark) .pdy-sb-avatar {
+                :global([data-theme="dark"]) .pdy-sb-avatar {
                     background: rgba(255,255,255,0.03);
                 }
 
@@ -615,7 +615,7 @@ export default function Sidebar() {
                     color: #94A3B8;
                     letter-spacing: 0.08em;
                 }
-                :global(.dark) .sb-header {
+                :global([data-theme="dark"]) .sb-header {
                     color: rgba(148,163,184,0.65);
                 }
 
@@ -645,7 +645,7 @@ export default function Sidebar() {
                     background: rgba(15, 23, 42, 0.12);
                     border-radius: 10px;
                 }
-                :global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+                :global([data-theme="dark"]) .custom-scrollbar::-webkit-scrollbar-thumb {
                     background: rgba(148, 163, 184, 0.18);
                 }
             `}</style>
