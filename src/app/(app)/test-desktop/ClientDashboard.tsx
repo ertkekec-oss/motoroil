@@ -250,7 +250,7 @@ export default function ClientDashboard() {
 
             {/* R I G H T   P A N E L  (DASHBOARD CARDS 80% SCALED TOKENS) */}
             <div
-                className={`flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative pdy-section pdy-density-80`}
+                className={`flex-1 overflow-y-auto w-full p-3.5 sm:p-3.5 xl:p-10 relative pdy-section pdy-density-80`}
                 style={{ scrollbarWidth: 'none' }}
                 onScroll={(e) => {
                     if (e.currentTarget.scrollTop > 120) {
@@ -264,24 +264,24 @@ export default function ClientDashboard() {
                 <div className="pdy-content-container max-w-[1400px] mx-auto space-y-8 pb-24 pdy-stack">
 
                     {/* Header Info */}
-                    <div className="mb-6 xl:mb-8 pdy-title">
-                        <h2 className="text-[32px] sm:text-[40px] font-[700] tracking-tight text-[#0F172A] dark:text-white leading-tight mb-1">PERİODYA DASHBOARD</h2>
-                        <p className="text-[14px] font-semibold text-slate-500 tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full opacity-80">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti</p>
+                    <div className="mb-5 xl:mb-5 pdy-title">
+                        <h2 className="text-[25px] sm:text-[36px] font-[700] tracking-tight text-[#0F172A] dark:text-white leading-tight mb-1">PERİODYA DASHBOARD</h2>
+                        <p className="text-[12.5px] font-semibold text-slate-500 tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full opacity-80">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti</p>
                     </div>
 
                     {/* EXECUTIVE BROADCAST LAYER (CONDITIONAL) */}
                     {MOCK_ANNOUNCEMENTS.length > 0 && (
                         <div
-                            className={`w-full border-b border-[#0F172A]/[0.08] dark:border-white/[0.08] bg-[#F8FAFC] dark:bg-[#0f111a] flex items-center transition-all duration-300 z-50 mb-10 overflow-hidden
+                            className={`w-full border-b border-[#0F172A]/[0.08] dark:border-white/[0.08] bg-[#F8FAFC] dark:bg-[#0f111a] flex items-center transition-all duration-300 z-50 mb-5 overflow-hidden
                                 ${isScrolled
-                                    ? 'h-[52px] sticky top-0 px-4 sm:px-8 xl:px-12 -mx-4 sm:-mx-8 xl:-mx-12 shadow-sm'
-                                    : 'h-[72px]'}`}
+                                    ? 'h-[46px] sticky top-0 px-3.5 sm:px-5 xl:px-10 -mx-4 sm:-mx-8 xl:-mx-12 shadow-sm'
+                                    : 'h-[64px]'}`}
                             onMouseEnter={() => setIsHoveringAnnouncements(true)}
                             onMouseLeave={() => setIsHoveringAnnouncements(false)}
                         >
                             {/* 1. DUYURU TÜRÜ (15%) */}
                             <div className="flex-[0.15] min-w-[120px] flex items-center gap-2 pr-4">
-                                <span className={`font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 transition-all ${isScrolled ? 'text-[10px]' : 'text-[11px]'}`}>
+                                <span className={`font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 transition-all ${isScrolled ? 'text-[9px]' : 'text-[9px]'}`}>
                                     {MOCK_ANNOUNCEMENTS[announcementIdx]?.tag === "BAKIM" ? "DUYURU" : MOCK_ANNOUNCEMENTS[announcementIdx]?.tag || "CANLI"}
                                 </span>
                                 <div className="w-1.5 h-1.5 rounded-full bg-slate-800 dark:bg-slate-300 flex-shrink-0"></div>
@@ -294,7 +294,7 @@ export default function ClientDashboard() {
                                         key={ann.id}
                                         className={`absolute inset-0 flex items-center transition-opacity duration-250 ease-in-out ${idx === announcementIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
                                     >
-                                        <div className={`font-[600] text-[#0F172A] dark:text-white truncate transition-all ${isScrolled ? 'text-[14px]' : 'text-[15px] lg:text-[16px]'}`}>
+                                        <div className={`font-[600] text-[#0F172A] dark:text-white truncate transition-all ${isScrolled ? 'text-[12.5px]' : 'text-[13.5px] lg:text-[14.5px]'}`}>
                                             {ann.title} — <span className="font-medium text-slate-600 dark:text-slate-400">{ann.msg}</span>
                                         </div>
                                     </div>
@@ -302,10 +302,10 @@ export default function ClientDashboard() {
                             </div>
 
                             {/* 3. AKSİYON (15%) */}
-                            <div className="flex-[0.15] min-w-[100px] flex items-center justify-end pl-4 gap-4">
+                            <div className="flex-[0.15] min-w-[100px] flex items-center justify-end pl-4 gap-3.5">
                                 <Link
                                     href={MOCK_ANNOUNCEMENTS[announcementIdx]?.link || "#"}
-                                    className={`font-semibold text-slate-500 hover:text-[#0F172A] dark:text-slate-400 dark:hover:text-white transition-colors ${isScrolled ? 'text-[12px]' : 'text-[13px]'}`}
+                                    className={`font-semibold text-slate-500 hover:text-[#0F172A] dark:text-slate-400 dark:hover:text-white transition-colors ${isScrolled ? 'text-[9px]' : 'text-[11.5px]'}`}
                                 >
                                     Detaylar →
                                 </Link>
@@ -339,7 +339,7 @@ export default function ClientDashboard() {
                             <>
                                 {/* Floating Modal */}
                                 {showOnboardingModal && (
-                                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3.5">
                                         <div
                                             className="absolute inset-0 bg-[#0F172A]/[0.35] backdrop-blur-[6px] transition-opacity duration-200"
                                             style={{ opacity: showOnboardingModal ? 1 : 0 }}
@@ -351,7 +351,7 @@ export default function ClientDashboard() {
                                         >
                                             {completionPhase === 'none' && (
                                                 <button
-                                                    className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
+                                                    className="absolute top-3.5 right-6 p-2 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
                                                     onClick={() => setShowOnboardingModal(false)}
                                                 >
                                                     <span className="sr-only">Kapat</span>
@@ -362,23 +362,23 @@ export default function ClientDashboard() {
                                             {/* Normal Timeline Content */}
                                             {completionPhase === 'none' || completionPhase === 'micro' ? (
                                                 <div className="w-full">
-                                                    <div className="text-center mb-10">
+                                                    <div className="text-center mb-5">
                                                         <h3 className="text-[22px] font-bold text-[#0F172A] dark:text-white leading-tight mb-2">Kurulum Merkezi</h3>
-                                                        <p className="text-[14px] font-medium text-slate-500">İşletme aktivasyon sürecinizi tamamlayın</p>
+                                                        <p className="text-[12.5px] font-medium text-slate-500">İşletme aktivasyon sürecinizi tamamlayın</p>
                                                     </div>
 
                                                     <div className="space-y-4 pdy-stack w-full">
                                                         {steps.map((step, idx) => (
-                                                            <div key={step.id} className={`flex items-center p-4 rounded-2xl border transition-all ${step.status === 'completed' ? 'bg-slate-50 dark:bg-white/[0.02] border-transparent' : step.status === 'active' ? 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20 shadow-sm' : 'bg-white dark:bg-[#080911] border-slate-100 dark:border-slate-800/60 opacity-60'}`}>
-                                                                <div className={`w-[32px] h-[32px] rounded-full flex flex-shrink-0 items-center justify-center font-bold text-[13px] mr-4 
+                                                            <div key={step.id} className={`flex items-center p-3.5 rounded-2xl border transition-all ${step.status === 'completed' ? 'bg-slate-50 dark:bg-white/[0.02] border-transparent' : step.status === 'active' ? 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20 shadow-sm' : 'bg-white dark:bg-[#080911] border-slate-100 dark:border-slate-800/60 opacity-60'}`}>
+                                                                <div className={`w-[32px] h-[32px] rounded-full flex flex-shrink-0 items-center justify-center font-bold text-[11.5px] mr-4 
                                                                     ${step.status === 'completed' ? 'bg-emerald-500 text-white shadow-sm' : step.status === 'active' ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
                                                                     {step.status === 'completed' ? <Check className="w-4 h-4 stroke-[3]" /> : step.id}
                                                                 </div>
                                                                 <div className="flex-1">
-                                                                    <div className={`font-bold text-[15px] ${step.status === 'completed' ? 'text-[#0F172A] dark:text-white line-through opacity-70' : step.status === 'active' ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500'}`}>
+                                                                    <div className={`font-bold text-[13.5px] ${step.status === 'completed' ? 'text-[#0F172A] dark:text-white line-through opacity-70' : step.status === 'active' ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500'}`}>
                                                                         {step.title}
                                                                     </div>
-                                                                    <div className="text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                                                                    <div className="text-[11.5px] font-medium text-slate-500 dark:text-slate-400">
                                                                         {step.desc}
                                                                     </div>
                                                                 </div>
@@ -389,13 +389,13 @@ export default function ClientDashboard() {
                                                                                 router.push(step.href);
                                                                                 setShowOnboardingModal(false);
                                                                             }}
-                                                                            className="px-4 py-2 bg-[#0F172A] hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white text-[13px] font-bold rounded-xl transition-all shadow-sm active:scale-95"
+                                                                            className="px-3.5 py-2 bg-[#0F172A] hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white text-[11.5px] font-bold rounded-xl transition-all shadow-sm active:scale-95"
                                                                         >
                                                                             Adımı Tamamla
                                                                         </button>
                                                                     )}
-                                                                    {step.status === 'completed' && <span className="text-[12px] font-bold text-emerald-600 dark:text-emerald-400 tracking-wide">TAMAMLANDI</span>}
-                                                                    {step.status === 'locked' && <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-widest"><Lock className="w-3.5 h-3.5" /> Kilitli</span>}
+                                                                    {step.status === 'completed' && <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 tracking-wide">TAMAMLANDI</span>}
+                                                                    {step.status === 'locked' && <span className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest"><Lock className="w-3.5 h-3.5" /> Kilitli</span>}
                                                                 </div>
                                                             </div>
                                                         ))}
@@ -404,7 +404,7 @@ export default function ClientDashboard() {
                                                     {/* Demo Button to trigger completion manually (Remove in prod) */}
                                                     <div className="mt-8 flex justify-center">
                                                         <button
-                                                            className="text-[11px] font-bold text-slate-300 hover:text-slate-400 transition-colors"
+                                                            className="text-[9px] font-bold text-slate-300 hover:text-slate-400 transition-colors"
                                                             onClick={() => {
                                                                 setCompletionPhase('micro');
                                                                 setTimeout(() => setCompletionPhase('executive'), 800);
@@ -416,18 +416,18 @@ export default function ClientDashboard() {
                                                 </div>
                                             ) : (
                                                 /* Executive Success State */
-                                                <div className="w-full flex flex-col items-center text-center py-10 animate-in fade-in zoom-in-95 duration-500 relative">
+                                                <div className="w-full flex flex-col items-center text-center py-3.5 animate-in fade-in zoom-in-95 duration-500 relative">
                                                     <div className="absolute inset-0 bg-blue-500/5 dark:bg-blue-400/5 rounded-full blur-[80px] -z-10"></div>
 
-                                                    <div className="w-20 h-20 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center mb-6 ring-8 ring-emerald-50/50 dark:ring-emerald-500/5 animate-in slide-in-from-bottom-4 duration-700">
-                                                        <Check className="w-10 h-10 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
+                                                    <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center mb-5 ring-8 ring-emerald-50/50 dark:ring-emerald-500/5 animate-in slide-in-from-bottom-4 duration-700">
+                                                        <Check className="w-8 h-8 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
                                                     </div>
 
-                                                    <h2 className="text-[28px] font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight mb-3 animate-in slide-in-from-bottom-2 duration-700 delay-100">Kurulum Tamamlandı</h2>
-                                                    <p className="text-[15px] font-medium text-slate-500 dark:text-slate-400 mb-10 max-w-[320px] animate-in slide-in-from-bottom-2 duration-700 delay-200">Sisteminiz artık tam kapasiteyle çalışmaya hazır.</p>
+                                                    <h2 className="text-[25px] font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight mb-3 animate-in slide-in-from-bottom-2 duration-700 delay-100">Kurulum Tamamlandı</h2>
+                                                    <p className="text-[13.5px] font-medium text-slate-500 dark:text-slate-400 mb-5 max-w-[320px] animate-in slide-in-from-bottom-2 duration-700 delay-200">Sisteminiz artık tam kapasiteyle çalışmaya hazır.</p>
 
                                                     <button
-                                                        className="px-8 py-3.5 bg-[#0F172A] hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white text-[15px] font-bold rounded-2xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95 animate-in slide-in-from-bottom-2 duration-700 delay-300"
+                                                        className="px-5 py-3.5 bg-[#0F172A] hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white text-[13.5px] font-bold rounded-2xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95 animate-in slide-in-from-bottom-2 duration-700 delay-300"
                                                         onClick={() => {
                                                             setShowOnboardingModal(false);
                                                             setTimeout(() => {
@@ -446,15 +446,15 @@ export default function ClientDashboard() {
 
                                 {/* Compact Strip */}
                                 <div
-                                    className={`mb-10 w-full h-[60px] rounded-[20px] px-6 bg-white dark:bg-[#080911] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_4px_14px_rgba(15,23,42,0.04)] flex items-center cursor-pointer transition-all duration-300 hover:shadow-[0_6px_20px_rgba(15,23,42,0.06)] group ${showOnboardingModal ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}
+                                    className={`mb-5 w-full h-[54px] rounded-[20px] px-5 bg-white dark:bg-[#080911] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_4px_14px_rgba(15,23,42,0.04)] flex items-center cursor-pointer transition-all duration-300 hover:shadow-[0_6px_20px_rgba(15,23,42,0.06)] group ${showOnboardingModal ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}
                                     onClick={() => setShowOnboardingModal(true)}
                                 >
                                     {/* Left */}
                                     <div className="flex items-center gap-3 flex-shrink-0 w-[180px]">
                                         <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                                         <div className="flex flex-col">
-                                            <span className="text-[13px] font-bold text-[#0F172A] dark:text-white">Kurulum Merkezi</span>
-                                            <span className="text-[10px] font-semibold text-slate-500 tracking-wide uppercase">%{displayPercent} Tamamlandı</span>
+                                            <span className="text-[11.5px] font-bold text-[#0F172A] dark:text-white">Kurulum Merkezi</span>
+                                            <span className="text-[9px] font-semibold text-slate-500 tracking-wide uppercase">%{displayPercent} Tamamlandı</span>
                                         </div>
                                     </div>
 
@@ -470,7 +470,7 @@ export default function ClientDashboard() {
 
                                     {/* Right */}
                                     <div className="flex items-center flex-shrink-0 w-[120px] justify-end">
-                                        <div className="text-[12px] font-bold text-slate-400 dark:text-slate-500 group-hover:text-[#0F172A] dark:group-hover:text-white transition-colors flex items-center gap-1">
+                                        <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 group-hover:text-[#0F172A] dark:group-hover:text-white transition-colors flex items-center gap-1">
                                             Devam Et <ArrowRight className="w-3.5 h-3.5" />
                                         </div>
                                     </div>
@@ -480,33 +480,33 @@ export default function ClientDashboard() {
                     })()}
 
                     {/* WIDGET GRID */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6 pdy-grid">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3.5 pdy-grid">
 
                         {/* 1. NAKİT AKIŞI & ÖDEMELER KARTI (LEDGER SOT) */}
-                        <div className="group overflow-hidden rounded-[24px] bg-slate-900 border border-slate-800 p-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.4)] transition-all flex flex-col pdy-card">
-                            <div className="flex justify-between items-start mb-8">
-                                <div className="flex items-center gap-4">
+                        <div className="group overflow-hidden rounded-[24px] bg-slate-900 border border-slate-800 p-3.5 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.4)] transition-all flex flex-col pdy-card">
+                            <div className="flex justify-between items-start mb-5">
+                                <div className="flex items-center gap-3.5">
                                     <div className="p-3 bg-white/10 text-white rounded-2xl backdrop-blur-xl">
-                                        <Wallet className="w-6 h-6" />
+                                        <Wallet className="w-5 h-5" />
                                     </div>
-                                    <h3 className="text-[17px] font-bold text-white tracking-tight">Finans & Likidite</h3>
+                                    <h3 className="text-[13.5px] font-bold text-white tracking-tight">Finans & Likidite</h3>
                                 </div>
-                                <span className="px-3 py-1.5 bg-indigo-500/20 text-indigo-300 text-[10px] font-black tracking-widest uppercase rounded-lg border border-indigo-500/20">Ledger SoT</span>
+                                <span className="px-3 py-1.5 bg-indigo-500/20 text-indigo-300 text-[9px] font-black tracking-widest uppercase rounded-lg border border-indigo-500/20">Ledger SoT</span>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-6 pdy-grid-tight mb-8 mt-auto">
+                            <div className="grid grid-cols-2 gap-3.5 pdy-grid-tight mb-5 mt-auto">
                                 <div>
-                                    <p className="text-[13px] text-slate-400 font-bold mb-2 flex items-center gap-2"><ArrowDownRight className="w-4 h-4 text-emerald-400" /> Yaklaşan Tahsilat</p>
-                                    <h4 className="text-2xl font-black text-white pdy-kpi">{loading ? "..." : formatter.format(d?.escrowPending || 0)}</h4>
+                                    <p className="text-[11.5px] text-slate-400 font-bold mb-2 flex items-center gap-2"><ArrowDownRight className="w-4 h-4 text-emerald-400" /> Yaklaşan Tahsilat</p>
+                                    <h4 className="text-lg font-black text-white pdy-kpi">{loading ? "..." : formatter.format(d?.escrowPending || 0)}</h4>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[13px] text-slate-400 font-bold mb-2 flex items-center gap-2 justify-end"><ArrowUpRight className="w-4 h-4 text-rose-400" /> Yaklaşan Ödeme</p>
-                                    <h4 className="text-2xl font-black text-rose-400 pdy-kpi">{loading ? "..." : formatter.format((d?.escrowPending || 0) * 0.4)}</h4>
+                                    <p className="text-[11.5px] text-slate-400 font-bold mb-2 flex items-center gap-2 justify-end"><ArrowUpRight className="w-4 h-4 text-rose-400" /> Yaklaşan Ödeme</p>
+                                    <h4 className="text-lg font-black text-rose-400 pdy-kpi">{loading ? "..." : formatter.format((d?.escrowPending || 0) * 0.4)}</h4>
                                 </div>
                             </div>
 
-                            <div className="bg-slate-800/50 rounded-2xl p-5 border border-slate-700/50">
-                                <h5 className="text-[11px] font-black text-slate-500 tracking-widest uppercase mb-4">Kasa Durumları</h5>
+                            <div className="bg-slate-800/50 rounded-2xl p-3.5 border border-slate-700/50">
+                                <h5 className="text-[9px] font-black text-slate-500 tracking-widest uppercase mb-4">Kasa Durumları</h5>
                                 <div className="space-y-3 pdy-stack">
                                     <div className="flex justify-between items-center">
                                         <span className="text-slate-300 text-sm font-semibold">Nakit Kasa</span>
@@ -525,42 +525,42 @@ export default function ClientDashboard() {
                         </div>
 
                         {/* 2. STOK & DEPO SAĞLIĞI */}
-                        <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col pdy-card">
-                            <div className="flex justify-between items-start mb-8">
-                                <div className="flex items-center gap-4">
+                        <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-3.5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col pdy-card">
+                            <div className="flex justify-between items-start mb-5">
+                                <div className="flex items-center gap-3.5">
                                     <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">
-                                        <PackageSearch className="w-6 h-6" />
+                                        <PackageSearch className="w-5 h-5" />
                                     </div>
-                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Depo & Stok Sağlığı</h3>
+                                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white tracking-tight">Depo & Stok Sağlığı</h3>
                                 </div>
                             </div>
 
-                            <div className="flex justify-between items-end mb-8 mt-auto px-2">
+                            <div className="flex justify-between items-end mb-5 mt-auto px-2">
                                 <div>
-                                    <p className="text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Aktif SKU</p>
-                                    <h1 className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white pdy-kpi">
+                                    <p className="text-[11.5px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Aktif SKU</p>
+                                    <h1 className="text-lg font-black tracking-tighter text-slate-900 dark:text-white pdy-kpi">
                                         {loading ? "..." : d?.stockHealth?.totalSku || 0}
                                     </h1>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[13px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Yoldaki Ürünler</p>
-                                    <h2 className="text-2xl font-black text-indigo-600 pdy-kpi">
+                                    <p className="text-[11.5px] text-slate-500 font-bold mb-2 uppercase tracking-wide">Yoldaki Ürünler</p>
+                                    <h2 className="text-lg font-black text-indigo-600 pdy-kpi">
                                         {loading ? "..." : d?.stockHealth?.inShipment || 0}
                                     </h2>
                                 </div>
                             </div>
 
                             <div className="space-y-4 pdy-stack">
-                                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+                                <div className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50">
                                     <span className="font-semibold text-sm text-slate-600 dark:text-slate-300">Stok Fazlası (Otonom)</span>
                                     <span className="font-bold text-sm text-slate-900">{loading ? "..." : d?.stockHealth?.overStock || 0} Adet</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="flex-1 flex items-center justify-between p-4 bg-rose-50 text-rose-700 rounded-2xl border border-rose-100">
+                                    <div className="flex-1 flex items-center justify-between p-3.5 bg-rose-50 text-rose-700 rounded-2xl border border-rose-100">
                                         <span className="font-bold text-sm">Kritik Stok</span>
                                         <span className="font-black text-base">{loading ? "..." : d?.stockHealth?.lowStock || 0}</span>
                                     </div>
-                                    <div className="flex-1 flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                    <div className="flex-1 flex items-center justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">
                                         <span className="font-bold text-sm text-slate-600">Sevkiyat Yok</span>
                                         <span className="font-black text-base text-slate-800">{loading ? "..." : d?.stockHealth?.noShipment || 0}</span>
                                     </div>
@@ -572,25 +572,25 @@ export default function ClientDashboard() {
 
                         {/* 4. PDKS & PERSONEL ÖZETİ */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "HR", "RISK"])) && (
-                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col pdy-card">
-                                <div className="flex items-center gap-4 mb-8">
-                                    <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl"><Fingerprint className="w-6 h-6" /></div>
-                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Vardiya & PDKS Durumu</h3>
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-3.5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col pdy-card">
+                                <div className="flex items-center gap-3.5 mb-5">
+                                    <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl"><Fingerprint className="w-5 h-5" /></div>
+                                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white tracking-tight">Vardiya & PDKS Durumu</h3>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4 pdy-grid-tight mt-auto">
-                                    <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
-                                        <h4 className="text-3xl font-black text-slate-800 pdy-kpi">{loading ? "..." : d?.pdksRules?.currentStaffCount || 0}</h4>
+                                <div className="grid grid-cols-2 gap-3.5 pdy-grid-tight mt-auto">
+                                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                                        <h4 className="text-lg font-black text-slate-800 pdy-kpi">{loading ? "..." : d?.pdksRules?.currentStaffCount || 0}</h4>
                                         <p className="text-sm font-bold text-slate-500 mt-1">Aktif Personel</p>
                                     </div>
-                                    <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
-                                        <h4 className="text-3xl font-black text-emerald-700 pdy-kpi">{loading ? "..." : d?.pdksRules?.checkedInCount || 0}</h4>
+                                    <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
+                                        <h4 className="text-lg font-black text-emerald-700 pdy-kpi">{loading ? "..." : d?.pdksRules?.checkedInCount || 0}</h4>
                                         <p className="text-sm font-bold text-emerald-600 mt-1">Giriş Yapan</p>
                                     </div>
-                                    <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center px-6 col-span-2">
+                                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center px-5 col-span-2">
                                         <span className="font-bold text-sm text-slate-600">Henüz Gelmeyen / İzinli:</span>
                                         <span className="font-black text-base text-slate-800">{loading ? "..." : d?.pdksRules?.notCheckedInCount || 0}</span>
                                     </div>
-                                    <div className="p-5 bg-rose-50 rounded-2xl border border-rose-100 flex justify-between items-center px-6 col-span-2">
+                                    <div className="p-3.5 bg-rose-50 rounded-2xl border border-rose-100 flex justify-between items-center px-5 col-span-2">
                                         <span className="font-bold text-sm text-rose-700">Geç Kalan İhlali:</span>
                                         <span className="font-black text-base text-rose-700">{loading ? "..." : d?.pdksRules?.lateCount || 0}</span>
                                     </div>
@@ -600,20 +600,20 @@ export default function ClientDashboard() {
 
                         {/* 5. SERVİS MASASI */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER"])) && (
-                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col pdy-card">
-                                <div className="flex items-center gap-4 mb-8">
-                                    <div className="p-3 bg-cyan-50 text-cyan-600 rounded-2xl"><HeadphonesIcon className="w-6 h-6" /></div>
-                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Servis & Bakım Ağı</h3>
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-3.5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col pdy-card">
+                                <div className="flex items-center gap-3.5 mb-5">
+                                    <div className="p-3 bg-cyan-50 text-cyan-600 rounded-2xl"><HeadphonesIcon className="w-5 h-5" /></div>
+                                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white tracking-tight">Servis & Bakım Ağı</h3>
                                 </div>
                                 <div className="mt-auto space-y-4 pdy-stack">
-                                    <div className="relative p-6 bg-slate-900 text-white rounded-3xl overflow-hidden shadow-lg border border-slate-800 flex items-center justify-between">
+                                    <div className="relative p-3.5 bg-slate-900 text-white rounded-3xl overflow-hidden shadow-lg border border-slate-800 flex items-center justify-between">
                                         <div className="relative z-10">
-                                            <p className="text-[13px] text-slate-400 font-bold uppercase tracking-wider mb-2">Şu an Serviste Olan</p>
+                                            <p className="text-[11.5px] text-slate-400 font-bold uppercase tracking-wider mb-2">Şu an Serviste Olan</p>
                                             <h1 className="text-5xl font-black text-cyan-400 pdy-kpi">{loading ? "..." : d?.serviceDesk?.currentlyInService || 0}</h1>
                                         </div>
                                         <Activity className="absolute right-0 top-1/2 -translate-y-1/2 w-40 h-40 text-white opacity-5 pointer-events-none" />
                                     </div>
-                                    <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center">
+                                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center">
                                         <span className="font-bold text-sm text-slate-600">Bugün Yeni Giren Kayıt:</span>
                                         <span className="font-black text-lg text-slate-800">+{loading ? "..." : d?.serviceDesk?.enteredToday || 0}</span>
                                     </div>
@@ -623,26 +623,26 @@ export default function ClientDashboard() {
 
                         {/* 6. FATURALAR VE İRSALİYELER */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"])) && (
-                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col pdy-card">
-                                <div className="flex justify-between items-start mb-8">
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><FileText className="w-6 h-6" /></div>
-                                        <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">E-Belge İşlemleri</h3>
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-3.5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col pdy-card">
+                                <div className="flex justify-between items-start mb-5">
+                                    <div className="flex items-center gap-3.5">
+                                        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><FileText className="w-5 h-5" /></div>
+                                        <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white tracking-tight">E-Belge İşlemleri</h3>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4 pdy-grid-tight mt-auto">
-                                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                                        <FileDown className="w-6 h-6 text-emerald-500 mb-4" />
-                                        <h4 className="text-3xl font-black text-slate-800 pdy-kpi">{loading ? "..." : d?.invoiceStatus?.incoming || 0}</h4>
-                                        <p className="text-[13px] text-slate-500 mt-1 font-bold">Gelen (Bu Hafta)</p>
+                                <div className="grid grid-cols-2 gap-3.5 pdy-grid-tight mt-auto">
+                                    <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                                        <FileDown className="w-5 h-5 text-emerald-500 mb-4" />
+                                        <h4 className="text-lg font-black text-slate-800 pdy-kpi">{loading ? "..." : d?.invoiceStatus?.incoming || 0}</h4>
+                                        <p className="text-[11.5px] text-slate-500 mt-1 font-bold">Gelen (Bu Hafta)</p>
                                     </div>
-                                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                                        <FileUp className="w-6 h-6 text-indigo-500 mb-4" />
-                                        <h4 className="text-3xl font-black text-slate-800 pdy-kpi">{loading ? "..." : d?.invoiceStatus?.outgoing || 0}</h4>
-                                        <p className="text-[13px] text-slate-500 mt-1 font-bold">Giden (Bu Hafta)</p>
+                                    <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                                        <FileUp className="w-5 h-5 text-indigo-500 mb-4" />
+                                        <h4 className="text-lg font-black text-slate-800 pdy-kpi">{loading ? "..." : d?.invoiceStatus?.outgoing || 0}</h4>
+                                        <p className="text-[11.5px] text-slate-500 mt-1 font-bold">Giden (Bu Hafta)</p>
                                     </div>
                                 </div>
-                                <div className="mt-4 flex items-center justify-between px-6 py-4 bg-amber-50 text-amber-700 rounded-2xl border border-amber-100">
+                                <div className="mt-4 flex items-center justify-between px-5 py-3.5 bg-amber-50 text-amber-700 rounded-2xl border border-amber-100">
                                     <span className="text-sm font-bold flex items-center gap-2"><Clock className="w-4 h-4" /> Onaylanacak Belgeler:</span>
                                     <span className="text-lg font-black">{loading ? "..." : d?.invoiceStatus?.pending || 0} Adet</span>
                                 </div>
@@ -651,36 +651,36 @@ export default function ClientDashboard() {
 
                         {/* 7. OTONOM FİYATLANDIRMA ÖZETİ */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"])) && (
-                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col relative pdy-card">
+                            <div className="overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-3.5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] transition-all flex flex-col relative pdy-card">
                                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-fuchsia-400"></div>
-                                <div className="flex items-center gap-4 mb-8">
-                                    <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl"><Activity className="w-6 h-6" /></div>
-                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Otonom Fiyatlandırma</h3>
+                                <div className="flex items-center gap-3.5 mb-5">
+                                    <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl"><Activity className="w-5 h-5" /></div>
+                                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white tracking-tight">Otonom Fiyatlandırma</h3>
                                 </div>
                                 <div className="mt-auto space-y-4 pdy-stack">
-                                    <div className="p-5 bg-purple-50 rounded-2xl border border-purple-100 flex items-center justify-between">
+                                    <div className="p-3.5 bg-purple-50 rounded-2xl border border-purple-100 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
                                                 <LineChart className="w-5 h-5 text-purple-600" />
                                             </div>
                                             <div>
-                                                <p className="font-bold text-purple-900 text-[14px]">Otonom Güncellenen SKU</p>
-                                                <p className="font-semibold text-purple-700/60 text-[11px] uppercase tracking-wide">Bugün</p>
+                                                <p className="font-bold text-purple-900 text-[12.5px]">Otonom Güncellenen SKU</p>
+                                                <p className="font-semibold text-purple-700/60 text-[9px] uppercase tracking-wide">Bugün</p>
                                             </div>
                                         </div>
-                                        <div className="text-2xl font-black text-purple-600 pdy-kpi">{loading ? "..." : d?.autonomous?.updatedProducts || 0}</div>
+                                        <div className="text-lg font-black text-purple-600 pdy-kpi">{loading ? "..." : d?.autonomous?.updatedProducts || 0}</div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                                            <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-widest mb-1">Ort. Marj</p>
-                                            <div className="text-xl font-black text-emerald-600">+{loading ? "..." : d?.autonomous?.avgMarginChange || 0}%</div>
+                                        <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                            <p className="text-[9px] font-bold text-emerald-800 uppercase tracking-widest mb-1">Ort. Marj</p>
+                                            <div className="text-lg font-black text-emerald-600">+{loading ? "..." : d?.autonomous?.avgMarginChange || 0}%</div>
                                         </div>
-                                        <div className="p-4 bg-rose-50 rounded-2xl border border-rose-100">
+                                        <div className="p-3.5 bg-rose-50 rounded-2xl border border-rose-100">
                                             <div className="flex justify-between items-start">
-                                                <p className="text-[11px] font-bold text-rose-800 uppercase tracking-widest mb-1">Riskli Sapma</p>
+                                                <p className="text-[9px] font-bold text-rose-800 uppercase tracking-widest mb-1">Riskli Sapma</p>
                                                 <AlertTriangle className="w-4 h-4 text-rose-500" />
                                             </div>
-                                            <div className="text-xl font-black text-rose-600">{loading ? "..." : d?.autonomous?.riskyDeviation || 0} <span className="text-xs font-bold text-rose-500/70">Ürün</span></div>
+                                            <div className="text-lg font-black text-rose-600">{loading ? "..." : d?.autonomous?.riskyDeviation || 0} <span className="text-xs font-bold text-rose-500/70">Ürün</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -688,59 +688,59 @@ export default function ClientDashboard() {
                         )}
 
                         {/* 8. BİLDİRİMLER VE ONAYLAR (GENİŞLETİLMİŞ) */}
-                        <div className="md:col-span-full lg:col-span-2 2xl:col-span-3 overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-8 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col pdy-card">
-                            <div className="flex justify-between items-start mb-6">
-                                <div className="flex items-center gap-4">
+                        <div className="md:col-span-full lg:col-span-2 2xl:col-span-3 overflow-hidden rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-3.5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_45px_-15px_rgba(0,0,0,0.12)] transition-all flex flex-col pdy-card">
+                            <div className="flex justify-between items-start mb-5">
+                                <div className="flex items-center gap-3.5">
                                     <div className="p-3 bg-red-50 text-red-600 rounded-2xl">
-                                        <Bell className="w-6 h-6" />
+                                        <Bell className="w-5 h-5" />
                                     </div>
-                                    <h3 className="text-[17px] font-bold text-slate-900 dark:text-white tracking-tight">Onaylar & Alarmlar</h3>
+                                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white tracking-tight">Onaylar & Alarmlar</h3>
                                 </div>
                                 {(d?.notificationsApp?.criticalAlerts || 0) > 0 && (
-                                    <div className="px-3 py-1 bg-red-500 text-white text-[11px] font-black tracking-widest uppercase rounded-lg flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                                    <div className="px-3 py-1 bg-red-500 text-white text-[9px] font-black tracking-widest uppercase rounded-lg flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
                                         <AlertTriangle className="w-3 h-3" /> Kritik Uyarı Var
                                     </div>
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pdy-grid">
-                                <div className="p-5 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pdy-grid">
+                                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-3.5">
+                                        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
                                             <CheckSquare className="w-5 h-5 text-amber-600" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-amber-900 text-[15px]">Bekleyen Onaylar</p>
-                                            <p className="font-medium text-amber-700/70 text-[12px] line-clamp-1">Fatura, Escrow ve Sözleşme</p>
+                                            <p className="font-bold text-amber-900 text-[13.5px]">Bekleyen Onaylar</p>
+                                            <p className="font-medium text-amber-700/70 text-[9px] line-clamp-1">Fatura, Escrow ve Sözleşme</p>
                                         </div>
                                     </div>
-                                    <div className="text-2xl font-black text-amber-600 ml-4 pdy-kpi">{loading ? "..." : d?.notificationsApp?.pendingApprovals || 0}</div>
+                                    <div className="text-lg font-black text-amber-600 ml-4 pdy-kpi">{loading ? "..." : d?.notificationsApp?.pendingApprovals || 0}</div>
                                 </div>
 
-                                <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
+                                <div className="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-3.5">
+                                        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
                                             <MessageCircle className="w-5 h-5 text-blue-600" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-blue-900 text-[15px]">Okunmamış Bildirim</p>
-                                            <p className="font-medium text-blue-700/70 text-[12px] line-clamp-1">Sistem güncelleme / Uyarı</p>
+                                            <p className="font-bold text-blue-900 text-[13.5px]">Okunmamış Bildirim</p>
+                                            <p className="font-medium text-blue-700/70 text-[9px] line-clamp-1">Sistem güncelleme / Uyarı</p>
                                         </div>
                                     </div>
-                                    <div className="text-2xl font-black text-blue-600 ml-4 pdy-kpi">{loading ? "..." : d?.notificationsApp?.newNotifications || 0}</div>
+                                    <div className="text-lg font-black text-blue-600 ml-4 pdy-kpi">{loading ? "..." : d?.notificationsApp?.newNotifications || 0}</div>
                                 </div>
 
-                                <div className="p-5 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
+                                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-3.5">
+                                        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
                                             <ShieldAlert className="w-5 h-5 text-rose-600" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-rose-900 text-[15px]">Kaçak / Riskli İşlem</p>
-                                            <p className="font-medium text-rose-700/70 text-[12px] line-clamp-1">Kritik güvenlik sekmesi</p>
+                                            <p className="font-bold text-rose-900 text-[13.5px]">Kaçak / Riskli İşlem</p>
+                                            <p className="font-medium text-rose-700/70 text-[9px] line-clamp-1">Kritik güvenlik sekmesi</p>
                                         </div>
                                     </div>
-                                    <span className="font-black text-rose-600 text-2xl ml-4">{loading ? "..." : d?.notificationsApp?.criticalAlerts || 0}</span>
+                                    <span className="font-black text-rose-600 text-lg ml-4">{loading ? "..." : d?.notificationsApp?.criticalAlerts || 0}</span>
                                 </div>
                             </div>
                         </div>
