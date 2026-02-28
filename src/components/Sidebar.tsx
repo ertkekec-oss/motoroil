@@ -538,9 +538,8 @@ export default function Sidebar() {
             {/* Injected Micro CSS for Sidebar Surface Typography and Animations */}
             <style jsx>{`
                 .pdy-sidebar {
-                    --sb-bg: #F8FAFF;
-                    --sb-bg2: #F3F6FF;
-                    --sb-tint: rgba(37,99,235,0.04);
+                    --sb-bg: #F8FAFC;
+                    --sb-surface: rgba(255,255,255,0.65);
                     --sb-border: rgba(15,23,42,0.06);
                     --sb-text: #0F172A;
                     --sb-muted: #64748B;
@@ -548,31 +547,24 @@ export default function Sidebar() {
                     --sb-active: rgba(37,99,235,0.10);
                     --sb-accent: #2563EB;
 
-                    background: linear-gradient(180deg, var(--sb-bg) 0%, var(--sb-bg2) 100%);
+                    background: var(--sb-bg);
                     border-right: 1px solid var(--sb-border);
                 }
 
                 :global(.dark) .pdy-sidebar {
                     --sb-bg: #0B1220;
                     --sb-bg2: #0E1628;
-                    --sb-tint: rgba(96,165,250,0.06);
+                    --sb-surface: rgba(15,23,42,0.55);
                     --sb-border: rgba(148,163,184,0.10);
-                    --sb-text: #E5E7EB;
-                    --sb-muted: #94A3B8;
-                    --sb-hover: rgba(96,165,250,0.08);
-                    --sb-active: rgba(96,165,250,0.14);
+                    --sb-text: rgba(226,232,240,0.95);
+                    --sb-muted: rgba(148,163,184,0.90);
+                    --sb-hover: rgba(96,165,250,0.10);
+                    --sb-active: rgba(96,165,250,0.16);
                     --sb-accent: #60A5FA;
 
                     background: linear-gradient(180deg, var(--sb-bg) 0%, var(--sb-bg2) 100%);
                     border-right: 1px solid var(--sb-border);
-                    box-shadow: inset -1px 0 0 rgba(96,165,250,0.08);
-                }
-
-                @supports (backdrop-filter: blur(6px)) {
-                    :global(.dark) .pdy-sidebar {
-                        background: linear-gradient(180deg, rgba(11,18,32,0.6) 0%, rgba(14,22,40,0.85) 100%);
-                        backdrop-filter: blur(6px);
-                    }
+                    box-shadow: inset -1px 0 0 rgba(96,165,250,0.06);
                 }
 
                 .pdy-sb-collapse-btn {
@@ -597,9 +589,13 @@ export default function Sidebar() {
                 }
 
                 .pdy-sb-avatar {
-                    background: var(--sb-hover);
+                    background: var(--sb-surface);
                     color: var(--sb-text);
                     border: 1px solid var(--sb-border);
+                    backdrop-filter: blur(6px);
+                }
+                :global(.dark) .pdy-sb-avatar {
+                    background: rgba(255,255,255,0.03);
                 }
 
                 .pdy-sb-badge {
@@ -616,7 +612,11 @@ export default function Sidebar() {
                 }
 
                 .sb-header {
-                    color: var(--sb-muted);
+                    color: #94A3B8;
+                    letter-spacing: 0.08em;
+                }
+                :global(.dark) .sb-header {
+                    color: rgba(148,163,184,0.65);
                 }
 
                 .sb-item.sb-default {
@@ -629,6 +629,7 @@ export default function Sidebar() {
                 .sb-item.sb-active {
                     background: var(--sb-active);
                     color: var(--sb-text);
+                    font-weight: 600;
                 }
                 .sb-item.sb-active .sb-icon {
                     color: var(--sb-accent);
@@ -646,9 +647,6 @@ export default function Sidebar() {
                 }
                 :global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
                     background: rgba(148, 163, 184, 0.18);
-                }
-                :global(.dark) .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-                    background: rgba(148, 163, 184, 0.25);
                 }
             `}</style>
         </aside>
