@@ -114,7 +114,6 @@ export default async function SellerOrdersPage({
     const nextCursor = hasNext ? data[data.length - 1]?.id : null;
 
     return (
-    return (
         <div className="flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative font-sans" style={{ scrollbarWidth: 'none' }}>
             <div className="max-w-[1400px] mx-auto space-y-8 pb-24">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
