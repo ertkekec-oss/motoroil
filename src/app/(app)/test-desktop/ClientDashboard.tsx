@@ -113,7 +113,7 @@ const MOCK_ANNOUNCEMENTS = [
 export default function ClientDashboard() {
     const { user } = useAuth();
     const router = useRouter();
-    const { setIsSidebarOpen, setIsDesktopSidebarCollapsed } = useApp();
+    const { setIsSidebarOpen, setIsDesktopSidebarCollapsed, isDesktopSidebarCollapsed } = useApp();
     const [summary, setSummary] = useState<DashboardSummary | null>(null);
     const [loading, setLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
@@ -212,58 +212,60 @@ export default function ClientDashboard() {
         <div className={`flex h-screen overflow-hidden bg-[#F8FAFC] dark:bg-[#0B1120] font-sans`}>
 
             {/* L E F T   P A N E L  (MODÜL GRID - 10% Scaled Up) */}
-            <div className="w-[310px] xl:w-[400px] flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/50 dark:border-white/5 flex flex-col h-full z-10 shadow-[8px_0_30px_-15px_rgba(0,0,0,0.05)] hidden md:flex overflow-hidden">
-                <div className="p-7 pb-5 bg-gradient-to-b from-white to-white/90 dark:from-slate-900 dark:to-slate-900/90 backdrop-blur-md z-20">
-                    <h2 className="text-[22px] font-extrabold tracking-tight text-[#0F172A] dark:text-white mb-4">Sistem Modülleri</h2>
-                    <div className="relative">
-                        <Search className="w-[18px] h-[18px] absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Arama yap..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-11 pr-4 py-3.5 bg-slate-100/70 hover:bg-slate-100 focus:bg-white dark:bg-slate-800/50 border border-transparent focus:border-blue-500/30 rounded-xl text-[15px] font-medium text-slate-800 dark:text-slate-200 transition-all focus:shadow-[0_4px_20px_-5px_rgba(37,99,235,0.15)] focus:outline-none placeholder:text-slate-400"
-                        />
+            {isDesktopSidebarCollapsed && (
+                <div className="w-[310px] xl:w-[400px] flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/50 dark:border-white/5 flex flex-col h-full z-10 shadow-[8px_0_30px_-15px_rgba(0,0,0,0.05)] hidden md:flex overflow-hidden">
+                    <div className="p-7 pb-5 bg-gradient-to-b from-white to-white/90 dark:from-slate-900 dark:to-slate-900/90 backdrop-blur-md z-20">
+                        <h2 className="text-[22px] font-extrabold tracking-tight text-[#0F172A] dark:text-white mb-4">Sistem Modülleri</h2>
+                        <div className="relative">
+                            <Search className="w-[18px] h-[18px] absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <input
+                                type="text"
+                                placeholder="Arama yap..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-11 pr-4 py-3.5 bg-slate-100/70 hover:bg-slate-100 focus:bg-white dark:bg-slate-800/50 border border-transparent focus:border-blue-500/30 rounded-xl text-[15px] font-medium text-slate-800 dark:text-slate-200 transition-all focus:shadow-[0_4px_20px_-5px_rgba(37,99,235,0.15)] focus:outline-none placeholder:text-slate-400"
+                            />
+                        </div>
                     </div>
-                </div>
 
-                {/* Hide Scrollbar, Touch-first padding, Two-column Grid Layout */}
-                <div className="flex-1 overflow-y-auto px-7 pb-8" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
-                    <div className="grid grid-cols-2 gap-4 pdy-grid-tight">
-                        {!mounted ? (
-                            Array.from({ length: 12 }).map((_, i) => (
-                                <div key={i} className="h-[105px] bg-slate-50 dark:bg-slate-800/50 rounded-2xl animate-pulse" />
-                            ))
-                        ) : (
-                            filteredFeatures.map(feat => (
-                                <button
-                                    key={feat.id}
-                                    onClick={() => {
-                                        trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
-                                        router.push(feat.href);
-                                    }}
-                                    className="text-left flex flex-col items-start p-5 rounded-[18px] transition-transform active:scale-95 border border-slate-200/60 hover:border-slate-300 dark:border-slate-700/50 dark:hover:border-slate-600 focus:outline-none shadow-sm hover:shadow-md cursor-pointer bg-white dark:bg-slate-800 group"
-                                >
-                                    <div className={`p-3 rounded-xl mb-3.5 shadow-sm ${feat.color.replace('border-', 'border border-')}`}>
-                                        <div className="scale-90 origin-top-left -mx-0.5 -my-0.5">
-                                            {feat.icon}
+                    {/* Hide Scrollbar, Touch-first padding, Two-column Grid Layout */}
+                    <div className="flex-1 overflow-y-auto px-7 pb-8" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                        <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
+                        <div className="grid grid-cols-2 gap-4 pdy-grid-tight">
+                            {!mounted ? (
+                                Array.from({ length: 12 }).map((_, i) => (
+                                    <div key={i} className="h-[105px] bg-slate-50 dark:bg-slate-800/50 rounded-2xl animate-pulse" />
+                                ))
+                            ) : (
+                                filteredFeatures.map(feat => (
+                                    <button
+                                        key={feat.id}
+                                        onClick={() => {
+                                            trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
+                                            router.push(feat.href);
+                                        }}
+                                        className="text-left flex flex-col items-start p-5 rounded-[18px] transition-transform active:scale-95 border border-slate-200/60 hover:border-slate-300 dark:border-slate-700/50 dark:hover:border-slate-600 focus:outline-none shadow-sm hover:shadow-md cursor-pointer bg-white dark:bg-slate-800 group"
+                                    >
+                                        <div className={`p-3 rounded-xl mb-3.5 shadow-sm ${feat.color.replace('border-', 'border border-')}`}>
+                                            <div className="scale-90 origin-top-left -mx-0.5 -my-0.5">
+                                                {feat.icon}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <h4 className="text-[14.5px] font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight">{feat.title}</h4>
-                                    <p className="text-[11px] font-semibold text-slate-500 mt-1 line-clamp-2 leading-snug">{feat.desc}</p>
-                                </button>
-                            ))
-                        )}
-                        {mounted && filteredFeatures.length === 0 && (
-                            <div className="col-span-2 text-center py-10">
-                                <BoxSelect className="w-9 h-9 text-slate-300 mx-auto mb-3" />
-                                <p className="text-[15px] text-slate-500 font-bold">Modül bulunamadı.</p>
-                            </div>
-                        )}
+                                        <h4 className="text-[14.5px] font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight">{feat.title}</h4>
+                                        <p className="text-[11px] font-semibold text-slate-500 mt-1 line-clamp-2 leading-snug">{feat.desc}</p>
+                                    </button>
+                                ))
+                            )}
+                            {mounted && filteredFeatures.length === 0 && (
+                                <div className="col-span-2 text-center py-10">
+                                    <BoxSelect className="w-9 h-9 text-slate-300 mx-auto mb-3" />
+                                    <p className="text-[15px] text-slate-500 font-bold">Modül bulunamadı.</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* R I G H T   P A N E L  (DASHBOARD CARDS 80% SCALED TOKENS) */}
             <div
@@ -295,7 +297,8 @@ export default function ClientDashboard() {
                     </div>
 
                     {/* EXECUTIVE PRESENCE LAYER */}
-                    <style dangerouslySetInnerHTML={{ __html: `
+                    <style dangerouslySetInnerHTML={{
+                        __html: `
                         .pdy-executive-surface {
                             background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,250,252,0.85));
                             border: 1px solid rgba(37,99,235,0.12);
@@ -316,7 +319,7 @@ export default function ClientDashboard() {
                             ${isScrolled ? 'h-[46px] px-4' : 'h-[64px] px-6'}`}
                         >
                             <div className="absolute inset-0 pdy-executive-glow pointer-events-none"></div>
-                            
+
                             {/* Sol: Kurumsal Kimlik Alanı */}
                             <div className="flex items-center gap-2.5 flex-shrink-0 relative z-10 w-[200px]">
                                 <div className="w-[5px] h-[5px] rounded-full bg-[#3b82f6] shadow-[0_0_6px_rgba(59,130,246,0.5)]"></div>
@@ -520,7 +523,7 @@ export default function ClientDashboard() {
                         {/* 1. NAKİT AKIŞI & LİKİDİTE */}
                         <div className="group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
                             <div className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] bg-slate-300 dark:bg-slate-700 shadow-[0_0_8px_rgba(148,163,184,0.3)] group-hover:shadow-[0_0_12px_rgba(148,163,184,0.4)] transition-all duration-160"></div>
-                            
+
                             <div className="flex justify-between items-center mb-6 pl-2">
                                 <div className="flex items-center gap-3">
                                     <Wallet className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
@@ -529,18 +532,18 @@ export default function ClientDashboard() {
                                 <div className="flex items-center gap-2">
                                     <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 dark:bg-blue-500/10 rounded-md">Ledger SoT</span>
                                     <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <div className="pl-2 mb-6">
                                 <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5 hover:text-slate-700 transition-colors">Net Likidite</p>
                                 <div className="text-[32px] font-[600] tracking-tight text-slate-900 dark:text-slate-100 leading-none">
                                     {loading ? "..." : formatter.format(d?.escrowPending || 0)}
                                 </div>
                             </div>
-                            
+
                             <div className="pl-2 flex gap-6 mb-6 flex-wrap">
                                 <div>
                                     <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Tahsilat</p>
@@ -555,7 +558,7 @@ export default function ClientDashboard() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="pl-2 mt-auto">
                                 <div className="bg-white/50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-white/5 rounded-xl p-3 backdrop-blur-sm">
                                     <div className="flex justify-between items-center mb-1.5">
@@ -583,7 +586,7 @@ export default function ClientDashboard() {
                         {/* 2. STOK & DEPO SAĞLIĞI */}
                         <div className="group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
                             <div className={`absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] transition-all duration-160 ${(d?.stockHealth?.lowStock || 0) > 0 ? 'bg-amber-500 dark:bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.3)] group-hover:shadow-[0_0_12px_rgba(245,158,11,0.4)]' : 'bg-emerald-500 dark:bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.3)] group-hover:shadow-[0_0_12px_rgba(16,185,129,0.4)]'}`}></div>
-                            
+
                             <div className="flex justify-between items-center mb-6 pl-2">
                                 <div className="flex items-center gap-3">
                                     <PackageSearch className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
@@ -594,18 +597,18 @@ export default function ClientDashboard() {
                                         {(d?.stockHealth?.lowStock || 0) > 0 ? 'Riskli' : 'Sağlıklı'}
                                     </span>
                                     <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <div className="pl-2 mb-6">
                                 <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5 hover:text-slate-700 transition-colors">Aktif SKU</p>
                                 <div className="text-[32px] font-[600] tracking-tight text-slate-900 dark:text-slate-100 leading-none">
                                     {loading ? "..." : d?.stockHealth?.totalSku || 0}
                                 </div>
                             </div>
-                            
+
                             <div className="pl-2 flex gap-4 mb-6 flex-wrap">
                                 <div className="mr-2">
                                     <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Kritik Stok</p>
@@ -626,7 +629,7 @@ export default function ClientDashboard() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="pl-2 mt-auto">
                                 <div className="flex justify-between text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5">
                                     <span>Health Score</span>
@@ -640,216 +643,216 @@ export default function ClientDashboard() {
 
                         {/* 3. VARDİYA & PDKS */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "HR", "RISK"])) && (
-                        <div className="group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
-                            <div className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] bg-slate-300 dark:bg-slate-700 shadow-[0_0_8px_rgba(148,163,184,0.3)] group-hover:shadow-[0_0_12px_rgba(148,163,184,0.4)] transition-all duration-160"></div>
-                            
-                            <div className="flex justify-between items-center mb-6 pl-2">
-                                <div className="flex items-center gap-3">
-                                    <Fingerprint className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
-                                    <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white">Vardiya & PDKS</h3>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-md">LIVE</span>
-                                    <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div className="pl-2 mb-6">
-                                <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5 hover:text-slate-700 transition-colors">Aktif Personel</p>
-                                <div className="text-[32px] font-[600] tracking-tight text-slate-900 dark:text-slate-100 leading-none">
-                                    {loading ? "..." : d?.pdksRules?.currentStaffCount || 0}
-                                </div>
-                            </div>
-                            
-                            <div className="pl-2 flex gap-4 mb-6 flex-wrap">
-                                <div className="mr-2">
-                                    <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Giriş Yapan</p>
-                                    <div className="text-[15px] font-[500] text-emerald-600 dark:text-emerald-400">
-                                        {loading ? "..." : d?.pdksRules?.checkedInCount || 0}
+                            <div className="group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
+                                <div className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] bg-slate-300 dark:bg-slate-700 shadow-[0_0_8px_rgba(148,163,184,0.3)] group-hover:shadow-[0_0_12px_rgba(148,163,184,0.4)] transition-all duration-160"></div>
+
+                                <div className="flex justify-between items-center mb-6 pl-2">
+                                    <div className="flex items-center gap-3">
+                                        <Fingerprint className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
+                                        <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white">Vardiya & PDKS</h3>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-md">LIVE</span>
+                                        <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
+                                        </button>
                                     </div>
                                 </div>
-                                <div className="mr-2">
-                                    <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">İzinli/Yok</p>
-                                    <div className="text-[15px] font-[500] text-slate-700 dark:text-slate-300">
-                                        {loading ? "..." : d?.pdksRules?.notCheckedInCount || 0}
+
+                                <div className="pl-2 mb-6">
+                                    <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5 hover:text-slate-700 transition-colors">Aktif Personel</p>
+                                    <div className="text-[32px] font-[600] tracking-tight text-slate-900 dark:text-slate-100 leading-none">
+                                        {loading ? "..." : d?.pdksRules?.currentStaffCount || 0}
                                     </div>
                                 </div>
-                                <div>
-                                    <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Geç Kalan</p>
-                                    <div className={`text-[15px] font-[500] ${(d?.pdksRules?.lateCount || 0) > 0 ? 'text-amber-500 dark:text-amber-400 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}>
-                                        {loading ? "..." : d?.pdksRules?.lateCount || 0}
+
+                                <div className="pl-2 flex gap-4 mb-6 flex-wrap">
+                                    <div className="mr-2">
+                                        <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Giriş Yapan</p>
+                                        <div className="text-[15px] font-[500] text-emerald-600 dark:text-emerald-400">
+                                            {loading ? "..." : d?.pdksRules?.checkedInCount || 0}
+                                        </div>
+                                    </div>
+                                    <div className="mr-2">
+                                        <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">İzinli/Yok</p>
+                                        <div className="text-[15px] font-[500] text-slate-700 dark:text-slate-300">
+                                            {loading ? "..." : d?.pdksRules?.notCheckedInCount || 0}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Geç Kalan</p>
+                                        <div className={`text-[15px] font-[500] ${(d?.pdksRules?.lateCount || 0) > 0 ? 'text-amber-500 dark:text-amber-400 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}>
+                                            {loading ? "..." : d?.pdksRules?.lateCount || 0}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pl-2 mt-auto">
+                                    <div className="mt-4 flex items-end gap-1 h-6 w-full opacity-70">
+                                        {[40, 70, 45, 90, 65, 85, 100].map((h, i) => (
+                                            <div key={i} className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-[2px]" style={{ height: `${h}%` }}></div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div className="pl-2 mt-auto">
-                                <div className="mt-4 flex items-end gap-1 h-6 w-full opacity-70">
-                                    {[40, 70, 45, 90, 65, 85, 100].map((h, i) => (
-                                        <div key={i} className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-[2px]" style={{ height: `${h}%` }}></div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
                         )}
 
                         {/* 4. SERVİS & BAKIM */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER"])) && (
-                        <div className="group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
-                            <div className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] bg-slate-300 dark:bg-slate-700 shadow-[0_0_8px_rgba(148,163,184,0.3)] group-hover:shadow-[0_0_12px_rgba(148,163,184,0.4)] transition-all duration-160"></div>
-                            
-                            <div className="flex justify-between items-center mb-6 pl-2">
-                                <div className="flex items-center gap-3">
-                                    <HeadphonesIcon className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
-                                    <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white">Servis & Bakım Ağı</h3>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-md">UPDATED</span>
-                                    <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div className="pl-2 mb-6">
-                                <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5 hover:text-slate-700 transition-colors">Şu an Serviste Olan</p>
-                                <div className="text-[32px] font-[600] tracking-tight text-slate-900 dark:text-slate-100 leading-none">
-                                    {loading ? "..." : d?.serviceDesk?.currentlyInService || 0}
-                                </div>
-                            </div>
-                            
-                            <div className="pl-2 flex gap-6 mb-6">
-                                <div>
-                                    <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Yeni Kayıt</p>
-                                    <div className="text-[15px] font-[500] text-slate-700 dark:text-slate-300">
-                                        +{loading ? "..." : d?.serviceDesk?.enteredToday || 0}
+                            <div className="group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
+                                <div className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] bg-slate-300 dark:bg-slate-700 shadow-[0_0_8px_rgba(148,163,184,0.3)] group-hover:shadow-[0_0_12px_rgba(148,163,184,0.4)] transition-all duration-160"></div>
+
+                                <div className="flex justify-between items-center mb-6 pl-2">
+                                    <div className="flex items-center gap-3">
+                                        <HeadphonesIcon className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
+                                        <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white">Servis & Bakım Ağı</h3>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-md">UPDATED</span>
+                                        <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
+                                        </button>
                                     </div>
                                 </div>
-                                <div>
-                                    <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Bekleyen</p>
-                                    <div className="text-[15px] font-[500] text-slate-700 dark:text-slate-300">
-                                        14
+
+                                <div className="pl-2 mb-6">
+                                    <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5 hover:text-slate-700 transition-colors">Şu an Serviste Olan</p>
+                                    <div className="text-[32px] font-[600] tracking-tight text-slate-900 dark:text-slate-100 leading-none">
+                                        {loading ? "..." : d?.serviceDesk?.currentlyInService || 0}
+                                    </div>
+                                </div>
+
+                                <div className="pl-2 flex gap-6 mb-6">
+                                    <div>
+                                        <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Yeni Kayıt</p>
+                                        <div className="text-[15px] font-[500] text-slate-700 dark:text-slate-300">
+                                            +{loading ? "..." : d?.serviceDesk?.enteredToday || 0}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Bekleyen</p>
+                                        <div className="text-[15px] font-[500] text-slate-700 dark:text-slate-300">
+                                            14
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pl-2 mt-auto">
+                                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                        <div className="h-full bg-blue-500 w-[60%] rounded-full"></div>
+                                    </div>
+                                    <div className="flex justify-between text-[10px] mt-1.5 font-semibold text-slate-400 uppercase tracking-widest">
+                                        <span>Kapasite</span>
+                                        <span>%60</span>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div className="pl-2 mt-auto">
-                                <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                                     <div className="h-full bg-blue-500 w-[60%] rounded-full"></div>
-                                </div>
-                                <div className="flex justify-between text-[10px] mt-1.5 font-semibold text-slate-400 uppercase tracking-widest">
-                                    <span>Kapasite</span>
-                                    <span>%60</span>
-                                </div>
-                            </div>
-                        </div>
                         )}
 
                         {/* 5. E-BELGE */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"])) && (
-                        <div className="group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
-                            <div className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] bg-slate-300 dark:bg-slate-700 shadow-[0_0_8px_rgba(148,163,184,0.3)] group-hover:shadow-[0_0_12px_rgba(148,163,184,0.4)] transition-all duration-160"></div>
-                            
-                            <div className="flex justify-between items-center mb-6 pl-2">
-                                <div className="flex items-center gap-3">
-                                    <FileText className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
-                                    <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white">E-Belge İşlemleri</h3>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-md">SYNCING</span>
-                                    <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div className="pl-2 mb-6">
-                                <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5 hover:text-slate-700 transition-colors">Onay Bekleyen</p>
-                                <div className="text-[32px] font-[600] tracking-tight text-slate-900 dark:text-slate-100 leading-none">
-                                    {loading ? "..." : d?.invoiceStatus?.pending || 0}
-                                </div>
-                            </div>
-                            
-                            <div className="pl-2 flex gap-6 mb-6">
-                                <div>
-                                    <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Gelen (Hafta)</p>
-                                    <div className="text-[15px] font-[500] text-slate-700 dark:text-slate-300">
-                                        {loading ? "..." : d?.invoiceStatus?.incoming || 0}
+                            <div className="group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
+                                <div className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] bg-slate-300 dark:bg-slate-700 shadow-[0_0_8px_rgba(148,163,184,0.3)] group-hover:shadow-[0_0_12px_rgba(148,163,184,0.4)] transition-all duration-160"></div>
+
+                                <div className="flex justify-between items-center mb-6 pl-2">
+                                    <div className="flex items-center gap-3">
+                                        <FileText className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
+                                        <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white">E-Belge İşlemleri</h3>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-md">SYNCING</span>
+                                        <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
+                                        </button>
                                     </div>
                                 </div>
-                                <div>
-                                    <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Giden (Hafta)</p>
-                                    <div className="text-[15px] font-[500] text-slate-700 dark:text-slate-300">
-                                        {loading ? "..." : d?.invoiceStatus?.outgoing || 0}
+
+                                <div className="pl-2 mb-6">
+                                    <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5 hover:text-slate-700 transition-colors">Onay Bekleyen</p>
+                                    <div className="text-[32px] font-[600] tracking-tight text-slate-900 dark:text-slate-100 leading-none">
+                                        {loading ? "..." : d?.invoiceStatus?.pending || 0}
+                                    </div>
+                                </div>
+
+                                <div className="pl-2 flex gap-6 mb-6">
+                                    <div>
+                                        <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Gelen (Hafta)</p>
+                                        <div className="text-[15px] font-[500] text-slate-700 dark:text-slate-300">
+                                            {loading ? "..." : d?.invoiceStatus?.incoming || 0}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Giden (Hafta)</p>
+                                        <div className="text-[15px] font-[500] text-slate-700 dark:text-slate-300">
+                                            {loading ? "..." : d?.invoiceStatus?.outgoing || 0}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pl-2 mt-auto">
+                                    <div className="flex items-center gap-1.5 pt-2">
+                                        {[...Array(12)].map((_, i) => (
+                                            <div key={i} className={`h-1.5 rounded-full flex-1 ${i < 8 ? 'bg-slate-300 dark:bg-slate-600' : 'bg-slate-100 dark:bg-slate-800'}`}></div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div className="pl-2 mt-auto">
-                                <div className="flex items-center gap-1.5 pt-2">
-                                    {[...Array(12)].map((_, i) => (
-                                        <div key={i} className={`h-1.5 rounded-full flex-1 ${i < 8 ? 'bg-slate-300 dark:bg-slate-600' : 'bg-slate-100 dark:bg-slate-800'}`}></div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
                         )}
 
                         {/* 6. OTONOM FİYATLANDIRMA */}
                         {(isAuthorized(["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"])) && (
-                        <div className="group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
-                            <div className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] bg-blue-600 dark:bg-blue-500 shadow-[0_0_8px_rgba(37,99,235,0.3)] group-hover:shadow-[0_0_12px_rgba(37,99,235,0.4)] transition-all duration-160"></div>
-                            
-                            <div className="flex justify-between items-center mb-6 pl-2">
-                                <div className="flex items-center gap-3">
-                                    <Activity className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
-                                    <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white">Otonom Fiyatlandırma</h3>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 dark:bg-blue-500/10 rounded-md">AUTOPILOT</span>
-                                    <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div className="pl-2 mb-6">
-                                <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5 hover:text-slate-700 transition-colors">Güncellenen SKU</p>
-                                <div className="text-[32px] font-[600] tracking-tight text-slate-900 dark:text-slate-100 leading-none">
-                                    {loading ? "..." : d?.autonomous?.updatedProducts || 0}
-                                </div>
-                            </div>
-                            
-                            <div className="pl-2 flex gap-6 mb-6 flex-wrap">
-                                <div>
-                                    <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Marj Etkisi</p>
-                                    <div className="text-[15px] font-[500] text-emerald-600 dark:text-emerald-400">
-                                        +{loading ? "..." : d?.autonomous?.avgMarginChange || 0}%
+                            <div className="group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
+                                <div className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] bg-blue-600 dark:bg-blue-500 shadow-[0_0_8px_rgba(37,99,235,0.3)] group-hover:shadow-[0_0_12px_rgba(37,99,235,0.4)] transition-all duration-160"></div>
+
+                                <div className="flex justify-between items-center mb-6 pl-2">
+                                    <div className="flex items-center gap-3">
+                                        <Activity className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
+                                        <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white">Otonom Fiyatlandırma</h3>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 dark:bg-blue-500/10 rounded-md">AUTOPILOT</span>
+                                        <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
+                                        </button>
                                     </div>
                                 </div>
-                                <div>
-                                    <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Riskli Sapma</p>
-                                    <div className={`text-[15px] font-[500] ${(d?.autonomous?.riskyDeviation || 0) > 0 ? 'text-amber-500 dark:text-amber-400 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}>
-                                        {loading ? "..." : d?.autonomous?.riskyDeviation || 0} Ürün
+
+                                <div className="pl-2 mb-6">
+                                    <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500 mb-1.5 hover:text-slate-700 transition-colors">Güncellenen SKU</p>
+                                    <div className="text-[32px] font-[600] tracking-tight text-slate-900 dark:text-slate-100 leading-none">
+                                        {loading ? "..." : d?.autonomous?.updatedProducts || 0}
+                                    </div>
+                                </div>
+
+                                <div className="pl-2 flex gap-6 mb-6 flex-wrap">
+                                    <div>
+                                        <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Marj Etkisi</p>
+                                        <div className="text-[15px] font-[500] text-emerald-600 dark:text-emerald-400">
+                                            +{loading ? "..." : d?.autonomous?.avgMarginChange || 0}%
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1">Riskli Sapma</p>
+                                        <div className={`text-[15px] font-[500] ${(d?.autonomous?.riskyDeviation || 0) > 0 ? 'text-amber-500 dark:text-amber-400 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}>
+                                            {loading ? "..." : d?.autonomous?.riskyDeviation || 0} Ürün
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pl-2 mt-auto">
+                                    <div className="h-6 w-full opacity-60">
+                                        <svg viewBox="0 0 100 24" preserveAspectRatio="none" className="w-full h-full stroke-slate-400 dark:stroke-slate-500 fill-none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M0,12 L15,14 L30,8 L45,16 L60,6 L75,10 L90,2 L100,5" />
+                                        </svg>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div className="pl-2 mt-auto">
-                                <div className="h-6 w-full opacity-60">
-                                    <svg viewBox="0 0 100 24" preserveAspectRatio="none" className="w-full h-full stroke-slate-400 dark:stroke-slate-500 fill-none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M0,12 L15,14 L30,8 L45,16 L60,6 L75,10 L90,2 L100,5" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
                         )}
 
                         {/* 7. ONAYLAR & ALARMLAR */}
                         <div className="col-span-1 lg:col-span-2 2xl:col-span-3 group relative flex flex-col rounded-[18px] border border-[#0F172A]/[0.06] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.85))] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.75),rgba(15,23,42,0.55))] p-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-none hover:border-[#0F172A]/[0.1] dark:hover:border-white/[0.1] transition-all duration-160">
                             <div className={`absolute left-0 top-6 bottom-6 w-[3px] rounded-r-[3px] transition-all duration-160 ${(d?.notificationsApp?.criticalAlerts || 0) > 0 ? 'bg-red-500 dark:bg-red-400 shadow-[0_0_8px_rgba(239,68,68,0.3)] group-hover:shadow-[0_0_12px_rgba(239,68,68,0.4)]' : 'bg-slate-300 dark:bg-slate-700 shadow-[0_0_8px_rgba(148,163,184,0.3)] group-hover:shadow-[0_0_12px_rgba(148,163,184,0.4)]'}`}></div>
-                            
+
                             <div className="flex justify-between items-center mb-6 pl-2">
                                 <div className="flex items-center gap-3">
                                     <Bell className="w-[18px] h-[18px] text-slate-500" strokeWidth={2.5} />
@@ -862,11 +865,11 @@ export default function ClientDashboard() {
                                         <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-md">NORMAL</span>
                                     )}
                                     <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <div className="pl-2 grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1 hover:text-slate-700 transition-colors">Bekleyen Onaylar</p>
@@ -875,7 +878,7 @@ export default function ClientDashboard() {
                                     </div>
                                     <p className="text-[13px] font-[500] text-slate-500 dark:text-slate-400">Fatura, Escrow ve Sözleşme işlemleri onayınızı bekliyor.</p>
                                 </div>
-                                
+
                                 <div>
                                     <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1 hover:text-slate-700 transition-colors">Okunmamış Bildirim</p>
                                     <div className="text-[32px] font-[600] tracking-tight text-blue-600 dark:text-blue-400 leading-none mb-2">
@@ -883,7 +886,7 @@ export default function ClientDashboard() {
                                     </div>
                                     <p className="text-[13px] font-[500] text-slate-500 dark:text-slate-400">Sistem güncellemeleri ve teknik bülten uyarıları.</p>
                                 </div>
-                                
+
                                 <div>
                                     <p className="text-[11px] uppercase tracking-[0.08em] font-[600] text-slate-500 mb-1 hover:text-slate-700 transition-colors">Riskli / Kaçak İşlem</p>
                                     <div className={`text-[32px] font-[600] tracking-tight leading-none mb-2 ${(d?.notificationsApp?.criticalAlerts || 0) > 0 ? 'text-red-500 dark:text-red-400' : 'text-slate-900 dark:text-slate-100'}`}>
