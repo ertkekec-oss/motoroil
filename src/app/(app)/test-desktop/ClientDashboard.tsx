@@ -124,6 +124,23 @@ export default function ClientDashboard() {
     const [showOnboardingModal, setShowOnboardingModal] = useState(false);
     const [completionPhase, setCompletionPhase] = useState<'none' | 'micro' | 'executive' | 'completed'>('none');
     const [isFullyDismissed, setIsFullyDismissed] = useState(false);
+    const [isBroadcastDismissed, setIsBroadcastDismissed] = useState(false);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const dismissed = localStorage.getItem("pdy_board_notice_v1");
+            if (dismissed === "true") {
+                setIsBroadcastDismissed(true);
+            }
+        }
+    }, []);
+
+    const dismissBroadcast = () => {
+        setIsBroadcastDismissed(true);
+        if (typeof window !== "undefined") {
+            localStorage.setItem("pdy_board_notice_v1", "true");
+        }
+    };
 
     useEffect(() => {
         if (isHoveringAnnouncements) return;
@@ -264,53 +281,71 @@ export default function ClientDashboard() {
                 <div className="pdy-content-container max-w-[1400px] mx-auto space-y-8 pb-24 pdy-stack">
 
                     {/* Header Info */}
-                    <div className="mb-5 xl:mb-5 pdy-title">
-                        <h2 className="text-[25px] sm:text-[36px] font-[700] tracking-tight text-[#0F172A] dark:text-white leading-tight mb-1">PERİODYA DASHBOARD</h2>
-                        <p className="text-[12.5px] font-semibold text-slate-500 tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full opacity-80">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti</p>
+                    <div className="mb-5 xl:mb-5 pdy-title flex justify-between items-start">
+                        <div>
+                            <h2 className="text-[25px] sm:text-[36px] font-[700] tracking-tight text-[#0F172A] dark:text-white leading-tight mb-1">PERİODYA DASHBOARD</h2>
+                            <p className="text-[12.5px] font-semibold text-slate-500 tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full opacity-80">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti</p>
+                        </div>
+                        {!isBroadcastDismissed && (
+                            <div className="hidden lg:flex items-center gap-2 mt-2 px-3 py-1.5 rounded-full bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-800/20">
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80"></div>
+                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Board Notice Active</span>
+                            </div>
+                        )}
                     </div>
 
-                    {/* EXECUTIVE BROADCAST LAYER (CONDITIONAL) */}
-                    {MOCK_ANNOUNCEMENTS.length > 0 && (
+                    {/* EXECUTIVE PRESENCE LAYER */}
+                    <style dangerouslySetInnerHTML={{ __html: `
+                        .pdy-executive-surface {
+                            background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,250,252,0.85));
+                            border: 1px solid rgba(37,99,235,0.12);
+                            backdrop-filter: blur(10px);
+                        }
+                        [data-theme="dark"] .pdy-executive-surface {
+                            background: linear-gradient(180deg, rgba(15,23,42,0.75), rgba(15,23,42,0.55));
+                            border: 1px solid rgba(96,165,250,0.18);
+                            backdrop-filter: blur(12px);
+                        }
+                        .pdy-executive-glow {
+                            background: radial-gradient(circle at top left, rgba(37,99,235,0.08), transparent 60%);
+                        }
+                    ` }} />
+                    {!isBroadcastDismissed && (
                         <div
-                            className={`w-full border-b border-[#0F172A]/[0.08] dark:border-white/[0.08] bg-[#F8FAFC] dark:bg-[#0f111a] flex items-center transition-all duration-300 z-50 mb-5 overflow-hidden
-                                ${isScrolled
-                                    ? 'h-[46px] sticky top-0 px-3.5 sm:px-5 xl:px-10 -mx-4 sm:-mx-8 xl:-mx-12 shadow-sm'
-                                    : 'h-[64px]'}`}
-                            onMouseEnter={() => setIsHoveringAnnouncements(true)}
-                            onMouseLeave={() => setIsHoveringAnnouncements(false)}
+                            className={`pdy-executive-surface relative w-full flex items-center justify-between transition-all duration-300 z-50 mb-7 rounded-2xl overflow-hidden shadow-sm group
+                            ${isScrolled ? 'h-[46px] px-4' : 'h-[64px] px-6'}`}
                         >
-                            {/* 1. DUYURU TÜRÜ (15%) */}
-                            <div className="flex-[0.15] min-w-[120px] flex items-center gap-2 pr-4">
-                                <span className={`font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 transition-all ${isScrolled ? 'text-[9px]' : 'text-[9px]'}`}>
-                                    {MOCK_ANNOUNCEMENTS[announcementIdx]?.tag === "BAKIM" ? "DUYURU" : MOCK_ANNOUNCEMENTS[announcementIdx]?.tag || "CANLI"}
+                            <div className="absolute inset-0 pdy-executive-glow pointer-events-none"></div>
+                            
+                            {/* Sol: Kurumsal Kimlik Alanı */}
+                            <div className="flex items-center gap-2.5 flex-shrink-0 relative z-10 w-[200px]">
+                                <div className="w-[5px] h-[5px] rounded-full bg-[#3b82f6] shadow-[0_0_6px_rgba(59,130,246,0.5)]"></div>
+                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-[0.12em] uppercase">
+                                    SUPER ADMIN BROADCAST
                                 </span>
-                                <div className="w-1.5 h-1.5 rounded-full bg-slate-800 dark:bg-slate-300 flex-shrink-0"></div>
                             </div>
 
-                            {/* 2. ANA MESAJ (70%) */}
-                            <div className="flex-[0.7] relative h-[24px] overflow-hidden">
-                                {MOCK_ANNOUNCEMENTS.map((ann, idx) => (
-                                    <div
-                                        key={ann.id}
-                                        className={`absolute inset-0 flex items-center transition-opacity duration-250 ease-in-out ${idx === announcementIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
-                                    >
-                                        <div className={`font-[600] text-[#0F172A] dark:text-white truncate transition-all ${isScrolled ? 'text-[12.5px]' : 'text-[13.5px] lg:text-[14.5px]'}`}>
-                                            {ann.title} — <span className="font-medium text-slate-600 dark:text-slate-400">{ann.msg}</span>
-                                        </div>
-                                    </div>
-                                ))}
+                            {/* Orta: Mesaj */}
+                            <div className="flex-1 flex justify-center relative z-10 px-4">
+                                <span className="text-[14px] font-[500] text-[#0F172A] dark:text-white truncate" title="Q1 finansal kapanışları için yeni Ledger modülü aktif edildi.">
+                                    Q1 finansal kapanışları için yeni Ledger modülü aktif edildi.
+                                </span>
                             </div>
 
-                            {/* 3. AKSİYON (15%) */}
-                            <div className="flex-[0.15] min-w-[100px] flex items-center justify-end pl-4 gap-3.5">
+                            {/* Sağ: Action & Close */}
+                            <div className="flex justify-end items-center gap-5 flex-shrink-0 relative z-10 w-[200px]">
                                 <Link
-                                    href={MOCK_ANNOUNCEMENTS[announcementIdx]?.link || "#"}
-                                    className={`font-semibold text-slate-500 hover:text-[#0F172A] dark:text-slate-400 dark:hover:text-white transition-colors ${isScrolled ? 'text-[9px]' : 'text-[11.5px]'}`}
+                                    href="/settings/updates"
+                                    className="text-[13px] font-semibold text-slate-500 hover:text-[#0F172A] dark:text-slate-400 dark:hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-current after:opacity-0 hover:after:opacity-40"
                                 >
-                                    Detaylar →
+                                    Detayları Gör →
                                 </Link>
-                                <button className="p-1.5 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <button
+                                    onClick={dismissBroadcast}
+                                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors opacity-0 group-hover:opacity-100 p-1 rounded-md focus:outline-none"
+                                    title="Kapat"
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                 </button>
                             </div>
                         </div>
