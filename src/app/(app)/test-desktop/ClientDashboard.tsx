@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
+import "./test-desktop-density.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -109,7 +110,7 @@ const MOCK_ANNOUNCEMENTS = [
     { id: 3, title: "Bakım Çalışması", msg: "Cumartesi gece 03:00'da kısa süreli altyapı bakımı yapılacaktır.", link: "#", tag: "BAKIM", color: "text-amber-600 bg-amber-100" },
 ];
 
-export default function ClientDashboard() {
+export default function ClientDashboard({ density = "standard" }: { density?: string }) {
     const { user } = useAuth();
     const router = useRouter();
     const { setIsSidebarOpen, setIsDesktopSidebarCollapsed } = useApp();
@@ -191,7 +192,13 @@ export default function ClientDashboard() {
     const d = summary || undefined;
 
     return (
-        <div className="flex h-screen overflow-hidden bg-[#F8FAFC] dark:bg-[#0B1120] font-sans">
+        <div className={`flex h-screen overflow-hidden bg-[#F8FAFC] dark:bg-[#0B1120] font-sans density density-${density}`}>
+            {/* Density Debug Pill */}
+            {process.env.NODE_ENV === 'development' && (
+                <div className="fixed bottom-4 right-4 z-[9999] bg-slate-800 text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-lg tracking-widest uppercase opacity-50 hover:opacity-100 transition-opacity">
+                    Density: {density}
+                </div>
+            )}
 
             {/* L E F T   P A N E L  (MODÜL GRID) */}
             <div className="w-[360px] xl:w-[480px] flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/50 dark:border-white/5 flex flex-col h-full z-10 shadow-[8px_0_30px_-15px_rgba(0,0,0,0.05)] hidden md:flex overflow-hidden">

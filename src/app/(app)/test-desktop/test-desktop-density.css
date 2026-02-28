@@ -1,0 +1,137 @@
+/* DENSITY: COMPACT */
+.density-compact {
+    /* Spacing Scale Reductions */
+    --gap-large: 1.75rem;
+    /* ~28px instead of 32-40px */
+    --gap-medium: 1.125rem;
+    /* ~18px instead of 24px */
+    --card-padding: 1.5rem;
+    /* 24px instead of 32px */
+
+    /* Typography Scale Reductions (~8-10%) */
+    --text-hero: 2.25rem;
+    /* 36px instead of 40px */
+    --text-section: 1.25rem;
+    /* 20px instead of 24px */
+    --text-card-title: 0.95rem;
+    /* ~15px instead of 16-17px */
+    --text-card-val: 1.35rem;
+    /* ~22px instead of 24px */
+    --text-metric: 1.6rem;
+    /* for big numbers */
+    --line-height-tight: 1.15;
+}
+
+/* DENSITY: COMFORT */
+.density-comfort {
+    --gap-large: 3rem;
+    /* 48px */
+    --gap-medium: 2rem;
+    /* 32px */
+    --card-padding: 2.5rem;
+    /* 40px */
+
+    --text-hero: 2.75rem;
+    /* 44px */
+    --text-section: 1.65rem;
+    /* 26px */
+    --text-card-title: 1.15rem;
+    /* 18px */
+    --text-card-val: 1.65rem;
+    /* 26px */
+    --text-metric: 2rem;
+    --line-height-tight: 1.3;
+}
+
+/* -------------------------------------
+   COMPACT OVERRIDES
+-------------------------------------- */
+.density-compact .space-y-8> :not([hidden])~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(var(--gap-large) * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(var(--gap-large) * var(--tw-space-y-reverse));
+}
+
+.density-compact .p-8 {
+    padding: var(--card-padding) !important;
+}
+
+.density-compact .gap-6,
+.density-compact .gap-8 {
+    gap: var(--gap-medium) !important;
+}
+
+.density-compact .max-w-\[1400px\] {
+    max-width: 1550px !important;
+    /* more room for smaller items */
+}
+
+/* KPI Cards */
+.density-compact .min-h-\[160px\] {
+    min-height: 140px !important;
+}
+
+/* Executive Broadcast Strip */
+.density-compact .h-\[72px\] {
+    height: 64px !important;
+}
+
+/* Typography Overrides */
+.density-compact h2.text-\[32px\],
+.density-compact h2.text-\[40px\],
+.density-compact .text-4xl {
+    font-size: var(--text-hero) !important;
+    line-height: var(--line-height-tight) !important;
+}
+
+.density-compact h3.text-2xl,
+.density-compact h3.text-\[20px\] {
+    font-size: var(--text-section) !important;
+}
+
+.density-compact h3.text-\[17px\] {
+    font-size: var(--text-card-title) !important;
+}
+
+.density-compact h4.text-2xl,
+.density-compact h4.text-\[24px\] {
+    font-size: var(--text-metric) !important;
+}
+
+/* -------------------------------------
+   COMFORT OVERRIDES
+-------------------------------------- */
+.density-comfort .space-y-8> :not([hidden])~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(var(--gap-large) * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(var(--gap-large) * var(--tw-space-y-reverse));
+}
+
+.density-comfort .p-8 {
+    padding: var(--card-padding) !important;
+}
+
+.density-comfort .gap-6 {
+    gap: var(--gap-large) !important;
+}
+
+.density-comfort h2.text-\[32px\],
+.density-comfort h2.text-\[40px\],
+.density-comfort .text-4xl {
+    font-size: var(--text-hero) !important;
+    line-height: var(--line-height-tight) !important;
+}
+
+.density-comfort h3.text-2xl,
+.density-comfort h3.text-\[20px\] {
+    font-size: var(--text-section) !important;
+}
+
+.density-comfort h4.text-2xl,
+.density-comfort h4.text-\[24px\] {
+    font-size: var(--text-metric) !important;
+}
+
+.density-comfort h3.text-\[17px\] {
+    font-size: var(--text-card-title) !important;
+}

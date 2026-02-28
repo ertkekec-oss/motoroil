@@ -4,7 +4,11 @@ import ClientDashboard from "./ClientDashboard";
 
 export const dynamic = "force-dynamic";
 
-export default async function TestDesktopPage() {
+export default async function TestDesktopPage({
+    searchParams
+}: {
+    searchParams?: any;
+}) {
     const session: any = await getSession();
     const user = session?.user || session;
 
@@ -18,5 +22,11 @@ export default async function TestDesktopPage() {
         redirect("/403");
     }
 
-    return <ClientDashboard />;
+    // Resolve searchParams potentially async (Next 15 safe)
+    const resolvedParams = searchParams ? await Promise.resolve(searchParams) : {};
+    const validDensities = ["compact", "standard", "comfort"];
+    const densityParam = resolvedParams?.density;
+    const density = typeof densityParam === "string" && validDensities.includes(densityParam) ? densityParam : "standard";
+
+    return <ClientDashboard density={density} />;
 }
