@@ -781,10 +781,10 @@ export default function StaffManagementContent() {
             `}</style>
 
             {/* --- HEADER --- */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', paddingBottom: '24px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200 dark:border-slate-800">
                 <div>
-                    <h1 style={{ fontSize: '30px', fontWeight: '700', color: 'var(--text-main, #fff)', margin: 0, letterSpacing: '-0.5px' }}>Ekip & Yetki Yönetimi</h1>
-                    <div style={{ fontSize: '13px', color: 'var(--text-muted, #888)', marginTop: '6px', fontWeight: '500' }}>
+                    <h1 className="text-[30px] font-bold text-slate-900 dark:text-slate-900 dark:text-slate-900 dark:text-white leading-tight">Ekip & Yetki Yönetimi</h1>
+                    <div className="text-[14px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
                         Organizasyon yapısı ve personel operasyon kontrolü
                     </div>
                 </div>
@@ -799,32 +799,32 @@ export default function StaffManagementContent() {
             </div>
 
             {/* --- STATS OVERVIEW --- */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div className="card glass p-5 relative overflow-hidden group">
+            <div className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm flex flex-col md:flex-row mb-8 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-800 overflow-hidden">
+                <div className="flex-1 p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:scale-110 transition-transform">👥</div>
-                    <div className="text-muted text-[10px] font-black uppercase tracking-widest mb-1">Toplam Ekip</div>
-                    <div className="text-3xl font-black text-white">{staff.length} <span className="text-xs font-normal opacity-40">Kişi</span></div>
+                    <div className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase mb-2">Toplam Ekip</div>
+                    <div className="text-[28px] font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-900 dark:text-white">{staff.length} <span className="text-xs font-normal opacity-40">Kişi</span></div>
                 </div>
-                <div className="card glass p-5 relative overflow-hidden group">
+                <div className="flex-1 p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:scale-110 transition-transform">🟢</div>
-                    <div className="text-muted text-[10px] font-black uppercase tracking-widest mb-1">Müsait Personel</div>
-                    <div className="text-3xl font-black text-emerald-400">{staff.filter(s => s.status === 'Müsait' || s.status === 'Boşta' || !s.status).length}</div>
+                    <div className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase mb-2">Müsait Personel</div>
+                    <div className="text-[28px] font-semibold text-emerald-600 dark:text-emerald-400">{staff.filter(s => s.status === 'Müsait' || s.status === 'Boşta' || !s.status).length}</div>
                 </div>
-                <div className="card glass p-5 relative overflow-hidden group">
+                <div className="flex-1 p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:scale-110 transition-transform">⚒️</div>
-                    <div className="text-muted text-[10px] font-black uppercase tracking-widest mb-1">Devam Eden İŞ</div>
-                    <div className="text-3xl font-black text-blue-400">{staff.filter(s => s.status === 'Meşgul').length}</div>
+                    <div className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase mb-2">Devam Eden İŞ</div>
+                    <div className="text-[28px] font-semibold text-amber-600 dark:text-amber-400">{staff.filter(s => s.status === 'Meşgul').length}</div>
                 </div>
-                <div className="card glass p-5 relative overflow-hidden group">
+                <div className="flex-1 p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:scale-110 transition-transform">📈</div>
-                    <div className="text-muted text-[10px] font-black uppercase tracking-widest mb-1">Ekip Verimliliği</div>
-                    <div className="text-3xl font-black text-slate-400">%94</div>
+                    <div className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase mb-2">Ekip Verimliliği</div>
+                    <div className="text-[28px] font-semibold text-blue-600 dark:text-blue-400">%94</div>
                 </div>
             </div>
 
             {/* --- TOOLBAR --- */}
-            <div className="flex items-center gap-4 mb-8 bg-[#0f111a] rounded-xl border border-white/5 overflow-hidden flex-col md:flex-row items-stretch">
-                <div className="flex bg-[#0f111a] border-b border-white/5 w-full overflow-x-auto select-none" style={{ borderRadius: '12px 12px 0 0' }}>
+            <div className="flex border-b border-slate-200 dark:border-slate-800 mb-8 w-full md:items-end">
+                <div className="flex whitespace-nowrap overflow-x-auto h-[48px] items-end gap-6 px-2 w-full custom-scroll select-none">
                     {[
                         { id: 'list', label: 'Personel Listesi' },
                         { id: 'roles', label: 'Roller & İzinler' },
@@ -839,9 +839,9 @@ export default function StaffManagementContent() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={activeTab === tab.id
-                                ? "px-6 py-4 text-[14px] font-semibold text-blue-400 whitespace-nowrap transition-all border-b-2 border-blue-500 group relative"
-                                : "px-6 py-4 text-[14px] font-medium text-white/40 hover:text-white/80 whitespace-nowrap transition-all border-b-2 border-transparent"}
-                            style={activeTab === tab.id ? { boxShadow: 'inset 0 -15px 15px -15px rgba(59, 130, 246, 0.2)' } : {}}
+                                ? "h-full px-2 py-0 text-[14px] font-semibold text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 transition-all flex items-center"
+                                : "h-full px-2 py-0 text-[14px] font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-b-2 border-transparent transition-all flex items-center"}
+                            
                         >
                             {tab.label}
                         </button>
@@ -854,7 +854,7 @@ export default function StaffManagementContent() {
                         <input
                             type="text"
                             placeholder="İsim, rol veya şube ile ara..."
-                            className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-sm text-white outline-none focus:border-blue-500/30/50 transition-all"
+                            className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] py-2.5 pl-11 pr-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500 transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -866,15 +866,15 @@ export default function StaffManagementContent() {
             {activeTab === 'list' && (
                 <div className="staff-grid">
                     {filteredStaff.map(person => (
-                        <div key={person.id} style={{ background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(12px)' }} className="rounded-2xl p-6 border border-white/5 hover:border-blue-500/30 transition-all duration-300 group shadow-lg">
+                        <div key={person.id} style={{ background: 'var(--bg-card)', backdropFilter: 'none' }} className="bg-white dark:bg-[#0f172a] rounded-[20px] p-6 border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-500/50 transition-all duration-300 group shadow-sm">
                             <div className="flex items-start justify-between mb-6">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-white/10 flex items-center justify-center text-2xl font-black text-blue-500">
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-2xl font-black text-blue-500">
                                         {person.name.charAt(0)}
                                     </div>
                                     <div>
-                                        <h3 style={{ fontSize: '18px', fontWeight: 800 }} className="text-white tracking-tight group-hover:text-blue-500 transition-colors">{person.name}</h3>
-                                        <div className="flex items-center gap-2 mt-2"><span className="px-2 py-0.5 rounded-md bg-white/5 text-[10px] font-bold text-white/50 uppercase border border-white/10">{person.role}</span><span className="px-2 py-0.5 rounded-md bg-white/5 text-[10px] font-bold text-white/50 uppercase border border-white/10">{person.branch}</span></div>
+                                        <h3 style={{ fontSize: '18px', fontWeight: 800 }} className="text-slate-900 dark:text-slate-900 dark:text-white tracking-tight group-hover:text-blue-500 transition-colors">{person.name}</h3>
+                                        <div className="flex items-center gap-2 mt-2"><span className="px-2 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/50 text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase border border-slate-200 dark:border-slate-800">{person.role}</span><span className="px-2 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/50 text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase border border-slate-200 dark:border-slate-800">{person.branch}</span></div>
                                     </div>
                                 </div>
                                 <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${(person.status === 'Müsait' || person.status === 'Boşta' || !person.status) ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-500'
@@ -883,44 +883,44 @@ export default function StaffManagementContent() {
                                 </div>
                             </div>
 
-                            <div className="bg-white/[0.03] rounded-2xl p-4 mb-6">
-                                <div className="text-[10px] text-white/20 font-black uppercase mb-1 tracking-widest">GÜNCEL GÖREV</div>
-                                <div className="text-sm text-white/80 font-medium italic">"{person.currentJob || '-'}"</div>
+                            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 mb-6">
+                                <div className="text-[10px] text-slate-900 dark:text-slate-900 dark:text-white/20 font-black uppercase mb-1 tracking-widest">GÜNCEL GÖREV</div>
+                                <div className="text-sm text-slate-700 dark:text-slate-200 font-medium italic">"{person.currentJob || '-'}"</div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 mb-6">
-                                <div className="bg-black/20 rounded-xl p-3 border border-white/5">
-                                    <div className="text-[9px] text-white/30 font-bold uppercase mb-1">BU AY CİRO</div>
+                                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[12px] p-3 border border-slate-100 dark:border-slate-800">
+                                    <div className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase mb-1">BU AY CİRO</div>
                                     <div className="text-sm font-black text-emerald-400">₺ {Number(person.earnings || 0).toLocaleString()}</div>
                                 </div>
-                                <div className="bg-black/20 rounded-xl p-3 border border-white/5">
-                                    <div className="text-[9px] text-white/30 font-bold uppercase mb-1">İŞ SKORU</div>
-                                    <div className="text-sm font-black text-white">{person.performance || 100}</div>
+                                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[12px] p-3 border border-slate-100 dark:border-slate-800">
+                                    <div className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase mb-1">İŞ SKORU</div>
+                                    <div className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-900 dark:text-white">{person.performance || 100}</div>
                                 </div>
                             </div>
 
                             <div className="flex gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
                                 <button
                                     onClick={() => { setEditStaff(person); setShowEditStaffModal(true); }}
-                                    className="flex-1 py-3 rounded-xl bg-transparent text-white/60 hover:text-blue-400 hover:bg-blue-500/10 border border-transparent hover:border-blue-500/20 text-[10px] font-black hover:bg-blue-500/20 transition-all"
+                                    className="flex-1 py-3 rounded-[12px] bg-transparent text-slate-600 dark:text-slate-300 hover:text-blue-400 hover:bg-blue-500/10 border border-transparent hover:border-blue-500/20 text-[10px] font-black hover:bg-blue-500/20 transition-all"
                                 >
                                     ✏️ DÜZENLE
                                 </button>
                                 <button
                                     onClick={() => { setSelectedStaff(person); setShowTaskModal(true); }}
-                                    className="flex-1 py-3 rounded-xl bg-transparent text-white/60 hover:text-white hover:bg-white/5 text-[10px] border-transparent font-black hover:bg-white/10 transition-all"
+                                    className="flex-1 py-3 rounded-[12px] bg-transparent text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-slate-800/50 text-[10px] border-transparent font-black hover:bg-white/10 transition-all"
                                 >
                                     GÖREV ATA
                                 </button>
                                 <button
                                     onClick={() => { setSelectedStaff(person); setShowPermissionModal(true); }}
-                                    className="flex-1 py-3 rounded-xl bg-transparent text-white/60 hover:text-white hover:bg-white/5 text-[10px] border-transparent font-black hover:bg-white/10 transition-all"
+                                    className="flex-1 py-3 rounded-[12px] bg-transparent text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-slate-800/50 text-[10px] border-transparent font-black hover:bg-white/10 transition-all"
                                 >
                                     YETKİLER
                                 </button>
                                 <button
                                     onClick={() => handleDeleteStaff(person)}
-                                    className="flex-none px-4 py-3 rounded-xl bg-transparent text-white/60 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 text-[10px] font-black hover:bg-red-500/20 transition-all"
+                                    className="flex-none px-4 py-3 rounded-[12px] bg-transparent text-slate-600 dark:text-slate-300 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 text-[10px] font-black hover:bg-red-500/20 transition-all"
                                 >
                                     🗑️ SİL
                                 </button>
@@ -930,8 +930,8 @@ export default function StaffManagementContent() {
                                         <button
                                             onClick={() => handleProcessAttendance(person.id.toString(), activeAtt ? 'CHECK_OUT' : 'CHECK_IN')}
                                             disabled={isProcessing}
-                                            className={`flex-1 py-3 rounded-xl border text-[10px] font-black transition-all ${activeAtt
-                                                ? 'bg-blue-500/10 border-blue-500/30 text-blue-500 hover:bg-blue-500/20'
+                                            className={`flex-1 py-3 rounded-[12px] border text-[10px] font-black transition-all ${activeAtt
+                                                ? 'bg-blue-500/10 border-blue-500/50 text-blue-500 hover:bg-blue-500/20'
                                                 : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
                                                 }`}
                                         >
@@ -947,10 +947,10 @@ export default function StaffManagementContent() {
 
             {/* --- ROLES TAB --- */}
             {activeTab === 'roles' && (
-                <div className="card glass p-0 overflow-hidden">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm overflow-hidden">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-white/5 text-[10px] text-white/40 font-black uppercase tracking-widest">
+                            <tr className="bg-slate-50 dark:bg-slate-800/50 text-[10px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest">
                                 <th className="p-6">ROL TANIMI</th>
                                 <th className="p-6">ERİŞİM KAPSAMI</th>
                                 <th className="p-6">YETKİ SAYISI</th>
@@ -959,16 +959,16 @@ export default function StaffManagementContent() {
                         </thead>
                         <tbody className="divide-y divide-white/5">
                             {Object.keys(roleTemplates).map((roleName, idx) => (
-                                <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
+                                <tr key={idx} className="hover:bg-slate-50 dark:bg-slate-800/50 transition-colors">
                                     <td className="p-6">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-lg">
+                                            <div className="w-10 h-10 rounded-[12px] bg-blue-500/10 flex items-center justify-center text-lg">
                                                 {roleName === 'Yönetici' ? '👑' : roleName === 'Saha Satış' ? '📍' : roleName === 'Şube Müdürü' ? '🏢' : '👤'}
                                             </div>
                                             <span className="font-black text-lg">{roleName}</span>
                                         </div>
                                     </td>
-                                    <td className="p-6 text-sm text-white/60">
+                                    <td className="p-6 text-sm text-slate-600 dark:text-slate-300">
                                         {roleName === 'Yönetici' ? 'Tüm modüllere sınırsız erişim' :
                                             roleName === 'Saha Satış' ? 'Müşteri, Stok ve Mobil Saha Satış modülleri' :
                                                 roleName === 'Şube Müdürü' ? 'Şube operasyonları, Satışlar ve Personel takibi' :
@@ -998,34 +998,34 @@ export default function StaffManagementContent() {
                 return (
                     <div className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="card glass p-8 border-t-4 border-emerald-500">
-                                <h4 className="text-muted text-xs font-black uppercase mb-4">GENEL CİRO HEDEFİ (%)</h4>
-                                <div className="text-5xl font-black text-white mb-4">%{overallProgress}</div>
-                                <div className="w-full h-2 bg-white/5 rounded-full">
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm p-6 border-t-4 border-emerald-500">
+                                <h4 className="text-muted text-[11px] font-semibold tracking-wider uppercase mb-4">GENEL CİRO HEDEFİ (%)</h4>
+                                <div className="text-5xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-4">%{overallProgress}</div>
+                                <div className="w-full h-2 bg-slate-50 dark:bg-slate-800/50 rounded-full">
                                     <div className="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" style={{ width: `${Math.min(overallProgress, 100)}%` }}></div>
                                 </div>
                             </div>
-                            <div className="card glass p-8 border-t-4 border-blue-500/30">
-                                <h4 className="text-muted text-xs font-black uppercase mb-4">TOPLAM HEDEF CİRO</h4>
-                                <div className="text-5xl font-black text-white mb-4">₺ {(totalTarget / 1000).toFixed(1)}K</div>
-                                <p className="text-xs text-white/30">Belirlenen toplam satış hedefi.</p>
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm p-6 border-t-4 border-blue-500/50">
+                                <h4 className="text-muted text-[11px] font-semibold tracking-wider uppercase mb-4">TOPLAM HEDEF CİRO</h4>
+                                <div className="text-5xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-4">₺ {(totalTarget / 1000).toFixed(1)}K</div>
+                                <p className="text-xs text-slate-400 dark:text-slate-500">Belirlenen toplam satış hedefi.</p>
                             </div>
                             <button
                                 onClick={() => setShowTargetModal(true)}
-                                className="card glass p-8 border-2 border-dashed border-white/10 hover:border-blue-500/30/50 hover:bg-blue-600/5 transition-all text-center flex flex-col items-center justify-center gap-3"
+                                className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm p-6 border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-blue-500 hover:bg-blue-600/5 transition-all text-center flex flex-col items-center justify-center gap-3"
                             >
                                 <span className="text-3xl">🎯</span>
                                 <span className="font-black text-sm text-blue-500">YENİ HEDEF TANIMLA</span>
                             </button>
                         </div>
 
-                        <div className="card glass p-0 overflow-hidden">
-                            <div className="p-6 border-b border-white/5">
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm overflow-hidden">
+                            <div className="p-6 border-b border-slate-100 dark:border-slate-800">
                                 <h3 className="text-xl font-black">Personel Bazlı Hedef Takibi</h3>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left">
-                                    <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
+                                    <thead className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                         <tr>
                                             <th className="p-6">PERSONEL</th>
                                             <th className="p-6">HEDEF TÜRÜ</th>
@@ -1041,14 +1041,14 @@ export default function StaffManagementContent() {
                                             targets.map((t, idx) => {
                                                 const progress = t.targetValue > 0 ? Math.round((t.currentValue / t.targetValue) * 100) : 0;
                                                 return (
-                                                    <tr key={t.id} className="hover:bg-white/[0.02]">
-                                                        <td className="p-6 font-bold text-white">{t.staff?.name}</td>
+                                                    <tr key={t.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
+                                                        <td className="p-6 font-bold text-slate-900 dark:text-slate-900 dark:text-white">{t.staff?.name}</td>
                                                         <td className="p-6">
-                                                            <span className="text-xs font-bold bg-white/5 px-2 py-1 rounded">
+                                                            <span className="text-xs font-bold bg-slate-50 dark:bg-slate-800/50 px-2 py-1 rounded">
                                                                 {t.type === 'TURNOVER' ? '💰 CİRO' : '📍 ZİYARET'}
                                                             </span>
                                                         </td>
-                                                        <td className="p-6 text-white/40">
+                                                        <td className="p-6 text-slate-500 dark:text-slate-400">
                                                             {t.type === 'TURNOVER' ? `₺ ${Number(t.targetValue).toLocaleString()}` : `${t.targetValue} Adet`}
                                                         </td>
                                                         <td className="p-6 font-black text-emerald-400">
@@ -1057,28 +1057,28 @@ export default function StaffManagementContent() {
                                                         <td className="p-6">
                                                             <div className="flex flex-col gap-1">
                                                                 <span className="text-sm font-black text-blue-400">₺ {Number(t.estimatedBonus || 0).toLocaleString()}</span>
-                                                                {t.commissionRate > 0 && <span className="text-[9px] text-white/30">%{t.commissionRate} Komisyon</span>}
+                                                                {t.commissionRate > 0 && <span className="text-[9px] text-slate-400 dark:text-slate-500">%{t.commissionRate} Komisyon</span>}
                                                             </div>
                                                         </td>
                                                         <td className="p-6">
                                                             <div className="flex items-center gap-3">
-                                                                <div className="flex-1 h-1.5 w-24 bg-white/5 rounded-full overflow-hidden">
+                                                                <div className="flex-1 h-1.5 w-24 bg-slate-50 dark:bg-slate-800/50 rounded-full overflow-hidden">
                                                                     <div
                                                                         className={`h-full rounded-full ${progress >= 100 ? 'bg-emerald-500' : 'bg-blue-600'}`}
                                                                         style={{ width: `${Math.min(progress, 100)}%` }}
                                                                     ></div>
                                                                 </div>
-                                                                <span className="text-xs font-black text-white">%{progress}</span>
+                                                                <span className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white">%{progress}</span>
                                                             </div>
                                                         </td>
-                                                        <td className="p-6 text-xs text-white/40 font-mono">
+                                                        <td className="p-6 text-xs text-slate-500 dark:text-slate-400 font-mono">
                                                             {new Date(t.startDate).toLocaleDateString('tr-TR')} - {new Date(t.endDate).toLocaleDateString('tr-TR')}
                                                         </td>
                                                     </tr>
                                                 );
                                             })
                                         ) : (
-                                            <tr><td colSpan={6} className="p-8 text-center text-white/40">Henüz bir hedef tanımlanmamış.</td></tr>
+                                            <tr><td colSpan={6} className="p-8 text-center text-slate-500 dark:text-slate-400">Henüz bir hedef tanımlanmamış.</td></tr>
                                         )}
                                     </tbody>
                                 </table>
@@ -1090,11 +1090,11 @@ export default function StaffManagementContent() {
 
             {/* --- SHIFT MANAGEMENT TAB --- */}
             {activeTab === 'shifts' && (
-                <div className="card glass p-0 overflow-hidden">
-                    <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm overflow-hidden">
+                    <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                         <div>
                             <h3 className="text-xl font-black mb-1">📅 Haftalık Vardiya Planı</h3>
-                            <p className="text-xs text-white/40 font-bold uppercase tracking-widest">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">
                                 {new Date(currentWeekStart).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })} - {new Date(new Date(currentWeekStart).setDate(new Date(currentWeekStart).getDate() + 6)).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
                             </p>
                         </div>
@@ -1105,7 +1105,7 @@ export default function StaffManagementContent() {
                                     d.setDate(d.getDate() - 7);
                                     setCurrentWeekStart(d);
                                 }}
-                                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition-all"
+                                className="px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-white/10 text-slate-900 dark:text-slate-900 dark:text-white text-xs font-bold transition-all"
                             >
                                 ◀ Önceki Hafta
                             </button>
@@ -1115,40 +1115,40 @@ export default function StaffManagementContent() {
                                     d.setDate(d.getDate() + 7);
                                     setCurrentWeekStart(d);
                                 }}
-                                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition-all"
+                                className="px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-white/10 text-slate-900 dark:text-slate-900 dark:text-white text-xs font-bold transition-all"
                             >
                                 Sonraki Hafta ▶
                             </button>
                             <button
                                 onClick={() => setShowShiftModal(true)}
-                                className="px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold transition-all ml-2 shadow-lg shadow-blue/20">+ YENİ PLAN</button>
+                                className="px-4 py-2 rounded-lg bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white text-xs font-bold transition-all ml-2 shadow-lg shadow-sm">+ YENİ PLAN</button>
                         </div>
                     </div>
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
+                            <thead className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                 <tr>
-                                    <th className="p-6 border-r border-white/5 w-[200px]">PERSONEL</th>
-                                    <th className="p-6 border-r border-white/5 text-center w-[14%]">Pazartesi</th>
-                                    <th className="p-6 border-r border-white/5 text-center w-[14%]">Salı</th>
-                                    <th className="p-6 border-r border-white/5 text-center w-[14%]">Çarşamba</th>
-                                    <th className="p-6 border-r border-white/5 text-center w-[14%]">Perşembe</th>
-                                    <th className="p-6 border-r border-white/5 text-center w-[14%]">Cuma</th>
+                                    <th className="p-6 border-r border-slate-100 dark:border-slate-800 w-[200px]">PERSONEL</th>
+                                    <th className="p-6 border-r border-slate-100 dark:border-slate-800 text-center w-[14%]">Pazartesi</th>
+                                    <th className="p-6 border-r border-slate-100 dark:border-slate-800 text-center w-[14%]">Salı</th>
+                                    <th className="p-6 border-r border-slate-100 dark:border-slate-800 text-center w-[14%]">Çarşamba</th>
+                                    <th className="p-6 border-r border-slate-100 dark:border-slate-800 text-center w-[14%]">Perşembe</th>
+                                    <th className="p-6 border-r border-slate-100 dark:border-slate-800 text-center w-[14%]">Cuma</th>
                                     <th className="p-6 text-center w-[14%]">Cumartesi</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
                                 {staff.map((person) => (
-                                    <tr key={person.id} className="hover:bg-white/[0.02]">
-                                        <td className="p-6 border-r border-white/5 font-bold">
+                                    <tr key={person.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
+                                        <td className="p-6 border-r border-slate-100 dark:border-slate-800 font-bold">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-xs font-black text-white/60">
+                                                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-[11px] font-semibold tracking-wider text-slate-600 dark:text-slate-300">
                                                     {person.name.charAt(0)}
                                                 </div>
                                                 <div>
-                                                    <div className="text-sm text-white">{person.name}</div>
-                                                    <div className="text-[10px] text-white/40 uppercase">{person.role}</div>
+                                                    <div className="text-sm text-slate-900 dark:text-slate-900 dark:text-white">{person.name}</div>
+                                                    <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">{person.role}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -1158,30 +1158,30 @@ export default function StaffManagementContent() {
                                             const shift = shifts.find(s => s.staffId === person.id && new Date(s.start).getDate() === d.getDate());
 
                                             return (
-                                                <td key={offset} className="p-4 border-r border-white/5 text-center align-middle">
+                                                <td key={offset} className="p-4 border-r border-slate-100 dark:border-slate-800 text-center align-middle">
                                                     {shift ? (
                                                         <div className="relative group/shift">
                                                             {shift.type === 'İzinli' ? (
-                                                                <div className="inline-block px-3 py-1 rounded bg-white/5 border border-white/5 text-[10px] font-bold text-white/30">
+                                                                <div className="inline-block px-3 py-1 rounded bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-[11px] font-semibold tracking-wider text-slate-400 dark:text-slate-500">
                                                                     İZİNLİ
                                                                 </div>
                                                             ) : (
                                                                 <div className="flex flex-col gap-1 items-center">
-                                                                    <span className="text-xs font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                                                    <span className="text-[11px] font-semibold tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                                                                         {new Date(shift.start).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} - {new Date(shift.end).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                                                                     </span>
                                                                 </div>
                                                             )}
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); handleDeleteShift(shift.id); }}
-                                                                className="absolute -top-3 -right-3 w-5 h-5 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center opacity-0 group-hover/shift:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
+                                                                className="absolute -top-3 -right-3 w-5 h-5 bg-red-500 rounded-full text-slate-900 dark:text-slate-900 dark:text-white text-[10px] flex items-center justify-center opacity-0 group-hover/shift:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
                                                                 title="Vardiyayı Sil"
                                                             >
                                                                 ✕
                                                             </button>
                                                         </div>
                                                     ) : (
-                                                        <div className="text-[10px] text-white/10">-</div>
+                                                        <div className="text-[10px] text-slate-900 dark:text-slate-900 dark:text-white/10">-</div>
                                                     )}
                                                 </td>
                                             )
@@ -1198,33 +1198,33 @@ export default function StaffManagementContent() {
             {activeTab === 'leaves' && (
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="card glass p-8">
-                            <h4 className="text-muted text-xs font-black uppercase mb-4">BUGÜN İZİNLİLER</h4>
-                            <div className="text-4xl font-black text-white mb-2">2 <span className="text-lg text-white/40 font-normal">Kişi</span></div>
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm p-6">
+                            <h4 className="text-muted text-[11px] font-semibold tracking-wider uppercase mb-4">BUGÜN İZİNLİLER</h4>
+                            <div className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-2">2 <span className="text-lg text-slate-500 dark:text-slate-400 font-normal">Kişi</span></div>
                             <div className="flex -space-x-2">
                                 <div className="w-8 h-8 rounded-full bg-red-500 border-2 border-[#1a1c2e]"></div>
                                 <div className="w-8 h-8 rounded-full bg-blue-500 border-2 border-[#1a1c2e]"></div>
                             </div>
                         </div>
-                        <div className="card glass p-8">
-                            <h4 className="text-muted text-xs font-black uppercase mb-4">BEKLEYEN ONAYLAR</h4>
-                            <div className="text-4xl font-black text-blue-400 mb-2">5 <span className="text-lg text-white/40 font-normal">Talep</span></div>
-                            <p className="text-xs text-white/40">Son talep 2 saat önce geldi.</p>
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm p-6">
+                            <h4 className="text-muted text-[11px] font-semibold tracking-wider uppercase mb-4">BEKLEYEN ONAYLAR</h4>
+                            <div className="text-4xl font-black text-blue-400 mb-2">5 <span className="text-lg text-slate-500 dark:text-slate-400 font-normal">Talep</span></div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Son talep 2 saat önce geldi.</p>
                         </div>
                         <button
                             onClick={() => setShowLeaveModal(true)}
-                            className="card glass p-8 border-2 border-dashed border-white/10 hover:border-blue-500/30/50 hover:bg-blue-600/5 transition-all text-center flex flex-col items-center justify-center gap-3">
+                            className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm p-6 border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-blue-500 hover:bg-blue-600/5 transition-all text-center flex flex-col items-center justify-center gap-3">
                             <span className="text-3xl">📝</span>
                             <span className="font-black text-sm text-blue-500">YENİ İZİN TALEBİ OLUŞTUR</span>
                         </button>
                     </div>
 
-                    <div className="card glass p-0 overflow-hidden">
-                        <div className="p-6 border-b border-white/5">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm overflow-hidden">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800">
                             <h3 className="text-xl font-black">İzin Hareketleri</h3>
                         </div>
                         <table className="w-full text-left">
-                            <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
+                            <thead className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                 <tr>
                                     <th className="p-6">PERSONEL</th>
                                     <th className="p-6">İZİN TÜRÜ</th>
@@ -1237,13 +1237,13 @@ export default function StaffManagementContent() {
                             <tbody className="divide-y divide-white/5">
                                 {leaves.length > 0 ? (
                                     leaves.map((leave, idx) => (
-                                        <tr key={leave.id} className="hover:bg-white/[0.02]">
+                                        <tr key={leave.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
                                             <td className="p-6 font-bold">{leave.staff?.name}</td>
-                                            <td className="p-6 text-sm text-white/70">{leave.type}</td>
-                                            <td className="p-6 font-mono text-sm text-white/60">
+                                            <td className="p-6 text-sm text-slate-600 dark:text-slate-300">{leave.type}</td>
+                                            <td className="p-6 font-mono text-sm text-slate-600 dark:text-slate-300">
                                                 {new Date(leave.startDate).toLocaleDateString('tr-TR')} - {new Date(leave.endDate).toLocaleDateString('tr-TR')}
                                             </td>
-                                            <td className="p-6 font-bold text-white">{leave.days} Gün</td>
+                                            <td className="p-6 font-bold text-slate-900 dark:text-slate-900 dark:text-white">{leave.days} Gün</td>
                                             <td className="p-6">
                                                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${leave.status === 'Onaylandı' ? 'bg-emerald-500/10 text-emerald-400' :
                                                     leave.status === 'Reddedildi' ? 'bg-red-500/10 text-red-500' :
@@ -1271,7 +1271,7 @@ export default function StaffManagementContent() {
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <div className="text-[10px] text-white/40 font-bold uppercase">
+                                                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">
                                                         {leave.approvedBy ? `İŞLEM: ${leave.approvedBy}` : (leave.status === 'Beklemede' ? 'BEKLİYOR' : '-')}
                                                     </div>
                                                 )}
@@ -1279,7 +1279,7 @@ export default function StaffManagementContent() {
                                         </tr>
                                     ))
                                 ) : (
-                                    <tr><td colSpan={6} className="p-8 text-center text-white/40">Henüz izin talebi bulunmuyor.</td></tr>
+                                    <tr><td colSpan={6} className="p-8 text-center text-slate-500 dark:text-slate-400">Henüz izin talebi bulunmuyor.</td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -1289,25 +1289,25 @@ export default function StaffManagementContent() {
 
             {/* --- PAYROLL TAB --- */}
             {activeTab === 'payroll' && (
-                <div className="card glass p-0 overflow-hidden">
-                    <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                         <div>
                             <h3 className="text-xl font-black">💰 Maaş & Hakediş Listesi</h3>
-                            <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">DÖNEM: {new Date().toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })}</div>
+                            <div className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">DÖNEM: {new Date().toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })}</div>
                         </div>
                         <div className="flex gap-3">
                             <button
                                 onClick={handleGeneratePayrolls}
                                 disabled={isProcessing}
-                                className="px-5 py-2 rounded-lg bg-blue-500 text-white text-xs font-black hover:bg-blue-400 transition-all shadow-lg shadow-blue-500/20 active:scale-95 disabled:opacity-50"
+                                className="px-5 py-2 rounded-lg bg-blue-500 text-slate-900 dark:text-slate-900 dark:text-white text-[11px] font-semibold tracking-wider hover:bg-blue-400 transition-all shadow-lg shadow-blue-500/20 active:scale-95 disabled:opacity-50"
                             >
                                 {isProcessing ? 'İŞLENİYOR...' : 'BORDROLARI OLUŞTUR ⚙️'}
                             </button>
-                            <button onClick={handlePayAll} className="px-5 py-2 rounded-lg bg-emerald-500 text-black text-xs font-black hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20 active:scale-95">TÜMÜNÜ ÖDE</button>
+                            <button onClick={handlePayAll} className="px-5 py-2 rounded-lg bg-emerald-500 text-black text-[11px] font-semibold tracking-wider hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20 active:scale-95">TÜMÜNÜ ÖDE</button>
                         </div>
                     </div>
                     <table className="w-full text-left">
-                        <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
+                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                             <tr>
                                 <th className="p-6">PERSONEL</th>
                                 <th className="p-6 text-right">MAAŞ</th>
@@ -1321,9 +1321,9 @@ export default function StaffManagementContent() {
                             {staff.map((person) => {
                                 const payroll = payrolls.find(p => p.staffId === person.id);
                                 return (
-                                    <tr key={person.id} className="hover:bg-white/[0.02]">
-                                        <td className="p-6 font-bold text-white">{person.name}</td>
-                                        <td className="p-6 text-right text-white/60">
+                                    <tr key={person.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
+                                        <td className="p-6 font-bold text-slate-900 dark:text-slate-900 dark:text-white">{person.name}</td>
+                                        <td className="p-6 text-right text-slate-600 dark:text-slate-300">
                                             {payroll ? `₺ ${Number(payroll.salary).toLocaleString()}` : '-'}
                                         </td>
                                         <td className="p-6 text-right text-emerald-400 font-bold">
@@ -1332,23 +1332,23 @@ export default function StaffManagementContent() {
                                         <td className="p-6 text-right text-red-400 font-bold">
                                             {payroll && Number(payroll.deductions) > 0 ? `- ₺ ${Number(payroll.deductions).toLocaleString()}` : '-'}
                                         </td>
-                                        <td className="p-6 text-right font-black text-xl text-white">
+                                        <td className="p-6 text-right font-black text-xl text-slate-900 dark:text-slate-900 dark:text-white">
                                             {payroll ? `₺ ${Number(payroll.netPay).toLocaleString()}` : '-'}
                                         </td>
                                         <td className="p-6 text-center">
                                             {payroll ? (
                                                 payroll.status === 'Bekliyor' ? (
                                                     <div className="flex flex-col gap-2 items-center">
-                                                        <span className="text-[10px] text-white/40 font-bold uppercase">BEKLİYOR</span>
+                                                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">BEKLİYOR</span>
                                                         <button
                                                             onClick={() => handleMarkAsPaid(payroll)}
-                                                            className="px-4 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-lg shadow-emerald-500/10 text-[10px]"
+                                                            className="px-4 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold hover:bg-emerald-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all shadow-lg shadow-emerald-500/10 text-[10px]"
                                                         >
                                                             ÖDE 💸
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${payroll.status === 'Ödendi' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/5 text-white/40'
+                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${payroll.status === 'Ödendi' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400'
                                                         }`}>
                                                         {payroll.status} {payroll.paidAt && `(${new Date(payroll.paidAt).toLocaleDateString()})`}
                                                     </span>
@@ -1365,9 +1365,9 @@ export default function StaffManagementContent() {
                                 )
                             })}
                         </tbody>
-                        <tfoot className="bg-white/5 border-t border-white/10">
+                        <tfoot className="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800">
                             <tr>
-                                <td colSpan={4} className="p-6 text-right text-xs font-black text-white/40 uppercase tracking-widest">TOPLAM ÖDENECEK</td>
+                                <td colSpan={4} className="p-6 text-right text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest">TOPLAM ÖDENECEK</td>
                                 <td className="p-6 text-right text-2xl font-black text-emerald-500">
                                     ₺ {payrolls.reduce((sum, p) => sum + Number(p.netPay || 0), 0).toLocaleString()}
                                 </td>
@@ -1383,21 +1383,21 @@ export default function StaffManagementContent() {
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="card glass p-6 border-l-4 border-emerald-500">
-                            <div className="text-[10px] font-black text-white/40 uppercase mb-2">ŞU AN ÇALIŞAN</div>
-                            <div className="text-3xl font-black text-white">{attendance.filter(a => !a.checkOut).length}</div>
+                            <div className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase mb-2">ŞU AN ÇALIŞAN</div>
+                            <div className="text-[28px] font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-900 dark:text-white">{attendance.filter(a => !a.checkOut).length}</div>
                         </div>
                         <div className="card glass p-6 border-l-4 border-blue-500">
-                            <div className="text-[10px] font-black text-white/40 uppercase mb-2">GEÇ KALANLAR</div>
-                            <div className="text-3xl font-black text-white">0</div>
+                            <div className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase mb-2">GEÇ KALANLAR</div>
+                            <div className="text-[28px] font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-900 dark:text-white">0</div>
                         </div>
                     </div>
 
-                    <div className="card glass p-0 overflow-hidden">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm overflow-hidden">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                             <h3 className="text-xl font-black">📍 Günlük Giriş-Çıkış Takibi</h3>
                         </div>
                         <table className="w-full text-left">
-                            <thead className="bg-white/5 text-[10px] text-white/40 font-black uppercase">
+                            <thead className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                 <tr>
                                     <th className="p-6">PERSONEL</th>
                                     <th className="p-6">TARİH</th>
@@ -1410,17 +1410,17 @@ export default function StaffManagementContent() {
                             <tbody className="divide-y divide-white/5">
                                 {attendance.length > 0 ? (
                                     attendance.map(a => (
-                                        <tr key={a.id} className="hover:bg-white/[0.02]">
+                                        <tr key={a.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
                                             <td className="p-6 font-bold">{a.staff?.name}</td>
-                                            <td className="p-6 text-sm text-white/60">{new Date(a.date).toLocaleDateString('tr-TR')}</td>
+                                            <td className="p-6 text-sm text-slate-600 dark:text-slate-300">{new Date(a.date).toLocaleDateString('tr-TR')}</td>
                                             <td className="p-6 font-mono text-emerald-400 font-bold">{new Date(a.checkIn).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</td>
                                             <td className="p-6 font-mono text-blue-400 font-bold">{a.checkOut ? new Date(a.checkOut).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
                                             <td className="p-6 font-black">{a.workingHours || 0} Sa</td>
-                                            <td className="p-6 text-right text-[10px] text-white/40">{a.locationIn || '—'}</td>
+                                            <td className="p-6 text-right text-[10px] text-slate-500 dark:text-slate-400">{a.locationIn || '—'}</td>
                                         </tr>
                                     ))
                                 ) : (
-                                    <tr><td colSpan={6} className="p-8 text-center text-white/40">Kayıt bulunamadı.</td></tr>
+                                    <tr><td colSpan={6} className="p-8 text-center text-slate-500 dark:text-slate-400">Kayıt bulunamadı.</td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -1436,49 +1436,49 @@ export default function StaffManagementContent() {
                             <div className="text-lg font-black">Aylık Puantaj Çizelgesi</div>
                             <input
                                 type="month"
-                                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-blue-500/30"
+                                className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 py-2 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500/50"
                                 value={selectedPeriod}
                                 onChange={(e) => setSelectedPeriod(e.target.value)}
                             />
                         </div>
                         <div className="flex gap-4">
-                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div> <span className="text-[10px] font-bold text-white/40">ÇALIŞILAN</span></div>
-                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div> <span className="text-[10px] font-bold text-white/40">İZİNLİ</span></div>
-                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-500 rounded-full"></div> <span className="text-[10px] font-bold text-white/40">GELMEDİ</span></div>
-                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-white/10 rounded-full"></div> <span className="text-[10px] font-bold text-white/40">HAFTA TATİLİ</span></div>
+                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div> <span className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400">ÇALIŞILAN</span></div>
+                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div> <span className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400">İZİNLİ</span></div>
+                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-500 rounded-full"></div> <span className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400">GELMEDİ</span></div>
+                            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-white/10 rounded-full"></div> <span className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400">HAFTA TATİLİ</span></div>
                         </div>
                     </div>
 
                     <div className="card glass p-0 overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-white/5 text-[9px] text-white/40 font-black uppercase border-b border-white/5">
-                                    <th className="p-4 sticky left-0 bg-[#0f111a] z-10 w-[150px]">PERSONEL</th>
+                                <tr className="bg-slate-50 dark:bg-slate-800/50 text-[9px] text-slate-500 dark:text-slate-400 font-black uppercase border-b border-slate-100 dark:border-slate-800">
+                                    <th className="p-4 sticky left-0 bg-white dark:bg-[#0f172a] z-10 w-[150px]">PERSONEL</th>
                                     {[...Array(31)].map((_, i) => (
-                                        <th key={i} className="p-2 text-center w-8 border-l border-white/5">{i + 1}</th>
+                                        <th key={i} className="p-2 text-center w-8 border-l border-slate-100 dark:border-slate-800">{i + 1}</th>
                                     ))}
-                                    <th className="p-4 text-center border-l-2 border-blue-500/30/20">TOPLAM</th>
+                                    <th className="p-4 text-center border-l-2 border-slate-200 dark:border-slate-800">TOPLAM</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
                                 {puantaj.map((row: any) => (
-                                    <tr key={row.staffId} className="hover:bg-white/[0.02]">
-                                        <td className="p-4 font-bold text-xs sticky left-0 bg-[#0f111a] border-r border-white/5 z-10">
+                                    <tr key={row.staffId} className="hover:bg-slate-50 dark:bg-slate-800/50">
+                                        <td className="p-4 font-bold text-xs sticky left-0 bg-white dark:bg-[#0f172a] border-r border-slate-100 dark:border-slate-800 z-10">
                                             {row.name}
-                                            <div className="text-[8px] text-white/40">{row.role}</div>
+                                            <div className="text-[8px] text-slate-500 dark:text-slate-400">{row.role}</div>
                                         </td>
                                         {row.dailyStats.map((stat: any, idx: number) => (
-                                            <td key={idx} className="p-2 border-l border-white/5 text-center">
-                                                <div className={`w-5 h-5 mx-auto rounded-md flex items-center justify-center text-[8px] font-black ${stat.status === 'WORKED' ? 'bg-emerald-500 text-white' :
-                                                    stat.status === 'LEAVE' ? 'bg-blue-500 text-white' :
-                                                        stat.status === 'OFF_DAY' ? 'bg-white/10 text-white/40' :
+                                            <td key={idx} className="p-2 border-l border-slate-100 dark:border-slate-800 text-center">
+                                                <div className={`w-5 h-5 mx-auto rounded-md flex items-center justify-center text-[8px] font-black ${stat.status === 'WORKED' ? 'bg-emerald-500 text-slate-900 dark:text-slate-900 dark:text-white' :
+                                                    stat.status === 'LEAVE' ? 'bg-blue-500 text-slate-900 dark:text-slate-900 dark:text-white' :
+                                                        stat.status === 'OFF_DAY' ? 'bg-white/10 text-slate-500 dark:text-slate-400' :
                                                             'bg-red-500/20 text-red-500'
                                                     }`}>
                                                     {stat.status === 'WORKED' ? 'Ç' : stat.status === 'LEAVE' ? 'İ' : stat.status === 'OFF_DAY' ? 'H' : 'X'}
                                                 </div>
                                             </td>
                                         ))}
-                                        <td className="p-4 text-center border-l-2 border-blue-500/30/20">
+                                        <td className="p-4 text-center border-l-2 border-slate-200 dark:border-slate-800">
                                             <div className="text-[10px] font-black whitespace-nowrap">{row.summary.workedDays}G / {row.summary.workedHours}S</div>
                                         </td>
                                     </tr>
@@ -1494,26 +1494,26 @@ export default function StaffManagementContent() {
             {/* 1. TASK ASSIGN MODAL */}
             {showTaskModal && selectedStaff && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl shadow-blue/20">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                            <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                ⚡ <span className="text-white/80">Görev Ata</span>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[24px] w-full max-w-md overflow-hidden shadow-2xl shadow-sm">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                            <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
+                                ⚡ <span className="text-slate-700 dark:text-slate-200">Görev Ata</span>
                             </h2>
-                            <button onClick={() => setShowTaskModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                            <button onClick={() => setShowTaskModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all">✕</button>
                         </div>
                         <div className="p-6 space-y-4">
-                            <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/5">
-                                <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-xl font-black text-blue-500 border border-blue-500/30/20">
+                            <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-[12px] border border-slate-100 dark:border-slate-800">
+                                <div className="w-12 h-12 rounded-[12px] bg-blue-500/20 flex items-center justify-center text-xl font-black text-blue-500 border border-slate-200 dark:border-slate-800">
                                     {selectedStaff.name.charAt(0)}
                                 </div>
                                 <div>
-                                    <div className="text-lg font-bold text-white">{selectedStaff.name}</div>
-                                    <div className="text-xs text-white/40 uppercase font-bold tracking-wider">{selectedStaff.role}</div>
+                                    <div className="text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white">{selectedStaff.name}</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">{selectedStaff.role}</div>
                                 </div>
                             </div>
 
                             <textarea
-                                className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-blue-500/30/50 focus:bg-white/10 transition-all outline-none resize-none"
+                                className="w-full h-32 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] p-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 focus:bg-white/10 transition-all outline-none resize-none"
                                 placeholder="Görevi detaylı açıklayınız..."
                                 value={taskContent}
                                 onChange={(e) => setTaskContent(e.target.value)}
@@ -1524,9 +1524,9 @@ export default function StaffManagementContent() {
                                     <button
                                         key={p}
                                         onClick={() => setTaskPriority(p)}
-                                        className={`flex-1 py-2 rounded-lg text-xs font-black uppercase transition-all border ${taskPriority === p
-                                            ? (p === 'yüksek' ? 'bg-red-500 text-white border-red-500' : p === 'normal' ? 'bg-blue-600 text-white border-blue-500/30' : 'bg-emerald-500 text-white border-emerald-500')
-                                            : 'bg-white/5 text-white/40 border-transparent hover:bg-white/10'
+                                        className={`flex-1 py-2 rounded-lg text-[11px] font-semibold tracking-wider uppercase transition-all border ${taskPriority === p
+                                            ? (p === 'yüksek' ? 'bg-red-500 text-slate-900 dark:text-slate-900 dark:text-white border-red-500' : p === 'normal' ? 'bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white border-blue-500/50' : 'bg-emerald-500 text-slate-900 dark:text-slate-900 dark:text-white border-emerald-500')
+                                            : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-transparent hover:bg-white/10'
                                             }`}
                                     >
                                         {p} Öncelik
@@ -1537,7 +1537,7 @@ export default function StaffManagementContent() {
                             <button
                                 onClick={handleAssignTask}
                                 disabled={isProcessing || !taskContent}
-                                className="w-full h-12 bg-blue-600 hover:bg-blue-600/80 text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-blue/20 hover:shadow-blue/40 transition-all disabled:opacity-50"
+                                className="w-full h-[44px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-[14px] font-semibold text-[14px] transition-all shadow-lg shadow-sm hover:shadow-md transition-all disabled:opacity-50"
                             >
                                 {isProcessing ? 'ATANIYOR...' : 'GÖREVİ İLET'}
                             </button>
@@ -1549,21 +1549,21 @@ export default function StaffManagementContent() {
             {/* 2. PERMISSIONS MODAL */}
             {showPermissionModal && selectedStaff && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col shadow-2xl shadow-blue/20">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[24px] w-full max-w-4xl h-[80vh] flex flex-col shadow-2xl shadow-sm">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                             <div>
-                                <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                    🛡️ <span className="text-white/80">Erişim & Yetki Yönetimi</span>
+                                <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
+                                    🛡️ <span className="text-slate-700 dark:text-slate-200">Erişim & Yetki Yönetimi</span>
                                 </h2>
-                                <div className="text-xs text-white/40 font-bold uppercase tracking-widest mt-1">
+                                <div className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">
                                     PERSONEL: {selectedStaff.name} ({selectedStaff.role})
                                 </div>
                             </div>
-                            <button onClick={() => setShowPermissionModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                            <button onClick={() => setShowPermissionModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all">✕</button>
                         </div>
 
                         {/* HIZLI ŞABLONLAR */}
-                        <div className="px-6 py-4 bg-white/[0.03] border-b border-white/5 flex items-center gap-4 shrink-0 overflow-x-auto custom-scrollbar">
+                        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4 shrink-0 overflow-x-auto custom-scrollbar">
                             <span className="text-[10px] font-black text-blue-500 uppercase whitespace-nowrap">⚡ Hızlı Şablonlar:</span>
                             <div className="flex gap-2">
                                 {Object.keys(roleTemplates).map(roleName => (
@@ -1573,7 +1573,7 @@ export default function StaffManagementContent() {
                                             setSelectedStaff({ ...selectedStaff, permissions: roleTemplates[roleName] });
                                             addNotification({ type: 'success', icon: '🪄', text: `${roleName} şablonu uygulandı.` });
                                         }}
-                                        className="px-4 py-1.5 rounded-lg bg-white/5 border border-white/5 text-[10px] font-bold text-white/60 hover:bg-blue-600 hover:text-white hover:border-blue-500/30 transition-all whitespace-nowrap"
+                                        className="px-4 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-[11px] font-semibold tracking-wider text-slate-600 dark:text-slate-300 hover:bg-blue-600 hover:text-slate-900 dark:text-slate-900 dark:text-white hover:border-blue-500/50 transition-all whitespace-nowrap"
                                     >
                                         {roleName}
                                     </button>
@@ -1585,7 +1585,7 @@ export default function StaffManagementContent() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {Array.from(new Set(allPermissions.map(p => p.category))).map(category => (
                                     <div key={category} className="perm-cat">
-                                        <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-4 border-b border-white/5 pb-2">
+                                        <h3 className="text-[11px] font-semibold tracking-wider text-blue-500 uppercase tracking-widest mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
                                             {category} YETKİLERİ
                                         </h3>
                                         <div className="space-y-3">
@@ -1593,9 +1593,9 @@ export default function StaffManagementContent() {
                                                 const isActive = (selectedStaff.permissions || []).includes(perm.id);
                                                 return (
                                                     <label key={perm.id} className="flex items-start gap-3 cursor-pointer group select-none">
-                                                        <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${isActive ? 'bg-blue-600 border-blue-500/30' : 'bg-white/5 border-white/10 group-hover:border-blue-500/30/50'
+                                                        <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${isActive ? 'bg-blue-600 border-blue-500/50' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 group-hover:border-blue-500'
                                                             }`}>
-                                                            {isActive && <span className="text-white text-xs font-bold">✓</span>}
+                                                            {isActive && <span className="text-slate-900 dark:text-slate-900 dark:text-white text-xs font-bold">✓</span>}
                                                         </div>
                                                         <input
                                                             type="checkbox"
@@ -1603,7 +1603,7 @@ export default function StaffManagementContent() {
                                                             checked={isActive}
                                                             onChange={() => togglePermission(perm.id)}
                                                         />
-                                                        <span className={`text-sm font-medium transition-colors ${isActive ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`}>
+                                                        <span className={`text-sm font-medium transition-colors ${isActive ? 'text-slate-900 dark:text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:text-slate-300'}`}>
                                                             {perm.label}
                                                         </span>
                                                     </label>
@@ -1615,9 +1615,9 @@ export default function StaffManagementContent() {
                             </div>
 
                             {/* MÜŞTERİ KATEGORİ ERİŞİMİ */}
-                            <div className="mt-8 p-6 bg-white/[0.03] border border-white/5 rounded-2xl space-y-4">
+                            <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="text-xs font-black text-blue-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <h3 className="text-[11px] font-semibold tracking-wider text-blue-500 uppercase tracking-[0.2em] flex items-center gap-2">
                                         🛡️ DATA SCOPING: Müşteri Kategorileri
                                     </h3>
                                     {selectedStaff.assignedCategoryIds?.length > 0 && (
@@ -1629,7 +1629,7 @@ export default function StaffManagementContent() {
                                         </button>
                                     )}
                                 </div>
-                                <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pl-1">
+                                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest pl-1">
                                     Bu personel sadece seçili kategorideki müşterilere erişebilir. Seçim yapılmazsa tümünü görür.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
@@ -1646,9 +1646,9 @@ export default function StaffManagementContent() {
                                                         : [...currentIds, cat.id];
                                                     setSelectedStaff({ ...selectedStaff, assignedCategoryIds: newIds });
                                                 }}
-                                                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all border ${isActive
-                                                    ? 'bg-blue-600 text-white border-blue-500/30 shadow-lg shadow-blue/20'
-                                                    : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10'
+                                                className={`px-4 py-2 rounded-[12px] text-[10px] font-black uppercase transition-all border ${isActive
+                                                    ? 'bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white border-blue-500/50 shadow-lg shadow-sm'
+                                                    : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800 hover:bg-white/10'
                                                     }`}
                                             >
                                                 {cat.name}
@@ -1659,11 +1659,11 @@ export default function StaffManagementContent() {
                             </div>
                         </div>
 
-                        <div className="p-6 border-t border-white/5 bg-white/[0.02] flex justify-end gap-3">
-                            <button onClick={() => setShowPermissionModal(false)} className="px-6 h-12 rounded-xl border border-white/10 text-white font-bold hover:bg-white/5 transition-all">
+                        <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
+                            <button onClick={() => setShowPermissionModal(false)} className="px-6 h-12 rounded-[12px] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-900 dark:text-white font-bold hover:bg-slate-50 dark:bg-slate-800/50 transition-all">
                                 VAZGEÇ
                             </button>
-                            <button onClick={savePermissions} disabled={isProcessing} className="px-8 h-12 rounded-xl bg-blue-600 text-white font-black tracking-widest shadow-lg shadow-blue/20 hover:shadow-blue/40 hover:scale-105 transition-all">
+                            <button onClick={savePermissions} disabled={isProcessing} className="px-8 h-[44px] rounded-[14px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white font-semibold transition-all shadow-lg shadow-sm hover:shadow-md hover:scale-105 transition-all">
                                 {isProcessing ? 'KAYDEDİLİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
                             </button>
                         </div>
@@ -1674,69 +1674,69 @@ export default function StaffManagementContent() {
             {/* 3. ADD STAFF MODAL */}
             {showAddStaffModal && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl shadow-blue/20 flex flex-col">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02] shrink-0">
-                            <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                🆕 <span className="text-white/80">Yeni Personel Kaydı & Özlük Girişi</span>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[24px] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl shadow-sm flex flex-col">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 shrink-0">
+                            <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
+                                🆕 <span className="text-slate-700 dark:text-slate-200">Yeni Personel Kaydı & Özlük Girişi</span>
                             </h2>
-                            <button onClick={() => setShowAddStaffModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                            <button onClick={() => setShowAddStaffModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all">✕</button>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
                             <div className="space-y-8">
                                 {/* Temel Bilgiler */}
                                 <section className="space-y-4">
-                                    <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest border-l-2 border-blue-500/30 pl-3">Temel Bilgiler</h3>
+                                    <h3 className="text-[11px] font-semibold tracking-wider text-blue-500 uppercase tracking-widest border-l-2 border-blue-500/50 pl-3">Temel Bilgiler</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Ad Soyad</label>
-                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" placeholder="Tam İsim" value={newStaff.name} onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Ad Soyad</label>
+                                            <input type="text" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="Tam İsim" value={newStaff.name} onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Kullanıcı Adı</label>
-                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" placeholder="ali_yilmaz" value={newStaff.username} onChange={(e) => setNewStaff({ ...newStaff, username: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Kullanıcı Adı</label>
+                                            <input type="text" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="ali_yilmaz" value={newStaff.username} onChange={(e) => setNewStaff({ ...newStaff, username: e.target.value })} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Şifre</label>
-                                            <input type="password" name="password" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" placeholder="••••••••" value={newStaff.password} onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Şifre</label>
+                                            <input type="password" name="password" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="••••••••" value={newStaff.password} onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">E-Posta</label>
-                                            <input type="email" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" placeholder="ornek@sirket.com" value={newStaff.email} onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">E-Posta</label>
+                                            <input type="email" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="ornek@sirket.com" value={newStaff.email} onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Telefon</label>
-                                            <input type="tel" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" placeholder="05xxxxxxxxx" value={newStaff.phone} onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Telefon</label>
+                                            <input type="tel" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="05xxxxxxxxx" value={newStaff.phone} onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })} />
                                         </div>
                                     </div>
                                 </section>
 
                                 {/* Özlük Detayları */}
                                 <section className="space-y-4">
-                                    <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest border-l-2 border-blue-500/30 pl-3">Özlük Bilgileri</h3>
+                                    <h3 className="text-[11px] font-semibold tracking-wider text-blue-500 uppercase tracking-widest border-l-2 border-blue-500/50 pl-3">Özlük Bilgileri</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Doğum Tarihi</label>
-                                            <input type="date" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50 cursor-pointer" value={newStaff.birthDate} onChange={(e) => setNewStaff({ ...newStaff, birthDate: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Doğum Tarihi</label>
+                                            <input type="date" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500 cursor-pointer" value={newStaff.birthDate} onChange={(e) => setNewStaff({ ...newStaff, birthDate: e.target.value })} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Medeni Durum</label>
-                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" value={newStaff.maritalStatus} onChange={(e) => setNewStaff({ ...newStaff, maritalStatus: e.target.value })}>
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Medeni Durum</label>
+                                            <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" value={newStaff.maritalStatus} onChange={(e) => setNewStaff({ ...newStaff, maritalStatus: e.target.value })}>
                                                 <option value="">Seçiniz</option>
                                                 <option value="Bekar">Bekar</option>
                                                 <option value="Evli">Evli</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Kan Grubu</label>
-                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" value={newStaff.bloodType} onChange={(e) => setNewStaff({ ...newStaff, bloodType: e.target.value })}>
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Kan Grubu</label>
+                                            <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" value={newStaff.bloodType} onChange={(e) => setNewStaff({ ...newStaff, bloodType: e.target.value })}>
                                                 <option value="">Seçiniz</option>
                                                 {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-'].map(t => <option key={t} value={t}>{t}</option>)}
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Askerlik Durumu</label>
-                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" value={newStaff.militaryStatus} onChange={(e) => setNewStaff({ ...newStaff, militaryStatus: e.target.value })}>
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Askerlik Durumu</label>
+                                            <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" value={newStaff.militaryStatus} onChange={(e) => setNewStaff({ ...newStaff, militaryStatus: e.target.value })}>
                                                 <option value="">Seçiniz</option>
                                                 <option value="Yapıldı">Yapıldı</option>
                                                 <option value="Muaf">Muaf</option>
@@ -1747,8 +1747,8 @@ export default function StaffManagementContent() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Eğitim Durumu</label>
-                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" value={newStaff.educationLevel} onChange={(e) => setNewStaff({ ...newStaff, educationLevel: e.target.value })}>
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Eğitim Durumu</label>
+                                            <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" value={newStaff.educationLevel} onChange={(e) => setNewStaff({ ...newStaff, educationLevel: e.target.value })}>
                                                 <option value="">Seçiniz</option>
                                                 <option value="İlkokul">İlkokul</option>
                                                 <option value="Ortaokul">Ortaokul</option>
@@ -1759,49 +1759,49 @@ export default function StaffManagementContent() {
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Ehliyet Durumu</label>
-                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" value={newStaff.hasDriverLicense ? "Evet" : "Hayır"} onChange={(e) => setNewStaff({ ...newStaff, hasDriverLicense: e.target.value === "Evet" })}>
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Ehliyet Durumu</label>
+                                            <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" value={newStaff.hasDriverLicense ? "Evet" : "Hayır"} onChange={(e) => setNewStaff({ ...newStaff, hasDriverLicense: e.target.value === "Evet" })}>
                                                 <option value="Hayır">Yok</option>
                                                 <option value="Evet">Var</option>
                                             </select>
                                         </div>
                                         <div className="col-span-2 space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Referans</label>
-                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" placeholder="İsim / Telefon / Not" value={newStaff.reference} onChange={(e) => setNewStaff({ ...newStaff, reference: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Referans</label>
+                                            <input type="text" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="İsim / Telefon / Not" value={newStaff.reference} onChange={(e) => setNewStaff({ ...newStaff, reference: e.target.value })} />
                                         </div>
                                     </div>
                                 </section>
 
                                 {/* Adres & Yakın Bilgisi */}
                                 <section className="space-y-4">
-                                    <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest border-l-2 border-blue-500/30 pl-3">Adres & İletişim Detayları</h3>
+                                    <h3 className="text-[11px] font-semibold tracking-wider text-blue-500 uppercase tracking-widest border-l-2 border-blue-500/50 pl-3">Adres & İletişim Detayları</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">İl</label>
-                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" placeholder="İstanbul" value={newStaff.city} onChange={(e) => setNewStaff({ ...newStaff, city: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">İl</label>
+                                            <input type="text" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="İstanbul" value={newStaff.city} onChange={(e) => setNewStaff({ ...newStaff, city: e.target.value })} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">İlçe</label>
-                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" placeholder="Üsküdar" value={newStaff.district} onChange={(e) => setNewStaff({ ...newStaff, district: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">İlçe</label>
+                                            <input type="text" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="Üsküdar" value={newStaff.district} onChange={(e) => setNewStaff({ ...newStaff, district: e.target.value })} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Acil Durum Yakını (İsim & Tel)</label>
-                                            <input type="text" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" placeholder="Ahmet Yılmaz - 0532..." value={newStaff.relativeName} onChange={(e) => setNewStaff({ ...newStaff, relativeName: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Acil Durum Yakını (İsim & Tel)</label>
+                                            <input type="text" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="Ahmet Yılmaz - 0532..." value={newStaff.relativeName} onChange={(e) => setNewStaff({ ...newStaff, relativeName: e.target.value })} />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Tam Adres</label>
-                                        <textarea className="w-full min-h-[80px] bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white outline-none focus:border-blue-500/30/50 resize-none" placeholder="Mahalle, sokak, no..." value={newStaff.address} onChange={(e) => setNewStaff({ ...newStaff, address: e.target.value })} />
+                                        <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Tam Adres</label>
+                                        <textarea className="w-full min-h-[80px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] p-3 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500 resize-none" placeholder="Mahalle, sokak, no..." value={newStaff.address} onChange={(e) => setNewStaff({ ...newStaff, address: e.target.value })} />
                                     </div>
                                 </section>
 
                                 {/* İş Bilgileri */}
                                 <section className="space-y-4 pb-4">
-                                    <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest border-l-2 border-blue-500/30 pl-3">İş & Finansal Bilgiler</h3>
+                                    <h3 className="text-[11px] font-semibold tracking-wider text-blue-500 uppercase tracking-widest border-l-2 border-blue-500/50 pl-3">İş & Finansal Bilgiler</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Rol / Pozisyon</label>
-                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" value={newStaff.role} onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}>
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Rol / Pozisyon</label>
+                                            <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" value={newStaff.role} onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}>
                                                 <option value="">Rol Seçiniz</option>
                                                 <option value="Yönetici">👑 Yönetici</option>
                                                 <option value="Şube Müdürü">🏢 Şube Müdürü</option>
@@ -1812,22 +1812,22 @@ export default function StaffManagementContent() {
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Şube</label>
-                                            <select className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" value={newStaff.branch} onChange={(e) => setNewStaff({ ...newStaff, branch: e.target.value })}>
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Şube</label>
+                                            <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" value={newStaff.branch} onChange={(e) => setNewStaff({ ...newStaff, branch: e.target.value })}>
                                                 <option value="">Şube Seçiniz</option>
                                                 {branches.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest pl-1">Net Maaş (TL)</label>
-                                            <input type="number" className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white outline-none focus:border-blue-500/30/50" placeholder="17002" value={newStaff.salary} onChange={(e) => setNewStaff({ ...newStaff, salary: e.target.value })} />
+                                            <label className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Net Maaş (TL)</label>
+                                            <input type="number" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="17002" value={newStaff.salary} onChange={(e) => setNewStaff({ ...newStaff, salary: e.target.value })} />
                                         </div>
                                     </div>
 
                                     {/* Müşteri Kategori Erişimi */}
-                                    <div className="space-y-3 p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                                    <div className="space-y-3 p-6 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-2xl">
                                         <div className="flex justify-between items-center">
-                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Müşteri Kategori Erişimi (Kısıtlama)</label>
+                                            <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Müşteri Kategori Erişimi (Kısıtlama)</label>
                                             <span className="text-[9px] text-blue-500/60 font-bold uppercase">Boş bırakılırsa tüm müşterileri görür</span>
                                         </div>
                                         <div className="flex flex-wrap gap-2">
@@ -1843,9 +1843,9 @@ export default function StaffManagementContent() {
                                                                 : [...newStaff.assignedCategoryIds, cat.id];
                                                             setNewStaff({ ...newStaff, assignedCategoryIds: newIds });
                                                         }}
-                                                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all border ${isActive
-                                                            ? 'bg-blue-600 text-white border-blue-500/30'
-                                                            : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10'
+                                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold tracking-wider uppercase transition-all border ${isActive
+                                                            ? 'bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white border-blue-500/50'
+                                                            : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800 hover:bg-white/10'
                                                             }`}
                                                     >
                                                         {cat.name}
@@ -1856,7 +1856,7 @@ export default function StaffManagementContent() {
                                     </div>
                                 </section>
 
-                                <button onClick={handleSaveStaff} disabled={isProcessing} className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-blue/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
+                                <button onClick={handleSaveStaff} disabled={isProcessing} className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-lg shadow-sm hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
                                     {isProcessing ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>KAYDEDİLİYOR...</span></> : <span>💾 PERSONELİ KAYDET VE ÖZLÜK DOSYASI OLUŞTUR</span>}
                                 </button>
                             </div>
@@ -1868,15 +1868,15 @@ export default function StaffManagementContent() {
             {/* 4. EDIT STAFF MODAL */}
             {showEditStaffModal && editStaff && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl shadow-blue/20 h-[90vh] flex flex-col">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02] shrink-0">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl shadow-sm h-[90vh] flex flex-col">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 shrink-0">
                             <div>
-                                <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                    🗂️ <span className="text-white/80">Personel Özlük Dosyası: {editStaff.name}</span>
+                                <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
+                                    🗂️ <span className="text-slate-700 dark:text-slate-200">Personel Özlük Dosyası: {editStaff.name}</span>
                                 </h2>
-                                <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1 pl-8">Dijital Arşiv ve Bilgi Yönetimi</div>
+                                <div className="text-[11px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-1 pl-8">Dijital Arşiv ve Bilgi Yönetimi</div>
                             </div>
-                            <button onClick={() => setShowEditStaffModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                            <button onClick={() => setShowEditStaffModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all">✕</button>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
@@ -1890,29 +1890,29 @@ export default function StaffManagementContent() {
                                             </h3>
                                             <div className="space-y-3">
                                                 <div className="group">
-                                                    <label className="text-[10px] font-bold text-white/20 uppercase group-focus-within:text-blue-500/50 transition-colors">Doğum Tarihi</label>
-                                                    <input type="date" className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/30 outline-none mt-1" value={editStaff.birthDate ? new Date(editStaff.birthDate).toISOString().split('T')[0] : ''} onChange={(e) => setEditStaff({ ...editStaff, birthDate: e.target.value })} />
+                                                    <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase group-focus-within:text-blue-500/50 transition-colors">Doğum Tarihi</label>
+                                                    <input type="date" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500/50/30 outline-none mt-1" value={editStaff.birthDate ? new Date(editStaff.birthDate).toISOString().split('T')[0] : ''} onChange={(e) => setEditStaff({ ...editStaff, birthDate: e.target.value })} />
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <div>
-                                                        <label className="text-[10px] font-bold text-white/20 uppercase">Medeni Durum</label>
-                                                        <select className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.maritalStatus || ''} onChange={(e) => setEditStaff({ ...editStaff, maritalStatus: e.target.value })}>
+                                                        <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase">Medeni Durum</label>
+                                                        <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none mt-1" value={editStaff.maritalStatus || ''} onChange={(e) => setEditStaff({ ...editStaff, maritalStatus: e.target.value })}>
                                                             <option value="">Seçiniz</option>
                                                             <option value="Bekar">Bekar</option>
                                                             <option value="Evli">Evli</option>
                                                         </select>
                                                     </div>
                                                     <div>
-                                                        <label className="text-[10px] font-bold text-white/20 uppercase">Kan Grubu</label>
-                                                        <select className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.bloodType || ''} onChange={(e) => setEditStaff({ ...editStaff, bloodType: e.target.value })}>
+                                                        <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase">Kan Grubu</label>
+                                                        <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none mt-1" value={editStaff.bloodType || ''} onChange={(e) => setEditStaff({ ...editStaff, bloodType: e.target.value })}>
                                                             <option value="">Seçiniz</option>
                                                             {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-'].map(t => <option key={t} value={t}>{t}</option>)}
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div className="group">
-                                                    <label className="text-[10px] font-bold text-white/20 uppercase">Eğitim Durumu</label>
-                                                    <select className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.educationLevel || ''} onChange={(e) => setEditStaff({ ...editStaff, educationLevel: e.target.value })}>
+                                                    <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase">Eğitim Durumu</label>
+                                                    <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none mt-1" value={editStaff.educationLevel || ''} onChange={(e) => setEditStaff({ ...editStaff, educationLevel: e.target.value })}>
                                                         <option value="">Seçiniz</option>
                                                         <option value="İlkokul">İlkokul</option>
                                                         <option value="Ortaokul">Ortaokul</option>
@@ -1923,8 +1923,8 @@ export default function StaffManagementContent() {
                                                     </select>
                                                 </div>
                                                 <div className="group">
-                                                    <label className="text-[10px] font-bold text-white/20 uppercase">Askerlik Durumu</label>
-                                                    <select className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.militaryStatus || ''} onChange={(e) => setEditStaff({ ...editStaff, militaryStatus: e.target.value })}>
+                                                    <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase">Askerlik Durumu</label>
+                                                    <select className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none mt-1" value={editStaff.militaryStatus || ''} onChange={(e) => setEditStaff({ ...editStaff, militaryStatus: e.target.value })}>
                                                         <option value="">Seçiniz</option>
                                                         <option value="Yapıldı">Yapıldı</option>
                                                         <option value="Muaf">Muaf</option>
@@ -1941,61 +1941,61 @@ export default function StaffManagementContent() {
                                             <div className="space-y-3">
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <div>
-                                                        <label className="text-[10px] font-bold text-white/20 uppercase">İl</label>
-                                                        <input type="text" className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.city || ''} onChange={(e) => setEditStaff({ ...editStaff, city: e.target.value })} />
+                                                        <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase">İl</label>
+                                                        <input type="text" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none mt-1" value={editStaff.city || ''} onChange={(e) => setEditStaff({ ...editStaff, city: e.target.value })} />
                                                     </div>
                                                     <div>
-                                                        <label className="text-[10px] font-bold text-white/20 uppercase">İlçe</label>
-                                                        <input type="text" className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.district || ''} onChange={(e) => setEditStaff({ ...editStaff, district: e.target.value })} />
+                                                        <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase">İlçe</label>
+                                                        <input type="text" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none mt-1" value={editStaff.district || ''} onChange={(e) => setEditStaff({ ...editStaff, district: e.target.value })} />
                                                     </div>
                                                 </div>
                                                 <div className="group">
-                                                    <label className="text-[10px] font-bold text-white/20 uppercase">Acil Durum Yakını</label>
-                                                    <input type="text" className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" placeholder="İsim - Telefon" value={editStaff.relativeName || ''} onChange={(e) => setEditStaff({ ...editStaff, relativeName: e.target.value })} />
+                                                    <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase">Acil Durum Yakını</label>
+                                                    <input type="text" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none mt-1" placeholder="İsim - Telefon" value={editStaff.relativeName || ''} onChange={(e) => setEditStaff({ ...editStaff, relativeName: e.target.value })} />
                                                 </div>
                                                 <div className="group">
-                                                    <label className="text-[10px] font-bold text-white/20 uppercase">Tam Adres</label>
-                                                    <textarea className="w-full h-24 bg-white/[0.03] border border-white/5 rounded-xl p-3 text-sm text-white outline-none mt-1 resize-none" value={editStaff.address || ''} onChange={(e) => setEditStaff({ ...editStaff, address: e.target.value })} />
+                                                    <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase">Tam Adres</label>
+                                                    <textarea className="w-full h-24 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] p-3 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none mt-1 resize-none" value={editStaff.address || ''} onChange={(e) => setEditStaff({ ...editStaff, address: e.target.value })} />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* EK BİLGİLER & NOTLAR */}
-                                    <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4">
-                                        <h3 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">🚩 Kurumsal & Ek Bilgiler</h3>
+                                    <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-4">
+                                        <h3 className="text-[10px] font-black text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-[0.2em]">🚩 Kurumsal & Ek Bilgiler</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-3">
-                                                <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
-                                                    <span className="text-[10px] font-bold text-white/40 uppercase">Ehliyet</span>
+                                                <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-[12px] border border-slate-100 dark:border-slate-800">
+                                                    <span className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">Ehliyet</span>
                                                     <button
                                                         onClick={() => setEditStaff({ ...editStaff, hasDriverLicense: !editStaff.hasDriverLicense })}
-                                                        className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${editStaff.hasDriverLicense ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-white/10 text-white/40'}`}
+                                                        className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${editStaff.hasDriverLicense ? 'bg-emerald-500 text-slate-900 dark:text-slate-900 dark:text-white shadow-lg shadow-emerald-500/20' : 'bg-white/10 text-slate-500 dark:text-slate-400'}`}
                                                     >
                                                         {editStaff.hasDriverLicense ? 'VAR' : 'YOK'}
                                                     </button>
                                                 </div>
                                                 <div className="group">
-                                                    <label className="text-[10px] font-bold text-white/20 uppercase">Referans</label>
-                                                    <input type="text" className="w-full h-11 bg-white/[0.03] border border-white/5 rounded-xl px-4 text-sm text-white outline-none mt-1" value={editStaff.reference || ''} onChange={(e) => setEditStaff({ ...editStaff, reference: e.target.value })} />
+                                                    <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase">Referans</label>
+                                                    <input type="text" className="w-full h-[44px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none mt-1" value={editStaff.reference || ''} onChange={(e) => setEditStaff({ ...editStaff, reference: e.target.value })} />
                                                 </div>
                                             </div>
                                             <div className="group">
-                                                <label className="text-[10px] font-bold text-white/20 uppercase">Personel Notları</label>
-                                                <textarea className="w-full h-[92px] bg-white/[0.03] border border-white/5 rounded-xl p-3 text-sm text-white outline-none mt-1 resize-none" placeholder="Örn: Sağlık durumu, özel yetenekler vb." value={editStaff.notes || ''} onChange={(e) => setEditStaff({ ...editStaff, notes: e.target.value })} />
+                                                <label className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase">Personel Notları</label>
+                                                <textarea className="w-full h-[92px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[12px] p-3 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none mt-1 resize-none" placeholder="Örn: Sağlık durumu, özel yetenekler vb." value={editStaff.notes || ''} onChange={(e) => setEditStaff({ ...editStaff, notes: e.target.value })} />
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* MÜŞTERİ KATEGORİ ERİŞİMİ */}
-                                    <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4">
+                                    <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-4">
                                         <div className="flex justify-between items-center">
-                                            <h3 className="text-[10px] font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                                            <h3 className="text-[10px] font-black text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-[0.2em] flex items-center gap-2">
                                                 <span className="w-2 h-2 rounded-full bg-blue-600" /> Müşteri Kategori Yetkileri
                                             </h3>
-                                            <span className="text-[9px] text-white/30 font-bold uppercase italic">Scoping & Segmentation</span>
+                                            <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase italic">Scoping & Segmentation</span>
                                         </div>
-                                        <p className="text-[9px] text-white/20 uppercase tracking-widest mb-2 border-b border-white/5 pb-2">Seçim yapılmazsa personel tüm müşterilere erişebilir.</p>
+                                        <p className="text-[9px] text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase tracking-widest mb-2 border-b border-slate-100 dark:border-slate-800 pb-2">Seçim yapılmazsa personel tüm müşterilere erişebilir.</p>
                                         <div className="flex flex-wrap gap-2">
                                             {customerCategories.map(cat => {
                                                 const isActive = (editStaff.assignedCategoryIds || []).includes(cat.id);
@@ -2010,9 +2010,9 @@ export default function StaffManagementContent() {
                                                                 : [...currentIds, cat.id];
                                                             setEditStaff({ ...editStaff, assignedCategoryIds: newIds });
                                                         }}
-                                                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all border ${isActive
-                                                            ? 'bg-blue-600 text-white border-blue-500/30 shadow-lg shadow-blue/20'
-                                                            : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10'
+                                                        className={`px-4 py-2 rounded-[12px] text-[10px] font-black uppercase transition-all border ${isActive
+                                                            ? 'bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white border-blue-500/50 shadow-lg shadow-sm'
+                                                            : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800 hover:bg-white/10'
                                                             }`}
                                                     >
                                                         {cat.name}
@@ -2022,56 +2022,56 @@ export default function StaffManagementContent() {
                                         </div>
                                     </div>
 
-                                    <button onClick={handleEditStaff} disabled={isProcessing} className="w-full h-14 bg-blue-600 text-white rounded-xl font-black text-xs tracking-[0.2em] shadow-xl shadow-blue/20 hover:scale-[1.01] active:scale-[0.99] transition-all">
+                                    <button onClick={handleEditStaff} disabled={isProcessing} className="w-full h-14 bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-xs tracking-[0.2em] shadow-xl shadow-sm hover:scale-[1.01] active:scale-[0.99] transition-all">
                                         {isProcessing ? 'GÜNCELLENİYOR...' : 'ÖZLÜK BİLGİLERİNİ GÜNCELLE'}
                                     </button>
                                 </div>
 
                                 {/* SAĞ KOLON: DİJİTAL DOSYALAR */}
                                 <div className="space-y-6">
-                                    <div className="p-6 bg-[#151821] border border-white/5 rounded-2xl flex flex-col h-full min-h-[400px]">
+                                    <div className="p-6 bg-[#151821] border border-slate-100 dark:border-slate-800 rounded-2xl flex flex-col h-full min-h-[400px]">
                                         <div className="flex justify-between items-center mb-6">
-                                            <h3 className="text-[10px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
+                                            <h3 className="text-[10px] font-black text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-[0.3em] flex items-center gap-2">
                                                 <span className="w-2 h-2 rounded-full bg-emerald-500" /> DİJİTAL ARŞİV
                                             </h3>
-                                            <span className="text-[10px] font-bold text-white/20 bg-white/5 px-2 py-1 rounded-md">{staffDocuments.length} DOSYA</span>
+                                            <span className="text-[11px] font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white/20 bg-slate-50 dark:bg-slate-800/50 px-2 py-1 rounded-md">{staffDocuments.length} DOSYA</span>
                                         </div>
 
                                         <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar mb-6 pr-1">
                                             {staffDocuments.length === 0 ? (
-                                                <div className="h-40 flex flex-col items-center justify-center text-white/10 gap-3 grayscale opacity-30">
+                                                <div className="h-40 flex flex-col items-center justify-center text-slate-900 dark:text-slate-900 dark:text-white/10 gap-3 grayscale opacity-30">
                                                     <span className="text-4xl">📂</span>
                                                     <span className="text-[10px] font-black uppercase tracking-widest">Arşiv Henüz Boş</span>
                                                 </div>
                                             ) : (
                                                 staffDocuments.map(doc => (
-                                                    <div key={doc.id} className="p-3 bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 rounded-xl flex justify-between items-center group transition-all">
+                                                    <div key={doc.id} className="p-3 bg-slate-50 dark:bg-slate-800/50 hover:bg-white/[0.05] border border-slate-100 dark:border-slate-800 rounded-[12px] flex justify-between items-center group transition-all">
                                                         <div className="flex items-center gap-3 overflow-hidden">
-                                                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-lg">
+                                                            <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center text-lg">
                                                                 {doc.fileType.includes('pdf') ? '📕' : '🖼️'}
                                                             </div>
                                                             <div className="truncate">
-                                                                <div className="text-[11px] font-bold text-white/80 truncate">{doc.fileName}</div>
-                                                                <div className="text-[9px] text-white/20 uppercase tracking-tighter">{new Date(doc.uploadedAt).toLocaleDateString()} • {(doc.fileSize / 1024).toFixed(0)} KB</div>
+                                                                <div className="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">{doc.fileName}</div>
+                                                                <div className="text-[9px] text-slate-900 dark:text-slate-900 dark:text-white/20 uppercase tracking-tighter">{new Date(doc.uploadedAt).toLocaleDateString()} • {(doc.fileSize / 1024).toFixed(0)} KB</div>
                                                             </div>
                                                         </div>
                                                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                                            <a href={doc.fileData} download={doc.fileName} className="w-7 h-7 flex items-center justify-center rounded bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all text-xs">⬇</a>
-                                                            <button onClick={() => handleDeleteDocument(doc.id)} className="w-7 h-7 flex items-center justify-center rounded bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all text-xs">🗑️</button>
+                                                            <a href={doc.fileData} download={doc.fileName} className="w-7 h-7 flex items-center justify-center rounded bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all text-xs">⬇</a>
+                                                            <button onClick={() => handleDeleteDocument(doc.id)} className="w-7 h-7 flex items-center justify-center rounded bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all text-xs">🗑️</button>
                                                         </div>
                                                     </div>
                                                 ))
                                             )}
                                         </div>
 
-                                        <div className={`mt-auto shrink-0 border-2 border-dashed border-white/5 rounded-2xl p-6 text-center transition-all ${isUploading ? 'opacity-50 pointer-events-none' : 'hover:border-blue-500/30/30 hover:bg-blue-600/5 group'}`}>
+                                        <div className={`mt-auto shrink-0 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl p-6 text-center transition-all ${isUploading ? 'opacity-50 pointer-events-none' : 'hover:border-blue-500/50/30 hover:bg-blue-600/5 group'}`}>
                                             <input type="file" id="doc-upload" className="hidden" onChange={handleFileUpload} accept=".pdf,.png,.jpg,.jpeg" />
                                             <label htmlFor="doc-upload" className="cursor-pointer flex flex-col items-center gap-2">
-                                                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-500/20 transition-all">
+                                                <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-500/20 transition-all">
                                                     <span className="text-xl">📤</span>
                                                 </div>
-                                                <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">Belge Yükle</span>
-                                                <span className="text-[8px] text-white/20 leading-tight uppercase">PDF, PNG, JPEG (MAX 5MB)</span>
+                                                <span className="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">Belge Yükle</span>
+                                                <span className="text-[8px] text-slate-900 dark:text-slate-900 dark:text-white/20 leading-tight uppercase">PDF, PNG, JPEG (MAX 5MB)</span>
                                             </label>
                                         </div>
                                     </div>
@@ -2086,44 +2086,44 @@ export default function StaffManagementContent() {
             {
                 showShiftModal && (
                     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                        <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-blue/20">
-                            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                                <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                    🕒 <span className="text-white/80">Vardiya Oluştur</span>
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-sm">
+                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                                <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
+                                    🕒 <span className="text-slate-700 dark:text-slate-200">Vardiya Oluştur</span>
                                 </h2>
-                                <button onClick={() => setShowShiftModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                                <button onClick={() => setShowShiftModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all">✕</button>
                             </div>
 
                             <div className="p-8 space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Personel</label>
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Personel</label>
                                     <select
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none appearance-none"
+                                        className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none appearance-none"
                                         value={newShift.staffId}
                                         onChange={(e) => setNewShift({ ...newShift, staffId: e.target.value })}
                                     >
-                                        <option value="" className="bg-[#0f111a]">Personel Seçiniz</option>
+                                        <option value="" className="bg-white dark:bg-[#0f172a]">Personel Seçiniz</option>
                                         {staff.map(p => (
-                                            <option key={p.id} value={p.id} className="bg-[#0f111a]">{p.name} ({p.role})</option>
+                                            <option key={p.id} value={p.id} className="bg-white dark:bg-[#0f172a]">{p.name} ({p.role})</option>
                                         ))}
                                     </select>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Başlangıç Zamanı</label>
+                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Başlangıç Zamanı</label>
                                         <input
                                             type="datetime-local"
-                                            className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none"
+                                            className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none"
                                             value={newShift.start}
                                             onChange={(e) => setNewShift({ ...newShift, start: e.target.value })}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Bitiş Zamanı</label>
+                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Bitiş Zamanı</label>
                                         <input
                                             type="datetime-local"
-                                            className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none"
+                                            className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none"
                                             value={newShift.end}
                                             onChange={(e) => setNewShift({ ...newShift, end: e.target.value })}
                                         />
@@ -2131,15 +2131,15 @@ export default function StaffManagementContent() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Vardiya Türü</label>
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Vardiya Türü</label>
                                     <div className="grid grid-cols-3 gap-3">
                                         {['Normal', 'Fazla Mesai', 'İzinli'].map(type => (
                                             <button
                                                 key={type}
                                                 onClick={() => setNewShift({ ...newShift, type })}
-                                                className={`py-3 rounded-xl text-xs font-black uppercase transition-all border ${newShift.type === type
-                                                    ? 'bg-blue-600 text-white border-blue-500/30'
-                                                    : 'bg-white/5 text-white/40 border-transparent hover:bg-white/10'
+                                                className={`py-3 rounded-[12px] text-[11px] font-semibold tracking-wider uppercase transition-all border ${newShift.type === type
+                                                    ? 'bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white border-blue-500/50'
+                                                    : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-transparent hover:bg-white/10'
                                                     }`}
                                             >
                                                 {type}
@@ -2151,7 +2151,7 @@ export default function StaffManagementContent() {
                                 <button
                                     onClick={handleCreateShift}
                                     disabled={isProcessing}
-                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-blue/20 hover:shadow-blue/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
                                 >
                                     {isProcessing ? (
                                         <>
@@ -2174,39 +2174,39 @@ export default function StaffManagementContent() {
             {
                 showLeaveModal && (
                     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                        <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-blue/20">
-                            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                                <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                    🏖️ <span className="text-white/80">İzin Talebi</span>
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-sm">
+                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                                <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
+                                    🏖️ <span className="text-slate-700 dark:text-slate-200">İzin Talebi</span>
                                 </h2>
-                                <button onClick={() => setShowLeaveModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                                <button onClick={() => setShowLeaveModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all">✕</button>
                             </div>
 
                             <div className="p-8 space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Personel</label>
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Personel</label>
                                     <select
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none appearance-none"
+                                        className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none appearance-none"
                                         value={newLeave.staffId}
                                         onChange={(e) => setNewLeave({ ...newLeave, staffId: e.target.value })}
                                     >
-                                        <option value="" className="bg-[#0f111a]">Personel Seçiniz</option>
+                                        <option value="" className="bg-white dark:bg-[#0f172a]">Personel Seçiniz</option>
                                         {staff.map(p => (
-                                            <option key={p.id} value={p.id} className="bg-[#0f111a]">{p.name}</option>
+                                            <option key={p.id} value={p.id} className="bg-white dark:bg-[#0f172a]">{p.name}</option>
                                         ))}
                                     </select>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">İzin Türü</label>
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">İzin Türü</label>
                                     <div className="grid grid-cols-3 gap-3">
                                         {['Yıllık İzin', 'Raporlu', 'Ücretsiz İzin'].map(type => (
                                             <button
                                                 key={type}
                                                 onClick={() => setNewLeave({ ...newLeave, type })}
-                                                className={`py-3 rounded-xl text-[10px] font-black uppercase transition-all border ${newLeave.type === type
-                                                    ? 'bg-blue-600 text-white border-blue-500/30'
-                                                    : 'bg-white/5 text-white/40 border-transparent hover:bg-white/10'
+                                                className={`py-3 rounded-[12px] text-[10px] font-black uppercase transition-all border ${newLeave.type === type
+                                                    ? 'bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white border-blue-500/50'
+                                                    : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-transparent hover:bg-white/10'
                                                     }`}
                                             >
                                                 {type}
@@ -2217,19 +2217,19 @@ export default function StaffManagementContent() {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Başlangıç</label>
+                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Başlangıç</label>
                                         <input
                                             type="date"
-                                            className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none"
+                                            className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none"
                                             value={newLeave.startDate}
                                             onChange={(e) => setNewLeave({ ...newLeave, startDate: e.target.value })}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Bitiş</label>
+                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Bitiş</label>
                                         <input
                                             type="date"
-                                            className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none"
+                                            className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none"
                                             value={newLeave.endDate}
                                             onChange={(e) => setNewLeave({ ...newLeave, endDate: e.target.value })}
                                         />
@@ -2237,9 +2237,9 @@ export default function StaffManagementContent() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Açıklama / Not</label>
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Açıklama / Not</label>
                                     <textarea
-                                        className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-blue-500/30/50 focus:bg-white/10 transition-all outline-none resize-none"
+                                        className="w-full h-24 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] p-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 focus:bg-white/10 transition-all outline-none resize-none"
                                         placeholder="İzin nedeni veya ek notlar..."
                                         value={newLeave.description}
                                         onChange={(e) => setNewLeave({ ...newLeave, description: e.target.value })}
@@ -2249,7 +2249,7 @@ export default function StaffManagementContent() {
                                 <button
                                     onClick={handleCreateLeave}
                                     disabled={isProcessing}
-                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-blue/20 hover:shadow-blue/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
                                 >
                                     {isProcessing ? (
                                         <>
@@ -2272,68 +2272,68 @@ export default function StaffManagementContent() {
             {
                 showPayrollModal && (
                     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                        <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-blue/20">
-                            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-sm">
+                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                                 <div>
-                                    <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                        💰 <span className="text-white/80">Maaş Hesapla</span>
+                                    <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
+                                        💰 <span className="text-slate-700 dark:text-slate-200">Maaş Hesapla</span>
                                     </h2>
-                                    <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">{currentPayroll.staffName} • {currentPayroll.period}</div>
+                                    <div className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">{currentPayroll.staffName} • {currentPayroll.period}</div>
                                 </div>
-                                <button onClick={() => setShowPayrollModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                                <button onClick={() => setShowPayrollModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all">✕</button>
                             </div>
 
                             <div className="p-8 space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-center">
-                                            <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Maaş (Net)</label>
+                                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Maaş (Net)</label>
                                             <label className="flex items-center gap-2 cursor-pointer group">
                                                 <input
                                                     type="checkbox"
                                                     checked={updateBaseSalary}
                                                     onChange={(e) => setUpdateBaseSalary(e.target.checked)}
-                                                    className="w-3 h-3 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-0 checked:bg-blue-600"
+                                                    className="w-3 h-3 rounded border-white/20 bg-slate-50 dark:bg-slate-800/50 text-blue-500 focus:ring-0 checked:bg-blue-600"
                                                 />
-                                                <span className="text-[9px] font-bold text-white/40 group-hover:text-white/60">VARSAYILAN YAP</span>
+                                                <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:text-slate-300">VARSAYILAN YAP</span>
                                             </label>
                                         </div>
                                         <input
                                             type="number"
-                                            className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none font-mono"
+                                            className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none font-mono"
                                             value={currentPayroll.salary}
                                             onChange={(e) => setCurrentPayroll({ ...currentPayroll, salary: Number(e.target.value) })}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Prim / Bonus</label>
+                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Prim / Bonus</label>
                                         <input
                                             type="number"
-                                            className="w-full h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 text-sm text-emerald-400 focus:border-emerald-500/50 outline-none font-mono"
+                                            className="w-full h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-[12px] px-4 text-sm text-emerald-400 focus:border-emerald-500/50 outline-none font-mono"
                                             value={currentPayroll.bonus}
                                             onChange={(e) => setCurrentPayroll({ ...currentPayroll, bonus: Number(e.target.value) })}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Avans / Kesinti</label>
+                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Avans / Kesinti</label>
                                         <input
                                             type="number"
-                                            className="w-full h-12 bg-red-500/10 border border-red-500/20 rounded-xl px-4 text-sm text-red-400 focus:border-red-500/50 outline-none font-mono"
+                                            className="w-full h-12 bg-red-500/10 border border-red-500/20 rounded-[12px] px-4 text-sm text-red-400 focus:border-red-500/50 outline-none font-mono"
                                             value={currentPayroll.deductions}
                                             onChange={(e) => setCurrentPayroll({ ...currentPayroll, deductions: Number(e.target.value) })}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">NET ÖDENECEK</label>
-                                        <div className="w-full h-12 bg-white/10 border border-white/20 rounded-xl px-4 flex items-center text-lg font-black text-white font-mono">
+                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">NET ÖDENECEK</label>
+                                        <div className="w-full h-12 bg-white/10 border border-white/20 rounded-[12px] px-4 flex items-center text-lg font-black text-slate-900 dark:text-slate-900 dark:text-white font-mono">
                                             ₺ {(Number(currentPayroll.salary) + Number(currentPayroll.bonus) - Number(currentPayroll.deductions)).toLocaleString()}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="p-4 bg-blue-500/10 border border-blue-500/30/20 rounded-2xl flex items-center gap-3">
+                                <div className="p-4 bg-blue-500/10 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center gap-3">
                                     <span className="text-xl">ℹ️</span>
-                                    <p className="text-[10px] font-bold text-blue-500/80 leading-relaxed uppercase">
+                                    <p className="text-[11px] font-semibold tracking-wider text-blue-500/80 leading-relaxed uppercase">
                                         ONAYLANDIKTAN SONRA BU TUTAR GİDERLERE "PERSONEL MAAŞ ÖDEMESİ" OLARAK İŞLENECEKTİR.
                                     </p>
                                 </div>
@@ -2341,7 +2341,7 @@ export default function StaffManagementContent() {
                                 <button
                                     onClick={handleSavePayroll}
                                     disabled={isProcessing}
-                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-blue/20 hover:shadow-blue/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
                                 >
                                     {isProcessing ? (
                                         <>
@@ -2362,46 +2362,46 @@ export default function StaffManagementContent() {
             {/* 6. TARGET MODAL */}
             {showTargetModal && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-blue/20">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                            <h2 className="text-xl font-black text-white flex items-center gap-3">
-                                🎯 <span className="text-white/80">Yeni Hedef Tanımla</span>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-sm">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                            <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
+                                🎯 <span className="text-slate-700 dark:text-slate-200">Yeni Hedef Tanımla</span>
                             </h2>
-                            <button onClick={() => setShowTargetModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">✕</button>
+                            <button onClick={() => setShowTargetModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all">✕</button>
                         </div>
 
                         <div className="p-8 space-y-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Personel</label>
+                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Personel</label>
                                 <select
-                                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none appearance-none"
+                                    className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none appearance-none"
                                     value={newTarget.staffId}
                                     onChange={(e) => setNewTarget({ ...newTarget, staffId: e.target.value })}
                                 >
-                                    <option value="" className="bg-[#0f111a]">Personel Seçiniz</option>
+                                    <option value="" className="bg-white dark:bg-[#0f172a]">Personel Seçiniz</option>
                                     {staff.map(p => (
-                                        <option key={p.id} value={p.id} className="bg-[#0f111a]">{p.name} ({p.role})</option>
+                                        <option key={p.id} value={p.id} className="bg-white dark:bg-[#0f172a]">{p.name} ({p.role})</option>
                                     ))}
                                 </select>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Hedef Türü</label>
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Hedef Türü</label>
                                     <select
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none appearance-none"
+                                        className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none appearance-none"
                                         value={newTarget.type}
                                         onChange={(e) => setNewTarget({ ...newTarget, type: e.target.value })}
                                     >
-                                        <option value="TURNOVER" className="bg-[#0f111a]">💰 Ciro Hedefi</option>
-                                        <option value="VISIT" className="bg-[#0f111a]">📍 Ziyaret Hedefi</option>
+                                        <option value="TURNOVER" className="bg-white dark:bg-[#0f172a]">💰 Ciro Hedefi</option>
+                                        <option value="VISIT" className="bg-white dark:bg-[#0f172a]">📍 Ziyaret Hedefi</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Periyot</label>
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Periyot</label>
                                     <input
                                         type="text"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white/50 outline-none"
+                                        className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-500 dark:text-slate-400 outline-none"
                                         value="Aylık (Varsayılan)"
                                         disabled
                                     />
@@ -2409,10 +2409,10 @@ export default function StaffManagementContent() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Hedef Değeri ({newTarget.type === 'TURNOVER' ? 'TL' : 'Adet'})</label>
+                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Hedef Değeri ({newTarget.type === 'TURNOVER' ? 'TL' : 'Adet'})</label>
                                 <input
                                     type="number"
-                                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none"
+                                    className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none"
                                     placeholder={newTarget.type === 'TURNOVER' ? "50000" : "100"}
                                     value={newTarget.targetValue}
                                     onChange={(e) => setNewTarget({ ...newTarget, targetValue: e.target.value })}
@@ -2422,21 +2422,21 @@ export default function StaffManagementContent() {
                             {newTarget.type === 'TURNOVER' && (
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Prim Oranı (%)</label>
+                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Prim Oranı (%)</label>
                                         <input
                                             type="number"
                                             step="0.1"
-                                            className="w-full h-12 bg-blue-500/5 border border-blue-500/10 rounded-xl px-4 text-sm text-blue-400 focus:border-blue-500/30 outline-none"
+                                            className="w-full h-12 bg-blue-500/5 border border-blue-500/10 rounded-[12px] px-4 text-sm text-blue-400 focus:border-blue-500/50 outline-none"
                                             placeholder="1.5"
                                             value={newTarget.commissionRate}
                                             onChange={(e) => setNewTarget({ ...newTarget, commissionRate: e.target.value })}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Hedef Bonusu (TL)</label>
+                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Hedef Bonusu (TL)</label>
                                         <input
                                             type="number"
-                                            className="w-full h-12 bg-emerald-500/5 border border-emerald-500/10 rounded-xl px-4 text-sm text-emerald-400 focus:border-emerald-500/30 outline-none"
+                                            className="w-full h-12 bg-emerald-500/5 border border-emerald-500/10 rounded-[12px] px-4 text-sm text-emerald-400 focus:border-emerald-500/30 outline-none"
                                             placeholder="2500"
                                             value={newTarget.bonusAmount}
                                             onChange={(e) => setNewTarget({ ...newTarget, bonusAmount: e.target.value })}
@@ -2447,19 +2447,19 @@ export default function StaffManagementContent() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Başlangıç</label>
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Başlangıç</label>
                                     <input
                                         type="date"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none"
+                                        className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none"
                                         value={newTarget.startDate}
                                         onChange={(e) => setNewTarget({ ...newTarget, startDate: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Bitiş</label>
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">Bitiş</label>
                                     <input
                                         type="date"
-                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-blue-500/30/50 outline-none"
+                                        className="w-full h-12 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white focus:border-blue-500 outline-none"
                                         value={newTarget.endDate}
                                         onChange={(e) => setNewTarget({ ...newTarget, endDate: e.target.value })}
                                     />
@@ -2469,7 +2469,7 @@ export default function StaffManagementContent() {
                             <button
                                 onClick={handleSaveTarget}
                                 disabled={isProcessing}
-                                className="w-full h-14 bg-blue-600 text-white rounded-xl font-black text-sm tracking-widest shadow-lg shadow-blue/20 hover:shadow-blue/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                                className="w-full h-14 bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
                             >
                                 {isProcessing ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

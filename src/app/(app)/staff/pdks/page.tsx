@@ -136,12 +136,12 @@ export default function AdminPdksPage() {
     };
 
     // Styling constants
-    const bgPage = isLight ? 'min-h-screen bg-slate-50' : 'min-h-screen bg-[#020617] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/40 via-[#020617] to-[#020617]';
+    const bgPage = isLight ? 'min-h-screen bg-[#F6F8FB]' : 'min-h-screen bg-[#0f172a]';
     const textMain = isLight ? 'text-slate-900' : 'text-slate-100';
     const textMuted = isLight ? 'text-slate-500' : 'text-slate-400';
-    const bgCard = isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/5';
-    const bgSurface = isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#1e293b] border-white/5';
-    const borderColor = isLight ? 'border-slate-200' : 'border-white/5';
+    const bgCard = isLight ? 'bg-white border-slate-200' : 'bg-[#1e293b] border-slate-800';
+    const bgSurface = isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0f172a] border-slate-800';
+    const borderColor = isLight ? 'border-slate-200' : 'border-slate-800';
 
     if (loading) return (
         <div className={`${bgPage} flex flex-col items-center justify-center p-20 animate-in fade-in duration-700`}>
@@ -206,7 +206,7 @@ export default function AdminPdksPage() {
                                 onClick={() => setActiveTab(tab.id as any)}
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] transition-all whitespace-nowrap ${isActive
                                     ? (isLight ? 'bg-blue-100 text-blue-700 font-semibold shadow-sm' : 'bg-blue-500/20 text-blue-400 font-semibold')
-                                    : (isLight ? 'text-slate-500 font-medium hover:bg-slate-200/50' : 'text-slate-400 font-medium hover:bg-white/5')
+                                    : (isLight ? 'text-slate-500 font-medium hover:bg-slate-200/50' : 'text-slate-400 font-medium hover:bg-slate-800')
                                     }`}
                             >
                                 <tab.icon size={16} />
@@ -224,7 +224,7 @@ export default function AdminPdksPage() {
                 {/* Content Container */}
                 <div className="space-y-6">
                     {activeTab === "onay" && (
-                        <div className={`rounded-[24px] border p-8 md:p-10 shadow-sm ${bgCard}`}>
+                        <div className={`rounded-[20px] border p-8 md:p-10 shadow-sm ${bgCard}`}>
                             {pendingEvents.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-16 opacity-60">
                                     <div className={`w-16 h-16 rounded-[16px] flex items-center justify-center mb-4 ${isLight ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-500/10 text-emerald-400'}`}>
@@ -289,7 +289,7 @@ export default function AdminPdksPage() {
                             {/* Tablet Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {displays.map(disp => (
-                                    <div key={disp.id} className={`rounded-[18px] border shadow-sm p-6 flex flex-col relative transition-all ${bgCard}`}>
+                                    <div key={disp.id} className={`rounded-[20px] border shadow-sm p-6 flex flex-col relative transition-all ${bgCard}`}>
                                         <div className={`absolute top-6 right-6 w-2.5 h-2.5 rounded-full ${disp.isActive ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-400'}`} title={disp.isActive ? "Aktif" : "Pasif"} />
 
                                         <div className="flex items-center gap-4 mb-6">
@@ -338,7 +338,7 @@ export default function AdminPdksPage() {
                                     </div>
                                 ))}
                                 {displays.length === 0 && (
-                                    <div className="col-span-full py-16 text-center border-2 border-dashed rounded-[18px] opacity-60 flex flex-col items-center">
+                                    <div className="col-span-full py-16 text-center border-2 border-dashed rounded-[20px] opacity-60 flex flex-col items-center">
                                         <TabletSmartphone size={32} className={`mb-3 ${textMuted}`} />
                                         <h3 className={`text-[15px] font-semibold ${textMain}`}>Kayıtlı Terminal Yok</h3>
                                         <p className={`text-[13px] mt-1 ${textMuted}`}>Sisteme yeni bir terminal cihazı ekleyerek başlayın.</p>
@@ -499,7 +499,7 @@ export default function AdminPdksPage() {
             {/* Modal for Creating/Editing Display */}
             {isModalOpen && (
                 <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
-                    <div className={`w-full max-w-lg overflow-hidden rounded-[24px] border shadow-2xl ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
+                    <div className={`w-full max-w-lg overflow-hidden rounded-[20px] border shadow-2xl ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
                         <div className="p-6 md:p-8">
                             <div className="flex justify-between items-start mb-6">
                                 <div>
@@ -556,7 +556,7 @@ export default function AdminPdksPage() {
                             </div>
                         </div>
 
-                        <div className={`p-6 border-t flex items-center gap-3 ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0b1120] border-white/10'}`}>
+                        <div className={`p-6 border-t flex items-center gap-3 ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
                             <button
                                 onClick={() => setIsModalOpen(false)}
                                 className={`flex-1 h-12 rounded-[12px] font-bold text-[13px] border transition-all ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-transparent border-white/10 text-slate-300 hover:bg-white/5'}`}
