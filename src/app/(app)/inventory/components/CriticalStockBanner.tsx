@@ -15,7 +15,7 @@ export default function CriticalStockBanner({ products, onFilterCritical, onProc
     if (criticalProducts.length === 0) return null;
 
     return (
-        <div className="mb-8 p-6 rounded-2xl border bg-red-50/50 border-red-200 dark:bg-red-950/20 dark:border-red-900/40 relative overflow-hidden group">
+        <div className="mb-8 p-6 rounded-[20px] border bg-red-50/50 border-red-200 dark:bg-red-950/20 dark:border-red-900/40 relative overflow-hidden group">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                 <div className="flex items-center gap-4">
                     <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 flex flex-shrink-0 items-center justify-center text-red-600 dark:text-red-400">

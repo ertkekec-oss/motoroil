@@ -56,7 +56,7 @@ export default function InventoryFilterBar({
                     placeholder="Envanterde Ara..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    className="w-full h-[40px] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 pl-9 pr-3 rounded-lg text-slate-900 dark:text-white text-[13px] placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-colors focus:border-blue-500"
+                    className="w-full h-[44px] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 pl-9 pr-3 rounded-lg text-slate-900 dark:text-white text-[13px] placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-colors focus:border-blue-500"
                 />
             </div>
 
@@ -65,7 +65,7 @@ export default function InventoryFilterBar({
                 <button
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
                     className={`
-                        flex items-center gap-2 px-4 h-[40px] rounded-lg text-[13px] font-medium transition-colors border
+                        flex items-center gap-2 px-4 h-[44px] rounded-lg text-[13px] font-medium transition-colors border
                         ${isFilterOpen
                             ? 'bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800'
                             : 'bg-white dark:bg-transparent border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5'

@@ -47,13 +47,11 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
     };
 
     return (
-        <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-sm relative z-0" style={{ height: 'calc(100vh - 300px)', minHeight: '600px' }}>
+        <div className="bg-white dark:bg-[#0f172a] rounded-[20px] p-6 border border-slate-200 dark:border-white/10 shadow-sm relative z-0" style={{ height: 'calc(100vh - 300px)', minHeight: '600px' }}>
             {/* Header Sticky Container */}
             <div className="shrink-0 bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/10 px-4 h-11 flex items-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 z-20 uppercase tracking-[0.08em] sticky top-0 rounded-t-xl">
                 <div className="w-10">
-                    <input
-                        type="checkbox"
-                        className="w-4 h-4 rounded border-slate-300 dark:border-white/20 bg-white dark:bg-white/5 checked:bg-blue-600 transition-all cursor-pointer"
+                    <input type="checkbox" className="w-[18px] h-[18px] accent-blue-600 rounded border-slate-300 cursor-pointer transition-all"
                         onChange={handleHeaderCheckboxChange}
                         checked={selectedIds.length === products.length && products.length > 0}
                     />
@@ -103,9 +101,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                 >
                                     {/* 1. Selection */}
                                     <div className="w-10 shrink-0 flex items-center" onClick={e => e.stopPropagation()}>
-                                        <input
-                                            type="checkbox"
-                                            className="w-4 h-4 rounded border-slate-300 dark:border-white/20 bg-white dark:bg-white/5 checked:bg-blue-600 transition-all cursor-pointer"
+                                        <input type="checkbox" className="w-[18px] h-[18px] accent-blue-600 rounded border-slate-300 cursor-pointer transition-all"
                                             checked={isSelected}
                                             onChange={() => isSelected ? onSelectionChange(selectedIds.filter(id => id !== item.id)) : onSelectionChange([...selectedIds, item.id])}
                                         />

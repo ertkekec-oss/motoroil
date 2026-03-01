@@ -105,13 +105,13 @@ export default function BulkPriceEntryContent({
                         <input
                             type="number"
                             placeholder="Değer..."
-                            className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 w-28 px-3 py-2 rounded-[10px] text-[13px] font-semibold text-center text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all duration-300 shadow-sm"
+                            className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 w-28 px-3 py-2 rounded-[12px] text-[13px] font-semibold text-center text-slate-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-300 shadow-sm"
                             value={adjValue || ''}
                             onChange={e => setAdjValue(parseFloat(e.target.value) || 0)}
                         />
                         <button
                             onClick={applyWizard}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-[10px] text-[12px] font-semibold tracking-wider transition-all shadow-sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-[12px] text-[12px] font-semibold tracking-wider transition-all shadow-sm"
                         >
                             UYGULA
                         </button>
@@ -136,7 +136,7 @@ export default function BulkPriceEntryContent({
                             {products.map(product => {
                                 const current = priceData[product.id] || {};
                                 return (
-                                    <tr key={product.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">
+                                    <tr key={product.id} className="h-[52px] border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">
                                         <td className="px-6 py-4">
                                             <div className="font-semibold text-slate-900 dark:text-white text-[13px] mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{product.name}</div>
                                             <div className="text-[11px] text-slate-500 flex items-center gap-2">
@@ -151,7 +151,7 @@ export default function BulkPriceEntryContent({
                                                     type="number"
                                                     value={current.buyPrice || ''}
                                                     onChange={e => handleUpdate(product.id, 'buyPrice', parseFloat(e.target.value) || 0)}
-                                                    className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[10px] p-2.5 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors pr-8"
+                                                    className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 h-[44px] rounded-[12px] px-3 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-colors pr-8"
                                                 />
                                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-semibold pointer-events-none">₺</span>
                                             </div>
@@ -161,7 +161,7 @@ export default function BulkPriceEntryContent({
                                                 <select
                                                     value={current.purchaseVat || 20}
                                                     onChange={e => handleUpdate(product.id, 'purchaseVat', parseInt(e.target.value))}
-                                                    className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[10px] px-2.5 py-2.5 text-[13px] font-medium text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                                    className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 h-[44px] rounded-[12px] px-3 text-[13px] font-medium text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-colors"
                                                 >
                                                     <option value="1">%1</option>
                                                     <option value="10">%10</option>
@@ -169,7 +169,7 @@ export default function BulkPriceEntryContent({
                                                 </select>
                                                 <button
                                                     onClick={() => handleUpdate(product.id, 'purchaseVatIncluded', !current.purchaseVatIncluded)}
-                                                    className={`px-3 py-2.5 rounded-[10px] text-[10px] font-semibold uppercase tracking-wider transition-colors ${current.purchaseVatIncluded
+                                                    className={`px-3 py-2.5 rounded-[12px] text-[10px] font-semibold uppercase tracking-wider transition-colors ${current.purchaseVatIncluded
                                                         ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
                                                         : 'bg-slate-50 text-slate-500 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'
                                                         }`}
@@ -184,7 +184,7 @@ export default function BulkPriceEntryContent({
                                                     type="number"
                                                     value={current.price || ''}
                                                     onChange={e => handleUpdate(product.id, 'price', parseFloat(e.target.value) || 0)}
-                                                    className="w-full bg-blue-50/50 dark:bg-blue-500/5 hover:bg-blue-50 dark:hover:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-[10px] p-2.5 text-[13px] font-bold text-blue-600 dark:text-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors pr-8 placeholder:text-blue-300 dark:placeholder:text-blue-800"
+                                                    className="w-full bg-blue-50/50 dark:bg-blue-500/5 hover:bg-blue-50 dark:hover:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 h-[44px] rounded-[12px] px-3 text-[13px] font-bold text-blue-600 dark:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-colors pr-8 placeholder:text-blue-300 dark:placeholder:text-blue-800"
                                                 />
                                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 dark:text-blue-500 text-xs font-bold pointer-events-none">₺</span>
                                             </div>
@@ -194,7 +194,7 @@ export default function BulkPriceEntryContent({
                                                 <select
                                                     value={current.salesVat || 20}
                                                     onChange={e => handleUpdate(product.id, 'salesVat', parseInt(e.target.value))}
-                                                    className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[10px] px-2.5 py-2.5 text-[13px] font-medium text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                                    className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 h-[44px] rounded-[12px] px-3 text-[13px] font-medium text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-colors"
                                                 >
                                                     <option value="1">%1</option>
                                                     <option value="10">%10</option>
@@ -202,7 +202,7 @@ export default function BulkPriceEntryContent({
                                                 </select>
                                                 <button
                                                     onClick={() => handleUpdate(product.id, 'salesVatIncluded', !current.salesVatIncluded)}
-                                                    className={`px-3 py-2.5 rounded-[10px] text-[10px] font-semibold uppercase tracking-wider transition-colors ${current.salesVatIncluded
+                                                    className={`px-3 py-2.5 rounded-[12px] text-[10px] font-semibold uppercase tracking-wider transition-colors ${current.salesVatIncluded
                                                         ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
                                                         : 'bg-slate-50 text-slate-500 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'
                                                         }`}

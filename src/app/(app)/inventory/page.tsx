@@ -1011,15 +1011,15 @@ function InventoryContent() {
         }
 
         /* Buttons - Secondary */
-        [data-theme="light"] .bg-subtle,
-        [data-theme="light"] button.bg-subtle {
+        [data-theme="light"] .bg-white dark:bg-[#111c30] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-[#1e293b],
+        [data-theme="light"] button.bg-white dark:bg-[#111c30] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-[#1e293b] {
           background: #ffffff !important;
           border: 1px solid #e2e8f0 !important;
           color: #0f172a !important;
           box-shadow: none !important;
         }
-        [data-theme="light"] .bg-subtle:hover,
-        [data-theme="light"] button.bg-subtle:hover {
+        [data-theme="light"] .bg-white dark:bg-[#111c30] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-[#1e293b]:hover,
+        [data-theme="light"] button.bg-white dark:bg-[#111c30] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-[#1e293b]:hover {
           background: #f1f5f9 !important;
           color: #0f172a !important;
         }
@@ -1069,7 +1069,7 @@ function InventoryContent() {
         }
 
         /* Tabs */
-        [data-theme="light"] .bg-subtle.backdrop-blur-md {
+        [data-theme="light"] .bg-white dark:bg-[#111c30] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-[#1e293b].backdrop-blur-md {
           background: #ffffff !important;
           border: 1px solid #e6ebf2 !important;
           padding: 4px !important;
@@ -1156,7 +1156,7 @@ function InventoryContent() {
         }
         [data-theme="light"] .bg-\[\#0f172a\],
         [data-theme="light"] .bg-\[\#0a0a0b\],
-        [data-theme="light"] .glass-plus,
+        [data-theme="light"] .bg-white dark:bg-[#0f172a] shadow-sm,
         [data-theme="light"] .animate-in {
           background: #ffffff !important;
           border: 1px solid #e6ebf2 !important;
@@ -1238,14 +1238,14 @@ function InventoryContent() {
                 </h1>
               </div>
               <div className="flex items-center gap-2 pl-1 mt-1">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(37,99,235,0.5)]"></span>
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-sm"></span>
                 <p className="text-white/50 font-medium text-xs uppercase tracking-widest">
                   ÜRÜN, STOK VE FİYAT YÖNETİMİ MERKEZİ
                 </p>
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-4 py-2 px-6 bg-amber-500/10 border border-amber-500/30 rounded-2xl">
+            <div className="flex items-center gap-4 py-2 px-6 bg-amber-500/10 border border-amber-500/30 rounded-[20px]">
               <div className="text-3xl animate-bounce">🔍</div>
               <div>
                 <h1 className="text-xl font-black text-amber-500 uppercase tracking-tight">
@@ -1261,57 +1261,27 @@ function InventoryContent() {
 
         {!isCounting && (
           <div className="flex items-center gap-3">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleExcelUpload}
-              accept=".xlsx, .xls"
-              className="hidden"
-            />
-
-            <div className="flex bg-subtle p-1 rounded-xl border border-main">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg hover-bg text-muted hover:text-main transition-colors text-[11px] font-bold uppercase tracking-wide"
-              >
-                <span className="text-sm">📤</span>
-                <span>Yükle</span>
-              </button>
-              <div className="w-px h-6 my-auto bg-main mx-1"></div>
-              <button
-                onClick={exportToExcel}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg hover-bg text-muted hover:text-main transition-colors text-[11px] font-bold uppercase tracking-wide"
-              >
-                <span className="text-sm">📥</span>
-                <span>İndir</span>
-              </button>
-            </div>
-
-            <button
-              onClick={startCount}
-              className="group relative px-6 py-2.5 rounded-xl bg-subtle border border-main overflow-hidden hover:border-emerald-500/50 transition-all hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="relative flex items-center gap-2 text-muted group-hover:text-emerald-400 font-bold text-xs uppercase tracking-wide">
-                <span className="group-hover:rotate-12 transition-transform duration-300 transform origin-center text-sm">
-                  🔍
-                </span>
-                <span>Stok Sayımı</span>
-              </div>
+            <input type="file" ref={fileInputRef} onChange={handleExcelUpload} accept=".xlsx, .xls" className="hidden" />
+            <button onClick={() => fileInputRef.current?.click()} className="h-[44px] px-4 rounded-[14px] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-[13px] hover:bg-slate-50 dark:hover:bg-[#1e293b] transition-all flex items-center gap-2 shadow-sm">
+              <span className="text-sm">📤</span> Yükle
+            </button>
+            <button onClick={exportToExcel} className="h-[44px] px-4 rounded-[14px] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-[13px] hover:bg-slate-50 dark:hover:bg-[#1e293b] transition-all flex items-center gap-2 shadow-sm">
+              <span className="text-sm">📥</span> İndir
+            </button>
+            <button onClick={startCount} className="h-[44px] px-4 rounded-[14px] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-[13px] hover:bg-slate-50 dark:hover:bg-[#1e293b] transition-all flex items-center gap-2 shadow-sm">
+              <span className="text-sm">🔍</span> Stok Sayımı
+            </button>
+            <button onClick={() => setShowScanner(true)} className="hidden md:flex h-[44px] px-4 rounded-[14px] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-[13px] hover:bg-slate-50 dark:hover:bg-[#1e293b] transition-all items-center gap-2 shadow-sm">
+              <span className="text-sm">📷</span> Barkod Tara
+            </button>
+            <button onClick={() => setShowAddModal(true)} className="h-[44px] px-6 rounded-[14px] bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[13px] transition-all flex items-center gap-2 shadow-sm">
+              <span>Yeni Ürün</span>
             </button>
 
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="group relative px-6 h-[42px] rounded-xl bg-blue-600 hover:bg-blue-700 shadow-sm transition-all"
-            >
-              <div className="relative flex items-center justify-center gap-2 text-white font-semibold text-[13px] tracking-wide">
-                <span>Yeni Ürün</span>
-              </div>
-            </button>
 
             <button
               onClick={() => setShowScanner(true)}
-              className="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-xl bg-subtle border border-main text-muted hover:text-main hover:border-white/30 transition-all font-bold text-xs uppercase tracking-wide"
+              className="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white dark:bg-[#111c30] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-main text-muted hover:text-main hover:border-white/30 transition-all font-bold text-xs uppercase tracking-wide"
             >
               <span>📷</span>
               Barkod Tara
@@ -1323,7 +1293,7 @@ function InventoryContent() {
       {/* --- DASHBOARD STATS (Premium Command Center) --- */}
       {/* --- DASHBOARD STATS (Horizontal Metrics Strip) --- */}
       {!isCounting && activeTab === "all" && (
-        <div className="mb-8 p-6 rounded-2xl border bg-gradient-to-b from-[#ffffff]/96 to-[#f8fafc]/88 border-[#0f172a]/5 dark:from-[#0f172a]/75 dark:to-[#0f172a]/55 dark:border-blue-400/15">
+        <div className="mb-8 p-6 rounded-[20px] border bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-black/5 dark:divide-white/5">
             {/* Toplam Ürün */}
             <div className="px-4 py-2 md:py-0">
@@ -1387,25 +1357,10 @@ function InventoryContent() {
         <div className="flex flex-col xl:flex-row items-center justify-between gap-6 mb-8 z-20 relative">
           {/* Left: Scrollable Tabs */}
           <div className="flex-shrink-0 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0 scrollbar-hide">
-            <div className="flex p-1 rounded-xl border border-slate-200 dark:border-white/10 whitespace-nowrap w-max h-[40px] items-center">
-              <button
-                onClick={() => setActiveTab("all")}
-                className={`px-4 h-full rounded-lg text-[13px] font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === "all" ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5"}`}
-              >
-                Envanter Listesi
-              </button>
-              <button
-                onClick={() => setActiveTab("transfers")}
-                className={`px-4 h-full rounded-lg text-[13px] font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === "transfers" ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5"}`}
-              >
-                Transfer & Sevkiyat
-              </button>
-              <button
-                onClick={() => setActiveTab("bulk-price")}
-                className={`px-4 h-full rounded-lg text-[13px] font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === "bulk-price" ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5"}`}
-              >
-                Fiyat Girişi
-              </button>
+            <div className="flex border-b border-slate-200 dark:border-white/10 whitespace-nowrap w-full md:w-max h-[48px] items-end gap-6 px-2">
+              <button onClick={() => setActiveTab("all")} className={`h-full px-2 text-[14px] font-semibold transition-all duration-300 flex items-center gap-2 border-b-2 ${activeTab === "all" ? "border-blue-600 text-blue-600 dark:text-blue-400" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"}`}>Envanter Listesi</button>
+              <button onClick={() => setActiveTab("transfers")} className={`h-full px-2 text-[14px] font-semibold transition-all duration-300 flex items-center gap-2 border-b-2 ${activeTab === "transfers" ? "border-blue-600 text-blue-600 dark:text-blue-400" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"}`}>Transfer & Sevkiyat</button>
+              <button onClick={() => setActiveTab("bulk-price")} className={`h-full px-2 text-[14px] font-semibold transition-all duration-300 flex items-center gap-2 border-b-2 ${activeTab === "bulk-price" ? "border-blue-600 text-blue-600 dark:text-blue-400" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"}`}>Fiyat Girişi</button>
             </div>
           </div>
 
@@ -1430,9 +1385,9 @@ function InventoryContent() {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-between mb-6 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
+        <div className="flex items-center justify-between mb-6 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-[20px]">
           <div className="flex items-center gap-4">
-            <div className="flex bg-subtle p-1 rounded-xl border border-main">
+            <div className="flex bg-white dark:bg-[#111c30] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-[#1e293b] p-1 rounded-xl border border-main">
               <input
                 type="text"
                 placeholder="Sayılacak ürünü ara..."

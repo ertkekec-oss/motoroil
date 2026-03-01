@@ -98,7 +98,7 @@ export default function TransferTabContent({
         <div className="animate-fade-in pb-12">
             {/* TOP: IN TRANSIT / PENDING RECEIPT */}
             {inTransitTransfers.length > 0 && (
-                <div className="mb-8 p-6 bg-blue-50 dark:bg-blue-500/5 rounded-[24px] border border-blue-200 dark:border-blue-500/20">
+                <div className="mb-8 p-6 bg-blue-50 dark:bg-blue-500/5 rounded-[20px] border border-blue-200 dark:border-blue-500/20">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-[16px] font-semibold flex items-center gap-2 text-slate-800 dark:text-white">
                             <span className="animate-pulse flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 text-lg">🚚</span> Yoldaki Sevkiyatlar / Mal Kabul Bekleyenler ({inTransitTransfers.length})
@@ -167,9 +167,9 @@ export default function TransferTabContent({
                 </div>
                 <div className="flex items-center gap-4">
                     {isTransferMode ? (
-                        <button onClick={() => { setIsTransferMode(false); setTransferCart([]); }} className="btn btn-ghost">← Listeye Dön</button>
+                        <button onClick={() => { setIsTransferMode(false); setTransferCart([]); }} className="h-[44px] px-6 rounded-[14px] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 font-semibold text-[13px] hover:bg-slate-50 dark:hover:bg-white/5 transition-all flex items-center justify-center gap-2 shadow-sm">← Listeye Dön</button>
                     ) : (
-                        <button onClick={() => setIsTransferMode(true)} className="btn btn-primary px-6 py-3 text-sm font-extrabold shadow-xl shadow-primary/20">
+                        <button onClick={() => setIsTransferMode(true)} className="h-[44px] px-6 rounded-[14px] bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[13px] transition-all flex items-center justify-center gap-2 shadow-sm">
                             + YENİ SEVKİYAT BAŞLAT
                         </button>
                     )}
@@ -179,7 +179,7 @@ export default function TransferTabContent({
             {isTransferMode ? (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* LEFT: SEARCH & ADD */}
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 shadow-sm h-[600px] flex flex-col p-6 rounded-[24px]">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 shadow-sm h-[600px] flex flex-col p-6 rounded-[20px]">
                         <h3 className="mb-6 text-[16px] font-semibold border-b border-slate-200 dark:border-white/10 pb-4 flex items-center gap-3 text-slate-900 dark:text-white">
                             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 text-[13px]">1</span> Ürün Seçimi
                         </h3>
@@ -222,7 +222,7 @@ export default function TransferTabContent({
                     </div>
 
                     {/* RIGHT: CART & CONFIRM */}
-                    <div className="bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 shadow-sm h-[600px] flex flex-col p-6 rounded-[24px]">
+                    <div className="bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 shadow-sm h-[600px] flex flex-col p-6 rounded-[20px]">
                         <h3 className="mb-6 text-[16px] font-semibold border-b border-slate-200 dark:border-white/10 pb-4 flex items-center gap-3 text-slate-900 dark:text-white">
                             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 text-[13px]">2</span> Sevkiyat Detayları
                         </h3>
@@ -274,7 +274,7 @@ export default function TransferTabContent({
                                     </thead>
                                     <tbody>
                                         {transferCart.map((item: any, idx: number) => (
-                                            <tr key={idx} className="border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+                                            <tr key={idx} className="h-[52px] border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
                                                 <td className="py-3 pl-2">
                                                     <div className="font-semibold text-slate-900 dark:text-white">{item.name}</div>
                                                     <div className="text-[11px] text-slate-500 mt-0.5">{item.code}</div>
@@ -344,7 +344,7 @@ export default function TransferTabContent({
                                 disabled={transferCart.length === 0}
                                 onClick={handleStartShipment}
                                 className={`
-                                    w-full h-[48px] rounded-[12px] text-[13px] font-semibold transition-all flex items-center justify-center gap-2
+                                    w-full h-[44px] rounded-[14px] text-[13px] font-semibold transition-all flex items-center justify-center gap-2
                                     ${transferCart.length === 0
                                         ? 'bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-white/10'
                                         : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
@@ -413,7 +413,7 @@ export default function TransferTabContent({
                                         </tr>
                                     ) : (
                                         recentTransfers.map(t => (
-                                            <tr key={t.id} className="border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+                                            <tr key={t.id} className="h-[52px] border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
                                                 <td className="py-3 px-5 text-slate-600 dark:text-slate-400 text-center">
                                                     <div className="font-medium">{new Date(t.shippedAt).toLocaleDateString('tr-TR')}</div>
                                                     <div className="text-[11px]">{new Date(t.shippedAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</div>

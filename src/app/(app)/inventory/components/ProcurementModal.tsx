@@ -114,7 +114,7 @@ export default function ProcurementModal({ isOpen, onClose, products }: Procurem
                             <p className="text-slate-500 dark:text-slate-400 font-medium text-[15px]">Tüm stoklar güvenli seviyede.</p>
                         </div>
                     ) : (
-                        <div className="border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden bg-white dark:bg-[#0f172a]">
+                        <div className="border border-slate-200 dark:border-white/10 rounded-[20px] overflow-hidden bg-white dark:bg-[#0f172a]">
                             <table className="w-full text-left">
                                 <thead className="bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/10">
                                     <tr className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
