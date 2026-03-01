@@ -127,75 +127,83 @@ function PaymentContent() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '20px'
+            padding: '40px 20px',
+            background: 'var(--bg-app, #080a0f)'
         }}>
-            <div className="card glass" style={{
+            <div style={{
                 maxWidth: '1200px',
                 width: '100%',
-                padding: '40px'
-            }}>
+                padding: '48px',
+                background: 'var(--bg-card, #0f172a)',
+                borderRadius: '24px',
+                border: '1px solid var(--border-color, rgba(255,255,255,0.05))',
+                boxShadow: '0 24px 60px rgba(0,0,0,0.2)'
+            }} className="animate-scale-in">
                 {/* Header */}
                 <div style={{
                     textAlign: 'center',
-                    marginBottom: '32px',
-                    borderBottom: '1px solid var(--border-light)',
-                    paddingBottom: '24px'
+                    marginBottom: '40px',
+                    borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))',
+                    paddingBottom: '32px'
                 }}>
                     <div style={{
-                        fontSize: '11px',
-                        color: 'var(--text-muted)',
+                        fontSize: '12px',
+                        color: paymentType === 'payable' ? '#ef4444' : '#10b981',
                         textTransform: 'uppercase',
-                        letterSpacing: '2px',
-                        fontWeight: '700',
-                        marginBottom: '8px'
-                    }}>
-                        {paymentType === 'payable' ? '💸 ÖDEME YAPILIYOR' : '💰 TAHSİLAT YAPILIYOR'}
-                    </div>
-                    <h1 style={{
-                        fontSize: '28px',
-                        margin: '0 0 12px 0',
+                        letterSpacing: '3px',
                         fontWeight: '800',
-                        color: 'white'
+                        marginBottom: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
                     }}>
-                        {paymentType === 'payable' ? 'Ödeme İşlemi' : 'Tahsilat İşlemi'}
-                    </h1>
+                        <span style={{ fontSize: '18px' }}>{paymentType === 'payable' ? '💸' : '💰'}</span>
+                        {paymentType === 'payable' ? 'ÖDEME İŞLEMİ' : 'TAHSİLAT İŞLEMİ'}
+                    </div>
                     <div style={{
-                        fontSize: '13px',
-                        color: 'var(--text-muted)'
+                        fontSize: '14px',
+                        color: 'var(--text-muted, #94a3b8)',
+                        fontWeight: '500',
+                        background: 'var(--bg-panel, rgba(255,255,255,0.03))',
+                        display: 'inline-flex',
+                        padding: '8px 16px',
+                        borderRadius: '12px',
+                        border: '1px solid var(--border-color, rgba(255,255,255,0.05))'
                     }}>
-                        <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>#{refId}</span> • {title}
+                        <span style={{ color: '#3b82f6', fontWeight: '800', marginRight: '8px' }}>#{refId}</span> {title}
                     </div>
                 </div>
 
                 {/* Main Content - Horizontal Layout */}
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr 1fr',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
                     gap: '24px',
-                    marginBottom: '32px'
+                    marginBottom: '40px'
                 }}>
                     {/* Left: Amount */}
                     <div style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        padding: '24px',
-                        borderRadius: '12px',
-                        border: '1px solid var(--border-light)',
+                        background: 'var(--bg-panel, rgba(255,255,255,0.02))',
+                        padding: '32px',
+                        borderRadius: '20px',
+                        border: '1px solid var(--border-color, rgba(255,255,255,0.05))',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'center'
                     }}>
                         <label style={{
-                            fontSize: '10px',
+                            fontSize: '11px',
                             display: 'block',
-                            marginBottom: '12px',
-                            color: 'var(--text-muted)',
-                            letterSpacing: '1.5px',
-                            fontWeight: '700'
+                            marginBottom: '16px',
+                            color: 'var(--text-muted, #64748b)',
+                            letterSpacing: '2px',
+                            fontWeight: '800'
                         }}>
                             İŞLEM TUTARI
                         </label>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontSize: '32px', fontWeight: 'bold', color: 'var(--primary)' }}>₺</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <span style={{ fontSize: '40px', fontWeight: '900', color: '#3b82f6' }}>₺</span>
                             <input
                                 type="number"
                                 value={amount}
@@ -203,11 +211,13 @@ function PaymentContent() {
                                 style={{
                                     background: 'transparent',
                                     border: 'none',
-                                    color: 'white',
-                                    fontSize: '40px',
+                                    color: 'var(--text-main, #fff)',
+                                    fontSize: '56px',
                                     fontWeight: '900',
                                     width: '100%',
-                                    outline: 'none'
+                                    outline: 'none',
+                                    fontFamily: 'monospace',
+                                    letterSpacing: '-2px'
                                 }}
                                 placeholder="0"
                             />
@@ -216,22 +226,22 @@ function PaymentContent() {
 
                     {/* Middle: Payment Method */}
                     <div style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        padding: '24px',
-                        borderRadius: '12px',
-                        border: '1px solid var(--border-light)'
+                        background: 'var(--bg-panel, rgba(255,255,255,0.02))',
+                        padding: '32px',
+                        borderRadius: '20px',
+                        border: '1px solid var(--border-color, rgba(255,255,255,0.05))'
                     }}>
                         <label style={{
-                            fontSize: '10px',
+                            fontSize: '11px',
                             display: 'block',
-                            marginBottom: '12px',
-                            color: 'var(--text-muted)',
-                            letterSpacing: '1.5px',
-                            fontWeight: '700'
+                            marginBottom: '16px',
+                            color: 'var(--text-muted, #64748b)',
+                            letterSpacing: '2px',
+                            fontWeight: '800'
                         }}>
                             ÖDEME YÖNTEMİ
                         </label>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {paymentMethods.map(method => (
                                 <button
                                     key={method.id}
@@ -239,36 +249,45 @@ function PaymentContent() {
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '12px',
-                                        padding: '12px 16px',
+                                        gap: '16px',
+                                        padding: '16px 20px',
                                         cursor: 'pointer',
-                                        borderRadius: '8px',
+                                        borderRadius: '16px',
                                         border: paymentMethod === method.id
                                             ? `2px solid ${method.color}`
-                                            : '1px solid rgba(255,255,255,0.1)',
+                                            : '1px solid var(--border-color, rgba(255,255,255,0.05))',
                                         background: paymentMethod === method.id
-                                            ? 'rgba(255,255,255,0.1)'
-                                            : 'transparent',
+                                            ? `${method.color}10`
+                                            : 'var(--bg-card, rgba(255,255,255,0.02))',
                                         transition: 'all 0.2s',
                                         position: 'relative'
                                     }}
+                                    className="hover:-translate-y-1 hover:shadow-md"
                                 >
-                                    <span style={{ fontSize: '24px' }}>{method.icon}</span>
+                                    <div style={{
+                                        width: '40px', height: '40px', borderRadius: '12px',
+                                        background: paymentMethod === method.id ? method.color : 'var(--bg-panel, rgba(255,255,255,0.05))',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: '20px', transition: 'all 0.2s'
+                                    }}>
+                                        {method.icon}
+                                    </div>
                                     <span style={{
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        color: 'white',
-                                        flex: 1
+                                        fontSize: '15px',
+                                        fontWeight: '700',
+                                        color: 'var(--text-main, #fff)',
+                                        flex: 1,
+                                        textAlign: 'left'
                                     }}>
                                         {method.label}
                                     </span>
                                     {paymentMethod === method.id && (
-                                        <span style={{
-                                            fontSize: '16px',
-                                            color: method.color
+                                        <div style={{
+                                            width: '24px', height: '24px', borderRadius: '50%', background: method.color, color: '#fff',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold'
                                         }}>
                                             ✓
-                                        </span>
+                                        </div>
                                     )}
                                 </button>
                             ))}
@@ -277,18 +296,18 @@ function PaymentContent() {
 
                     {/* Right: Account Selection */}
                     <div style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        padding: '24px',
-                        borderRadius: '12px',
-                        border: '1px solid var(--border-light)'
+                        background: 'var(--bg-panel, rgba(255,255,255,0.02))',
+                        padding: '32px',
+                        borderRadius: '20px',
+                        border: '1px solid var(--border-color, rgba(255,255,255,0.05))'
                     }}>
                         <label style={{
-                            fontSize: '10px',
+                            fontSize: '11px',
                             display: 'block',
-                            marginBottom: '12px',
-                            color: 'var(--text-muted)',
-                            letterSpacing: '1.5px',
-                            fontWeight: '700'
+                            marginBottom: '16px',
+                            color: 'var(--text-muted, #64748b)',
+                            letterSpacing: '2px',
+                            fontWeight: '800'
                         }}>
                             HEDEF KASA/BANKA
                         </label>
@@ -297,25 +316,27 @@ function PaymentContent() {
                             onChange={(e) => setSelectedAccount(e.target.value)}
                             style={{
                                 width: '100%',
-                                background: 'rgba(0,0,0,0.3)',
-                                color: 'white',
-                                border: '1px solid var(--border-light)',
-                                padding: '12px',
-                                borderRadius: '8px',
+                                background: 'var(--bg-card, rgba(255,255,255,0.05))',
+                                color: 'var(--text-main, #fff)',
+                                border: '1px solid var(--border-color, rgba(255,255,255,0.1))',
+                                padding: '16px 20px',
+                                borderRadius: '14px',
                                 cursor: 'pointer',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                marginBottom: '16px'
+                                fontSize: '15px',
+                                fontWeight: '700',
+                                marginBottom: '24px',
+                                outline: 'none'
                             }}
+                            className="focus:border-blue-500 focus:bg-blue-500/5 transition-all"
                         >
                             {paymentMethod === 'cash' && kasalar.filter(k => k.type === 'Nakit').map(c => (
-                                <option key={c.id} value={c.id}>{c.name}</option>
+                                <option key={c.id} value={c.id} style={{ background: '#0f172a' }}>{c.name}</option>
                             ))}
                             {paymentMethod === 'cc' && kasalar.filter(k => k.type === 'POS' || k.type === 'Kredi Kartı Tahsilat').map(p => (
-                                <option key={p.id} value={p.id}>{p.name}</option>
+                                <option key={p.id} value={p.id} style={{ background: '#0f172a' }}>{p.name}</option>
                             ))}
                             {paymentMethod === 'iban' && kasalar.filter(k => k.type === 'Banka').map(b => (
-                                <option key={b.id} value={b.id}>{b.name}</option>
+                                <option key={b.id} value={b.id} style={{ background: '#0f172a' }}>{b.name}</option>
                             ))}
                         </select>
 
@@ -323,23 +344,25 @@ function PaymentContent() {
                         {paymentMethod === 'cc' && (
                             <div>
                                 <label style={{
-                                    fontSize: '10px',
+                                    fontSize: '11px',
                                     display: 'block',
-                                    marginBottom: '8px',
-                                    color: 'var(--text-muted)',
-                                    letterSpacing: '1.5px',
-                                    fontWeight: '700'
+                                    marginBottom: '12px',
+                                    color: 'var(--text-muted, #64748b)',
+                                    letterSpacing: '2px',
+                                    fontWeight: '800'
                                 }}>
                                     TAKSİT
                                 </label>
                                 {installmentOptions.length === 0 ? (
                                     <div style={{
-                                        padding: '12px',
+                                        padding: '16px',
                                         textAlign: 'center',
-                                        color: 'var(--text-muted)',
-                                        fontSize: '11px',
-                                        background: 'rgba(255,0,0,0.1)',
-                                        borderRadius: '6px'
+                                        color: '#ef4444',
+                                        fontSize: '13px',
+                                        fontWeight: '700',
+                                        background: 'rgba(239, 68, 68, 0.1)',
+                                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                                        borderRadius: '12px'
                                     }}>
                                         ⚠️ Taksit tanımı yok
                                     </div>
@@ -347,30 +370,31 @@ function PaymentContent() {
                                     <div style={{
                                         display: 'grid',
                                         gridTemplateColumns: 'repeat(3, 1fr)',
-                                        gap: '6px'
+                                        gap: '8px'
                                     }}>
                                         {installmentOptions.map(opt => (
                                             <button
                                                 key={opt.value}
                                                 onClick={() => setInstallment(opt.value)}
                                                 style={{
-                                                    padding: '10px 6px',
-                                                    borderRadius: '6px',
+                                                    padding: '12px 8px',
+                                                    borderRadius: '12px',
                                                     border: installment === opt.value
-                                                        ? '2px solid var(--primary)'
-                                                        : '1px solid rgba(255,255,255,0.2)',
+                                                        ? '2px solid #3b82f6'
+                                                        : '1px solid var(--border-color, rgba(255,255,255,0.05))',
                                                     background: installment === opt.value
-                                                        ? 'rgba(59, 130, 246, 0.2)'
-                                                        : 'transparent',
-                                                    color: 'white',
-                                                    fontWeight: '600',
-                                                    fontSize: '11px',
+                                                        ? 'rgba(59, 130, 246, 0.1)'
+                                                        : 'var(--bg-card, rgba(255,255,255,0.02))',
+                                                    color: installment === opt.value ? '#3b82f6' : 'var(--text-main, #fff)',
+                                                    fontWeight: '700',
+                                                    fontSize: '13px',
                                                     cursor: 'pointer',
                                                     transition: 'all 0.2s',
                                                     textAlign: 'center'
                                                 }}
+                                                className="hover:border-blue-500/50"
                                             >
-                                                {opt.value === 1 ? 'Tek' : opt.value}
+                                                {opt.value === 1 ? 'Tek Çekim' : `${opt.value} Taksit`}
                                             </button>
                                         ))}
                                     </div>
@@ -381,35 +405,60 @@ function PaymentContent() {
                 </div>
 
                 {/* Action Buttons */}
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', gap: '16px', justifyContent: 'space-between', paddingTop: '24px', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
                     <button
                         onClick={() => router.back()}
                         disabled={isProcessing}
-                        className="btn btn-outline"
                         style={{
                             padding: '16px 32px',
-                            borderRadius: '10px',
-                            fontSize: '14px',
-                            fontWeight: '600'
+                            borderRadius: '16px',
+                            fontSize: '15px',
+                            fontWeight: '800',
+                            background: 'var(--bg-panel, rgba(255,255,255,0.05))',
+                            color: 'var(--text-main, #fff)',
+                            border: '1px solid var(--border-color, rgba(255,255,255,0.1))',
+                            cursor: isProcessing ? 'not-allowed' : 'pointer',
+                            opacity: isProcessing ? 0.5 : 1,
+                            transition: 'all 0.2s'
                         }}
+                        className="hover:bg-white/10"
                     >
-                        ← İptal
+                        ← Geri Dön
                     </button>
                     <button
                         onClick={handlePayment}
                         disabled={isProcessing}
-                        className="btn btn-primary"
                         style={{
-                            width: '50%',
+                            flex: 1,
+                            maxWidth: '60%',
                             padding: '16px',
-                            fontSize: '15px',
-                            fontWeight: '700',
-                            opacity: isProcessing ? 0.7 : 1,
+                            fontSize: '16px',
+                            fontWeight: '900',
+                            background: paymentType === 'payable' ? '#ef4444' : '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '16px',
                             cursor: isProcessing ? 'not-allowed' : 'pointer',
-                            borderRadius: '10px'
+                            opacity: isProcessing ? 0.8 : 1,
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '12px',
+                            boxShadow: `0 8px 32px ${paymentType === 'payable' ? 'rgba(239, 68, 68, 0.4)' : 'rgba(59, 130, 246, 0.4)'}`
                         }}
+                        className="hover:-translate-y-1 hover:shadow-lg"
                     >
-                        {isProcessing ? '⏳ İŞLENİYOR...' : '✓ ONAYLA VE İŞLEMİ TAMAMLA'}
+                        {isProcessing ? (
+                            <>
+                                <span className="loader" style={{ width: '20px', height: '20px', border: '3px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
+                                İŞLENİYOR...
+                            </>
+                        ) : paymentType === 'payable' ? (
+                            <>💸 ONAYLA VE ÖDEMEYİ YAP</>
+                        ) : (
+                            <>💰 ONAYLA VE TAHSİLATI AL</>
+                        )}
                     </button>
                 </div>
             </div>

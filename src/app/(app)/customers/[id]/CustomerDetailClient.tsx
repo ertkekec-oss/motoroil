@@ -538,7 +538,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
     return (
         <div className="flex flex-col min-h-screen" style={{ background: 'var(--bg-main)', color: 'var(--text-main)' }}>
-            
+
             {/* EXECUTIVE HEADER STRIP */}
             <div style={{
                 background: 'var(--bg-panel, rgba(15, 23, 42, 0.6))',
@@ -550,7 +550,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 zIndex: 40
             }}>
                 <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    
+
                     {/* Top Row: Back link & Title */}
                     <div className="flex-between">
                         <Link href="/customers" style={{ color: 'var(--text-muted, #888)', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', transition: 'color 0.2s' }} className="hover:text-blue-500">
@@ -603,7 +603,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏷️</span> {val(customer.category?.name, 'Genel Müşteri')}</span>
                                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📱</span> {val(customer.phone, 'Telefon Yok')}</span>
                                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📧</span> {val(customer.email, 'E-posta Yok')}</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📍</span> 
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📍</span>
                                         {(() => {
                                             let addr = customer.address;
                                             if (customer.city || customer.district) {
@@ -680,44 +680,50 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 {/* PREMIUM ACTION BAR */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
                     <Link href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
-                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px', background: 'linear-gradient(to right, #2563eb, #3b82f6)', color: 'white', padding: '20px', borderRadius: '16px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(59, 130, 246, 0.3)', border: '1px solid rgba(59, 130, 246, 0.5)' }}
-                        className="hover:-translate-y-1 hover:shadow-lg"
+                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(59, 130, 246, 0.05)', color: '#3b82f6', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(59, 130, 246, 0.2)' }}
+                        className="hover:-translate-y-1 hover:bg-blue-500/10 hover:border-blue-500/40"
                     >
-                        <span style={{ fontSize: '24px' }}>💰</span>
-                        <span style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px' }}>TAHSİLAT AL</span>
-                        <span style={{ fontSize: '11px', opacity: 0.8, fontWeight: '500' }}>Cari hesaptan nakit / kk ile ödeme al</span>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>💰</div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>TAHSİLAT AL</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Cari hesaptan nakit / kk ile ödeme al</div>
+                        </div>
                     </Link>
 
                     <Link href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
-                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px', background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-main, white)', padding: '20px', borderRadius: '16px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}
-                        className="hover:-translate-y-1 hover:bg-white/5"
+                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'rgba(239, 68, 68, 0.02)', color: '#ef4444', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(239, 68, 68, 0.2)' }}
+                        className="hover:-translate-y-1 hover:bg-red-500/5 hover:border-red-500/40"
                     >
-                        <span style={{ fontSize: '24px' }}>💸</span>
-                        <span style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px' }}>ÖDEME YAP</span>
-                        <span style={{ fontSize: '11px', color: 'var(--text-muted, #888)', fontWeight: '500' }}>Müşteriye nakit / kk ile ödeme çıkışı yap</span>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>💸</div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>ÖDEME YAP</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Firmadan nakit / kk ile ödeme çıkışı yap</div>
+                        </div>
                     </Link>
 
                     <button
                         onClick={() => router.push(`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`)}
-                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px', background: 'linear-gradient(to right, #059669, #10b981)', color: 'white', padding: '20px', borderRadius: '16px', border: 'none', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)' }}
-                        className="hover:-translate-y-1 hover:shadow-lg"
+                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-main, white)', padding: '24px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', cursor: 'pointer', transition: 'all 0.2s' }}
+                        className="hover:-translate-y-1 hover:bg-white/5 hover:border-white/20"
                     >
-                        <span style={{ fontSize: '24px' }}>🛒</span>
-                        <span style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px' }}>SATIŞ YAP (POS YÖNLENDİR)</span>
-                        <span style={{ fontSize: '11px', opacity: 0.8, fontWeight: '500' }}>Bu müşteriye yeni bir ürün veya hizmet sat</span>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'var(--bg-panel, rgba(255,255,255,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🛒</div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>SATIŞ YAP (POS)</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Bu müşteriye yeni işlem başlat</div>
+                        </div>
                     </button>
                 </div>
 
-                {/* PREMIUM TABS */}
-                <div style={{ display: 'flex', gap: '8px', padding: '6px', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '14px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', overflowX: 'auto' }}>
+                {/* ENTERPRISE TABS */}
+                <div style={{ display: 'flex', gap: '32px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', overflowX: 'auto', paddingBottom: '0' }}>
                     {[
-                        { id: 'all', label: 'Tüm Hareketler', icon: '📋' },
-                        { id: 'sales', label: 'Satışlar & Faturalar', icon: '🧾' },
-                        { id: 'payments', label: 'Finansal İşlemler', icon: '💳' },
-                        { id: 'documents', label: 'Dosyalar & Evraklar', icon: '📁' },
-                        { id: 'services', label: 'Servis Geçmişi', icon: '🔧' },
-                        { id: 'warranties', label: 'Garantiler', icon: '🛡️' },
-                        { id: 'checks', label: 'Çek & Senetler', icon: '📑' }
+                        { id: 'all', label: 'Tüm Hareketler' },
+                        { id: 'sales', label: 'Satışlar & Faturalar' },
+                        { id: 'payments', label: 'Finansal İşlemler' },
+                        { id: 'documents', label: 'Dosyalar & Evraklar' },
+                        { id: 'services', label: 'Servis Geçmişi' },
+                        { id: 'warranties', label: 'Garantiler' },
+                        { id: 'checks', label: 'Çek & Senetler' }
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -727,587 +733,592 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 if (tab.id === 'services') fetchServices();
                             }}
                             style={{
-                                padding: '10px 20px',
-                                borderRadius: '10px',
+                                padding: '16px 4px',
                                 border: 'none',
-                                background: activeTab === tab.id ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
-                                color: activeTab === tab.id ? '#3b82f6' : 'var(--text-muted, #888)',
+                                background: 'transparent',
+                                color: activeTab === tab.id ? '#3b82f6' : 'var(--text-muted, #64748b)',
                                 fontWeight: activeTab === tab.id ? '800' : '600',
                                 fontSize: '13px',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '8px',
-                                transition: 'all 0.2s',
-                                whiteSpace: 'nowrap'
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px',
+                                position: 'relative',
+                                whiteSpace: 'nowrap',
+                                transition: 'color 0.2s'
                             }}
-                            className={activeTab !== tab.id ? "hover:bg-white/5 hover:text-white" : ""}
+                            className={activeTab !== tab.id ? "hover:text-white" : ""}
                         >
-                            <span>{tab.icon}</span> {tab.label}
+                            {tab.label}
+                            {activeTab === tab.id && (
+                                <div style={{ position: 'absolute', bottom: '-1px', left: 0, right: 0, height: '2px', background: '#3b82f6', borderRadius: '4px 4px 0 0' }}></div>
+                            )}
                         </button>
                     ))}
                 </div>
 
                 {/* CONTENT AREA */}
-                <div style={{ 
-                    background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', 
-                    borderRadius: '20px', 
-                    border: '1px solid var(--border-color, rgba(255,255,255,0.05))', 
+                <div style={{
+                    background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))',
+                    borderRadius: '20px',
+                    border: '1px solid var(--border-color, rgba(255,255,255,0.05))',
                     overflow: 'hidden',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)' 
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
                 }}>
 
-                {activeTab === 'services' ? (
-                    <div style={{ padding: '32px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Servis Kayıtları</h3>
-                            <div style={{ display: 'flex', gap: '12px' }}>
-                                <Link
-                                    href={`/service/new?customerId=${customer.id}&customerName=${encodeURIComponent(customer.name)}`}
-                                    className="btn btn-primary"
-                                    style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', border: 'none', color: 'white', fontWeight: '800' }}
-                                >
-                                    🛠️ Servis Başlat
-                                </Link>
+                    {activeTab === 'services' ? (
+                        <div style={{ padding: '32px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                                <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Servis Kayıtları</h3>
+                                <div style={{ display: 'flex', gap: '12px' }}>
+                                    <Link
+                                        href={`/service/new?customerId=${customer.id}&customerName=${encodeURIComponent(customer.name)}`}
+                                        className="btn btn-primary"
+                                        style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', border: 'none', color: 'white', fontWeight: '800' }}
+                                    >
+                                        🛠️ Servis Başlat
+                                    </Link>
 
-                                {services.length > 0 && services[0].plate && (
-                                    <>
-                                        <button
-                                            onClick={() => setQrPlate(services[0].plate)}
-                                            className="btn btn-outline"
-                                            style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontWeight: '600' }}
-                                        >
-                                            📱 Dijital Karne (QR)
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                const plate = services[0].plate;
-                                                const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.periodya.com/vehicle/${plate}`;
-                                                window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
-                                            }}
-                                            className="btn btn-primary"
-                                            style={{ background: '#25D366', border: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', color: 'white', fontWeight: '800' }}
-                                        >
-                                            💬 WhatsApp Bildirim
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* QR MODAL (Services Tab Inline) */}
-                        {qrPlate && (
-                            <div style={{
-                                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                                background: 'rgba(15, 23, 42, 0.85)', zIndex: 9999,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                backdropFilter: 'blur(12px)'
-                            }} onClick={() => setQrPlate(null)}>
-                                <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-card, #1e293b)', padding: '40px', borderRadius: '24px', textAlign: 'center', maxWidth: '360px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }} className="animate-scale-in">
-                                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📱</div>
-                                    <h3 style={{ color: 'var(--text-main, #fff)', margin: '0 0 12px 0', fontSize: '20px', fontWeight: '800' }}>Dijital Servis Karnesi</h3>
-                                    <div style={{ fontSize: '13px', color: 'var(--text-muted, #94a3b8)', marginBottom: '24px', lineHeight: '1.6' }}>Müşteriniz bu QR kodunu okutarak veya linke tıklayarak servis geçmişine ulaşabilir.</div>
-                                    <div style={{ background: 'white', padding: '16px', borderRadius: '16px', display: 'inline-block' }}>
-                                        <img
-                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://www.periodya.com/vehicle/${qrPlate}`}
-                                            alt="QR"
-                                            style={{ width: '220px', height: '220px', borderRadius: '8px' }}
-                                        />
-                                    </div>
-                                    <div style={{ marginTop: '24px', fontWeight: '900', fontSize: '24px', color: '#3b82f6', letterSpacing: '2px' }}>{qrPlate}</div>
-                                    <button onClick={() => setQrPlate(null)} style={{ marginTop: '24px', padding: '14px 0', width: '100%', background: 'var(--bg-panel, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '12px', cursor: 'pointer', fontWeight: '800' }}>Kapat</button>
+                                    {services.length > 0 && services[0].plate && (
+                                        <>
+                                            <button
+                                                onClick={() => setQrPlate(services[0].plate)}
+                                                className="btn btn-outline"
+                                                style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontWeight: '600' }}
+                                            >
+                                                📱 Dijital Karne (QR)
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    const plate = services[0].plate;
+                                                    const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.periodya.com/vehicle/${plate}`;
+                                                    window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
+                                                }}
+                                                className="btn btn-primary"
+                                                style={{ background: '#25D366', border: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', color: 'white', fontWeight: '800' }}
+                                            >
+                                                💬 WhatsApp Bildirim
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
-                        )}
 
-                        {servicesLoading ? (
-                            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
-                                <div className="loader" style={{ margin: '0 auto 16px', width: '24px', height: '24px', border: '3px solid rgba(59, 130, 246, 0.3)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                                Servis verileri getiriliyor...
+                            {/* QR MODAL (Services Tab Inline) */}
+                            {qrPlate && (
+                                <div style={{
+                                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                                    background: 'rgba(15, 23, 42, 0.85)', zIndex: 9999,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    backdropFilter: 'blur(12px)'
+                                }} onClick={() => setQrPlate(null)}>
+                                    <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-card, #1e293b)', padding: '40px', borderRadius: '24px', textAlign: 'center', maxWidth: '360px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }} className="animate-scale-in">
+                                        <div style={{ fontSize: '48px', marginBottom: '16px' }}>📱</div>
+                                        <h3 style={{ color: 'var(--text-main, #fff)', margin: '0 0 12px 0', fontSize: '20px', fontWeight: '800' }}>Dijital Servis Karnesi</h3>
+                                        <div style={{ fontSize: '13px', color: 'var(--text-muted, #94a3b8)', marginBottom: '24px', lineHeight: '1.6' }}>Müşteriniz bu QR kodunu okutarak veya linke tıklayarak servis geçmişine ulaşabilir.</div>
+                                        <div style={{ background: 'white', padding: '16px', borderRadius: '16px', display: 'inline-block' }}>
+                                            <img
+                                                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://www.periodya.com/vehicle/${qrPlate}`}
+                                                alt="QR"
+                                                style={{ width: '220px', height: '220px', borderRadius: '8px' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginTop: '24px', fontWeight: '900', fontSize: '24px', color: '#3b82f6', letterSpacing: '2px' }}>{qrPlate}</div>
+                                        <button onClick={() => setQrPlate(null)} style={{ marginTop: '24px', padding: '14px 0', width: '100%', background: 'var(--bg-panel, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '12px', cursor: 'pointer', fontWeight: '800' }}>Kapat</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {servicesLoading ? (
+                                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
+                                    <div className="loader" style={{ margin: '0 auto 16px', width: '24px', height: '24px', border: '3px solid rgba(59, 130, 246, 0.3)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                                    Servis verileri getiriliyor...
+                                </div>
+                            ) : services.length === 0 ? (
+                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🔧</div>
+                                    <div style={{ marginBottom: '24px', color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Bu müşteriye ait servis kaydı yok.</div>
+                                    <button
+                                        onClick={() => router.push(`/service/new?customerId=${customer.id}&customerName=${encodeURIComponent(customer.name)}`)}
+                                        className="btn btn-primary"
+                                        style={{ padding: '12px 24px', fontSize: '14px', borderRadius: '12px', background: '#3b82f6', color: 'white', fontWeight: '800', border: 'none' }}
+                                    >
+                                        ➕ İlk Servis Kaydını Oluştur
+                                    </button>
+                                </div>
+                            ) : (
+                                <div style={{ overflowX: 'auto' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                                        <thead>
+                                            <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
+                                                <th style={{ padding: '16px 20px' }}>TARİH</th>
+                                                <th style={{ padding: '16px 20px' }}>MARKA / MODEL</th>
+                                                <th style={{ padding: '16px 20px' }}>PLAKA</th>
+                                                <th style={{ padding: '16px 20px' }}>KİLOMETRE</th>
+                                                <th style={{ padding: '16px 20px' }}>YAPILAN İŞLEMLER</th>
+                                                <th style={{ padding: '16px 20px', textAlign: 'right' }}>TUTAR</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {services.map((svc: any, i: number) => {
+                                                let itemsStr = '';
+                                                try {
+                                                    const items = typeof svc.items === 'string' ? JSON.parse(svc.items) : svc.items;
+                                                    if (Array.isArray(items) && items.length > 0) {
+                                                        itemsStr = items.map((p: any) => p.name).join(', ');
+                                                    }
+                                                } catch (e) { console.error('Error parsing items', e); }
+
+                                                const displayDate = svc.date ? svc.date : svc.createdAt;
+
+                                                return (
+                                                    <tr key={svc.id || i} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', cursor: 'pointer', transition: 'background 0.2s' }} onClick={() => router.push(`/service/${svc.id}`)} className="hover:bg-white/5">
+                                                        <td style={{ padding: '20px', color: 'var(--text-main, #e2e8f0)', fontWeight: '500' }}>{displayDate ? new Date(displayDate).toLocaleDateString('tr-TR') : '-'}</td>
+                                                        <td style={{ padding: '20px' }}><span style={{ fontWeight: '600', color: 'var(--text-main, #fff)' }}>{svc.vehicleBrand || '-'}</span></td>
+                                                        <td style={{ padding: '20px' }}>
+                                                            <span style={{ padding: '4px 10px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontWeight: '800', color: '#3b82f6', letterSpacing: '1px' }}>
+                                                                {svc.plate || '-'}
+                                                            </span>
+                                                        </td>
+                                                        <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)' }}>{svc.km ? svc.km.toLocaleString() : '-'} km</td>
+                                                        <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)' }}>
+                                                            {itemsStr ? (
+                                                                <span title={itemsStr} style={{ display: 'inline-block', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{itemsStr}</span>
+                                                            ) : (
+                                                                <span style={{ display: 'inline-block', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{svc.description || svc.notes || '-'}</span>
+                                                            )}
+                                                        </td>
+                                                        <td style={{ padding: '20px', textAlign: 'right', fontWeight: '800', color: '#3b82f6', fontSize: '14px' }}>
+                                                            {Number(svc.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    ) : activeTab === 'documents' ? (
+                        <div style={{ padding: '32px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                                <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Müşteri Dosyaları</h3>
+                                <label className="btn btn-primary" style={{ cursor: uploading ? 'wait' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: uploading ? 'var(--bg-card)' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', color: 'white', fontWeight: '800' }}>
+                                    {uploading ? 'Yükleniyor...' : '⬆️ Dosya Yükle'}
+                                    <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} disabled={uploading} accept=".pdf,.png,.jpg,.jpeg" />
+                                </label>
                             </div>
-                        ) : services.length === 0 ? (
-                            <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
-                                <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🔧</div>
-                                <div style={{ marginBottom: '24px', color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Bu müşteriye ait servis kaydı yok.</div>
+
+                            {docsLoading ? (
+                                <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
+                                    <div className="loader" style={{ margin: '0 auto 16px', width: '24px', height: '24px', border: '3px solid rgba(59, 130, 246, 0.3)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                                    Dosyalar getiriliyor...
+                                </div>
+                            ) : documents.length === 0 ? (
+                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📁</div>
+                                    <div style={{ color: 'var(--text-muted, #888)', fontSize: '15px', fontWeight: '500' }}>Henüz dosyası yüklenmemiş. (Maks 5MB PDF, PNG, JPEG)</div>
+                                </div>
+                            ) : (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
+                                    {documents.map(doc => (
+                                        <div key={doc.id} className="glass hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-xl" style={{ padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', background: 'var(--bg-card, rgba(255,255,255,0.03))', display: 'flex', flexDirection: 'column', alignItems: 'center', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                            <div style={{ fontSize: '48px', marginBottom: '16px', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))' }}>
+                                                {doc.fileType?.includes('pdf') ? '📄' : '🖼️'}
+                                            </div>
+                                            <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', marginBottom: '8px' }}>
+                                                {doc.fileName}
+                                            </div>
+                                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', marginBottom: '20px', fontWeight: '500' }}>
+                                                {(doc.fileSize / 1024).toFixed(1)} KB • {new Date(doc.uploadedAt).toLocaleDateString()}
+                                            </div>
+                                            <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                                                <button onClick={() => handleViewDoc(doc.id, doc.fileType)} style={{ flex: 1, padding: '8px', borderRadius: '8px', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', background: 'var(--bg-panel, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', cursor: 'pointer', fontSize: '12px', fontWeight: '700' }} className="hover:bg-white/10 hover:border-white/30">Aç</button>
+                                                <button onClick={() => handleDeleteDoc(doc.id)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', cursor: 'pointer', fontSize: '12px', fontWeight: '700' }} className="hover:bg-red-500/20">Sil</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ) : activeTab === 'warranties' ? (
+                        <div style={{ padding: '32px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                                <div>
+                                    <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Dijital Garanti Karnesi & Takip</h3>
+                                    <p style={{ color: 'var(--text-muted, #888)', fontSize: '13px', marginTop: '6px', fontWeight: '500' }}>Müşteriye satılan ürünlerin garanti süreçlerini yönetin.</p>
+                                </div>
                                 <button
-                                    onClick={() => router.push(`/service/new?customerId=${customer.id}&customerName=${encodeURIComponent(customer.name)}`)}
+                                    onClick={() => setWarrantyModalOpen(true)}
                                     className="btn btn-primary"
-                                    style={{ padding: '12px 24px', fontSize: '14px', borderRadius: '12px', background: '#3b82f6', color: 'white', fontWeight: '800', border: 'none' }}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', fontWeight: '800', border: 'none', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}
                                 >
-                                    ➕ İlk Servis Kaydını Oluştur
+                                    🛡️ Garanti Başlat
                                 </button>
                             </div>
-                        ) : (
-                            <div style={{ overflowX: 'auto' }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
-                                    <thead>
-                                        <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
-                                            <th style={{ padding: '16px 20px' }}>TARİH</th>
-                                            <th style={{ padding: '16px 20px' }}>MARKA / MODEL</th>
-                                            <th style={{ padding: '16px 20px' }}>PLAKA</th>
-                                            <th style={{ padding: '16px 20px' }}>KİLOMETRE</th>
-                                            <th style={{ padding: '16px 20px' }}>YAPILAN İŞLEMLER</th>
-                                            <th style={{ padding: '16px 20px', textAlign: 'right' }}>TUTAR</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {services.map((svc: any, i: number) => {
-                                            let itemsStr = '';
-                                            try {
-                                                const items = typeof svc.items === 'string' ? JSON.parse(svc.items) : svc.items;
-                                                if (Array.isArray(items) && items.length > 0) {
-                                                    itemsStr = items.map((p: any) => p.name).join(', ');
-                                                }
-                                            } catch (e) { console.error('Error parsing items', e); }
 
-                                            const displayDate = svc.date ? svc.date : svc.createdAt;
+                            {warranties.length === 0 ? (
+                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🛡️</div>
+                                    <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Henüz kayıtlı garanti karnesi bulunmuyor.</div>
+                                </div>
+                            ) : (
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+                                    {warranties.map(w => (
+                                        <div key={w.id} className="glass hover:border-blue-500/30" style={{
+                                            padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.08))',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                            background: 'linear-gradient(90deg, var(--bg-card, rgba(255,255,255,0.03)) 0%, rgba(255,255,255,0) 100%)',
+                                            transition: 'all 0.2s',
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                        }}>
+                                            <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+                                                <div style={{
+                                                    width: '56px', height: '56px', borderRadius: '16px',
+                                                    background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px',
+                                                    border: '1px solid rgba(59, 130, 246, 0.2)'
+                                                }}>
+                                                    🛡️
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main, white)' }}>{w.productName}</div>
+                                                    <div style={{ fontSize: '13px', color: 'var(--text-muted, #888)', marginTop: '4px', display: 'flex', gap: '12px', fontWeight: '500' }}>
+                                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏷</span> S. No: <span style={{ color: 'var(--text-main, #ccc)' }}>{w.serialNo}</span></span>
+                                                        <span>•</span>
+                                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🧾</span> Fatura: <span style={{ color: 'var(--text-main, #ccc)' }}>{w.invoiceNo}</span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                            return (
-                                                <tr key={svc.id || i} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', cursor: 'pointer', transition: 'background 0.2s' }} onClick={() => router.push(`/service/${svc.id}`)} className="hover:bg-white/5">
-                                                    <td style={{ padding: '20px', color: 'var(--text-main, #e2e8f0)', fontWeight: '500' }}>{displayDate ? new Date(displayDate).toLocaleDateString('tr-TR') : '-'}</td>
-                                                    <td style={{ padding: '20px' }}><span style={{ fontWeight: '600', color: 'var(--text-main, #fff)' }}>{svc.vehicleBrand || '-'}</span></td>
+                                            <div style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
+                                                <div style={{ textAlign: 'center' }}>
+                                                    <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px', marginBottom: '4px' }}>BAŞLANGIÇ</div>
+                                                    <div style={{ color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }}>{new Date(w.startDate).toLocaleDateString()}</div>
+                                                </div>
+
+                                                <div style={{ textAlign: 'center' }}>
+                                                    <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px', marginBottom: '4px' }}>BİTİŞ</div>
+                                                    <div style={{ color: '#ef4444', fontWeight: '700', fontSize: '14px' }}>{new Date(w.endDate).toLocaleDateString()}</div>
+                                                </div>
+
+                                                <div style={{ textAlign: 'right', minWidth: '160px' }}>
+                                                    <div style={{
+                                                        padding: '8px 16px', borderRadius: '8px',
+                                                        background: w.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                                        color: w.status === 'Active' ? '#10b981' : '#ef4444',
+                                                        border: `1px solid ${w.status === 'Active' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                                                        fontSize: '12px', fontWeight: '800',
+                                                        display: 'inline-flex', alignItems: 'center', gap: '6px'
+                                                    }}>
+                                                        {w.status === 'Active' ? '✅ Garantisi Devam Ediyor' : '❌ Süresi Doldu'}
+                                                    </div>
+                                                    <div style={{ fontSize: '12px', color: 'var(--text-muted, #666)', marginTop: '8px', fontWeight: '600' }}>
+                                                        G. Süresi: {w.period}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ) : activeTab === 'checks' ? (
+                        <div style={{ padding: '32px' }}>
+                            <div style={{ marginBottom: '24px' }}>
+                                <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Müşteri Çek & Senetleri</h3>
+                            </div>
+                            {!customer.checks || customer.checks.length === 0 ? (
+                                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📑</div>
+                                    <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Kayıtlı evrak bulunmuyor.</div>
+                                </div>
+                            ) : (
+                                <div style={{ overflowX: 'auto' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                                        <thead>
+                                            <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
+                                                <th style={{ padding: '16px 20px' }}>EVRAK TÜRÜ</th>
+                                                <th style={{ padding: '16px 20px' }}>VADE TARİHİ</th>
+                                                <th style={{ padding: '16px 20px' }}>BANKA / NO</th>
+                                                <th style={{ padding: '16px 20px' }}>DURUM</th>
+                                                <th style={{ textAlign: 'right', padding: '16px 20px' }}>TUTAR</th>
+                                                <th style={{ textAlign: 'right', padding: '16px 20px' }}>İŞLEM</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {customer.checks.map((c: any) => (
+                                                <tr key={c.id} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', transition: 'background 0.2s' }} className="hover:bg-white/5">
+                                                    <td style={{ padding: '20px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{c.type}</td>
+                                                    <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
+                                                    <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{c.bank} - <span style={{ fontFamily: 'monospace' }}>{c.number}</span></td>
                                                     <td style={{ padding: '20px' }}>
-                                                        <span style={{ padding: '4px 10px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontWeight: '800', color: '#3b82f6', letterSpacing: '1px' }}>
-                                                            {svc.plate || '-'}
-                                                        </span>
+                                                        <span style={{ padding: '6px 12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontSize: '11px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{c.status}</span>
                                                     </td>
-                                                    <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)' }}>{svc.km ? svc.km.toLocaleString() : '-'} km</td>
-                                                    <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)' }}>
-                                                        {itemsStr ? (
-                                                            <span title={itemsStr} style={{ display: 'inline-block', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{itemsStr}</span>
-                                                        ) : (
-                                                            <span style={{ display: 'inline-block', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{svc.description || svc.notes || '-'}</span>
+                                                    <td style={{ textAlign: 'right', fontWeight: '800', padding: '20px', color: '#3b82f6', fontSize: '14px' }}>{Number(c.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                    <td style={{ textAlign: 'right', padding: '20px' }}>
+                                                        {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    setActiveCheck(c);
+                                                                    setTargetKasaId(String(kasalar[0]?.id || ''));
+                                                                    setShowCheckCollectModal(true);
+                                                                }}
+                                                                style={{ padding: '8px 16px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s' }}
+                                                                className="hover:bg-blue-500 hover:text-white"
+                                                            >
+                                                                {c.type.includes('Alınan') ? '💰 Tahsil Et' : '💸 Öde'}
+                                                            </button>
                                                         )}
                                                     </td>
-                                                    <td style={{ padding: '20px', textAlign: 'right', fontWeight: '800', color: '#3b82f6', fontSize: '14px' }}>
-                                                        {Number(svc.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
-                                                    </td>
                                                 </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-                ) : activeTab === 'documents' ? (
-                    <div style={{ padding: '32px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                            <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Müşteri Dosyaları</h3>
-                            <label className="btn btn-primary" style={{ cursor: uploading ? 'wait' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: uploading ? 'var(--bg-card)' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', color: 'white', fontWeight: '800' }}>
-                                {uploading ? 'Yükleniyor...' : '⬆️ Dosya Yükle'}
-                                <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} disabled={uploading} accept=".pdf,.png,.jpg,.jpeg" />
-                            </label>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
+                    ) : (
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
+                                <thead>
+                                    <tr style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-muted, #888)', fontSize: '11px', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800' }}>
+                                        <th style={{ padding: '24px' }}>Tarih</th>
+                                        <th style={{ padding: '24px' }}>Hareket Türü</th>
+                                        <th style={{ padding: '24px' }}>Açıklama</th>
+                                        <th style={{ padding: '24px', textAlign: 'right' }}>Tutar</th>
+                                        <th style={{ padding: '24px', textAlign: 'right', width: '220px' }}>Aksiyonlar</th>
+                                        <th style={{ padding: '24px', textAlign: 'center', width: '60px' }}></th>
+                                    </tr>
+                                </thead>
 
-                        {docsLoading ? (
-                            <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
-                                <div className="loader" style={{ margin: '0 auto 16px', width: '24px', height: '24px', border: '3px solid rgba(59, 130, 246, 0.3)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                                Dosyalar getiriliyor...
-                            </div>
-                        ) : documents.length === 0 ? (
-                            <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
-                                <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📁</div>
-                                <div style={{ color: 'var(--text-muted, #888)', fontSize: '15px', fontWeight: '500' }}>Henüz dosyası yüklenmemiş. (Maks 5MB PDF, PNG, JPEG)</div>
-                            </div>
-                        ) : (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
-                                {documents.map(doc => (
-                                    <div key={doc.id} className="glass" style={{ padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', background: 'var(--bg-card, rgba(255,255,255,0.03))', display: 'flex', flexDirection: 'column', alignItems: 'center', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} className="hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-xl">
-                                        <div style={{ fontSize: '48px', marginBottom: '16px', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))' }}>
-                                            {doc.fileType?.includes('pdf') ? '📄' : '🖼️'}
-                                        </div>
-                                        <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', marginBottom: '8px' }}>
-                                            {doc.fileName}
-                                        </div>
-                                        <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', marginBottom: '20px', fontWeight: '500' }}>
-                                            {(doc.fileSize / 1024).toFixed(1)} KB • {new Date(doc.uploadedAt).toLocaleDateString()}
-                                        </div>
-                                        <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
-                                            <button onClick={() => handleViewDoc(doc.id, doc.fileType)} style={{ flex: 1, padding: '8px', borderRadius: '8px', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', background: 'var(--bg-panel, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', cursor: 'pointer', fontSize: '12px', fontWeight: '700' }} className="hover:bg-white/10 hover:border-white/30">Aç</button>
-                                            <button onClick={() => handleDeleteDoc(doc.id)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', cursor: 'pointer', fontSize: '12px', fontWeight: '700' }} className="hover:bg-red-500/20">Sil</button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                ) : activeTab === 'warranties' ? (
-                    <div style={{ padding: '32px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                            <div>
-                                <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Dijital Garanti Karnesi & Takip</h3>
-                                <p style={{ color: 'var(--text-muted, #888)', fontSize: '13px', marginTop: '6px', fontWeight: '500' }}>Müşteriye satılan ürünlerin garanti süreçlerini yönetin.</p>
-                            </div>
-                            <button
-                                onClick={() => setWarrantyModalOpen(true)}
-                                className="btn btn-primary"
-                                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', fontWeight: '800', border: 'none', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}
-                            >
-                                🛡️ Garanti Başlat
-                            </button>
-                        </div>
-
-                        {warranties.length === 0 ? (
-                            <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
-                                <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🛡️</div>
-                                <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Henüz kayıtlı garanti karnesi bulunmuyor.</div>
-                            </div>
-                        ) : (
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
-                                {warranties.map(w => (
-                                    <div key={w.id} className="glass" style={{
-                                        padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.08))',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                        background: 'linear-gradient(90deg, var(--bg-card, rgba(255,255,255,0.03)) 0%, rgba(255,255,255,0) 100%)',
-                                        transition: 'all 0.2s',
-                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                                    }} className="hover:border-blue-500/30">
-                                        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                                            <div style={{
-                                                width: '56px', height: '56px', borderRadius: '16px',
-                                                background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px',
-                                                border: '1px solid rgba(59, 130, 246, 0.2)'
-                                            }}>
-                                                🛡️
-                                            </div>
-                                            <div>
-                                                <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main, white)' }}>{w.productName}</div>
-                                                <div style={{ fontSize: '13px', color: 'var(--text-muted, #888)', marginTop: '4px', display: 'flex', gap: '12px', fontWeight: '500' }}>
-                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏷</span> S. No: <span style={{ color: 'var(--text-main, #ccc)' }}>{w.serialNo}</span></span>
-                                                    <span>•</span>
-                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🧾</span> Fatura: <span style={{ color: 'var(--text-main, #ccc)' }}>{w.invoiceNo}</span></span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
-                                            <div style={{ textAlign: 'center' }}>
-                                                <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px', marginBottom: '4px' }}>BAŞLANGIÇ</div>
-                                                <div style={{ color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }}>{new Date(w.startDate).toLocaleDateString()}</div>
-                                            </div>
-
-                                            <div style={{ textAlign: 'center' }}>
-                                                <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px', marginBottom: '4px' }}>BİTİŞ</div>
-                                                <div style={{ color: '#ef4444', fontWeight: '700', fontSize: '14px' }}>{new Date(w.endDate).toLocaleDateString()}</div>
-                                            </div>
-
-                                            <div style={{ textAlign: 'right', minWidth: '160px' }}>
-                                                <div style={{
-                                                    padding: '8px 16px', borderRadius: '8px',
-                                                    background: w.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                                                    color: w.status === 'Active' ? '#10b981' : '#ef4444',
-                                                    border: `1px solid ${w.status === 'Active' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                                                    fontSize: '12px', fontWeight: '800',
-                                                    display: 'inline-flex', alignItems: 'center', gap: '6px'
-                                                }}>
-                                                    {w.status === 'Active' ? '✅ Garantisi Devam Ediyor' : '❌ Süresi Doldu'}
-                                                </div>
-                                                <div style={{ fontSize: '12px', color: 'var(--text-muted, #666)', marginTop: '8px', fontWeight: '600' }}>
-                                                    G. Süresi: {w.period}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                ) : activeTab === 'checks' ? (
-                    <div style={{ padding: '32px' }}>
-                        <div style={{ marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Müşteri Çek & Senetleri</h3>
-                        </div>
-                        {!customer.checks || customer.checks.length === 0 ? (
-                            <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
-                                <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📑</div>
-                                <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Kayıtlı evrak bulunmuyor.</div>
-                            </div>
-                        ) : (
-                            <div style={{ overflowX: 'auto' }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
-                                    <thead>
-                                        <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
-                                            <th style={{ padding: '16px 20px' }}>EVRAK TÜRÜ</th>
-                                            <th style={{ padding: '16px 20px' }}>VADE TARİHİ</th>
-                                            <th style={{ padding: '16px 20px' }}>BANKA / NO</th>
-                                            <th style={{ padding: '16px 20px' }}>DURUM</th>
-                                            <th style={{ textAlign: 'right', padding: '16px 20px' }}>TUTAR</th>
-                                            <th style={{ textAlign: 'right', padding: '16px 20px' }}>İŞLEM</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {customer.checks.map((c: any) => (
-                                            <tr key={c.id} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', transition: 'background 0.2s' }} className="hover:bg-white/5">
-                                                <td style={{ padding: '20px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{c.type}</td>
-                                                <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
-                                                <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{c.bank} - <span style={{ fontFamily: 'monospace' }}>{c.number}</span></td>
-                                                <td style={{ padding: '20px' }}>
-                                                    <span style={{ padding: '6px 12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontSize: '11px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{c.status}</span>
-                                                </td>
-                                                <td style={{ textAlign: 'right', fontWeight: '800', padding: '20px', color: '#3b82f6', fontSize: '14px' }}>{Number(c.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
-                                                <td style={{ textAlign: 'right', padding: '20px' }}>
-                                                    {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
-                                                        <button
-                                                            onClick={() => {
-                                                                setActiveCheck(c);
-                                                                setTargetKasaId(String(kasalar[0]?.id || ''));
-                                                                setShowCheckCollectModal(true);
-                                                            }}
-                                                            style={{ padding: '8px 16px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s' }}
-                                                            className="hover:bg-blue-500 hover:text-white"
-                                                        >
-                                                            {c.type.includes('Alınan') ? '💰 Tahsil Et' : '💸 Öde'}
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
-                            <thead>
-                                <tr style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-muted, #888)', fontSize: '11px', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800' }}>
-                                    <th style={{ padding: '24px' }}>Tarih</th>
-                                    <th style={{ padding: '24px' }}>Hareket Türü</th>
-                                    <th style={{ padding: '24px' }}>Açıklama</th>
-                                    <th style={{ padding: '24px', textAlign: 'right' }}>Tutar</th>
-                                    <th style={{ padding: '24px', textAlign: 'right', width: '220px' }}>Aksiyonlar</th>
-                                    <th style={{ padding: '24px', textAlign: 'center', width: '60px' }}></th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {filteredHistory.length === 0 ? (
-                                    <tr><td colSpan={6} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted, #666)', fontSize: '15px', fontWeight: '500' }}>Bu kategoride kayıt veya işlem bulunamadı.</td></tr>
-                                ) : (
-                                    paginatedHistory.map((item, idx) => (
-                                        <Fragment key={item.id || idx}>
-                                            <tr
-                                                onClick={() => item.items && setExpandedRowId(expandedRowId === item.id ? null : item.id)}
-                                                style={{
-                                                    borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))',
-                                                    cursor: item.items ? 'pointer' : 'default',
-                                                    background: expandedRowId === item.id ? 'var(--bg-card, rgba(255,255,255,0.03))' : 'transparent',
-                                                    transition: 'all 0.2s'
-                                                }}
-                                                className="hover:bg-white/5"
-                                            >
-                                                <td style={{ padding: '24px', fontSize: '13px', color: 'var(--text-main, #ddd)', fontWeight: '600' }}>{item.date}</td>
-                                                <td style={{ padding: '24px' }}>
-                                                    <span style={{
-                                                        padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '800',
-                                                        background: item.color + '15', color: item.color, border: '1px solid ' + item.color + '30'
-                                                    }}>
-                                                        {item.type}
-                                                    </span>
-                                                </td>
-                                                <td style={{ padding: '24px', fontSize: '13px', color: 'var(--text-muted, #aaa)', fontWeight: '500' }}>{item.desc}</td>
-                                                <td style={{ padding: '24px', textAlign: 'right', fontWeight: '800', fontSize: '15px', color: item.amount > 0 ? '#ef4444' : '#10b981', fontFamily: 'monospace' }}>
-                                                    {Math.abs(item.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
-                                                </td>
-                                                <td style={{ padding: '24px', textAlign: 'right' }}>
-                                                    {item.type === 'Satış' && (
-                                                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
-                                                            {item.orderId && (
-                                                                item.isFormal ? (
-                                                                    <>
-                                                                        <span style={{
-                                                                            padding: '6px 10px',
-                                                                            background: 'rgba(16,185,129,0.1)',
-                                                                            color: '#10b981',
-                                                                            border: '1px solid rgba(16,185,129,0.2)',
-                                                                            borderRadius: '8px',
-                                                                            fontSize: '11px',
-                                                                            fontWeight: '800',
-                                                                            whiteSpace: 'nowrap',
-                                                                            display: 'inline-flex',
-                                                                            alignItems: 'center',
-                                                                            gap: '6px'
-                                                                        }}>
-                                                                            ✅ Faturalandı
-                                                                        </span>
-                                                                        {item.formalInvoiceId && (
-                                                                            <button
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${item.formalInvoiceId}`, '_blank');
-                                                                                }}
-                                                                                style={{ padding: '6px 10px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                                                                                className="hover:bg-indigo-500 hover:text-white transition-colors"
-                                                                            >
-                                                                                🖨️ Yazdır
-                                                                            </button>
-                                                                        )}
-                                                                    </>
-                                                                ) : (
-                                                                    <button
-                                                                        onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
-                                                                        style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
-                                                                        className="hover:bg-blue-500 hover:text-white box-shadow-blue"
-                                                                    >
-                                                                        🧾 Faturalandır
-                                                                    </button>
-                                                                )
-                                                            )}
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleOpenPlanModal(item); }}
-                                                                style={{ padding: '6px 12px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
-                                                                className="hover:bg-amber-500 hover:text-white"
-                                                            >
-                                                                📅 Vadelendir
-                                                            </button>
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    if (!completedIds.includes(item.id) && !processingIds.includes(item.id)) {
-                                                                        handleReturnTransaction(item.id);
-                                                                    }
-                                                                }}
-                                                                disabled={completedIds.includes(item.id) || processingIds.includes(item.id)}
-                                                                style={{
-                                                                    padding: '6px 12px',
-                                                                    background: completedIds.includes(item.id) ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
-                                                                    color: completedIds.includes(item.id) ? 'var(--text-muted, #666)' : '#ef4444',
-                                                                    border: completedIds.includes(item.id) ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(239, 68, 68, 0.3)',
-                                                                    borderRadius: '8px',
-                                                                    fontSize: '11px',
-                                                                    fontWeight: '800',
-                                                                    cursor: completedIds.includes(item.id) ? 'default' : 'pointer',
-                                                                    whiteSpace: 'nowrap',
-                                                                    opacity: processingIds.includes(item.id) ? 0.5 : 1,
-                                                                    display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                                                    transition: 'all 0.2s'
-                                                                }}
-                                                                className={!completedIds.includes(item.id) && !processingIds.includes(item.id) ? "hover:bg-red-500 hover:text-white" : ""}
-                                                                title="İşlemi İade Al / İptal Et"
-                                                            >
-                                                                {processingIds.includes(item.id) ? '⏳' : (completedIds.includes(item.id) ? '✅ İade Edildi' : '↩️ İptal')}
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </td>
-                                                <td style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #666)' }}>{item.items ? (expandedRowId === item.id ? '▲' : '▼') : ''}</td>
-                                            </tr>
-                                            {expandedRowId === item.id && item.items && (
-                                                <tr style={{ background: '#080a0f', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.03))' }}>
-                                                    <td colSpan={6} style={{ padding: '24px 32px' }}>
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px' }}>
-                                                            {/* Sol Taraf: Kalemler (Order Summary) */}
-                                                            <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
-                                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', paddingBottom: '16px' }}>
-                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
-                                                                            📦
+                                <tbody>
+                                    {filteredHistory.length === 0 ? (
+                                        <tr><td colSpan={6} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted, #666)', fontSize: '15px', fontWeight: '500' }}>Bu kategoride kayıt veya işlem bulunamadı.</td></tr>
+                                    ) : (
+                                        paginatedHistory.map((item, idx) => (
+                                            <Fragment key={item.id || idx}>
+                                                <tr
+                                                    onClick={() => item.items && setExpandedRowId(expandedRowId === item.id ? null : item.id)}
+                                                    style={{
+                                                        borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))',
+                                                        cursor: item.items ? 'pointer' : 'default',
+                                                        background: expandedRowId === item.id ? 'var(--bg-card, rgba(255,255,255,0.03))' : 'transparent',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                    className="hover:bg-white/5"
+                                                >
+                                                    <td style={{ padding: '24px', fontSize: '13px', color: 'var(--text-main, #ddd)', fontWeight: '600' }}>{item.date}</td>
+                                                    <td style={{ padding: '24px' }}>
+                                                        <span style={{
+                                                            padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '800',
+                                                            background: item.color + '15', color: item.color, border: '1px solid ' + item.color + '30'
+                                                        }}>
+                                                            {item.type}
+                                                        </span>
+                                                    </td>
+                                                    <td style={{ padding: '24px', fontSize: '13px', color: 'var(--text-muted, #aaa)', fontWeight: '500' }}>{item.desc}</td>
+                                                    <td style={{ padding: '24px', textAlign: 'right', fontWeight: '800', fontSize: '15px', color: item.amount > 0 ? '#ef4444' : '#10b981', fontFamily: 'monospace' }}>
+                                                        {Math.abs(item.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                    </td>
+                                                    <td style={{ padding: '24px', textAlign: 'right' }}>
+                                                        {item.type === 'Satış' && (
+                                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                                {item.orderId && (
+                                                                    item.isFormal ? (
+                                                                        <>
+                                                                            <span style={{
+                                                                                padding: '6px 10px',
+                                                                                background: 'rgba(16,185,129,0.1)',
+                                                                                color: '#10b981',
+                                                                                border: '1px solid rgba(16,185,129,0.2)',
+                                                                                borderRadius: '8px',
+                                                                                fontSize: '11px',
+                                                                                fontWeight: '800',
+                                                                                whiteSpace: 'nowrap',
+                                                                                display: 'inline-flex',
+                                                                                alignItems: 'center',
+                                                                                gap: '6px'
+                                                                            }}>
+                                                                                ✅ Faturalandı
+                                                                            </span>
+                                                                            {item.formalInvoiceId && (
+                                                                                <button
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${item.formalInvoiceId}`, '_blank');
+                                                                                    }}
+                                                                                    style={{ padding: '6px 10px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                                                                    className="hover:bg-indigo-500 hover:text-white transition-colors"
+                                                                                >
+                                                                                    🖨️ Yazdır
+                                                                                </button>
+                                                                            )}
+                                                                        </>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
+                                                                            style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                                                                            className="hover:bg-blue-500 hover:text-white box-shadow-blue"
+                                                                        >
+                                                                            🧾 Faturalandır
+                                                                        </button>
+                                                                    )
+                                                                )}
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); handleOpenPlanModal(item); }}
+                                                                    style={{ padding: '6px 12px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                                                                    className="hover:bg-amber-500 hover:text-white"
+                                                                >
+                                                                    📅 Vadelendir
+                                                                </button>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        if (!completedIds.includes(item.id) && !processingIds.includes(item.id)) {
+                                                                            handleReturnTransaction(item.id);
+                                                                        }
+                                                                    }}
+                                                                    disabled={completedIds.includes(item.id) || processingIds.includes(item.id)}
+                                                                    style={{
+                                                                        padding: '6px 12px',
+                                                                        background: completedIds.includes(item.id) ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
+                                                                        color: completedIds.includes(item.id) ? 'var(--text-muted, #666)' : '#ef4444',
+                                                                        border: completedIds.includes(item.id) ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(239, 68, 68, 0.3)',
+                                                                        borderRadius: '8px',
+                                                                        fontSize: '11px',
+                                                                        fontWeight: '800',
+                                                                        cursor: completedIds.includes(item.id) ? 'default' : 'pointer',
+                                                                        whiteSpace: 'nowrap',
+                                                                        opacity: processingIds.includes(item.id) ? 0.5 : 1,
+                                                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                                                        transition: 'all 0.2s'
+                                                                    }}
+                                                                    className={!completedIds.includes(item.id) && !processingIds.includes(item.id) ? "hover:bg-red-500 hover:text-white" : ""}
+                                                                    title="İşlemi İade Al / İptal Et"
+                                                                >
+                                                                    {processingIds.includes(item.id) ? '⏳' : (completedIds.includes(item.id) ? '✅ İade Edildi' : '↩️ İptal')}
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #666)' }}>{item.items ? (expandedRowId === item.id ? '▲' : '▼') : ''}</td>
+                                                </tr>
+                                                {expandedRowId === item.id && item.items && (
+                                                    <tr style={{ background: '#080a0f', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.03))' }}>
+                                                        <td colSpan={6} style={{ padding: '24px 32px' }}>
+                                                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px' }}>
+                                                                {/* Sol Taraf: Kalemler (Order Summary) */}
+                                                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', paddingBottom: '16px' }}>
+                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                                            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
+                                                                                📦
+                                                                            </div>
+                                                                            <div>
+                                                                                <h4 style={{ margin: 0, fontSize: '14px', fontWeight: '800', color: 'var(--text-main, #fff)', letterSpacing: '0.5px' }}>SATIŞ ÖZETİ</h4>
+                                                                                <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>{item.items.length} Kalem Listeleniyor</div>
+                                                                            </div>
                                                                         </div>
-                                                                        <div>
-                                                                            <h4 style={{ margin: 0, fontSize: '14px', fontWeight: '800', color: 'var(--text-main, #fff)', letterSpacing: '0.5px' }}>SATIŞ ÖZETİ</h4>
-                                                                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>{item.items.length} Kalem Listeleniyor</div>
-                                                                        </div>
+                                                                        <span style={{ fontSize: '11px', fontWeight: '800', padding: '6px 12px', borderRadius: '20px', background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>{item.isFormal ? 'Faturalandı' : 'Sipariş'}</span>
                                                                     </div>
-                                                                    <span style={{ fontSize: '11px', fontWeight: '800', padding: '6px 12px', borderRadius: '20px', background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>{item.isFormal ? 'Faturalandı' : 'Sipariş'}</span>
-                                                                </div>
 
-                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                                    {item.items.map((sub: any, sIdx: number) => (
-                                                                        <div key={sIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '12px', border: '1px solid var(--border-color, rgba(255,255,255,0.02))' }}>
-                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                                                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--bg-card, rgba(255,255,255,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: 'var(--text-muted, #888)', fontWeight: '800' }}>
-                                                                                    {sIdx + 1}
-                                                                                </div>
-                                                                                <div>
-                                                                                    <div style={{ color: 'var(--text-main, #e2e8f0)', fontWeight: '700', fontSize: '14px', marginBottom: '4px' }}>{sub.name || sub.productName}</div>
-                                                                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                                                                        <span style={{ fontSize: '11px', color: 'var(--text-muted, #888)', background: 'var(--bg-card, rgba(255,255,255,0.05))', padding: '2px 6px', borderRadius: '4px' }}>x{sub.qty || sub.quantity}</span>
-                                                                                        {sub.price && <span style={{ fontSize: '11px', color: 'var(--text-muted, #666)' }}>Birim: {Number(sub.price).toLocaleString('tr-TR')} ₺</span>}
+                                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                        {item.items.map((sub: any, sIdx: number) => (
+                                                                            <div key={sIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '12px', border: '1px solid var(--border-color, rgba(255,255,255,0.02))' }}>
+                                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                                                                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--bg-card, rgba(255,255,255,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: 'var(--text-muted, #888)', fontWeight: '800' }}>
+                                                                                        {sIdx + 1}
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <div style={{ color: 'var(--text-main, #e2e8f0)', fontWeight: '700', fontSize: '14px', marginBottom: '4px' }}>{sub.name || sub.productName}</div>
+                                                                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                                                            <span style={{ fontSize: '11px', color: 'var(--text-muted, #888)', background: 'var(--bg-card, rgba(255,255,255,0.05))', padding: '2px 6px', borderRadius: '4px' }}>x{sub.qty || sub.quantity}</span>
+                                                                                            {sub.price && <span style={{ fontSize: '11px', color: 'var(--text-muted, #666)' }}>Birim: {Number(sub.price).toLocaleString('tr-TR')} ₺</span>}
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
+                                                                                <div style={{ fontWeight: '800', color: 'var(--text-main, #fff)', fontFamily: 'monospace', fontSize: '15px' }}>
+                                                                                    {((sub.price || 0) * (sub.qty || sub.quantity || 1)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                                                </div>
                                                                             </div>
-                                                                            <div style={{ fontWeight: '800', color: 'var(--text-main, #fff)', fontFamily: 'monospace', fontSize: '15px' }}>
-                                                                                {((sub.price || 0) * (sub.qty || sub.quantity || 1)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Sağ Taraf: Payment Breakdown & Timeline */}
-                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                                                                
-                                                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
-                                                                    <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>FİNANSAL ÖZET</h4>
-                                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted, #aaa)' }}>
-                                                                            <span>Ara Toplam</span>
-                                                                            <span>{Math.abs(item.amount * 0.8).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
-                                                                        </div>
-                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted, #aaa)' }}>
-                                                                            <span>KDV (%20)</span>
-                                                                            <span>{Math.abs(item.amount * 0.2).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
-                                                                        </div>
-                                                                        <div style={{ height: '1px', background: 'var(--border-color, rgba(255,255,255,0.1))', margin: '8px 0' }}></div>
-                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>GENEL TOPLAM</span>
-                                                                            <span style={{ fontSize: '20px', fontWeight: '900', color: '#3b82f6', fontFamily: 'monospace' }}>
-                                                                                {Math.abs(item.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
-                                                                            </span>
-                                                                        </div>
+                                                                        ))}
                                                                     </div>
                                                                 </div>
 
-                                                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
-                                                                     <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>ZAMAN ÇİZELGESİ</h4>
-                                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative' }}>
-                                                                        <div style={{ position: 'absolute', left: '7px', top: '10px', bottom: '10px', width: '2px', background: 'var(--border-color, rgba(255,255,255,0.05))' }}></div>
-                                                                        
-                                                                        <div style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 1 }}>
-                                                                            <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#3b82f6', border: '4px solid #080a0f', flexShrink: 0, marginTop: '2px' }}></div>
-                                                                            <div>
-                                                                                <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Satış Oluşturuldu</div>
-                                                                                <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>{item.date} • İşlem No: #{item.id?.substring(0,8)}</div>
+                                                                {/* Sağ Taraf: Payment Breakdown & Timeline */}
+                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+                                                                    <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                        <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>FİNANSAL ÖZET</h4>
+                                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted, #aaa)' }}>
+                                                                                <span>Ara Toplam</span>
+                                                                                <span>{Math.abs(item.amount * 0.8).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                                                            </div>
+                                                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted, #aaa)' }}>
+                                                                                <span>KDV (%20)</span>
+                                                                                <span>{Math.abs(item.amount * 0.2).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                                                            </div>
+                                                                            <div style={{ height: '1px', background: 'var(--border-color, rgba(255,255,255,0.1))', margin: '8px 0' }}></div>
+                                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                                <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>GENEL TOPLAM</span>
+                                                                                <span style={{ fontSize: '20px', fontWeight: '900', color: '#3b82f6', fontFamily: 'monospace' }}>
+                                                                                    {Math.abs(item.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                                                </span>
                                                                             </div>
                                                                         </div>
-                                                                        
-                                                                        {item.isFormal && (
+                                                                    </div>
+
+                                                                    <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                        <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>ZAMAN ÇİZELGESİ</h4>
+                                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative' }}>
+                                                                            <div style={{ position: 'absolute', left: '7px', top: '10px', bottom: '10px', width: '2px', background: 'var(--border-color, rgba(255,255,255,0.05))' }}></div>
+
                                                                             <div style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 1 }}>
-                                                                                <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#10b981', border: '4px solid #080a0f', flexShrink: 0, marginTop: '2px' }}></div>
+                                                                                <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#3b82f6', border: '4px solid #080a0f', flexShrink: 0, marginTop: '2px' }}></div>
                                                                                 <div>
-                                                                                    <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Resmileştirildi (Faturalandı)</div>
-                                                                                    <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>Sistem tarafından E-Arşive eklendi</div>
+                                                                                    <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Satış Oluşturuldu</div>
+                                                                                    <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>{item.date} • İşlem No: #{item.id?.substring(0, 8)}</div>
                                                                                 </div>
                                                                             </div>
-                                                                        )}
-                                                                     </div>
-                                                                </div>
 
+                                                                            {item.isFormal && (
+                                                                                <div style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 1 }}>
+                                                                                    <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#10b981', border: '4px solid #080a0f', flexShrink: 0, marginTop: '2px' }}></div>
+                                                                                    <div>
+                                                                                        <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Resmileştirildi (Faturalandı)</div>
+                                                                                        <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>Sistem tarafından E-Arşive eklendi</div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </Fragment>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </Fragment>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
+                    {/* PAGINATION */}
+                    <div style={{ padding: '24px 32px', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
                     </div>
-                )}
-                
-                {/* PAGINATION */}
-                <div style={{ padding: '24px 32px', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={setCurrentPage}
-                    />
                 </div>
-            </div>
 
             </div>
 
@@ -1607,9 +1618,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                         <span style={{ fontSize: '14px', color: 'var(--text-muted, #888)', fontWeight: '700' }}>KDV Toplam</span>
                                                         <span style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text-main, #fff)', fontFamily: 'monospace' }}>{totalVat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                     </div>
-                                                    
+
                                                     <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.4) 50%, transparent 100%)', margin: '20px 0' }}></div>
-                                                    
+
                                                     <div className="flex-between items-center">
                                                         <span style={{ fontSize: '16px', fontWeight: '900', letterSpacing: '1px' }}>GENEL TOPLAM</span>
                                                         <span style={{ fontSize: '32px', fontWeight: '900', color: '#3b82f6', letterSpacing: '-1px', textShadow: '0 4px 12px rgba(59,130,246,0.3)', fontFamily: 'monospace' }}>{finalTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span style={{ fontSize: '20px', opacity: 0.8 }}>₺</span></span>
@@ -1670,9 +1681,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     const msg = `Sayın ${customer.name}, ${lastInvoice.invoiceNo} numaralı faturanızı bu bağlantıdan görüntüleyebilirsiniz: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
                                     window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                 }}
-                                className="btn btn-primary"
+                                className="btn btn-primary hover:-translate-y-1"
                                 style={{ background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)', boxShadow: '0 8px 24px rgba(37, 211, 102, 0.3)', border: 'none', height: '64px', borderRadius: '20px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
-                                className="hover:-translate-y-1"
                             >
                                 <span style={{ fontSize: '24px' }}>💬</span> Müşteriye WhatsApp'tan İlet
                             </button>
@@ -1680,9 +1690,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 onClick={() => {
                                     window.location.href = `mailto:${customer.email || ''}?subject=Faturanız Hazır - ${lastInvoice.invoiceNo}&body=Sayın ${customer.name}, %0D%0A%0D%0A${lastInvoice.invoiceNo} numaralı faturanız ekte yer almaktadır. %0D%0A%0D%0AFaturayı görüntülemek için tıkla: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
                                 }}
-                                className="btn btn-outline"
+                                className="btn btn-outline hover:bg-white/10"
                                 style={{ height: '64px', borderRadius: '20px', fontWeight: '800', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
-                                className="hover:bg-white/10"
                             >
                                 <span style={{ fontSize: '24px' }}>📧</span> E-Posta ile Gönder
                             </button>
@@ -1788,7 +1797,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* WARRANTY START MODAL */}
             {warrantyModalOpen && (
                 <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
-                    <div className="card glass animate-scale-in" style={{ width: '520px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 24px 60px rgba(0,0,0,0.4)',  }}>
+                    <div className="card glass animate-scale-in" style={{ width: '520px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 24px 60px rgba(0,0,0,0.4)', }}>
                         <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
                             <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
                                 <span style={{ fontSize: '24px' }}>🛡️</span> Garanti Başlat
@@ -1886,9 +1895,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                             <button
                                 onClick={handleStartWarranty}
-                                className="btn btn-primary"
+                                className="btn btn-primary hover:-translate-y-1 hover:shadow-xl"
                                 style={{ marginTop: '24px', padding: '18px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', transition: 'all 0.2s', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                                className="hover:-translate-y-1 hover:shadow-xl"
                             >
                                 <span>✅</span> GARANTİYİ BAŞLAT VE ONAYLA
                             </button>
@@ -2018,7 +2026,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     <div className="card glass animate-scale-in" style={{ background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', width: '100%', maxWidth: '440px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                             <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-main, #fff)', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <span>{activeCheck.type.includes('Alınan') ? '📥' : '📤'}</span> 
+                                <span>{activeCheck.type.includes('Alınan') ? '📥' : '📤'}</span>
                                 {activeCheck.type.includes('Alınan') ? 'Tahsilat Onayı' : 'Ödeme Çıkış Onayı'}
                             </h3>
                             <button onClick={() => setShowCheckCollectModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
@@ -2140,9 +2148,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                             <button
                                 onClick={handleSavePlan}
-                                className="btn btn-primary"
+                                className="btn btn-primary hover:-translate-y-1 hover:shadow-xl"
                                 style={{ marginTop: '20px', padding: '18px', width: '100%', justifyContent: 'center', borderRadius: '16px', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(245, 158, 11, 0.3)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}
-                                className="hover:-translate-y-1 hover:shadow-xl"
                             >
                                 <span>✅</span> ÖDEME PLANINI OLUŞTUR
                             </button>
