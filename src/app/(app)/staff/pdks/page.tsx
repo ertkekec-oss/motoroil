@@ -1,20 +1,30 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-    IconDeviceTablet,
-    IconCheck,
-    IconX,
-    IconAlertTriangle,
-    IconInfoCircle,
-    IconPlus,
-    IconRefresh,
-    IconHistory,
-    IconShieldCheck
-} from "@/components/icons/PremiumIcons";
+import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
+import {
+    ShieldCheck,
+    RefreshCw,
+    Plus,
+    AlertTriangle,
+    TabletSmartphone,
+    History,
+    Check,
+    CheckCircle2,
+    X,
+    Info,
+    Smartphone,
+    MapPin,
+    Clock,
+    User,
+    Wifi
+} from "lucide-react";
 
 export default function AdminPdksPage() {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState<"onay" | "tabletler" | "loglar">("onay");
@@ -125,223 +135,269 @@ export default function AdminPdksPage() {
         }
     };
 
+    // Styling constants
+    const bgPage = isLight ? 'min-h-screen bg-slate-50' : 'min-h-screen bg-[#020617] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/40 via-[#020617] to-[#020617]';
+    const textMain = isLight ? 'text-slate-900' : 'text-slate-100';
+    const textMuted = isLight ? 'text-slate-500' : 'text-slate-400';
+    const bgCard = isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/5';
+    const bgSurface = isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#1e293b] border-white/5';
+    const borderColor = isLight ? 'border-slate-200' : 'border-white/5';
+
+    if (loading) return (
+        <div className={`${bgPage} flex flex-col items-center justify-center p-20 animate-in fade-in duration-700`}>
+            <div className={`w-12 h-12 rounded-full border-4 border-t-blue-600 animate-spin mb-4 ${isLight ? 'border-slate-200' : 'border-slate-800'}`}></div>
+            <div className={`text-[12px] font-bold uppercase tracking-widest ${textMuted}`}>Güvenlik Paneli Yükleniyor...</div>
+        </div>
+    );
+
+    const pendingEvents = events.filter(e => e.status === "PENDING");
+
     return (
-        <div className="p-8 max-w-7xl mx-auto font-sans animate-in fade-in duration-700">
-            {/* Header Area */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center">
-                            <IconShieldCheck className="w-6 h-6 text-indigo-500" />
+        <div data-pos-theme={theme} className={`${bgPage} font-sans transition-colors duration-300 p-6 md:p-10 animate-in fade-in duration-700`}>
+            <div className="max-w-[1400px] mx-auto space-y-8">
+
+                {/* Executive Header Strip */}
+                <header className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b ${borderColor}`}>
+                    <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center shadow-sm ${isLight ? 'bg-blue-50 text-blue-600' : 'bg-blue-500/10 text-blue-400'}`}>
+                            <ShieldCheck size={24} strokeWidth={2.5} />
                         </div>
-                        <h1 className="text-3xl font-black text-slate-800 tracking-tighter">
-                            PDKS <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-violet-500">Kontrol Paneli</span>
-                        </h1>
+                        <div>
+                            <h1 className={`text-[28px] font-bold tracking-tight mb-1 ${textMain}`}>
+                                Workforce Security Control
+                            </h1>
+                            <p className={`text-[13px] font-medium flex items-center gap-2 ${textMuted}`}>
+                                <TabletSmartphone size={14} /> Donanımsız Personel Takip Sistemi Yönetimi
+                            </p>
+                        </div>
                     </div>
-                    <p className="text-slate-500 text-sm font-bold uppercase tracking-widest pl-1">Donanımsız Personel Takip Sistemi Yönetimi</p>
-                </div>
 
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={fetchData}
-                        disabled={isRefreshing}
-                        className="p-3 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 transition-all text-slate-500 disabled:opacity-50"
-                    >
-                        <IconRefresh className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    </button>
-                    {activeTab === "tabletler" && (
+                    <div className="flex items-center gap-3">
                         <button
-                            onClick={handleOpenCreate}
-                            className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-900/10 hover:-translate-y-1 transition-all"
+                            onClick={fetchData}
+                            disabled={isRefreshing}
+                            className={`w-10 h-10 rounded-[12px] flex items-center justify-center transition-all border ${isLight ? 'bg-white border-slate-200 text-slate-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200' : 'bg-transparent border-white/10 text-slate-400 hover:bg-blue-500/10 hover:text-blue-400 hover:border-blue-500/20'} disabled:opacity-50`}
+                            title="Yenile"
                         >
-                            <IconPlus className="w-4 h-4" />
-                            Yeni Tablet Ekle
+                            <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
                         </button>
-                    )}
-                </div>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex flex-wrap gap-2 mb-8 bg-slate-100 p-1.5 rounded-3xl w-fit border border-slate-200">
-                {[
-                    { id: "onay", label: "Onay Havuzu", icon: IconAlertTriangle },
-                    { id: "tabletler", label: "Tablet Yönetimi", icon: IconDeviceTablet },
-                    { id: "loglar", label: "Tüm Hareketler", icon: IconHistory }
-                ].map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${activeTab === tab.id
-                            ? "bg-white text-indigo-600 shadow-sm"
-                            : "text-slate-500 hover:text-slate-800"
-                            }`}
-                    >
-                        <tab.icon className="w-4 h-4" />
-                        {tab.label}
-                        {tab.id === "onay" && events.filter(e => e.status === "PENDING").length > 0 && (
-                            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse ml-1" />
+                        {activeTab === "tabletler" && (
+                            <button
+                                onClick={handleOpenCreate}
+                                className={`h-10 px-4 rounded-[12px] text-[13px] font-semibold transition-all shadow-sm flex items-center gap-2 ${isLight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+                            >
+                                <Plus size={16} strokeWidth={3} /> Yeni Terminal
+                            </button>
                         )}
-                    </button>
-                ))}
-            </div>
+                    </div>
+                </header>
 
-            {/* Content Area */}
-            {loading ? (
-                <div className="h-64 flex items-center justify-center text-slate-400 font-bold animate-pulse uppercase tracking-[0.2em] text-xs">Veriler Hazırlanıyor...</div>
-            ) : (
-                <div className="space-y-8">
+                {/* Premium Segmented Control */}
+                <div className={`flex items-center p-1.5 rounded-full w-fit max-w-full overflow-x-auto custom-scrollbar ${bgSurface}`}>
+                    {[
+                        { id: "onay", label: "Onay Havuzu", icon: AlertTriangle, count: pendingEvents.length },
+                        { id: "tabletler", label: "Tablet Yönetimi", icon: TabletSmartphone },
+                        { id: "loglar", label: "Tüm Hareketler", icon: History }
+                    ].map((tab) => {
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as any)}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] transition-all whitespace-nowrap ${isActive
+                                    ? (isLight ? 'bg-blue-100 text-blue-700 font-semibold shadow-sm' : 'bg-blue-500/20 text-blue-400 font-semibold')
+                                    : (isLight ? 'text-slate-500 font-medium hover:bg-slate-200/50' : 'text-slate-400 font-medium hover:bg-white/5')
+                                    }`}
+                            >
+                                <tab.icon size={16} />
+                                {tab.label}
+                                {tab.id === "onay" && tab.count! > 0 && (
+                                    <span className={`ml-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${isActive ? (isLight ? 'bg-blue-200 text-blue-800' : 'bg-blue-500/30 text-blue-200') : (isLight ? 'bg-slate-200 text-slate-600' : 'bg-white/10 text-slate-300')}`}>
+                                        {tab.count}
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Content Container */}
+                <div className="space-y-6">
                     {activeTab === "onay" && (
-                        <div className="grid gap-4">
-                            {events.filter(e => e.status === "PENDING").length === 0 ? (
-                                <div className="bg-white border border-slate-100 border-dashed rounded-[2.5rem] p-16 text-center">
-                                    <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <IconCheck className="w-8 h-8 text-emerald-500" />
+                        <div className={`rounded-[24px] border p-8 md:p-10 shadow-sm ${bgCard}`}>
+                            {pendingEvents.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-16 opacity-60">
+                                    <div className={`w-16 h-16 rounded-[16px] flex items-center justify-center mb-4 ${isLight ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                                        <CheckCircle2 size={32} />
                                     </div>
-                                    <p className="text-slate-500 font-black text-sm uppercase tracking-widest">Bekleyen onay bulunmuyor</p>
+                                    <h3 className={`text-[16px] font-semibold ${textMain}`}>Bekleyen Onay Yok</h3>
+                                    <p className={`text-[13px] mt-1 ${textMuted}`}>Tüm personel hareketleri onaylanmış durumda.</p>
                                 </div>
                             ) : (
-                                events.filter(e => e.status === "PENDING").map(ev => (
-                                    <div key={ev.id} className="bg-white border border-slate-200 p-6 rounded-[2.5rem] flex items-center justify-between group hover:shadow-2xl hover:shadow-indigo-500/5 transition-all">
-                                        <div className="flex items-center gap-6">
-                                            <div className="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-white font-black text-lg">
-                                                {ev.staff?.name?.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <h3 className="font-black text-slate-800 tracking-tight text-lg">{ev.staff?.name}</h3>
-                                                <div className="flex items-center gap-3 mt-1">
-                                                    <span className="text-[10px] font-black uppercase bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md">{ev.mode}</span>
-                                                    <span className="text-[10px] font-black uppercase text-rose-500 bg-rose-50 px-2 py-0.5 rounded-md flex items-center gap-1">
-                                                        <IconAlertTriangle className="w-3 h-3" />
-                                                        {ev.riskFlags?.join(", ")}
-                                                    </span>
-                                                    <span className="text-slate-400 text-[10px] font-bold uppercase">{new Date(ev.serverTime).toLocaleString('tr-TR')}</span>
+                                <div className="grid gap-4">
+                                    <div className="mb-2 flex items-center gap-2">
+                                        <span className={`w-2 h-2 rounded-full bg-amber-500 animate-pulse`}></span>
+                                        <h3 className={`text-[14px] font-semibold ${textMain}`}>Bekleyen İşlemler ({pendingEvents.length})</h3>
+                                    </div>
+                                    {pendingEvents.map(ev => (
+                                        <div key={ev.id} className={`p-5 rounded-[16px] border flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all ${isLight ? 'bg-slate-50 border-slate-200 hover:border-blue-300 hover:shadow-sm' : 'bg-white/[0.02] border-white/5 hover:border-blue-500/30'}`}>
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center font-bold text-[14px] shadow-sm ${isLight ? 'bg-white border border-slate-200 text-slate-700' : 'bg-slate-800 border border-slate-700 text-slate-300'}`}>
+                                                    {ev.staff?.name?.charAt(0) || <User size={16} />}
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-[15px] font-semibold ${textMain}`}>{ev.staff?.name}</h4>
+                                                    <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                                                        <span className={`px-2 py-0.5 rounded-[6px] text-[10px] font-bold uppercase tracking-wide border ${ev.type === 'SHIFT_START' ? (isLight ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-blue-500/10 text-blue-400 border-blue-500/20') : (isLight ? 'bg-white text-slate-600 border-slate-200' : 'bg-slate-800 text-slate-400 border-slate-700')}`}>
+                                                            {ev.type === 'SHIFT_START' ? 'Giriş' : 'Çıkış'} • {ev.mode}
+                                                        </span>
+                                                        {ev.riskFlags?.length > 0 && (
+                                                            <span className={`px-2 py-0.5 rounded-[6px] text-[10px] font-bold uppercase tracking-wide border flex items-center gap-1 ${isLight ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                                                                <AlertTriangle size={10} /> {ev.riskFlags.join(", ")}
+                                                            </span>
+                                                        )}
+                                                        <span className={`text-[11px] font-medium flex items-center gap-1 ${textMuted}`}>
+                                                            <Clock size={12} /> {new Date(ev.serverTime).toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button
-                                                onClick={() => handleApprove(ev.id, "REJECTED")}
-                                                className="p-4 bg-rose-50 text-rose-600 rounded-2xl hover:bg-rose-100 transition-all"
-                                            >
-                                                <IconX className="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleApprove(ev.id, "APPROVED")}
-                                                className="flex items-center gap-2 px-8 py-4 bg-emerald-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all"
-                                            >
-                                                <IconCheck className="w-5 h-5" />
-                                                ONAYLA
-                                            </button>
+                                            <div className="flex items-center gap-2 w-full sm:w-auto">
+                                                <button
+                                                    onClick={() => handleApprove(ev.id, "REJECTED")}
+                                                    className={`flex-1 sm:flex-none h-10 px-4 rounded-[10px] text-[13px] font-semibold border transition-all flex items-center justify-center gap-2 ${isLight ? 'bg-white border-rose-200 text-rose-600 hover:bg-rose-50' : 'bg-transparent border-rose-500/30 text-rose-400 hover:bg-rose-500/10'}`}
+                                                >
+                                                    <X size={16} /> Reddet
+                                                </button>
+                                                <button
+                                                    onClick={() => handleApprove(ev.id, "APPROVED")}
+                                                    className={`flex-[2] sm:flex-none h-10 px-6 rounded-[10px] text-[13px] font-semibold transition-all flex items-center justify-center gap-2 ${isLight ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm' : 'bg-emerald-600 text-emerald-50 hover:bg-emerald-500'}`}
+                                                >
+                                                    <Check size={16} /> Onayla
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))
+                                    ))}
+                                </div>
                             )}
                         </div>
                     )}
 
                     {activeTab === "tabletler" && (
-                        <div className="space-y-12">
+                        <div className="space-y-8">
                             {/* Tablet Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {displays.map(disp => (
-                                    <div key={disp.id} className="bg-white border border-slate-200 p-8 rounded-[3.5rem] relative group hover:shadow-2xl hover:shadow-indigo-500/5 transition-all flex flex-col">
-                                        <div className={`absolute top-8 right-8 w-3 h-3 rounded-full ${disp.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+                                    <div key={disp.id} className={`rounded-[18px] border shadow-sm p-6 flex flex-col relative transition-all ${bgCard}`}>
+                                        <div className={`absolute top-6 right-6 w-2.5 h-2.5 rounded-full ${disp.isActive ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-400'}`} title={disp.isActive ? "Aktif" : "Pasif"} />
 
-                                        <div className="w-16 h-16 bg-indigo-50 rounded-3xl flex items-center justify-center mb-6">
-                                            <IconDeviceTablet className="w-8 h-8 text-indigo-500" />
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className={`w-12 h-12 rounded-[12px] flex items-center justify-center border ${isLight ? 'bg-blue-50 border-blue-100 text-blue-600' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'}`}>
+                                                <TabletSmartphone size={24} />
+                                            </div>
+                                            <div>
+                                                <h3 className={`text-[15px] font-bold ${textMain}`}>{disp.name}</h3>
+                                                <div className={`text-[11px] font-medium uppercase tracking-wide flex items-center gap-1 mt-0.5 ${textMuted}`}>
+                                                    <MapPin size={10} /> Site ID: {disp.siteId}
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <h3 className="text-xl font-black text-slate-800 mb-1">{disp.name}</h3>
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Sitede: {disp.siteId}</span>
-                                        </div>
-
-                                        <div className="bg-slate-50 p-6 rounded-3xl border border-dashed border-slate-200 mb-6 flex-1">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Eşleştirme Kodu</p>
-                                            <p className="text-2xl font-black text-slate-800 tracking-[0.3em] font-mono mb-4">{disp.pairingCode}</p>
+                                        <div className={`p-5 rounded-[14px] border mb-6 flex-1 ${bgSurface}`}>
+                                            <p className={`text-[11px] font-semibold uppercase tracking-wide mb-1 opacity-70 ${textMuted}`}>Eşleştirme Kodu</p>
+                                            <p className={`text-[24px] font-black tracking-widest font-mono ${textMain}`}>{disp.pairingCode}</p>
 
                                             {disp.announcement && (
-                                                <div className="mt-4 pt-4 border-t border-slate-200">
-                                                    <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">Aktif Duyuru</p>
-                                                    <p className="text-xs text-slate-600 line-clamp-2">{disp.announcement}</p>
+                                                <div className={`mt-4 pt-4 border-t ${borderColor}`}>
+                                                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-1 ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>Aktif Duyuru</p>
+                                                    <p className={`text-[12px] leading-relaxed line-clamp-2 ${textMuted}`}>{disp.announcement}</p>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div className="flex flex-col gap-3">
+                                        <div className="flex flex-col gap-3 mt-auto">
                                             <button
                                                 onClick={() => handleOpenEdit(disp)}
-                                                className="w-full py-3 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all"
+                                                className={`w-full h-10 border rounded-[10px] text-[12px] font-semibold transition-all ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-[#1e293b] border-white/10 text-slate-300 hover:bg-white/5'}`}
                                             >
-                                                Tableti Düzenle
+                                                Cihazı Yapılandır
                                             </button>
-                                            <div className="flex items-center justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest pt-2">
-                                                <span>IP: {disp.lastPublicIp || "-"}</span>
+                                            <div className="flex items-center justify-between px-1">
+                                                <span className={`text-[10px] font-semibold flex items-center gap-1 ${textMuted}`}>
+                                                    <Wifi size={10} /> IP: {disp.lastPublicIp || "Bağlanmadı"}
+                                                </span>
                                                 <button
                                                     onClick={() => handleDeleteDisplay(disp.id)}
-                                                    className="text-rose-400 hover:text-rose-600 transition-colors"
+                                                    className={`text-[11px] font-semibold transition-colors ${isLight ? 'text-slate-400 hover:text-red-500' : 'text-slate-500 hover:text-red-400'}`}
                                                 >
-                                                    Cihazı Kaldır
+                                                    Kaldır
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
+                                {displays.length === 0 && (
+                                    <div className="col-span-full py-16 text-center border-2 border-dashed rounded-[18px] opacity-60 flex flex-col items-center">
+                                        <TabletSmartphone size={32} className={`mb-3 ${textMuted}`} />
+                                        <h3 className={`text-[15px] font-semibold ${textMain}`}>Kayıtlı Terminal Yok</h3>
+                                        <p className={`text-[13px] mt-1 ${textMuted}`}>Sisteme yeni bir terminal cihazı ekleyerek başlayın.</p>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Usage Instructions & Links */}
-                            <div className="grid md:grid-cols-2 gap-8">
-                                <div className="bg-indigo-900/5 border border-indigo-500/10 p-10 rounded-[3.5rem]">
-                                    <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-indigo-500 text-white rounded-xl flex items-center justify-center text-xs">1</div>
-                                        Terminalleri Hazırlayın
+                            {/* Usage Instructions */}
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div className={`p-8 rounded-[20px] border shadow-sm ${bgCard}`}>
+                                    <h3 className={`text-[16px] font-bold mb-5 flex items-center gap-3 ${textMain}`}>
+                                        <div className={`w-8 h-8 rounded-[8px] flex items-center justify-center text-[13px] font-bold ${isLight ? 'bg-blue-100 text-blue-700' : 'bg-blue-500/20 text-blue-400'}`}>1</div>
+                                        Terminal Kurulumu
                                     </h3>
-                                    <div className="space-y-6">
+                                    <div className="space-y-5">
                                         <div className="flex gap-4">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 flex-shrink-0" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
                                             <div>
-                                                <p className="font-black text-slate-800 text-sm mb-1 uppercase tracking-tight">EKRAN LİNKİ</p>
-                                                <p className="text-slate-500 text-sm leading-relaxed mb-3">
-                                                    Herhangi bir tabletten veya akıllı ekrandan aşağıdaki linki açın:
+                                                <p className={`text-[12px] font-bold uppercase tracking-wide mb-1 ${textMain}`}>BİNA GİRİŞ EKRANI</p>
+                                                <p className={`text-[13px] leading-relaxed mb-3 ${textMuted}`}>
+                                                    Kurulum yapacağınız terminal (tablet / akıllı ekran) cihazından aşağıdaki bağlantıyı açın:
                                                 </p>
-                                                <code className="block p-4 bg-white border border-indigo-200 rounded-2xl text-indigo-600 font-bold text-sm break-all select-all shadow-sm">
+                                                <code className={`block p-3 rounded-[10px] border text-[13px] font-bold font-mono break-all select-all ${isLight ? 'bg-slate-50 border-slate-200 text-blue-600' : 'bg-black/20 border-white/10 text-blue-400'}`}>
                                                     {window.location.origin}/pdks/display
                                                 </code>
                                             </div>
                                         </div>
                                         <div className="flex gap-4">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 flex-shrink-0" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
                                             <div>
-                                                <p className="font-black text-slate-800 text-sm mb-1 uppercase tracking-tight">CİHAZ EŞLEŞTİRME</p>
-                                                <p className="text-slate-500 text-sm leading-relaxed">
-                                                    Ekran açıldığında karşınıza çıkan kutuya buradaki <b>PDKS-XXXX</b> kodunu girerek terminali sisteme bağlayın.
+                                                <p className={`text-[12px] font-bold uppercase tracking-wide mb-1 ${textMain}`}>CİHAZ EŞLEŞTİRME</p>
+                                                <p className={`text-[13px] leading-relaxed ${textMuted}`}>
+                                                    Ekranda beliren uyarı kutusuna, yukarıda oluşturduğunuz terminalin <b>8 haneli kodunu</b> girerek bağlantıyı tamamlayın.
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-900 border border-slate-800 p-10 rounded-[3.5rem] text-white">
-                                    <h3 className="text-xl font-black mb-6 flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-emerald-500 text-slate-900 rounded-xl flex items-center justify-center text-xs">2</div>
-                                        Personel Girişi
+                                <div className={`p-8 rounded-[20px] border shadow-sm ${bgCard}`}>
+                                    <h3 className={`text-[16px] font-bold mb-5 flex items-center gap-3 ${textMain}`}>
+                                        <div className={`w-8 h-8 rounded-[8px] flex items-center justify-center text-[13px] font-bold ${isLight ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-500/20 text-emerald-400'}`}>2</div>
+                                        Personel İşlemi
                                     </h3>
-                                    <div className="space-y-6">
-                                        <p className="text-slate-400 text-sm leading-relaxed">
-                                            Personelleriniz mobil uygulama üzerinden "Dashboard" ekranındaki PDKS butonuna basarak ekrandaki QR kodu okutabilirler.
+                                    <div className="space-y-5">
+                                        <p className={`text-[13px] leading-relaxed ${textMuted}`}>
+                                            Personelleriniz kendi mobil cihazlarındaki Dashboard üzerinden <strong className={textMain}>PDKS</strong> butonuna basarak, terminaldeki QR kodu okuturlar.
                                         </p>
-                                        <div className="bg-white/5 border border-white/10 p-6 rounded-3xl">
-                                            <h4 className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-4">GÜVENLİK ÖZELLİKLERİ</h4>
-                                            <ul className="space-y-3">
-                                                <li className="flex items-center gap-3 text-xs font-bold text-slate-300">
-                                                    <IconCheck className="w-4 h-4 text-emerald-500" /> Dinamik 8 saniyelik QR kod değişimi
+                                        <div className={`p-5 rounded-[12px] border ${bgSurface}`}>
+                                            <h4 className={`text-[11px] font-bold uppercase tracking-widest mb-3 ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>GÜVENLİK METRİKLERİ</h4>
+                                            <ul className="space-y-2.5">
+                                                <li className={`flex items-start gap-2 text-[12px] font-medium ${textMain}`}>
+                                                    <CheckCircle2 size={14} className={`mt-0.5 ${isLight ? 'text-emerald-500' : 'text-emerald-400'}`} /> Dinamik 8 saniyelik QR kod (Kopya Engeli)
                                                 </li>
-                                                <li className="flex items-center gap-3 text-xs font-bold text-slate-300">
-                                                    <IconCheck className="w-4 h-4 text-emerald-500" /> Cihaz parmak izi (Fingerprint) kontrolü
+                                                <li className={`flex items-start gap-2 text-[12px] font-medium ${textMain}`}>
+                                                    <CheckCircle2 size={14} className={`mt-0.5 ${isLight ? 'text-emerald-500' : 'text-emerald-400'}`} /> Cihaz parmak izi (Fingerprint) kontrolü
                                                 </li>
-                                                <li className="flex items-center gap-3 text-xs font-bold text-slate-300">
-                                                    <IconCheck className="w-4 h-4 text-emerald-500" /> IP Mismatch ve GPS mesafe denetimi
+                                                <li className={`flex items-start gap-2 text-[12px] font-medium ${textMain}`}>
+                                                    <CheckCircle2 size={14} className={`mt-0.5 ${isLight ? 'text-emerald-500' : 'text-emerald-400'}`} /> IP Mismatch ve GPS lokasyon mesafe denetimi
                                                 </li>
                                             </ul>
                                         </div>
@@ -352,121 +408,164 @@ export default function AdminPdksPage() {
                     )}
 
                     {activeTab === "loglar" && (
-                        <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-50 border-b border-slate-100">
-                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest w-64">Personel</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tip / Mod</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">IP / Konum</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Zaman</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Durum</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {events.map((ev) => (
-                                        <tr key={ev.id} className="hover:bg-slate-50 transition-colors group">
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-[10px] font-black text-slate-500">
-                                                        {ev.staff?.name?.charAt(0)}
-                                                    </div>
-                                                    <span className="font-black text-slate-800 text-sm tracking-tight">{ev.staff?.name}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className={`text-[9px] font-black px-2 py-0.5 rounded w-fit ${ev.type === 'SHIFT_START' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-600'}`}>{ev.type}</span>
-                                                    <span className="text-[10px] font-bold text-slate-400 uppercase">{ev.mode}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="text-[10px] font-bold text-slate-600">{ev.requestPublicIp || "-"}</span>
-                                                    {ev.lat && <span className="text-[9px] font-bold text-slate-400">{ev.lat.toFixed(4)}, {ev.lng.toFixed(4)}</span>}
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <span className="text-[10px] font-bold text-slate-500">{new Date(ev.serverTime).toLocaleString('tr-TR')}</span>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-2">
-                                                    {ev.status === 'APPROVED' ? (
-                                                        <span className="text-[9px] font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-widest">ONAYLI</span>
-                                                    ) : ev.status === 'REJECTED' ? (
-                                                        <span className="text-[9px] font-black text-rose-500 bg-rose-50 px-2 py-0.5 rounded uppercase tracking-widest">REDDEDİLDİ</span>
-                                                    ) : (
-                                                        <span className="text-[9px] font-black text-amber-500 bg-amber-50 px-2 py-0.5 rounded uppercase tracking-widest animate-pulse">BEKLİYOR</span>
-                                                    )}
-                                                </div>
-                                            </td>
+                        <div className={`rounded-[20px] border shadow-sm overflow-hidden ${bgCard}`}>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse min-w-[800px]">
+                                    <thead>
+                                        <tr className={`border-b ${borderColor} ${bgSurface}`}>
+                                            <th className={`px-6 py-4 text-[11px] font-bold uppercase tracking-wider ${textMuted}`}>Personel</th>
+                                            <th className={`px-6 py-4 text-[11px] font-bold uppercase tracking-wider ${textMuted}`}>İşlem Tipi</th>
+                                            <th className={`px-6 py-4 text-[11px] font-bold uppercase tracking-wider ${textMuted}`}>Konum / Ağ</th>
+                                            <th className={`px-6 py-4 text-[11px] font-bold uppercase tracking-wider ${textMuted}`}>Zaman (Sunucu)</th>
+                                            <th className={`px-6 py-4 text-[11px] font-bold uppercase tracking-wider ${textMuted}`}>Durum</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className={`divide-y ${borderColor}`}>
+                                        {events.map((ev) => (
+                                            <tr key={ev.id} className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-white/[0.02]'}`}>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-8 h-8 rounded-[8px] flex items-center justify-center font-bold text-[12px] ${isLight ? 'bg-slate-100 text-slate-600' : 'bg-slate-800 text-slate-300'}`}>
+                                                            {ev.staff?.name?.charAt(0) || <User size={12} />}
+                                                        </div>
+                                                        <span className={`text-[13px] font-semibold ${textMain}`}>{ev.staff?.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col gap-1 items-start">
+                                                        <span className={`px-2 py-0.5 rounded-[6px] text-[10px] font-bold uppercase tracking-wide border ${ev.type === 'SHIFT_START' ? (isLight ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-blue-500/10 text-blue-400 border-blue-500/20') : (isLight ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-slate-800 text-slate-400 border-slate-700')}`}>
+                                                            {ev.type === 'SHIFT_START' ? 'MESAi BAŞI' : 'MESAİ SONU'}
+                                                        </span>
+                                                        <span className={`text-[10px] font-semibold uppercase ${textMuted}`}>{ev.mode}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className={`text-[11px] font-medium flex items-center gap-1 ${textMain}`}>
+                                                            <Wifi size={10} className={textMuted} /> {ev.requestPublicIp || "-"}
+                                                        </span>
+                                                        {ev.lat && (
+                                                            <span className={`text-[10px] font-medium flex items-center gap-1 ${textMuted}`}>
+                                                                <MapPin size={10} /> {ev.lat.toFixed(4)}, {ev.lng.toFixed(4)}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className={`text-[12px] font-medium ${textMain}`}>
+                                                            {new Date(ev.serverTime).toLocaleDateString('tr-TR')}
+                                                        </span>
+                                                        <span className={`text-[11px] font-medium ${textMuted}`}>
+                                                            {new Date(ev.serverTime).toLocaleTimeString('tr-TR')}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {ev.status === 'APPROVED' ? (
+                                                        <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold uppercase tracking-widest border ${isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>ONAYLI</span>
+                                                    ) : ev.status === 'REJECTED' ? (
+                                                        <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold uppercase tracking-widest border ${isLight ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>REDDEDİLDİ</span>
+                                                    ) : (
+                                                        <span className={`px-2.5 py-1 rounded-[6px] text-[10px] font-bold uppercase tracking-widest border animate-pulse ${isLight ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>BEKLİYOR</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {events.length === 0 && (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-12 text-center">
+                                                    <span className={`text-[13px] font-medium ${textMuted}`}>Kayıt bulunamadı.</span>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                 </div>
-            )}
+
+                {/* Compliance Info Bar */}
+                <div className={`mt-10 p-4 rounded-[12px] border flex items-start sm:items-center gap-3 ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5'}`}>
+                    <Info size={16} className={`shrink-0 ${textMuted}`} />
+                    <p className={`text-[12px] font-medium ${textMuted}`}>
+                        Sistem üzerindeki tüm personel takip verileri KVKK standartlarına uygun olarak şifrelenir ve loglanır. IP Address ve Geolocation risk metrikleri Fraud tespit algoritmasıyla otomatik hesaplanmaktadır.
+                    </p>
+                </div>
+
+            </div>
 
             {/* Modal for Creating/Editing Display */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl shadow-indigo-500/10 overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-300">
-                        <div className="p-10">
-                            <h2 className="text-2xl font-black text-slate-800 tracking-tight mb-2">
-                                {editingDisplay ? "Tableti Düzenle" : "Yeni Tablet Tanımla"}
-                            </h2>
-                            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-8">PDKS GİRİŞ NOKTASI YAPILANDIRMASI</p>
-
-                            <div className="space-y-6">
+                <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
+                    <div className={`w-full max-w-lg overflow-hidden rounded-[24px] border shadow-2xl ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
+                        <div className="p-6 md:p-8">
+                            <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2 px-1">Cihaz İsmi</label>
+                                    <h2 className={`text-[20px] font-bold tracking-tight mb-1 ${textMain}`}>
+                                        {editingDisplay ? "Cihazı Yapılandır" : "Yeni Terminal Tanımla"}
+                                    </h2>
+                                    <p className={`text-[11px] font-bold uppercase tracking-widest ${textMuted}`}>PDKS GİRİŞ NOKTASI YAPILANDIRMASI</p>
+                                </div>
+                                <button onClick={() => setIsModalOpen(false)} className={`w-8 h-8 rounded-[8px] flex items-center justify-center transition-all ${isLight ? 'hover:bg-slate-100 text-slate-500' : 'hover:bg-white/10 text-slate-400'}`}>
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <div className="space-y-5">
+                                <div className="space-y-2">
+                                    <label className={`block text-[11px] font-bold uppercase tracking-wide ml-1 ${textMuted}`}>Cihaz İsmi <span className="text-rose-500">*</span></label>
                                     <input
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        placeholder="Örn: Merkez Bina Girişi"
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 font-bold text-slate-700 focus:border-indigo-500 outline-none transition-all shadow-sm"
+                                        placeholder="Örn: Merkez Bina Ana Giriş"
+                                        className={`w-full h-[48px] px-4 rounded-[12px] border text-[13px] font-semibold transition-all outline-none shadow-sm ${isLight ? 'bg-white border-slate-200 focus:border-blue-500 text-slate-900 placeholder:text-slate-400' : 'bg-white/[0.02] border-white/10 focus:border-blue-500/50 text-white placeholder:text-slate-500'}`}
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2 px-1">Ekran Duyurusu (Opsiyonel)</label>
+                                <div className="space-y-2">
+                                    <label className={`block text-[11px] font-bold uppercase tracking-wide ml-1 ${textMuted}`}>Ekran Duyurusu (Opsiyonel)</label>
                                     <textarea
-                                        rows={4}
+                                        rows={3}
                                         value={formData.announcement}
                                         onChange={(e) => setFormData({ ...formData, announcement: e.target.value })}
-                                        placeholder="Personeller için önemli bir not yazın..."
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 font-bold text-slate-700 focus:border-indigo-500 outline-none transition-all shadow-sm resize-none"
+                                        placeholder="Personeller için ekranda görünecek önemli bir not yazın..."
+                                        className={`w-full p-4 rounded-[12px] border text-[13px] font-medium transition-all outline-none shadow-sm resize-none ${isLight ? 'bg-white border-slate-200 focus:border-blue-500 text-slate-900 placeholder:text-slate-400' : 'bg-white/[0.02] border-white/10 focus:border-blue-500/50 text-white placeholder:text-slate-500'}`}
                                     />
                                 </div>
 
-                                <div className="flex items-center gap-3 bg-slate-100/50 p-4 rounded-3xl">
-                                    <input
-                                        type="checkbox"
-                                        id="isActive"
-                                        checked={formData.isActive}
-                                        onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                                        className="w-5 h-5 accent-indigo-500"
-                                    />
-                                    <label htmlFor="isActive" className="text-xs font-black text-slate-600 uppercase tracking-widest cursor-pointer">
-                                        Tablet Aktif (QR Üretilebilir)
-                                    </label>
-                                </div>
+                                <label className={`flex items-start gap-3 p-4 rounded-[12px] border cursor-pointer transition-all ${isLight ? 'bg-slate-50 border-slate-200 hover:bg-slate-100' : 'bg-white/[0.02] border-white/10 hover:bg-white/[0.04]'}`}>
+                                    <div className="mt-0.5 relative flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.isActive}
+                                            onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                                            className="peer w-5 h-5 opacity-0 absolute cursor-pointer"
+                                        />
+                                        <div className={`w-5 h-5 rounded-[6px] border flex items-center justify-center transition-all ${formData.isActive ? 'bg-blue-600 border-blue-600 text-white' : (isLight ? 'bg-white border-slate-300' : 'bg-transparent border-slate-600')}`}>
+                                            {formData.isActive && <Check size={12} strokeWidth={3} />}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className={`text-[13px] font-semibold ${textMain}`}>Terminal Aktif</div>
+                                        <div className={`text-[11px] font-medium mt-0.5 ${textMuted}`}>Cihaz açıkken ekranda dinamik QR kodu üretmeye devam eder.</div>
+                                    </div>
+                                </label>
                             </div>
                         </div>
 
-                        <div className="p-8 bg-slate-50 flex items-center gap-4 border-t border-slate-200">
+                        <div className={`p-6 border-t flex items-center gap-3 ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0b1120] border-white/10'}`}>
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="flex-1 py-4 bg-white border border-slate-200 text-slate-500 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all"
+                                className={`flex-1 h-12 rounded-[12px] font-bold text-[13px] border transition-all ${isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-transparent border-white/10 text-slate-300 hover:bg-white/5'}`}
                             >
-                                Vazgeç
+                                İptal
                             </button>
                             <button
                                 onClick={handleSaveDisplay}
-                                className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-slate-900/10 hover:-translate-y-1 active:scale-95 transition-all"
+                                className={`flex-1 h-12 rounded-[12px] font-bold text-[13px] text-white transition-all shadow-sm ${isLight ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-500'}`}
                             >
                                 Ayarları Kaydet
                             </button>
@@ -475,13 +574,14 @@ export default function AdminPdksPage() {
                 </div>
             )}
 
-            {/* Support Tooltip */}
-            <div className="mt-12 flex items-center justify-center gap-2 text-slate-400 p-8 border-t border-slate-100">
-                <IconInfoCircle className="w-4 h-4" />
-                <p className="text-[10px] font-bold uppercase tracking-widest text-center max-w-2xl leading-relaxed">
-                    Tüm PDKS verileri KVKK uyumlu olarak loglanmaktadır. İp mismatch ve lokasyon riskleri sistem tarafından otomatik belirlenir.
-                </p>
-            </div>
+            <style jsx global>{`
+                .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
+                [data-pos-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
+                [data-pos-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+            `}</style>
         </div>
     );
 }
