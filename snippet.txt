@@ -1,0 +1,15 @@
+                                            </div>
+                                        </div>
+                                        <button onClick={() => {
+                                            const newComms = salesExpenses.posCommissions.filter((_: any, i: number) => i !== idx);
+                                            updateSalesExpenses({ ...salesExpenses, posCommissions: newComms });
+                                        }} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors">🗑️</button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* 3. FATURA AYARLARI */}
+                {/* PROFILE TAB */}

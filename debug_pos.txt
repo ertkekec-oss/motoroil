@@ -1,0 +1,15 @@
+1363:                                                             newComms[idx].rate = Number(e.target.value);
+1364:                                                             updateSalesExpenses({ ...salesExpenses, posCommissions: newComms });
+1365:                                                         }}
+1366:                                                         style={{ width: '100%', background: 'transparent', border: "1px solid #E2E8F0", borderRadius: '4px', padding: '8px', textAlign: 'center', fontWeight: 'bold' }}
+1367:                                                     />
+1368:                                                     <span>%</span>
+1369:                                                 </div>
+1370:                                             </div>
+1371:                                         </div>
+1372:                                         <button onClick={() => {
+1373:                                             const newComms = salesExpenses.posCommissions.filter((_: any, i: number) => i !== idx);
+1374:                                             updateSalesExpenses({ ...salesExpenses, posCommissions: newComms });
+1375:                                         }} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors">🗑️</button>
+1376:                                     </div>
+1377:                                 ))}

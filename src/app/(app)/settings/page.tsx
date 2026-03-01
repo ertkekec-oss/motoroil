@@ -1007,10 +1007,10 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="container" style={{ padding: '0', height: '100vh', display: 'flex' }}>
+        <div className="flex h-screen bg-[#F6F8FB] dark:bg-[#0B1120] text-slate-900 dark:text-white overflow-hidden">
 
             {/* LEFT SIDEBAR MENU */}
-            <div className="w-[240px] border-r border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-[#0F172A] flex flex-col gap-1">
+            <div className="w-[260px] shrink-0 border-r border-slate-200 dark:border-slate-800 p-6 bg-white dark:bg-[#111827] flex flex-col gap-2 overflow-y-auto">
                 <h2 className="text-[11px] font-bold mb-4 px-3 text-slate-500 uppercase tracking-widest">⚙ Ayarlar</h2>
 
                 {[
@@ -1049,7 +1049,7 @@ export default function SettingsPage() {
                     );
                 })}
 
-                <div style={{ height: '1px', background: 'var(--border-light)', margin: '12px 0' }}></div>
+                <div style={{ height: '1px', background: "#E2E8F0", margin: '12px 0' }}></div>
 
                 <button
                     onClick={() => setActiveTab('reset')}
@@ -1068,7 +1068,7 @@ export default function SettingsPage() {
             </div>
 
             {/* RIGHT CONTENT AREA */}
-            <div style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
+            <div className="flex-1 p-8 overflow-y-auto w-full max-w-7xl mx-auto flex flex-col gap-8 pb-32">
 
                 {/* 0. FİRMA PROFİLİ */}
                 {activeTab === 'company' && (
@@ -1076,36 +1076,36 @@ export default function SettingsPage() {
                         <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px' }}>Firma Profili</h2>
                         <p className="text-muted mb-8" style={{ fontSize: '14px' }}>Belgelerde ve tekliflerde görünecek genel firma bilgilerini düzenleyin.</p>
 
-                        <div className="card glass flex-col gap-6" style={{ padding: '24px' }}>
+                        <div className="flex flex-col gap-6 p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm">
                             <div className="flex-col gap-2">
-                                <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>FİRMA ADI</label>
+                                <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">FİRMA ADI</label>
                                 <input
                                     type="text"
                                     value={tempCompanyInfo?.company_name || ""}
                                     onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_name: e.target.value })}
                                     placeholder="Örn: MOTOROIL"
-                                    style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white', fontWeight: '800' }}
+                                    className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm" style={{ fontWeight: 800 }}
                                 />
                             </div>
 
                             <div className="flex-col gap-2">
-                                <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>SLOGAN / ALT BAŞLIK</label>
+                                <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">SLOGAN / ALT BAŞLIK</label>
                                 <input
                                     type="text"
                                     value={tempCompanyInfo?.company_slogan || ""}
                                     onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_slogan: e.target.value })}
                                     placeholder="Örn: Profesyonel Oto Servis ve Bakım"
-                                    style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                    className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>ŞEHİR</label>
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">ŞEHİR</label>
                                     <select
                                         value={tempCompanyInfo?.company_city || ""}
                                         onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_city: e.target.value, company_district: '' })}
-                                        style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
                                     >
                                         <option value="">Şehir Seçin...</option>
                                         {TURKISH_CITIES.map(city => (
@@ -1114,12 +1114,12 @@ export default function SettingsPage() {
                                     </select>
                                 </div>
                                 <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>İLÇE</label>
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">İLÇE</label>
                                     <select
                                         value={tempCompanyInfo?.company_district || ""}
                                         onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_district: e.target.value })}
                                         disabled={!tempCompanyInfo?.company_city}
-                                        style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
                                     >
                                         <option value="">İlçe Seçin...</option>
                                         {(TURKISH_DISTRICTS[tempCompanyInfo?.company_city] || []).map(district => (
@@ -1131,46 +1131,46 @@ export default function SettingsPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>GENEL E-POSTA</label>
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">GENEL E-POSTA</label>
                                     <input
                                         type="email"
                                         value={tempCompanyInfo?.company_email || ""}
                                         onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_email: e.target.value })}
                                         placeholder="info@firma.com"
-                                        style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
                                     />
                                 </div>
                                 <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>WEB SİTESİ</label>
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">WEB SİTESİ</label>
                                     <input
                                         type="text"
                                         value={tempCompanyInfo?.company_website || ""}
                                         onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_website: e.target.value })}
                                         placeholder="www.firma.com.tr"
-                                        style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
                                     />
                                 </div>
                             </div>
 
                             <div className="flex-col gap-2">
-                                <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>VARSAYILAN ADRES (ŞUBE BİLGİSİ YOKSA)</label>
+                                <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">VARSAYILAN ADRES (ŞUBE BİLGİSİ YOKSA)</label>
                                 <textarea
                                     rows={3}
                                     value={tempCompanyInfo?.company_address || ""}
                                     onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_address: e.target.value })}
                                     placeholder="Firma açık adresi..."
-                                    style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                    className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
                                 />
                             </div>
 
                             <div className="flex-col gap-2">
-                                <label style={{ fontSize: '11px', fontWeight: '900', opacity: 0.5 }}>VARSAYILAN TELEFON</label>
+                                <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">VARSAYILAN TELEFON</label>
                                 <input
                                     type="text"
                                     value={tempCompanyInfo?.company_phone || ""}
                                     onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_phone: e.target.value })}
                                     placeholder="+90 (---) --- -- --"
-                                    style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '10px', color: 'white' }}
+                                    className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
                                 />
                             </div>
 
@@ -1210,20 +1210,20 @@ export default function SettingsPage() {
                         <h2 style={{ marginBottom: '20px' }}>Şubeler ve Dijital Arşiv</h2>
 
                         {/* Add/Edit Branch Form */}
-                        <div className="card glass mb-8" style={{ padding: '24px', borderLeft: editingBranchId ? '4px solid var(--warning)' : '4px solid var(--primary)' }}>
+                        <div className="flex flex-col gap-6 p-8 mb-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ borderLeft: editingBranchId ? '4px solid var(--warning)' : '4px solid var(--primary)' }}>
                             <div className="flex-between mb-4">
                                 <h3 style={{ fontSize: '16px', color: editingBranchId ? 'var(--warning)' : 'var(--primary)' }}>
                                     {editingBranchId ? '✏️ Şube Düzenleme Modu' : '➕ Yeni Şube / Depo Ekle'}
                                 </h3>
                                 {editingBranchId && (
-                                    <button onClick={() => { setEditingBranchId(null); setNewBranch({ name: '', type: 'Şube', city: '', district: '', address: '', phone: '', manager: '', status: 'Aktif' }); }} className="btn btn-ghost" style={{ fontSize: '12px' }}>Vazgeç</button>
+                                    <button onClick={() => { setEditingBranchId(null); setNewBranch({ name: '', type: 'Şube', city: '', district: '', address: '', phone: '', manager: '', status: 'Aktif' }); }} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ fontSize: '12px' }}>Vazgeç</button>
                                 )}
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                                 <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>TÜR</label>
-                                    <select value={newBranch.type} onChange={e => setNewBranch({ ...newBranch, type: e.target.value })} style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }}>
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">TÜR</label>
+                                    <select value={newBranch.type} onChange={e => setNewBranch({ ...newBranch, type: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm">
                                         <option>Şube</option>
                                         <option>Depo</option>
                                         <option>Merkez Ofis</option>
@@ -1231,15 +1231,15 @@ export default function SettingsPage() {
                                     </select>
                                 </div>
                                 <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ŞUBE ADI</label>
-                                    <input type="text" value={newBranch.name} onChange={e => setNewBranch({ ...newBranch, name: e.target.value })} style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }} placeholder="Örn: İzmir Bornova Şube" />
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">ŞUBE ADI</label>
+                                    <input type="text" value={newBranch.name} onChange={e => setNewBranch({ ...newBranch, name: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm" placeholder="Örn: İzmir Bornova Şube" />
                                 </div>
                                 <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ŞEHİR</label>
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">ŞEHİR</label>
                                     <select
                                         value={newBranch.city}
                                         onChange={e => setNewBranch({ ...newBranch, city: e.target.value, district: '' })}
-                                        style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }}
+                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
                                     >
                                         <option value="">Şehir Seçin...</option>
                                         {TURKISH_CITIES.map(city => (
@@ -1248,12 +1248,12 @@ export default function SettingsPage() {
                                     </select>
                                 </div>
                                 <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>İLÇE</label>
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">İLÇE</label>
                                     <select
                                         value={newBranch.district}
                                         onChange={e => setNewBranch({ ...newBranch, district: e.target.value })}
                                         disabled={!newBranch.city}
-                                        style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }}
+                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
                                     >
                                         <option value="">İlçe Seçin...</option>
                                         {(TURKISH_DISTRICTS[newBranch.city] || []).map(district => (
@@ -1262,8 +1262,8 @@ export default function SettingsPage() {
                                     </select>
                                 </div>
                                 <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>DURUM</label>
-                                    <select value={newBranch.status} onChange={e => setNewBranch({ ...newBranch, status: e.target.value })} style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }}>
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">DURUM</label>
+                                    <select value={newBranch.status} onChange={e => setNewBranch({ ...newBranch, status: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm">
                                         <option>Aktif</option>
                                         <option>Tadilat</option>
                                         <option>Kapalı</option>
@@ -1273,16 +1273,16 @@ export default function SettingsPage() {
 
                             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px', marginBottom: '20px' }}>
                                 <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>AÇIK ADRES</label>
-                                    <input type="text" value={newBranch.address} onChange={e => setNewBranch({ ...newBranch, address: e.target.value })} style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }} placeholder="Mahalle, Cadde, No..." />
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">AÇIK ADRES</label>
+                                    <input type="text" value={newBranch.address} onChange={e => setNewBranch({ ...newBranch, address: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm" placeholder="Mahalle, Cadde, No..." />
                                 </div>
                                 <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>TELEFON</label>
-                                    <input type="text" value={newBranch.phone} onChange={e => setNewBranch({ ...newBranch, phone: e.target.value })} style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }} placeholder="0212..." />
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">TELEFON</label>
+                                    <input type="text" value={newBranch.phone} onChange={e => setNewBranch({ ...newBranch, phone: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm" placeholder="0212..." />
                                 </div>
                                 <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>YÖNETİCİ</label>
-                                    <input type="text" value={newBranch.manager} onChange={e => setNewBranch({ ...newBranch, manager: e.target.value })} style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-deep)', color: 'white' }} placeholder="Ad Soyad" />
+                                    <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">YÖNETİCİ</label>
+                                    <input type="text" value={newBranch.manager} onChange={e => setNewBranch({ ...newBranch, manager: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm" placeholder="Ad Soyad" />
                                 </div>
                             </div>
 
@@ -1294,11 +1294,11 @@ export default function SettingsPage() {
                         {/* Branch List */}
                         <div className="flex-col gap-4">
                             {branches.map(branch => (
-                                <div key={branch.id} className="card glass animate-slide-up" style={{ borderLeft: `4px solid ${branch.status === 'Aktif' ? 'var(--success)' : 'var(--text-muted)'}` }}>
+                                <div key={branch.id} className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up" style={{ borderLeft: `4px solid ${branch.status === 'Aktif' ? 'var(--success)' : "#64748B"}` }}>
                                     <div className="flex-between" style={{ alignItems: 'flex-start' }}>
                                         <div className="flex-col gap-1">
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                <span style={{ background: 'var(--bg-deep)', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', border: '1px solid var(--border-light)' }}>
+                                                <span style={{ backgroundColor: "transparent", padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', border: '1px solid var(--border-light)' }}>
                                                     {branch.type || 'Şube'}
                                                 </span>
                                                 <h3 style={{ fontSize: '18px', fontWeight: 'bold' }}>{branch.name}</h3>
@@ -1316,8 +1316,8 @@ export default function SettingsPage() {
 
                                         <div className="flex-col gap-2" style={{ alignItems: 'flex-end' }}>
                                             <div className="flex-center gap-2">
-                                                <button onClick={() => editBranch(branch)} className="btn btn-ghost" style={{ padding: '6px 10px', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--primary)', fontSize: '12px' }}>✏️ Düzenle</button>
-                                                <button onClick={() => deleteBranch(branch.id)} className="btn btn-ghost" style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', fontSize: '12px' }}>🗑️ Sil</button>
+                                                <button onClick={() => editBranch(branch)} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ padding: '6px 10px', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--primary)', fontSize: '12px' }}>✏️ Düzenle</button>
+                                                <button onClick={() => deleteBranch(branch.id)} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', fontSize: '12px' }}>🗑️ Sil</button>
                                             </div>
                                             <button
                                                 onClick={() => setSelectedBranchDocs(selectedBranchDocs === branch.id ? null : branch.id)}
@@ -1330,17 +1330,17 @@ export default function SettingsPage() {
                                     </div>
 
                                     {selectedBranchDocs === branch.id && (
-                                        <div className="animate-fade-in" style={{ marginTop: '20px', padding: '20px', background: 'var(--bg-deep)', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
+                                        <div className="animate-fade-in" style={{ marginTop: '20px', padding: '20px', backgroundColor: "transparent", borderRadius: '12px', border: '1px solid var(--border-light)' }}>
                                             <div className="flex-between mb-4">
                                                 <h4 className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>📂 Şube Dijital Arşivi <span style={{ fontSize: '11px', opacity: 0.5 }}>(Kira Kontratı, Ruhsat vb.)</span></h4>
                                                 <div>
                                                     <input
                                                         type="file"
                                                         id={`file-upload-${branch.id}`}
-                                                        style={{ display: 'none' }}
+                                                        className="hidden"
                                                         onChange={(e) => handleFileUpload(e, branch.id)}
                                                     />
-                                                    <label htmlFor={`file-upload-${branch.id}`} className="btn btn-outline" style={{ borderStyle: 'dashed', fontSize: '12px', cursor: 'pointer' }}>
+                                                    <label htmlFor={`file-upload-${branch.id}`} className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ borderStyle: 'dashed', fontSize: '12px', cursor: 'pointer' }}>
                                                         ⬆ Yeni Belge Yükle
                                                     </label>
                                                 </div>
@@ -1356,11 +1356,11 @@ export default function SettingsPage() {
                                                                 <div style={{ fontSize: '24px', opacity: 0.8 }}>{file.fileType.includes('pdf') ? '📄' : '🖼️'}</div>
                                                                 <div>
                                                                     <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{file.fileName}</div>
-                                                                    <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{new Date(file.uploadedAt).toLocaleDateString('tr-TR')} • {(file.fileSize / 1024).toFixed(1)} KB</div>
+                                                                    <div style={{ fontSize: '10px', color: "#64748B" }}>{new Date(file.uploadedAt).toLocaleDateString('tr-TR')} • {(file.fileSize / 1024).toFixed(1)} KB</div>
                                                                 </div>
                                                             </div>
                                                             <div className="flex gap-2">
-                                                                <button onClick={() => deleteBranchDoc(file.id, branch.id)} className="btn btn-ghost" style={{ padding: '6px', fontSize: '11px', color: 'var(--danger)', opacity: 0.7 }}>🗑️</button>
+                                                                <button onClick={() => deleteBranchDoc(file.id, branch.id)} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ padding: '6px', fontSize: '11px', color: 'var(--danger)', opacity: 0.7 }}>🗑️</button>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -1376,7 +1376,7 @@ export default function SettingsPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 mb-8">
 
                             {/* SOL PANEL: ÖDEME YÖNTEMLERİ (Anasayfa Butonları) */}
-                            <div className="card glass overflow-hidden border border-white/5">
+                            <div className="bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                                 <div className="p-4 border-b border-white/5 bg-white/5 flex-between">
                                     <div>
                                         <h3 className="font-bold flex items-center gap-2">🔘 Ödeme Yöntemi Butonları</h3>
@@ -1445,7 +1445,7 @@ export default function SettingsPage() {
                             </div>
 
                             {/* SAĞ PANEL: KASA & BANKA HESAPLARI */}
-                            <div className="card glass overflow-hidden border border-white/5">
+                            <div className="bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                                 <div className="p-4 border-b border-white/5 bg-white/5 flex-between">
                                     <div>
                                         <h3 className="font-bold flex items-center gap-2">🏛️ Kasa & Banka Hesapları</h3>
@@ -1546,7 +1546,7 @@ export default function SettingsPage() {
                                     <div className="text-muted text-center p-4 bg-white/5 rounded">Henüz oran tanımlanmamış.</div>
                                 )}
                                 {salesExpenses?.posCommissions?.map((comm: any, idx: number) => (
-                                    <div key={idx} className="flex-between" style={{ padding: '12px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                                    <div key={idx} className="flex-between" style={{ padding: '12px', backgroundColor: "transparent", borderRadius: '8px', border: '1px solid var(--border-light)' }}>
                                         <div className="flex gap-4 items-center flex-1">
                                             <div className="flex-col gap-1 flex-1">
                                                 <label className="text-muted" style={{ fontSize: '10px', fontWeight: 'bold' }}>TAKSİT / TÜR</label>
@@ -1599,7 +1599,7 @@ export default function SettingsPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* INFO CARD */}
-                            <div className="card glass" style={{ padding: '32px' }}>
+                            <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '32px' }}>
                                 <div className="flex items-center gap-6 mb-8">
                                     <div style={{
                                         width: '80px', height: '80px', borderRadius: '24px',
@@ -1677,25 +1677,25 @@ export default function SettingsPage() {
                     <div style={{ maxWidth: '600px' }} className="animate-fade-in-up">
                         <h2 style={{ fontSize: '18px', fontWeight: '900', marginBottom: '16px' }}>Fatura Konfigürasyonu</h2>
 
-                        <div className="card glass flex-col gap-4" style={{ padding: '20px' }}>
+                        <div className="flex flex-col gap-4 p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '20px' }}>
                             <div className="flex-col gap-1">
                                 <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>FATURA NOTU (VARSAYILAN)</label>
                                 <textarea
                                     rows={2}
                                     value={invoiceSettings?.defaultNote || ''}
                                     onChange={(e) => updateInvoiceSettings({ ...invoiceSettings, defaultNote: e.target.value })}
-                                    style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', padding: '10px', borderRadius: '8px', color: 'white', fontSize: '12px' }}
+                                    style={{ backgroundColor: "transparent", border: '1px solid var(--border-light)', padding: '10px', borderRadius: '8px', color: 'white', fontSize: '12px' }}
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex-col gap-1">
                                     <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>SERİ ÖN EKİ</label>
-                                    <input type="text" value={invoiceSettings?.prefix || ''} onChange={e => updateInvoiceSettings({ ...invoiceSettings, prefix: e.target.value })} style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', color: 'var(--text-main)', fontSize: '12px' }} />
+                                    <input type="text" value={invoiceSettings?.prefix || ''} onChange={e => updateInvoiceSettings({ ...invoiceSettings, prefix: e.target.value })} style={{ padding: '8px 12px', borderRadius: '6px', backgroundColor: "transparent", border: '1px solid var(--border-light)', color: 'var(--text-main)', fontSize: '12px' }} />
                                 </div>
                                 <div className="flex-col gap-1">
                                     <label style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>SIRADAKİ NO</label>
-                                    <input type="number" value={invoiceSettings?.nextNumber || 0} readOnly style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', color: 'var(--text-muted)', fontSize: '12px', cursor: 'not-allowed' }} />
+                                    <input type="number" value={invoiceSettings?.nextNumber || 0} readOnly style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', color: "#64748B", fontSize: '12px', cursor: 'not-allowed' }} />
                                 </div>
                             </div>
 
@@ -1708,13 +1708,13 @@ export default function SettingsPage() {
                 {activeTab === 'services' && (
                     <div style={{ maxWidth: '500px' }} className="animate-fade-in-up">
                         <h2 style={{ fontSize: '18px', fontWeight: '900', marginBottom: '16px' }}>Servis Ücretleri</h2>
-                        <div className="card glass" style={{ padding: '20px' }}>
+                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '20px' }}>
                             <div className="flex-col gap-3">
                                 {[
                                     { icon: '🏍️', label: 'Motosiklet Bakım', price: localServiceSettings.motoMaintenancePrice, field: 'motoMaintenancePrice' },
                                     { icon: '🚲', label: 'Bisiklet Bakım', price: localServiceSettings.bikeMaintenancePrice, field: 'bikeMaintenancePrice' }
                                 ].map(s => (
-                                    <div key={s.field} className="flex-between" style={{ padding: '12px 16px', background: 'var(--bg-deep)', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
+                                    <div key={s.field} className="flex-between" style={{ padding: '12px 16px', backgroundColor: "transparent", borderRadius: '10px', border: '1px solid var(--border-light)' }}>
                                         <div>
                                             <div style={{ fontWeight: '800', fontSize: '13px' }}>{s.icon} {s.label}</div>
                                             <div style={{ fontSize: '10px', opacity: 0.4 }}>Otomatik gelen işçilik bedeli</div>
@@ -1724,7 +1724,7 @@ export default function SettingsPage() {
                                                 type="number"
                                                 value={s.price}
                                                 onChange={(e) => setLocalServiceSettings({ ...localServiceSettings, [s.field]: Number(e.target.value) })}
-                                                style={{ width: '90px', padding: '8px 25px 8px 8px', borderRadius: '6px', background: 'var(--bg-card)', border: '1px solid var(--primary)', color: 'white', fontWeight: '900', textAlign: 'right', fontSize: '13px' }}
+                                                style={{ width: '90px', padding: '8px 25px 8px 8px', borderRadius: '6px', backgroundColor: "transparent", border: '1px solid var(--primary)', color: 'white', fontWeight: '900', textAlign: 'right', fontSize: '13px' }}
                                             />
                                             <span style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', fontWeight: '900', fontSize: '11px', color: 'var(--primary)' }}>₺</span>
                                         </div>
@@ -1748,10 +1748,10 @@ export default function SettingsPage() {
                     <div style={{ maxWidth: '500px' }} className="animate-fade-in-up">
                         <h2 style={{ fontSize: '18px', fontWeight: '900', marginBottom: '16px' }}>Vergi Oranları</h2>
 
-                        <div className="card glass" style={{ padding: '20px' }}>
+                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '20px' }}>
                             <div className="flex-col gap-2">
                                 {((invoiceSettings as any)?.kdvRates || []).map((rate: any, idx: number) => (
-                                    <div key={idx} className="flex-between" style={{ padding: '10px 16px', background: 'var(--bg-deep)', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
+                                    <div key={idx} className="flex-between" style={{ padding: '10px 16px', backgroundColor: "transparent", borderRadius: '10px', border: '1px solid var(--border-light)' }}>
                                         <div className="flex-center gap-3">
                                             <span style={{ fontSize: '14px', fontWeight: '900', color: 'var(--primary)' }}>%{rate}</span>
                                             <span style={{ fontSize: '10px', opacity: 0.5, fontWeight: '700' }}>KDV ORANI</span>
@@ -1781,7 +1781,7 @@ export default function SettingsPage() {
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') addKdv();
                                                 }}
-                                                style={{ width: '100%', padding: '10px 30px 10px 12px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'var(--bg-card)', color: 'white', fontSize: '14px', fontWeight: '800' }}
+                                                style={{ width: '100%', padding: '10px 30px 10px 12px', borderRadius: '8px', border: '1px solid var(--border-light)', backgroundColor: "transparent", color: 'white', fontSize: '14px', fontWeight: '800' }}
                                             />
                                             <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', fontWeight: '900', fontSize: '12px', opacity: 0.5 }}>%</span>
                                         </div>
@@ -1825,7 +1825,7 @@ export default function SettingsPage() {
                                         placeholder="Örn: 4 Taksit"
                                         value={newCommission.installment}
                                         onChange={e => setNewCommission({ ...newCommission, installment: e.target.value })}
-                                        style={{ width: '100%', padding: '10px 15px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                        style={{ width: '100%', padding: '10px 15px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
                                     />
                                 </div>
                                 <div style={{ flex: 1 }}>
@@ -1837,7 +1837,7 @@ export default function SettingsPage() {
                                             placeholder="0.0"
                                             value={newCommission.rate || ''}
                                             onChange={e => setNewCommission({ ...newCommission, rate: parseFloat(e.target.value) || 0 })}
-                                            style={{ width: '100%', padding: '10px 30px 10px 15px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                            style={{ width: '100%', padding: '10px 30px 10px 15px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
                                         />
                                         <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-40%)', fontSize: '12px', opacity: 0.5 }}>%</span>
                                     </div>
@@ -1861,7 +1861,7 @@ export default function SettingsPage() {
                                                             type="text"
                                                             value={editingCommissionData.installment}
                                                             onChange={e => setEditingCommissionData({ ...editingCommissionData, installment: e.target.value })}
-                                                            style={{ width: '100%', padding: '8px', background: 'var(--bg-card)', border: '1px solid var(--primary)', borderRadius: '4px', color: 'var(--text-main)', fontWeight: 'bold' }}
+                                                            style={{ width: '100%', padding: '8px', backgroundColor: "transparent", border: '1px solid var(--primary)', borderRadius: '4px', color: 'var(--text-main)', fontWeight: 'bold' }}
                                                         />
                                                     </td>
                                                     <td>
@@ -1872,14 +1872,14 @@ export default function SettingsPage() {
                                                                 step="0.1"
                                                                 value={editingCommissionData.rate}
                                                                 onChange={e => setEditingCommissionData({ ...editingCommissionData, rate: parseFloat(e.target.value) || 0 })}
-                                                                style={{ width: '80px', padding: '8px', background: 'var(--bg-card)', border: '1px solid var(--primary)', borderRadius: '4px', color: 'var(--danger)', fontWeight: 'bold' }}
+                                                                style={{ width: '80px', padding: '8px', backgroundColor: "transparent", border: '1px solid var(--primary)', borderRadius: '4px', color: 'var(--danger)', fontWeight: 'bold' }}
                                                             />
                                                         </div>
                                                     </td>
                                                     <td style={{ textAlign: 'right' }}>
                                                         <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
                                                             <button onClick={saveEditingCommission} className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors" style={{ padding: '4px 12px', fontSize: '12px' }}>Kaydet</button>
-                                                            <button onClick={cancelEditingCommission} className="btn btn-ghost" style={{ padding: '4px 12px', fontSize: '12px' }}>İptal</button>
+                                                            <button onClick={cancelEditingCommission} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ padding: '4px 12px', fontSize: '12px' }}>İptal</button>
                                                         </div>
                                                     </td>
                                                 </>
@@ -1890,8 +1890,8 @@ export default function SettingsPage() {
                                                     <td style={{ color: 'var(--danger)' }}>%{comm.rate.toFixed(1)}</td>
                                                     <td style={{ textAlign: 'right' }}>
                                                         <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
-                                                            <button onClick={() => startEditingCommission(idx)} className="btn btn-ghost" style={{ padding: '4px 12px', fontSize: '12px', color: 'var(--primary)' }}>Düzenle</button>
-                                                            <button onClick={() => removeCommissionRate(idx)} className="btn btn-ghost" style={{ padding: '4px 8px', fontSize: '12px', color: 'var(--danger)' }}>Sil</button>
+                                                            <button onClick={() => startEditingCommission(idx)} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ padding: '4px 12px', fontSize: '12px', color: 'var(--primary)' }}>Düzenle</button>
+                                                            <button onClick={() => removeCommissionRate(idx)} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ padding: '4px 8px', fontSize: '12px', color: 'var(--danger)' }}>Sil</button>
                                                         </div>
                                                     </td>
                                                 </>
@@ -1904,7 +1904,7 @@ export default function SettingsPage() {
 
                         {/* E-FATURA VE YAZDIRMA GİDERLERİ */}
                         <div className="grid-cols-2 gap-6 mb-6">
-                            <div className="card glass">
+                            <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm">
                                 <h3 className="mb-4">🧾 E-Fatura Kontör Gideri</h3>
                                 <p className="text-muted" style={{ fontSize: '11px', marginBottom: '12px' }}>Her fatura için ödenen kontör bedeli</p>
                                 <div className="flex-center gap-2">
@@ -1919,7 +1919,7 @@ export default function SettingsPage() {
                                 </div>
                             </div>
 
-                            <div className="card glass">
+                            <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm">
                                 <h3 className="mb-4">🖨️ Kağıt/Yazdırma Gideri</h3>
                                 <p className="text-muted" style={{ fontSize: '11px', marginBottom: '12px' }}>Fiziksel yazdırma başına maliyet</p>
                                 <div className="flex-center gap-2">
@@ -1936,7 +1936,7 @@ export default function SettingsPage() {
                         </div>
 
                         {/* DİĞER GİDERLER */}
-                        <div className="card glass">
+                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm">
                             <div className="flex-between mb-4">
                                 <div>
                                     <h3>📦 Diğer Satış Giderleri</h3>
@@ -1971,7 +1971,7 @@ export default function SettingsPage() {
                                         <span style={{ fontWeight: 'bold' }}>{cost.name}</span>
                                         <div className="flex-center gap-4">
                                             <span style={{ color: 'var(--warning)', fontWeight: 'bold' }}>{cost.cost.toFixed(2)} ₺</span>
-                                            <button onClick={() => removeOtherCost(idx)} className="btn btn-ghost" style={{ padding: '4px 8px', fontSize: '12px', color: 'var(--danger)' }}>Sil</button>
+                                            <button onClick={() => removeOtherCost(idx)} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ padding: '4px 8px', fontSize: '12px', color: 'var(--danger)' }}>Sil</button>
                                         </div>
                                     </div>
                                 ))}
@@ -1981,7 +1981,7 @@ export default function SettingsPage() {
 
                         <div className="card" style={{ marginTop: '24px', background: 'rgba(59, 130, 246, 0.05)', border: '1px solid var(--primary)' }}>
                             <h4 style={{ color: 'var(--primary)', marginBottom: '8px' }}>💡 Nasıl Çalışır?</h4>
-                            <ul style={{ fontSize: '13px', lineHeight: '1.8', color: 'var(--text-muted)', paddingLeft: '20px' }}>
+                            <ul style={{ fontSize: '13px', lineHeight: '1.8', color: "#64748B", paddingLeft: '20px' }}>
                                 <li>POS ile yapılan satışlarda, seçilen taksit türüne göre komisyon <b>otomatik hesaplanır</b></li>
                                 <li>Her fatura için e-fatura kontör gideri <b>otomatik eklenir</b></li>
                                 <li>Fiziksel yazdırma yapılırsa yazdırma maliyeti <b>kara yansıtılır</b></li>
@@ -2000,7 +2000,7 @@ export default function SettingsPage() {
 
                             {/* SIDEBAR */}
                             <div className="card glass-dark" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
-                                <h3 style={{ fontSize: '12px', fontWeight: '900', color: 'var(--text-muted)', marginBottom: '8px', paddingLeft: '8px' }}>TANIMLAR</h3>
+                                <h3 style={{ fontSize: '12px', fontWeight: '900', color: "#64748B", marginBottom: '8px', paddingLeft: '8px' }}>TANIMLAR</h3>
                                 {[
                                     { id: 'brands', label: 'Markalar', icon: '🏷️', desc: 'Ürün markaları' },
                                     { id: 'prod_cat', label: 'Ürün Kategorileri', icon: '📂', desc: 'Stok grupları' },
@@ -2019,7 +2019,7 @@ export default function SettingsPage() {
                                             border: '1px solid',
                                             borderColor: definitionTab === t.id ? 'var(--primary)' : 'transparent',
                                             background: definitionTab === t.id ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
-                                            color: definitionTab === t.id ? 'white' : 'var(--text-muted)',
+                                            color: definitionTab === t.id ? 'white' : "#64748B",
                                             textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s',
                                             position: 'relative', overflow: 'hidden'
                                         }}
@@ -2056,7 +2056,7 @@ export default function SettingsPage() {
 
                                     <div className="flex gap-4 items-end">
                                         <div style={{ flex: 1 }}>
-                                            <label style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '6px', color: 'var(--text-muted)' }}>YENİ EKLE</label>
+                                            <label style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '6px', color: "#64748B" }}>YENİ EKLE</label>
                                             <div className="flex gap-2">
                                                 {/* Payment Method Type Selector */}
                                                 {definitionTab === 'payment_methods' && (
@@ -2064,7 +2064,7 @@ export default function SettingsPage() {
                                                         value={newPaymentMethod.type}
                                                         onChange={(e) => setNewPaymentMethod({ ...newPaymentMethod, type: e.target.value as any })}
                                                         style={{
-                                                            padding: '14px', borderRadius: '12px', background: 'var(--bg-deep)',
+                                                            padding: '14px', borderRadius: '12px', backgroundColor: "transparent",
                                                             border: '1px solid var(--border-light)', color: 'white', fontWeight: 'bold', width: '140px'
                                                         }}
                                                     >
@@ -2113,7 +2113,7 @@ export default function SettingsPage() {
                                                     }}
                                                     className="w-full"
                                                     style={{
-                                                        padding: '14px 20px', borderRadius: '12px', background: 'var(--bg-deep)',
+                                                        padding: '14px 20px', borderRadius: '12px', backgroundColor: "transparent",
                                                         border: '1px solid var(--border-light)', color: 'white', fontSize: '15px'
                                                     }}
                                                 />
@@ -2230,17 +2230,17 @@ export default function SettingsPage() {
                         <h2 style={{ fontSize: '18px', fontWeight: '900', marginBottom: '16px' }}>Güvenlik & Bulut</h2>
 
                         <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div className="card glass" style={{ borderLeft: '3px solid var(--success)', padding: '16px' }}>
+                            <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ borderLeft: '3px solid var(--success)', padding: '16px' }}>
                                 <div style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>BULUT DURUMU</div>
                                 <div style={{ fontSize: '15px', fontWeight: '900', color: 'var(--success)', marginTop: '4px' }}>✓ Senkronize</div>
                             </div>
-                            <div className="card glass" style={{ padding: '16px' }}>
+                            <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '16px' }}>
                                 <div style={{ fontSize: '10px', fontWeight: '900', opacity: 0.5 }}>DEPOLAMA</div>
                                 <div style={{ fontSize: '15px', fontWeight: '900', marginTop: '4px' }}>1.2 GB / 10 GB</div>
                             </div>
                         </div>
 
-                        <div className="card glass flex-col gap-4" style={{ padding: '20px' }}>
+                        <div className="flex flex-col gap-4 p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '20px' }}>
                             <div className="flex-between" style={{ background: 'rgba(59, 130, 246, 0.05)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ fontWeight: '900', color: 'var(--primary)', fontSize: '13px' }}>🛡️ Geri Yükleme Noktası</div>
@@ -2254,7 +2254,7 @@ export default function SettingsPage() {
                                     <div style={{ fontWeight: '800', fontSize: '13px' }}>Manuel SQL Yedekleme</div>
                                     <p style={{ fontSize: '10px', opacity: 0.5 }}>Veritabanını JSON olarak indir.</p>
                                 </div>
-                                <button onClick={() => { /* ... */ }} className="btn btn-ghost" style={{ fontSize: '12px', border: '1px solid var(--border-light)' }}>⬇ İNDİR</button>
+                                <button onClick={() => { /* ... */ }} className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ fontSize: '12px', border: '1px solid var(--border-light)' }}>⬇ İNDİR</button>
                             </div>
                         </div>
                     </div>
@@ -2264,7 +2264,7 @@ export default function SettingsPage() {
                     <div style={{ maxWidth: '500px' }} className="animate-fade-in-up">
                         <h2 style={{ fontSize: '18px', fontWeight: '900', marginBottom: '16px' }}>Bildirim Tercihleri</h2>
 
-                        <div className="card glass flex-col gap-4" style={{ padding: '20px' }}>
+                        <div className="flex flex-col gap-4 p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '20px' }}>
                             <div className="flex-col gap-3">
                                 {[
                                     { id: 'notif_on_delete', label: 'Kritik Silme İşlemleri', desc: 'Bir kayıt silindiğinde Admin e-postası' },
@@ -2297,12 +2297,12 @@ export default function SettingsPage() {
                                 <h2 style={{ fontSize: '18px', fontWeight: '900' }}>İşlem Günlükleri</h2>
                                 <p style={{ fontSize: '11px', opacity: 0.5 }}>Sistemdeki son değişiklikler</p>
                             </div>
-                            <button className="btn btn-outline" style={{ height: '32px', fontSize: '11px', fontWeight: '800' }} onClick={fetchLogs} disabled={isLogsLoading}>
+                            <button className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold transition-colors" style={{ height: '32px', fontSize: '11px', fontWeight: '800' }} onClick={fetchLogs} disabled={isLogsLoading}>
                                 {isLogsLoading ? '...' : '🔄 YENİLE'}
                             </button>
                         </div>
 
-                        <div className="card glass" style={{ padding: '0', overflow: 'hidden' }}>
+                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '0', overflow: 'hidden' }}>
                             <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', fontSize: '12px' }}>
                                 <thead>
                                     <tr style={{ background: 'rgba(255,255,255,0.02)', fontWeight: '900', fontSize: '10px', opacity: 0.4 }}>
@@ -2351,7 +2351,7 @@ export default function SettingsPage() {
                         </div>
 
                         {/* SUB-TABS NAVIGATION */}
-                        <div style={{ display: 'flex', gap: '8px', background: 'var(--bg-card)', padding: '6px', borderRadius: '14px', border: '1px solid var(--border-light)', width: 'fit-content' }}>
+                        <div style={{ display: 'flex', gap: '8px', backgroundColor: "transparent", padding: '6px', borderRadius: '14px', border: '1px solid var(--border-light)', width: 'fit-content' }}>
                             {[
                                 { id: 'loyalty', label: 'Ana Kampanyalar', icon: '✨' },
                                 { id: 'referral', label: 'Referans Sistemi', icon: '🔗' },
@@ -2372,7 +2372,7 @@ export default function SettingsPage() {
                                         cursor: 'pointer',
                                         transition: 'all 0.2s',
                                         background: campaignSubTab === t.id ? 'var(--primary)' : 'transparent',
-                                        color: campaignSubTab === t.id ? 'white' : 'var(--text-muted)',
+                                        color: campaignSubTab === t.id ? 'white' : "#64748B",
                                         boxShadow: campaignSubTab === t.id ? '0 4px 12px var(--primary)' : 'none'
                                     }}
                                 >
@@ -2387,7 +2387,7 @@ export default function SettingsPage() {
                                 <div className="grid-cols-12 gap-6">
                                     {/* Create/Edit Form */}
                                     <div className="col-span-12 xl:col-span-5">
-                                        <div className="card glass" style={{ border: '1px solid var(--primary)' }}>
+                                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ border: '1px solid var(--primary)' }}>
                                             <h3 className="mb-4" style={{ fontSize: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                                                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>+</div>
                                                 {editingCampaignId ? 'Kampanyayı Düzenle' : 'Yeni Kampanya Tanımla'}
@@ -2395,13 +2395,13 @@ export default function SettingsPage() {
                                             <div className="flex-col gap-4">
                                                 <div className="flex-col gap-2">
                                                     <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>KAMPANYA ADI</label>
-                                                    <input type="text" value={newCampaign.name} onChange={e => setNewCampaign({ ...newCampaign, name: e.target.value })} placeholder="Örn: Hafta Sonu Nakit İndirimi" style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white', fontSize: '14px' }} />
+                                                    <input type="text" value={newCampaign.name} onChange={e => setNewCampaign({ ...newCampaign, name: e.target.value })} placeholder="Örn: Hafta Sonu Nakit İndirimi" style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white', fontSize: '14px' }} />
                                                 </div>
 
                                                 <div className="grid-cols-2 gap-4">
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>KAMPANYA TİPİ</label>
-                                                        <select value={newCampaign.type} onChange={e => setNewCampaign({ ...newCampaign, type: e.target.value })} style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }}>
+                                                        <select value={newCampaign.type} onChange={e => setNewCampaign({ ...newCampaign, type: e.target.value })} style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }}>
                                                             <option value="payment_method_discount">💳 Ödeme İndirimi</option>
                                                             <option value="buy_x_get_discount">🏷️ X Alana % İndirim</option>
                                                             <option value="buy_x_get_free">🎁 X Alana Y Bedava</option>
@@ -2419,7 +2419,7 @@ export default function SettingsPage() {
                                                                 if (newCampaign.type === 'loyalty_points') setNewCampaign({ ...newCampaign, pointsRate: val });
                                                                 else setNewCampaign({ ...newCampaign, discountRate: val });
                                                             }}
-                                                            style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
+                                                            style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
                                                     </div>
                                                 </div>
 
@@ -2435,7 +2435,7 @@ export default function SettingsPage() {
                                                                         type="number"
                                                                         value={newCampaign.conditions.buyQuantity || 1}
                                                                         onChange={e => setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, buyQuantity: parseInt(e.target.value) } })}
-                                                                        style={{ padding: '10px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                                                        style={{ padding: '10px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
                                                                     />
                                                                 </div>
                                                                 {newCampaign.type === 'buy_x_get_discount' && (
@@ -2445,7 +2445,7 @@ export default function SettingsPage() {
                                                                             type="number"
                                                                             value={newCampaign.conditions.rewardValue || 0}
                                                                             onChange={e => setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, rewardValue: parseFloat(e.target.value) } })}
-                                                                            style={{ padding: '10px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                                                            style={{ padding: '10px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
                                                                         />
                                                                     </div>
                                                                 )}
@@ -2457,7 +2457,7 @@ export default function SettingsPage() {
                                                                     <select
                                                                         value={newCampaign.conditions.rewardProductId || ''}
                                                                         onChange={e => setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, rewardProductId: e.target.value } })}
-                                                                        style={{ padding: '10px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                                                        style={{ padding: '10px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
                                                                     >
                                                                         <option value="">Aynı Üründen</option>
                                                                         {(products || []).map((p: any) => (
@@ -2470,7 +2470,7 @@ export default function SettingsPage() {
                                                                             type="number"
                                                                             value={newCampaign.conditions.rewardQuantity || 1}
                                                                             onChange={e => setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, rewardQuantity: parseInt(e.target.value) } })}
-                                                                            style={{ padding: '10px', width: '100px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
+                                                                            style={{ padding: '10px', width: '100px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '8px', color: 'white' }}
                                                                         />
                                                                     </div>
                                                                 </div>
@@ -2481,7 +2481,7 @@ export default function SettingsPage() {
 
                                                 <div className="flex-col gap-2">
                                                     <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>HEDEF MÜŞTERİ GRUPLARI (SAHA SATIŞ ÖZEL)</label>
-                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '10px', background: 'var(--bg-deep)', borderRadius: '10px', border: '1px solid var(--border-light)', minHeight: '60px' }}>
+                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '10px', backgroundColor: "transparent", borderRadius: '10px', border: '1px solid var(--border-light)', minHeight: '60px' }}>
                                                         {(custClasses || []).map(cc => (
                                                             <button
                                                                 key={cc}
@@ -2508,7 +2508,7 @@ export default function SettingsPage() {
 
                                                 <div className="flex-col gap-2">
                                                     <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>GEÇERLİ OLDUĞU MARKALAR (Boşsa Tümü)</label>
-                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '10px', background: 'var(--bg-deep)', borderRadius: '10px', border: '1px solid var(--border-light)', minHeight: '60px' }}>
+                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '10px', backgroundColor: "transparent", borderRadius: '10px', border: '1px solid var(--border-light)', minHeight: '60px' }}>
                                                         {(allBrands || []).map(b => (
                                                             <button
                                                                 key={b}
@@ -2534,7 +2534,7 @@ export default function SettingsPage() {
 
                                                 <div className="flex-col gap-2">
                                                     <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>GEÇERLİ OLDUĞU KATEGORİLER (Boşsa Tümü)</label>
-                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '10px', background: 'var(--bg-deep)', borderRadius: '10px', border: '1px solid var(--border-light)', minHeight: '60px' }}>
+                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '10px', backgroundColor: "transparent", borderRadius: '10px', border: '1px solid var(--border-light)', minHeight: '60px' }}>
                                                         {(allCats || []).map(c => (
                                                             <button
                                                                 key={c}
@@ -2561,7 +2561,7 @@ export default function SettingsPage() {
                                                 {newCampaign.type === 'payment_method_discount' && (
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>ÖDEME YÖNTEMİ SEÇİMİ</label>
-                                                        <select style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }}
+                                                        <select style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }}
                                                             value={newCampaign.conditions.paymentMethod || ''}
                                                             onChange={e => setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, paymentMethod: e.target.value } })}>
                                                             <option value="">Tüm Yöntemler</option>
@@ -2612,14 +2612,14 @@ export default function SettingsPage() {
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                                 {campaigns.map(camp => (
-                                                    <div key={camp.id} style={{ background: 'var(--bg-deep)', padding: '16px', borderRadius: '14px', border: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <div key={camp.id} style={{ backgroundColor: "transparent", padding: '16px', borderRadius: '14px', border: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                                                             <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: camp.type === 'loyalty_points' ? 'rgba(0, 240, 255, 0.1)' : (camp.type === 'buy_x_get_free' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)'), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
                                                                 {camp.type === 'loyalty_points' ? '💎' : (camp.type === 'buy_x_get_free' ? '🎁' : (camp.type === 'buy_x_get_discount' ? '🏷️' : '💳'))}
                                                             </div>
                                                             <div>
                                                                 <div style={{ fontWeight: '800', fontSize: '14px', marginBottom: '2px' }}>{camp.name}</div>
-                                                                <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                                                <div style={{ fontSize: '11px', color: "#64748B", display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                                                     <span>
                                                                         {camp.type === 'loyalty_points' && 'Sadakat Puanı'}
                                                                         {camp.type === 'payment_method_discount' && 'Ödeme İndirimi'}
@@ -2661,7 +2661,7 @@ export default function SettingsPage() {
                         {/* 10.2 REFERANS SİSTEMİ */}
                         {campaignSubTab === 'referral' && (
                             <div className="animate-fade-in-up" style={{ maxWidth: '800px' }}>
-                                <div className="card glass" style={{ border: '1px solid rgba(100,116,139, 0.2)' }}>
+                                <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ border: '1px solid rgba(100,116,139, 0.2)' }}>
                                     <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginBottom: '30px' }}>
                                         <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'var(--secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', boxShadow: '0 8px 16px rgba(100,116,139, 0.2)' }}>🔗</div>
                                         <div>
@@ -2671,7 +2671,7 @@ export default function SettingsPage() {
                                     </div>
 
                                     <div className="grid-cols-2 gap-8 mb-8">
-                                        <div style={{ background: 'var(--bg-deep)', padding: '20px', borderRadius: '16px', border: '1px solid var(--border-light)' }}>
+                                        <div style={{ backgroundColor: "transparent", padding: '20px', borderRadius: '16px', border: '1px solid var(--border-light)' }}>
                                             <div className="flex-between mb-2">
                                                 <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>REFERANS OLAN KİŞİYE ÖDÜL</label>
                                                 <select
@@ -2698,10 +2698,10 @@ export default function SettingsPage() {
                                                     {referralSettings.referrerRewardType === 'amount' ? '₺' : '%'}
                                                 </div>
                                             </div>
-                                            <p style={{ fontSize: '11px', marginTop: '15px', color: 'var(--text-muted)' }}>Mevcut müşteri, yeni birini getirdiğinde bu değerde bir indirim kuponu kazanır.</p>
+                                            <p style={{ fontSize: '11px', marginTop: '15px', color: "#64748B" }}>Mevcut müşteri, yeni birini getirdiğinde bu değerde bir indirim kuponu kazanır.</p>
                                         </div>
 
-                                        <div style={{ background: 'var(--bg-deep)', padding: '20px', borderRadius: '16px', border: '1px solid var(--border-light)' }}>
+                                        <div style={{ backgroundColor: "transparent", padding: '20px', borderRadius: '16px', border: '1px solid var(--border-light)' }}>
                                             <div className="flex-between mb-2">
                                                 <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>YENİ GELEN KİŞİYE HEDİYE</label>
                                                 <select
@@ -2728,7 +2728,7 @@ export default function SettingsPage() {
                                                     {referralSettings.refereeGiftType === 'percent' ? '%' : '₺'}
                                                 </div>
                                             </div>
-                                            <p style={{ fontSize: '11px', marginTop: '15px', color: 'var(--text-muted)' }}>Yeni müşteri ilk alışverişinde bu değerde anında hoşgeldin indirimi alır.</p>
+                                            <p style={{ fontSize: '11px', marginTop: '15px', color: "#64748B" }}>Yeni müşteri ilk alışverişinde bu değerde anında hoşgeldin indirimi alır.</p>
                                         </div>
                                     </div>
 
@@ -2749,47 +2749,47 @@ export default function SettingsPage() {
                             <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                                 <div className="grid-cols-12 gap-6">
                                     <div className="col-span-12 lg:col-span-5">
-                                        <div className="card glass">
+                                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm">
                                             <h3 className="mb-6" style={{ fontSize: '16px' }}>🎫 Kod Üretici</h3>
                                             <div className="flex-col gap-5">
                                                 <div className="flex-col gap-2">
                                                     <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>KAMPANYA ADI</label>
-                                                    <input type="text" value={newCoupon.campaignName} onChange={e => setNewCoupon({ ...newCoupon, campaignName: e.target.value })} placeholder="Yılbaşı Paket İndirimi" style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
+                                                    <input type="text" value={newCoupon.campaignName} onChange={e => setNewCoupon({ ...newCoupon, campaignName: e.target.value })} placeholder="Yılbaşı Paket İndirimi" style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
                                                 </div>
 
                                                 <div className="grid-cols-2 gap-4">
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>ÜRETİLECEK ADET</label>
-                                                        <input type="number" value={newCoupon.count} onChange={e => setNewCoupon({ ...newCoupon, count: parseInt(e.target.value) || 1 })} style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
+                                                        <input type="number" value={newCoupon.count} onChange={e => setNewCoupon({ ...newCoupon, count: parseInt(e.target.value) || 1 })} style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
                                                     </div>
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>SON KULLANIM</label>
-                                                        <input type="date" value={newCoupon.expiryDate} onChange={e => setNewCoupon({ ...newCoupon, expiryDate: e.target.value })} style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
+                                                        <input type="date" value={newCoupon.expiryDate} onChange={e => setNewCoupon({ ...newCoupon, expiryDate: e.target.value })} style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
                                                     </div>
                                                 </div>
 
                                                 <div className="grid-cols-2 gap-4">
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>İNDİRİM TİPİ</label>
-                                                        <select value={newCoupon.type} onChange={e => setNewCoupon({ ...newCoupon, type: e.target.value })} style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }}>
+                                                        <select value={newCoupon.type} onChange={e => setNewCoupon({ ...newCoupon, type: e.target.value })} style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }}>
                                                             <option value="percent">İndirim Oranı (%)</option>
                                                             <option value="amount">İndirim Tutarı (₺)</option>
                                                         </select>
                                                     </div>
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>DEĞER</label>
-                                                        <input type="number" value={newCoupon.value} onChange={e => setNewCoupon({ ...newCoupon, value: parseFloat(e.target.value) || 0 })} style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
+                                                        <input type="number" value={newCoupon.value} onChange={e => setNewCoupon({ ...newCoupon, value: parseFloat(e.target.value) || 0 })} style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
                                                     </div>
                                                 </div>
 
                                                 <div className="grid-cols-2 gap-4">
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>SEPET LİMİTİ (Min ₺)</label>
-                                                        <input type="number" value={newCoupon.minPurchaseAmount} onChange={e => setNewCoupon({ ...newCoupon, minPurchaseAmount: parseFloat(e.target.value) || 0 })} placeholder="0 (Limitsiz)" style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
+                                                        <input type="number" value={newCoupon.minPurchaseAmount} onChange={e => setNewCoupon({ ...newCoupon, minPurchaseAmount: parseFloat(e.target.value) || 0 })} placeholder="0 (Limitsiz)" style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }} />
                                                     </div>
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>KULLANIM HAKKI</label>
-                                                        <select value={newCoupon.usageLimit} onChange={e => setNewCoupon({ ...newCoupon, usageLimit: parseInt(e.target.value) })} style={{ padding: '12px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }}>
+                                                        <select value={newCoupon.usageLimit} onChange={e => setNewCoupon({ ...newCoupon, usageLimit: parseInt(e.target.value) })} style={{ padding: '12px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '10px', color: 'white' }}>
                                                             <option value={1}>1 Seferlik (Kullanınca Biter)</option>
                                                             <option value={0}>Sürekli (Her Alışverişte)</option>
                                                         </select>
@@ -2799,7 +2799,7 @@ export default function SettingsPage() {
                                                 <div className="grid-cols-2 gap-4">
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>MARKA KISITI</label>
-                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '8px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)', minHeight: '50px' }}>
+                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '8px', backgroundColor: "transparent", borderRadius: '8px', border: '1px solid var(--border-light)', minHeight: '50px' }}>
                                                             {(allBrands || []).map(b => (
                                                                 <button
                                                                     type="button"
@@ -2818,7 +2818,7 @@ export default function SettingsPage() {
                                                     </div>
                                                     <div className="flex-col gap-2">
                                                         <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.5 }}>KAT. KISITI</label>
-                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '8px', background: 'var(--bg-deep)', borderRadius: '8px', border: '1px solid var(--border-light)', minHeight: '50px' }}>
+                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '8px', backgroundColor: "transparent", borderRadius: '8px', border: '1px solid var(--border-light)', minHeight: '50px' }}>
                                                             {(allCats || []).map(c => (
                                                                 <button
                                                                     type="button"
@@ -2889,7 +2889,7 @@ export default function SettingsPage() {
                     <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
                         <h2 style={{ marginBottom: '20px', color: 'var(--danger)', fontSize: '24px', fontWeight: '900' }}>⚠️ KRİTİK SİSTEM SIFIRLAMA</h2>
 
-                        <div className="card glass" style={{ border: '2px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)', padding: '40px', borderRadius: '24px' }}>
+                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ border: '2px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)', padding: '40px', borderRadius: '24px' }}>
                             <div style={{ fontSize: '64px', marginBottom: '20px' }}>🧨</div>
                             <h3 style={{ fontSize: '22px', fontWeight: '900', marginBottom: '15px', color: 'white' }}>Veri Temizleme ve Yapılandırma</h3>
                             <p className="text-muted" style={{ marginBottom: '30px', lineHeight: '1.6', fontSize: '14px' }}>
@@ -3004,7 +3004,7 @@ export default function SettingsPage() {
                 {/* 10.4 HEDİYE ÇEKİ YÖNETİM MODALI */}
                 {showCouponModal && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }} onClick={() => setShowCouponModal(false)}>
-                        <div style={{ background: 'var(--bg-card)', width: '90%', maxWidth: '1200px', maxHeight: '90vh', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ backgroundColor: "transparent", width: '90%', maxWidth: '1200px', maxHeight: '90vh', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }} onClick={e => e.stopPropagation()}>
                             {/* Modal Header */}
                             <div style={{ padding: '32px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
@@ -3026,7 +3026,7 @@ export default function SettingsPage() {
                                         placeholder="Kod veya kampanya adı ile ara..."
                                         value={couponSearch}
                                         onChange={e => { setCouponSearch(e.target.value); setCouponPage(1); }}
-                                        style={{ width: '100%', background: 'var(--bg-deep)', border: '1px solid rgba(255,255,255,0.1)', padding: '16px 20px 16px 50px', borderRadius: '16px', color: 'white', outline: 'none', fontSize: '15px' }}
+                                        style={{ width: '100%', backgroundColor: "transparent", border: '1px solid rgba(255,255,255,0.1)', padding: '16px 20px 16px 50px', borderRadius: '16px', color: 'white', outline: 'none', fontSize: '15px' }}
                                     />
                                     <span style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', fontSize: '20px', opacity: 0.3 }}>🔍</span>
                                 </div>
@@ -3084,7 +3084,7 @@ export default function SettingsPage() {
                                                                 refreshCoupons();
                                                             });
                                                         }}
-                                                        className="btn btn-ghost"
+                                                        className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors"
                                                         style={{ color: 'var(--danger)', fontSize: '18px', padding: '10px' }}
                                                     >🗑️</button>
                                                 </td>
@@ -3135,7 +3135,7 @@ export default function SettingsPage() {
                             <p className="text-sm text-white/40" style={{ fontSize: '13px', opacity: 0.4 }}>Mail sunucu yapılandırması ve SMTP entegrasyon ayarları.</p>
                         </div>
 
-                        <div className="card glass p-8" style={{ padding: '32px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '16px' }}>
+                        <div className="card glass p-8" style={{ padding: '32px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '16px' }}>
                             <div className="flex justify-between items-center border-b border-white/5 pb-6 mb-6" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '24px', marginBottom: '24px' }}>
                                 <div>
                                     <h3 className="text-lg font-black flex items-center gap-2" style={{ fontSize: '18px', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '8px' }}>

@@ -1,0 +1,74 @@
+﻿Ôû▓ Next.js 16.1.4 (Turbopack)
+- Environments: .env.production.local, .env.local, .env.production, .env
+
+node.exe : ÔÜá The "middlewar
+e" file convention is depreca
+ted. Please use "proxy" inste
+ad. Learn more: https://nextj
+s.org/docs/messages/middlewar
+e-to-proxy
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (ÔÜá The  
+   "middle...leware-to-pro   
+ xy:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed
+ with 1 errors:
+./src/app/(app)/settings/page
+.tsx:1378:35
+Parsing ecmascript source cod
+e failed
+[0m [90m 1376 |[39m       
+                             
+     }} className[33m=[39m
+[32m"px-4 py-2 rounded-xl tex
+t-slate-600 dark:text-slate-4
+00 hover:bg-slate-100 dark:ho
+ver:bg-slate-800 font-semibol
+d transition-colors"[39m[33
+m>[39m­şùæ´©Å[33m<[39m[33
+m/[39m[33mbutton[39m[33m>
+[39m
+ [90m 1377 |[39m           
+                          [3
+3m<[39m[33m/[39m[33mdiv[
+39m[33m>[39m
+[31m[1m>[22m[39m[90m 137
+8 |[39m                     
+            ))}
+ [90m      |[39m           
+                        [31m
+[1m^[22m[39m
+ [90m 1379 |[39m           
+                  [33m<[39m
+[33m/[39m[33mdiv[39m[33m
+>[39m
+ [90m 1380 |[39m           
+              [33m<[39m[33
+m/[39m[33mdiv[39m[33m>[3
+9m
+ [90m 1381 |[39m           
+          [33m<[39m[33m/[
+39m[33mdiv[39m[33m>[39m[
+0m
+
+Unexpected token. Did you mea
+n `{'}'}` or `&rbrace;`?
+
+
+    at <unknown> (./src/app/(
+app)/settings/page.tsx:1378:3
+5)
