@@ -1010,8 +1010,8 @@ export default function SettingsPage() {
         <div className="container" style={{ padding: '0', height: '100vh', display: 'flex' }}>
 
             {/* LEFT SIDEBAR MENU */}
-            <div style={{ width: '220px', borderRight: '1px solid var(--border-light)', padding: '16px', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <h2 style={{ fontSize: '14px', fontWeight: '900', marginBottom: '16px', paddingLeft: '8px', opacity: 0.5, letterSpacing: '1px', textTransform: 'uppercase' }}>⚙ Ayarlar</h2>
+            <div className="w-[240px] border-r border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-[#0F172A] flex flex-col gap-1">
+                <h2 className="text-[11px] font-bold mb-4 px-3 text-slate-500 uppercase tracking-widest">⚙ Ayarlar</h2>
 
                 {[
                     { id: 'company', label: 'Firma Profili', icon: '🏢' },
@@ -1028,24 +1028,26 @@ export default function SettingsPage() {
                     { id: 'backup', label: 'Bulut Yedekleme', icon: '☁️' },
                     { id: 'logs', label: 'İşlem Günlükleri', icon: '📜' },
                     { id: 'system', label: 'Mail Ayarları', icon: '📧' }
-                ].map(item => (
-                    <button
-                        key={item.id}
-                        onClick={() => setActiveTab(item.id)}
-                        className={`btn ${activeTab === item.id ? 'btn-primary' : 'btn-ghost'}`}
-                        style={{
-                            justifyContent: 'flex-start',
-                            padding: '8px 12px',
-                            fontSize: '12px',
-                            fontWeight: activeTab === item.id ? '800' : '600',
-                            borderRadius: '8px',
-                            gap: '10px'
-                        }}
-                    >
-                        <span style={{ fontSize: '14px' }}>{item.icon}</span>
-                        {item.label}
-                    </button>
-                ))}
+                ].map(item => {
+                    const isActive = activeTab === item.id;
+                    return (
+                        <button
+                            key={item.id}
+                            onClick={() => setActiveTab(item.id)}
+                            className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg transition-colors text-left relative overflow-hidden ${isActive
+                                ? 'bg-[#E0E7FF] dark:bg-[#1E293B] text-blue-700 dark:text-white font-bold'
+                                : 'text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
+                            style={{ fontSize: '13px' }}
+                        >
+                            {isActive && (
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 dark:bg-blue-400" />
+                            )}
+                            <span className={isActive ? 'opacity-100' : 'opacity-60'} style={{ fontSize: '16px' }}>{item.icon}</span>
+                            {item.label}
+                        </button>
+                    );
+                })}
 
                 <div style={{ height: '1px', background: 'var(--border-light)', margin: '12px 0' }}></div>
 
