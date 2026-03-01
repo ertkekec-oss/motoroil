@@ -71,32 +71,32 @@ export default function InventoryBulkEditModal({
     };
 
     return (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-black/85 backdrop-blur-xl animate-fade-in">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
             <div
-                className={`glass-plus overflow-hidden flex flex-col border border-white/20 rounded-[40px] shadow-[0_50px_100px_rgba(0,0,0,0.9)] animate-in ${(mode === 'barcode' || mode === 'price') ? 'w-full max-w-7xl h-[85vh]' : 'w-full max-w-lg'
+                className={`bg-white dark:bg-[#0f172a] flex flex-col border border-slate-200 dark:border-white/10 rounded-[24px] shadow-2xl animate-in ${(mode === 'barcode' || mode === 'price') ? 'w-full max-w-7xl h-[85vh]' : 'w-full max-w-lg'
                     }`}
             >
-                <div className="px-10 py-8 border-b border-white/5 flex gap-10 justify-between items-center bg-white/5">
+                <div className="px-8 py-6 border-b border-slate-200 dark:border-white/10 flex gap-6 justify-between items-center">
                     <div>
-                        <h3 className="text-3xl font-black bg-gradient-to-br from-white to-white/50 bg-clip-text text-transparent mb-1">
+                        <h3 className="text-[20px] font-semibold text-slate-900 dark:text-white mb-1">
                             {mode === 'category' ? '📁 Kategori Taşıma' :
                                 mode === 'vat' ? '🏛️ Vergi Yapılandırma' :
                                     mode === 'price' ? '💰 Fiyat Revizyonu' : '🔍 Barkod Terminali'}
                         </h3>
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                            <p className="text-muted text-[10px] font-black uppercase tracking-widest leading-none">Seçili {selectedIds.length} ürün işleme hazır</p>
+                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                            <p className="text-slate-500 text-[11px] font-medium tracking-wider uppercase">Seçili {selectedIds.length} ürün işleme hazır</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-all text-xl font-light">&times;</button>
+                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 flex items-center justify-center dark:hover:bg-white/10 transition-colors text-slate-500 font-medium">✕</button>
                 </div>
 
-                <div className="p-10 overflow-y-auto flex-1 custom-scroll bg-black/20">
+                <div className="p-8 overflow-y-auto flex-1 custom-scroll">
                     {mode === 'category' && (
-                        <div className="flex flex-col gap-6 py-4">
-                            <label className="text-primary text-[10px] font-black tracking-[3px] uppercase">Yeni Kategori Hedefi</label>
+                        <div className="flex flex-col gap-4 py-2">
+                            <label className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase">Yeni Kategori Hedefi</label>
                             <select
-                                className="w-full bg-black/40 p-5 rounded-2xl border border-white/10 text-base font-bold focus:border-primary outline-none appearance-none cursor-pointer"
+                                className="w-full bg-slate-50 dark:bg-[#1e293b] px-4 py-3 rounded-[12px] border border-slate-200 dark:border-white/10 text-[14px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer transition-colors shadow-sm"
                                 onChange={(e) => setBulkValues({ category: e.target.value })}
                             >
                                 <option value="">--- Bir kategori seçin ---</option>
@@ -108,22 +108,22 @@ export default function InventoryBulkEditModal({
                     )}
 
                     {mode === 'vat' && (
-                        <div className="grid grid-cols-2 gap-8 py-4">
-                            <div className="flex flex-col gap-4">
-                                <label className="text-primary text-[10px] font-black tracking-[3px] uppercase">Satış KDV (%)</label>
+                        <div className="grid grid-cols-2 gap-6 py-2">
+                            <div className="flex flex-col gap-3">
+                                <label className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase">Satış KDV (%)</label>
                                 <input
                                     type="number"
                                     placeholder="20"
-                                    className="w-full bg-black/40 p-5 rounded-2xl border border-white/10 text-2xl font-black text-center focus:border-primary outline-none"
+                                    className="w-full bg-slate-50 dark:bg-[#1e293b] px-4 py-3 rounded-[12px] border border-slate-200 dark:border-white/10 text-[18px] font-semibold text-center text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
                                     onChange={e => setBulkValues({ ...bulkValues, salesVat: parseInt(e.target.value) })}
                                 />
                             </div>
-                            <div className="flex flex-col gap-4">
-                                <label className="text-primary text-[10px] font-black tracking-[3px] uppercase">Alış KDV (%)</label>
+                            <div className="flex flex-col gap-3">
+                                <label className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase">Alış KDV (%)</label>
                                 <input
                                     type="number"
                                     placeholder="20"
-                                    className="w-full bg-black/40 p-5 rounded-2xl border border-white/10 text-2xl font-black text-center focus:border-primary outline-none"
+                                    className="w-full bg-slate-50 dark:bg-[#1e293b] px-4 py-3 rounded-[12px] border border-slate-200 dark:border-white/10 text-[18px] font-semibold text-center text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
                                     onChange={e => setBulkValues({ ...bulkValues, purchaseVat: parseInt(e.target.value) })}
                                 />
                             </div>
@@ -133,10 +133,10 @@ export default function InventoryBulkEditModal({
                     {mode === 'barcode' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {selectedProducts.map(product => (
-                                <div key={product.id} className="bg-white/5 border border-white/5 rounded-3xl p-6 flex flex-col gap-4 hover:bg-white/[0.08] transition-colors group">
+                                <div key={product.id} className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[16px] p-5 flex flex-col gap-3 hover:border-blue-500 transition-colors group shadow-sm">
                                     <div className="flex flex-col">
-                                        <div className="text-xs font-black text-white/90 truncate mb-1">{product.name}</div>
-                                        <div className="text-[10px] text-muted font-mono tracking-wider opacity-60">{product.code}</div>
+                                        <div className="text-[13px] font-semibold text-slate-900 dark:text-white truncate mb-0.5">{product.name}</div>
+                                        <div className="text-[11px] text-slate-500 font-medium tracking-wider">{product.code}</div>
                                     </div>
                                     <input
                                         type="text"
@@ -144,7 +144,7 @@ export default function InventoryBulkEditModal({
                                         defaultValue={product.barcode}
                                         onChange={(e) => setBulkValues({ ...bulkValues, [product.id]: e.target.value })}
                                         autoFocus={selectedIds[0] === product.id}
-                                        className="bg-black/60 border border-white/10 p-4 rounded-xl text-primary font-black text-sm focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all"
+                                        className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 px-3 py-2.5 rounded-[10px] text-blue-600 dark:text-blue-400 font-semibold text-[13px] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all shadow-sm"
                                     />
                                 </div>
                             ))}
@@ -152,17 +152,17 @@ export default function InventoryBulkEditModal({
                     )}
 
                     {mode === 'price' && (
-                        <div className="flex flex-col gap-8">
+                        <div className="flex flex-col gap-6">
                             {/* Wizard Bar */}
-                            <div className="sticky top-0 z-10 flex justify-center pb-6">
-                                <div className="bg-slate-900/90 border border-primary/40 rounded-3xl py-3 px-8 flex items-center gap-6 shadow-2xl backdrop-blur-2xl">
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] font-black text-primary tracking-[3px] uppercase leading-none mb-1">Akıllı Sihirbaz</span>
-                                        <div className="text-white text-xs font-bold leading-none italic opacity-50">Tümüne Uygula</div>
+                            <div className="sticky top-0 z-10 flex justify-center pb-4">
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[16px] py-2.5 px-6 flex items-center gap-4 shadow-sm">
+                                    <div className="flex items-center gap-2">
+                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 text-[12px]">⚡</span>
+                                        <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-300">Akıllı Sihirbaz</span>
                                     </div>
-                                    <div className="w-px h-8 bg-white/10"></div>
+                                    <div className="w-px h-6 bg-slate-200 dark:bg-white/10"></div>
                                     <select
-                                        className="bg-transparent text-white border-none text-xs font-black uppercase tracking-wider cursor-pointer outline-none"
+                                        className="bg-transparent text-slate-900 dark:text-white border-none text-[12px] font-semibold tracking-wider cursor-pointer outline-none"
                                         value={adjTarget}
                                         onChange={e => setAdjTarget(e.target.value as any)}
                                     >
@@ -171,7 +171,7 @@ export default function InventoryBulkEditModal({
                                         <option value="both">Tüm Fiyatlar</option>
                                     </select>
                                     <select
-                                        className="bg-transparent text-white border-none text-xs font-black uppercase tracking-wider cursor-pointer outline-none"
+                                        className="bg-transparent text-slate-500 dark:text-slate-400 border-none text-[12px] font-medium tracking-wider cursor-pointer outline-none"
                                         value={adjType}
                                         onChange={e => setAdjType(e.target.value as any)}
                                     >
@@ -183,11 +183,11 @@ export default function InventoryBulkEditModal({
                                         placeholder="0"
                                         value={adjValue || ''}
                                         onChange={e => setAdjValue(parseFloat(e.target.value) || 0)}
-                                        className="bg-black/60 border border-white/10 w-24 py-2 px-4 text-white rounded-xl text-sm font-black text-center focus:border-primary outline-none"
+                                        className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 w-20 py-1.5 px-3 text-slate-900 dark:text-white rounded-[8px] text-[13px] font-semibold text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
                                     />
                                     <button
                                         onClick={applyAdjustmentRule}
-                                        className="bg-primary text-white border-none py-2.5 px-6 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-primary/80 transition-all shadow-lg shadow-primary/40"
+                                        className="bg-blue-600 text-white border-none py-1.5 px-4 rounded-[8px] text-[11px] font-semibold tracking-wider hover:bg-blue-700 transition-colors shadow-sm ml-2"
                                     >
                                         Hepsini Güncelle
                                     </button>
@@ -198,17 +198,17 @@ export default function InventoryBulkEditModal({
                                 {selectedProducts.map((product) => {
                                     const currentValues = bulkValues[product.id] || { buyPrice: product.buyPrice, price: product.price };
                                     return (
-                                        <div key={product.id} className="bg-white/5 border border-white/5 rounded-3xl p-6 hover:bg-white/[0.08] transition-all group">
+                                        <div key={product.id} className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[16px] p-5 hover:border-blue-500 transition-colors group shadow-sm">
                                             <div className="flex flex-col mb-4">
-                                                <div className="text-[11px] font-black text-white/90 truncate mb-1 leading-tight" title={product.name}>{product.name}</div>
-                                                <div className="text-[9px] text-muted font-bold uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">{product.code}</div>
+                                                <div className="text-[13px] font-semibold text-slate-900 dark:text-white truncate mb-0.5 leading-tight" title={product.name}>{product.name}</div>
+                                                <div className="text-[11px] text-slate-500 font-medium tracking-wider">{product.code}</div>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-2 gap-3">
                                                 <div className="flex flex-col gap-1.5">
-                                                    <label className="text-[9px] text-muted font-black tracking-widest uppercase">ALIŞ</label>
+                                                    <label className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold tracking-wider uppercase">ALIŞ</label>
                                                     <input
                                                         type="number"
-                                                        className="w-full bg-black/40 border border-white/10 p-2.5 rounded-xl text-xs font-bold focus:border-white/30 outline-none"
+                                                        className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 p-2 rounded-[8px] text-[12px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
                                                         value={currentValues.buyPrice}
                                                         onChange={(e) => {
                                                             const newVals = { ...bulkValues, [product.id]: { ...currentValues, buyPrice: parseFloat(e.target.value) } };
@@ -217,10 +217,10 @@ export default function InventoryBulkEditModal({
                                                     />
                                                 </div>
                                                 <div className="flex flex-col gap-1.5">
-                                                    <label className="text-primary text-[9px] font-black tracking-widest uppercase">SATIŞ</label>
+                                                    <label className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold tracking-wider uppercase">SATIŞ</label>
                                                     <input
                                                         type="number"
-                                                        className="w-full bg-primary/10 border border-primary/20 p-2.5 rounded-xl text-xs font-black text-primary focus:border-primary outline-none"
+                                                        className="w-full bg-blue-50/50 dark:bg-blue-500/5 border border-blue-200 dark:border-blue-500/20 p-2 rounded-[8px] text-[12px] font-bold text-blue-600 dark:text-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
                                                         value={currentValues.price}
                                                         onChange={(e) => {
                                                             const newVals = { ...bulkValues, [product.id]: { ...currentValues, price: parseFloat(e.target.value) } };
@@ -237,10 +237,10 @@ export default function InventoryBulkEditModal({
                     )}
                 </div>
 
-                <div className="p-10 border-t border-white/10 bg-white/5 flex justify-end gap-6 items-center">
-                    <button className="text-[11px] font-black uppercase tracking-[3px] text-muted hover:text-white transition-colors" onClick={onClose} disabled={isProcessing}>VAZGEÇ</button>
-                    <button className="btn-primary px-12 py-5 text-base font-black tracking-[2px]" onClick={handleApply} disabled={isProcessing}>
-                        {isProcessing ? 'SİSTEME İŞLENİYOR...' : '🚀 ONAYLA'}
+                <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1e293b] flex justify-end gap-3 items-center rounded-b-[24px]">
+                    <button className="text-[12px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors px-4 py-2" onClick={onClose} disabled={isProcessing}>VAZGEÇ</button>
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-[12px] text-[13px] font-semibold tracking-wider transition-colors shadow-sm disabled:opacity-50" onClick={handleApply} disabled={isProcessing}>
+                        {isProcessing ? 'SİSTEME İŞLENİYOR...' : 'ONAYLA'}
                     </button>
                 </div>
             </div>

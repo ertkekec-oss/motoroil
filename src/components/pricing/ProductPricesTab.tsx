@@ -81,39 +81,40 @@ export function ProductPricesTab({ productId }: ProductPricesTabProps) {
 
     return (
         <div className="space-y-4">
-            <h3 className="text-lg font-bold">Fiyat Listeleri</h3>
-            <div className="space-y-2">
+            <h3 className="text-[14px] font-semibold text-slate-800 dark:text-white pb-2 border-b border-slate-200 dark:border-white/10">Fiyat Listeleri</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {prices.map(p => (
-                    <div key={p.priceListId} className="flex items-center gap-4 p-3 border rounded-lg bg-white/5">
-                        <div className="flex-1">
-                            <div className="font-bold text-sm">{p.priceListName}</div>
-                            {p.derivedFromListId && <div className="text-xs opacity-50">Formül ile üretildi</div>}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <div className="flex flex-col items-end">
-                                <label className="text-[10px] opacity-70 mb-1">Fiyat ({p.currency})</label>
-                                <Input
-                                    type="number"
-                                    className="w-32 h-8 text-right"
-                                    defaultValue={p.price}
-                                    onBlur={(e) => handleSave(p.priceListId, parseFloat(e.target.value), true)} // Auto save as override on change
-                                />
+                    <div key={p.priceListId} className="flex flex-col gap-4 p-5 border border-slate-200 dark:border-white/10 rounded-[16px] bg-slate-50 dark:bg-[#1e293b] shadow-sm">
+                        <div className="flex justify-between items-start">
+                            <div className="flex flex-col gap-1">
+                                <span className="font-semibold text-[13px] text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] px-3 py-1 rounded-[8px] border border-slate-200 dark:border-white/10 shadow-sm w-fit">{p.priceListName}</span>
+                                {p.derivedFromListId && <span className="text-[11px] font-medium text-slate-500 mt-1 flex items-center gap-1">✨ Formül ile üretildi</span>}
                             </div>
-
-                            <div className="flex flex-col items-center">
-                                <label className="text-[10px] opacity-70 mb-1">Manuel</label>
+                            <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-3 py-1.5 rounded-[10px] border border-slate-200 dark:border-white/10 shadow-sm">
                                 <Checkbox
                                     checked={p.isManualOverride}
                                     onCheckedChange={(c) => handleSave(p.priceListId, p.price, !!c)}
+                                    className="w-4 h-4 rounded border-slate-300 dark:border-white/20 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                                 />
+                                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer">Manuel Yönetim</label>
                             </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2 pt-2 border-t border-slate-200 dark:border-white/10">
+                            <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Özel Fiyat Merkezi ({p.currency})</label>
+                            <Input
+                                type="number"
+                                className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-4 text-[16px] font-bold text-slate-900 dark:text-white focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:border-blue-500 placeholder-slate-400 transition-colors shadow-inner"
+                                defaultValue={p.price}
+                                onBlur={(e) => handleSave(p.priceListId, parseFloat(e.target.value), true)} // Auto save as override on change
+                            />
                         </div>
                     </div>
                 ))}
             </div>
-            <div className="text-xs opacity-50 mt-2">
-                * Fiyatı değiştirdiğinizde otomatik olarak "Manuel" işaretlenir ve formüllerden etkilenmez.
+            <div className="text-[11px] font-medium text-slate-500 flex items-center gap-2 bg-slate-50 dark:bg-[#1e293b] p-3 rounded-[12px] border border-slate-200 dark:border-white/10">
+                <span className="text-blue-500 text-[14px]">ℹ️</span>
+                Fiyat değeri değiştirildiğinde otomatik olarak "Manuel Yönetim" aktif edilir ve hiyerarşik formüllerden etkilenmez.
             </div>
         </div>
     );

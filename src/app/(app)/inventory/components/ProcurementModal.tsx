@@ -92,110 +92,113 @@ export default function ProcurementModal({ isOpen, onClose, products }: Procurem
     };
 
     return (
-        <div className="fixed inset-0 z-[4000] flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl animate-fade-in">
-            <div className="w-full max-w-5xl bg-[#080911] rounded-[40px] border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-[4000] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="w-full max-w-5xl bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
 
                 {/* Header */}
-                <div className="p-8 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-red-500/10 to-transparent">
+                <div className="p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center bg-slate-50/50 dark:bg-[#1e293b]/50 shrink-0">
                     <div>
-                        <h2 className="text-3xl font-black text-white flex items-center gap-3">
-                            <span className="text-4xl">📋</span> Gelişmiş Tedarik Planlayıcı
+                        <h2 className="text-[20px] font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span className="text-[24px]">📋</span> Tedarik Planlayıcı
                         </h2>
-                        <p className="text-muted text-xs font-bold uppercase tracking-[2px] mt-1 opacity-60">Kritik seviyeleri normalize etmek için ürün seçin</p>
+                        <p className="text-[13px] text-slate-500 font-medium mt-1">Kritik seviyeleri normalize etmek için ürün seçin</p>
                     </div>
-                    <button onClick={onClose} className="w-12 h-12 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-3xl font-light transition-all">×</button>
+                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 flex items-center justify-center text-slate-500 transition-colors">✕</button>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-8">
-                    <table className="w-full text-left border-separate border-spacing-y-3">
-                        <thead>
-                            <tr className="text-[11px] font-black text-white/40 uppercase tracking-widest">
-                                <th className="px-6 py-2">Seç</th>
-                                <th className="px-6 py-2">Ürün Bilgisi</th>
-                                <th className="px-6 py-2 text-center">Mevcut</th>
-                                <th className="px-6 py-2 text-center">Kritik</th>
-                                <th className="px-6 py-2 text-center">Önerilen</th>
-                                <th className="px-6 py-2">Sipariş Miktarı</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {criticalItems.map(p => (
-                                <tr key={p.id} className={`group transition-all ${selectedIds.includes(p.id) ? 'bg-white/[0.03]' : 'opacity-40'}`}>
-                                    <td className="px-6 py-4 rounded-l-2xl">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedIds.includes(p.id)}
-                                            onChange={() => toggleSelect(p.id)}
-                                            className="w-5 h-5 accent-red-500 cursor-pointer"
-                                        />
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-black text-white">{p.name}</span>
-                                            <span className="text-[10px] text-white/40 font-bold">{p.code} • {p.brand}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-center">
-                                        <span className={`text-sm font-black ${p.stock <= 0 ? 'text-red-500' : 'text-amber-500'}`}>{p.stock}</span>
-                                    </td>
-                                    <td className="px-6 py-4 text-center">
-                                        <span className="text-sm font-bold text-white/60">{p.minStock || 5}</span>
-                                    </td>
-                                    <td className="px-6 py-4 text-center">
-                                        <span className="text-xs font-black text-emerald-400">+{Math.max(0, (p.minStock || 5) * 2 - (p.stock || 0))}</span>
-                                    </td>
-                                    <td className="px-6 py-4 rounded-r-2xl">
-                                        <div className="flex items-center gap-3">
-                                            <input
-                                                type="number"
-                                                value={targetQuantities[p.id] || 0}
-                                                onChange={(e) => updateQty(p.id, parseInt(e.target.value) || 0)}
-                                                className="w-24 bg-black/40 border border-white/10 rounded-xl p-2 text-center text-sm font-black focus:border-red-500 outline-none"
-                                            />
-                                            <span className="text-[10px] font-black text-white/20">ADET</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-
-                    {criticalItems.length === 0 && (
-                        <div className="py-20 text-center">
-                            <span className="text-6xl block mb-4">✨</span>
-                            <p className="text-white/40 font-bold">Tüm stoklar güvenli seviyede.</p>
+                <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scroll relative">
+                    {criticalItems.length === 0 ? (
+                        <div className="py-24 flex flex-col items-center justify-center text-center opacity-70">
+                            <span className="text-5xl block mb-4">✨</span>
+                            <p className="text-slate-500 dark:text-slate-400 font-medium text-[15px]">Tüm stoklar güvenli seviyede.</p>
+                        </div>
+                    ) : (
+                        <div className="border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden bg-white dark:bg-[#0f172a]">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/10">
+                                    <tr className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                        <th className="px-5 py-3 w-12 text-center"></th>
+                                        <th className="px-5 py-3">Ürün Bilgisi</th>
+                                        <th className="px-5 py-3 text-center">Mevcut</th>
+                                        <th className="px-5 py-3 text-center">Kritik</th>
+                                        <th className="px-5 py-3 text-center">Önerilen</th>
+                                        <th className="px-5 py-3 w-40 text-center">Sipariş Miktarı</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                    {criticalItems.map(p => (
+                                        <tr key={p.id} className={`transition-colors hover:bg-slate-50/50 dark:hover:bg-white/5 ${selectedIds.includes(p.id) ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
+                                            <td className="px-5 py-3 text-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedIds.includes(p.id)}
+                                                    onChange={() => toggleSelect(p.id)}
+                                                    className="w-4 h-4 rounded border-slate-300 dark:border-white/20 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                                />
+                                            </td>
+                                            <td className="px-5 py-3">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[13px] font-semibold text-slate-900 dark:text-slate-100">{p.name}</span>
+                                                    <span className="text-[11px] text-slate-500 font-medium mt-0.5">{p.code} • {p.brand}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-5 py-3 text-center">
+                                                <span className={`text-[13px] font-bold ${p.stock <= 0 ? 'text-red-500' : 'text-amber-500'}`}>{p.stock}</span>
+                                            </td>
+                                            <td className="px-5 py-3 text-center">
+                                                <span className="text-[13px] font-medium text-slate-500">{p.minStock || 5}</span>
+                                            </td>
+                                            <td className="px-5 py-3 text-center">
+                                                <span className="text-[13px] font-bold text-emerald-500">+{Math.max(0, (p.minStock || 5) * 2 - (p.stock || 0))}</span>
+                                            </td>
+                                            <td className="px-5 py-3 text-center">
+                                                <div className="flex justify-center items-center gap-2">
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        value={targetQuantities[p.id] || 0}
+                                                        onChange={(e) => updateQty(p.id, parseInt(e.target.value) || 0)}
+                                                        className="w-20 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg p-2 text-center text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none shadow-sm transition-shadow"
+                                                    />
+                                                    <span className="text-[10px] font-semibold text-slate-400">Adet</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     )}
                 </div>
 
                 {/* Footer */}
-                <div className="p-8 border-t border-white/5 bg-white/[0.01] flex justify-between items-center">
+                <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1e293b] flex justify-between items-center shrink-0">
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Planlanan Kalem Sayısı</span>
-                        <span className="text-2xl font-black text-white">{selectedIds.length} Ürün</span>
+                        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest">Planlanan Kalem Sayısı</span>
+                        <span className="text-[16px] font-bold text-slate-900 dark:text-white">{selectedIds.length} Ürün</span>
                     </div>
 
-                    <div className="flex gap-4">
+                    <div className="flex gap-3">
                         <button
                             onClick={onClose}
-                            className="px-8 py-4 rounded-2xl border border-white/10 text-white/60 font-black text-xs hover:bg-white/5 transition-all"
+                            className="px-6 py-2.5 rounded-[12px] bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-[13px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors shadow-sm"
                         >
-                            VAZGEÇ
-                        </button>
-                        <button
-                            onClick={handleExportExcel}
-                            disabled={selectedIds.length === 0}
-                            className="px-10 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs shadow-xl shadow-emerald-500/20 transition-all flex items-center gap-3 active:scale-95 disabled:opacity-30 ripple"
-                        >
-                            📥 EXCEL İNDİR
+                            Vazgeç
                         </button>
                         <button
                             onClick={handleExportPDF}
                             disabled={selectedIds.length === 0}
-                            className="px-10 py-4 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-black text-xs shadow-xl shadow-red-500/20 transition-all flex items-center gap-3 active:scale-95 disabled:opacity-30 ripple"
+                            className="px-6 py-2.5 rounded-[12px] bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white border border-slate-200 dark:border-white/10 font-semibold text-[13px] transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
                         >
-                            📄 PDF İNDİR
+                            📄 PDF İndir
+                        </button>
+                        <button
+                            onClick={handleExportExcel}
+                            disabled={selectedIds.length === 0}
+                            className="px-8 py-2.5 rounded-[12px] bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[13px] transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50"
+                        >
+                            📥 Excel İndir
                         </button>
                     </div>
                 </div>

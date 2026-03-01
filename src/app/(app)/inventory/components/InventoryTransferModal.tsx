@@ -57,26 +57,26 @@ export default function InventoryTransferModal({
     const selectedProduct = products.find(p => p.id === transferData.productId);
 
     return (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-black/85 backdrop-blur-xl animate-fade-in">
-            <div className="w-full max-w-xl glass-plus rounded-[40px] p-12 border border-primary/30 shadow-[0_50px_100px_rgba(0,0,0,0.9)] animate-in">
-                <div className="flex justify-between items-start mb-10">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white dark:bg-[#0f172a] w-full max-w-lg rounded-[24px] border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col animate-in">
+                <div className="px-8 py-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e293b]/50 flex justify-between items-center">
                     <div>
-                        <h2 className="text-3xl font-black bg-gradient-to-br from-white to-white/50 bg-clip-text text-transparent mb-2">
-                            📦 Stok Transferi
+                        <h2 className="text-[20px] font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-1">
+                            <span>📦 Stok Transferi</span>
                         </h2>
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]"></span>
-                            <p className="text-muted text-xs font-bold uppercase tracking-widest">Şubeler Arası Güvenli Taşıma</p>
+                            <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>
+                            <p className="text-slate-500 text-[11px] font-medium uppercase tracking-wider">Şubeler Arası Güvenli Taşıma</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors text-xl font-light">&times;</button>
+                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-slate-500 font-medium">✕</button>
                 </div>
 
-                <div className="flex flex-col gap-8">
-                    <div className="flex flex-col gap-3">
-                        <label className="text-primary text-[10px] font-black tracking-[3px] uppercase">Ürün Seçimi</label>
+                <div className="p-8 flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ürün Seçimi</label>
                         <select
-                            className="w-full bg-black/40 p-4.5 text-base font-bold rounded-2xl border border-white/10 focus:border-primary outline-none accent-primary transition-all cursor-pointer"
+                            className="w-full bg-white dark:bg-[#0f172a] p-3 text-[13px] font-semibold text-slate-900 dark:text-white rounded-[12px] border border-slate-200 dark:border-white/10 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors cursor-pointer shadow-sm disabled:opacity-50"
                             value={transferData.productId}
                             onChange={e => setTransferData({ ...transferData, productId: parseInt(e.target.value) })}
                         >
@@ -89,17 +89,17 @@ export default function InventoryTransferModal({
                         </select>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="flex flex-col gap-3">
-                            <label className="text-primary text-[10px] font-black tracking-[3px] uppercase">Kaynak</label>
-                            <div className="w-full bg-white/5 p-4.5 text-sm font-bold rounded-2xl border border-white/5 text-white/50">
+                    <div className="grid grid-cols-2 gap-5">
+                        <div className="flex flex-col gap-2">
+                            <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Kaynak</label>
+                            <div className="w-full bg-slate-50 dark:bg-[#1e293b] p-3 text-[13px] font-semibold text-slate-500 dark:text-slate-400 rounded-[12px] border border-slate-200 dark:border-white/10 shadow-sm flex items-center">
                                 {selectedProduct?.branch || '-'}
                             </div>
                         </div>
-                        <div className="flex flex-col gap-3">
-                            <label className="text-primary text-[10px] font-black tracking-[3px] uppercase">Hedef</label>
+                        <div className="flex flex-col gap-2">
+                            <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hedef</label>
                             <select
-                                className="w-full bg-black/40 p-4.5 text-sm font-bold rounded-2xl border border-white/10 focus:border-primary outline-none cursor-pointer"
+                                className="w-full bg-white dark:bg-[#0f172a] p-3 text-[13px] font-semibold text-slate-900 dark:text-white rounded-[12px] border border-slate-200 dark:border-white/10 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors cursor-pointer shadow-sm disabled:opacity-50"
                                 value={transferData.to}
                                 onChange={e => setTransferData({ ...transferData, to: e.target.value })}
                             >
@@ -110,36 +110,36 @@ export default function InventoryTransferModal({
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-3">
-                        <label className="text-primary text-[10px] font-black tracking-[3px] uppercase">Miktar</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Miktar</label>
                         <div className="relative">
                             <input
                                 type="number"
-                                className="w-full bg-black/60 p-6 text-4xl font-black rounded-3xl border border-white/10 text-center focus:border-primary outline-none transition-all"
+                                className="w-full bg-white dark:bg-[#1e293b] py-4 px-6 text-[24px] font-bold text-slate-900 dark:text-white rounded-[16px] border border-slate-200 dark:border-white/10 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-inner"
                                 value={transferData.qty}
                                 onChange={e => setTransferData({ ...transferData, qty: parseInt(e.target.value) || 0 })}
                                 placeholder="0"
                             />
-                            <div className="absolute right-6 top-1/2 -translate-y-1/2 text-muted font-black text-xs uppercase">ADET</div>
+                            <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-semibold text-[11px] uppercase tracking-wider pointer-events-none">ADET</div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="flex flex-col gap-4 mt-6">
-                        <button
-                            className="btn-primary w-full py-5 text-lg font-black tracking-[2px]"
-                            onClick={handleSubmit}
-                            disabled={isProcessing || !transferData.productId || transferData.qty <= 0}
-                        >
-                            {isProcessing ? 'İŞLENİYOR...' : (isSystemAdmin ? '🚀 TRANSFERİ TAMAMLA' : '🏁 ONAY TALEBİ GÖNDER')}
-                        </button>
-                        <button
-                            className="w-full py-4 text-xs font-black uppercase tracking-[3px] text-muted hover:text-white transition-colors"
-                            onClick={onClose}
-                            disabled={isProcessing}
-                        >
-                            VAZGEÇ
-                        </button>
-                    </div>
+                <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1e293b] flex flex-col gap-3">
+                    <button
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-[12px] font-semibold text-[14px] tracking-wider transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        onClick={handleSubmit}
+                        disabled={isProcessing || !transferData.productId || transferData.qty <= 0}
+                    >
+                        {isProcessing ? 'İŞLENİYOR...' : (isSystemAdmin ? 'TRANSFERİ TAMAMLA' : 'ONAY TALEBİ GÖNDER')}
+                    </button>
+                    <button
+                        className="w-full py-2.5 text-[12px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                        onClick={onClose}
+                        disabled={isProcessing}
+                    >
+                        VAZGEÇ
+                    </button>
                 </div>
             </div>
         </div>
