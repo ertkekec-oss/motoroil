@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
 import BankIntegrationOnboarding from './Banking/BankIntegrationOnboarding';
 import { apiFetch } from '@/lib/api-client';
+import { EnterpriseInput, EnterpriseSelect } from "@/components/ui/enterprise";
 
 export default function IntegrationsContent() {
     const { showSuccess, showError } = useModal();
@@ -254,7 +255,7 @@ export default function IntegrationsContent() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                 <div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-                        <span className="p-2 bg-blue-600/10 rounded-xl text-2xl">🔌</span>
+                        <span className="p-2 bg-blue-600/10 rounded-[16px] text-2xl">🔌</span>
                         Entegrasyonlar
                     </h2>
                     <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-2 max-w-md">
@@ -264,7 +265,7 @@ export default function IntegrationsContent() {
                 <button
                     onClick={saveSettings}
                     disabled={isSaving}
-                    className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white !text-white rounded-xl font-black text-xs tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all flex items-center gap-3 active:scale-95 disabled:opacity-50"
+                    className="h-10 px-6 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white rounded-[14px] font-semibold text-sm transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 shadow-sm border border-transparent"
                 >
                     {isSaving ? (
                         <>
@@ -277,7 +278,7 @@ export default function IntegrationsContent() {
                 </button>
             </div>
 
-            <div className="flex flex-wrap gap-2 p-1.5 bg-slate-50 dark:bg-white/5 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/10 w-fit mb-10 shadow-inner">
+            <div className="flex flex-wrap gap-2 p-1.5 bg-slate-50 dark:bg-white/5  rounded-[20px] border border-slate-200 dark:border-white/10 w-fit mb-10 ">
                 {[
                     { id: 'efatura', label: 'E-Fatura (Nilvera)', icon: '📄' },
                     { id: 'marketplace', label: 'Pazaryerleri', icon: '🛒' },
@@ -287,8 +288,8 @@ export default function IntegrationsContent() {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
-                        className={`px-5 py-2.5 rounded-xl text-xs font-black tracking-wider transition-all flex items-center gap-2.5 ${activeTab === tab.id
-                            ? 'bg-blue-600 !text-white shadow-xl shadow-blue-500/25 scale-105'
+                        className={`px-5 py-2.5 rounded-[16px] text-xs font-black tracking-wider transition-all flex items-center gap-2.5 ${activeTab === tab.id
+                            ? 'bg-blue-600 text-white shadow-sm '
                             : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800'
                             }`}
                     >
@@ -303,12 +304,12 @@ export default function IntegrationsContent() {
             {/* E-Fatura Tab */}
             {activeTab === 'efatura' && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm p-8 border border-slate-200 dark:border-white/10 overflow-hidden relative">
+                    <div className="bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm p-8 relative">
                         {/* Decorative Background Glow */}
                         <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
 
                         <div className="flex flex-col sm:flex-row items-center gap-5 border-b border-slate-200 dark:border-white/5 pb-8 mb-8">
-                            <div className="w-14 h-14 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-slate-200 dark:border-white/5">
+                            <div className="w-14 h-14 rounded-[20px]  flex items-center justify-center text-3xl  border border-slate-200 dark:border-white/5">
                                 📄
                             </div>
                             <div className="text-center sm:text-left">
@@ -318,7 +319,7 @@ export default function IntegrationsContent() {
                             <div className="sm:ml-auto">
                                 <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border shadow-sm ${eFaturaSettings.environment === 'production'
                                     ? 'bg-blue-600/10 text-blue-600 dark:text-blue-500 border-blue-500/20'
-                                    : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                    : 'bg-slate-800/10 text-amber-500 border-amber-500/20'
                                     }`}>
                                     {eFaturaSettings.environment === 'production' ? '🚀 Canlı Ortam' : '🧪 Test Ortamı'}
                                 </div>
@@ -330,13 +331,13 @@ export default function IntegrationsContent() {
                             <div className="space-y-8">
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Çalışma Ortamı Seçimi</label>
-                                    <div className="flex gap-2 p-1.5 bg-slate-100 dark:bg-black/20 rounded-xl border border-slate-200 dark:border-white/5">
+                                    <div className="flex gap-2 p-1.5 bg-slate-100 dark:bg-black/20 rounded-[16px] border border-slate-200 dark:border-white/5">
                                         {['test', 'production'].map((env) => (
                                             <button
                                                 key={env}
                                                 onClick={() => setEFaturaSettings({ ...eFaturaSettings, environment: env })}
                                                 className={`flex-1 py-3 rounded-lg text-xs font-black uppercase transition-all ${eFaturaSettings.environment === env
-                                                    ? (env === 'production' ? 'bg-blue-600 !text-white shadow-lg shadow-emerald-500/20' : 'bg-amber-500 !text-white shadow-lg shadow-amber-500/20')
+                                                    ? (env === 'production' ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-800 text-white shadow-sm')
                                                     : 'text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:bg-white/5'
                                                     }`}
                                             >
@@ -349,15 +350,15 @@ export default function IntegrationsContent() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Şirket VKN / TCKN</label>
-                                        <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={eFaturaSettings.companyVkn} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, companyVkn: e.target.value })} />
+                                        <EnterpriseInput value={eFaturaSettings.companyVkn} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, companyVkn: e.target.value })} />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Şirket Ünvanı</label>
-                                        <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" placeholder="Fatura başlığı..." value={eFaturaSettings.companyTitle} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, companyTitle: e.target.value })} />
+                                        <EnterpriseInput placeholder="Fatura başlığı..." value={eFaturaSettings.companyTitle} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, companyTitle: e.target.value })} />
                                     </div>
                                 </div>
 
-                                <div className="p-5 bg-blue-600/5 border border-primary/10 rounded-2xl relative overflow-hidden group">
+                                <div className="p-5 bg-blue-600/5 border border-primary/10 rounded-[20px] relative overflow-hidden group">
                                     <div className="absolute right-0 top-0 bottom-0 w-1 bg-blue-600/30" />
                                     <div className="flex items-center gap-4">
                                         <div className="text-2xl opacity-50">💡</div>
@@ -374,12 +375,12 @@ export default function IntegrationsContent() {
                             <div className="space-y-4">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">API Adresi</label>
-                                    <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={eFaturaSettings.apiUrl} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiUrl: e.target.value })} />
+                                    <EnterpriseInput value={eFaturaSettings.apiUrl} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiUrl: e.target.value })} />
                                 </div>
 
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">API Key (Opsiyonel)</label>
-                                    <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" placeholder="🔑 Opsiyonel anahtar" value={eFaturaSettings.apiKey} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiKey: e.target.value })} />
+                                    <EnterpriseInput placeholder="🔑 Opsiyonel anahtar" value={eFaturaSettings.apiKey} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiKey: e.target.value })} />
                                 </div>
 
                                 <div className="relative py-4">
@@ -392,18 +393,18 @@ export default function IntegrationsContent() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Kullanıcı Adı</label>
-                                        <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" placeholder="test01@nilvera.com" value={eFaturaSettings.username} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, username: e.target.value })} />
+                                        <EnterpriseInput placeholder="test01@nilvera.com" value={eFaturaSettings.username} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, username: e.target.value })} />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Portal Şifresi</label>
-                                        <input type="password" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" placeholder="••••••••" value={eFaturaSettings.password} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, password: e.target.value })} />
+                                        <EnterpriseInput type="password" placeholder="••••••••" value={eFaturaSettings.password} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, password: e.target.value })} />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-10 mt-10 border-t border-slate-200 dark:border-white/5">
-                            <label className="flex items-center gap-5 p-5 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/50 dark:bg-white/[0.05] rounded-2xl border border-slate-200 dark:border-white/5 cursor-pointer transition-all select-none group">
+                            <label className="flex items-center gap-5 p-5 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/50 dark:bg-white/[0.05] rounded-[20px] border border-slate-200 dark:border-white/5 cursor-pointer transition-all select-none group">
                                 <div className={`w-12 h-6 rounded-full relative transition-all duration-300 ${eFaturaSettings.autoSend ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                     <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-md ${eFaturaSettings.autoSend ? 'left-7' : 'left-1'}`} />
                                 </div>
@@ -413,7 +414,7 @@ export default function IntegrationsContent() {
                                     <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-medium">Satış tamamlandığında faturayı otomatik oluşturur.</div>
                                 </div>
                             </label>
-                            <label className="flex items-center gap-5 p-5 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/50 dark:bg-white/[0.05] rounded-2xl border border-slate-200 dark:border-white/5 cursor-pointer transition-all select-none group">
+                            <label className="flex items-center gap-5 p-5 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/50 dark:bg-white/[0.05] rounded-[20px] border border-slate-200 dark:border-white/5 cursor-pointer transition-all select-none group">
                                 <div className={`w-12 h-6 rounded-full relative transition-all duration-300 ${eFaturaSettings.autoApprove ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                     <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-md ${eFaturaSettings.autoApprove ? 'left-7' : 'left-1'}`} />
                                 </div>
@@ -441,7 +442,7 @@ export default function IntegrationsContent() {
                                 )}
                             </button>
                             {testResults.efatura && (
-                                <div className={`mt-5 p-5 rounded-2xl border animate-in zoom-in-95 flex items-center gap-4 ${testResults.efatura.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
+                                <div className={`mt-5 p-5 rounded-[20px] border animate-in zoom-in-95 flex items-center gap-4 ${testResults.efatura.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 ${testResults.efatura.includes('✅') ? 'bg-blue-600/20' : 'bg-red-500/20'}`}>
                                         {testResults.efatura.includes('✅') ? '✓' : '!'}
                                     </div>
@@ -461,7 +462,7 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-24 -right-24 w-64 h-64 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
 
                             <div className="flex flex-col sm:flex-row items-center gap-5 border-b border-slate-200 dark:border-white/5 pb-8 mb-4">
-                                <div className="w-14 h-14 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-slate-200 dark:border-white/5">💳</div>
+                                <div className="w-14 h-14 rounded-[20px]  flex items-center justify-center text-3xl  border border-slate-200 dark:border-white/5">💳</div>
                                 <div className="text-center sm:text-left">
                                     <h3 className="text-xl font-black text-slate-900 dark:text-white">Ödeal Yazar Kasa POS</h3>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">Ödeme sistemleri ve yazar kasa POS entegrasyonu</p>
@@ -476,11 +477,11 @@ export default function IntegrationsContent() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Ödeal API Token (Canlı)</label>
-                                    <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" placeholder="Od_Live_••••••••••••" value={posSettings.apiKey} onChange={(e) => setPosSettings({ ...posSettings, apiKey: e.target.value })} />
+                                    <EnterpriseInput placeholder="Od_Live_••••••••••••" value={posSettings.apiKey} onChange={(e) => setPosSettings({ ...posSettings, apiKey: e.target.value })} />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Terminal / Cihaz Seri No</label>
-                                    <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" placeholder="9988XXXX" value={posSettings.terminalId} onChange={(e) => setPosSettings({ ...posSettings, terminalId: e.target.value })} />
+                                    <EnterpriseInput placeholder="9988XXXX" value={posSettings.terminalId} onChange={(e) => setPosSettings({ ...posSettings, terminalId: e.target.value })} />
                                 </div>
                             </div>
 
@@ -497,7 +498,7 @@ export default function IntegrationsContent() {
                                     </div>
                                 </label>
                                 <label className="flex items-center gap-5 cursor-pointer select-none group">
-                                    <div className={`w-12 h-6 rounded-full relative transition-all duration-300 shrink-0 ${posSettings.testMode ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                                    <div className={`w-12 h-6 rounded-full relative transition-all duration-300 shrink-0 ${posSettings.testMode ? 'bg-slate-800' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                         <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-md ${posSettings.testMode ? 'left-7' : 'left-1'}`} />
                                     </div>
                                     <input type="checkbox" className="hidden" checked={posSettings.testMode} onChange={(e) => setPosSettings({ ...posSettings, testMode: e.target.checked })} />
@@ -508,7 +509,7 @@ export default function IntegrationsContent() {
                                 </label>
                             </div>
 
-                            <div className="p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl text-[11px] text-slate-500 dark:text-slate-400 space-y-2 border border-slate-200 dark:border-white/5">
+                            <div className="p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-[20px] text-[11px] text-slate-500 dark:text-slate-400 space-y-2 border border-slate-200 dark:border-white/5">
                                 <div className="font-black text-slate-900 dark:text-white flex items-center gap-2 mb-2 uppercase tracking-widest text-[10px]"><span>ℹ️</span> İşlem Akışı</div>
                                 <p>• Satış POS ekranında "Ödeal POS" seçildiğinde tutar otomatik olarak cihaz ekranına düşer.</p>
                                 <p>• Kart çekimi başarılı olduğu anda Periodya'da "Satış Onaylandı" durumuna geçer ve kasa kaydı oluşur.</p>
@@ -549,7 +550,7 @@ export default function IntegrationsContent() {
                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium leading-relaxed max-w-sm">Tüm pazaryeri akışları, muhasebe entegrasyonu ve FIFO maliyet katmanları gerçek zamanlı olarak izlenmektedir.</p>
                                 </div>
                             </div>
-                            <button onClick={fetchStats} className="px-6 py-3 bg-slate-50 dark:bg-white/5 hover:bg-slate-200 dark:bg-slate-700 rounded-2xl text-[10px] font-black tracking-widest text-slate-900 dark:text-white transition-all border border-slate-200 dark:border-white/10 active:scale-95">
+                            <button onClick={fetchStats} className="px-6 py-3 bg-slate-50 dark:bg-white/5 hover:bg-slate-200 dark:bg-slate-700 rounded-[20px] text-[10px] font-black tracking-widest text-slate-900 dark:text-white transition-all border border-slate-200 dark:border-white/10 active:scale-95">
                                 VERİLERİ TAZELE 🔄
                             </button>
                         </div>
@@ -572,7 +573,7 @@ export default function IntegrationsContent() {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">XML URL</label>
-                                            <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" placeholder="https://site.com/xml.php" value={marketplaceSettings.custom.url} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, url: e.target.value } })} />
+                                            <EnterpriseInput placeholder="https://site.com/xml.php" value={marketplaceSettings.custom.url} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, url: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">İşlem Deposu</label>
@@ -587,7 +588,7 @@ export default function IntegrationsContent() {
                                             </select>
                                         </div>
                                     </div>
-                                    <label className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all select-none">
+                                    <label className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-white/5 rounded-[16px] border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all select-none">
                                         <input type="checkbox" className="accent-blue-600 w-5 h-5" checked={marketplaceSettings.custom.autoSync} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, autoSync: e.target.checked } })} />
                                         <div>
                                             <div className="text-sm font-bold text-slate-900 dark:text-white">Otomatik Senkronizasyon</div>
@@ -612,7 +613,7 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-16 -right-16 w-48 h-48 bg-slate-50 dark:bg-slate-800/30 rounded-full blur-3xl pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-[#f27a1a]/10">
+                                    <div className="w-16 h-16 rounded-[20px]  flex items-center justify-center text-3xl  border border-[#f27a1a]/10">
                                         🟠
                                     </div>
                                     <div>
@@ -620,7 +621,7 @@ export default function IntegrationsContent() {
                                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium tracking-wide">Türkiye'nin lider pazaryeri platformu</p>
                                     </div>
                                 </div>
-                                <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all group/toggle">
+                                <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-[16px] border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all group/toggle">
                                     <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.trendyol.enabled ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                         <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.trendyol.enabled ? 'left-5.5' : 'left-0.5'}`} />
                                     </div>
@@ -634,15 +635,15 @@ export default function IntegrationsContent() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">API Key</label>
-                                            <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.trendyol.apiKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, apiKey: e.target.value } })} />
+                                            <EnterpriseInput value={marketplaceSettings.trendyol.apiKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, apiKey: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">API Secret</label>
-                                            <input type="password" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.trendyol.apiSecret} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, apiSecret: e.target.value } })} />
+                                            <EnterpriseInput type="password" value={marketplaceSettings.trendyol.apiSecret} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, apiSecret: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Supplier ID</label>
-                                            <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.trendyol.supplierId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, supplierId: e.target.value } })} />
+                                            <EnterpriseInput value={marketplaceSettings.trendyol.supplierId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, supplierId: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
@@ -658,7 +659,7 @@ export default function IntegrationsContent() {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-200 dark:border-white/5">
+                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-[20px] border border-slate-200 dark:border-white/5">
                                         <label className="flex items-center gap-4 cursor-pointer select-none">
                                             <div className={`w-11 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.trendyol.autoSync ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                                 <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.trendyol.autoSync ? 'left-6.5' : 'left-0.5'}`} />
@@ -667,14 +668,14 @@ export default function IntegrationsContent() {
                                             <span className="text-xs font-black text-slate-500 dark:text-slate-400 tracking-tighter">OTOMATİK SENKRONİZASYON</span>
                                         </label>
 
-                                        <button onClick={() => testMarketplaceConnection('trendyol')} disabled={isTesting} className="px-6 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-black text-[10px] tracking-widest transition-all shadow-sm flex items-center gap-3 active:scale-95 disabled:opacity-50 group/btn">
+                                        <button onClick={() => testMarketplaceConnection('trendyol')} disabled={isTesting} className="px-6 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-[16px] font-black text-[10px] tracking-widest transition-all shadow-sm flex items-center gap-3 active:scale-95 disabled:opacity-50 group/btn">
                                             {isTesting ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span>🔍</span>}
                                             BAĞLANTIYI TEST ET
                                         </button>
                                     </div>
 
                                     {testResults.trendyol && (
-                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.trendyol.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
+                                        <div className={`mt-4 p-4 rounded-[16px] border flex items-center gap-3 animate-in zoom-in-95 ${testResults.trendyol.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                             <span className="text-sm font-bold tracking-tight">{testResults.trendyol}</span>
                                         </div>
                                     )}
@@ -686,7 +687,7 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#ff6000]/5 rounded-full blur-3xl pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-[#ff6000]/10">
+                                    <div className="w-16 h-16 rounded-[20px]  flex items-center justify-center text-3xl  border border-[#ff6000]/10">
                                         🟧
                                     </div>
                                     <div>
@@ -696,12 +697,12 @@ export default function IntegrationsContent() {
                                 </div>
                                 <div className="flex items-center gap-4">
                                     {marketplaceSettings.hepsiburada.enabled && (
-                                        <label className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-lg cursor-pointer">
+                                        <label className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/10 border border-amber-500/20 rounded-lg cursor-pointer">
                                             <input type="checkbox" className="accent-amber-500 w-3.5 h-3.5" checked={(marketplaceSettings.hepsiburada as any).isTest || false} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, isTest: e.target.checked } as any })} />
                                             <span className="text-[10px] font-black text-amber-500">SANDBOX</span>
                                         </label>
                                     )}
-                                    <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
+                                    <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-[16px] border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
                                         <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.hepsiburada.enabled ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                             <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.hepsiburada.enabled ? 'left-5.5' : 'left-0.5'}`} />
                                         </div>
@@ -716,15 +717,15 @@ export default function IntegrationsContent() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Merchant ID (Portal)</label>
-                                            <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.hepsiburada.merchantId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, merchantId: e.target.value } })} placeholder="f225561c-..." />
+                                            <EnterpriseInput value={marketplaceSettings.hepsiburada.merchantId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, merchantId: e.target.value } })} placeholder="f225561c-..." />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">API User (Portal)</label>
-                                            <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.hepsiburada.username || ''} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, username: e.target.value } })} placeholder="Portalda 'API Kullanıcısı' olarak geçer" />
+                                            <EnterpriseInput value={marketplaceSettings.hepsiburada.username || ''} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, username: e.target.value } })} placeholder="Portalda 'API Kullanıcısı' olarak geçer" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Secret Key (API)</label>
-                                            <input type="password" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.hepsiburada.password} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, password: e.target.value } })} placeholder="DTSF5..." />
+                                            <EnterpriseInput type="password" value={marketplaceSettings.hepsiburada.password} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, password: e.target.value } })} placeholder="DTSF5..." />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
@@ -740,7 +741,7 @@ export default function IntegrationsContent() {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-200 dark:border-white/5">
+                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-[20px] border border-slate-200 dark:border-white/5">
                                         <label className="flex items-center gap-4 cursor-pointer select-none">
                                             <div className={`w-11 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.hepsiburada.autoSync ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                                 <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.hepsiburada.autoSync ? 'left-6.5' : 'left-0.5'}`} />
@@ -749,14 +750,14 @@ export default function IntegrationsContent() {
                                             <span className="text-xs font-black text-slate-500 dark:text-slate-400 tracking-tighter">OTOMATİK SENKRONİZASYON</span>
                                         </label>
 
-                                        <button onClick={() => testMarketplaceConnection('hepsiburada')} disabled={isTesting} className="px-6 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-black text-[10px] tracking-widest transition-all shadow-sm flex items-center gap-3 active:scale-95 disabled:opacity-50">
+                                        <button onClick={() => testMarketplaceConnection('hepsiburada')} disabled={isTesting} className="px-6 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-[16px] font-black text-[10px] tracking-widest transition-all shadow-sm flex items-center gap-3 active:scale-95 disabled:opacity-50">
                                             {isTesting ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span>🔍</span>}
                                             BAĞLANTIYI TEST ET
                                         </button>
                                     </div>
 
                                     {testResults.hepsiburada && (
-                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.hepsiburada.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
+                                        <div className={`mt-4 p-4 rounded-[16px] border flex items-center gap-3 animate-in zoom-in-95 ${testResults.hepsiburada.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                             <span className="text-sm font-bold tracking-tight">{testResults.hepsiburada}</span>
                                         </div>
                                     )}
@@ -768,7 +769,7 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#603996]/5 rounded-full blur-3xl pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-[#603996]/10">
+                                    <div className="w-16 h-16 rounded-[20px]  flex items-center justify-center text-3xl  border border-[#603996]/10">
                                         🐞
                                     </div>
                                     <div>
@@ -776,7 +777,7 @@ export default function IntegrationsContent() {
                                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium tracking-wide">Hayat Sana Gelir - Global pazaryeri ortağı</p>
                                     </div>
                                 </div>
-                                <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
+                                <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-[16px] border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
                                     <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.n11.enabled ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                         <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.n11.enabled ? 'left-5.5' : 'left-0.5'}`} />
                                     </div>
@@ -790,11 +791,11 @@ export default function IntegrationsContent() {
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">API Application Key</label>
-                                            <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.n11.apiKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, apiKey: e.target.value } })} />
+                                            <EnterpriseInput value={marketplaceSettings.n11.apiKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, apiKey: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">API Secret</label>
-                                            <input type="password" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.n11.apiSecret} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, apiSecret: e.target.value } })} />
+                                            <EnterpriseInput type="password" value={marketplaceSettings.n11.apiSecret} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, apiSecret: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
@@ -810,7 +811,7 @@ export default function IntegrationsContent() {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-200 dark:border-white/5">
+                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-[20px] border border-slate-200 dark:border-white/5">
                                         <label className="flex items-center gap-4 cursor-pointer select-none">
                                             <div className={`w-11 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.n11.autoSync ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                                 <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.n11.autoSync ? 'left-6.5' : 'left-0.5'}`} />
@@ -819,14 +820,14 @@ export default function IntegrationsContent() {
                                             <span className="text-xs font-black text-slate-500 dark:text-slate-400 tracking-tighter">OTOMATİK SENKRONİZASYON</span>
                                         </label>
 
-                                        <button onClick={() => testMarketplaceConnection('n11')} disabled={isTesting} className="px-6 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-black text-[10px] tracking-widest transition-all shadow-sm flex items-center gap-3 active:scale-95 disabled:opacity-50">
+                                        <button onClick={() => testMarketplaceConnection('n11')} disabled={isTesting} className="px-6 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-[16px] font-black text-[10px] tracking-widest transition-all shadow-sm flex items-center gap-3 active:scale-95 disabled:opacity-50">
                                             {isTesting ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span>🔍</span>}
                                             BAĞLANTIYI TEST ET
                                         </button>
                                     </div>
 
                                     {testResults.n11 && (
-                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.n11.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
+                                        <div className={`mt-4 p-4 rounded-[16px] border flex items-center gap-3 animate-in zoom-in-95 ${testResults.n11.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                             <span className="text-sm font-bold tracking-tight">{testResults.n11}</span>
                                         </div>
                                     )}
@@ -838,7 +839,7 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#232f3e]/5 rounded-full blur-3xl pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-[#232f3e]/10">
+                                    <div className="w-16 h-16 rounded-[20px]  flex items-center justify-center text-3xl  border border-[#232f3e]/10">
                                         🅰️
                                     </div>
                                     <div>
@@ -846,7 +847,7 @@ export default function IntegrationsContent() {
                                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium tracking-wide">Amazon Türkiye Marketplace</p>
                                     </div>
                                 </div>
-                                <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
+                                <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-[16px] border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
                                     <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.amazon.enabled ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                         <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.amazon.enabled ? 'left-5.5' : 'left-0.5'}`} />
                                     </div>
@@ -860,19 +861,19 @@ export default function IntegrationsContent() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Seller ID</label>
-                                            <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.amazon.sellerId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, sellerId: e.target.value } })} />
+                                            <EnterpriseInput value={marketplaceSettings.amazon.sellerId} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, sellerId: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">MWS Auth Token</label>
-                                            <input type="password" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.amazon.mwsAuthToken} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, mwsAuthToken: e.target.value } })} />
+                                            <EnterpriseInput type="password" value={marketplaceSettings.amazon.mwsAuthToken} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, mwsAuthToken: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Access Key</label>
-                                            <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.amazon.accessKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, accessKey: e.target.value } })} />
+                                            <EnterpriseInput value={marketplaceSettings.amazon.accessKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, accessKey: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">Secret Key</label>
-                                            <input type="password" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.amazon.secretKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, secretKey: e.target.value } })} />
+                                            <EnterpriseInput type="password" value={marketplaceSettings.amazon.secretKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, secretKey: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
@@ -888,7 +889,7 @@ export default function IntegrationsContent() {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-200 dark:border-white/5">
+                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-[20px] border border-slate-200 dark:border-white/5">
                                         <label className="flex items-center gap-4 cursor-pointer select-none">
                                             <div className={`w-11 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.amazon.autoSync ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                                 <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.amazon.autoSync ? 'left-6.5' : 'left-0.5'}`} />
@@ -897,14 +898,14 @@ export default function IntegrationsContent() {
                                             <span className="text-xs font-black text-slate-500 dark:text-slate-400 tracking-tighter">OTOMATİK SENKRONİZASYON</span>
                                         </label>
 
-                                        <button onClick={() => testMarketplaceConnection('amazon')} disabled={isTesting} className="px-6 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-black text-[10px] tracking-widest transition-all shadow-sm flex items-center gap-3 active:scale-95 disabled:opacity-50">
+                                        <button onClick={() => testMarketplaceConnection('amazon')} disabled={isTesting} className="px-6 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-[16px] font-black text-[10px] tracking-widest transition-all shadow-sm flex items-center gap-3 active:scale-95 disabled:opacity-50">
                                             {isTesting ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span>🔍</span>}
                                             BAĞLANTIYI TEST ET
                                         </button>
                                     </div>
 
                                     {testResults.amazon && (
-                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.amazon.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
+                                        <div className={`mt-4 p-4 rounded-[16px] border flex items-center gap-3 animate-in zoom-in-95 ${testResults.amazon.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                             <span className="text-sm font-bold tracking-tight">{testResults.amazon}</span>
                                         </div>
                                     )}
@@ -916,7 +917,7 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#006BFF]/5 rounded-full blur-3xl pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-[#006BFF]/10">
+                                    <div className="w-16 h-16 rounded-[20px]  flex items-center justify-center text-3xl  border border-[#006BFF]/10">
                                         🔵
                                     </div>
                                     <div>
@@ -931,7 +932,7 @@ export default function IntegrationsContent() {
                                             <span className="text-[10px] font-black text-blue-500">SANDBOX</span>
                                         </label>
                                     )}
-                                    <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
+                                    <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-[16px] border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
                                         <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.pazarama.enabled ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                             <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.pazarama.enabled ? 'left-5.5' : 'left-0.5'}`} />
                                         </div>
@@ -946,11 +947,11 @@ export default function IntegrationsContent() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">App Key</label>
-                                            <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.pazarama.apiKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, apiKey: e.target.value } })} />
+                                            <EnterpriseInput value={marketplaceSettings.pazarama.apiKey} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, apiKey: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">App Secret</label>
-                                            <input type="password" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={marketplaceSettings.pazarama.apiSecret} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, apiSecret: e.target.value } })} />
+                                            <EnterpriseInput type="password" value={marketplaceSettings.pazarama.apiSecret} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, apiSecret: e.target.value } })} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
@@ -966,7 +967,7 @@ export default function IntegrationsContent() {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-200 dark:border-white/5">
+                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-slate-50/50 dark:bg-white/[0.02] rounded-[20px] border border-slate-200 dark:border-white/5">
                                         <label className="flex items-center gap-4 cursor-pointer select-none">
                                             <div className={`w-11 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.pazarama.autoSync ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                                 <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.pazarama.autoSync ? 'left-6.5' : 'left-0.5'}`} />
@@ -975,14 +976,14 @@ export default function IntegrationsContent() {
                                             <span className="text-xs font-black text-slate-500 dark:text-slate-400 tracking-tighter">OTOMATİK SENKRONİZASYON</span>
                                         </label>
 
-                                        <button onClick={() => testMarketplaceConnection('pazarama')} disabled={isTesting} className="px-6 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-black text-[10px] tracking-widest transition-all shadow-sm flex items-center gap-3 active:scale-95 disabled:opacity-50">
+                                        <button onClick={() => testMarketplaceConnection('pazarama')} disabled={isTesting} className="px-6 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-[16px] font-black text-[10px] tracking-widest transition-all shadow-sm flex items-center gap-3 active:scale-95 disabled:opacity-50">
                                             {isTesting ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span>🔍</span>}
                                             BAĞLANTIYI TEST ET
                                         </button>
                                     </div>
 
                                     {testResults.pazarama && (
-                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.pazarama.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
+                                        <div className={`mt-4 p-4 rounded-[16px] border flex items-center gap-3 animate-in zoom-in-95 ${testResults.pazarama.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                             <span className="text-sm font-bold tracking-tight">{testResults.pazarama}</span>
                                         </div>
                                     )}
