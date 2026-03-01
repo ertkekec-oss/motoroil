@@ -1177,7 +1177,7 @@ export default function SettingsPage() {
                             <button
                                 onClick={handleSaveCompany}
                                 disabled={isSaving}
-                                className="btn btn-primary h-12"
+                                className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors h-12"
                                 style={{
                                     width: '100%',
                                     marginTop: '10px',
@@ -1286,7 +1286,7 @@ export default function SettingsPage() {
                                 </div>
                             </div>
 
-                            <button onClick={addBranch} className={`btn w-full ${editingBranchId ? 'btn-warning' : 'btn-primary'}`} style={{ height: '48px', fontWeight: 'bold', fontSize: '14px' }}>
+                            <button onClick={addBranch} className={`btn w-full ${editingBranchId ? 'btn-warning' : 'bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors'}`} style={{ height: '48px', fontWeight: 'bold', fontSize: '14px' }}>
                                 {editingBranchId ? '💾 Değişiklikleri Kaydet (Güncelle)' : '➕ Sisteme Yeni Şube Ekle'}
                             </button>
                         </div>
@@ -1321,7 +1321,7 @@ export default function SettingsPage() {
                                             </div>
                                             <button
                                                 onClick={() => setSelectedBranchDocs(selectedBranchDocs === branch.id ? null : branch.id)}
-                                                className={`btn ${selectedBranchDocs === branch.id ? 'btn-primary' : 'btn-outline'}`}
+                                                className={`btn ${selectedBranchDocs === branch.id ? 'bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors' : 'btn-outline'}`}
                                                 style={{ fontSize: '11px', padding: '6px 12px' }}
                                             >
                                                 {selectedBranchDocs === branch.id ? '📂 Evrakları Kapat' : `📁 Evrak Yönetimi (${branch.docs})`}
@@ -1382,7 +1382,7 @@ export default function SettingsPage() {
                                         <h3 className="font-bold flex items-center gap-2">🔘 Ödeme Yöntemi Butonları</h3>
                                         <p className="text-[10px] text-muted">Anasayfadaki hızlı işlem butonlarını tanımlayın.</p>
                                     </div>
-                                    <button onClick={() => setShowKasaDefinitions(!showKasaDefinitions)} className="btn btn-xs btn-primary">
+                                    <button onClick={() => setShowKasaDefinitions(!showKasaDefinitions)} className="btn btn-xs bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors">
                                         {showKasaDefinitions ? 'KAPAT' : '+ YENİ BUTON'}
                                     </button>
                                 </div>
@@ -1405,7 +1405,7 @@ export default function SettingsPage() {
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
-                                                <button onClick={addPaymentMethodDefinition} className="btn btn-primary btn-sm flex-1 font-bold">
+                                                <button onClick={addPaymentMethodDefinition} className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors btn-sm flex-1 font-bold">
                                                     {editingPaymentMethodId ? 'GÜNCELLE' : 'EKLE'}
                                                 </button>
                                                 {editingPaymentMethodId && <button onClick={() => { setEditingPaymentMethodId(null); setNewPaymentMethod({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' }); }} className="btn btn-ghost btn-sm">İptal</button>}
@@ -1535,7 +1535,7 @@ export default function SettingsPage() {
                                     <h3>POS / Banka Komisyon Oranları</h3>
                                     <p className="text-muted" style={{ fontSize: '12px' }}>Kredi kartı satışlarında otomatik gider kaydı olarak düşülecek komisyon oranları.</p>
                                 </div>
-                                <button className="btn btn-primary" onClick={() => {
+                                <button className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors" onClick={() => {
                                     const currentComms = salesExpenses?.posCommissions || [];
                                     updateSalesExpenses({ ...salesExpenses, posCommissions: [...currentComms, { installment: 'Tek Çekim', rate: 0 }] });
                                 }}>+ Yeni Oran Ekle</button>
@@ -1663,7 +1663,7 @@ export default function SettingsPage() {
                                     </div>
                                     <button
                                         onClick={handlePasswordChange}
-                                        className="btn btn-primary mt-2 font-bold"
+                                        className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors mt-2 font-bold"
                                     >
                                         Şifreyi Güncelle
                                     </button>
@@ -1699,7 +1699,7 @@ export default function SettingsPage() {
                                 </div>
                             </div>
 
-                            <button className="btn btn-primary" style={{ marginTop: '10px', fontSize: '12px', fontWeight: '900', padding: '10px' }}>AYARLARI KAYDET</button>
+                            <button className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors" style={{ marginTop: '10px', fontSize: '12px', fontWeight: '900', padding: '10px' }}>AYARLARI KAYDET</button>
                         </div>
                     </div>
                 )}
@@ -1734,7 +1734,7 @@ export default function SettingsPage() {
 
                             <button
                                 onClick={handleSaveServiceSettings}
-                                className="btn btn-primary w-full mt-4"
+                                className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors w-full mt-4"
                                 style={{ height: '38px', fontWeight: '900', fontSize: '12px' }}
                             >
                                 💾 AYARLARI KAYDET
@@ -1842,7 +1842,7 @@ export default function SettingsPage() {
                                         <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-40%)', fontSize: '12px', opacity: 0.5 }}>%</span>
                                     </div>
                                 </div>
-                                <button onClick={addCommissionRate} className="btn btn-primary" style={{ alignSelf: 'flex-end', height: '42px', padding: '0 20px', borderRadius: '8px' }}>+ EKLE</button>
+                                <button onClick={addCommissionRate} className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors" style={{ alignSelf: 'flex-end', height: '42px', padding: '0 20px', borderRadius: '8px' }}>+ EKLE</button>
                             </div>
 
                             {/* Commission Table */}
@@ -1878,7 +1878,7 @@ export default function SettingsPage() {
                                                     </td>
                                                     <td style={{ textAlign: 'right' }}>
                                                         <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
-                                                            <button onClick={saveEditingCommission} className="btn btn-primary" style={{ padding: '4px 12px', fontSize: '12px' }}>Kaydet</button>
+                                                            <button onClick={saveEditingCommission} className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors" style={{ padding: '4px 12px', fontSize: '12px' }}>Kaydet</button>
                                                             <button onClick={cancelEditingCommission} className="btn btn-ghost" style={{ padding: '4px 12px', fontSize: '12px' }}>İptal</button>
                                                         </div>
                                                     </td>
@@ -1961,7 +1961,7 @@ export default function SettingsPage() {
                                     onChange={e => setNewOtherCost({ ...newOtherCost, cost: parseFloat(e.target.value) || 0 })}
                                     style={{ padding: '10px', background: 'black', border: '1px solid var(--border-light)', borderRadius: '6px', color: 'white' }}
                                 />
-                                <button onClick={addOtherCost} className="btn btn-primary" style={{ background: 'var(--warning)' }}>+ Ekle</button>
+                                <button onClick={addOtherCost} className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors" style={{ background: 'var(--warning)' }}>+ Ekle</button>
                             </div>
 
                             {/* Other Costs List */}
@@ -2144,7 +2144,7 @@ export default function SettingsPage() {
                                                             else if (definitionTab === 'vehicle_types') addDefinition('vehicleTypes', vehicleTypes, setVehicleTypes);
                                                         }
                                                     }}
-                                                    className="btn btn-primary"
+                                                    className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors"
                                                     style={{ padding: '0 24px', borderRadius: '12px', fontSize: '20px' }}
                                                 >
                                                     +
@@ -2246,7 +2246,7 @@ export default function SettingsPage() {
                                     <div style={{ fontWeight: '900', color: 'var(--primary)', fontSize: '13px' }}>🛡️ Geri Yükleme Noktası</div>
                                     <p style={{ fontSize: '10px', opacity: 0.5, marginTop: '2px' }}>Kritik işlemlerden önce Snapshot alın.</p>
                                 </div>
-                                <button onClick={() => { /* ... */ }} className="btn btn-primary" style={{ fontSize: '11px', fontWeight: '900', padding: '10px 15px' }}>SNAPSHOT AL</button>
+                                <button onClick={() => { /* ... */ }} className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors" style={{ fontSize: '11px', fontWeight: '900', padding: '10px 15px' }}>SNAPSHOT AL</button>
                             </div>
 
                             <div className="flex-between" style={{ padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
@@ -2284,7 +2284,7 @@ export default function SettingsPage() {
                                     </label>
                                 ))}
                             </div>
-                            <button className="btn btn-primary" style={{ height: '38px', fontSize: '11px', fontWeight: '900', marginTop: '4px' }} onClick={saveNotifSettings}>DEĞİŞİKLİKLERİ KAYDET</button>
+                            <button className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors" style={{ height: '38px', fontSize: '11px', fontWeight: '900', marginTop: '4px' }} onClick={saveNotifSettings}>DEĞİŞİKLİKLERİ KAYDET</button>
                         </div>
                     </div>
                 )}
@@ -2573,7 +2573,7 @@ export default function SettingsPage() {
                                                 )}
 
                                                 <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                                                    <button onClick={addCampaign} className="btn-primary" style={{ flex: 1, height: '48px', borderRadius: '12px', fontWeight: '900' }}>
+                                                    <button onClick={addCampaign} className="bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors" style={{ flex: 1, height: '48px', borderRadius: '12px', fontWeight: '900' }}>
                                                         {editingCampaignId ? 'KAMPANYAYI GÜNCELLE' : 'KAMPANYAYI OLUŞTUR'}
                                                     </button>
                                                     {editingCampaignId && (
@@ -2735,7 +2735,7 @@ export default function SettingsPage() {
                                     <button
                                         type="button"
                                         onClick={saveReferralSettings}
-                                        className="btn btn-primary w-full"
+                                        className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors w-full"
                                         style={{ height: '54px', borderRadius: '16px', fontWeight: '900', fontSize: '15px' }}
                                     >
                                         SİSTEM AYARLARINI GÜNCELLE
@@ -2840,7 +2840,7 @@ export default function SettingsPage() {
                                                 <button
                                                     type="button"
                                                     onClick={addCoupon}
-                                                    className="btn btn-primary w-full"
+                                                    className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors w-full"
                                                     style={{ height: '54px', borderRadius: '16px', fontWeight: '900', marginTop: '10px' }}
                                                 >
                                                     🚀 KODLARI OLUŞTUR VE YAYINLA
@@ -2859,7 +2859,7 @@ export default function SettingsPage() {
                                             <div style={{ display: 'flex', gap: '15px' }}>
                                                 <button
                                                     onClick={() => setShowCouponModal(true)}
-                                                    className="btn-primary"
+                                                    className="bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors"
                                                     style={{ padding: '16px 35px', borderRadius: '18px', fontWeight: '900', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 10px 25px rgba(var(--primary-rgb), 0.3)' }}
                                                 >
                                                     <span>👁️</span> KODLARI YÖNET & LİSTELE

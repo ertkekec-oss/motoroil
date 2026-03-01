@@ -95,7 +95,7 @@ export default function BranchSettingsPage() {
                     <h1 className="text-[30px] font-bold text-slate-800 dark:text-white">🏢 Şube Ayarları</h1>
                     <p className="text-muted">Şube bazlı kasa/banka erişim yetkileri</p>
                 </div>
-                <button onClick={saveSettings} className="btn btn-primary">
+                <button onClick={saveSettings} className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors">
                     💾 Ayarları Kaydet
                 </button>
             </header>
