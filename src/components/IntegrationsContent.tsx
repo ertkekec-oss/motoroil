@@ -306,7 +306,7 @@ export default function IntegrationsContent() {
                 <div className="animate-in fade-in slide-in- duration-500">
                     <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 relative">
                         {/* Decorative Background Glow */}
-                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/5 rounded-full  pointer-events-none" />
 
                         <div className="flex flex-col sm:flex-row items-center gap-5 border-b border-slate-200 dark:border-white/5 pb-8 mb-8">
                             <div className="w-14 h-14 rounded-2xl  flex items-center justify-center text-3xl  border border-slate-200 dark:border-white/5">
@@ -406,7 +406,7 @@ export default function IntegrationsContent() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-10 mt-10 border-t border-slate-200 dark:border-white/5">
                             <label className="flex items-center gap-5 p-5 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/50 dark:bg-white/[0.05] rounded-2xl border border-slate-200 dark:border-white/5 cursor-pointer transition-all select-none group">
                                 <div className={`w-12 h-6 rounded-full relative transition-all duration-300 ${eFaturaSettings.autoSend ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
-                                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-md ${eFaturaSettings.autoSend ? 'left-7' : 'left-1'}`} />
+                                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-sm ${eFaturaSettings.autoSend ? 'left-7' : 'left-1'}`} />
                                 </div>
                                 <input type="checkbox" className="hidden" checked={eFaturaSettings.autoSend} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, autoSend: e.target.checked })} />
                                 <div>
@@ -416,7 +416,7 @@ export default function IntegrationsContent() {
                             </label>
                             <label className="flex items-center gap-5 p-5 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/50 dark:bg-white/[0.05] rounded-2xl border border-slate-200 dark:border-white/5 cursor-pointer transition-all select-none group">
                                 <div className={`w-12 h-6 rounded-full relative transition-all duration-300 ${eFaturaSettings.autoApprove ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
-                                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-md ${eFaturaSettings.autoApprove ? 'left-7' : 'left-1'}`} />
+                                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-sm ${eFaturaSettings.autoApprove ? 'left-7' : 'left-1'}`} />
                                 </div>
                                 <input type="checkbox" className="hidden" checked={eFaturaSettings.autoApprove} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, autoApprove: e.target.checked })} />
                                 <div>
@@ -459,7 +459,7 @@ export default function IntegrationsContent() {
                 activeTab === 'pos' && (
                     <div className="animate-in fade-in slide-in- duration-500">
                         <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 space-y-8 relative overflow-hidden border border-slate-200 dark:border-white/10">
-                            <div className="absolute -top-24 -right-24 w-64 h-64 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -top-24 -right-24 w-64 h-64 bg-secondary/5 rounded-full  pointer-events-none" />
 
                             <div className="flex flex-col sm:flex-row items-center gap-5 border-b border-slate-200 dark:border-white/5 pb-8 mb-4">
                                 <div className="w-14 h-14 rounded-2xl  flex items-center justify-center text-3xl  border border-slate-200 dark:border-white/5">💳</div>
@@ -489,7 +489,7 @@ export default function IntegrationsContent() {
                                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-500/40" />
                                 <label className="flex items-center gap-5 cursor-pointer select-none group">
                                     <div className={`w-12 h-6 rounded-full relative transition-all duration-300 shrink-0 ${posSettings.autoReceipt ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
-                                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-md ${posSettings.autoReceipt ? 'left-7' : 'left-1'}`} />
+                                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-sm ${posSettings.autoReceipt ? 'left-7' : 'left-1'}`} />
                                     </div>
                                     <input type="checkbox" className="hidden" checked={posSettings.autoReceipt} onChange={(e) => setPosSettings({ ...posSettings, autoReceipt: e.target.checked })} />
                                     <div>
@@ -499,7 +499,7 @@ export default function IntegrationsContent() {
                                 </label>
                                 <label className="flex items-center gap-5 cursor-pointer select-none group">
                                     <div className={`w-12 h-6 rounded-full relative transition-all duration-300 shrink-0 ${posSettings.testMode ? 'bg-slate-800' : 'bg-slate-200 dark:bg-slate-700'}`}>
-                                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-md ${posSettings.testMode ? 'left-7' : 'left-1'}`} />
+                                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-sm ${posSettings.testMode ? 'left-7' : 'left-1'}`} />
                                     </div>
                                     <input type="checkbox" className="hidden" checked={posSettings.testMode} onChange={(e) => setPosSettings({ ...posSettings, testMode: e.target.checked })} />
                                     <div>
@@ -544,7 +544,7 @@ export default function IntegrationsContent() {
                         {/* Integration Hub Banner */}
                         <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8   via-transparent  border border-slate-200 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 group">
                             <div className="flex items-center gap-6">
-                                <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center text-3xl shadow-lg border border-slate-200 dark:border-white/10 group-hover:rotate-[360deg] transition-all duration-700">🛰️</div>
+                                <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center text-3xl shadow-sm border border-slate-200 dark:border-white/10 group-hover:rotate-[360deg] transition-all duration-700">🛰️</div>
                                 <div>
                                     <h4 className="text-xl font-black text-slate-900 dark:text-white tracking-wide">Enterprise Marketplace Control</h4>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium leading-relaxed max-w-sm">Tüm pazaryeri akışları, muhasebe entegrasyonu ve FIFO maliyet katmanları gerçek zamanlı olarak izlenmektedir.</p>
@@ -610,7 +610,7 @@ export default function IntegrationsContent() {
                         </div>
 
                         <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 relative overflow-hidden group border border-slate-200 dark:border-white/10">
-                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-slate-50 dark:bg-slate-800/30 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-slate-50 dark:bg-slate-800/30 rounded-full  pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
                                     <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl  border border-[#f27a1a]/10">
@@ -684,7 +684,7 @@ export default function IntegrationsContent() {
                         </div>
 
                         <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 relative overflow-hidden group border border-slate-200 dark:border-white/10">
-                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#ff6000]/5 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#ff6000]/5 rounded-full  pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
                                     <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl  border border-[#ff6000]/10">
@@ -766,7 +766,7 @@ export default function IntegrationsContent() {
                         </div>
 
                         <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 relative overflow-hidden group border border-slate-200 dark:border-white/10">
-                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#603996]/5 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#603996]/5 rounded-full  pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
                                     <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl  border border-[#603996]/10">
@@ -836,7 +836,7 @@ export default function IntegrationsContent() {
                         </div>
 
                         <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 relative overflow-hidden group border border-slate-200 dark:border-white/10">
-                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#232f3e]/5 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#232f3e]/5 rounded-full  pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
                                     <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl  border border-[#232f3e]/10">
@@ -914,7 +914,7 @@ export default function IntegrationsContent() {
                         </div>
 
                         <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 relative overflow-hidden group border border-slate-200 dark:border-white/10">
-                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#006BFF]/5 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#006BFF]/5 rounded-full  pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
                                     <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl  border border-[#006BFF]/10">

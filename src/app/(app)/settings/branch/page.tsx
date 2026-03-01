@@ -80,8 +80,8 @@ export default function BranchSettingsPage() {
 
     if (!hasPermission('settings_manage')) {
         return (
-            <div className="container" style={{ padding: '100px 20px', textAlign: 'center' }}>
-                <div style={{ fontSize: '60px', marginBottom: '20px' }}>🔐</div>
+            <div className="container">
+                <div>🔐</div>
                 <h1 className="text-[30px] font-bold text-slate-800 dark:text-white">Yetkisiz Erişim</h1>
                 <p className="text-muted">Şube ayarlarını görüntüleme yetkiniz bulunmamaktadır.</p>
             </div>
@@ -89,8 +89,8 @@ export default function BranchSettingsPage() {
     }
 
     return (
-        <div className="container" style={{ padding: '40px 20px' }}>
-            <header className="flex-between" style={{ marginBottom: '32px' }}>
+        <div className="container">
+            <header className="flex-between">
                 <div>
                     <h1 className="text-[30px] font-bold text-slate-800 dark:text-white">🏢 Şube Ayarları</h1>
                     <p className="text-muted">Şube bazlı kasa/banka erişim yetkileri</p>
@@ -100,26 +100,26 @@ export default function BranchSettingsPage() {
                 </button>
             </header>
 
-            <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all">
+            <div className="bg-white dark:bg-[#111827] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all">
                 <h3 className="mb-6">Şube - Kasa/Banka Eşleştirmeleri</h3>
-                <p className="text-muted mb-6" style={{ fontSize: '13px' }}>
+                <p className="text-muted mb-6">
                     Her şubenin hangi kasa ve banka hesaplarında işlem yapabileceğini belirleyin.
                     Personeller sadece kendi şubelerine tanımlı hesaplarda işlem görebilir ve yapabilir.
                 </p>
 
                 <div className="flex-col gap-6">
                     {branches.map(branch => (
-                        <div key={branch} className="card" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)' }}>
+                        <div key={branch} className="card">
                             <div className="flex-between mb-4">
                                 <div>
-                                    <div style={{ fontSize: '18px', fontWeight: 'bold' }}>📍 {branch}</div>
-                                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                                    <div>📍 {branch}</div>
+                                    <div>
                                         {(branchConfigs[branch] || []).length} kasa/banka tanımlı
                                     </div>
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px' }}>
+                            <div>
                                 {kasalar.map(kasa => {
                                     // Use string ID directly - no conversion needed
                                     const kasaId = String(kasa.id);
@@ -129,34 +129,14 @@ export default function BranchSettingsPage() {
                                         <div
                                             key={kasa.id}
                                             onClick={() => toggleKasaForBranch(branch, kasaId)}
-                                            style={{
-                                                padding: '16px',
-                                                background: isAssigned ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.02)',
-                                                border: `2px solid ${isAssigned ? 'var(--success)' : 'var(--border-light)'}`,
-                                                borderRadius: '12px',
-                                                cursor: 'pointer',
-                                                transition: '0.3s',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '12px'
-                                            }}
                                             className="hover-lift"
                                         >
-                                            <div style={{
-                                                width: '24px',
-                                                height: '24px',
-                                                borderRadius: '6px',
-                                                background: isAssigned ? 'var(--success)' : 'rgba(255,255,255,0.1)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontSize: '14px'
-                                            }}>
+                                            <div>
                                                 {isAssigned ? '✓' : ''}
                                             </div>
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{kasa.name}</div>
-                                                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                            <div>
+                                                <div>{kasa.name}</div>
+                                                <div>
                                                     {kasa.type} • ₺ {kasa.balance.toLocaleString()}
                                                 </div>
                                             </div>
@@ -172,7 +152,7 @@ export default function BranchSettingsPage() {
             <style jsx>{`
                 .hover-lift:hover {
                     transform: translateY(-2px);
-                    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+                    box-shadow: 0 8px 16px 'transparent';
                 }
             `}</style>
         </div>

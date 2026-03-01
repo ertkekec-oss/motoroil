@@ -22,21 +22,6 @@ export default function CampaignPointsPanel(props: any) {
                                 <button
                                     key={t.id}
                                     onClick={() => setCampaignSubTab(t.id)}
-                                    style={{
-                                        padding: '10px 20px',
-                                        borderRadius: '10px',
-                                        fontSize: '13px',
-                                        fontWeight: '700',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '8px',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s',
-                                        background: campaignSubTab === t.id ? 'var(--primary)' : 'transparent',
-                                        color: campaignSubTab === t.id ? 'white' : "#64748B",
-                                        boxShadow: campaignSubTab === t.id ? '0 4px 12px var(--primary)' : 'none'
-                                    }}
                                 >
                                     <span>{t.icon}</span> {t.label}
                                 </button>
@@ -152,16 +137,6 @@ export default function CampaignPointsPanel(props: any) {
                                                                     const next = current.includes(cc) ? current.filter((x: string) => x !== cc) : [...current, cc];
                                                                     setNewCampaign({ ...newCampaign, targetCustomerCategoryIds: next });
                                                                 }}
-                                                                style={{
-                                                                    padding: '4px 10px',
-                                                                    borderRadius: '6px',
-                                                                    fontSize: '11px',
-                                                                    fontWeight: '700',
-                                                                    background: newCampaign.targetCustomerCategoryIds?.includes(cc) ? '#3B82F6' : '',
-                                                                    border: 'none',
-                                                                    color: 'white',
-                                                                    cursor: 'pointer'
-                                                                }}
                                                             >{cc}</button>
                                                         ))}
                                                         {(custClasses || []).length === 0 && <span >Kategori tanımlanmamış.</span>}
@@ -179,16 +154,6 @@ export default function CampaignPointsPanel(props: any) {
                                                                     const next = current.includes(b) ? current.filter((x: string) => x !== b) : [...current, b];
                                                                     setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, brands: next } });
                                                                 }}
-                                                                style={{
-                                                                    padding: '4px 10px',
-                                                                    borderRadius: '6px',
-                                                                    fontSize: '11px',
-                                                                    fontWeight: '700',
-                                                                    background: newCampaign.conditions.brands?.includes(b) ? '#3B82F6' : '',
-                                                                    border: 'none',
-                                                                    color: 'white',
-                                                                    cursor: 'pointer'
-                                                                }}
                                                             >{b}</button>
                                                         ))}
                                                     </div>
@@ -204,16 +169,6 @@ export default function CampaignPointsPanel(props: any) {
                                                                     const current = newCampaign.conditions.categories || [];
                                                                     const next = current.includes(c) ? current.filter((x: string) => x !== c) : [...current, c];
                                                                     setNewCampaign({ ...newCampaign, conditions: { ...newCampaign.conditions, categories: next } });
-                                                                }}
-                                                                style={{
-                                                                    padding: '4px 10px',
-                                                                    borderRadius: '6px',
-                                                                    fontSize: '11px',
-                                                                    fontWeight: '700',
-                                                                    background: newCampaign.conditions.categories?.includes(c) ? '#3B82F6' : '',
-                                                                    border: 'none',
-                                                                    color: 'white',
-                                                                    cursor: 'pointer'
                                                                 }}
                                                             >{c}</button>
                                                         ))}

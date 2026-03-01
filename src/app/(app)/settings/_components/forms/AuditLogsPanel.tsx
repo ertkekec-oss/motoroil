@@ -37,12 +37,7 @@ export default function AuditLogsPanel(props: any) {
                                                     <div >{log.userName || 'Sistem'}</div>
                                                 </td>
                                                 <td>
-                                                    <span style={{
-                                                        padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: '900',
-                                                        backgroundColor: log.action?.includes("DELETE") ? "#FEF2F2" : "#EFF6FF",
-                                                        color: log.action?.includes('DELETE') ? 'var(--danger)' : 'var(--primary)',
-                                                        textTransform: 'uppercase'
-                                                    }}>
+                                                    <span>
                                                         {log.action}
                                                     </span>
                                                 </td>

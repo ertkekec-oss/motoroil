@@ -24,16 +24,6 @@ export default function DefinitionsListPanel(props: any) {
                                     <button
                                         key={t.id}
                                         onClick={() => { setDefinitionTab(t.id); setNewItemInput(''); }}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '12px',
-                                            padding: '12px 14px', borderRadius: '12px',
-                                            border: '1px solid',
-                                            borderColor: definitionTab === t.id ? 'var(--primary)' : 'transparent',
-                                            background: definitionTab === t.id ? '#EFF6FF' : 'transparent',
-                                            color: definitionTab === t.id ? 'white' : "#64748B",
-                                            textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s',
-                                            position: 'relative', overflow: 'hidden'
-                                        }}
                                     >
                                         <span >{t.icon}</span>
                                         <div className="flex-col">
@@ -74,10 +64,6 @@ export default function DefinitionsListPanel(props: any) {
                                                     <select
                                                         value={newPaymentMethod.type}
                                                         onChange={(e) => setNewPaymentMethod({ ...newPaymentMethod, type: e.target.value as any })}
-                                                        style={{
-                                                            padding: '14px', borderRadius: '12px', backgroundColor: "transparent",
-                                                            border: '1px solid var(--border-light)', color: 'white', fontWeight: 'bold', width: '140px'
-                                                        }}
                                                     >
                                                         <option value="cash">Nakit</option>
                                                         <option value="card">Kredi Kartı</option>
@@ -123,10 +109,6 @@ export default function DefinitionsListPanel(props: any) {
                                                         }
                                                     }}
                                                     className="w-full"
-                                                    style={{
-                                                        padding: '14px 20px', borderRadius: '12px', backgroundColor: "transparent",
-                                                        border: '1px solid var(--border-light)', color: 'white', fontSize: '15px'
-                                                    }}
                                                 />
                                                 <button
                                                     onClick={() => {

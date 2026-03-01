@@ -13,13 +13,7 @@ export default function AccountPanel(props: any) {
                             {/* INFO CARD */}
                             <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                                 <div className="flex items-center gap-6 mb-8">
-                                    <div style={{
-                                        width: '80px', height: '80px', borderRadius: '24px',
-                                        
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: '32px', fontWeight: '900', color: 'white',
-                                        
-                                    }}>
+                                    <div>
                                         {users.find((u: any) => u.name === (currentUser?.name || ''))?.name?.substring(0, 1).toUpperCase() || 'A'}
                                     </div>
                                     <div>

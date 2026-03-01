@@ -111,13 +111,6 @@ export default function CompanyProfileForm(props: any) {
                                 onClick={handleSaveCompany}
                                 disabled={isSaving}
                                 className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors h-12"
-                                style={{
-                                    width: '100%',
-                                    marginTop: '10px',
-                                    fontSize: '14px',
-                                    fontWeight: '900',
-                                    gap: '10px'
-                                }}
                             >
                                 {isSaving ? '⏳ KAYDEDİLİYOR...' : '💾 DEĞİŞİKLİKLERİ KAYDET'}
                             </button>

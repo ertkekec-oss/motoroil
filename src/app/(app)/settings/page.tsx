@@ -1046,7 +1046,8 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="flex h-screen bg-slate-50 dark:bg-[#0B1220] text-slate-900 dark:text-white overflow-hidden grid grid-cols-[260px_1fr] md:flex">
+        <div className="flex h-screen bg-transparent text-slate-900 dark:text-white overflow-hidden grid grid-cols-[260px_1fr] md:flex">
+            <div className="fixed inset-0 -z-10 bg-slate-50 dark:bg-[#0B1220]" />
 
             {/* LEFT SIDEBAR MENU */}
             <div className="w-[260px] shrink-0 border-r border-slate-200 dark:border-slate-800 p-6 bg-white dark:bg-[#0F172A] flex flex-col gap-2 overflow-y-auto">
@@ -1095,14 +1096,6 @@ export default function SettingsPage() {
                 <button
                     onClick={() => setActiveTab('reset')}
                     className={`btn ${activeTab === 'reset' ? 'btn-danger' : 'btn-ghost'}`}
-                    style={{
-                        justifyContent: 'flex-start',
-                        color: activeTab === 'reset' ? 'white' : 'var(--danger)',
-                        fontSize: '11px',
-                        fontWeight: '800',
-                        padding: '8px 12px',
-                        borderRadius: '8px'
-                    }}
                 >
                     🚨 SİSTEM SIFIRLAMA
                 </button>
@@ -1214,11 +1207,7 @@ export default function SettingsPage() {
                                                 <td>
                                                     <div >
                                                         <div >
-                                                            <div style={{
-                                                                width: `${c.usageLimit > 0 ? (c.usedCount / c.usageLimit) * 100 : (c.usedCount > 0 ? 100 : 0)}%`,
-                                                                height: '100%',
-                                                                background: c.isUsed ? '#E2E8F0' : '#3B82F6'
-                                                            }} />
+                                                            <div />
                                                         </div>
                                                         <span >
                                                             {c.usedCount} / {c.usageLimit === 0 ? '∞' : c.usageLimit}

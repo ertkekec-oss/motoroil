@@ -99,7 +99,7 @@ export const EnterpriseSwitch = ({ checked, onChange, label, description, classN
     return (
         <label className={`flex items-center gap-5 p-5 bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.05] rounded-xl border border-slate-200 dark:border-white/5 cursor-pointer transition-all select-none group ${className}`}>
             <div className={`w-12 h-6 rounded-full relative transition-all duration-300 shrink-0 ${checked ? 'bg-blue-600 shadow-inner' : 'bg-slate-200 dark:bg-slate-700'}`}>
-                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-md ${checked ? 'left-7' : 'left-1'}`} />
+                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-sm ${checked ? 'left-7' : 'left-1'}`} />
             </div>
             <input type="checkbox" className="hidden" checked={checked} onChange={onChange} />
             <div>
@@ -134,7 +134,7 @@ export const EnterpriseTable = ({ headers, children, className = '' }: any) => {
 export const EnterpriseModal = ({ isOpen, onClose, title, children, footer, className = '' }: any) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/60  animate-in fade-in duration-200">
             <div className={`bg-white dark:bg-[#0F172A] rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 ${className}`}>
                 <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-slate-800/80">
                     <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">{title}</h3>
@@ -142,7 +142,7 @@ export const EnterpriseModal = ({ isOpen, onClose, title, children, footer, clas
                         ✕
                     </button>
                 </div>
-                <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+                <div className="p-6 overflow-y-auto">
                     {children}
                 </div>
                 {footer && (

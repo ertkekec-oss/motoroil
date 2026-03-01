@@ -99,19 +99,6 @@ export default function SystemResetPanel(props: any) {
                                         );
                                     }}
                                     className="btn"
-                                    style={{
-                                        background: '#dc2626',
-                                        color: 'white',
-                                        fontWeight: '900',
-                                        padding: '18px 40px',
-                                        width: '100%',
-                                        maxWidth: '400px',
-                                        fontSize: '16px',
-                                        borderRadius: '18px',
-                                        boxShadow: 'none',
-                                        opacity: (!Object.values(resetOptions).some(v => v)) ? 0.5 : 1,
-                                        cursor: (!Object.values(resetOptions).some(v => v)) ? 'not-allowed' : 'pointer'
-                                    }}
                                 >
                                     🔥 SEÇİLİ VERİLERİ SİL & SIFIRLA
                                 </button>
