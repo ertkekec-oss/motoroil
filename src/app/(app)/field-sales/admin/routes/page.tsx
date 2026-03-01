@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useModal } from '@/contexts/ModalContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Map, Settings, Target, ChevronLeft, ChevronRight, Plus, MapPin, Search, X, Edit2, Info, Users, CheckCircle2, Circle, Trash2 } from 'lucide-react';
+import { Map, Settings, Target, ChevronLeft, ChevronRight, Plus, MapPin, Search, X, Edit2, Info, Users, CheckCircle2, Circle, Trash2, Calendar } from 'lucide-react';
 
 export default function AdminRoutesPage() {
     const { isAuthenticated, isLoading, user: currentUser } = useAuth();
