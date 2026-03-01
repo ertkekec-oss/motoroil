@@ -409,7 +409,7 @@ function PaymentContent() {
                             borderRadius: '10px'
                         }}
                     >
-                        {isProcessing ? '⏳ İŞLENİYOR...' : '✓ ONAYLA VE FİŞ KES'}
+                        {isProcessing ? '⏳ İŞLENİYOR...' : '✓ ONAYLA VE İŞLEMİ TAMAMLA'}
                     </button>
                 </div>
             </div>

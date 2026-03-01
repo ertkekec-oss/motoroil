@@ -537,164 +537,235 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     const paginatedHistory = filteredHistory.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
     return (
-        <div className="container" style={{ padding: '30px 20px', maxWidth: '1400px', margin: '0 auto' }}>
+        <div className="flex flex-col min-h-screen" style={{ background: 'var(--bg-main)', color: 'var(--text-main)' }}>
+            
+            {/* EXECUTIVE HEADER STRIP */}
+            <div style={{
+                background: 'var(--bg-panel, rgba(15, 23, 42, 0.6))',
+                borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))',
+                padding: '24px 40px',
+                backdropFilter: 'blur(12px)',
+                position: 'sticky',
+                top: 0,
+                zIndex: 40
+            }}>
+                <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    
+                    {/* Top Row: Back link & Title */}
+                    <div className="flex-between">
+                        <Link href="/customers" style={{ color: 'var(--text-muted, #888)', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', transition: 'color 0.2s' }} className="hover:text-blue-500">
+                            <span style={{ fontSize: '16px' }}>←</span> Müşteri Merkezi
+                        </Link>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                                onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
+                                className="btn"
+                                style={{ background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
+                            >
+                                📄 Özet Ekstre
+                            </button>
+                            <button
+                                onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
+                                className="btn"
+                                style={{ background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
+                            >
+                                📑 Detaylı Ekstre
+                            </button>
+                            <button
+                                onClick={() => router.push(`/customers?edit=${customer.id}`)}
+                                className="btn"
+                                style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', color: '#3b82f6', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600', display: 'flex', gap: '8px', alignItems: 'center' }}
+                            >
+                                ✏️ Düzenle
+                            </button>
+                        </div>
+                    </div>
 
-            {/* --- HEADER SECTION --- */}
-            <div style={{ marginBottom: '30px' }}>
-                <Link href="/customers" style={{ color: '#888', textDecoration: 'none', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <span>←</span> Müşteri Listesine Dön
-                </Link>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '30px', marginTop: '20px' }} className="responsive-grid">
-
-                    {/* PROFILE CARD */}
-                    <div className="glass" style={{ padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    {/* Business/Profile Row */}
+                    <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                        {/* Left: Avatar + Details */}
+                        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                             <div style={{
-                                width: '80px', height: '80px', borderRadius: '20px',
-                                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                width: '72px', height: '72px', borderRadius: '18px',
+                                background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '32px', fontWeight: 'bold', color: 'white',
-                                boxShadow: '0 10px 20px rgba(59, 130, 246, 0.3)'
+                                fontSize: '28px', fontWeight: '800', color: 'white',
+                                boxShadow: '0 8px 16px rgba(59, 130, 246, 0.25)',
+                                border: '1px solid rgba(255,255,255,0.1)'
                             }}>
                                 {val(customer.name, '?').charAt(0).toUpperCase()}
                             </div>
                             <div>
-                                <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0, color: 'white' }}>{val(customer.name)}</h1>
-                                <span style={{ color: '#888', fontSize: '14px', marginTop: '4px', display: 'block' }}>{val(customer.category?.name, 'Genel Müşteri')}</span>
-                            </div>
-                        </div>
-
-                        <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#ccc', fontSize: '13px' }}>
-                                <span style={{ opacity: 0.5 }}>📱</span> {val(customer.phone, 'Telefon Girilmemiş')}
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#ccc', fontSize: '13px' }}>
-                                <span style={{ opacity: 0.5 }}>📧</span> {val(customer.email, 'E-posta Girilmemiş')}
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#ccc', fontSize: '13px' }}>
-                                <span style={{ opacity: 0.5 }}>📍</span>
-                                <span>
-                                    {(() => {
-                                        let addr = customer.address;
-                                        // Priority 1: New fields (city/district)
-                                        if (customer.city || customer.district) {
-                                            return `${addr ? addr + ' ' : ''}${customer.district ? customer.district + ' / ' : ''}${customer.city || ''}`;
-                                        }
-                                        // Priority 2: Legacy JSON parsing
-                                        try {
-                                            if (addr && typeof addr === 'string' && addr.trim().startsWith('{')) {
-                                                const parsed = JSON.parse(addr);
-                                                return `${parsed.address || ''} ${parsed.district ? '- ' + parsed.district : ''} ${parsed.city ? '/' + parsed.city : ''}`;
+                                <h1 style={{ fontSize: '26px', fontWeight: '800', margin: '0 0 6px 0', color: 'var(--text-main, #fff)', letterSpacing: '-0.5px' }}>
+                                    {val(customer.name)}
+                                </h1>
+                                <div style={{ display: 'flex', gap: '16px', color: 'var(--text-muted, #888)', fontSize: '13px', fontWeight: '500' }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏷️</span> {val(customer.category?.name, 'Genel Müşteri')}</span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📱</span> {val(customer.phone, 'Telefon Yok')}</span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📧</span> {val(customer.email, 'E-posta Yok')}</span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>📍</span> 
+                                        {(() => {
+                                            let addr = customer.address;
+                                            if (customer.city || customer.district) {
+                                                return `${customer.district ? customer.district + ' / ' : ''}${customer.city || ''}`;
                                             }
-                                        } catch (e) { }
-                                        return val(addr, 'Adres Girilmemiş');
-                                    })()}
-                                </span>
-                            </div>
-
-                            {/* --- Quick Actions (WhatsApp & QR) --- */}
-                            {services.length > 0 && services[0].plate && (
-                                <div style={{ marginTop: '16px', display: 'flex', gap: '10px' }}>
-                                    <button
-                                        onClick={() => setQrPlate(services[0].plate)}
-                                        className="btn btn-outline"
-                                        style={{ fontSize: '12px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'rgba(255,255,255,0.2)', color: '#ccc' }}
-                                    >
-                                        📱 Dijital Karne
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            const plate = services[0].plate;
-                                            const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.periodya.com/vehicle/${plate}`;
-                                            window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
-                                        }}
-                                        className="btn btn-primary"
-                                        style={{ background: '#25D366', border: 'none', fontSize: '12px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                                    >
-                                        💬 WhatsApp
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* ACTIONS & BALANCE CARD */}
-                    <div className="glass" style={{ padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.0) 100%)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <div>
-                                <div style={{ fontSize: '13px', color: '#888', letterSpacing: '1px', fontWeight: 'bold' }}>TOPLAM BAKİYE</div>
-                                <div style={{ fontSize: '42px', fontWeight: 'bold', color: balanceColor, marginTop: '5px' }}>
-                                    {Math.abs(balance).toLocaleString()} ₺
-                                    <span style={{ fontSize: '16px', fontWeight: 'normal', opacity: 0.7, marginLeft: '10px' }}>
-                                        {balance > 0 ? '(Borçlu)' : balance < 0 ? '(Alacaklı)' : '(Dengeli)'}
+                                            try {
+                                                if (addr && typeof addr === 'string' && addr.trim().startsWith('{')) {
+                                                    const parsed = JSON.parse(addr);
+                                                    return `${parsed.district ? parsed.district : ''} ${parsed.city ? '/' + parsed.city : ''}`;
+                                                }
+                                            } catch (e) { }
+                                            return 'Adres Yok';
+                                        })()}
                                     </span>
                                 </div>
-                            </div>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                                <button
-                                    onClick={() => router.push(`/customers?edit=${customer.id}`)}
-                                    style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', padding: '10px 16px', borderRadius: '10px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}>
-                                    ✏️ Düzenle
-                                </button>
-                                <button
-                                    onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
-                                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '10px 16px', borderRadius: '10px', cursor: 'pointer', fontSize: '13px' }}>
-                                    📄 Özet Ekstre
-                                </button>
-                                <button
-                                    onClick={() => { setStatementType('detailed'); setStatementOpen(true); }}
-                                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '10px 16px', borderRadius: '10px', cursor: 'pointer', fontSize: '13px' }}>
-                                    📑 Detaylı Ekstre
-                                </button>
+                                {services.length > 0 && services[0].plate && (
+                                    <div style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
+                                        <button
+                                            onClick={() => setQrPlate(services[0].plate)}
+                                            style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: '600' }}
+                                        >
+                                            📱 Dijital Karne Müşteri Linki (QR)
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                const plate = services[0].plate;
+                                                const msg = `Sayın ${customer.name}, ${plate} plakalı aracınızın servis işlemleri Periodya güvencesiyle kayıt altına alınmıştır. Dijital karnenize buradan ulaşabilirsiniz: https://www.periodya.com/vehicle/${plate}`;
+                                                window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
+                                            }}
+                                            style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', background: 'rgba(37, 211, 102, 0.1)', border: '1px solid rgba(37, 211, 102, 0.3)', color: '#25D366', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: '600' }}
+                                        >
+                                            💬 WhatsApp'tan Karne Gönder
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', marginTop: '20px' }}>
-                            <Link href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#3b82f6', color: 'white', border: 'none', padding: '16px', borderRadius: '14px', fontWeight: 'bold', cursor: 'pointer', textDecoration: 'none', transition: '0.2s', boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)' }}>
-                                💰 Tahsilat Al
-                            </Link>
-
-                            <Link href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', padding: '16px', borderRadius: '14px', fontWeight: 'bold', cursor: 'pointer', textDecoration: 'none' }}>
-                                💸 Ödeme Yap
-                            </Link>
-
-                            <button
-                                onClick={() => router.push(`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`)}
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', border: 'none', padding: '16px', borderRadius: '14px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)' }}
-                            >
-                                🛒 Satış Yap
-                            </button>
+                        {/* Right: Balance & Financial Health */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
+                            <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '8px' }}>
+                                FİNANSAL DURUM (NET BAKİYE)
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                                <div style={{ fontSize: '36px', fontWeight: '900', color: balanceColor, lineHeight: '1', letterSpacing: '-1px' }}>
+                                    {Math.abs(balance).toLocaleString()} <span style={{ fontSize: '24px', opacity: 0.8 }}>₺</span>
+                                </div>
+                                <div style={{
+                                    padding: '4px 10px',
+                                    borderRadius: '8px',
+                                    fontSize: '11px',
+                                    fontWeight: '800',
+                                    background: balance > 0 ? 'rgba(239, 68, 68, 0.1)' : balance < 0 ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-card, rgba(255,255,255,0.05))',
+                                    color: balanceColor,
+                                    border: `1px solid ${balance > 0 ? 'rgba(239, 68, 68, 0.3)' : balance < 0 ? 'rgba(16, 185, 129, 0.3)' : 'var(--border-color, rgba(255,255,255,0.1))'}`,
+                                    textTransform: 'uppercase'
+                                }}>
+                                    {balance > 0 ? 'Borçlu (Risk)' : balance < 0 ? 'Alacaklı' : 'Kapalı (Dengeli)'}
+                                </div>
+                            </div>
+                            {portfolioChecks > 0 && (
+                                <div style={{ fontSize: '12px', color: '#f59e0b', fontWeight: '600', marginTop: '8px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                    <span>⚠️</span> Portföyde {portfolioChecks.toLocaleString()} ₺ değerinde aktif çek/senet var.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* --- TABS --- */}
-            <div style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '24px', display: 'flex', gap: '30px' }}>
-                <button onClick={() => setActiveTab('all')} style={{ padding: '15px 0', background: 'none', border: 'none', borderBottom: activeTab === 'all' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'all' ? '#3b82f6' : '#888', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>Tüm Hareketler</button>
-                <button onClick={() => setActiveTab('sales')} style={{ padding: '15px 0', background: 'none', border: 'none', borderBottom: activeTab === 'sales' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'sales' ? '#3b82f6' : '#888', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>Satışlar & Faturalar</button>
-                <button onClick={() => setActiveTab('payments')} style={{ padding: '15px 0', background: 'none', border: 'none', borderBottom: activeTab === 'payments' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'payments' ? '#3b82f6' : '#888', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>Finansal İşlemler</button>
-                <button onClick={() => { setActiveTab('documents'); fetchDocuments(); }} style={{ padding: '15px 0', background: 'none', border: 'none', borderBottom: activeTab === 'documents' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'documents' ? '#3b82f6' : '#888', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>📁 Dosyalar & Evraklar</button>
-                <button onClick={() => { setActiveTab('services'); fetchServices(); }} style={{ padding: '15px 0', background: 'none', border: 'none', borderBottom: activeTab === 'services' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'services' ? '#3b82f6' : '#888', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>🔧 Servis Geçmişi</button>
-                <button onClick={() => setActiveTab('warranties')} style={{ padding: '15px 0', background: 'none', border: 'none', borderBottom: activeTab === 'warranties' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'warranties' ? '#3b82f6' : '#888', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>🛡️ Garantiler</button>
-                <button onClick={() => setActiveTab('checks')} style={{ padding: '15px 0', background: 'none', border: 'none', borderBottom: activeTab === 'checks' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'checks' ? '#3b82f6' : '#888', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>📑 Çek & Senetler</button>
-            </div>
+            {/* MAIN CONTENT AREA */}
+            <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
-            {/* --- CONTENT --- */}
-            <div className="glass" style={{ borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.2)' }}>
+                {/* PREMIUM ACTION BAR */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                    <Link href={`/payment?amount=${Math.abs(balance)}&title=Tahsilat-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}&type=collection`}
+                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px', background: 'linear-gradient(to right, #2563eb, #3b82f6)', color: 'white', padding: '20px', borderRadius: '16px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(59, 130, 246, 0.3)', border: '1px solid rgba(59, 130, 246, 0.5)' }}
+                        className="hover:-translate-y-1 hover:shadow-lg"
+                    >
+                        <span style={{ fontSize: '24px' }}>💰</span>
+                        <span style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px' }}>TAHSİLAT AL</span>
+                        <span style={{ fontSize: '11px', opacity: 0.8, fontWeight: '500' }}>Cari hesaptan nakit / kk ile ödeme al</span>
+                    </Link>
+
+                    <Link href={`/payment?type=payment&title=Ödeme-${encodeURIComponent(val(customer.name))}&ref=CUST-${customer.id}`}
+                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px', background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-main, white)', padding: '20px', borderRadius: '16px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}
+                        className="hover:-translate-y-1 hover:bg-white/5"
+                    >
+                        <span style={{ fontSize: '24px' }}>💸</span>
+                        <span style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px' }}>ÖDEME YAP</span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted, #888)', fontWeight: '500' }}>Müşteriye nakit / kk ile ödeme çıkışı yap</span>
+                    </Link>
+
+                    <button
+                        onClick={() => router.push(`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`)}
+                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px', background: 'linear-gradient(to right, #059669, #10b981)', color: 'white', padding: '20px', borderRadius: '16px', border: 'none', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)' }}
+                        className="hover:-translate-y-1 hover:shadow-lg"
+                    >
+                        <span style={{ fontSize: '24px' }}>🛒</span>
+                        <span style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px' }}>SATIŞ YAP (POS YÖNLENDİR)</span>
+                        <span style={{ fontSize: '11px', opacity: 0.8, fontWeight: '500' }}>Bu müşteriye yeni bir ürün veya hizmet sat</span>
+                    </button>
+                </div>
+
+                {/* PREMIUM TABS */}
+                <div style={{ display: 'flex', gap: '8px', padding: '6px', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '14px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', overflowX: 'auto' }}>
+                    {[
+                        { id: 'all', label: 'Tüm Hareketler', icon: '📋' },
+                        { id: 'sales', label: 'Satışlar & Faturalar', icon: '🧾' },
+                        { id: 'payments', label: 'Finansal İşlemler', icon: '💳' },
+                        { id: 'documents', label: 'Dosyalar & Evraklar', icon: '📁' },
+                        { id: 'services', label: 'Servis Geçmişi', icon: '🔧' },
+                        { id: 'warranties', label: 'Garantiler', icon: '🛡️' },
+                        { id: 'checks', label: 'Çek & Senetler', icon: '📑' }
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => {
+                                setActiveTab(tab.id as any);
+                                if (tab.id === 'documents') fetchDocuments();
+                                if (tab.id === 'services') fetchServices();
+                            }}
+                            style={{
+                                padding: '10px 20px',
+                                borderRadius: '10px',
+                                border: 'none',
+                                background: activeTab === tab.id ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+                                color: activeTab === tab.id ? '#3b82f6' : 'var(--text-muted, #888)',
+                                fontWeight: activeTab === tab.id ? '800' : '600',
+                                fontSize: '13px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                transition: 'all 0.2s',
+                                whiteSpace: 'nowrap'
+                            }}
+                            className={activeTab !== tab.id ? "hover:bg-white/5 hover:text-white" : ""}
+                        >
+                            <span>{tab.icon}</span> {tab.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* CONTENT AREA */}
+                <div style={{ 
+                    background: 'var(--bg-panel, rgba(15, 23, 42, 0.4))', 
+                    borderRadius: '20px', 
+                    border: '1px solid var(--border-color, rgba(255,255,255,0.05))', 
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)' 
+                }}>
+
                 {activeTab === 'services' ? (
-                    <div style={{ padding: '24px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                            <h3 style={{ margin: 0, color: '#fff' }}>Servis Kayıtları</h3>
-                            <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ padding: '32px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                            <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Servis Kayıtları</h3>
+                            <div style={{ display: 'flex', gap: '12px' }}>
                                 <Link
                                     href={`/service/new?customerId=${customer.id}&customerName=${encodeURIComponent(customer.name)}`}
                                     className="btn btn-primary"
-                                    style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                                    style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', border: 'none', color: 'white', fontWeight: '800' }}
                                 >
                                     🛠️ Servis Başlat
                                 </Link>
@@ -704,7 +775,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         <button
                                             onClick={() => setQrPlate(services[0].plate)}
                                             className="btn btn-outline"
-                                            style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                                            style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontWeight: '600' }}
                                         >
                                             📱 Dijital Karne (QR)
                                         </button>
@@ -715,7 +786,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                             }}
                                             className="btn btn-primary"
-                                            style={{ background: '#25D366', border: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                                            style={{ background: '#25D366', border: 'none', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', color: 'white', fontWeight: '800' }}
                                         >
                                             💬 WhatsApp Bildirim
                                         </button>
@@ -724,118 +795,137 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             </div>
                         </div>
 
-                        {/* QR MODAL */}
+                        {/* QR MODAL (Services Tab Inline) */}
                         {qrPlate && (
                             <div style={{
                                 position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                                background: 'rgba(0,0,0,0.8)', zIndex: 9999,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                background: 'rgba(15, 23, 42, 0.85)', zIndex: 9999,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                backdropFilter: 'blur(12px)'
                             }} onClick={() => setQrPlate(null)}>
-                                <div onClick={e => e.stopPropagation()} style={{ background: '#fff', padding: '30px', borderRadius: '20px', textAlign: 'center', maxWidth: '300px' }}>
-                                    <h3 style={{ color: '#000', margin: '0 0 10px 0' }}>Dijital Servis Karnesi</h3>
-                                    <div style={{ fontSize: '12px', color: '#666', marginBottom: '20px' }}>Müşteriniz bu QR kodunu okutarak servis geçmişini görebilir.</div>
-                                    <img
-                                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://www.periodya.com/vehicle/${qrPlate}`}
-                                        alt="QR"
-                                        style={{ width: '100%', borderRadius: '10px' }}
-                                    />
-                                    <div style={{ marginTop: '20px', fontWeight: 'bold', fontSize: '20px', color: '#333' }}>{qrPlate}</div>
-                                    <button onClick={() => setQrPlate(null)} style={{ marginTop: '20px', padding: '10px 30px', background: '#333', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>Kapat</button>
+                                <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-card, #1e293b)', padding: '40px', borderRadius: '24px', textAlign: 'center', maxWidth: '360px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }} className="animate-scale-in">
+                                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📱</div>
+                                    <h3 style={{ color: 'var(--text-main, #fff)', margin: '0 0 12px 0', fontSize: '20px', fontWeight: '800' }}>Dijital Servis Karnesi</h3>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-muted, #94a3b8)', marginBottom: '24px', lineHeight: '1.6' }}>Müşteriniz bu QR kodunu okutarak veya linke tıklayarak servis geçmişine ulaşabilir.</div>
+                                    <div style={{ background: 'white', padding: '16px', borderRadius: '16px', display: 'inline-block' }}>
+                                        <img
+                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://www.periodya.com/vehicle/${qrPlate}`}
+                                            alt="QR"
+                                            style={{ width: '220px', height: '220px', borderRadius: '8px' }}
+                                        />
+                                    </div>
+                                    <div style={{ marginTop: '24px', fontWeight: '900', fontSize: '24px', color: '#3b82f6', letterSpacing: '2px' }}>{qrPlate}</div>
+                                    <button onClick={() => setQrPlate(null)} style={{ marginTop: '24px', padding: '14px 0', width: '100%', background: 'var(--bg-panel, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '12px', cursor: 'pointer', fontWeight: '800' }}>Kapat</button>
                                 </div>
                             </div>
                         )}
 
                         {servicesLoading ? (
-                            <div style={{ padding: '40px', textAlign: 'center', color: '#888' }}>Yükleniyor...</div>
+                            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
+                                <div className="loader" style={{ margin: '0 auto 16px', width: '24px', height: '24px', border: '3px solid rgba(59, 130, 246, 0.3)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                                Servis verileri getiriliyor...
+                            </div>
                         ) : services.length === 0 ? (
-                            <div style={{ padding: '40px', textAlign: 'center', color: '#888' }}>
-                                <div style={{ marginBottom: '16px' }}>Kayıtlı servis işlemi yok.</div>
+                            <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🔧</div>
+                                <div style={{ marginBottom: '24px', color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Bu müşteriye ait servis kaydı yok.</div>
                                 <button
                                     onClick={() => router.push(`/service/new?customerId=${customer.id}&customerName=${encodeURIComponent(customer.name)}`)}
                                     className="btn btn-primary"
-                                    style={{ padding: '10px 20px', fontSize: '14px' }}
+                                    style={{ padding: '12px 24px', fontSize: '14px', borderRadius: '12px', background: '#3b82f6', color: 'white', fontWeight: '800', border: 'none' }}
                                 >
-                                    ➕ Servis Kaydı Oluştur
+                                    ➕ İlk Servis Kaydını Oluştur
                                 </button>
                             </div>
                         ) : (
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead>
-                                    <tr style={{ color: '#888', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                                        <th style={{ padding: '12px' }}>Tarih</th>
-                                        <th>Marka / Model</th>
-                                        <th>Plaka</th>
-                                        <th>KM</th>
-                                        <th>Yapılan İşlemler</th>
-                                        <th style={{ textAlign: 'right' }}>Tutar</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {services.map((svc: any, i: number) => {
-                                        let itemsStr = '';
-                                        try {
-                                            // Handle items whether they are string or object
-                                            const items = typeof svc.items === 'string' ? JSON.parse(svc.items) : svc.items;
-                                            if (Array.isArray(items) && items.length > 0) {
-                                                itemsStr = items.map((p: any) => p.name).join(', ');
-                                            }
-                                        } catch (e) { console.error('Error parsing items', e); }
+                            <div style={{ overflowX: 'auto' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                                    <thead>
+                                        <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
+                                            <th style={{ padding: '16px 20px' }}>TARİH</th>
+                                            <th style={{ padding: '16px 20px' }}>MARKA / MODEL</th>
+                                            <th style={{ padding: '16px 20px' }}>PLAKA</th>
+                                            <th style={{ padding: '16px 20px' }}>KİLOMETRE</th>
+                                            <th style={{ padding: '16px 20px' }}>YAPILAN İŞLEMLER</th>
+                                            <th style={{ padding: '16px 20px', textAlign: 'right' }}>TUTAR</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {services.map((svc: any, i: number) => {
+                                            let itemsStr = '';
+                                            try {
+                                                const items = typeof svc.items === 'string' ? JSON.parse(svc.items) : svc.items;
+                                                if (Array.isArray(items) && items.length > 0) {
+                                                    itemsStr = items.map((p: any) => p.name).join(', ');
+                                                }
+                                            } catch (e) { console.error('Error parsing items', e); }
 
-                                        // Fallback date if date is missing (e.g. use createdAt)
-                                        const displayDate = svc.date ? svc.date : svc.createdAt;
+                                            const displayDate = svc.date ? svc.date : svc.createdAt;
 
-                                        return (
-                                            <tr key={svc.id || i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '13px', cursor: 'pointer' }} onClick={() => router.push(`/service/${svc.id}`)}>
-                                                <td style={{ padding: '16px' }}>{displayDate ? new Date(displayDate).toLocaleDateString('tr-TR') : '-'}</td>
-                                                <td><span style={{ fontWeight: '500' }}>{svc.vehicleBrand || '-'}</span></td>
-                                                <td><span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', fontWeight: 'bold' }}>{svc.plate || '-'}</span></td>
-                                                <td>{svc.km ? svc.km.toLocaleString() : '-'} km</td>
-                                                <td style={{ color: '#aaa' }}>
-                                                    {itemsStr ? (
-                                                        <span title={itemsStr}>{itemsStr.length > 50 ? itemsStr.substring(0, 50) + '...' : itemsStr}</span>
-                                                    ) : (
-                                                        <span>{svc.description || svc.notes || '-'}</span>
-                                                    )}
-                                                </td>
-                                                <td style={{ textAlign: 'right', fontWeight: 'bold', color: '#fff' }}>
-                                                    {Number(svc.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody></table>
+                                            return (
+                                                <tr key={svc.id || i} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', cursor: 'pointer', transition: 'background 0.2s' }} onClick={() => router.push(`/service/${svc.id}`)} className="hover:bg-white/5">
+                                                    <td style={{ padding: '20px', color: 'var(--text-main, #e2e8f0)', fontWeight: '500' }}>{displayDate ? new Date(displayDate).toLocaleDateString('tr-TR') : '-'}</td>
+                                                    <td style={{ padding: '20px' }}><span style={{ fontWeight: '600', color: 'var(--text-main, #fff)' }}>{svc.vehicleBrand || '-'}</span></td>
+                                                    <td style={{ padding: '20px' }}>
+                                                        <span style={{ padding: '4px 10px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontWeight: '800', color: '#3b82f6', letterSpacing: '1px' }}>
+                                                            {svc.plate || '-'}
+                                                        </span>
+                                                    </td>
+                                                    <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)' }}>{svc.km ? svc.km.toLocaleString() : '-'} km</td>
+                                                    <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)' }}>
+                                                        {itemsStr ? (
+                                                            <span title={itemsStr} style={{ display: 'inline-block', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{itemsStr}</span>
+                                                        ) : (
+                                                            <span style={{ display: 'inline-block', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{svc.description || svc.notes || '-'}</span>
+                                                        )}
+                                                    </td>
+                                                    <td style={{ padding: '20px', textAlign: 'right', fontWeight: '800', color: '#3b82f6', fontSize: '14px' }}>
+                                                        {Number(svc.totalAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
                     </div>
                 ) : activeTab === 'documents' ? (
-                    <div style={{ padding: '24px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                            <h3 style={{ margin: 0, color: '#fff' }}>Müşteri Dosyaları</h3>
-                            <label className="btn btn-primary" style={{ cursor: uploading ? 'wait' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ padding: '32px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                            <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Müşteri Dosyaları</h3>
+                            <label className="btn btn-primary" style={{ cursor: uploading ? 'wait' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: uploading ? 'var(--bg-card)' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', color: 'white', fontWeight: '800' }}>
                                 {uploading ? 'Yükleniyor...' : '⬆️ Dosya Yükle'}
                                 <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} disabled={uploading} accept=".pdf,.png,.jpg,.jpeg" />
                             </label>
                         </div>
 
                         {docsLoading ? (
-                            <div style={{ padding: '40px', textAlign: 'center', color: '#888' }}>Yükleniyor...</div>
+                            <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
+                                <div className="loader" style={{ margin: '0 auto 16px', width: '24px', height: '24px', border: '3px solid rgba(59, 130, 246, 0.3)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                                Dosyalar getiriliyor...
+                            </div>
                         ) : documents.length === 0 ? (
-                            <div style={{ padding: '40px', textAlign: 'center', color: '#888' }}>Henüz dosya yüklenmemiş.</div>
+                            <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📁</div>
+                                <div style={{ color: 'var(--text-muted, #888)', fontSize: '15px', fontWeight: '500' }}>Henüz dosyası yüklenmemiş. (Maks 5MB PDF, PNG, JPEG)</div>
+                            </div>
                         ) : (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
                                 {documents.map(doc => (
-                                    <div key={doc.id} className="glass" style={{ padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', position: 'relative' }}>
-                                        <div style={{ fontSize: '40px', marginBottom: '10px', textAlign: 'center' }}>
+                                    <div key={doc.id} className="glass" style={{ padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', background: 'var(--bg-card, rgba(255,255,255,0.03))', display: 'flex', flexDirection: 'column', alignItems: 'center', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} className="hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-xl">
+                                        <div style={{ fontSize: '48px', marginBottom: '16px', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))' }}>
                                             {doc.fileType?.includes('pdf') ? '📄' : '🖼️'}
                                         </div>
-                                        <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#ddd', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '5px' }}>
+                                        <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', marginBottom: '8px' }}>
                                             {doc.fileName}
                                         </div>
-                                        <div style={{ fontSize: '11px', color: '#888', marginBottom: '15px' }}>
+                                        <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', marginBottom: '20px', fontWeight: '500' }}>
                                             {(doc.fileSize / 1024).toFixed(1)} KB • {new Date(doc.uploadedAt).toLocaleDateString()}
                                         </div>
-                                        <div style={{ display: 'flex', gap: '10px' }}>
-                                            <button onClick={() => handleViewDoc(doc.id, doc.fileType)} style={{ flex: 1, padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>Aç</button>
-                                            <button onClick={() => handleDeleteDoc(doc.id)} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ef4444', background: 'transparent', color: '#ef4444', cursor: 'pointer', fontSize: '12px' }}>Sil</button>
+                                        <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                                            <button onClick={() => handleViewDoc(doc.id, doc.fileType)} style={{ flex: 1, padding: '8px', borderRadius: '8px', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', background: 'var(--bg-panel, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', cursor: 'pointer', fontSize: '12px', fontWeight: '700' }} className="hover:bg-white/10 hover:border-white/30">Aç</button>
+                                            <button onClick={() => handleDeleteDoc(doc.id)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', cursor: 'pointer', fontSize: '12px', fontWeight: '700' }} className="hover:bg-red-500/20">Sil</button>
                                         </div>
                                     </div>
                                 ))}
@@ -843,74 +933,79 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         )}
                     </div>
                 ) : activeTab === 'warranties' ? (
-                    <div style={{ padding: '24px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <div style={{ padding: '32px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                             <div>
-                                <h3 style={{ margin: 0, color: '#fff', fontSize: '18px' }}>Dijital Garanti Karnesi & Takip</h3>
-                                <p style={{ color: '#888', fontSize: '12px', marginTop: '4px' }}>Müşteriye satılan ürünlerin garanti süreçlerini yönetin.</p>
+                                <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Dijital Garanti Karnesi & Takip</h3>
+                                <p style={{ color: 'var(--text-muted, #888)', fontSize: '13px', marginTop: '6px', fontWeight: '500' }}>Müşteriye satılan ürünlerin garanti süreçlerini yönetin.</p>
                             </div>
                             <button
                                 onClick={() => setWarrantyModalOpen(true)}
                                 className="btn btn-primary"
-                                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '14px' }}
+                                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', fontWeight: '800', border: 'none', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}
                             >
                                 🛡️ Garanti Başlat
                             </button>
                         </div>
 
                         {warranties.length === 0 ? (
-                            <div style={{ padding: '40px', textAlign: 'center', color: '#888', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
-                                <div style={{ fontSize: '24px', marginBottom: '10px' }}>🛡️</div>
-                                <div>Henüz kayıtlı garanti bulunmuyor.</div>
+                            <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>🛡️</div>
+                                <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Henüz kayıtlı garanti karnesi bulunmuyor.</div>
                             </div>
                         ) : (
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                 {warranties.map(w => (
                                     <div key={w.id} className="glass" style={{
-                                        padding: '20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)',
+                                        padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.08))',
                                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                        background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%)'
-                                    }}>
-                                        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                                        background: 'linear-gradient(90deg, var(--bg-card, rgba(255,255,255,0.03)) 0%, rgba(255,255,255,0) 100%)',
+                                        transition: 'all 0.2s',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                    }} className="hover:border-blue-500/30">
+                                        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                                             <div style={{
-                                                width: '50px', height: '50px', borderRadius: '12px',
+                                                width: '56px', height: '56px', borderRadius: '16px',
                                                 background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px',
+                                                border: '1px solid rgba(59, 130, 246, 0.2)'
                                             }}>
-                                                🚲
+                                                🛡️
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'white' }}>{w.productName}</div>
-                                                <div style={{ fontSize: '13px', color: '#888', marginTop: '2px', display: 'flex', gap: '10px' }}>
-                                                    <span>Seri No: <span style={{ color: '#ccc' }}>{w.serialNo}</span></span>
+                                                <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main, white)' }}>{w.productName}</div>
+                                                <div style={{ fontSize: '13px', color: 'var(--text-muted, #888)', marginTop: '4px', display: 'flex', gap: '12px', fontWeight: '500' }}>
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🏷</span> S. No: <span style={{ color: 'var(--text-main, #ccc)' }}>{w.serialNo}</span></span>
                                                     <span>•</span>
-                                                    <span>Fatura: {w.invoiceNo}</span>
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ opacity: 0.6 }}>🧾</span> Fatura: <span style={{ color: 'var(--text-main, #ccc)' }}>{w.invoiceNo}</span></span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
                                             <div style={{ textAlign: 'center' }}>
-                                                <div style={{ fontSize: '11px', color: '#888', textTransform: 'uppercase' }}>BAŞLANGIÇ</div>
-                                                <div style={{ color: 'white', fontWeight: '500' }}>{new Date(w.startDate).toLocaleDateString()}</div>
+                                                <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px', marginBottom: '4px' }}>BAŞLANGIÇ</div>
+                                                <div style={{ color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }}>{new Date(w.startDate).toLocaleDateString()}</div>
                                             </div>
 
                                             <div style={{ textAlign: 'center' }}>
-                                                <div style={{ fontSize: '11px', color: '#888', textTransform: 'uppercase' }}>BİTİŞ</div>
-                                                <div style={{ color: '#ef4444', fontWeight: '500' }}>{new Date(w.endDate).toLocaleDateString()}</div>
+                                                <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px', marginBottom: '4px' }}>BİTİŞ</div>
+                                                <div style={{ color: '#ef4444', fontWeight: '700', fontSize: '14px' }}>{new Date(w.endDate).toLocaleDateString()}</div>
                                             </div>
 
-                                            <div style={{ textAlign: 'right' }}>
+                                            <div style={{ textAlign: 'right', minWidth: '160px' }}>
                                                 <div style={{
-                                                    padding: '6px 12px', borderRadius: '20px',
-                                                    background: w.status === 'Active' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                                                    color: w.status === 'Active' ? '#34d399' : '#f87171',
-                                                    fontSize: '12px', fontWeight: 'bold'
+                                                    padding: '8px 16px', borderRadius: '8px',
+                                                    background: w.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                                    color: w.status === 'Active' ? '#10b981' : '#ef4444',
+                                                    border: `1px solid ${w.status === 'Active' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                                                    fontSize: '12px', fontWeight: '800',
+                                                    display: 'inline-flex', alignItems: 'center', gap: '6px'
                                                 }}>
-                                                    {w.status === 'Active' ? 'Garantisi Devam Ediyor' : 'Süresi Doldu'}
+                                                    {w.status === 'Active' ? '✅ Garantisi Devam Ediyor' : '❌ Süresi Doldu'}
                                                 </div>
-                                                <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>
-                                                    Süre: {w.period}
+                                                <div style={{ fontSize: '12px', color: 'var(--text-muted, #666)', marginTop: '8px', fontWeight: '600' }}>
+                                                    G. Süresi: {w.period}
                                                 </div>
                                             </div>
                                         </div>
@@ -920,197 +1015,292 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                         )}
                     </div>
                 ) : activeTab === 'checks' ? (
-                    <div style={{ padding: '24px' }}>
-                        <div style={{ marginBottom: '20px' }}>
-                            <h3 style={{ margin: 0, color: '#fff' }}>Müşteri Çek & Senetleri</h3>
+                    <div style={{ padding: '32px' }}>
+                        <div style={{ marginBottom: '24px' }}>
+                            <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '800' }}>Müşteri Çek & Senetleri</h3>
                         </div>
                         {!customer.checks || customer.checks.length === 0 ? (
-                            <div style={{ padding: '40px', textAlign: 'center', color: '#888' }}>Kayıtlı evrak bulunmuyor.</div>
+                            <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📑</div>
+                                <div style={{ color: 'var(--text-main, #fff)', fontSize: '16px', fontWeight: '600' }}>Kayıtlı evrak bulunmuyor.</div>
+                            </div>
                         ) : (
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead>
-                                    <tr style={{ color: '#888', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                                        <th style={{ padding: '12px' }}>Tür</th>
-                                        <th>Vade</th>
-                                        <th>Banka / No</th>
-                                        <th>Durum</th>
-                                        <th style={{ textAlign: 'right', paddingRight: '20px' }}>Tutar</th>
-                                        <th style={{ textAlign: 'right' }}>İşlem</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {customer.checks.map((c: any) => (
-                                        <tr key={c.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '13px' }}>
-                                            <td style={{ padding: '16px' }}><b>{c.type}</b></td>
-                                            <td>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
-                                            <td style={{ color: '#aaa' }}>{c.bank} - {c.number}</td>
-                                            <td><span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '11px' }}>{c.status}</span></td>
-                                            <td style={{ textAlign: 'right', fontWeight: 'bold', paddingRight: '20px' }}>{Number(c.amount).toLocaleString()} ₺</td>
-                                            <td style={{ textAlign: 'right' }}>
-                                                {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
-                                                    <button
-                                                        onClick={() => {
-                                                            setActiveCheck(c);
-                                                            setTargetKasaId(String(kasalar[0]?.id || ''));
-                                                            setShowCheckCollectModal(true);
-                                                        }}
-                                                        style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
-                                                    >
-                                                        {c.type.includes('Alınan') ? 'Tahsil Et' : 'Öde'}
-                                                    </button>
-                                                )}
-                                            </td>
+                            <div style={{ overflowX: 'auto' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                                    <thead>
+                                        <tr style={{ color: 'var(--text-muted, #888)', fontSize: '11px', textTransform: 'uppercase', textAlign: 'left', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '800', letterSpacing: '0.5px' }}>
+                                            <th style={{ padding: '16px 20px' }}>EVRAK TÜRÜ</th>
+                                            <th style={{ padding: '16px 20px' }}>VADE TARİHİ</th>
+                                            <th style={{ padding: '16px 20px' }}>BANKA / NO</th>
+                                            <th style={{ padding: '16px 20px' }}>DURUM</th>
+                                            <th style={{ textAlign: 'right', padding: '16px 20px' }}>TUTAR</th>
+                                            <th style={{ textAlign: 'right', padding: '16px 20px' }}>İŞLEM</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {customer.checks.map((c: any) => (
+                                            <tr key={c.id} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '13px', transition: 'background 0.2s' }} className="hover:bg-white/5">
+                                                <td style={{ padding: '20px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{c.type}</td>
+                                                <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{new Date(c.dueDate).toLocaleDateString('tr-TR')}</td>
+                                                <td style={{ padding: '20px', color: 'var(--text-muted, #94a3b8)', fontWeight: '500' }}>{c.bank} - <span style={{ fontFamily: 'monospace' }}>{c.number}</span></td>
+                                                <td style={{ padding: '20px' }}>
+                                                    <span style={{ padding: '6px 12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '6px', fontSize: '11px', fontWeight: '700', color: 'var(--text-main, #e2e8f0)' }}>{c.status}</span>
+                                                </td>
+                                                <td style={{ textAlign: 'right', fontWeight: '800', padding: '20px', color: '#3b82f6', fontSize: '14px' }}>{Number(c.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</td>
+                                                <td style={{ textAlign: 'right', padding: '20px' }}>
+                                                    {(c.status === 'Portföyde' || c.status === 'Beklemede') && (
+                                                        <button
+                                                            onClick={() => {
+                                                                setActiveCheck(c);
+                                                                setTargetKasaId(String(kasalar[0]?.id || ''));
+                                                                setShowCheckCollectModal(true);
+                                                            }}
+                                                            style={{ padding: '8px 16px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s' }}
+                                                            className="hover:bg-blue-500 hover:text-white"
+                                                        >
+                                                            {c.type.includes('Alınan') ? '💰 Tahsil Et' : '💸 Öde'}
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
                     </div>
                 ) : (
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ background: 'rgba(255,255,255,0.03)', color: '#888', fontSize: '12px', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                <th style={{ padding: '20px' }}>Tarih</th>
-                                <th>Tür</th>
-                                <th>Açıklama</th>
-                                <th style={{ textAlign: 'right' }}>Tutar</th>
-                                <th style={{ textAlign: 'right', width: '130px' }}>Fatura</th>
-                                <th style={{ padding: '20px', textAlign: 'center', width: '80px' }}>Detay</th>
-                            </tr>
-                        </thead>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
+                            <thead>
+                                <tr style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-muted, #888)', fontSize: '11px', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800' }}>
+                                    <th style={{ padding: '24px' }}>Tarih</th>
+                                    <th style={{ padding: '24px' }}>Hareket Türü</th>
+                                    <th style={{ padding: '24px' }}>Açıklama</th>
+                                    <th style={{ padding: '24px', textAlign: 'right' }}>Tutar</th>
+                                    <th style={{ padding: '24px', textAlign: 'right', width: '220px' }}>Aksiyonlar</th>
+                                    <th style={{ padding: '24px', textAlign: 'center', width: '60px' }}></th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                            {filteredHistory.length === 0 ? (
-                                <tr><td colSpan={6} style={{ padding: '50px', textAlign: 'center', color: '#666', fontSize: '14px' }}>Bu kategoride kayıt bulunamadı.</td></tr>
-                            ) : (
-                                paginatedHistory.map((item, idx) => (
-                                    <Fragment key={item.id || idx}>
-                                        <tr
-                                            onClick={() => item.items && setExpandedRowId(expandedRowId === item.id ? null : item.id)}
-                                            style={{
-                                                borderBottom: '1px solid rgba(255,255,255,0.05)',
-                                                cursor: item.items ? 'pointer' : 'default',
-                                                background: expandedRowId === item.id ? 'rgba(255,255,255,0.03)' : 'transparent',
-                                                transition: '0.2s'
-                                            }}
-                                            className="hover:bg-white/5"
-                                        >
-                                            <td style={{ padding: '20px', fontSize: '14px', color: '#ddd' }}>{item.date}</td>
-                                            <td>
-                                                <span style={{
-                                                    padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold',
-                                                    background: item.color + '20', color: item.color, border: '1px solid ' + item.color + '40'
-                                                }}>
-                                                    {item.type}
-                                                </span>
-                                            </td>
-                                            <td style={{ fontSize: '14px', opacity: 0.8 }}>{item.desc}</td>
-                                            <td style={{ textAlign: 'right', fontWeight: 'bold', fontSize: '15px', color: item.amount > 0 ? '#ef4444' : '#10b981', fontFamily: 'monospace' }}>
-                                                {Math.abs(item.amount).toLocaleString()} ₺
-                                            </td>
-                                            <td style={{ textAlign: 'right', paddingRight: '20px' }}>
-                                                {item.type === 'Satış' && (
-                                                    <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                if (!completedIds.includes(item.id) && !processingIds.includes(item.id)) {
-                                                                    handleReturnTransaction(item.id);
-                                                                }
-                                                            }}
-                                                            disabled={completedIds.includes(item.id) || processingIds.includes(item.id)}
-                                                            style={{
-                                                                padding: '6px 8px',
-                                                                background: completedIds.includes(item.id) ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
-                                                                color: completedIds.includes(item.id) ? '#666' : '#ef4444',
-                                                                border: completedIds.includes(item.id) ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(239, 68, 68, 0.3)',
-                                                                borderRadius: '8px',
-                                                                fontSize: '11px',
-                                                                fontWeight: 'bold',
-                                                                cursor: completedIds.includes(item.id) ? 'default' : 'pointer',
-                                                                whiteSpace: 'nowrap',
-                                                                opacity: processingIds.includes(item.id) ? 0.7 : 1
-                                                            }}
-                                                            title="İade Al / İptal Et"
-                                                        >
-                                                            {processingIds.includes(item.id) ? '⏳ İşleniyor...' : (completedIds.includes(item.id) ? '✅ İade Edildi' : '↩️ İade')}
-                                                        </button>
-                                                        {item.orderId && (
-                                                            item.isFormal ? (
-                                                                // Already invoiced — show locked badge + print button
-                                                                <>
-                                                                    <span style={{
-                                                                        padding: '6px 8px',
-                                                                        background: 'rgba(16,185,129,0.1)',
-                                                                        color: '#10b981',
-                                                                        border: '1px solid rgba(16,185,129,0.3)',
-                                                                        borderRadius: '8px',
-                                                                        fontSize: '11px',
-                                                                        fontWeight: 'bold',
-                                                                        whiteSpace: 'nowrap',
-                                                                        display: 'inline-flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '4px'
-                                                                    }}>
-                                                                        ✅ Faturalandı
-                                                                    </span>
-                                                                    {item.formalInvoiceId && (
-                                                                        <button
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${item.formalInvoiceId}`, '_blank');
-                                                                            }}
-                                                                            style={{ padding: '6px 8px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                                                                        >
-                                                                            🖨️ Yazdır
-                                                                        </button>
-                                                                    )}
-                                                                </>
-                                                            ) : (
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
-                                                                    style={{ padding: '6px 8px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                                                                >
-                                                                    🧾 Faturalandır
-                                                                </button>
-                                                            )
-                                                        )}
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); handleOpenPlanModal(item); }}
-                                                            style={{ padding: '6px 8px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                                                        >
-                                                            📅 Vadelendir
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td style={{ textAlign: 'center', color: '#666' }}>{item.items ? (expandedRowId === item.id ? '▲' : '▼') : ''}</td>
-                                        </tr>
-                                        {expandedRowId === item.id && item.items && (
-                                            <tr style={{ background: 'rgba(0,0,0,0.3)', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)' }}>
-                                                <td colSpan={6} style={{ padding: '20px 40px' }}>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                                        <h4 style={{ fontSize: '12px', color: '#888', textTransform: 'uppercase', marginBottom: '5px' }}>Fatura İçeriği</h4>
-                                                        {item.items.map((sub: any, sIdx: number) => (
-                                                            <div key={sIdx} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px dashed rgba(255,255,255,0.1)', fontSize: '13px' }}>
-                                                                <span style={{ color: '#ddd' }}>{sub.name || sub.productName} <span style={{ color: '#666', marginLeft: '10px' }}>x {sub.qty || sub.quantity}</span></span>
-                                                                <span style={{ fontFamily: 'monospace' }}>{((sub.price || 0) * (sub.qty || sub.quantity || 1)).toLocaleString()} ₺</span>
-                                                            </div>
-                                                        ))}
-                                                        <div style={{ textAlign: 'right', marginTop: '10px', fontSize: '15px', fontWeight: 'bold', color: '#3b82f6' }}>
-                                                            Toplam: {Math.abs(item.amount).toLocaleString()} ₺
-                                                        </div>
-                                                    </div>
+                            <tbody>
+                                {filteredHistory.length === 0 ? (
+                                    <tr><td colSpan={6} style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted, #666)', fontSize: '15px', fontWeight: '500' }}>Bu kategoride kayıt veya işlem bulunamadı.</td></tr>
+                                ) : (
+                                    paginatedHistory.map((item, idx) => (
+                                        <Fragment key={item.id || idx}>
+                                            <tr
+                                                onClick={() => item.items && setExpandedRowId(expandedRowId === item.id ? null : item.id)}
+                                                style={{
+                                                    borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))',
+                                                    cursor: item.items ? 'pointer' : 'default',
+                                                    background: expandedRowId === item.id ? 'var(--bg-card, rgba(255,255,255,0.03))' : 'transparent',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                                className="hover:bg-white/5"
+                                            >
+                                                <td style={{ padding: '24px', fontSize: '13px', color: 'var(--text-main, #ddd)', fontWeight: '600' }}>{item.date}</td>
+                                                <td style={{ padding: '24px' }}>
+                                                    <span style={{
+                                                        padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '800',
+                                                        background: item.color + '15', color: item.color, border: '1px solid ' + item.color + '30'
+                                                    }}>
+                                                        {item.type}
+                                                    </span>
                                                 </td>
+                                                <td style={{ padding: '24px', fontSize: '13px', color: 'var(--text-muted, #aaa)', fontWeight: '500' }}>{item.desc}</td>
+                                                <td style={{ padding: '24px', textAlign: 'right', fontWeight: '800', fontSize: '15px', color: item.amount > 0 ? '#ef4444' : '#10b981', fontFamily: 'monospace' }}>
+                                                    {Math.abs(item.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                </td>
+                                                <td style={{ padding: '24px', textAlign: 'right' }}>
+                                                    {item.type === 'Satış' && (
+                                                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'nowrap', alignItems: 'center' }}>
+                                                            {item.orderId && (
+                                                                item.isFormal ? (
+                                                                    <>
+                                                                        <span style={{
+                                                                            padding: '6px 10px',
+                                                                            background: 'rgba(16,185,129,0.1)',
+                                                                            color: '#10b981',
+                                                                            border: '1px solid rgba(16,185,129,0.2)',
+                                                                            borderRadius: '8px',
+                                                                            fontSize: '11px',
+                                                                            fontWeight: '800',
+                                                                            whiteSpace: 'nowrap',
+                                                                            display: 'inline-flex',
+                                                                            alignItems: 'center',
+                                                                            gap: '6px'
+                                                                        }}>
+                                                                            ✅ Faturalandı
+                                                                        </span>
+                                                                        {item.formalInvoiceId && (
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${item.formalInvoiceId}`, '_blank');
+                                                                                }}
+                                                                                style={{ padding: '6px 10px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                                                                className="hover:bg-indigo-500 hover:text-white transition-colors"
+                                                                            >
+                                                                                🖨️ Yazdır
+                                                                            </button>
+                                                                        )}
+                                                                    </>
+                                                                ) : (
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); handleOpenInvoicing(item.orderId); }}
+                                                                        style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                                                                        className="hover:bg-blue-500 hover:text-white box-shadow-blue"
+                                                                    >
+                                                                        🧾 Faturalandır
+                                                                    </button>
+                                                                )
+                                                            )}
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleOpenPlanModal(item); }}
+                                                                style={{ padding: '6px 12px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', fontSize: '11px', fontWeight: '800', cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                                                                className="hover:bg-amber-500 hover:text-white"
+                                                            >
+                                                                📅 Vadelendir
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    if (!completedIds.includes(item.id) && !processingIds.includes(item.id)) {
+                                                                        handleReturnTransaction(item.id);
+                                                                    }
+                                                                }}
+                                                                disabled={completedIds.includes(item.id) || processingIds.includes(item.id)}
+                                                                style={{
+                                                                    padding: '6px 12px',
+                                                                    background: completedIds.includes(item.id) ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
+                                                                    color: completedIds.includes(item.id) ? 'var(--text-muted, #666)' : '#ef4444',
+                                                                    border: completedIds.includes(item.id) ? '1px solid var(--border-color, rgba(255,255,255,0.1))' : '1px solid rgba(239, 68, 68, 0.3)',
+                                                                    borderRadius: '8px',
+                                                                    fontSize: '11px',
+                                                                    fontWeight: '800',
+                                                                    cursor: completedIds.includes(item.id) ? 'default' : 'pointer',
+                                                                    whiteSpace: 'nowrap',
+                                                                    opacity: processingIds.includes(item.id) ? 0.5 : 1,
+                                                                    display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                                                    transition: 'all 0.2s'
+                                                                }}
+                                                                className={!completedIds.includes(item.id) && !processingIds.includes(item.id) ? "hover:bg-red-500 hover:text-white" : ""}
+                                                                title="İşlemi İade Al / İptal Et"
+                                                            >
+                                                                {processingIds.includes(item.id) ? '⏳' : (completedIds.includes(item.id) ? '✅ İade Edildi' : '↩️ İptal')}
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </td>
+                                                <td style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #666)' }}>{item.items ? (expandedRowId === item.id ? '▲' : '▼') : ''}</td>
                                             </tr>
-                                        )}
-                                    </Fragment>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                            {expandedRowId === item.id && item.items && (
+                                                <tr style={{ background: '#080a0f', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.03))' }}>
+                                                    <td colSpan={6} style={{ padding: '24px 32px' }}>
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px' }}>
+                                                            {/* Sol Taraf: Kalemler (Order Summary) */}
+                                                            <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', paddingBottom: '16px' }}>
+                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
+                                                                            📦
+                                                                        </div>
+                                                                        <div>
+                                                                            <h4 style={{ margin: 0, fontSize: '14px', fontWeight: '800', color: 'var(--text-main, #fff)', letterSpacing: '0.5px' }}>SATIŞ ÖZETİ</h4>
+                                                                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>{item.items.length} Kalem Listeleniyor</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <span style={{ fontSize: '11px', fontWeight: '800', padding: '6px 12px', borderRadius: '20px', background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>{item.isFormal ? 'Faturalandı' : 'Sipariş'}</span>
+                                                                </div>
+
+                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                    {item.items.map((sub: any, sIdx: number) => (
+                                                                        <div key={sIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '12px', border: '1px solid var(--border-color, rgba(255,255,255,0.02))' }}>
+                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                                                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--bg-card, rgba(255,255,255,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: 'var(--text-muted, #888)', fontWeight: '800' }}>
+                                                                                    {sIdx + 1}
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div style={{ color: 'var(--text-main, #e2e8f0)', fontWeight: '700', fontSize: '14px', marginBottom: '4px' }}>{sub.name || sub.productName}</div>
+                                                                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                                                        <span style={{ fontSize: '11px', color: 'var(--text-muted, #888)', background: 'var(--bg-card, rgba(255,255,255,0.05))', padding: '2px 6px', borderRadius: '4px' }}>x{sub.qty || sub.quantity}</span>
+                                                                                        {sub.price && <span style={{ fontSize: '11px', color: 'var(--text-muted, #666)' }}>Birim: {Number(sub.price).toLocaleString('tr-TR')} ₺</span>}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div style={{ fontWeight: '800', color: 'var(--text-main, #fff)', fontFamily: 'monospace', fontSize: '15px' }}>
+                                                                                {((sub.price || 0) * (sub.qty || sub.quantity || 1)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Sağ Taraf: Payment Breakdown & Timeline */}
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                                                
+                                                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                    <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>FİNANSAL ÖZET</h4>
+                                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted, #aaa)' }}>
+                                                                            <span>Ara Toplam</span>
+                                                                            <span>{Math.abs(item.amount * 0.8).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                                                        </div>
+                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted, #aaa)' }}>
+                                                                            <span>KDV (%20)</span>
+                                                                            <span>{Math.abs(item.amount * 0.2).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</span>
+                                                                        </div>
+                                                                        <div style={{ height: '1px', background: 'var(--border-color, rgba(255,255,255,0.1))', margin: '8px 0' }}></div>
+                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>GENEL TOPLAM</span>
+                                                                            <span style={{ fontSize: '20px', fontWeight: '900', color: '#3b82f6', fontFamily: 'monospace' }}>
+                                                                                {Math.abs(item.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', borderRadius: '20px', padding: '24px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                                                     <h4 style={{ margin: '0 0 20px 0', fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '1px' }}>ZAMAN ÇİZELGESİ</h4>
+                                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative' }}>
+                                                                        <div style={{ position: 'absolute', left: '7px', top: '10px', bottom: '10px', width: '2px', background: 'var(--border-color, rgba(255,255,255,0.05))' }}></div>
+                                                                        
+                                                                        <div style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 1 }}>
+                                                                            <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#3b82f6', border: '4px solid #080a0f', flexShrink: 0, marginTop: '2px' }}></div>
+                                                                            <div>
+                                                                                <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Satış Oluşturuldu</div>
+                                                                                <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>{item.date} • İşlem No: #{item.id?.substring(0,8)}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        {item.isFormal && (
+                                                                            <div style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 1 }}>
+                                                                                <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#10b981', border: '4px solid #080a0f', flexShrink: 0, marginTop: '2px' }}></div>
+                                                                                <div>
+                                                                                    <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main, #fff)' }}>Resmileştirildi (Faturalandı)</div>
+                                                                                    <div style={{ fontSize: '11px', color: 'var(--text-muted, #888)' }}>Sistem tarafından E-Arşive eklendi</div>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                     </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </Fragment>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
-                <div style={{ padding: '20px' }}>
+                
+                {/* PAGINATION */}
+                <div style={{ padding: '24px 32px', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}
@@ -1119,76 +1309,81 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 </div>
             </div>
 
-            {/* INVOICE MODAL - PROFESSIONAL E-FATURA STYLE */}
+            </div>
+
+            {/* MODALS START HERE */}
+
+            {/* INVOICE MODAL (Professional E-Fatura Style) */}
             {
                 invoiceModalOpen && selectedOrder && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(12px)' }}>
-                        <div className="card glass animate-in" style={{ width: '1200px', maxWidth: '98vw', padding: 0, border: '1px solid rgba(59, 130, 246, 0.4)', borderRadius: '24px', overflow: 'hidden' }}>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
+                        <div className="card glass animate-scale-in" style={{ width: '1200px', maxWidth: '98vw', padding: 0, border: '1px solid rgba(59, 130, 246, 0.4)', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(59, 130, 246, 0.1)' }}>
                             {/* Header */}
-                            <div style={{ padding: '24px 32px', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%)', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ padding: '24px 40px', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%)', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
-                                    <h2 style={{ margin: 0, fontSize: '22px', fontWeight: '900', color: '#fff', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <span style={{ padding: '8px', background: '#3b82f6', borderRadius: '10px', fontSize: '18px' }}>📄</span>
+                                    <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '900', color: 'var(--text-main, #fff)', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                        <span style={{ padding: '10px', background: '#3b82f6', borderRadius: '12px', fontSize: '20px', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)' }}>📄</span>
                                         RESMİ FATURALANDIRMA SİSTEMİ
                                     </h2>
-                                    <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 'bold', letterSpacing: '2px', marginTop: '4px' }}>E-ARŞİV / E-FATURA TASLAĞI</div>
+                                    <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '800', letterSpacing: '2px', marginTop: '6px' }}>E-ARŞİV / E-FATURA TASLAĞI</div>
                                 </div>
-                                <button onClick={() => setInvoiceModalOpen(false)} style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#fff', cursor: 'pointer', fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&times;</button>
+                                <button onClick={() => setInvoiceModalOpen(false)} style={{ width: '48px', height: '48px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', cursor: 'pointer', fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} className="hover:bg-white/10 hover:border-white/30">&times;</button>
                             </div>
 
-                            <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px', maxHeight: '80vh', overflowY: 'auto' }}>
+                            <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '40px', maxHeight: '80vh', overflowY: 'auto', background: 'var(--bg-panel, #0f172a)' }}>
 
                                 {/* Section: Buyer Information */}
-                                <div>
-                                    <h3 style={{ fontSize: '12px', fontWeight: '900', color: '#3b82f6', marginBottom: '16px', borderLeft: '3px solid #3b82f6', paddingLeft: '10px' }}>ALICI BİLGİLERİ</h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-                                        <div className="flex-col gap-1">
-                                            <label style={{ fontSize: '11px', fontWeight: 'bold', color: '#888' }}>ÜNVAN / AD SOYAD</label>
-                                            <input id="inv_name" defaultValue={customer.name} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontWeight: '600' }} />
+                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                    <h3 style={{ fontSize: '13px', fontWeight: '900', color: '#3b82f6', marginBottom: '24px', borderLeft: '4px solid #3b82f6', paddingLeft: '12px', letterSpacing: '1px' }}>ALICI BİLGİLERİ</h3>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+                                        <div className="flex-col gap-2">
+                                            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)' }}>ÜNVAN / AD SOYAD</label>
+                                            <input id="inv_name" defaultValue={customer.name} style={{ width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }} className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors" />
                                         </div>
-                                        <div className="flex-col gap-1">
-                                            <label style={{ fontSize: '11px', fontWeight: 'bold', color: '#888' }}>V.N. / T.C. KİMLİK NO</label>
-                                            <input id="inv_tax_no" defaultValue={customer.taxNumber} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontWeight: '600' }} />
+                                        <div className="flex-col gap-2">
+                                            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)' }}>V.N. / T.C. KİMLİK NO</label>
+                                            <input id="inv_tax_no" defaultValue={customer.taxNumber} style={{ width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }} className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors" />
                                         </div>
-                                        <div className="flex-col gap-1">
-                                            <label style={{ fontSize: '11px', fontWeight: 'bold', color: '#888' }}>VERGİ DAİRESİ</label>
-                                            <input id="inv_tax_office" defaultValue={customer.taxOffice} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontWeight: '600' }} />
+                                        <div className="flex-col gap-2">
+                                            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)' }}>VERGİ DAİRESİ</label>
+                                            <input id="inv_tax_office" defaultValue={customer.taxOffice} style={{ width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }} className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors" />
                                         </div>
-                                        <div className="flex-col gap-1">
-                                            <label style={{ fontSize: '11px', fontWeight: 'bold', color: '#888' }}>TELEFON</label>
-                                            <input id="inv_phone" defaultValue={customer.phone} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontWeight: '600' }} />
+                                        <div className="flex-col gap-2">
+                                            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)' }}>TELEFON</label>
+                                            <input id="inv_phone" defaultValue={customer.phone} style={{ width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '14px' }} className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors" />
                                         </div>
-                                        <div className="flex-col gap-1" style={{ gridColumn: 'span 4' }}>
-                                            <label style={{ fontSize: '11px', fontWeight: 'bold', color: '#888' }}>ADRES</label>
-                                            <textarea id="inv_address" defaultValue={customer.address} style={{ width: '100%', minHeight: '60px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '12px 16px', fontWeight: '500', resize: 'vertical' }} />
+                                        <div className="flex-col gap-2" style={{ gridColumn: 'span 4' }}>
+                                            <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)' }}>ADRES</label>
+                                            <textarea id="inv_address" defaultValue={customer.address} style={{ width: '100%', minHeight: '80px', borderRadius: '14px', background: 'var(--bg-panel, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', padding: '16px 20px', fontWeight: '600', resize: 'vertical', fontSize: '14px' }} className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors" />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Section: Items Table */}
-                                <div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                        <h3 style={{ fontSize: '12px', fontWeight: '900', color: '#3b82f6', margin: 0, borderLeft: '3px solid #3b82f6', paddingLeft: '10px' }}>FATURA KALEMLERİ</h3>
+                                <div style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                                        <h3 style={{ fontSize: '13px', fontWeight: '900', color: '#3b82f6', margin: 0, borderLeft: '4px solid #3b82f6', paddingLeft: '12px', letterSpacing: '1px' }}>FATURA KALEMLERİ</h3>
                                         <button
                                             onClick={() => setIsProductPickerOpen(true)}
-                                            style={{ padding: '6px 12px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
+                                            style={{ padding: '10px 20px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', fontSize: '13px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                            className="hover:bg-blue-500 hover:text-white"
                                         >
-                                            ➕ Envanterden Ürün Ekle
+                                            <span>➕</span> Envanterden Ürün Seç
                                         </button>
                                     </div>
-                                    <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <div style={{ background: 'var(--bg-panel, rgba(0,0,0,0.2))', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', overflowX: 'auto' }}>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
                                             <thead>
-                                                <tr style={{ background: 'rgba(255,255,255,0.02)', color: '#666', fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                                                    <th style={{ padding: '12px', textAlign: 'center', width: '40px' }}>NO</th>
-                                                    <th style={{ padding: '12px', textAlign: 'left', minWidth: '220px' }}>MALZEME / HİZMET</th>
-                                                    <th style={{ padding: '12px', textAlign: 'center', width: '80px' }}>MİKTAR</th>
-                                                    <th style={{ padding: '12px', textAlign: 'right', width: '130px' }}>BİRİM FİYAT</th>
+                                                <tr style={{ background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-muted, #666)', fontSize: '11px', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px' }}>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'center', width: '50px' }}>NO</th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'left', minWidth: '250px' }}>MALZEME / HİZMET</th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'center', width: '90px' }}>MİKTAR</th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'right', width: '150px' }}>BİRİM FİYAT (NET)</th>
 
-                                                    <th style={{ padding: '12px', textAlign: 'center', width: '70px' }}>KDV %</th>
-                                                    <th style={{ padding: '12px', textAlign: 'right', width: '100px' }}>KDV TUTAR</th>
-                                                    <th style={{ padding: '12px', textAlign: 'right', width: '120px' }}>TOPLAM</th>
-                                                    <th style={{ width: '40px' }}></th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'center', width: '90px' }}>KDV %</th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'right', width: '120px' }}>KDV TUTARI</th>
+                                                    <th style={{ padding: '16px 20px', textAlign: 'right', width: '160px' }}>BRÜT TOPLAM</th>
+                                                    <th style={{ width: '60px' }}></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1198,7 +1393,6 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     const vatRate = Number(it.vat || 20);
                                                     const otvRate = Number(it.otv || 0);
 
-                                                    // Formula: (Net * Qty * (1 + OTV)) * (1 + VAT)
                                                     const lineNetTotal = qty * netPrice;
                                                     const otvAmount = lineNetTotal * (otvRate / 100);
                                                     const vatMatrah = lineNetTotal + otvAmount;
@@ -1213,28 +1407,21 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                                                     const handleGrossChange = (newGross: number) => {
                                                         if (qty === 0) return;
-                                                        // newGross = (netPrice * qty * (1 + OTV)) * (1 + VAT)
-                                                        // netPrice = newGross / (qty * (1 + OTV) * (1 + VAT))
                                                         const calculatedNet = newGross / (qty * (1 + otvRate / 100) * (1 + vatRate / 100));
                                                         updateItem('price', calculatedNet);
                                                     };
 
                                                     return (
-                                                        <tr key={it.id || i} style={{ borderTop: '1px solid rgba(255,255,255,0.05)', fontSize: '13px' }}>
-                                                            <td style={{ padding: '12px', textAlign: 'center', color: '#888' }}>{i + 1}</td>
-                                                            <td style={{ padding: '12px' }}>
-                                                                <div className="flex-col">
+                                                        <tr key={it.id || i} style={{ borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))', fontSize: '14px', transition: 'background 0.2s' }} className="hover:bg-white/5">
+                                                            <td style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted, #888)', fontWeight: '700' }}>{i + 1}</td>
+                                                            <td style={{ padding: '20px' }}>
+                                                                <div className="flex-col gap-2">
                                                                     <select
                                                                         value={it.productId || ''}
                                                                         onChange={(e) => {
                                                                             const selectedProduct = products.find(p => String(p.id) === e.target.value);
-                                                                            console.log('🔍 Selected product ID:', e.target.value);
-                                                                            console.log('🔍 Found product:', selectedProduct);
                                                                             if (selectedProduct) {
-                                                                                // Create a deep copy to force React re-render
                                                                                 const currentItems = JSON.parse(JSON.stringify(invoiceItems));
-
-                                                                                // Update the specific item
                                                                                 currentItems[i] = {
                                                                                     ...currentItems[i],
                                                                                     productId: selectedProduct.id,
@@ -1245,105 +1432,98 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                                                     otvType: selectedProduct.otvType || 'Ö.T.V yok',
                                                                                     oiv: Number(selectedProduct.salesOiv || 0)
                                                                                 };
-
-                                                                                console.log('✅ Updated item:', currentItems[i]);
-                                                                                console.log('📦 Setting new items array');
-
-                                                                                // Force update with new reference
                                                                                 setInvoiceItems(currentItems);
-
-                                                                                // Verify after a tick
-                                                                                setTimeout(() => {
-                                                                                    console.log('🔄 State should be updated now');
-                                                                                }, 100);
                                                                             }
                                                                         }}
                                                                         style={{
                                                                             width: '100%',
-                                                                            background: 'rgba(255,255,255,0.05)',
-                                                                            border: '1px solid rgba(255,255,255,0.1)',
-                                                                            color: 'white',
-                                                                            fontWeight: '600',
-                                                                            padding: '8px',
-                                                                            borderRadius: '8px',
-                                                                            cursor: 'pointer'
+                                                                            background: 'var(--bg-card, rgba(255,255,255,0.05))',
+                                                                            border: '1px solid var(--border-color, rgba(255,255,255,0.1))',
+                                                                            color: 'var(--text-main, white)',
+                                                                            fontWeight: '700',
+                                                                            padding: '12px 16px',
+                                                                            borderRadius: '12px',
+                                                                            cursor: 'pointer',
+                                                                            fontSize: '14px'
                                                                         }}
                                                                     >
-                                                                        <option value="">Ürün seçiniz...</option>
+                                                                        <option value="">Ürün veya hizmet seçin...</option>
                                                                         {products.map(p => (
                                                                             <option key={p.id} value={p.id}>{p.name}</option>
                                                                         ))}
                                                                     </select>
                                                                     {it.name && it.name !== 'Ürün' && (
-                                                                        <div style={{ fontSize: '11px', color: '#888', marginTop: '4px', paddingLeft: '4px' }}>
+                                                                        <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', paddingLeft: '6px', fontWeight: '500' }}>
                                                                             Seçili: {it.name}
                                                                         </div>
                                                                     )}
-                                                                    <div style={{ paddingLeft: '4px', marginTop: '4px', display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                                    <div style={{ paddingLeft: '6px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                                                                         {(it.otvType && it.otvType !== 'Ö.T.V yok') && (
-                                                                            <span style={{ fontSize: '9px', background: 'rgba(255,100,0,0.15)', color: '#fdba74', padding: '1px 6px', borderRadius: '4px', border: '1px solid rgba(255,100,0,0.2)' }}>
-                                                                                {it.otvType === 'yüzdesel Ö.T.V' ? `ÖTV %${it.otv}` : `ÖTV ${it.otv}₺`}
+                                                                            <span style={{ fontSize: '10px', background: 'rgba(245,158,11,0.15)', color: '#f59e0b', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(245,158,11,0.2)', fontWeight: '800' }}>
+                                                                                {it.otvType === 'yüzdesel Ö.T.V' ? `ÖTV %${it.otv}` : `ÖTV ${it.otv} ₺`}
                                                                             </span>
                                                                         )}
                                                                         {(Number(it.oiv || 0) > 0) && (
-                                                                            <span style={{ fontSize: '9px', background: 'rgba(59,130,246,0.15)', color: '#93c5fd', padding: '1px 6px', borderRadius: '4px', border: '1px solid rgba(59,130,246,0.2)' }}>
+                                                                            <span style={{ fontSize: '10px', background: 'rgba(59,130,246,0.15)', color: '#60a5fa', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(59,130,246,0.2)', fontWeight: '800' }}>
                                                                                 ÖİV %${it.oiv}
                                                                             </span>
                                                                         )}
                                                                         <button
                                                                             onClick={() => setTaxEditIndex(i)}
-                                                                            style={{ fontSize: '10px', background: 'rgba(255,255,255,0.05)', color: '#aaa', border: '1px dashed rgba(255,255,255,0.15)', padding: '2px 8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', transition: '0.2s' }}
-                                                                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#3b82f6'; e.currentTarget.style.color = '#3b82f6'; }}
-                                                                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#aaa'; }}
+                                                                            style={{ fontSize: '11px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-muted, #aaa)', border: '1px dashed var(--border-color, rgba(255,255,255,0.2))', padding: '4px 10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', fontWeight: '700' }}
+                                                                            className="hover:border-blue-500 hover:text-blue-500"
                                                                         >
-                                                                            ⚙️ Diğer Vergiler
+                                                                            ⚙️ Vergi Ayarı
                                                                         </button>
                                                                     </div>
                                                                 </div>
                                                             </td>
-                                                            <td style={{ padding: '12px', textAlign: 'center' }}>
+                                                            <td style={{ padding: '20px', textAlign: 'center' }}>
                                                                 <input
                                                                     type="number"
                                                                     value={it.qty}
                                                                     onChange={(e) => updateItem('qty', Number(e.target.value))}
-                                                                    style={{ width: '60px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', textAlign: 'center', borderRadius: '4px' }}
+                                                                    style={{ width: '70px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', textAlign: 'center', borderRadius: '10px', padding: '12px 8px', fontWeight: '700' }}
                                                                 />
                                                             </td>
-                                                            <td style={{ padding: '12px', textAlign: 'right' }}>
-                                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                                                            <td style={{ padding: '20px', textAlign: 'right' }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
                                                                     <input
                                                                         type="number"
                                                                         step="0.0001"
                                                                         value={netPrice > 0 ? Number(netPrice.toFixed(4)) : ''}
                                                                         placeholder="0.00"
                                                                         onChange={(e) => updateItem('price', Number(e.target.value))}
-                                                                        style={{ width: '100px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', textAlign: 'right', borderRadius: '4px' }}
+                                                                        style={{ width: '120px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', textAlign: 'right', borderRadius: '10px', padding: '12px 10px', fontWeight: '700', fontFamily: 'monospace' }}
                                                                     />
-                                                                    <span style={{ color: '#888', fontSize: '10px' }}>₺+KDV</span>
+                                                                    <span style={{ color: 'var(--text-muted, #888)', fontSize: '12px', fontWeight: '700' }}>₺ + KDV</span>
                                                                 </div>
                                                             </td>
 
-                                                            <td style={{ padding: '12px', textAlign: 'center' }}>
-                                                                <input
-                                                                    type="number"
-                                                                    value={it.vat}
-                                                                    onChange={(e) => updateItem('vat', Number(e.target.value))}
-                                                                    style={{ width: '50px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', textAlign: 'center', borderRadius: '4px' }}
-                                                                />
+                                                            <td style={{ padding: '20px', textAlign: 'center' }}>
+                                                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                                                    <input
+                                                                        type="number"
+                                                                        value={it.vat}
+                                                                        onChange={(e) => updateItem('vat', Number(e.target.value))}
+                                                                        style={{ width: '64px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', textAlign: 'center', borderRadius: '10px', padding: '12px 20px 12px 8px', fontWeight: '700' }}
+                                                                    />
+                                                                    <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: 'var(--text-muted, #888)', pointerEvents: 'none' }}>%</span>
+                                                                </div>
                                                             </td>
-                                                            <td style={{ padding: '12px', textAlign: 'right', color: '#888', fontFamily: 'monospace' }}>
-                                                                {vatAmount.toFixed(2)} ₺
+                                                            <td style={{ padding: '20px', textAlign: 'right', color: 'var(--text-muted, #888)', fontFamily: 'monospace', fontWeight: '700', fontSize: '15px' }}>
+                                                                {vatAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
                                                             </td>
-                                                            <td style={{ padding: '12px', textAlign: 'right' }}>
+                                                            <td style={{ padding: '20px', textAlign: 'right' }}>
                                                                 <input
                                                                     type="number"
                                                                     value={lineGrossTotal.toFixed(2)}
                                                                     onChange={(e) => handleGrossChange(Number(e.target.value))}
-                                                                    style={{ width: '110px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', color: '#3b82f6', textAlign: 'right', borderRadius: '4px', fontWeight: '800', fontFamily: 'monospace' }}
+                                                                    style={{ width: '130px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.4)', color: '#3b82f6', textAlign: 'right', borderRadius: '10px', fontWeight: '900', fontFamily: 'monospace', padding: '12px 10px', fontSize: '15px' }}
                                                                 />
                                                             </td>
-                                                            <td style={{ padding: '12px', textAlign: 'center' }}>
-                                                                <button onClick={() => setInvoiceItems(invoiceItems.filter((_, idx) => idx !== i))} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}>trash</button>
+                                                            <td style={{ padding: '20px', textAlign: 'center' }}>
+                                                                <button onClick={() => setInvoiceItems(invoiceItems.filter((_, idx) => idx !== i))} style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', cursor: 'pointer', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} className="hover:bg-red-500 hover:text-white">🗑️</button>
                                                             </td>
                                                         </tr>
                                                     );
@@ -1355,8 +1535,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 </div>
 
                                 {/* Section: Totals Summary */}
-                                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                    <div style={{ width: '400px', background: 'rgba(59, 130, 246, 0.05)', padding: '24px', borderRadius: '16px', border: '1px solid rgba(59, 130, 246, 0.1)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', background: 'var(--bg-card, rgba(255,255,255,0.02))', padding: '32px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                    <div style={{ width: '480px', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.1) 100%)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(59, 130, 246, 0.2)', boxShadow: '0 12px 30px rgba(59, 130, 246, 0.15)' }}>
                                         {(() => {
                                             const subtotal = invoiceItems.reduce((acc, it) => acc + (Number(it.qty) * Number(it.price)), 0);
 
@@ -1389,50 +1569,52 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             const finalTotal = subtotal + totalOtv + totalOiv + totalVat - discAmount;
 
                                             return (
-                                                <>
-                                                    <div className="flex-between" style={{ marginBottom: '10px' }}>
-                                                        <span style={{ fontSize: '13px', color: '#888' }}>Ara Toplam (Net)</span>
-                                                        <span style={{ fontWeight: 'bold' }}>{subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                <div className="flex-col gap-4">
+                                                    <div className="flex-between">
+                                                        <span style={{ fontSize: '14px', color: 'var(--text-muted, #888)', fontWeight: '700' }}>Ara Toplam (Net)</span>
+                                                        <span style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text-main, #fff)', fontFamily: 'monospace' }}>{subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                     </div>
 
                                                     {totalOtv > 0 && (
-                                                        <div className="flex-between" style={{ marginBottom: '10px' }}>
-                                                            <span style={{ fontSize: '13px', color: '#888' }}>ÖTV Toplam</span>
-                                                            <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{totalOtv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                        <div className="flex-between">
+                                                            <span style={{ fontSize: '14px', color: 'var(--text-muted, #888)', fontWeight: '700' }}>ÖTV Toplam</span>
+                                                            <span style={{ fontWeight: '800', fontSize: '15px', color: '#f59e0b', fontFamily: 'monospace' }}>{totalOtv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                         </div>
                                                     )}
 
-                                                    <div className="flex-between" style={{ marginBottom: '10px' }}>
+                                                    <div className="flex-between">
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                            <span style={{ fontSize: '13px', color: '#888' }}>İskonto</span>
+                                                            <span style={{ fontSize: '14px', color: 'var(--text-muted, #888)', fontWeight: '700' }}>İskonto (İndirim)</span>
                                                             <select
                                                                 value={discountType}
                                                                 onChange={(e: any) => setDiscountType(e.target.value)}
-                                                                style={{ padding: '2px 4px', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', fontSize: '11px' }}
+                                                                style={{ padding: '6px 12px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '13px', fontWeight: '800' }}
                                                             >
-                                                                <option value="percent">%</option>
-                                                                <option value="amount">₺</option>
+                                                                <option value="percent">% Yüzde</option>
+                                                                <option value="amount">₺ Tutar</option>
                                                             </select>
                                                             <input
                                                                 type="number"
                                                                 value={discountValue}
                                                                 onChange={(e) => setDiscountValue(Number(e.target.value))}
-                                                                style={{ width: '60px', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', fontSize: '11px', padding: '2px 4px' }}
+                                                                style={{ width: '80px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', borderRadius: '8px', fontSize: '14px', padding: '6px 12px', fontWeight: '800', textAlign: 'center' }}
                                                             />
                                                         </div>
-                                                        <span style={{ fontWeight: 'bold', color: '#ef4444' }}>- {discAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                        <span style={{ fontWeight: '800', fontSize: '15px', color: '#ef4444', fontFamily: 'monospace' }}>- {discAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                     </div>
 
-                                                    <div className="flex-between" style={{ marginBottom: '10px' }}>
-                                                        <span style={{ fontSize: '13px', color: '#888' }}>KDV Toplam</span>
-                                                        <span style={{ fontWeight: 'bold' }}>{totalVat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
-                                                    </div>
-                                                    <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '16px 0' }}></div>
                                                     <div className="flex-between">
-                                                        <span style={{ fontSize: '15px', fontWeight: '900' }}>GENEL TOPLAM</span>
-                                                        <span style={{ fontSize: '24px', fontWeight: '950', color: '#3b82f6' }}>{finalTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
+                                                        <span style={{ fontSize: '14px', color: 'var(--text-muted, #888)', fontWeight: '700' }}>KDV Toplam</span>
+                                                        <span style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text-main, #fff)', fontFamily: 'monospace' }}>{totalVat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</span>
                                                     </div>
-                                                </>
+                                                    
+                                                    <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.4) 50%, transparent 100%)', margin: '20px 0' }}></div>
+                                                    
+                                                    <div className="flex-between items-center">
+                                                        <span style={{ fontSize: '16px', fontWeight: '900', letterSpacing: '1px' }}>GENEL TOPLAM</span>
+                                                        <span style={{ fontSize: '32px', fontWeight: '900', color: '#3b82f6', letterSpacing: '-1px', textShadow: '0 4px 12px rgba(59,130,246,0.3)', fontFamily: 'monospace' }}>{finalTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span style={{ fontSize: '20px', opacity: 0.8 }}>₺</span></span>
+                                                    </div>
+                                                </div>
                                             );
                                         })()}
                                     </div>
@@ -1441,8 +1623,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             </div>
 
                             {/* Footer Actions */}
-                            <div style={{ padding: '24px 32px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '16px', justifyContent: 'flex-end' }}>
-                                <button onClick={() => setInvoiceModalOpen(false)} className="btn btn-outline" style={{ minWidth: '150px', height: '54px', borderRadius: '16px', fontWeight: '700' }}>İPTAL ET</button>
+                            <div style={{ padding: '24px 40px', background: 'var(--bg-panel, rgba(15, 23, 42, 0.95))', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', gap: '20px', justifyContent: 'flex-end', backdropFilter: 'blur(20px)' }}>
+                                <button onClick={() => setInvoiceModalOpen(false)} className="btn btn-outline" style={{ minWidth: '160px', height: '60px', borderRadius: '16px', fontWeight: '800', fontSize: '15px', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', color: 'var(--text-main, #fff)', background: 'var(--bg-card, rgba(255,255,255,0.05))', letterSpacing: '1px' }}>İPTAL ET</button>
                                 <button
                                     disabled={isConverting}
                                     onClick={() => {
@@ -1456,9 +1638,14 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                         };
                                         handleConvertToInvoice(data);
                                     }}
-                                    style={{ minWidth: '220px', height: '54px', borderRadius: '16px', border: 'none', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', fontWeight: '900', cursor: 'pointer', boxShadow: '0 10px 20px rgba(59, 130, 246, 0.3)', fontSize: '16px' }}
+                                    style={{ minWidth: '260px', height: '60px', borderRadius: '16px', border: 'none', background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)', color: 'white', fontWeight: '900', cursor: 'pointer', boxShadow: '0 12px 24px rgba(37, 99, 235, 0.4)', fontSize: '16px', letterSpacing: '1px', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}
+                                    className={isConverting ? "opacity-70" : "hover:-translate-y-1 hover:shadow-2xl"}
                                 >
-                                    {isConverting ? 'İŞLENİYOR...' : 'FATURAYI ONAYLA'}
+                                    {isConverting ? (
+                                        <><div className="loader border-t-white w-5 h-5 rounded-full border-2 border-white/20 animate-spin"></div> İŞLENİYOR...</>
+                                    ) : (
+                                        <><span>✅</span> FATURAYI ONAYLA</>
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -1469,45 +1656,51 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
             {/* INVOICE SUCCESS & SHARE MODAL */}
             {shareModalOpen && lastInvoice && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(20px)' }}>
-                    <div className="card glass animate-in" style={{ width: '450px', padding: '40px', borderRadius: '32px', textAlign: 'center', border: '1px solid rgba(16, 185, 129, 0.4)', boxShadow: '0 0 50px rgba(16, 185, 129, 0.2)' }}>
-                        <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '50px', margin: '0 auto 24px' }}>✅</div>
-                        <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#fff', marginBottom: '8px' }}>Fatura Hazır!</h2>
-                        <p style={{ color: '#888', fontSize: '14px', marginBottom: '32px' }}>Resmi faturanız başarıyla oluşturuldu ve GİB sistemine iletildi.</p>
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.9)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(20px)' }}>
+                    <div className="card glass animate-scale-in" style={{ width: '480px', padding: '48px 40px', borderRadius: '32px', textAlign: 'center', border: '1px solid rgba(16, 185, 129, 0.4)', background: 'var(--bg-panel, #0f172a)', boxShadow: '0 24px 60px rgba(0,0,0,0.5), 0 0 60px rgba(16, 185, 129, 0.15)' }}>
+                        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%)', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '64px', margin: '0 auto 32px', boxShadow: '0 12px 30px rgba(16, 185, 129, 0.2)' }}>
+                            🎉
+                        </div>
+                        <h2 style={{ fontSize: '28px', fontWeight: '900', color: 'var(--text-main, #fff)', marginBottom: '12px', letterSpacing: '-0.5px' }}>Fatura Hazır!</h2>
+                        <p style={{ color: 'var(--text-muted, #94a3b8)', fontSize: '15px', marginBottom: '40px', lineHeight: '1.6', fontWeight: '500' }}>Resmi faturanız başarıyla oluşturuldu ve GİB sistemine entegre edildi.</p>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             <button
                                 onClick={() => {
                                     const msg = `Sayın ${customer.name}, ${lastInvoice.invoiceNo} numaralı faturanızı bu bağlantıdan görüntüleyebilirsiniz: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
                                     window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
                                 }}
                                 className="btn btn-primary"
-                                style={{ background: '#25D366', border: 'none', height: '56px', borderRadius: '16px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                                style={{ background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)', boxShadow: '0 8px 24px rgba(37, 211, 102, 0.3)', border: 'none', height: '64px', borderRadius: '20px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
+                                className="hover:-translate-y-1"
                             >
-                                <span style={{ fontSize: '18px' }}>💬</span> WhatsApp ile Gönder
+                                <span style={{ fontSize: '24px' }}>💬</span> Müşteriye WhatsApp'tan İlet
                             </button>
                             <button
                                 onClick={() => {
                                     window.location.href = `mailto:${customer.email || ''}?subject=Faturanız Hazır - ${lastInvoice.invoiceNo}&body=Sayın ${customer.name}, %0D%0A%0D%0A${lastInvoice.invoiceNo} numaralı faturanız ekte yer almaktadır. %0D%0A%0D%0AFaturayı görüntülemek için tıkla: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
                                 }}
                                 className="btn btn-outline"
-                                style={{ height: '56px', borderRadius: '16px', fontWeight: 'bold', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                                style={{ height: '64px', borderRadius: '20px', fontWeight: '800', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
+                                className="hover:bg-white/10"
                             >
-                                <span style={{ fontSize: '18px' }}>📧</span> E-Posta ile Gönder
+                                <span style={{ fontSize: '24px' }}>📧</span> E-Posta ile Gönder
                             </button>
                             <button
                                 onClick={() => window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`, '_blank')}
-                                style={{ marginTop: '12px', background: 'none', border: 'none', color: '#3b82f6', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', textDecoration: 'underline' }}
+                                style={{ marginTop: '16px', background: 'none', border: 'none', color: '#3b82f6', fontSize: '15px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+                                className="hover:text-blue-400"
                             >
-                                Faturayı PDF olarak Görüntüle
+                                <span>📄</span> PDF İndir / Görüntüle
                             </button>
                         </div>
 
                         <button
                             onClick={() => setShareModalOpen(false)}
-                            style={{ marginTop: '40px', width: '100%', padding: '16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}
+                            style={{ marginTop: '48px', width: '100%', padding: '20px', background: 'var(--bg-card, rgba(255,255,255,0.02))', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', borderRadius: '20px', color: 'var(--text-muted, #888)', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', letterSpacing: '1px' }}
+                            className="hover:bg-white/5 hover:text-white"
                         >
-                            Bilgilendirmeyi Kapat
+                            PENCEREYİ KAPAT
                         </button>
                     </div>
                 </div>
@@ -1517,16 +1710,18 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* ADDITIONAL TAX MODAL */}
             {
                 taxEditIndex !== null && invoiceItems[taxEditIndex] && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 5000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }}>
-                        <div className="card glass animate-in" style={{ width: '450px', padding: '32px', borderRadius: '24px', background: 'rgba(15, 23, 42, 0.95)', border: '1px solid var(--primary)' }}>
-                            <div className="flex-between mb-6">
-                                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '900' }}>⚙️ Ek Vergi Ayarları</h3>
-                                <button onClick={() => setTaxEditIndex(null)} style={{ background: 'none', border: 'none', color: '#888', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 5000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
+                        <div className="card glass animate-scale-in" style={{ width: '480px', padding: '40px', borderRadius: '24px', background: 'var(--bg-panel, #0f172a)', border: '1px solid rgba(59, 130, 246, 0.4)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                            <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <span style={{ fontSize: '24px' }}>⚙️</span> Ek Vergi Parametreleri
+                                </h3>
+                                <button onClick={() => setTaxEditIndex(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
                             </div>
 
                             <div className="flex-col gap-6">
                                 <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>Ö.T.V TİPİ</label>
+                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>Ö.T.V UYGULAMA TİPİ</label>
                                     <select
                                         value={invoiceItems[taxEditIndex].otvType || 'Ö.T.V yok'}
                                         onChange={(e) => {
@@ -1535,17 +1730,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                             if (e.target.value === 'Ö.T.V yok') newItems[taxEditIndex].otv = 0;
                                             setInvoiceItems(newItems);
                                         }}
-                                        style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontWeight: '600' }}
+                                        style={{ width: '100%', padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '15px' }}
                                     >
-                                        <option value="Ö.T.V yok">Ö.T.V yok</option>
-                                        <option value="yüzdesel Ö.T.V">Yüzdesel Ö.T.V (%)</option>
-                                        <option value="maktu Ö.T.V">Maktu Ö.T.V (₺)</option>
+                                        <option value="Ö.T.V yok">🟢 Uygulanmasın (Yok)</option>
+                                        <option value="yüzdesel Ö.T.V">🔵 Yüzde Oranlı (%)</option>
+                                        <option value="maktu Ö.T.V">🟠 Sabit Tutarlı (₺)</option>
                                     </select>
                                 </div>
 
                                 {invoiceItems[taxEditIndex].otvType !== 'Ö.T.V yok' && (
-                                    <div className="flex-col gap-2 animate-in">
-                                        <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--primary)' }}>Ö.T.V {invoiceItems[taxEditIndex].otvType === 'yüzdesel Ö.T.V' ? 'ORANI (%)' : 'TUTARI (₺)'}</label>
+                                    <div className="flex-col gap-2 animate-scale-in">
+                                        <label style={{ fontSize: '11px', fontWeight: '800', color: '#f59e0b', letterSpacing: '0.5px' }}>BELİRLENEN Ö.T.V {invoiceItems[taxEditIndex].otvType === 'yüzdesel Ö.T.V' ? 'ORANI (%)' : 'TUTARI (₺)'}</label>
                                         <input
                                             type="number"
                                             value={invoiceItems[taxEditIndex].otv || 0}
@@ -1554,32 +1749,35 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                 newItems[taxEditIndex].otv = Number(e.target.value);
                                                 setInvoiceItems(newItems);
                                             }}
-                                            style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'rgba(255, 100, 0, 0.05)', border: '1px solid rgba(255, 100, 0, 0.2)', color: 'white', fontWeight: '900', fontSize: '18px' }}
+                                            style={{ width: '100%', padding: '16px 20px', borderRadius: '16px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.3)', color: '#f59e0b', fontWeight: '900', fontSize: '20px', textAlign: 'center' }}
                                         />
                                     </div>
                                 )}
 
-                                <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '11px', fontWeight: '800', opacity: 0.6 }}>Ö.İ.V ORANI (%)</label>
-                                    <input
-                                        type="number"
-                                        value={invoiceItems[taxEditIndex].oiv || 0}
-                                        onChange={(e) => {
-                                            const newItems = [...invoiceItems];
-                                            newItems[taxEditIndex].oiv = Number(e.target.value);
-                                            setInvoiceItems(newItems);
-                                        }}
-                                        placeholder="0"
-                                        style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontWeight: '600' }}
-                                    />
-                                    <span style={{ fontSize: '10px', opacity: 0.4 }}>Özel İletişim Vergisi</span>
+                                <div className="flex-col gap-2 pt-4" style={{ borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))' }}>
+                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>ÖZEL İLETİŞİM VERGİSİ (Ö.İ.V %)</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            type="number"
+                                            value={invoiceItems[taxEditIndex].oiv || 0}
+                                            onChange={(e) => {
+                                                const newItems = [...invoiceItems];
+                                                newItems[taxEditIndex].oiv = Number(e.target.value);
+                                                setInvoiceItems(newItems);
+                                            }}
+                                            placeholder="0"
+                                            style={{ width: '100%', padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontWeight: '700', fontSize: '16px' }}
+                                        />
+                                        <span style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', fontWeight: '800', color: 'var(--text-muted, #888)' }}>%</span>
+                                    </div>
                                 </div>
 
                                 <button
                                     onClick={() => setTaxEditIndex(null)}
-                                    style={{ width: '100%', marginTop: '10px', padding: '16px', borderRadius: '16px', border: 'none', background: 'var(--primary)', color: 'white', fontWeight: '900', cursor: 'pointer', boxShadow: '0 10px 20px rgba(255,100,0,0.2)' }}
+                                    style={{ width: '100%', marginTop: '24px', padding: '18px', borderRadius: '16px', border: 'none', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', fontWeight: '900', cursor: 'pointer', boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)', fontSize: '15px', letterSpacing: '1px', transition: 'all 0.2s' }}
+                                    className="hover:-translate-y-1 hover:shadow-lg"
                                 >
-                                    SEÇİMİ KAYDET ✅
+                                    AYARLARI ONAYLA ✅
                                 </button>
                             </div>
                         </div>
@@ -1587,35 +1785,28 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 )
             }
 
-            <style jsx>{`
-                .glass { backdrop-filter: blur(10px); }
-                @media (max-width: 768px) {
-                    .responsive-grid { grid-template-columns: 1fr !important; }
-                }
-                tr:hover { background-color: rgba(255,255,255,0.02); }
-            `}</style>
-
             {/* WARRANTY START MODAL */}
             {warrantyModalOpen && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="card glass animate-fade-in" style={{ width: '500px', maxHeight: '90vh', overflowY: 'auto', background: '#1e1e1e' }}>
-                        <div className="flex-between mb-6">
-                            <h3 style={{ borderBottom: '2px solid var(--primary)', paddingBottom: '5px' }}>🛡️ Garanti Başlat</h3>
-                            <button onClick={() => setWarrantyModalOpen(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
+                    <div className="card glass animate-scale-in" style={{ width: '520px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 24px 60px rgba(0,0,0,0.4)',  }}>
+                        <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
+                            <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ fontSize: '24px' }}>🛡️</span> Garanti Başlat
+                            </h3>
+                            <button onClick={() => setWarrantyModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
                         </div>
 
-                        <div className="flex-col gap-4">
+                        <div className="flex-col gap-5">
                             <div className="flex-col gap-2">
-                                <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>FATURA SEÇİNİ (Satın Alma Kaydı)</label>
+                                <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>FATURA SEÇİMİ (Satın Alma Kaydı)</label>
                                 <select
                                     value={newWarranty.invoiceId}
                                     onChange={(e) => {
-                                        const inv = customerInvoices.find(i => i.id.toString() === e.target.value);
                                         setNewWarranty({ ...newWarranty, invoiceId: e.target.value, productId: '', productName: '' });
                                     }}
-                                    style={{ padding: '12px', borderRadius: '8px', background: 'var(--bg-deep)', color: 'white', border: '1px solid var(--border-light)' }}
+                                    style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
                                 >
-                                    <option value="">Seçiniz...</option>
+                                    <option value="">İlgili faturayı seçiniz...</option>
                                     {customerInvoices.map(inv => (
                                         <option key={inv.id} value={inv.id}>{inv.number} - {inv.date} ({inv.total} ₺)</option>
                                     ))}
@@ -1623,26 +1814,23 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             </div>
 
                             {newWarranty.invoiceId && (
-                                <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>ÜRÜN SEÇİNİ</label>
+                                <div className="flex-col gap-2 animate-scale-in">
+                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>ÜRÜN SEÇİMİ</label>
                                     <select
                                         value={newWarranty.productId}
                                         onChange={(e) => {
                                             const inv = customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId);
                                             const prodItem = inv?.items.find((p: any) => (p.productId || p.id || '').toString() === e.target.value);
-
-                                            // Find real product name from Inventory if missing in Item
                                             let pName = prodItem?.name || '';
                                             if (!pName && prodItem?.productId) {
                                                 const realProd = products.find(p => p.id === prodItem.productId);
                                                 if (realProd) pName = realProd.name;
                                             }
-
                                             setNewWarranty({ ...newWarranty, productId: e.target.value, productName: pName });
                                         }}
-                                        style={{ padding: '12px', borderRadius: '8px', background: 'var(--bg-deep)', color: 'white', border: '1px solid var(--border-light)' }}
+                                        style={{ padding: '16px 20px', borderRadius: '16px', background: 'rgba(59, 130, 246, 0.05)', color: 'var(--text-main, white)', border: '1px solid rgba(59, 130, 246, 0.2)', fontWeight: '700', fontSize: '14px' }}
                                     >
-                                        <option value="">Seçiniz...</option>
+                                        <option value="">Garanti tanımlanacak ürünü seçin...</option>
                                         {customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId)?.items.map((p: any) => {
                                             let displayName = p.name;
                                             if (!displayName && p.productId) {
@@ -1660,23 +1848,24 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             )}
 
                             <div className="flex-col gap-2">
-                                <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>SERİ NO (KADRO NO)</label>
+                                <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>SERİ NO (KADRO / ŞASİ NO)</label>
                                 <input
                                     type="text"
                                     placeholder="Örn: CR12345678"
                                     value={newWarranty.serialNo}
                                     onChange={(e) => setNewWarranty({ ...newWarranty, serialNo: e.target.value })}
-                                    style={{ padding: '12px', borderRadius: '8px', background: 'var(--bg-deep)', color: 'white', border: '1px solid var(--border-light)' }}
+                                    style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
+                                    className="focus:border-blue-500 transition-colors"
                                 />
                             </div>
 
-                            <div className="grid-cols-2 gap-4">
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                                 <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>GARANTİ SÜRESİ</label>
+                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>GARANTİ SÜRESİ</label>
                                     <select
                                         value={newWarranty.period}
                                         onChange={(e) => setNewWarranty({ ...newWarranty, period: e.target.value })}
-                                        style={{ padding: '12px', borderRadius: '8px', background: 'var(--bg-deep)', color: 'white', border: '1px solid var(--border-light)' }}
+                                        style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
                                     >
                                         {(warrantyPeriods && warrantyPeriods.length > 0 ? warrantyPeriods : ['6 Ay', '1 Yıl', '2 Yıl', '3 Yıl', '5 Yıl']).map(p => (
                                             <option key={p} value={p}>{p}</option>
@@ -1684,12 +1873,13 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     </select>
                                 </div>
                                 <div className="flex-col gap-2">
-                                    <label className="text-muted" style={{ fontSize: '11px', fontWeight: 'bold' }}>BAŞLANGIÇ TARİHİ</label>
+                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>BAŞLANGIÇ TARİHİ</label>
                                     <input
                                         type="date"
                                         value={newWarranty.startDate}
                                         onChange={(e) => setNewWarranty({ ...newWarranty, startDate: e.target.value })}
-                                        style={{ padding: '12px', borderRadius: '8px', background: 'var(--bg-deep)', color: 'white', border: '1px solid var(--border-light)' }}
+                                        style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
+                                        className="input-date-dark"
                                     />
                                 </div>
                             </div>
@@ -1697,9 +1887,10 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             <button
                                 onClick={handleStartWarranty}
                                 className="btn btn-primary"
-                                style={{ marginTop: '20px', padding: '14px' }}
+                                style={{ marginTop: '24px', padding: '18px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', transition: 'all 0.2s', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                className="hover:-translate-y-1 hover:shadow-xl"
                             >
-                                Garanti Başlat ✅
+                                <span>✅</span> GARANTİYİ BAŞLAT VE ONAYLA
                             </button>
                         </div>
                     </div>
@@ -1709,28 +1900,29 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* PRODUCT PICKER MODAL */}
             {
                 isProductPickerOpen && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }}>
-                        <div className="card glass animate-in" style={{ width: '650px', maxWidth: '95vw', padding: '32px', borderRadius: '24px', border: '1px solid rgba(59, 130, 246, 0.3)', background: 'rgba(15, 23, 42, 0.95)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
+                        <div className="card glass animate-scale-in" style={{ width: '700px', maxWidth: '95vw', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', background: 'var(--bg-panel, #0f172a)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                                 <div>
-                                    <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900' }}>Envanterden Ürün Seçin</h3>
-                                    <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 'bold', marginTop: '4px' }}>ENVANTER LİSTESİNDEN SEÇİM YAPIN</div>
+                                    <h3 style={{ margin: 0, fontSize: '24px', fontWeight: '900', color: 'var(--text-main, white)' }}>Envanterden Ürün Seçimi</h3>
+                                    <div style={{ fontSize: '12px', color: '#3b82f6', fontWeight: '800', marginTop: '6px', letterSpacing: '1px' }}>GERÇEK ZAMANLI STOK & FİYAT BİLGİSİ</div>
                                 </div>
-                                <button onClick={() => setIsProductPickerOpen(false)} style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '20px', cursor: 'pointer' }}>&times;</button>
+                                <button onClick={() => setIsProductPickerOpen(false)} style={{ width: '48px', height: '48px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', fontSize: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} className="hover:bg-white/10">&times;</button>
                             </div>
 
-                            <div style={{ position: 'relative', marginBottom: '20px' }}>
-                                <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
+                            <div style={{ position: 'relative', marginBottom: '24px' }}>
+                                <span style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5, fontSize: '20px' }}>🔍</span>
                                 <input
                                     autoFocus
-                                    placeholder="Ürün adı, barkod veya kod ile ara..."
+                                    placeholder="Ürün adı, barkod veya stok kodu ile arayın..."
                                     value={productSearchTerm}
                                     onChange={(e) => setProductSearchTerm(e.target.value)}
-                                    style={{ width: '100%', padding: '14px 16px 14px 45px', borderRadius: '14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '14px' }}
+                                    style={{ width: '100%', padding: '18px 20px 18px 56px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', fontSize: '15px', fontWeight: '600' }}
+                                    className="focus:border-blue-500 focus:bg-blue-500/5 transition-colors"
                                 />
                             </div>
 
-                            <div style={{ maxHeight: '450px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '10px' }}>
+                            <div style={{ maxHeight: '480px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '12px' }} className="custom-scrollbar">
                                 {products
                                     .filter(p => !productSearchTerm || p.name.toLocaleLowerCase('tr').includes(productSearchTerm.toLocaleLowerCase('tr')) || p.barcode?.includes(productSearchTerm) || p.code?.includes(productSearchTerm))
                                     .slice(0, 50)
@@ -1775,72 +1967,81 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     setIsProductPickerOpen(false);
                                                     setProductSearchTerm('');
                                                 }}
-                                                style={{ padding: '16px', borderRadius: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: '0.2s' }}
-                                                className="hover:border-primary/50 hover:bg-white/5"
+                                                style={{ padding: '20px', borderRadius: '20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.2s' }}
+                                                className="hover:border-blue-500/50 hover:bg-blue-500/5 hover:-translate-y-0.5 hover:shadow-lg"
                                             >
-                                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                                    <div style={{ width: '40px', height: '40px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', color: '#3b82f6', fontWeight: 'bold' }}>
+                                                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                                    <div style={{ width: '52px', height: '52px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', color: '#3b82f6', fontWeight: '800', boxShadow: 'inset 0 0 12px rgba(59, 130, 246, 0.2)' }}>
                                                         {p.category?.charAt(0) || '📦'}
                                                     </div>
                                                     <div>
-                                                        <div style={{ fontWeight: '800', fontSize: '14px', color: '#eee' }}>{p.name}</div>
-                                                        <div style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>Stok: <span style={{ color: p.stock > 0 ? '#10b981' : '#ef4444' }}>{p.stock}</span> | Barkod: {p.barcode || 'Yok'}</div>
+                                                        <div style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text-main, #eee)' }}>{p.name}</div>
+                                                        <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', marginTop: '4px', fontWeight: '500' }}>
+                                                            Stok: <span style={{ color: p.stock > 0 ? '#10b981' : '#ef4444', fontWeight: '800' }}>{p.stock}</span> <span style={{ margin: '0 6px', opacity: 0.3 }}>|</span> Barkod: <span style={{ fontFamily: 'monospace' }}>{p.barcode || 'Yok'}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div style={{ textAlign: 'right' }}>
-                                                    <div style={{ fontWeight: '900', color: '#fff', fontSize: '15px' }}>{grossPrice.toLocaleString()} ₺</div>
-                                                    <div style={{ fontSize: '10px', color: '#3b82f6', fontWeight: 'bold' }}>%{vatRate} KDV DAHİL</div>
+                                                    <div style={{ fontWeight: '900', color: 'var(--text-main, #fff)', fontSize: '18px', fontFamily: 'monospace' }}>{grossPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                                                    <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '800', marginTop: '2px' }}>%{vatRate} KDV DAHİL (BRÜT)</div>
                                                 </div>
                                             </div>
                                         );
                                     })}
                             </div>
 
-                            <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '12px' }}>
+                            <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', gap: '16px' }}>
                                 <button
                                     onClick={() => {
-                                        setInvoiceItems([...invoiceItems, { name: 'Yeni Hizmet/Ürün', qty: 1, price: 0, vat: 20 }]);
+                                        setInvoiceItems([...invoiceItems, { name: 'Yeni Manuel Hizmet / Ürün', qty: 1, price: 0, vat: 20 }]);
                                         setIsProductPickerOpen(false);
                                     }}
-                                    style={{ flex: 1, padding: '14px', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', color: '#aaa', border: '1px dashed rgba(255,255,255,0.2)', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}
+                                    style={{ flex: 1, padding: '18px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-muted, #aaa)', border: '1px dashed var(--border-color, rgba(255,255,255,0.2))', fontSize: '14px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                    className="hover:border-dashed hover:border-white/50 hover:bg-white/5 hover:text-white"
                                 >
-                                    ➕ Manuel Hizmet/Boş Satır Ekle
+                                    <span>➕</span> Envanter Dışı Manuel Hizmet Ekle
                                 </button>
                             </div>
                         </div>
                     </div>
                 )
             }
+
             {/* CHECK COLLECT MODAL */}
             {showCheckCollectModal && activeCheck && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.8)', zIndex: 10000,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    background: 'rgba(15, 23, 42, 0.85)', zIndex: 10000,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    backdropFilter: 'blur(16px)'
                 }}>
-                    <div style={{ background: '#111', padding: '30px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.1)', width: '100%', maxWidth: '400px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', color: '#fff' }}>{activeCheck.type.includes('Alınan') ? '📥 Tahsilat Onayı' : '📤 Ödeme Onayı'}</h3>
-                            <button onClick={() => setShowCheckCollectModal(false)} style={{ background: 'none', border: 'none', color: '#888', fontSize: '24px', cursor: 'pointer' }}>&times;</button>
+                    <div className="card glass animate-scale-in" style={{ background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', width: '100%', maxWidth: '440px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                            <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-main, #fff)', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span>{activeCheck.type.includes('Alınan') ? '📥' : '📤'}</span> 
+                                {activeCheck.type.includes('Alınan') ? 'Tahsilat Onayı' : 'Ödeme Çıkış Onayı'}
+                            </h3>
+                            <button onClick={() => setShowCheckCollectModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <div style={{ padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div style={{ fontSize: '12px', color: '#888', textTransform: 'uppercase', marginBottom: '4px' }}>{activeCheck.type}</div>
-                                <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#fff' }}>{Number(activeCheck.amount).toLocaleString()} ₺</div>
-                                <div style={{ fontSize: '13px', color: '#666', marginTop: '4px' }}>{activeCheck.bank} - {activeCheck.number}</div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            <div style={{ padding: '24px', background: 'var(--bg-card, rgba(255,255,255,0.03))', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', textAlign: 'center' }}>
+                                <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: '800', letterSpacing: '1px' }}>{activeCheck.type}</div>
+                                <div style={{ fontSize: '36px', fontWeight: '900', color: 'var(--text-main, #fff)', fontFamily: 'monospace' }}>{Number(activeCheck.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span style={{ fontSize: '24px', opacity: 0.8 }}>₺</span></div>
+                                <div style={{ fontSize: '13px', color: 'var(--text-muted, #aaa)', marginTop: '8px', fontWeight: '600' }}>{activeCheck.bank} - <span style={{ fontFamily: 'monospace' }}>{activeCheck.number}</span></div>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label style={{ fontSize: '13px', color: '#bbb' }}>{activeCheck.type.includes('Alınan') ? 'Tahsilatın Aktarılacağı' : 'Ödemenin Çıkacağı'} Hesap</label>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <label style={{ fontSize: '12px', color: 'var(--text-muted, #bbb)', fontWeight: '800', letterSpacing: '0.5px' }}>{activeCheck.type.includes('Alınan') ? 'TAHSİLATIN GEÇECEĞİ (GİRECEĞİ) HESAP' : 'ÖDEMENİN ÇIKACAĞI HESAP'}</label>
                                 <select
                                     value={targetKasaId}
                                     onChange={(e) => setTargetKasaId(e.target.value)}
-                                    style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '14px', outline: 'none' }}
+                                    style={{ width: '100%', padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontSize: '15px', fontWeight: '700', outline: 'none' }}
+                                    className="focus:border-blue-500"
                                 >
-                                    <option value="">Seçiniz...</option>
+                                    <option value="">İşlem yapılacak kasayı seçin...</option>
                                     {kasalar.filter((k: any) => k.name !== 'ÇEK / SENET PORTFÖYÜ').map((k: any) => (
-                                        <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString()} ₺)</option>
+                                        <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺)</option>
                                     ))}
                                 </select>
                             </div>
@@ -1849,13 +2050,19 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 onClick={handleExecuteCheckCollect}
                                 disabled={isProcessingCollection || !targetKasaId}
                                 style={{
-                                    width: '100%', padding: '16px', borderRadius: '16px', background: '#3b82f6', color: '#fff',
-                                    border: 'none', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer',
-                                    opacity: (isProcessingCollection || !targetKasaId) ? 0.5 : 1, transition: '0.2s',
-                                    boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)'
+                                    width: '100%', padding: '20px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: '#fff',
+                                    border: 'none', fontWeight: '900', fontSize: '15px', cursor: 'pointer',
+                                    opacity: (isProcessingCollection || !targetKasaId) ? 0.6 : 1, transition: 'all 0.2s',
+                                    boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', letterSpacing: '1px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
                                 }}
+                                className={(!isProcessingCollection && targetKasaId) ? "hover:-translate-y-1 hover:shadow-xl" : ""}
                             >
-                                {isProcessingCollection ? 'İŞLENİYOR...' : 'İŞLEMİ TAMAMLA'}
+                                {isProcessingCollection ? (
+                                    <><div className="loader border-t-white w-4 h-4 rounded-full border-2 border-white/20 animate-spin"></div> İŞLENİYOR...</>
+                                ) : (
+                                    <><span>✅</span> İŞLEMİ TAMAMLA</>
+                                )}
                             </button>
                         </div>
                     </div>
@@ -1864,73 +2071,80 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
             {/* PLAN MODAL */}
             {showPlanModal && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(5px)' }}>
-                    <div className="card glass animate-in" style={{ width: '500px', maxWidth: '90vw', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0, color: '#fff', fontSize: '18px' }}>Vadeli Satış Planı Oluştur</h3>
-                            <button onClick={() => setShowPlanModal(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '20px', cursor: 'pointer' }}>&times;</button>
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
+                    <div className="card glass animate-scale-in" style={{ width: '520px', maxWidth: '90vw', border: '1px solid rgba(245, 158, 11, 0.3)', background: 'var(--bg-panel, #0f172a)', padding: '0', borderRadius: '32px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                        <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%)' }}>
+                            <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ padding: '8px', background: '#f59e0b', borderRadius: '12px', fontSize: '18px', boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)' }}>📅</span>
+                                Vadeli Satış Planı Oluştur
+                            </h3>
+                            <button onClick={() => setShowPlanModal(false)} style={{ background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontSize: '20px', cursor: 'pointer', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} className="hover:bg-white/10">&times;</button>
                         </div>
-                        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                             <div>
-                                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>Plan Başlığı</label>
+                                <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>ÖDEME PLANI BAŞLIĞI</label>
                                 <input
                                     value={planData.title}
                                     onChange={e => setPlanData({ ...planData, title: e.target.value })}
-                                    style={{ width: '100%', padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px' }}
+                                    style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px' }}
+                                    className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
                                 />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                                 <div>
-                                    <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>Toplam Tutar</label>
+                                    <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>TOPLAM TUTAR (₺)</label>
                                     <input
                                         type="number"
                                         value={planData.totalAmount}
                                         onChange={e => setPlanData({ ...planData, totalAmount: e.target.value })}
-                                        style={{ width: '100%', padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px', fontWeight: 'bold' }}
+                                        style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '900', fontSize: '16px', fontFamily: 'monospace' }}
+                                        className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>Taksit Sayısı</label>
+                                    <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>TAKSİT / VADE SAYISI</label>
                                     <input
                                         type="number"
                                         value={planData.installmentCount}
                                         onChange={e => setPlanData({ ...planData, installmentCount: e.target.value })}
-                                        style={{ width: '100%', padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px' }}
+                                        style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px', textAlign: 'center' }}
+                                        className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
                                     />
                                 </div>
                             </div>
                             <div>
-                                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '5px' }}>Başlangıç Tarihi</label>
+                                <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>PLANI BAŞLATMA TARİHİ</label>
                                 <input
                                     type="date"
                                     value={planData.startDate}
                                     onChange={e => setPlanData({ ...planData, startDate: e.target.value })}
-                                    style={{ width: '100%', padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px' }}
-                                    className="input-date-dark"
+                                    style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px' }}
+                                    className="input-date-dark focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
                                 />
                             </div>
 
-                            <div style={{ padding: '10px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px', marginTop: '5px' }}>
-                                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#10b981', cursor: 'pointer' }}>
+                            <div style={{ padding: '20px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '16px', marginTop: '12px' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#f59e0b', cursor: 'pointer', fontWeight: '800' }}>
                                     <input
                                         type="checkbox"
                                         checked={planData.isExisting}
                                         onChange={e => setPlanData({ ...planData, isExisting: e.target.checked })}
-                                        style={{ accentColor: '#10b981' }}
+                                        style={{ accentColor: '#f59e0b', width: '20px', height: '20px' }}
                                     />
-                                    <span><b>Mevcut Bakiyeden Dönüştür</b></span>
+                                    <span>Mevcut Bakiyeden Dönüştür (Re-Scheduling)</span>
                                 </label>
-                                <div style={{ fontSize: '11px', color: '#888', marginTop: '5px', marginLeft: '24px' }}>
-                                    Bu seçenek aktifken cari bakiyesine ekstra borç eklenmez, sadece ödeme planı oluşturulur.
+                                <div style={{ fontSize: '12px', color: 'var(--text-muted, #aaa)', marginTop: '8px', marginLeft: '32px', fontWeight: '500', lineHeight: '1.5' }}>
+                                    Bu seçenek aktifken cari hesap bakiyesine ekstra borç eklenmez, işlemi mevcut açık risk üzerinden planlar.
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleSavePlan}
                                 className="btn btn-primary"
-                                style={{ marginTop: '10px', padding: '12px', width: '100%', justifyContent: 'center' }}
+                                style={{ marginTop: '20px', padding: '18px', width: '100%', justifyContent: 'center', borderRadius: '16px', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(245, 158, 11, 0.3)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                className="hover:-translate-y-1 hover:shadow-xl"
                             >
-                                Planı Oluştur
+                                <span>✅</span> ÖDEME PLANINI OLUŞTUR
                             </button>
                         </div>
                     </div>
@@ -1955,7 +2169,6 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 type={statementType}
                 entityType="CUSTOMER"
             />
-        </div >
+        </div>
     );
 }
-
