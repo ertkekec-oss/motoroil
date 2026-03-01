@@ -82,7 +82,7 @@ export default function BranchSettingsPage() {
         return (
             <div className="container" style={{ padding: '100px 20px', textAlign: 'center' }}>
                 <div style={{ fontSize: '60px', marginBottom: '20px' }}>🔐</div>
-                <h1 className="text-gradient">Yetkisiz Erişim</h1>
+                <h1 className="text-[30px] font-bold text-slate-800 dark:text-white">Yetkisiz Erişim</h1>
                 <p className="text-muted">Şube ayarlarını görüntüleme yetkiniz bulunmamaktadır.</p>
             </div>
         );
@@ -92,7 +92,7 @@ export default function BranchSettingsPage() {
         <div className="container" style={{ padding: '40px 20px' }}>
             <header className="flex-between" style={{ marginBottom: '32px' }}>
                 <div>
-                    <h1 className="text-gradient">🏢 Şube Ayarları</h1>
+                    <h1 className="text-[30px] font-bold text-slate-800 dark:text-white">🏢 Şube Ayarları</h1>
                     <p className="text-muted">Şube bazlı kasa/banka erişim yetkileri</p>
                 </div>
                 <button onClick={saveSettings} className="btn btn-primary">

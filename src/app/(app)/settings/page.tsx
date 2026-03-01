@@ -2344,7 +2344,7 @@ export default function SettingsPage() {
                 {activeTab === 'campaigns' && (
                     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         <div style={{ padding: '10px 0' }}>
-                            <h1 style={{ fontSize: '24px', fontWeight: '900', background: 'var(--gradient-text)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '4px' }}>🎁 Sadakat & Kampanya Merkezi</h1>
+                            <h1 style={{ fontSize: '24px', fontWeight: '900', color: 'var(--text-main)', marginBottom: '4px' }}>🎁 Sadakat & Kampanya Merkezi</h1>
                             <p className="text-muted" style={{ fontSize: '13px' }}>Müşteri sadakatini artıracak indirim, puan ve hediye çeki kurgularını yönetin.</p>
                         </div>
 
@@ -2371,7 +2371,7 @@ export default function SettingsPage() {
                                         transition: 'all 0.2s',
                                         background: campaignSubTab === t.id ? 'var(--primary)' : 'transparent',
                                         color: campaignSubTab === t.id ? 'white' : 'var(--text-muted)',
-                                        boxShadow: campaignSubTab === t.id ? '0 4px 12px var(--primary-glow)' : 'none'
+                                        boxShadow: campaignSubTab === t.id ? '0 4px 12px var(--primary)' : 'none'
                                     }}
                                 >
                                     <span>{t.icon}</span> {t.label}
@@ -2385,7 +2385,7 @@ export default function SettingsPage() {
                                 <div className="grid-cols-12 gap-6">
                                     {/* Create/Edit Form */}
                                     <div className="col-span-12 xl:col-span-5">
-                                        <div className="card glass" style={{ border: '1px solid var(--primary-glow)' }}>
+                                        <div className="card glass" style={{ border: '1px solid var(--primary)' }}>
                                             <h3 className="mb-4" style={{ fontSize: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                                                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>+</div>
                                                 {editingCampaignId ? 'Kampanyayı Düzenle' : 'Yeni Kampanya Tanımla'}
@@ -2612,7 +2612,7 @@ export default function SettingsPage() {
                                                 {campaigns.map(camp => (
                                                     <div key={camp.id} style={{ background: 'var(--bg-deep)', padding: '16px', borderRadius: '14px', border: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                                            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: camp.type === 'loyalty_points' ? 'rgba(0, 240, 255, 0.1)' : (camp.type === 'buy_x_get_free' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 85, 0, 0.1)'), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
+                                                            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: camp.type === 'loyalty_points' ? 'rgba(0, 240, 255, 0.1)' : (camp.type === 'buy_x_get_free' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)'), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
                                                                 {camp.type === 'loyalty_points' ? '💎' : (camp.type === 'buy_x_get_free' ? '🎁' : (camp.type === 'buy_x_get_discount' ? '🏷️' : '💳'))}
                                                             </div>
                                                             <div>
@@ -2659,9 +2659,9 @@ export default function SettingsPage() {
                         {/* 10.2 REFERANS SİSTEMİ */}
                         {campaignSubTab === 'referral' && (
                             <div className="animate-fade-in-up" style={{ maxWidth: '800px' }}>
-                                <div className="card glass" style={{ border: '1px solid var(--secondary-rgb)' }}>
+                                <div className="card glass" style={{ border: '1px solid rgba(100,116,139, 0.2)' }}>
                                     <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginBottom: '30px' }}>
-                                        <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'var(--secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', boxShadow: '0 8px 16px var(--secondary-rgb)' }}>🔗</div>
+                                        <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'var(--secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', boxShadow: '0 8px 16px rgba(100,116,139, 0.2)' }}>🔗</div>
                                         <div>
                                             <h3 style={{ fontSize: '20px', fontWeight: '900', marginBottom: '4px' }}>Referans & Ödül Sistemi</h3>
                                             <p className="text-muted" style={{ fontSize: '13px' }}>Müşterilerinizin işletmenizi başkalarına tavsiye etmesini teşvik edin.</p>
@@ -2887,7 +2887,7 @@ export default function SettingsPage() {
                     <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
                         <h2 style={{ marginBottom: '20px', color: 'var(--danger)', fontSize: '24px', fontWeight: '900' }}>⚠️ KRİTİK SİSTEM SIFIRLAMA</h2>
 
-                        <div className="card glass" style={{ border: '2px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)', padding: '40px', borderRadius: '32px' }}>
+                        <div className="card glass" style={{ border: '2px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)', padding: '40px', borderRadius: '24px' }}>
                             <div style={{ fontSize: '64px', marginBottom: '20px' }}>🧨</div>
                             <h3 style={{ fontSize: '22px', fontWeight: '900', marginBottom: '15px', color: 'white' }}>Veri Temizleme ve Yapılandırma</h3>
                             <p className="text-muted" style={{ marginBottom: '30px', lineHeight: '1.6', fontSize: '14px' }}>
@@ -2979,7 +2979,7 @@ export default function SettingsPage() {
                                     }}
                                     className="btn"
                                     style={{
-                                        background: 'linear-gradient(45deg, #ef4444, #b91c1c)',
+                                        background: '#dc2626',
                                         color: 'white',
                                         fontWeight: '900',
                                         padding: '18px 40px',
@@ -2987,7 +2987,7 @@ export default function SettingsPage() {
                                         maxWidth: '400px',
                                         fontSize: '16px',
                                         borderRadius: '18px',
-                                        boxShadow: '0 10px 30px rgba(239, 68, 68, 0.4)',
+                                        boxShadow: 'none',
                                         opacity: (!Object.values(resetOptions).some(v => v)) ? 0.5 : 1,
                                         cursor: (!Object.values(resetOptions).some(v => v)) ? 'not-allowed' : 'pointer'
                                     }}
@@ -3002,7 +3002,7 @@ export default function SettingsPage() {
                 {/* 10.4 HEDİYE ÇEKİ YÖNETİM MODALI */}
                 {showCouponModal && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }} onClick={() => setShowCouponModal(false)}>
-                        <div style={{ background: 'var(--bg-card)', width: '90%', maxWidth: '1200px', maxHeight: '90vh', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ background: 'var(--bg-card)', width: '90%', maxWidth: '1200px', maxHeight: '90vh', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }} onClick={e => e.stopPropagation()}>
                             {/* Modal Header */}
                             <div style={{ padding: '32px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
