@@ -7,6 +7,8 @@ import { useApp } from '@/contexts/AppContext';
 import { useInventory } from '@/contexts/InventoryContext';
 import { useCRM } from '@/contexts/CRMContext';
 import { useSettings } from '@/contexts/SettingsContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ArrowLeft, CheckCircle2, Info, Search, Shield, X, Package, Box, MapPin, Tool, Check, AlertTriangle, Bike, Car, Truck } from 'lucide-react';
 
 function ServiceAcceptanceContent() {
     const router = useRouter();
@@ -15,11 +17,13 @@ function ServiceAcceptanceContent() {
     const { products } = useInventory();
     const { customers } = useCRM();
     const { serviceSettings, vehicleTypes } = useSettings();
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+
     const [vehicleType, setVehicleType] = useState('Motosiklet');
 
     useEffect(() => {
         if (vehicleTypes && vehicleTypes.length > 0 && !vehicleTypes.includes(vehicleType)) {
-            // If current selection is not in list, select first available
             if (vehicleTypes.includes('Motosiklet')) setVehicleType('Motosiklet');
             else setVehicleType(vehicleTypes[0]);
         }
@@ -29,7 +33,6 @@ function ServiceAcceptanceContent() {
         const t = type.toLowerCase();
         return !t.includes('bisiklet') && !t.includes('bicycle') && !t.includes('bike');
     };
-
 
     const [selectedParts, setSelectedParts] = useState<{ id: string | number, name: string, price: number, quantity: number, originalId: string | number, isWarranty?: boolean }[]>([]);
     const [isLaborWarranty, setIsLaborWarranty] = useState(false);
@@ -46,7 +49,7 @@ function ServiceAcceptanceContent() {
             p.name.toLowerCase().includes(q) ||
             p.code.toLowerCase().includes(q) ||
             (p.barcode && p.barcode.toLowerCase().includes(q))
-        ).slice(0, 10); // Limit results
+        ).slice(0, 10);
     }, [products, productSearchQuery]);
 
     // Form State
@@ -113,11 +116,9 @@ function ServiceAcceptanceContent() {
     const checkCustomerWarranties = async (cId: string) => {
         if (!cId) return;
         try {
-            // 1. Gerçek garanti kayıtlarını kontrol et
             const wRes = await fetch(`/api/warranties?customerId=${cId}`);
             const wData = await wRes.json();
 
-            // 2. Geçmiş servis kayıtlarını kontrol et (Fallback)
             const sRes = await fetch(`/api/services?customerId=${cId}`);
             const sData = await sRes.json();
 
@@ -264,354 +265,355 @@ function ServiceAcceptanceContent() {
         }
     };
 
+    const textMain = isLight ? 'text-slate-900' : 'text-white';
+    const textMuted = isLight ? 'text-slate-500' : 'text-slate-400';
+    const cardBg = isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/5';
+    const inputBg = isLight ? 'bg-slate-50 border-slate-200 focus:border-blue-500 hover:bg-white text-slate-900 placeholder:text-slate-400' : 'bg-white/[0.02] border-white/10 focus:border-blue-500/50 hover:bg-white/[0.04] text-white placeholder:text-white/20';
+    const pageBg = isLight ? 'min-h-screen bg-[#fafafa]' : 'min-h-screen bg-[#020617] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/40 via-[#020617] to-[#020617]';
+    const dropdownBg = isLight ? 'bg-white border-slate-200 shadow-lg' : 'bg-[#1e293b] border-white/10 shadow-2xl';
+
     return (
-        <div className="container p-8 max-w-[1400px] mx-auto min-h-screen">
+        <div data-pos-theme={theme} className={`${pageBg} p-8 font-sans transition-colors duration-300`}>
             {/* WARRANTY MODAL */}
             {warrantyModalOpen && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[99] flex items-center justify-center p-6 animate-in">
-                    <div className="bg-[#1a1c2e] border border-white/10 rounded-[32px] p-8 w-full max-w-lg shadow-[0_32px_64px_rgba(0,0,0,0.8)]">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="w-12 h-12 rounded-2xl bg-success/10 flex items-center justify-center text-2xl shadow-inner border border-success/20">🛡️</div>
+                <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
+                    <div className={`w-full max-w-[500px] overflow-hidden rounded-[24px] border shadow-2xl flex flex-col ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
+                        <div className={`p-6 border-b flex items-center gap-4 ${isLight ? 'border-slate-200' : 'border-white/10'}`}>
+                            <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center text-xl shadow-sm border ${isLight ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'}`}>
+                                <Shield size={24} />
+                            </div>
                             <div>
-                                <h3 className="text-xl font-black text-white">Garanti Kaydı Bulundu</h3>
-                                <p className="text-white/40 text-sm font-medium">Bu müşteriye ait aktif garantiler:</p>
+                                <h3 className={`text-[18px] font-bold ${textMain}`}>Garanti Kaydı Bulundu</h3>
+                                <p className={`text-[13px] font-medium mt-0.5 ${textMuted}`}>Bu müşteriye ait aktif garantiler:</p>
                             </div>
                         </div>
 
-                        <div className="space-y-3 mb-8 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="p-6 space-y-3 max-h-[350px] overflow-y-auto custom-scrollbar">
                             {customerWarranties.map(w => (
                                 <button key={w.id}
                                     onClick={() => handleWarrantySelect(w)}
-                                    className="w-full text-left p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-success/50 hover:bg-success/5 transition-all group relative overflow-hidden"
+                                    className={`w-full text-left p-4 rounded-[16px] border transition-all flex justify-between items-center group ${isLight ? 'bg-slate-50 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50' : 'bg-white/[0.02] border-white/5 hover:border-emerald-500/50 hover:bg-emerald-500/5'}`}
                                 >
-                                    <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity"><span className="text-success text-xs font-black uppercase tracking-widest">Seç ↗</span></div>
-                                    <div className="font-black text-white group-hover:text-success transition-colors">{w.productName}</div>
-                                    <div className="flex items-center gap-3 mt-1.5">
-                                        <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">S/N: {w.serialNo}</span>
-                                        <div className="w-1 h-1 rounded-full bg-white/10"></div>
-                                        <span className="text-[10px] font-black text-success/60 uppercase tracking-widest capitalize">Bitiş: {w.endDate}</span>
+                                    <div>
+                                        <div className={`font-bold text-[14px] ${textMain} group-hover:text-emerald-500 transition-colors`}>{w.productName}</div>
+                                        <div className="flex items-center gap-3 mt-1.5">
+                                            <span className={`text-[11px] font-semibold uppercase tracking-wide ${textMuted}`}>S/N: {w.serialNo}</span>
+                                            <div className={`w-1 h-1 rounded-full ${isLight ? 'bg-slate-300' : 'bg-slate-700'}`}></div>
+                                            <span className={`text-[11px] font-bold text-emerald-500 uppercase tracking-wide`}>Bitiş: {w.endDate}</span>
+                                        </div>
+                                    </div>
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span className={`text-[11px] font-bold uppercase tracking-wide ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`}>Seç ↗</span>
                                     </div>
                                 </button>
                             ))}
                         </div>
 
-                        <div className="flex gap-4">
-                            <button onClick={() => setWarrantyModalOpen(false)} className="flex-1 py-4 rounded-2xl bg-white/5 text-white/40 font-black text-xs uppercase tracking-widest hover:text-white transition-all">İptal / Yeni Ürün</button>
+                        <div className={`p-4 border-t ${isLight ? 'border-slate-200 bg-slate-50' : 'border-white/10 bg-white/[0.02]'}`}>
+                            <button onClick={() => setWarrantyModalOpen(false)} className={`w-full py-3 rounded-[12px] text-[12px] font-semibold transition-all ${isLight ? 'text-slate-600 bg-slate-200 hover:bg-slate-300' : 'text-slate-300 bg-white/10 hover:bg-white/20'}`}>
+                                İptal / Yeni Ürün
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* HEADER */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-                <div className="space-y-1">
+            <div className="max-w-[1240px] mx-auto space-y-6">
+
+                {/* HEADER */}
+                <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 border-b pb-6 border-slate-200 dark:border-white/10">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => router.back()} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">←</button>
+                        <button onClick={() => router.back()} className={`w-10 h-10 rounded-[12px] flex items-center justify-center transition-all ${isLight ? 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 shadow-sm' : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'}`}>
+                            <ArrowLeft size={18} />
+                        </button>
                         <div>
-                            <h1 className="text-4xl font-black text-white tracking-tight">Yeni Servis Kabul</h1>
-                            <p className="text-white/30 font-bold text-sm ml-1 uppercase tracking-[0.2em]">Servis İş Emri Oluşturma</p>
+                            <h1 className={`text-[24px] font-bold tracking-tight ${textMain}`}>Yeni Servis Kabul</h1>
+                            <p className={`text-[12px] font-semibold uppercase tracking-wide mt-1 ${textMuted}`}>İş Emri & Randevu Kaydı</p>
                         </div>
                     </div>
-                </div>
-                <div className="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md flex flex-col items-end">
-                    <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-1">Tarih / Saat</span>
-                    <span className="text-sm font-black text-white/80">{new Date().toLocaleDateString('tr-TR')} • {new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
-                </div>
-            </header>
+                    <div className={`px-4 py-2 rounded-[12px] flex items-center gap-3 border shadow-sm ${isLight ? 'bg-white border-slate-200' : 'bg-white/5 border-white/10'}`}>
+                        <Clock size={16} className={textMuted} />
+                        <span className={`text-[13px] font-semibold ${textMain}`}>
+                            {new Date().toLocaleDateString('tr-TR')} • {new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                    </div>
+                </header>
 
-            <div className="grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-12 items-start">
+                <div className="flex flex-col lg:flex-row gap-8 items-start">
 
-                {/* LEFT: FORM CONTENT */}
-                <div className="space-y-10">
+                    {/* LEFT: FORM CONTENT */}
+                    <div className="w-full space-y-8 flex-1">
 
-                    {/* SECTION 1: VEHICLE & CUSTOMER */}
-                    <section className="bg-white/5 rounded-[40px] border border-white/10 p-10 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-10 opacity-[0.03] text-9xl font-black italic pointer-events-none">01</div>
-                        <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
-                            <span className="w-8 h-[2px] bg-primary"></span>
-                            1. Müşteri & Araç Bilgileri
-                        </h2>
+                        {/* SECTION 1 */}
+                        <section className={`rounded-[20px] border shadow-sm p-6 sm:p-8 relative overflow-hidden ${cardBg}`}>
+                            <div className={`absolute top-0 right-0 p-6 text-[100px] font-black italic opacity-[0.03] leading-none pointer-events-none ${isLight ? 'text-slate-900' : 'text-white'}`}>01</div>
+                            <h2 className={`text-[13px] font-bold uppercase tracking-wide mb-6 flex items-center gap-3 ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>
+                                <span className={`w-6 h-1 rounded-full ${isLight ? 'bg-blue-600' : 'bg-blue-500'}`}></span>
+                                Müşteri & Araç Bilgileri
+                            </h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                            {/* Vehicle Type Switcher */}
-                            <div className="col-span-full mb-4">
-                                <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1 mb-3 block text-center">Taşıt Türü</label>
-                                <div className="flex flex-wrap justify-center gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5 w-fit mx-auto max-w-full">
-                                    {(vehicleTypes && vehicleTypes.length > 0 ? vehicleTypes : ['Motosiklet', 'Bisiklet']).map((t) => (
-                                        <button
-                                            key={t}
-                                            onClick={() => setVehicleType(t)}
-                                            className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${vehicleType === t ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-white/20 hover:text-white/40'}`}
-                                        >
-                                            {t === 'Motosiklet' ? '🏍️' : t === 'Bisiklet' ? '🚲' : '🛵'} {t}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Customer Search */}
-                            <div className="space-y-2 relative">
-                                <label className="text-[11px] font-black text-white/40 uppercase tracking-widest ml-1">Müşteri Seçimi</label>
-                                <div className="relative group">
-                                    <input
-                                        type="text"
-                                        placeholder="Müşteri adını girin veya arayın..."
-                                        value={searchQuery}
-                                        onChange={handleSearchChange}
-                                        onFocus={() => { if (searchQuery.length > 0) setShowSuggestions(true); }}
-                                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                                        className="w-full bg-black/40 border-2 border-white/5 rounded-2xl px-6 py-4 text-white font-bold placeholder:text-white/10 focus:border-primary/50 focus:bg-black/60 transition-all outline-none"
-                                    />
-                                    {isNewCustomer && searchQuery.length > 2 && (
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 px-2 py-1 bg-secondary/10 border border-secondary/20 rounded-md text-[9px] font-black text-secondary uppercase tracking-widest">Yeni</div>
-                                    )}
-
-                                    {/* Suggestions */}
-                                    {showSuggestions && filteredCustomers.length > 0 && (
-                                        <div className="absolute top-full left-0 right-0 mt-3 bg-[#1a1c2e] border border-white/10 rounded-3xl overflow-hidden z-[50] shadow-2xl animate-in">
-                                            {filteredCustomers.map(c => (
-                                                <button
-                                                    key={c.id}
-                                                    onClick={() => selectCustomer(c)}
-                                                    className="w-full p-5 flex justify-between items-center hover:bg-white/5 border-b border-white/5 last:border-0 transition-colors"
-                                                >
-                                                    <span className="font-black text-white text-sm">{c.name}</span>
-                                                    <span className="text-[10px] font-bold text-white/20 font-mono italic">{c.phone}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-black text-white/40 uppercase tracking-widest ml-1">İletişim Numarası</label>
-                                <input type="text" placeholder="5xx xxx xx xx"
-                                    value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full bg-black/40 border-2 border-white/5 rounded-2xl px-6 py-4 text-white font-bold placeholder:text-white/10 focus:border-white/20 transition-all outline-none"
-                                />
-                            </div>
-
-                            {/* Dynamic Fields */}
-                            {isMotorized(vehicleType) ? (
-                                <>
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] font-black text-white/40 uppercase tracking-widest ml-1">Araç Plakası</label>
-                                        <input type="text" placeholder="34 MOT 123"
-                                            value={formData.plate} onChange={e => setFormData({ ...formData, plate: e.target.value })}
-                                            className="w-full bg-black/40 border-2 border-white/5 rounded-2xl px-6 py-4 text-white font-black placeholder:text-white/10 focus:border-white/20 transition-all outline-none uppercase font-mono tracking-widest"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] font-black text-white/40 uppercase tracking-widest ml-1">Mevcut Kilometre</label>
-                                        <input type="number" placeholder="Örn: 12400"
-                                            value={formData.km} onChange={e => setFormData({ ...formData, km: e.target.value })}
-                                            className="w-full bg-black/40 border-2 border-white/5 rounded-2xl px-6 py-4 text-white font-black placeholder:text-white/10 focus:border-white/20 transition-all outline-none"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] font-black text-primary/60 uppercase tracking-widest ml-1">Gelecek Bakım (Km)</label>
-                                        <input type="number" placeholder="Örn: 17400"
-                                            value={formData.nextKm} onChange={e => setFormData({ ...formData, nextKm: e.target.value })}
-                                            className="w-full bg-primary/5 border-2 border-primary/20 rounded-2xl px-6 py-4 text-white font-black placeholder:text-white/10 focus:border-primary/40 transition-all outline-none"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] font-black text-primary/60 uppercase tracking-widest ml-1">Gelecek Bakım (Tarih)</label>
-                                        <input type="date"
-                                            value={formData.nextDate} onChange={e => setFormData({ ...formData, nextDate: e.target.value })}
-                                            className="w-full bg-primary/5 border-2 border-primary/20 rounded-2xl px-6 py-4 text-white font-black transition-all outline-none"
-                                        />
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] font-black text-white/40 uppercase tracking-widest ml-1">Marka / Model</label>
-                                        <input type="text" placeholder="Örn: Carraro 710"
-                                            value={formData.brand} onChange={e => setFormData({ ...formData, brand: e.target.value })}
-                                            className="w-full bg-black/40 border-2 border-white/5 rounded-2xl px-6 py-4 text-white font-bold placeholder:text-white/10 focus:border-white/20 transition-all outline-none"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] font-black text-white/40 uppercase tracking-widest ml-1">Kadro / Seri No</label>
-                                        <input type="text" placeholder="Örn: CR123456"
-                                            value={formData.serialNumber} onChange={e => setFormData({ ...formData, serialNumber: e.target.value })}
-                                            className="w-full bg-black/40 border-2 border-white/5 rounded-2xl px-6 py-4 text-white font-black placeholder:text-white/10 focus:border-white/20 transition-all outline-none"
-                                        />
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </section>
-
-                    {/* SECTION 2: SERVICES & PARTS */}
-                    <section className="bg-white/5 rounded-[40px] border border-white/10 p-10 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-10 opacity-[0.03] text-9xl font-black italic pointer-events-none">02</div>
-                        <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
-                            <span className="w-8 h-[2px] bg-primary"></span>
-                            2. Parça & İşçilik Yönetimi
-                        </h2>
-
-                        <div className="space-y-8">
-                            {/* Product Search */}
-                            <div className="relative pb-6 border-b border-white/5">
-                                <label className="text-[11px] font-black text-white/20 uppercase tracking-widest ml-1 mb-3 block">Envanterden Parça Ekle</label>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        placeholder="Parça adı, kod veya barkod ile arayın..."
-                                        value={productSearchQuery}
-                                        onChange={(e) => setProductSearchQuery(e.target.value)}
-                                        onFocus={() => setShowProductSuggestions(true)}
-                                        onBlur={() => setTimeout(() => setShowProductSuggestions(false), 200)}
-                                        className="w-full bg-white/5 border-2 border-white/5 rounded-[24px] px-14 py-5 text-white font-bold placeholder:text-white/20 focus:border-primary/40 focus:bg-white/[0.08] transition-all outline-none shadow-inner"
-                                    />
-                                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-xl opacity-30">🔍</span>
-
-                                    {showProductSuggestions && productSearchQuery.length > 0 && (
-                                        <div className="absolute top-full left-0 right-0 mt-3 bg-[#1a1c2e] border border-white/20 rounded-[32px] overflow-hidden z-[60] shadow-[0_32px_128px_rgba(0,0,0,0.8)] animate-in">
-                                            {filteredProducts.length === 0 ? (
-                                                <div className="p-8 text-center text-white/20 italic font-bold">Sonuç bulunamadı...</div>
-                                            ) : (
-                                                filteredProducts.map(p => (
-                                                    <button
-                                                        key={p.id}
-                                                        onClick={() => addPart(p)}
-                                                        className="w-full p-6 flex justify-between items-center hover:bg-white/5 border-b border-white/5 last:border-0 group transition-all"
-                                                    >
-                                                        <div className="flex flex-col items-start gap-1">
-                                                            <span className="font-black text-white text-[15px] group-hover:text-primary transition-colors">{p.name}</span>
-                                                            <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">{p.code} • Stok: {p.stock} adet</span>
-                                                        </div>
-                                                        <div className="flex flex-col items-end gap-1">
-                                                            <span className="font-black text-lg text-white">₺{p.price.toLocaleString()}</span>
-                                                            <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">+KDV (%)</span>
-                                                        </div>
-                                                    </button>
-                                                ))
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Added Items List */}
-                            <div className="space-y-4">
-                                <label className="text-[11px] font-black text-white/40 uppercase tracking-widest ml-1">Uygulanan Kalemler</label>
-                                <div className="space-y-3">
-                                    {/* Selected Parts */}
-                                    {selectedParts.map((part) => (
-                                        <div key={part.id} className="group p-5 rounded-[24px] bg-black/40 border border-white/5 flex items-center justify-between transition-all hover:bg-black/60">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-lg">📦</div>
-                                                <div>
-                                                    <div className="font-black text-white text-[15px]">{part.name}</div>
-                                                    {part.isWarranty && <div className="text-[10px] font-black text-success uppercase tracking-widest mt-0.5">🛡️ Garanti Değişimi</div>}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-8">
-                                                <button
-                                                    onClick={() => togglePartWarranty(part.id)}
-                                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${part.isWarranty ? 'bg-success/10 text-success border border-success/20' : 'bg-white/5 text-white/30 hover:text-white border border-transparent'}`}
-                                                >
-                                                    {part.isWarranty ? 'Garanti Aktif' : 'Garanti?'}
-                                                </button>
-                                                <div className="text-right min-w-[100px]">
-                                                    <div className={`font-black text-[15px] ${part.isWarranty ? 'text-white/20 line-through decoration-danger' : 'text-white'}`}>₺{part.price.toLocaleString()}</div>
-                                                    <div className="text-[9px] font-bold text-white/20 tracking-tighter uppercase">Net Birim Fiyat</div>
-                                                </div>
-                                                <button onClick={() => removePart(part.id)} className="w-8 h-8 rounded-full flex items-center justify-center text-white/20 hover:text-red-500 hover:bg-red-500/10 transition-all text-2xl font-light">&times;</button>
-                                            </div>
-                                        </div>
-                                    ))}
-
-                                    {/* Labor Item (Static) */}
-                                    <div className="group p-5 rounded-[24px] bg-primary/5 border border-primary/10 flex items-center justify-between transition-all hover:bg-primary/[0.08]">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-lg">🔧</div>
-                                            <div>
-                                                <div className="font-black text-white text-[15px]">Standart {vehicleType} Bakım Hizmeti</div>
-                                                {isLaborWarranty && <div className="text-[10px] font-black text-success uppercase tracking-widest mt-0.5">🛡️ Garanti Kapsamı</div>}
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                                {/* Toggle */}
+                                <div className="col-span-full mb-2">
+                                    <label className={`text-[11px] font-semibold uppercase tracking-wide block mb-2 ${textMuted}`}>Taşıt Türü</label>
+                                    <div className={`inline-flex p-1 rounded-[999px] border shadow-sm ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
+                                        {(vehicleTypes && vehicleTypes.length > 0 ? vehicleTypes : ['Motosiklet', 'Bisiklet']).map((t) => (
                                             <button
-                                                onClick={() => setIsLaborWarranty(!isLaborWarranty)}
-                                                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isLaborWarranty ? 'bg-success/10 text-success border border-success/20' : 'bg-white/5 text-white/30 hover:text-white border border-transparent'}`}
+                                                key={t}
+                                                onClick={() => setVehicleType(t)}
+                                                className={`px-5 py-2 rounded-[999px] text-[12px] font-semibold transition-all flex items-center gap-2 ${vehicleType === t ? (isLight ? 'bg-white text-slate-900 shadow-sm' : 'bg-slate-800 text-white shadow-sm') : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')}`}
                                             >
-                                                {isLaborWarranty ? 'Garanti Aktif' : 'Garanti?'}
+                                                <span className="opacity-70">{t === 'Motosiklet' ? '🏍️' : t === 'Bisiklet' ? '🚲' : '🛵'}</span>
+                                                {t}
                                             </button>
-                                            <div className="text-right min-w-[100px]">
-                                                <div className={`font-black text-[15px] ${isLaborWarranty ? 'text-white/20 line-through decoration-danger' : 'text-primary'}`}>₺{laborCost.toLocaleString()}</div>
-                                                <div className="text-[9px] font-bold text-white/20 tracking-tighter uppercase">İşçilik Bedeli</div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Inputs */}
+                                <div className="space-y-1.5 relative">
+                                    <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 ${textMuted}`}>Müşteri Seçimi</label>
+                                    <div className="relative group">
+                                        <input type="text" placeholder="Müşteri adını girin veya arayın..."
+                                            value={searchQuery}
+                                            onChange={handleSearchChange}
+                                            onFocus={() => { if (searchQuery.length > 0) setShowSuggestions(true); }}
+                                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                            className={`w-full h-[42px] px-4 rounded-[12px] border text-[13px] transition-all outline-none shadow-sm ${inputBg}`}
+                                        />
+                                        <Search size={16} className={`absolute right-3 top-1/2 -translate-y-1/2 ${textMuted} opacity-50`} />
+                                        {isNewCustomer && searchQuery.length > 2 && (
+                                            <div className={`absolute right-10 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded-[6px] text-[10px] font-bold uppercase tracking-wide ${isLight ? 'bg-amber-100 text-amber-700' : 'bg-amber-500/20 text-amber-400'}`}>Yeni</div>
+                                        )}
+                                        {showSuggestions && filteredCustomers.length > 0 && (
+                                            <div className={`absolute top-full left-0 right-0 mt-2 rounded-[16px] overflow-hidden z-[50] ${dropdownBg}`}>
+                                                {filteredCustomers.map(c => (
+                                                    <button key={c.id} onClick={() => selectCustomer(c)} className={`w-full p-4 flex justify-between items-center border-b last:border-0 transition-colors ${isLight ? 'hover:bg-slate-50 border-slate-100' : 'hover:bg-white/5 border-white/5'}`}>
+                                                        <span className={`font-semibold text-[13px] ${textMain}`}>{c.name}</span>
+                                                        <span className={`text-[12px] font-mono ${textMuted}`}>{c.phone}</span>
+                                                    </button>
+                                                ))}
                                             </div>
-                                            <div className="w-8 h-8"></div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 ${textMuted}`}>İletişim Numarası</label>
+                                    <input type="text" placeholder="5xx xxx xx xx" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                        className={`w-full h-[42px] px-4 rounded-[12px] border text-[13px] transition-all outline-none shadow-sm ${inputBg}`}
+                                    />
+                                </div>
+
+                                {isMotorized(vehicleType) ? (
+                                    <>
+                                        <div className="space-y-1.5">
+                                            <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 ${textMuted}`}>Araç Plakası</label>
+                                            <input type="text" placeholder="34 MOT 123" value={formData.plate} onChange={e => setFormData({ ...formData, plate: e.target.value })}
+                                                className={`w-full h-[42px] px-4 rounded-[12px] border text-[14px] font-mono uppercase tracking-wider transition-all outline-none shadow-sm ${inputBg}`}
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 ${textMuted}`}>Mevcut Kilometre</label>
+                                            <input type="number" placeholder="Örn: 12400" value={formData.km} onChange={e => setFormData({ ...formData, km: e.target.value })}
+                                                className={`w-full h-[42px] px-4 rounded-[12px] border text-[13px] transition-all outline-none shadow-sm ${inputBg}`}
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>Gelecek Bakım (Km)</label>
+                                            <input type="number" placeholder="Örn: 17400" value={formData.nextKm} onChange={e => setFormData({ ...formData, nextKm: e.target.value })}
+                                                className={`w-full h-[42px] px-4 rounded-[12px] border text-[13px] transition-all outline-none shadow-sm ${isLight ? 'bg-blue-50/50 border-blue-200 focus:border-blue-500 text-slate-900 focus:bg-white' : 'bg-blue-500/5 border-blue-500/20 focus:border-blue-500/50 text-white'}`}
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>Gelecek Bakım (Tarih)</label>
+                                            <input type="date" value={formData.nextDate} onChange={e => setFormData({ ...formData, nextDate: e.target.value })}
+                                                className={`w-full h-[42px] px-4 rounded-[12px] border text-[13px] transition-all outline-none shadow-sm ${isLight ? 'bg-blue-50/50 border-blue-200 focus:border-blue-500 text-slate-900 focus:bg-white' : 'bg-blue-500/5 border-blue-500/20 focus:border-blue-500/50 text-white'}`}
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="space-y-1.5">
+                                            <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 ${textMuted}`}>Marka / Model</label>
+                                            <input type="text" placeholder="Örn: Carraro 710" value={formData.brand} onChange={e => setFormData({ ...formData, brand: e.target.value })}
+                                                className={`w-full h-[42px] px-4 rounded-[12px] border text-[13px] transition-all outline-none shadow-sm ${inputBg}`}
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 ${textMuted}`}>Kadro / Seri No</label>
+                                            <input type="text" placeholder="Örn: CR123456" value={formData.serialNumber} onChange={e => setFormData({ ...formData, serialNumber: e.target.value })}
+                                                className={`w-full h-[42px] px-4 rounded-[12px] border text-[13px] transition-all outline-none shadow-sm ${inputBg}`}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </section>
+
+                        {/* SECTION 2 */}
+                        <section className={`rounded-[20px] border shadow-sm p-6 sm:p-8 relative overflow-hidden ${cardBg}`}>
+                            <div className={`absolute top-0 right-0 p-6 text-[100px] font-black italic opacity-[0.03] leading-none pointer-events-none ${isLight ? 'text-slate-900' : 'text-white'}`}>02</div>
+                            <h2 className={`text-[13px] font-bold uppercase tracking-wide mb-6 flex items-center gap-3 ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>
+                                <span className={`w-6 h-1 rounded-full ${isLight ? 'bg-blue-600' : 'bg-blue-500'}`}></span>
+                                Parça & İşçilik Yönetimi
+                            </h2>
+
+                            <div className="space-y-8">
+                                {/* Search */}
+                                <div className={`relative pb-6 border-b ${isLight ? 'border-slate-200' : 'border-white/5'}`}>
+                                    <label className={`text-[11px] font-semibold uppercase tracking-wide block mb-2 ml-1 ${textMuted}`}>Envanterden Parça Ekle</label>
+                                    <div className="relative">
+                                        <input type="text" placeholder="Parça adı, kod veya barkod ile arayın..."
+                                            value={productSearchQuery}
+                                            onChange={(e) => setProductSearchQuery(e.target.value)}
+                                            onFocus={() => setShowProductSuggestions(true)}
+                                            onBlur={() => setTimeout(() => setShowProductSuggestions(false), 200)}
+                                            className={`w-full h-[48px] px-12 rounded-[12px] border text-[13px] transition-all outline-none shadow-sm ${inputBg}`}
+                                        />
+                                        <Search size={18} className={`absolute left-4 top-1/2 -translate-y-1/2 ${textMuted}`} />
+
+                                        {showProductSuggestions && productSearchQuery.length > 0 && (
+                                            <div className={`absolute top-full left-0 right-0 mt-2 rounded-[16px] overflow-hidden z-[60] ${dropdownBg}`}>
+                                                {filteredProducts.length === 0 ? (
+                                                    <div className={`p-6 text-center text-[13px] font-medium ${textMuted}`}>Sonuç bulunamadı...</div>
+                                                ) : (
+                                                    filteredProducts.map(p => (
+                                                        <button key={p.id} onClick={() => addPart(p)} className={`w-full p-4 flex justify-between items-center border-b last:border-0 transition-colors ${isLight ? 'hover:bg-slate-50 border-slate-100' : 'hover:bg-white/5 border-white/5'}`}>
+                                                            <div className="flex flex-col items-start gap-1">
+                                                                <span className={`font-semibold text-[14px] ${textMain}`}>{p.name}</span>
+                                                                <span className={`text-[11px] font-medium uppercase tracking-wide ${textMuted}`}>{p.code} • Stok: {p.stock} adet</span>
+                                                            </div>
+                                                            <div className="flex flex-col items-end gap-1">
+                                                                <span className={`font-bold text-[14px] ${textMain}`}>₺{p.price.toLocaleString()}</span>
+                                                                <span className={`text-[10px] uppercase font-bold tracking-wide ${textMuted}`}>+KDV (%)</span>
+                                                            </div>
+                                                        </button>
+                                                    ))
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Item Rows */}
+                                <div className="space-y-4">
+                                    <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 ${textMuted}`}>Uygulanan Kalemler</label>
+                                    <div className="space-y-3">
+                                        {selectedParts.map((part) => (
+                                            <div key={part.id} className={`p-4 rounded-[16px] border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all ${isLight ? 'bg-slate-50 border-slate-200 hover:bg-slate-100' : 'bg-white/[0.02] border-white/10 hover:bg-white/[0.04]'}`}>
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center border shadow-sm ${isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-slate-800 border-slate-700 text-slate-400'}`}>
+                                                        <Package size={18} />
+                                                    </div>
+                                                    <div>
+                                                        <div className={`font-semibold text-[14px] ${textMain}`}>{part.name}</div>
+                                                        {part.isWarranty && <div className="text-[10px] font-bold text-emerald-500 uppercase tracking-wide mt-0.5 flex items-center gap-1"><Shield size={10} /> Garanti Değişimi</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                                                    <button onClick={() => togglePartWarranty(part.id)} className={`px-3 py-1.5 rounded-[8px] text-[11px] font-semibold uppercase tracking-wide border transition-all ${part.isWarranty ? (isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20') : (isLight ? 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50' : 'bg-transparent text-slate-400 border-slate-600 hover:bg-slate-800')}`}>
+                                                        {part.isWarranty ? 'Garanti' : 'Garanti?'}
+                                                    </button>
+                                                    <div className="text-right min-w-[80px]">
+                                                        <div className={`font-bold text-[14px] ${part.isWarranty ? 'text-slate-400 line-through decoration-red-500' : textMain}`}>₺{part.price.toLocaleString()}</div>
+                                                        <div className={`text-[10px] font-semibold tracking-wide uppercase ${textMuted}`}>Net Fiyat</div>
+                                                    </div>
+                                                    <button onClick={() => removePart(part.id)} className={`w-8 h-8 rounded-[8px] flex items-center justify-center transition-all ${isLight ? 'text-slate-400 hover:bg-red-50 hover:text-red-500' : 'text-slate-500 hover:bg-red-500/10 hover:text-red-400'}`}>
+                                                        <X size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        {/* Labor Row */}
+                                        <div className={`p-4 rounded-[16px] border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all sm:-mx-1 ${isLight ? 'bg-blue-50/50 border-blue-100 hover:bg-blue-50' : 'bg-blue-500/5 border-blue-500/10 hover:bg-blue-500/10'}`}>
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center border shadow-sm ${isLight ? 'bg-white border-blue-200 text-blue-600' : 'bg-blue-900 border-blue-800 text-blue-400'}`}>
+                                                    <Tool size={18} />
+                                                </div>
+                                                <div>
+                                                    <div className={`font-semibold text-[14px] ${isLight ? 'text-blue-900' : 'text-blue-100'}`}>Standart {vehicleType} Bakım Hizmeti</div>
+                                                    {isLaborWarranty && <div className="text-[10px] font-bold text-emerald-500 uppercase tracking-wide mt-0.5 flex items-center gap-1"><Shield size={10} /> Garanti Kapsamı</div>}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                                                <button onClick={() => setIsLaborWarranty(!isLaborWarranty)} className={`px-3 py-1.5 rounded-[8px] text-[11px] font-semibold uppercase tracking-wide border transition-all ${isLaborWarranty ? (isLight ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20') : (isLight ? 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50' : 'bg-blue-900 text-blue-300 border-blue-800 hover:bg-blue-800')}`}>
+                                                    {isLaborWarranty ? 'Garanti' : 'Garanti?'}
+                                                </button>
+                                                <div className="text-right min-w-[80px]">
+                                                    <div className={`font-bold text-[14px] ${isLaborWarranty ? 'text-blue-400/50 line-through decoration-red-500' : (isLight ? 'text-blue-700' : 'text-blue-400')}`}>₺{laborCost.toLocaleString()}</div>
+                                                    <div className={`text-[10px] font-semibold tracking-wide uppercase ${isLight ? 'text-blue-600/70' : 'text-blue-400/70'}`}>İşçilik Bedeli</div>
+                                                </div>
+                                                <div className="w-8 h-8"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pt-2">
+                                    <label className={`text-[11px] font-semibold uppercase tracking-wide ml-1 block mb-2 ${textMuted}`}>Müşteri Şikayeti / Detaylı Notlar</label>
+                                    <textarea rows={4} placeholder="Müşterinin belirttiği şikayetler veya teknik notlar..."
+                                        value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                                        className={`w-full p-4 rounded-[12px] border text-[13px] transition-all outline-none shadow-sm resize-none ${inputBg}`}
+                                    />
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* RIGHT: SUMMARY CARD */}
+                    <div className="w-full lg:w-[380px] xl:w-[420px] sticky top-8 shrink-0 space-y-6">
+                        <div className={`rounded-[24px] border shadow-xl p-6 sm:p-8 relative overflow-hidden ${isLight ? 'bg-white border-slate-200' : 'bg-[#1a1c2e] border-white/10'}`}>
+                            <div className={`hidden dark:block absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none`}></div>
+                            <h3 className={`text-[16px] font-bold mb-6 border-b pb-4 ${isLight ? 'border-slate-200 text-slate-900' : 'border-white/10 text-white'}`}>İş Emri Özeti</h3>
+
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center bg-transparent">
+                                    <span className={`text-[13px] font-medium ${textMuted}`}>Parça Toplamı</span>
+                                    <span className={`text-[14px] font-semibold ${textMain}`}>₺{totalParts.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center bg-transparent">
+                                    <span className={`text-[13px] font-medium ${textMuted}`}>İşçilik Hizmeti</span>
+                                    <span className={`text-[14px] font-semibold ${isLaborWarranty ? 'text-slate-400 line-through decoration-slate-500' : textMain}`}>₺{laborCost.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center bg-transparent">
+                                    <span className={`text-[13px] font-medium ${textMuted}`}>KDV (%20)</span>
+                                    <span className={`text-[14px] font-semibold ${textMain}`}>₺{(totalCost * 0.1666).toFixed(0).toLocaleString()}</span>
+                                </div>
+
+                                <div className={`pt-5 mt-5 border-t ${isLight ? 'border-slate-200' : 'border-white/10'}`}>
+                                    <div className="flex justify-between items-end">
+                                        <span className={`text-[11px] font-bold uppercase tracking-wide ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>Genel Toplam</span>
+                                        <div className="flex flex-col items-end">
+                                            <div className={`text-[32px] font-bold tracking-tight leading-none ${textMain}`}>₺{totalCost.toFixed(0).toLocaleString()}</div>
+                                            <div className={`text-[11px] font-semibold uppercase tracking-wide mt-1.5 ${textMuted}`}>Vergiler Dahil Fiyat</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Notes Area */}
-                            <div className="space-y-4 pt-4">
-                                <label className="text-[11px] font-black text-white/40 uppercase tracking-widest ml-1">Müşteri Şikayeti / Detaylı Notlar</label>
-                                <textarea rows={4} placeholder="Müşterinin belirttiği şikayetler veya teknik notlar..."
-                                    value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                                    className="w-full bg-black/40 border-2 border-white/5 rounded-3xl px-6 py-5 text-white font-bold placeholder:text-white/10 focus:border-white/20 transition-all outline-none resize-none"
-                                />
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                {/* RIGHT: SUMMARY STICKY */}
-                <div className="sticky top-8 space-y-6">
-                    <div className="bg-[#1a1c2e] rounded-[40px] border border-white/10 p-8 shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                        <h3 className="text-lg font-black text-white mb-8 border-b border-white/5 pb-4">İş Emri Özeti</h3>
-
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center group">
-                                <span className="text-sm font-bold text-white/30 italic group-hover:text-white/50 transition-colors">Parça Toplamı</span>
-                                <span className="font-black text-white">₺{totalParts.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between items-center group">
-                                <span className="text-sm font-bold text-white/30 italic group-hover:text-white/50 transition-colors">İşçilik Hizmeti</span>
-                                <span className={`font-black ${isLaborWarranty ? 'text-white/20 line-through' : 'text-white'}`}>₺{laborCost.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between items-center group">
-                                <span className="text-sm font-bold text-white/30 italic group-hover:text-white/50 transition-colors">KDV (%20)</span>
-                                <span className="font-black text-white">₺{(totalCost * 0.1666).toFixed(0).toLocaleString()}</span>
-                            </div>
-
-                            <div className="pt-6 mt-6 border-t border-white/10 flex flex-col gap-1">
-                                <div className="flex justify-between items-end">
-                                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Genel Toplam</span>
-                                    <div className="flex flex-col items-end">
-                                        <div className="text-4xl font-black text-white tracking-tighter">₺{totalCost.toFixed(0).toLocaleString()}</div>
-                                        <div className="text-[10px] font-bold text-white/20 uppercase tracking-widest leading-none mt-1">Herşey Dahil Fiyat</div>
-                                    </div>
-                                </div>
+                            <div className="mt-8 space-y-3">
+                                <button onClick={handleSave} className={`w-full h-[48px] rounded-[12px] text-[13px] font-bold uppercase tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 ${isLight ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}>
+                                    <Check size={16} strokeWidth={3} />
+                                    {isNewCustomer ? 'Kaydet ve Ödeme Al' : 'Oluştur ve Ödeme Al'}
+                                </button>
+                                <button onClick={() => router.back()} className={`w-full h-[44px] rounded-[12px] border text-[12px] font-bold uppercase tracking-wide transition-all ${isLight ? 'border-slate-200 text-slate-500 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}>
+                                    İşlemi İptal Et
+                                </button>
                             </div>
                         </div>
 
-                        <div className="mt-10 space-y-3">
-                            <button onClick={handleSave} className="w-full py-5 rounded-[24px] bg-primary hover:bg-primary/90 text-white font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all relative overflow-hidden group">
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                                {isNewCustomer ? '➕ Kaydet ve Ödeme Al' : '✨ Oluştur ve Ödeme Al'}
-                            </button>
-                            <button onClick={() => router.back()} className="w-full py-4 rounded-2xl bg-white/5 text-white/40 font-black text-[11px] uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all">İşlemi İptal Et</button>
+                        <div className={`p-4 rounded-[16px] border flex items-start gap-4 ${isLight ? 'bg-blue-50 border-blue-100' : 'bg-blue-500/10 border-blue-500/20'}`}>
+                            <div className={`w-8 h-8 rounded-[8px] flex items-center justify-center shrink-0 mt-0.5 ${isLight ? 'bg-white text-blue-500 shadow-sm' : 'bg-blue-500/20 text-blue-400'}`}>
+                                <Info size={16} />
+                            </div>
+                            <p className={`text-[12px] leading-relaxed font-medium ${isLight ? 'text-blue-800' : 'text-blue-200'}`}>
+                                Kaydet butonuna bastığınızda seçilen parçalar stoktan düşülür ve tahsilat için ödeme terminaline aktarılırsınız.
+                            </p>
                         </div>
                     </div>
-
-                    <div className="p-6 rounded-[32px] bg-white/[0.02] border border-white/5 flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-xl">💡</div>
-                        <p className="text-[11px] text-white/40 font-bold leading-relaxed italic">
-                            Kaydet butonuna bastığınızda stoklar otomatik olarak düşülür ve ödeme sayfasına yönlendirilirsiniz.
-                        </p>
-                    </div>
                 </div>
-
             </div>
         </div>
     );
@@ -619,12 +621,12 @@ function ServiceAcceptanceContent() {
 
 export default function ServiceAcceptancePage() {
     return (
-        <Suspense fallback={<div className="container flex-center min-h-screen">
-            <div className="animate-pulse flex flex-col items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-white/10 border-4 border-t-primary border-transparent animate-spin"></div>
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Yükleniyor...</span>
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+                <div className="w-10 h-10 border-4 border-slate-200 dark:border-slate-800 border-t-blue-600 rounded-full animate-spin"></div>
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Yükleniyor...</span>
             </div>
-        </div>}>
+        }>
             <ServiceAcceptanceContent />
         </Suspense>
     );
