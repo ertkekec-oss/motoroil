@@ -2037,13 +2037,13 @@ function InventoryContent() {
                   {priceLists.filter((pl) =>
                     ["Perakende", "Toptan"].includes(pl.name),
                   ).length > 0 ? (
-                    <div className="mt-2 pt-4 border-t border-white/5">
+                    <div className="mt-4 pt-5 border-t border-slate-200 dark:border-white/10">
                       <div
                         onClick={() => setShowOtherPrices(!showOtherPrices)}
-                        className="flex items-center gap-2 mb-3 cursor-pointer select-none hover:bg-white/5 p-2 rounded-lg transition-colors"
+                        className="flex items-center gap-2 mb-4 cursor-pointer select-none hover:bg-slate-100 dark:hover:bg-white/5 p-2 rounded-[12px] transition-colors"
                       >
-                        <span className="text-[10px] font-black uppercase text-muted tracking-widest">
-                          📋 DİĞER FİYAT LİSTELERİ (
+                        <span className="text-[11px] font-semibold uppercase text-slate-500 dark:text-slate-400 tracking-widest flex items-center gap-2">
+                          📋 Diğer Fiyat Listeleri (
                           {
                             priceLists.filter((pl) =>
                               ["Perakende", "Toptan"].includes(pl.name),
@@ -2051,12 +2051,12 @@ function InventoryContent() {
                           }
                           )
                         </span>
-                        <span className="text-xs opacity-50 ml-auto">
-                          {showOtherPrices ? "▼ Gizle" : "▶ Göster"}
+                        <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 ml-auto flex items-center gap-1">
+                          {showOtherPrices ? "Gizle" : "Göster"}
                         </span>
                       </div>
                       {showOtherPrices && (
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-2 p-2 rounded-xl bg-black/20 border border-white/5">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 animate-in fade-in slide-in-from-top-2 p-3 rounded-[16px] bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 shadow-sm">
                           {priceLists
                             .filter((pl) =>
                               ["Perakende", "Toptan"].includes(pl.name),
@@ -2064,7 +2064,7 @@ function InventoryContent() {
                             .map((pl: any) => (
                               <div key={pl.id} className="relative group">
                                 <label
-                                  className="text-[9px] font-bold text-muted uppercase mb-1 block truncate"
+                                  className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase mb-1.5 block truncate"
                                   title={pl.name}
                                 >
                                   {pl.name}
@@ -2072,8 +2072,8 @@ function InventoryContent() {
                                 <div className="relative">
                                   <input
                                     type="number"
-                                    className="w-full bg-black/40 border border-white/10 rounded-lg py-2 pl-3 pr-8 text-xs focus:border-primary outline-none transition-colors group-hover:bg-white/5"
-                                    placeholder="Liste Fiyatı"
+                                    className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[10px] py-2.5 pl-3 pr-10 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
+                                    placeholder="0.00"
                                     value={productPrices[pl.id] || ""}
                                     onChange={(e) =>
                                       setProductPrices({
@@ -2082,7 +2082,7 @@ function InventoryContent() {
                                       })
                                     }
                                   />
-                                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold opacity-50">
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 dark:text-slate-500">
                                     {pl.currency}
                                   </span>
                                 </div>
@@ -2092,17 +2092,17 @@ function InventoryContent() {
                       )}
                     </div>
                   ) : (
-                    <div className="mt-2 pt-4 border-t border-white/5">
-                      <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                    <div className="mt-4 pt-5 border-t border-slate-200 dark:border-white/10">
+                      <div className="flex items-center justify-between p-4 rounded-[16px] bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500">
+                          <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-500 text-lg shadow-sm">
                             ⚠️
                           </div>
                           <div>
-                            <div className="text-xs font-bold text-amber-200">
+                            <div className="text-[13px] font-semibold text-amber-900 dark:text-amber-200">
                               Fiyat Listesi Tanımlı Değil
                             </div>
-                            <div className="text-[10px] text-amber-200/60">
+                            <div className="text-[11px] text-amber-700 dark:text-amber-200/60 font-medium">
                               Toptan ve diğer fiyatlar için liste oluşturun.
                             </div>
                           </div>
@@ -2130,38 +2130,41 @@ function InventoryContent() {
                               console.error(err);
                             }
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-amber-500 text-black text-[10px] font-black hover:bg-amber-400 transition-colors"
+                          className="px-4 py-2 rounded-[10px] bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-semibold transition-colors shadow-sm"
                         >
-                          OLUŞTUR
+                          Oluştur
                         </button>
                       </div>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="mt-4 pt-5 border-t border-slate-200 dark:border-white/10 grid grid-cols-2 gap-5">
                     <div>
-                      <label className="text-xs font-bold text-muted uppercase mb-1 block">
+                      <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
                         Alış İskonto (%)
                       </label>
-                      <input
-                        type="number"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
-                        value={(newProduct as any).purchaseDiscount || 0}
-                        onChange={(e) =>
-                          setNewProduct({
-                            ...newProduct,
-                            purchaseDiscount: parseFloat(e.target.value),
-                          } as any)
-                        }
-                      />
+                      <div className="relative">
+                        <input
+                          type="number"
+                          className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] py-2.5 pl-3 pr-8 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
+                          value={(newProduct as any).purchaseDiscount || 0}
+                          onChange={(e) =>
+                            setNewProduct({
+                              ...newProduct,
+                              purchaseDiscount: parseFloat(e.target.value),
+                            } as any)
+                          }
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-[13px]">%</span>
+                      </div>
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-muted uppercase mb-1 block">
+                      <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
                         Stok Miktarı
                       </label>
                       <input
                         type="number"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                        className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-2.5 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
                         value={newProduct.stock}
                         onChange={(e) =>
                           setNewProduct({
@@ -2175,18 +2178,18 @@ function InventoryContent() {
                 </div>
 
                 {/* Ek Vergiler & Detaylar */}
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
-                  <h3 className="text-sm font-bold text-white/80 border-b border-white/10 pb-2">
-                    📑 Ek Vergiler & Gümrük
+                <div className="p-6 bg-slate-50 dark:bg-black/10 rounded-[20px] border border-slate-200 dark:border-white/5 space-y-5">
+                  <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-3 flex items-center gap-2">
+                    <span className="text-lg">📑</span> Ek Vergiler & Gümrük
                   </h3>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-5">
                     <div>
-                      <label className="text-xs font-bold text-muted uppercase mb-1 block">
+                      <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
                         Ö.T.V Türü
                       </label>
                       <select
-                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                        className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-2.5 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm appearance-none cursor-pointer"
                         value={newProduct.otvType}
                         onChange={(e) =>
                           setNewProduct({ ...newProduct, otvType: e.target.value })
@@ -2198,12 +2201,12 @@ function InventoryContent() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-muted uppercase mb-1 block">
+                      <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
                         Ö.T.V Tutarı
                       </label>
                       <input
                         type="number"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                        className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-2.5 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
                         value={newProduct.salesOtv}
                         onChange={(e) =>
                           setNewProduct({
@@ -2215,14 +2218,14 @@ function InventoryContent() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-5">
                     <div>
-                      <label className="text-xs font-bold text-muted uppercase mb-1 block">
+                      <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
                         Ö.İ.V Tutarı
                       </label>
                       <input
                         type="number"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                        className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-2.5 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
                         value={newProduct.salesOiv}
                         onChange={(e) =>
                           setNewProduct({
@@ -2233,12 +2236,12 @@ function InventoryContent() {
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-muted uppercase mb-1 block">
+                      <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
                         GTİP Kodu
                       </label>
                       <input
                         type="text"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary outline-none"
+                        className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] p-2.5 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors shadow-sm"
                         value={(newProduct as any).gtip || ""}
                         onChange={(e) =>
                           setNewProduct({
@@ -2252,18 +2255,18 @@ function InventoryContent() {
                   </div>
                 </div>
 
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-sm font-bold text-white/80">
-                      🎨 Varyant Yapılandırması
+                <div className="p-6 bg-slate-50 dark:bg-black/10 rounded-[20px] border border-slate-200 dark:border-white/5 space-y-5">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                      <span className="text-lg">🎨</span> Varyant Yapılandırması
                     </h3>
-                    <div className="flex items-center gap-2 bg-black/40 p-1.5 rounded-lg border border-white/10">
-                      <span className="text-[10px] font-black uppercase text-muted">
-                        VARYANT KULLAN
+                    <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] p-2 rounded-[12px] border border-slate-200 dark:border-white/10 shadow-sm">
+                      <span className="text-[10px] font-semibold uppercase text-slate-500 dark:text-slate-400">
+                        Varyant Kullan
                       </span>
                       <input
                         type="checkbox"
-                        className="w-4 h-4 accent-primary cursor-pointer"
+                        className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-white/20 focus:ring-blue-500 bg-slate-50 dark:bg-black/20 cursor-pointer"
                         checked={useVariants}
                         onChange={(e) => setUseVariants(e.target.checked)}
                       />
@@ -2271,7 +2274,7 @@ function InventoryContent() {
                   </div>
 
                   {useVariants && (
-                    <div className="space-y-4 animate-fade-in">
+                    <div className="space-y-5 animate-fade-in">
                       <div className="flex flex-wrap gap-2">
                         {variantAttributes.map((attr) => (
                           <button
@@ -2285,9 +2288,9 @@ function InventoryContent() {
                                 setSelectedAttributes((prev) => [...prev, attr.id]);
                               }
                             }}
-                            className={`px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wide border transition-all ${selectedAttributes.includes(attr.id)
-                              ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
-                              : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                            className={`px-3 py-1.5 rounded-[10px] text-[11px] font-semibold uppercase tracking-wide border transition-all ${selectedAttributes.includes(attr.id)
+                              ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20"
+                              : "bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 shadow-sm"
                               }`}
                           >
                             {attr.name}
@@ -2296,7 +2299,7 @@ function InventoryContent() {
                         <a
                           href="/inventory/variants"
                           target="_blank"
-                          className="px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wide bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all"
+                          className="px-3 py-1.5 rounded-[10px] text-[11px] font-semibold uppercase tracking-wide bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all shadow-sm flex items-center gap-1"
                         >
                           + Yeni Özellik Tanımla
                         </a>
@@ -2306,25 +2309,25 @@ function InventoryContent() {
                         <div className="space-y-4">
                           <button
                             onClick={generateCombinations}
-                            className="w-full py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-black hover:bg-white/10 transition-all"
+                            className="w-full py-2.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[12px] text-[12px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-all shadow-sm flex items-center justify-center gap-2"
                           >
-                            🔄 KOMBİNASYONLARI OLUŞTUR
+                            🔄 Kombinasyonları Oluştur
                           </button>
 
                           {generatedVariants.length > 0 && (
-                            <div className="max-h-64 overflow-y-auto space-y-2 pr-2 custom-scroll">
+                            <div className="max-h-[300px] overflow-y-auto space-y-3 pr-2 custom-scroll">
                               {generatedVariants.map((v, idx) => (
                                 <div
                                   key={idx}
-                                  className="p-3 bg-black/40 border border-white/5 rounded-xl grid grid-cols-4 gap-2 items-end"
+                                  className="p-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[16px] grid grid-cols-4 gap-4 items-end shadow-sm"
                                 >
                                   <div className="col-span-1">
-                                    <div className="text-[9px] font-black text-muted uppercase mb-1">
+                                    <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                                       {v.variantLabel}
                                     </div>
                                     <input
                                       type="text"
-                                      className="w-full bg-white/5 border border-white/10 rounded-lg p-1.5 text-[10px] outline-none"
+                                      className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[10px] p-2.5 text-[12px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                                       value={v.code}
                                       onChange={(e) => {
                                         const copy = [...generatedVariants];
@@ -2334,12 +2337,12 @@ function InventoryContent() {
                                     />
                                   </div>
                                   <div className="col-span-1">
-                                    <div className="text-[9px] font-black text-muted uppercase mb-1">
-                                      STOK
+                                    <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                      Stok
                                     </div>
                                     <input
                                       type="number"
-                                      className="w-full bg-white/5 border border-white/10 rounded-lg p-1.5 text-[10px] outline-none"
+                                      className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[10px] p-2.5 text-[12px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                                       value={v.stock}
                                       onChange={(e) => {
                                         const copy = [...generatedVariants];
@@ -2351,12 +2354,12 @@ function InventoryContent() {
                                     />
                                   </div>
                                   <div className="col-span-1">
-                                    <div className="text-[9px] font-black text-muted uppercase mb-1">
-                                      ALIŞ
+                                    <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                      Alış
                                     </div>
                                     <input
                                       type="number"
-                                      className="w-full bg-white/5 border border-white/10 rounded-lg p-1.5 text-[10px] outline-none"
+                                      className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[10px] p-2.5 text-[12px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                                       value={v.buyPrice}
                                       onChange={(e) => {
                                         const copy = [...generatedVariants];
@@ -2368,12 +2371,12 @@ function InventoryContent() {
                                     />
                                   </div>
                                   <div className="col-span-1">
-                                    <div className="text-[9px] font-black text-muted uppercase mb-1">
-                                      SATIŞ
+                                    <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                      Satış
                                     </div>
                                     <input
                                       type="number"
-                                      className="w-full bg-white/5 border border-white/10 rounded-lg p-1.5 text-[10px] outline-none"
+                                      className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[10px] p-2.5 text-[12px] font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                                       value={v.price}
                                       onChange={(e) => {
                                         const copy = [...generatedVariants];
