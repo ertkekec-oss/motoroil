@@ -8,7 +8,7 @@ import { useInventory } from '@/contexts/InventoryContext';
 import { useCRM } from '@/contexts/CRMContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { ArrowLeft, CheckCircle2, Info, Search, Shield, X, Package, Box, MapPin, Tool, Check, AlertTriangle, Bike, Car, Truck } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Info, Search, Shield, X, Package, Box, MapPin, Wrench, Check, AlertTriangle, Bike, Car, Truck, Clock } from 'lucide-react';
 
 function ServiceAcceptanceContent() {
     const router = useRouter();
@@ -530,7 +530,7 @@ function ServiceAcceptanceContent() {
                                         <div className={`p-4 rounded-[16px] border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all sm:-mx-1 ${isLight ? 'bg-blue-50/50 border-blue-100 hover:bg-blue-50' : 'bg-blue-500/5 border-blue-500/10 hover:bg-blue-500/10'}`}>
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center border shadow-sm ${isLight ? 'bg-white border-blue-200 text-blue-600' : 'bg-blue-900 border-blue-800 text-blue-400'}`}>
-                                                    <Tool size={18} />
+                                                    <Wrench size={18} />
                                                 </div>
                                                 <div>
                                                     <div className={`font-semibold text-[14px] ${isLight ? 'text-blue-900' : 'text-blue-100'}`}>Standart {vehicleType} Bakım Hizmeti</div>
