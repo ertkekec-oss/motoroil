@@ -8,10 +8,10 @@ export default function TaxesPanel(props: any) {
                     <div  className="animate-fade-in-up">
                         <h2 >Vergi Oranları</h2>
 
-                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
+                        <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                             <div className="flex-col gap-2">
                                 {((invoiceSettings as any)?.kdvRates || []).map((rate: any, idx: number) => (
-                                    <div key={idx} className="flex-between" >
+                                    <div key={idx} className="flex justify-between items-center" >
                                         <div className="flex-center gap-3">
                                             <span >%{rate}</span>
                                             <span >KDV ORANI</span>

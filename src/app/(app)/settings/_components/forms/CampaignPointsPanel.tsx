@@ -49,7 +49,7 @@ export default function CampaignPointsPanel(props: any) {
                                 <div className="grid-cols-12 gap-6">
                                     {/* Create/Edit Form */}
                                     <div className="col-span-12 xl:col-span-5">
-                                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
+                                        <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                                             <h3 className="mb-4" >
                                                 <div >+</div>
                                                 {editingCampaignId ? 'Kampanyayı Düzenle' : 'Yeni Kampanya Tanımla'}
@@ -157,7 +157,7 @@ export default function CampaignPointsPanel(props: any) {
                                                                     borderRadius: '6px',
                                                                     fontSize: '11px',
                                                                     fontWeight: '700',
-                                                                    background: newCampaign.targetCustomerCategoryIds?.includes(cc) ? 'var(--info)' : 'rgba(255,255,255,0.05)',
+                                                                    background: newCampaign.targetCustomerCategoryIds?.includes(cc) ? '#3B82F6' : '',
                                                                     border: 'none',
                                                                     color: 'white',
                                                                     cursor: 'pointer'
@@ -184,7 +184,7 @@ export default function CampaignPointsPanel(props: any) {
                                                                     borderRadius: '6px',
                                                                     fontSize: '11px',
                                                                     fontWeight: '700',
-                                                                    background: newCampaign.conditions.brands?.includes(b) ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                                                                    background: newCampaign.conditions.brands?.includes(b) ? '#3B82F6' : '',
                                                                     border: 'none',
                                                                     color: 'white',
                                                                     cursor: 'pointer'
@@ -210,7 +210,7 @@ export default function CampaignPointsPanel(props: any) {
                                                                     borderRadius: '6px',
                                                                     fontSize: '11px',
                                                                     fontWeight: '700',
-                                                                    background: newCampaign.conditions.categories?.includes(c) ? 'var(--secondary)' : 'rgba(255,255,255,0.05)',
+                                                                    background: newCampaign.conditions.categories?.includes(c) ? '#3B82F6' : '',
                                                                     border: 'none',
                                                                     color: 'white',
                                                                     cursor: 'pointer'
@@ -301,8 +301,8 @@ export default function CampaignPointsPanel(props: any) {
                                                                 <div >{camp.type === 'buy_x_get_free' ? 'ADET' : 'ORAN'}</div>
                                                             </div>
                                                             <div >
-                                                                <button onClick={() => startEditingCampaign(camp)} className="px-6 h-[44px] rounded-[14px] font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 btn-sm" >✏️</button>
-                                                                <button onClick={() => deleteCampaign(camp.id)} className="px-6 h-[44px] rounded-[14px] font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 btn-sm" >🗑️</button>
+                                                                <button onClick={() => startEditingCampaign(camp)} className="px-6 h-[44px] rounded-xl font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 btn-sm" >✏️</button>
+                                                                <button onClick={() => deleteCampaign(camp.id)} className="px-6 h-[44px] rounded-xl font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 btn-sm" >🗑️</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -323,7 +323,7 @@ export default function CampaignPointsPanel(props: any) {
                         {/* 10.2 REFERANS SİSTEMİ */}
                         {campaignSubTab === 'referral' && (
                             <div className="animate-fade-in-up" >
-                                <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
+                                <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                                     <div >
                                         <div >🔗</div>
                                         <div>
@@ -334,7 +334,7 @@ export default function CampaignPointsPanel(props: any) {
 
                                     <div className="grid-cols-2 gap-8 mb-8">
                                         <div >
-                                            <div className="flex-between mb-2">
+                                            <div className="flex justify-between items-center mb-2">
                                                 <label >REFERANS OLAN KİŞİYE ÖDÜL</label>
                                                 <select
                                                     value={referralSettings.referrerRewardType || 'percent'}
@@ -364,7 +364,7 @@ export default function CampaignPointsPanel(props: any) {
                                         </div>
 
                                         <div >
-                                            <div className="flex-between mb-2">
+                                            <div className="flex justify-between items-center mb-2">
                                                 <label >YENİ GELEN KİŞİYE HEDİYE</label>
                                                 <select
                                                     value={referralSettings.refereeGiftType || 'amount'}
@@ -411,7 +411,7 @@ export default function CampaignPointsPanel(props: any) {
                             <div className="animate-fade-in-up" >
                                 <div className="grid-cols-12 gap-6">
                                     <div className="col-span-12 lg:col-span-5">
-                                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm">
+                                        <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                                             <h3 className="mb-6" >🎫 Kod Üretici</h3>
                                             <div className="flex-col gap-5">
                                                 <div className="flex-col gap-2">
@@ -512,7 +512,7 @@ export default function CampaignPointsPanel(props: any) {
                                     </div>
 
                                     <div className="col-span-12 lg:col-span-7">
-                                        <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all flex-col items-center justify-center" >
+                                        <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all flex-col items-center justify-center" >
                                             <div >🎫</div>
                                             <h3 >Hediye Çeki Yönetimi</h3>
                                             <p >

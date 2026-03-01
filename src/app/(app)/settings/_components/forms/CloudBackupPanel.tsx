@@ -9,18 +9,18 @@ export default function CloudBackupPanel(props: any) {
                         <h2 >Güvenlik & Bulut</h2>
 
                         <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
+                            <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                                 <div >BULUT DURUMU</div>
                                 <div >✓ Senkronize</div>
                             </div>
-                            <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
+                            <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                                 <div >DEPOLAMA</div>
                                 <div >1.2 GB / 10 GB</div>
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-4 p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
-                            <div className="flex-between" >
+                        <div className="flex flex-col gap-4 p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
+                            <div className="flex justify-between items-center" >
                                 <div >
                                     <div >🛡️ Geri Yükleme Noktası</div>
                                     <p >Kritik işlemlerden önce Snapshot alın.</p>
@@ -28,7 +28,7 @@ export default function CloudBackupPanel(props: any) {
                                 <button onClick={() => { /* ... */ }} className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors" >SNAPSHOT AL</button>
                             </div>
 
-                            <div className="flex-between" >
+                            <div className="flex justify-between items-center" >
                                 <div>
                                     <div >Manuel SQL Yedekleme</div>
                                     <p >Veritabanını JSON olarak indir.</p>

@@ -11,14 +11,14 @@ export default function AccountPanel(props: any) {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* INFO CARD */}
-                            <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
+                            <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                                 <div className="flex items-center gap-6 mb-8">
                                     <div style={{
                                         width: '80px', height: '80px', borderRadius: '24px',
-                                        background: 'linear-gradient(135deg, var(--primary) 0%, #E64A00 100%)',
+                                        
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         fontSize: '32px', fontWeight: '900', color: 'white',
-                                        boxShadow: '0 10px 30px rgba(36,123,254,0.3)'
+                                        
                                     }}>
                                         {users.find((u: any) => u.name === (currentUser?.name || ''))?.name?.substring(0, 1).toUpperCase() || 'A'}
                                     </div>
@@ -41,7 +41,7 @@ export default function AccountPanel(props: any) {
                             </div>
 
                             {/* PASSWORD CHANGE */}
-                            <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all p-6">
+                            <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all p-6">
                                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                                     🔐 Şifre Değiştir
                                 </h3>

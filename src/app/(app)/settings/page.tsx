@@ -983,17 +983,17 @@ export default function SettingsPage() {
     const activeListRender = () => {
         if (definitionTab === 'payment_methods') {
             return paymentMethods.map((pm: any, i: number) => (
-                <div key={pm.id || i} className="flex-between" style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                <div key={pm.id || i} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
                     <div className="flex items-center gap-2">
                         <span>{pm.icon || '💰'}</span>
                         <div className="flex-col">
-                            <span style={{ fontSize: '12px', fontWeight: '600' }}>{pm.label}</span>
-                            <span style={{ fontSize: '10px', opacity: 0.5 }}>{pm.type === 'card' ? 'Kredi Kartı' : 'Nakit'}</span>
+                            <span >{pm.label}</span>
+                            <span >{pm.type === 'card' ? 'Kredi Kartı' : 'Nakit'}</span>
                         </div>
                     </div>
                     <button
                         onClick={() => quickRemovePaymentMethod(pm.id)}
-                        style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '14px' }}
+                        className="text-red-500 hover:text-red-600 transition-colors"
                     >
                         🗑️
                     </button>
@@ -1007,8 +1007,8 @@ export default function SettingsPage() {
                     definitionTab === 'supp_class' ? suppClasses : warranties;
 
         return list.map((item: string, i: number) => (
-            <div key={i} className="flex-between" style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)' }}>
-                <span style={{ fontSize: '12px', fontWeight: '600' }}>{item}</span>
+            <div key={i} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                <span >{item}</span>
                 <button
                     onClick={() => {
                         if (definitionTab === 'brands') removeDefinition('brands', item, brands, setBrands);
@@ -1017,7 +1017,7 @@ export default function SettingsPage() {
                         if (definitionTab === 'supp_class') removeDefinition('suppClasses', item, suppClasses, setSuppClasses);
                         if (definitionTab === 'warranties') removeDefinition('warranties', item, warranties, setWarranties);
                     }}
-                    style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '14px' }}
+                    className="text-red-500 hover:text-red-600 transition-colors"
                 >
                     🗑️
                 </button>
@@ -1046,10 +1046,10 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="flex h-screen bg-[#F6F8FB] dark:bg-[#0B1120] text-slate-900 dark:text-white overflow-hidden">
+        <div className="flex h-screen bg-slate-50 dark:bg-[#0B1220] text-slate-900 dark:text-white overflow-hidden grid grid-cols-[260px_1fr] md:flex">
 
             {/* LEFT SIDEBAR MENU */}
-            <div className="w-[260px] shrink-0 border-r border-slate-200 dark:border-slate-800 p-6 bg-white dark:bg-[#111827] flex flex-col gap-2 overflow-y-auto">
+            <div className="w-[260px] shrink-0 border-r border-slate-200 dark:border-slate-800 p-6 bg-white dark:bg-[#0F172A] flex flex-col gap-2 overflow-y-auto">
                 <h2 className="text-[11px] font-bold mb-4 px-3 text-slate-500 uppercase tracking-widest">⚙ Ayarlar</h2>
 
                 {[
@@ -1076,8 +1076,8 @@ export default function SettingsPage() {
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
                             className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg transition-colors text-left relative overflow-hidden ${isActive
-                                ? 'bg-[#E0E7FF] dark:bg-[#1E293B] text-blue-700 dark:text-white font-bold'
-                                : 'text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-800'
+                                ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-medium'
+                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-xl'
                                 }`}
 
                         >
@@ -1217,7 +1217,7 @@ export default function SettingsPage() {
                                                             <div style={{
                                                                 width: `${c.usageLimit > 0 ? (c.usedCount / c.usageLimit) * 100 : (c.usedCount > 0 ? 100 : 0)}%`,
                                                                 height: '100%',
-                                                                background: c.isUsed ? 'rgba(255,255,255,0.2)' : 'var(--primary)'
+                                                                background: c.isUsed ? '#E2E8F0' : '#3B82F6'
                                                             }} />
                                                         </div>
                                                         <span >

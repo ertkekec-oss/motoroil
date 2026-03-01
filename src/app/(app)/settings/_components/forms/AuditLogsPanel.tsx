@@ -6,7 +6,7 @@ export default function AuditLogsPanel(props: any) {
     return (
         (
                     <div className="animate-fade-in-up">
-                        <div className="flex-between mb-4">
+                        <div className="flex justify-between items-center mb-4">
                             <div>
                                 <h2 >İşlem Günlükleri</h2>
                                 <p >Sistemdeki son değişiklikler</p>
@@ -16,7 +16,7 @@ export default function AuditLogsPanel(props: any) {
                             </button>
                         </div>
 
-                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
+                        <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                             <table >
                                 <thead className="h-[52px] px-6 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
 <tr >
@@ -39,7 +39,7 @@ export default function AuditLogsPanel(props: any) {
                                                 <td>
                                                     <span style={{
                                                         padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: '900',
-                                                        background: log.action?.includes('DELETE') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                                                        backgroundColor: log.action?.includes("DELETE") ? "#FEF2F2" : "#EFF6FF",
                                                         color: log.action?.includes('DELETE') ? 'var(--danger)' : 'var(--primary)',
                                                         textTransform: 'uppercase'
                                                     }}>

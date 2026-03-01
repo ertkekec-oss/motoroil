@@ -9,8 +9,8 @@ export default function SalesExpensesPanel(props: any) {
                         <h2 >Masraf & Komisyon Yönetimi</h2>
 
                         {/* POS KOMİSYONLARI */}
-                        <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all mb-8">
-                            <div className="flex-between mb-4">
+                        <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all mb-8">
+                            <div className="flex justify-between items-center mb-4">
                                 <div>
                                     <h3>POS / Banka Komisyon Oranları</h3>
                                     <p className="text-muted" >Kredi kartı satışlarında otomatik gider kaydı olarak düşülecek komisyon oranları.</p>
@@ -26,7 +26,7 @@ export default function SalesExpensesPanel(props: any) {
                                     <div className="text-muted text-center p-4 bg-white/5 rounded">Henüz oran tanımlanmamış.</div>
                                 )}
                                 {salesExpenses?.posCommissions?.map((comm: any, idx: number) => (
-                                    <div key={idx} className="flex-between" >
+                                    <div key={idx} className="flex justify-between items-center" >
                                         <div className="flex gap-4 items-center flex-1">
                                             <div className="flex-col gap-1 flex-1">
                                                 <label className="text-muted" >TAKSİT / TÜR</label>
@@ -62,7 +62,7 @@ export default function SalesExpensesPanel(props: any) {
                                         <button onClick={() => {
                                             const newComms = salesExpenses.posCommissions.filter((_: any, i: number) => i !== idx);
                                             updateSalesExpenses({ ...salesExpenses, posCommissions: newComms });
-                                        }} className="px-6 h-[44px] rounded-[14px] font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 text-danger ml-4">🗑️</button>
+                                        }} className="px-6 h-[44px] rounded-xl font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 text-danger ml-4">🗑️</button>
                                     </div>
                                 ))}
                             </div>

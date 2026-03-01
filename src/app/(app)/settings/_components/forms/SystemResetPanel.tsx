@@ -8,7 +8,7 @@ export default function SystemResetPanel(props: any) {
                     <div >
                         <h2 >⚠️ KRİTİK SİSTEM SIFIRLAMA</h2>
 
-                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
+                        <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                             <div >🧨</div>
                             <h3 >Veri Temizleme ve Yapılandırma</h3>
                             <p className="text-muted" >

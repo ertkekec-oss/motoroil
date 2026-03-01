@@ -9,8 +9,8 @@ export default function BranchesPanel(props: any) {
                         <h2 >Şubeler ve Dijital Arşiv</h2>
 
                         {/* Add/Edit Branch Form */}
-                        <div className="flex flex-col gap-6 p-8 mb-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
-                            <div className="flex-between mb-4">
+                        <div className="flex flex-col gap-6 p-8 mb-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
+                            <div className="flex justify-between items-center mb-4">
                                 <h3 >
                                     {editingBranchId ? '✏️ Şube Düzenleme Modu' : '➕ Yeni Şube / Depo Ekle'}
                                 </h3>
@@ -22,7 +22,7 @@ export default function BranchesPanel(props: any) {
                             <div >
                                 <div className="flex-col gap-2">
                                     <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">TÜR</label>
-                                    <select value={newBranch.type} onChange={e => setNewBranch({ ...newBranch, type: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm">
+                                    <select value={newBranch.type} onChange={e => setNewBranch({ ...newBranch, type: e.target.value })} className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm">
                                         <option>Şube</option>
                                         <option>Depo</option>
                                         <option>Merkez Ofis</option>
@@ -31,14 +31,14 @@ export default function BranchesPanel(props: any) {
                                 </div>
                                 <div className="flex-col gap-2">
                                     <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">ŞUBE ADI</label>
-                                    <input type="text" value={newBranch.name} onChange={e => setNewBranch({ ...newBranch, name: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm" placeholder="Örn: İzmir Bornova Şube" />
+                                    <input type="text" value={newBranch.name} onChange={e => setNewBranch({ ...newBranch, name: e.target.value })} className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm" placeholder="Örn: İzmir Bornova Şube" />
                                 </div>
                                 <div className="flex-col gap-2">
                                     <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">ŞEHİR</label>
                                     <select
                                         value={newBranch.city}
                                         onChange={e => setNewBranch({ ...newBranch, city: e.target.value, district: '' })}
-                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
+                                        className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm"
                                     >
                                         <option value="">Şehir Seçin...</option>
                                         {TURKISH_CITIES.map(city => (
@@ -52,7 +52,7 @@ export default function BranchesPanel(props: any) {
                                         value={newBranch.district}
                                         onChange={e => setNewBranch({ ...newBranch, district: e.target.value })}
                                         disabled={!newBranch.city}
-                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
+                                        className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm"
                                     >
                                         <option value="">İlçe Seçin...</option>
                                         {(TURKISH_DISTRICTS[newBranch.city] || []).map(district => (
@@ -62,7 +62,7 @@ export default function BranchesPanel(props: any) {
                                 </div>
                                 <div className="flex-col gap-2">
                                     <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">DURUM</label>
-                                    <select value={newBranch.status} onChange={e => setNewBranch({ ...newBranch, status: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm">
+                                    <select value={newBranch.status} onChange={e => setNewBranch({ ...newBranch, status: e.target.value })} className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm">
                                         <option>Aktif</option>
                                         <option>Tadilat</option>
                                         <option>Kapalı</option>
@@ -73,15 +73,15 @@ export default function BranchesPanel(props: any) {
                             <div >
                                 <div className="flex-col gap-2">
                                     <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">AÇIK ADRES</label>
-                                    <input type="text" value={newBranch.address} onChange={e => setNewBranch({ ...newBranch, address: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm" placeholder="Mahalle, Cadde, No..." />
+                                    <input type="text" value={newBranch.address} onChange={e => setNewBranch({ ...newBranch, address: e.target.value })} className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm" placeholder="Mahalle, Cadde, No..." />
                                 </div>
                                 <div className="flex-col gap-2">
                                     <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">TELEFON</label>
-                                    <input type="text" value={newBranch.phone} onChange={e => setNewBranch({ ...newBranch, phone: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm" placeholder="0212..." />
+                                    <input type="text" value={newBranch.phone} onChange={e => setNewBranch({ ...newBranch, phone: e.target.value })} className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm" placeholder="0212..." />
                                 </div>
                                 <div className="flex-col gap-2">
                                     <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">YÖNETİCİ</label>
-                                    <input type="text" value={newBranch.manager} onChange={e => setNewBranch({ ...newBranch, manager: e.target.value })} className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm" placeholder="Ad Soyad" />
+                                    <input type="text" value={newBranch.manager} onChange={e => setNewBranch({ ...newBranch, manager: e.target.value })} className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm" placeholder="Ad Soyad" />
                                 </div>
                             </div>
 
@@ -93,8 +93,8 @@ export default function BranchesPanel(props: any) {
                         {/* Branch List */}
                         <div className="flex-col gap-4">
                             {branches.map(branch => (
-                                <div key={branch.id} className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up" >
-                                    <div className="flex-between" >
+                                <div key={branch.id} className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up" >
+                                    <div className="flex justify-between items-center" >
                                         <div className="flex-col gap-1">
                                             <div >
                                                 <span >
@@ -130,7 +130,7 @@ export default function BranchesPanel(props: any) {
 
                                     {selectedBranchDocs === branch.id && (
                                         <div className="animate-fade-in" >
-                                            <div className="flex-between mb-4">
+                                            <div className="flex justify-between items-center mb-4">
                                                 <h4 className="text-muted" >📂 Şube Dijital Arşivi <span >(Kira Kontratı, Ruhsat vb.)</span></h4>
                                                 <div>
                                                     <input
@@ -150,7 +150,7 @@ export default function BranchesPanel(props: any) {
                                                 <div className="grid-cols-2 gap-4">
                                                     {branchDocs.length === 0 && <div className="col-span-2 text-center text-muted" >Belge bulunmamaktadır.</div>}
                                                     {branchDocs.map((file, idx) => (
-                                                        <div key={file.id} className="flex-between" >
+                                                        <div key={file.id} className="flex justify-between items-center" >
                                                             <div className="flex-center gap-3">
                                                                 <div >{file.fileType.includes('pdf') ? '📄' : '🖼️'}</div>
                                                                 <div>
@@ -175,8 +175,8 @@ export default function BranchesPanel(props: any) {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 mb-8">
 
                             {/* SOL PANEL: ÖDEME YÖNTEMLERİ (Anasayfa Butonları) */}
-                            <div className="bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                                <div className="p-4 border-b border-white/5 bg-white/5 flex-between">
+                            <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                                <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
                                     <div>
                                         <h3 className="font-bold flex items-center gap-2">🔘 Ödeme Yöntemi Butonları</h3>
                                         <p className="text-[10px] text-muted">Anasayfadaki hızlı işlem butonlarını tanımlayın.</p>
@@ -207,7 +207,7 @@ export default function BranchesPanel(props: any) {
                                                 <button onClick={addPaymentMethodDefinition} className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors btn-sm flex-1 font-bold">
                                                     {editingPaymentMethodId ? 'GÜNCELLE' : 'EKLE'}
                                                 </button>
-                                                {editingPaymentMethodId && <button onClick={() => { setEditingPaymentMethodId(null); setNewPaymentMethod({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' }); }} className="px-6 h-[44px] rounded-[14px] font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 btn-sm">İptal</button>}
+                                                {editingPaymentMethodId && <button onClick={() => { setEditingPaymentMethodId(null); setNewPaymentMethod({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' }); }} className="px-6 h-[44px] rounded-xl font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 btn-sm">İptal</button>}
                                             </div>
                                         </div>
                                     </div>
@@ -216,7 +216,7 @@ export default function BranchesPanel(props: any) {
                                 <div className="p-4">
                                     <div className="grid grid-cols-1 gap-2">
                                         {(paymentMethods || []).map(pm => (
-                                            <div key={pm.id} className="flex-between p-3 bg-white/5 border border-white/5 rounded-xl group hover:bg-white/10 transition-all">
+                                            <div key={pm.id} className="flex justify-between items-center p-3 bg-white/5 border border-white/5 rounded-xl group hover:bg-white/10 transition-all">
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-xl p-2 bg-white/5 rounded-lg">{pm.icon}</span>
                                                     <div>
@@ -230,7 +230,7 @@ export default function BranchesPanel(props: any) {
                                                 </div>
                                             </div>
                                         ))}
-                                        <div className="flex-between p-3 bg-blue-600 hover:bg-blue-700 text-white shadow-sm/10 border border-primary/20 rounded-xl">
+                                        <div className="flex justify-between items-center p-3 bg-blue-600 hover:bg-blue-700 text-white shadow-sm/10 border border-primary/20 rounded-xl">
                                             <div className="flex items-center gap-3">
                                                 <span className="text-xl p-2 bg-white/5 rounded-lg">📖</span>
                                                 <div>
@@ -244,8 +244,8 @@ export default function BranchesPanel(props: any) {
                             </div>
 
                             {/* SAĞ PANEL: KASA & BANKA HESAPLARI */}
-                            <div className="bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                                <div className="p-4 border-b border-white/5 bg-white/5 flex-between">
+                            <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                                <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
                                     <div>
                                         <h3 className="font-bold flex items-center gap-2">🏛️ Kasa & Banka Hesapları</h3>
                                         <p className="text-[10px] text-muted">Gerçek para giriş-çıkışı yapılan hesaplar.</p>
@@ -292,7 +292,7 @@ export default function BranchesPanel(props: any) {
                                     <div className="flex flex-col gap-2">
                                         {(kasalar || []).map(k => (
                                             <div key={k.id} className="p-3 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-all group">
-                                                <div className="flex-between">
+                                                <div className="flex justify-between items-center">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-8 h-8 rounded-full bg-secondary/20 flex-center text-secondary font-black text-xs">
                                                             {k.type.substring(0, 1).toUpperCase()}

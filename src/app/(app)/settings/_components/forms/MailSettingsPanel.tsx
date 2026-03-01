@@ -13,7 +13,7 @@ export default function MailSettingsPanel(props: any) {
                             <p className="text-sm text-white/40" >Mail sunucu yapılandırması ve SMTP entegrasyon ayarları.</p>
                         </div>
 
-                        <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all p-8" >
+                        <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all p-8" >
                             <div className="flex justify-between items-center border-b border-white/5 pb-6 mb-6" >
                                 <div>
                                     <h3 className="text-lg font-black flex items-center gap-2" >
@@ -55,7 +55,7 @@ export default function MailSettingsPanel(props: any) {
                             <div className="flex justify-end mt-6" >
                                 <button
                                     onClick={saveSmtpSettings}
-                                    className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-white font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                                    className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-white font-black hover:scale-105 active:scale-95 transition-all shadow-sm"
                                     
                                 >
                                     KAYDET

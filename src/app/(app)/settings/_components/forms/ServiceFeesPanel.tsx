@@ -7,13 +7,13 @@ export default function ServiceFeesPanel(props: any) {
         (
                     <div  className="animate-fade-in-up">
                         <h2 >Servis Ücretleri</h2>
-                        <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
+                        <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                             <div className="flex-col gap-3">
                                 {[
                                     { icon: '🏍️', label: 'Motosiklet Bakım', price: localServiceSettings.motoMaintenancePrice, field: 'motoMaintenancePrice' },
                                     { icon: '🚲', label: 'Bisiklet Bakım', price: localServiceSettings.bikeMaintenancePrice, field: 'bikeMaintenancePrice' }
                                 ].map(s => (
-                                    <div key={s.field} className="flex-between" >
+                                    <div key={s.field} className="flex justify-between items-center" >
                                         <div>
                                             <div >{s.icon} {s.label}</div>
                                             <div >Otomatik gelen işçilik bedeli</div>

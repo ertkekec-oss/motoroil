@@ -8,7 +8,7 @@ export default function InvoiceSettingsPanel(props: any) {
                     <div  className="animate-fade-in-up">
                         <h2 >Fatura Konfigürasyonu</h2>
 
-                        <div className="flex flex-col gap-4 p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" >
+                        <div className="flex flex-col gap-4 p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
                             <div className="flex-col gap-1">
                                 <label >FATURA NOTU (VARSAYILAN)</label>
                                 <textarea

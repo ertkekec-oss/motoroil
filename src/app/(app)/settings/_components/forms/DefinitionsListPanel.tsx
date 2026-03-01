@@ -10,7 +10,7 @@ export default function DefinitionsListPanel(props: any) {
                         <div >
 
                             {/* SIDEBAR */}
-                            <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all-dark" >
+                            <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all-dark" >
                                 <h3 >TANIMLAR</h3>
                                 {[
                                     { id: 'brands', label: 'Markalar', icon: '🏷️', desc: 'Ürün markaları' },
@@ -29,7 +29,7 @@ export default function DefinitionsListPanel(props: any) {
                                             padding: '12px 14px', borderRadius: '12px',
                                             border: '1px solid',
                                             borderColor: definitionTab === t.id ? 'var(--primary)' : 'transparent',
-                                            background: definitionTab === t.id ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                                            background: definitionTab === t.id ? '#EFF6FF' : 'transparent',
                                             color: definitionTab === t.id ? 'white' : "#64748B",
                                             textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s',
                                             position: 'relative', overflow: 'hidden'
@@ -51,7 +51,7 @@ export default function DefinitionsListPanel(props: any) {
                             <div className="flex-col gap-6" >
 
                                 {/* Header & Input */}
-                                <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all p-6">
+                                <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all p-6">
                                     <h2 >
                                         {definitionTab === 'brands' && 'Marka Tanımları'}
                                         {definitionTab === 'prod_cat' && 'Ürün Kategorileri'}
@@ -169,7 +169,7 @@ export default function DefinitionsListPanel(props: any) {
                                 <div >
                                     {definitionTab === 'payment_methods' ?
                                         (paymentMethods || []).map((pm: any, i: number) => (
-                                            <div key={pm.id || i} className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all-hover animate-scale-in" >
+                                            <div key={pm.id || i} className="bg-white dark:bg-[#0F172A] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all-hover animate-scale-in" >
                                                 <div className="flex items-center gap-3">
                                                     <div >
                                                         {pm.icon || '💰'}
@@ -196,7 +196,7 @@ export default function DefinitionsListPanel(props: any) {
                                                         definitionTab === 'supp_class' ? (suppClasses || []) :
                                                             definitionTab === 'vehicle_types' ? (vehicleTypes || []) : (warranties || [])
                                             ).map((item: string, i: number) => (
-                                                <div key={i} className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all-hover animate-scale-in" >
+                                                <div key={i} className="bg-white dark:bg-[#0F172A] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all-hover animate-scale-in" >
                                                     <span >{item}</span>
                                                     <button
                                                         onClick={() => {

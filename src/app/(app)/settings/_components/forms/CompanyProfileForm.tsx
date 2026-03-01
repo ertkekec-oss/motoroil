@@ -9,7 +9,7 @@ export default function CompanyProfileForm(props: any) {
                         <h2 >Firma Profili</h2>
                         <p className="text-muted mb-8" >Belgelerde ve tekliflerde görünecek genel firma bilgilerini düzenleyin.</p>
 
-                        <div className="flex flex-col gap-6 p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div className="flex flex-col gap-6 p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                             <div className="flex-col gap-2">
                                 <label className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 block mb-2">FİRMA ADI</label>
                                 <input
@@ -17,7 +17,7 @@ export default function CompanyProfileForm(props: any) {
                                     value={tempCompanyInfo?.company_name || ""}
                                     onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_name: e.target.value })}
                                     placeholder="Örn: MOTOROIL"
-                                    className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm" 
+                                    className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm" 
                                 />
                             </div>
 
@@ -28,7 +28,7 @@ export default function CompanyProfileForm(props: any) {
                                     value={tempCompanyInfo?.company_slogan || ""}
                                     onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_slogan: e.target.value })}
                                     placeholder="Örn: Profesyonel Oto Servis ve Bakım"
-                                    className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
+                                    className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm"
                                 />
                             </div>
 
@@ -38,7 +38,7 @@ export default function CompanyProfileForm(props: any) {
                                     <select
                                         value={tempCompanyInfo?.company_city || ""}
                                         onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_city: e.target.value, company_district: '' })}
-                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
+                                        className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm"
                                     >
                                         <option value="">Şehir Seçin...</option>
                                         {TURKISH_CITIES.map(city => (
@@ -52,7 +52,7 @@ export default function CompanyProfileForm(props: any) {
                                         value={tempCompanyInfo?.company_district || ""}
                                         onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_district: e.target.value })}
                                         disabled={!tempCompanyInfo?.company_city}
-                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
+                                        className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm"
                                     >
                                         <option value="">İlçe Seçin...</option>
                                         {(TURKISH_DISTRICTS[tempCompanyInfo?.company_city] || []).map(district => (
@@ -70,7 +70,7 @@ export default function CompanyProfileForm(props: any) {
                                         value={tempCompanyInfo?.company_email || ""}
                                         onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_email: e.target.value })}
                                         placeholder="info@firma.com"
-                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
+                                        className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm"
                                     />
                                 </div>
                                 <div className="flex-col gap-2">
@@ -80,7 +80,7 @@ export default function CompanyProfileForm(props: any) {
                                         value={tempCompanyInfo?.company_website || ""}
                                         onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_website: e.target.value })}
                                         placeholder="www.firma.com.tr"
-                                        className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
+                                        className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm"
                                     />
                                 </div>
                             </div>
@@ -92,7 +92,7 @@ export default function CompanyProfileForm(props: any) {
                                     value={tempCompanyInfo?.company_address || ""}
                                     onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_address: e.target.value })}
                                     placeholder="Firma açık adresi..."
-                                    className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
+                                    className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm"
                                 />
                             </div>
 
@@ -103,7 +103,7 @@ export default function CompanyProfileForm(props: any) {
                                     value={tempCompanyInfo?.company_phone || ""}
                                     onChange={(e) => setTempCompanyInfo({ ...tempCompanyInfo, company_phone: e.target.value })}
                                     placeholder="+90 (---) --- -- --"
-                                    className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
+                                    className="w-full h-11 px-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40 outline-none transition-all shadow-sm"
                                 />
                             </div>
 
