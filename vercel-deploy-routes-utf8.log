@@ -1,0 +1,589 @@
+﻿node.exe : Vercel CLI 50.22.0
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Vercel   
+  CLI 50.22.0:String) [],    
+ RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Retrieving projectÔÇĞ
+Deploying motoroils-projects/
+motoroil
+Inspect: https://vercel.com/m
+otoroils-projects/motoroil/Cp
+VqrX7pqvdR4cyznuVMkvpPgabH [3
+s]
+Production: https://motoroil-
+hj374zksn-motoroils-projects.
+vercel.app [3s]
+Building...
+Building...
+Building: Running build in Wa
+shington, D.C., USA (East) ÔÇ
+ô iad1
+Building: Build machine confi
+guration: 4 cores, 8 GB
+Building: Retrieving list of 
+deployment files...
+Building: Downloading 1504 de
+ployment files...
+Building: Restored build cach
+e from previous deployment (6
+h6eAjYSCHvY8cWZpjf4otBVWdW7)
+Building: Running "vercel bui
+ld"
+Building: Vercel CLI 50.23.2
+Building: Installing dependen
+cies...
+Building: > periodya@0.1.0 po
+stinstall
+Building: > prisma generate
+Building: Environment variabl
+es loaded from .env
+Building: Prisma schema loade
+d from prisma/schema.prisma
+Building: Ô£ö Generated Prism
+a Client (v5.22.0) to ./node_
+modules/@prisma/client in 2.1
+7s
+Building: Start by importing 
+your Prisma Client (See: http
+s://pris.ly/d/importing-clien
+t)
+Building: Tip: Want real-time
+ updates to your database wit
+hout manual polling? Discover
+ how with Pulse: https://pris
+.ly/tip-0-pulse
+Building: up to date in 5s
+Building: 182 packages are lo
+oking for funding
+Building: run `npm fund` for 
+details
+Building: Detected Next.js ve
+rsion: 16.1.4
+Building: Running "npm run ve
+rcel-build"
+Building: > periodya@0.1.0 ve
+rcel-build
+Building: > prisma generate &
+& prisma db push --accept-dat
+a-loss && next build
+Building: Environment variabl
+es loaded from .env
+Building: Prisma schema loade
+d from prisma/schema.prisma
+Building: Ô£ö Generated Prism
+a Client (v5.22.0) to ./node_
+modules/@prisma/client in 1.7
+3s
+Building: Start by importing 
+your Prisma Client (See: http
+s://pris.ly/d/importing-clien
+t)
+Building: Tip: Want real-time
+ updates to your database wit
+hout manual polling? Discover
+ how with Pulse: https://pris
+.ly/tip-0-pulse
+Building: ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÉ
+Building: Ôöé  Update availab
+le 5.22.0 -> 7.4.2           
+            Ôöé
+Building: Ôöé                
+                             
+            Ôöé
+Building: Ôöé  This is a majo
+r update - please follow the 
+guide at    Ôöé
+Building: Ôöé  https://pris.l
+y/d/major-version-upgrade    
+            Ôöé
+Building: Ôöé                
+                             
+            Ôöé
+Building: Ôöé  Run the follow
+ing to update                
+            Ôöé
+Building: Ôöé    npm i --save
+-dev prisma@latest           
+            Ôöé
+Building: Ôöé    npm i @prism
+a/client@latest              
+            Ôöé
+Building: ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöİ
+Building: Environment variabl
+es loaded from .env
+Building: Prisma schema loade
+d from prisma/schema.prisma
+Building: Datasource "db": Po
+stgreSQL database "neondb", s
+chema "public" at "ep-billowi
+ng-glade-agt0zp7m-pooler.c-2.
+eu-central-1.aws.neon.tech"
+Building: The database is alr
+eady in sync with the Prisma 
+schema.
+Building: Running generate...
+ (Use --skip-generate to skip
+ the generators)
+Building: Running generate...
+ - Prisma Client
+Building: Ô£ö Generated Prism
+a Client (v5.22.0) to ./node_
+modules/@prisma/client in 1.7
+4s
+Building: Ôû▓ Next.js 16.1.4 
+(Turbopack)
+Building: - Environments: .en
+v.production, .env
+Building: ÔÜá The "middleware
+" file convention is deprecat
+ed. Please use "proxy" instea
+d. Learn more: https://nextjs
+.org/docs/messages/middleware
+-to-proxy
+Building: Creating an optimiz
+ed production build ...
+Building: > Build error occur
+red
+Building: Error: Turbopack bu
+ild failed with 1 errors:
+Building: ./src/app/(app)/fie
+ld-sales/admin/routes/page.ts
+x:500:53
+Building: Ecmascript file had
+ an error
+Building: 498 |              
+                             
+          className={`p-3 bor
+der-r last:border-0 transitio
+n-all relative flex flex-col 
+gap-2 drag-target-cell ${bord
+erColor} ${isToday(day) ? (is
+Light ? 'bg-blue-50/20' : 'bg
+-blue-500/[0.02]') : ''}`}
+Building: 499 |              
+                             
+      >
+Building: > 500 |            
+                             
+            <style jsx>{`
+Building: |                  
+                             
+      ^^^^^^^^^^^^^
+Building: > 501 |            
+                             
+                .drag-target-
+cell.drag-over-active {
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
+Building: > 502 |            
+                             
+                    backgroun
+d-color: ${isLight ? 'rgba(59
+, 130, 246, 0.05)' : 'rgba(59
+, 130, 246, 0.1)'};
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
+Building: > 503 |            
+                             
+                    box-shado
+w: inset 0 0 0 2px rgba(59, 1
+30, 246, 0.4);
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
+Building: > 504 |            
+                             
+                }
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
+Building: > 505 |            
+                             
+            `}</style>
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
+Building: 506 |
+Building: 507 |              
+                             
+          {dayRoutes.map(rout
+e => (
+Building: 508 |              
+                             
+              <div
+Building: Detected nested sty
+led-jsx tag.
+Building: Read more: https://
+nextjs.org/docs/messages/nest
+ed-styled-jsx-tags
+Building: Import traces:
+Building: Client Component Br
+owser:
+Building: ./src/app/(app)/fie
+ld-sales/admin/routes/page.ts
+x [Client Component Browser]
+Building: ./src/app/(app)/fie
+ld-sales/admin/routes/page.ts
+x [Server Component]
+Building: Client Component SS
+R:
+Building: ./src/app/(app)/fie
+ld-sales/admin/routes/page.ts
+x [Client Component SSR]
+Building: ./src/app/(app)/fie
+ld-sales/admin/routes/page.ts
+x [Server Component]
+Building: at <unknown> (./src
+/app/(app)/field-sales/admin/
+routes/page.tsx:500:53)
+Building: Error: Command "npm
+ run vercel-build" exited wit
+h 1
+2026-03-01T00:54:37.716Z  Run
+ning build in Washington, D.C
+., USA (East) ÔÇô iad1
+2026-03-01T00:54:37.716Z  Bui
+ld machine configuration: 4 c
+ores, 8 GB
+2026-03-01T00:54:37.841Z  Ret
+rieving list of deployment fi
+les...
+2026-03-01T00:54:38.410Z  Dow
+nloading 1504 deployment file
+s...
+2026-03-01T00:54:48.219Z  Res
+tored build cache from previo
+us deployment (6h6eAjYSCHvY8c
+WZpjf4otBVWdW7)
+2026-03-01T00:54:48.735Z  Run
+ning "vercel build"
+2026-03-01T00:54:49.340Z  Ver
+cel CLI 50.23.2
+2026-03-01T00:54:49.855Z  Ins
+talling dependencies...
+2026-03-01T00:54:51.429Z  
+2026-03-01T00:54:51.430Z  > p
+eriodya@0.1.0 postinstall
+2026-03-01T00:54:51.430Z  > p
+risma generate
+2026-03-01T00:54:51.430Z  
+2026-03-01T00:54:51.861Z  Env
+ironment variables loaded fro
+m .env
+2026-03-01T00:54:51.864Z  Pri
+sma schema loaded from prisma
+/schema.prisma
+2026-03-01T00:54:55.211Z  
+2026-03-01T00:54:55.212Z  Ô£ö
+ Generated Prisma Client (v5.
+22.0) to ./node_modules/@pris
+ma/client in 2.17s
+2026-03-01T00:54:55.212Z  
+2026-03-01T00:54:55.212Z  Sta
+rt by importing your Prisma C
+lient (See: https://pris.ly/d
+/importing-client)
+2026-03-01T00:54:55.212Z  
+2026-03-01T00:54:55.212Z  Tip
+: Want real-time updates to y
+our database without manual p
+olling? Discover how with Pul
+se: https://pris.ly/tip-0-pul
+se
+2026-03-01T00:54:55.212Z  
+2026-03-01T00:54:55.419Z  
+2026-03-01T00:54:55.419Z  up 
+to date in 5s
+2026-03-01T00:54:55.419Z  
+2026-03-01T00:54:55.419Z  182
+ packages are looking for fun
+ding
+2026-03-01T00:54:55.419Z  run
+ `npm fund` for details
+2026-03-01T00:54:55.454Z  Det
+ected Next.js version: 16.1.4
+2026-03-01T00:54:55.460Z  Run
+ning "npm run vercel-build"
+2026-03-01T00:54:55.560Z  
+2026-03-01T00:54:55.560Z  > p
+eriodya@0.1.0 vercel-build
+2026-03-01T00:54:55.561Z  > p
+risma generate && prisma db p
+ush --accept-data-loss && nex
+t build
+2026-03-01T00:54:55.561Z  
+2026-03-01T00:54:55.887Z  Env
+ironment variables loaded fro
+m .env
+2026-03-01T00:54:55.889Z  Pri
+sma schema loaded from prisma
+/schema.prisma
+2026-03-01T00:54:58.649Z  
+2026-03-01T00:54:58.650Z  Ô£ö
+ Generated Prisma Client (v5.
+22.0) to ./node_modules/@pris
+ma/client in 1.73s
+2026-03-01T00:54:58.650Z  
+2026-03-01T00:54:58.650Z  Sta
+rt by importing your Prisma C
+lient (See: https://pris.ly/d
+/importing-client)
+2026-03-01T00:54:58.650Z  
+2026-03-01T00:54:58.650Z  Tip
+: Want real-time updates to y
+our database without manual p
+olling? Discover how with Pul
+se: https://pris.ly/tip-0-pul
+se
+2026-03-01T00:54:58.650Z  
+2026-03-01T00:54:58.684Z  Ôöî
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+2026-03-01T00:54:58.685Z  Ôöé
+  Update available 5.22.0 -> 
+7.4.2                       Ô
+öé
+2026-03-01T00:54:58.685Z  Ôöé
+                             
+                            Ô
+öé
+2026-03-01T00:54:58.685Z  Ôöé
+  This is a major update - pl
+ease follow the guide at    Ô
+öé
+2026-03-01T00:54:58.685Z  Ôöé
+  https://pris.ly/d/major-ver
+sion-upgrade                Ô
+öé
+2026-03-01T00:54:58.685Z  Ôöé
+                             
+                            Ô
+öé
+2026-03-01T00:54:58.685Z  Ôöé
+  Run the following to update
+                            Ô
+öé
+2026-03-01T00:54:58.685Z  Ôöé
+    npm i --save-dev prisma@l
+atest                       Ô
+öé
+2026-03-01T00:54:58.686Z  Ôöé
+    npm i @prisma/client@late
+st                          Ô
+öé
+2026-03-01T00:54:58.686Z  Ôöö
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöİ
+2026-03-01T00:54:59.215Z  Env
+ironment variables loaded fro
+m .env
+2026-03-01T00:54:59.216Z  Pri
+sma schema loaded from prisma
+/schema.prisma
+2026-03-01T00:54:59.236Z  Dat
+asource "db": PostgreSQL data
+base "neondb", schema "public
+" at "ep-billowing-glade-agt0
+zp7m-pooler.c-2.eu-central-1.
+aws.neon.tech"
+2026-03-01T00:55:04.153Z  
+2026-03-01T00:55:04.153Z  The
+ database is already in sync 
+with the Prisma schema.
+2026-03-01T00:55:04.154Z  
+2026-03-01T00:55:04.154Z  Run
+ning generate... (Use --skip-
+generate to skip the generato
+rs)
+2026-03-01T00:55:05.152Z  Run
+ning generate... - Prisma Cli
+ent
+2026-03-01T00:55:06.896Z  Ô£ö
+ Generated Prisma Client (v5.
+22.0) to ./node_modules/@pris
+ma/client in 1.74s
+2026-03-01T00:55:06.896Z  
+2026-03-01T00:55:08.149Z  Ôû▓
+ Next.js 16.1.4 (Turbopack)
+2026-03-01T00:55:08.150Z  - E
+nvironments: .env.production,
+ .env
+2026-03-01T00:55:08.150Z  
+2026-03-01T00:55:08.158Z  ÔÜá
+ The "middleware" file conven
+tion is deprecated. Please us
+e "proxy" instead. Learn more
+: https://nextjs.org/docs/mes
+sages/middleware-to-proxy
+2026-03-01T00:55:08.263Z  Cre
+ating an optimized production
+ build ...
+2026-03-01T00:55:42.182Z  
+2026-03-01T00:55:42.182Z  > B
+uild error occurred
+2026-03-01T00:55:42.185Z  Err
+or: Turbopack build failed wi
+th 1 errors:
+2026-03-01T00:55:42.186Z  ./s
+rc/app/(app)/field-sales/admi
+n/routes/page.tsx:500:53
+2026-03-01T00:55:42.186Z  Ecm
+ascript file had an error
+2026-03-01T00:55:42.186Z  498
+ |                           
+                          cla
+ssName={`p-3 border-r last:bo
+rder-0 transition-all relativ
+e flex flex-col gap-2 drag-ta
+rget-cell ${borderColor} ${is
+Today(day) ? (isLight ? 'bg-b
+lue-50/20' : 'bg-blue-500/[0.
+02]') : ''}`}
+2026-03-01T00:55:42.186Z  499
+ |                           
+                      >
+2026-03-01T00:55:42.186Z  > 5
+00 |                         
+                            <
+style jsx>{`
+2026-03-01T00:55:42.186Z  |  
+                             
+                      ^^^^^^^
+^^^^^^
+2026-03-01T00:55:42.186Z  > 5
+01 |                         
+                             
+   .drag-target-cell.drag-ove
+r-active {
+2026-03-01T00:55:42.187Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^
+2026-03-01T00:55:42.192Z  > 5
+02 |                         
+                             
+       background-color: ${is
+Light ? 'rgba(59, 130, 246, 0
+.05)' : 'rgba(59, 130, 246, 0
+.1)'};
+2026-03-01T00:55:42.192Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^
+2026-03-01T00:55:42.192Z  > 5
+03 |                         
+                             
+       box-shadow: inset 0 0 
+0 2px rgba(59, 130, 246, 0.4)
+;
+2026-03-01T00:55:42.192Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^
+2026-03-01T00:55:42.192Z  > 5
+04 |                         
+                             
+   }
+2026-03-01T00:55:42.192Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^
+2026-03-01T00:55:42.192Z  > 5
+05 |                         
+                            `
+}</style>
+2026-03-01T00:55:42.192Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^
+2026-03-01T00:55:42.192Z  506
+ |
+2026-03-01T00:55:42.192Z  507
+ |                           
+                          {da
+yRoutes.map(route => (
+2026-03-01T00:55:42.192Z  508
+ |                           
+                             
+ <div
+2026-03-01T00:55:42.193Z  
+2026-03-01T00:55:42.193Z  Det
+ected nested styled-jsx tag.
+2026-03-01T00:55:42.193Z  Rea
+d more: https://nextjs.org/do
+cs/messages/nested-styled-jsx
+-tags
+2026-03-01T00:55:42.193Z  
+2026-03-01T00:55:42.193Z  Imp
+ort traces:
+2026-03-01T00:55:42.193Z  Cli
+ent Component Browser:
+2026-03-01T00:55:42.193Z  ./s
+rc/app/(app)/field-sales/admi
+n/routes/page.tsx [Client Com
+ponent Browser]
+2026-03-01T00:55:42.193Z  ./s
+rc/app/(app)/field-sales/admi
+n/routes/page.tsx [Server Com
+ponent]
+2026-03-01T00:55:42.193Z  
+2026-03-01T00:55:42.193Z  Cli
+ent Component SSR:
+2026-03-01T00:55:42.193Z  ./s
+rc/app/(app)/field-sales/admi
+n/routes/page.tsx [Client Com
+ponent SSR]
+2026-03-01T00:55:42.193Z  ./s
+rc/app/(app)/field-sales/admi
+n/routes/page.tsx [Server Com
+ponent]
+2026-03-01T00:55:42.193Z  
+2026-03-01T00:55:42.193Z  
+2026-03-01T00:55:42.193Z  at 
+<unknown> (./src/app/(app)/fi
+eld-sales/admin/routes/page.t
+sx:500:53)
+2026-03-01T00:55:42.328Z  Err
+or: Command "npm run vercel-b
+uild" exited with 1
+https://motoroil-hj374zksn-motoroils-projects.vercel.app

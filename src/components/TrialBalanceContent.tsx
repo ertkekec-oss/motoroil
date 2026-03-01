@@ -78,19 +78,19 @@ export default function TrialBalanceContent() {
     const formatMoney = (val: number) => val.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     return (
-        <div className="animate-fade-in-up">
-            <div className="card glass mb-6">
+        <div className="animate-in fade-in duration-500">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm mb-6">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
-                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600">
+                        <h2 className="text-[24px] font-bold text-slate-900 dark:text-white  bg-gradient-to-r from-green-400 to-emerald-600">
                             ⚖️ Genel Geçici Mizan
                         </h2>
-                        <p className="text-muted text-sm mt-1">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
                             Hesapların dönem sonu borç/alacak toplamları ve bakiyeleri.
                         </p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-gray-300 hover:text-white transition-colors">
+                        <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-slate-900 dark:text-white hover:text-slate-900 dark:text-white transition-colors">
                             <input
                                 type="checkbox"
                                 checked={hideZero}
@@ -110,58 +110,58 @@ export default function TrialBalanceContent() {
                         placeholder="Hesap Ara..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 pl-12 focus:outline-none focus:border-green-500 transition-colors"
+                        className="w-full bg-black/20 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 py-4 text-[13px] h-[52px] pl-12 focus:outline-none focus:border-green-500 transition-colors"
                     />
-                    <span className="absolute left-4 top-3.5 text-gray-400">🔍</span>
+                    <span className="absolute left-4 top-3.5 text-slate-500 dark:text-slate-400">🔍</span>
                 </div>
             </div>
 
-            <div className="card glass overflow-hidden p-0">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm overflow-hidden p-0">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse text-sm">
-                        <thead className="bg-white/5 text-gray-400 border-b border-white/5 font-bold">
+                        <thead className="bg-[#F6F8FB] dark:bg-[#0F172A] border-b border-slate-200 dark:border-slate-800 font-bold sticky top-0 z-10">
                             <tr>
-                                <th className="p-4 w-32">KOD</th>
-                                <th className="p-4">HESAP ADI</th>
-                                <th className="p-4 text-right w-32 bg-white/[0.02]">TOPLAM BORÇ</th>
-                                <th className="p-4 text-right w-32 bg-white/[0.02]">TOPLAM ALACAK</th>
-                                <th className="p-4 text-right w-32 text-red-300">BORÇ BAKİYESİ</th>
-                                <th className="p-4 text-right w-32 text-blue-300">ALACAK BAKİYESİ</th>
+                                <th className="p-4 w-32 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">KOD</th>
+                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">HESAP ADI</th>
+                                <th className="p-4 text-right w-32 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">TOPLAM BORÇ</th>
+                                <th className="p-4 text-right w-32 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">TOPLAM ALACAK</th>
+                                <th className="p-4 text-right w-32 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">BORÇ BAKİYESİ</th>
+                                <th className="p-4 text-right w-32 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400">ALACAK BAKİYESİ</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={6} className="p-8 text-center text-gray-500">Mizan hesaplanıyor...</td></tr>
+                                <tr><td colSpan={6} className="p-8 text-center text-slate-500 dark:text-slate-400">Mizan hesaplanıyor...</td></tr>
                             ) : filteredData.length === 0 ? (
-                                <tr><td colSpan={6} className="p-8 text-center text-gray-500">Kayıt bulunamadı.</td></tr>
+                                <tr><td colSpan={6} className="p-8 text-center text-slate-500 dark:text-slate-400">Kayıt bulunamadı.</td></tr>
                             ) : (
                                 filteredData.map(row => (
                                     <tr
                                         key={row.id}
                                         onClick={() => openLedger(row)}
-                                        className="border-b border-white/5 hover:bg-white/5 transition-colors group cursor-pointer"
+                                        className="h-[52px] border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer"
                                         title="Ekstre için tıklayın"
                                     >
-                                        <td className="p-3 font-mono text-gray-300 group-hover:text-white transition-colors">
+                                        <td className="px-4 py-2 font-mono text-[13px] text-slate-900 dark:text-white">
                                             {row.code}
                                         </td>
-                                        <td className="p-3 font-bold text-gray-200 group-hover:text-white">
+                                        <td className="px-4 py-2 font-semibold text-[13px] text-slate-900 dark:text-white">
                                             {row.name}
                                         </td>
 
                                         {/* Tutarlar */}
-                                        <td className="p-3 text-right font-mono bg-white/[0.01] group-hover:bg-white/[0.03]">
+                                        <td className="px-4 py-2 text-[13px] text-right font-mono text-slate-900 dark:text-white">
                                             {row.totalDebt > 0 ? formatMoney(row.totalDebt) : '-'}
                                         </td>
-                                        <td className="p-3 text-right font-mono bg-white/[0.01] group-hover:bg-white/[0.03]">
+                                        <td className="px-4 py-2 text-[13px] text-right font-mono text-slate-900 dark:text-white">
                                             {row.totalCredit > 0 ? formatMoney(row.totalCredit) : '-'}
                                         </td>
 
                                         {/* Bakiyeler */}
-                                        <td className="p-3 text-right font-mono text-red-300 font-bold bg-red-500/[0.02]">
+                                        <td className="px-4 py-2 text-[13px] text-right font-mono font-bold text-slate-900 dark:text-white">
                                             {row.balanceDirection === 'Borç' ? formatMoney(row.balance) : '-'}
                                         </td>
-                                        <td className="p-3 text-right font-mono text-blue-300 font-bold bg-blue-500/[0.02]">
+                                        <td className="px-4 py-2 text-[13px] text-right font-mono font-bold text-slate-900 dark:text-white">
                                             {row.balanceDirection === 'Alacak' ? formatMoney(row.balance) : '-'}
                                         </td>
                                     </tr>
@@ -170,13 +170,13 @@ export default function TrialBalanceContent() {
                         </tbody>
                         {/* DİP TOPLAM */}
                         {!loading && filteredData.length > 0 && (
-                            <tfoot className="bg-[#0f0f1a] border-t-2 border-white/10 text-white font-bold sticky bottom-0">
+                            <tfoot className="bg-[#F6F8FB] dark:bg-[#0F172A] border-t-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white font-bold sticky bottom-0">
                                 <tr>
-                                    <td colSpan={2} className="p-4 text-right uppercase tracking-wider text-gray-400">Genel Toplam</td>
-                                    <td className="p-4 text-right font-mono text-lg">{formatMoney(totals.debt)}</td>
-                                    <td className="p-4 text-right font-mono text-lg">{formatMoney(totals.credit)}</td>
-                                    <td className="p-4 text-right font-mono text-lg text-red-400">{formatMoney(totals.balanceDebt)}</td>
-                                    <td className="p-4 text-right font-mono text-lg text-blue-400">{formatMoney(totals.balanceCredit)}</td>
+                                    <td colSpan={2} className="p-4 text-right uppercase tracking-wider text-[12px] text-slate-500 dark:text-slate-400">Genel Toplam</td>
+                                    <td className="p-4 text-right font-mono text-[14px] text-slate-900 dark:text-white">{formatMoney(totals.debt)}</td>
+                                    <td className="p-4 text-right font-mono text-[14px] text-slate-900 dark:text-white">{formatMoney(totals.credit)}</td>
+                                    <td className="p-4 text-right font-mono text-[14px] text-slate-900 dark:text-white">{formatMoney(totals.balanceDebt)}</td>
+                                    <td className="p-4 text-right font-mono text-[14px] text-slate-900 dark:text-white">{formatMoney(totals.balanceCredit)}</td>
                                 </tr>
                             </tfoot>
                         )}
@@ -186,7 +186,7 @@ export default function TrialBalanceContent() {
 
             {/* Mizan Denge Kontrolü */}
             {!loading && Math.abs(totals.debt - totals.credit) > 0.05 && (
-                <div className="mt-4 p-4 bg-red-500/20 border border-red-500/50 rounded-xl flex items-center gap-4 text-red-200 animate-pulse">
+                <div className="mt-4 p-4 bg-rose-50 dark:bg-rose-500/10 border border-red-500/50 rounded-[12px] flex items-center gap-4 text-red-200 animate-pulse">
                     <div className="text-3xl">⚠️</div>
                     <div>
                         <h4 className="font-bold text-lg">Mizan Dengesi Bozuk!</h4>
@@ -195,7 +195,7 @@ export default function TrialBalanceContent() {
                 </div>
             )}
             {!loading && Math.abs(totals.debt - totals.credit) <= 0.05 && (
-                <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-xl flex justify-center text-green-400 text-sm font-bold">
+                <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-[12px] flex justify-center text-emerald-600 dark:text-emerald-400 text-sm font-bold">
                     ✅ Mizan Dengeli (Borç = Alacak)
                 </div>
             )}

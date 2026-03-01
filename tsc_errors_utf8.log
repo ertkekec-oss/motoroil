@@ -1,0 +1,347 @@
+﻿enterprise_tabs.tsx(260,226): error TS1005: '}' expected.
+enterprise_tabs.tsx(260,238): error TS1003: Identifier expected.
+enterprise_tabs.tsx(260,259): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(261,57): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(261,59): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(261,60): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(263,55): error TS17002: Expected corresponding JSX closing tag for 'td'.
+enterprise_tabs.tsx(271,46): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(272,43): error TS17002: Expected corresponding JSX closing tag for 'tr'.
+enterprise_tabs.tsx(273,37): error TS1005: ')' expected.
+enterprise_tabs.tsx(273,39): error TS17002: Expected corresponding JSX closing tag for 'tbody'.
+enterprise_tabs.tsx(275,29): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(275,31): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(276,27): error TS17002: Expected corresponding JSX closing tag for 'table'.
+enterprise_tabs.tsx(286,23): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(287,17): error TS1005: ')' expected.
+enterprise_tabs.tsx(288,13): error TS1109: Expression expected.
+enterprise_tabs.tsx(383,99): error TS1005: ':' expected.
+enterprise_tabs.tsx(383,111): error TS1003: Identifier expected.
+enterprise_tabs.tsx(383,132): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(385,53): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(385,55): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(385,56): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(387,51): error TS17002: Expected corresponding JSX closing tag for 'td'.
+enterprise_tabs.tsx(388,45): error TS1005: ')' expected.
+enterprise_tabs.tsx(388,47): error TS17002: Expected corresponding JSX closing tag for 'tr'.
+enterprise_tabs.tsx(393,39): error TS17002: Expected corresponding JSX closing tag for 'tbody'.
+enterprise_tabs.tsx(394,35): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(395,31): error TS17002: Expected corresponding JSX closing tag for 'table'.
+enterprise_tabs.tsx(396,27): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(398,17): error TS1005: ')' expected.
+enterprise_tabs.tsx(399,13): error TS1109: Expression expected.
+enterprise_tabs.tsx(437,138): error TS1005: ':' expected.
+enterprise_tabs.tsx(437,152): error TS1005: '...' expected.
+enterprise_tabs.tsx(437,179): error TS1003: Identifier expected.
+enterprise_tabs.tsx(437,184): error TS1005: ',' expected.
+enterprise_tabs.tsx(437,196): error TS1005: ',' expected.
+enterprise_tabs.tsx(437,209): error TS1005: ',' expected.
+enterprise_tabs.tsx(437,210): error TS1005: ',' expected.
+enterprise_tabs.tsx(437,221): error TS1005: ',' expected.
+enterprise_tabs.tsx(437,226): error TS1005: ',' expected.
+enterprise_tabs.tsx(437,239): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(439,45): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(439,47): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(440,37): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(442,39): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(443,35): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(455,17): error TS1005: ')' expected.
+enterprise_tabs.tsx(456,13): error TS1109: Expression expected.
+enterprise_tabs.tsx(460,17): error TS2657: JSX expressions must have one parent element.
+enterprise_tabs.tsx(504,53): error TS2657: JSX expressions must have one parent element.
+enterprise_tabs.tsx(505,172): error TS1005: ':' expected.
+enterprise_tabs.tsx(505,186): error TS1005: '...' expected.
+enterprise_tabs.tsx(505,213): error TS1003: Identifier expected.
+enterprise_tabs.tsx(505,273): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(506,61): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(506,63): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(506,64): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(508,59): error TS17002: Expected corresponding JSX closing tag for 'label'.
+enterprise_tabs.tsx(518,53): error TS1005: ')' expected.
+enterprise_tabs.tsx(518,55): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(520,45): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(520,47): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(522,37): error TS1005: ')' expected.
+enterprise_tabs.tsx(523,35): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(559,69): error TS1005: ':' expected.
+enterprise_tabs.tsx(559,83): error TS1005: '...' expected.
+enterprise_tabs.tsx(559,110): error TS1003: Identifier expected.
+enterprise_tabs.tsx(559,115): error TS1005: ';' expected.
+enterprise_tabs.tsx(559,127): error TS1005: ';' expected.
+enterprise_tabs.tsx(559,140): error TS1005: ';' expected.
+enterprise_tabs.tsx(559,169): error TS1005: ';' expected.
+enterprise_tabs.tsx(560,53): error TS1128: Declaration or statement expected.
+enterprise_tabs.tsx(561,53): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(561,55): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(562,45): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(564,47): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(566,37): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(566,39): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(579,21): error TS1005: ')' expected.
+enterprise_tabs.tsx(580,17): error TS1109: Expression expected.
+enterprise_tabs.tsx(581,13): error TS1109: Expression expected.
+enterprise_tabs.tsx(708,34): error TS17008: JSX element 'section' has no corresponding closing tag.
+enterprise_tabs.tsx(756,77): error TS1005: ':' expected.
+enterprise_tabs.tsx(756,91): error TS1005: '...' expected.
+enterprise_tabs.tsx(756,118): error TS1003: Identifier expected.
+enterprise_tabs.tsx(756,123): error TS1005: ';' expected.
+enterprise_tabs.tsx(756,135): error TS1005: ';' expected.
+enterprise_tabs.tsx(756,148): error TS1005: ';' expected.
+enterprise_tabs.tsx(756,177): error TS1005: ';' expected.
+enterprise_tabs.tsx(757,61): error TS1128: Declaration or statement expected.
+enterprise_tabs.tsx(758,61): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(758,63): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(759,53): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(761,55): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(763,45): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(763,47): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(766,35): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(773,21): error TS1005: ')' expected.
+enterprise_tabs.tsx(774,17): error TS1109: Expression expected.
+enterprise_tabs.tsx(775,13): error TS1109: Expression expected.
+enterprise_tabs.tsx(882,246): error TS1005: '}' expected.
+enterprise_tabs.tsx(882,258): error TS1003: Identifier expected.
+enterprise_tabs.tsx(882,279): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(882,294): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(882,296): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(883,53): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(885,55): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(923,77): error TS1005: ':' expected.
+enterprise_tabs.tsx(923,91): error TS1005: '...' expected.
+enterprise_tabs.tsx(923,118): error TS1003: Identifier expected.
+enterprise_tabs.tsx(923,123): error TS1005: ';' expected.
+enterprise_tabs.tsx(923,135): error TS1005: ';' expected.
+enterprise_tabs.tsx(923,148): error TS1005: ';' expected.
+enterprise_tabs.tsx(923,177): error TS1005: ';' expected.
+enterprise_tabs.tsx(924,61): error TS1128: Declaration or statement expected.
+enterprise_tabs.tsx(925,61): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(925,63): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(926,53): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(928,55): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(930,45): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(930,47): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(976,251): error TS1005: '}' expected.
+enterprise_tabs.tsx(976,265): error TS1005: '...' expected.
+enterprise_tabs.tsx(976,292): error TS1003: Identifier expected.
+enterprise_tabs.tsx(976,352): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(976,362): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(976,364): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(976,365): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(989,25): error TS1005: ')' expected.
+enterprise_tabs.tsx(990,21): error TS1109: Expression expected.
+enterprise_tabs.tsx(991,17): error TS1109: Expression expected.
+enterprise_tabs.tsx(992,13): error TS1109: Expression expected.
+enterprise_tabs.tsx(1050,69): error TS1005: ':' expected.
+enterprise_tabs.tsx(1050,83): error TS1005: '...' expected.
+enterprise_tabs.tsx(1050,110): error TS1003: Identifier expected.
+enterprise_tabs.tsx(1050,115): error TS1005: ',' expected.
+enterprise_tabs.tsx(1050,127): error TS1005: ',' expected.
+enterprise_tabs.tsx(1050,140): error TS1005: ',' expected.
+enterprise_tabs.tsx(1050,141): error TS1005: ',' expected.
+enterprise_tabs.tsx(1050,152): error TS1005: ',' expected.
+enterprise_tabs.tsx(1050,157): error TS1005: ',' expected.
+enterprise_tabs.tsx(1050,170): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(1052,53): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(1052,55): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(1053,45): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(1055,47): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(1056,43): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(1078,21): error TS1005: ')' expected.
+enterprise_tabs.tsx(1079,17): error TS1109: Expression expected.
+enterprise_tabs.tsx(1117,69): error TS1005: ':' expected.
+enterprise_tabs.tsx(1117,83): error TS1005: '...' expected.
+enterprise_tabs.tsx(1117,110): error TS1003: Identifier expected.
+enterprise_tabs.tsx(1117,115): error TS1005: ',' expected.
+enterprise_tabs.tsx(1117,127): error TS1005: ',' expected.
+enterprise_tabs.tsx(1117,140): error TS1005: ',' expected.
+enterprise_tabs.tsx(1117,141): error TS1005: ',' expected.
+enterprise_tabs.tsx(1117,152): error TS1005: ',' expected.
+enterprise_tabs.tsx(1117,157): error TS1005: ',' expected.
+enterprise_tabs.tsx(1117,170): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(1119,53): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(1119,55): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(1120,45): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+enterprise_tabs.tsx(1122,47): error TS17002: Expected corresponding JSX closing tag for 'div'.
+enterprise_tabs.tsx(1123,43): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+enterprise_tabs.tsx(1176,21): error TS1005: ')' expected.
+enterprise_tabs.tsx(1177,17): error TS1109: Expression expected.
+enterprise_tabs.tsx(1391,9): error TS1128: Declaration or statement expected.
+enterprise_tabs.tsx(1392,5): error TS1109: Expression expected.
+enterprise_tabs.tsx(1393,1): error TS1128: Declaration or statement expected.
+original_tabs.tsx(1391,9): error TS1128: Declaration or statement expected.
+original_tabs.tsx(1392,5): error TS1109: Expression expected.
+original_tabs.tsx(1393,1): error TS1128: Declaration or statement expected.
+src/components/StaffManagementContent.tsx(1316,226): error TS1005: '}' expected.
+src/components/StaffManagementContent.tsx(1316,238): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(1316,259): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1317,57): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1317,59): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1317,60): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(1319,55): error TS17002: Expected corresponding JSX closing tag for 'td'.
+src/components/StaffManagementContent.tsx(1327,46): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1328,43): error TS17002: Expected corresponding JSX closing tag for 'tr'.
+src/components/StaffManagementContent.tsx(1329,37): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(1329,39): error TS17002: Expected corresponding JSX closing tag for 'tbody'.
+src/components/StaffManagementContent.tsx(1331,29): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1331,31): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1332,27): error TS17002: Expected corresponding JSX closing tag for 'table'.
+src/components/StaffManagementContent.tsx(1342,23): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(1343,17): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(1344,14): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1439,99): error TS1005: ':' expected.
+src/components/StaffManagementContent.tsx(1439,111): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(1439,132): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1441,53): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1441,55): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1441,56): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(1443,51): error TS17002: Expected corresponding JSX closing tag for 'td'.
+src/components/StaffManagementContent.tsx(1444,45): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(1444,47): error TS17002: Expected corresponding JSX closing tag for 'tr'.
+src/components/StaffManagementContent.tsx(1449,39): error TS17002: Expected corresponding JSX closing tag for 'tbody'.
+src/components/StaffManagementContent.tsx(1450,35): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1451,31): error TS17002: Expected corresponding JSX closing tag for 'table'.
+src/components/StaffManagementContent.tsx(1452,27): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(1454,17): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(1455,14): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1493,138): error TS1005: ':' expected.
+src/components/StaffManagementContent.tsx(1493,152): error TS1005: '...' expected.
+src/components/StaffManagementContent.tsx(1493,179): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(1493,184): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(1493,196): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(1493,209): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(1493,210): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(1493,221): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(1493,226): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(1493,239): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1495,45): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1495,47): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1496,37): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(1498,39): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(1499,35): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1511,17): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(1516,17): error TS2657: JSX expressions must have one parent element.
+src/components/StaffManagementContent.tsx(1560,53): error TS2657: JSX expressions must have one parent element.
+src/components/StaffManagementContent.tsx(1561,172): error TS1005: ':' expected.
+src/components/StaffManagementContent.tsx(1561,186): error TS1005: '...' expected.
+src/components/StaffManagementContent.tsx(1561,213): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(1561,273): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1562,61): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1562,63): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1562,64): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(1564,59): error TS17002: Expected corresponding JSX closing tag for 'label'.
+src/components/StaffManagementContent.tsx(1574,53): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(1574,55): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(1576,45): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1576,47): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1578,37): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(1579,35): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1615,69): error TS1005: ':' expected.
+src/components/StaffManagementContent.tsx(1615,83): error TS1005: '...' expected.
+src/components/StaffManagementContent.tsx(1615,110): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(1615,115): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1615,127): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1615,140): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1615,169): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1616,53): error TS1128: Declaration or statement expected.
+src/components/StaffManagementContent.tsx(1617,53): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1617,55): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1618,45): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(1620,47): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(1622,37): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1622,39): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1635,21): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(1636,17): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(1637,13): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(1764,34): error TS17008: JSX element 'section' has no corresponding closing tag.
+src/components/StaffManagementContent.tsx(1812,77): error TS1005: ':' expected.
+src/components/StaffManagementContent.tsx(1812,91): error TS1005: '...' expected.
+src/components/StaffManagementContent.tsx(1812,118): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(1812,123): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1812,135): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1812,148): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1812,177): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1813,61): error TS1128: Declaration or statement expected.
+src/components/StaffManagementContent.tsx(1814,61): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1814,63): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1815,53): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(1817,55): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(1819,45): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1819,47): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1822,35): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(1829,21): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(1830,17): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(1831,13): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(1938,246): error TS1005: '}' expected.
+src/components/StaffManagementContent.tsx(1938,258): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(1938,279): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1938,294): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1938,296): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1939,53): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(1941,55): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(1979,77): error TS1005: ':' expected.
+src/components/StaffManagementContent.tsx(1979,91): error TS1005: '...' expected.
+src/components/StaffManagementContent.tsx(1979,118): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(1979,123): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1979,135): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1979,148): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1979,177): error TS1005: ';' expected.
+src/components/StaffManagementContent.tsx(1980,61): error TS1128: Declaration or statement expected.
+src/components/StaffManagementContent.tsx(1981,61): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1981,63): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1982,53): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(1984,55): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(1986,45): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(1986,47): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2032,251): error TS1005: '}' expected.
+src/components/StaffManagementContent.tsx(2032,265): error TS1005: '...' expected.
+src/components/StaffManagementContent.tsx(2032,292): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(2032,352): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2032,362): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2032,364): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2032,365): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(2045,25): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(2046,21): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(2047,17): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(2048,13): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(2106,69): error TS1005: ':' expected.
+src/components/StaffManagementContent.tsx(2106,83): error TS1005: '...' expected.
+src/components/StaffManagementContent.tsx(2106,110): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(2106,115): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2106,127): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2106,140): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2106,141): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2106,152): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2106,157): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2106,170): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2108,53): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2108,55): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2109,45): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(2111,47): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(2112,43): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2134,21): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(2135,17): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(2173,69): error TS1005: ':' expected.
+src/components/StaffManagementContent.tsx(2173,83): error TS1005: '...' expected.
+src/components/StaffManagementContent.tsx(2173,110): error TS1003: Identifier expected.
+src/components/StaffManagementContent.tsx(2173,115): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2173,127): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2173,140): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2173,141): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2173,152): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2173,157): error TS1005: ',' expected.
+src/components/StaffManagementContent.tsx(2173,170): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2175,53): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2175,55): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2176,45): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/components/StaffManagementContent.tsx(2178,47): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/components/StaffManagementContent.tsx(2179,43): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/StaffManagementContent.tsx(2232,21): error TS1005: ')' expected.
+src/components/StaffManagementContent.tsx(2233,17): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(2447,9): error TS1128: Declaration or statement expected.
+src/components/StaffManagementContent.tsx(2448,5): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(2449,1): error TS1128: Declaration or statement expected.
+src/components/StaffManagementContent.tsx(2452,17): error TS1128: Declaration or statement expected.
+src/components/StaffManagementContent.tsx(2453,13): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(2454,9): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(2455,5): error TS1109: Expression expected.
+src/components/StaffManagementContent.tsx(2456,1): error TS1128: Declaration or statement expected.

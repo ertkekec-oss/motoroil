@@ -1,4 +1,4 @@
-﻿.next/dev/types/validator.ts(1584,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/admin/finance/payout/requests/[id]/approve/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/finance/payout/requests/[id]/approve">'.
+.next/dev/types/validator.ts(1584,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/admin/finance/payout/requests/[id]/approve/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/finance/payout/requests/[id]/approve">'.
   Types of property 'POST' are incompatible.
     Type '(req: NextRequest, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ error: string; }> | NextResponse<{ id: string; currency: string; status: PayoutRequestStatus; ... 11 more ...; approvedByUserId: string; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
       Types of parameters '__1' and 'context' are incompatible.
@@ -103,6 +103,12 @@
         Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
           Types of property 'params' are incompatible.
             Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(927,374): error TS17001: JSX elements cannot have multiple attributes with the same name.
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(976,44): error TS17001: JSX elements cannot have multiple attributes with the same name.
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(1686,33): error TS17001: JSX elements cannot have multiple attributes with the same name.
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(1696,33): error TS17001: JSX elements cannot have multiple attributes with the same name.
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(1902,33): error TS17001: JSX elements cannot have multiple attributes with the same name.
+src/app/(app)/customers/[id]/CustomerDetailClient.tsx(2156,33): error TS17001: JSX elements cannot have multiple attributes with the same name.
 src/app/(app)/field-sales/admin/routes/page.tsx(614,54): error TS2304: Cannot find name 'Check'.
 src/app/(app)/service/page.tsx(134,34): error TS2365: Operator '>' cannot be applied to types 'string | number' and 'number'.
 src/app/api/admin/dashboard/actions/route.ts(39,30): error TS2554: Expected 5-6 arguments, but got 3.

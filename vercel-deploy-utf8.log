@@ -1,0 +1,644 @@
+﻿node.exe : Vercel CLI 50.22.0
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Vercel   
+  CLI 50.22.0:String) [],    
+ RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Retrieving projectÔÇĞ
+Deploying motoroils-projects/
+motoroil
+Uploading [------------------
+--] (0.0B/884B)
+Uploading [==================
+==] (884.0B/884B)
+Inspect: https://vercel.com/m
+otoroils-projects/motoroil/V3
+uYGikPeGpP28WNXnT7Vu7Y9vLi [4
+s]
+Production: https://motoroil-
+exxe6edto-motoroils-projects.
+vercel.app [4s]
+Building...
+Building...
+Building: Running build in Wa
+shington, D.C., USA (East) ÔÇ
+ô iad1
+Building: Build machine confi
+guration: 4 cores, 8 GB
+Building: Retrieving list of 
+deployment files...
+Building: Downloading 1501 de
+ployment files...
+Building: Restored build cach
+e from previous deployment (3
+82nA7rmkVsc5PNdsf6z2iBqGV6d)
+Building: Running "vercel bui
+ld"
+Building: Vercel CLI 50.23.2
+Building: Installing dependen
+cies...
+Building: > periodya@0.1.0 po
+stinstall
+Building: > prisma generate
+Building: Environment variabl
+es loaded from .env
+Building: Prisma schema loade
+d from prisma/schema.prisma
+Building: Ô£ö Generated Prism
+a Client (v5.22.0) to ./node_
+modules/@prisma/client in 2.1
+3s
+Building: Start by importing 
+your Prisma Client (See: http
+s://pris.ly/d/importing-clien
+t)
+Building: Tip: Want real-time
+ updates to your database wit
+hout manual polling? Discover
+ how with Pulse: https://pris
+.ly/tip-0-pulse
+Building: up to date in 5s
+Building: 182 packages are lo
+oking for funding
+Building: run `npm fund` for 
+details
+Building: Detected Next.js ve
+rsion: 16.1.4
+Building: Running "npm run ve
+rcel-build"
+Building: > periodya@0.1.0 ve
+rcel-build
+Building: > prisma generate &
+& prisma db push --accept-dat
+a-loss && next build
+Building: Environment variabl
+es loaded from .env
+Building: Prisma schema loade
+d from prisma/schema.prisma
+Building: Ô£ö Generated Prism
+a Client (v5.22.0) to ./node_
+modules/@prisma/client in 1.6
+9s
+Building: Start by importing 
+your Prisma Client (See: http
+s://pris.ly/d/importing-clien
+t)
+Building: Help us improve the
+ Prisma ORM for everyone. Sha
+re your feedback in a short 2
+-min survey: https://pris.ly/
+orm/survey/release-5-22
+Building: ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÉ
+Building: Ôöé  Update availab
+le 5.22.0 -> 7.4.2           
+            Ôöé
+Building: Ôöé                
+                             
+            Ôöé
+Building: Ôöé  This is a majo
+r update - please follow the 
+guide at    Ôöé
+Building: Ôöé  https://pris.l
+y/d/major-version-upgrade    
+            Ôöé
+Building: Ôöé                
+                             
+            Ôöé
+Building: Ôöé  Run the follow
+ing to update                
+            Ôöé
+Building: Ôöé    npm i --save
+-dev prisma@latest           
+            Ôöé
+Building: Ôöé    npm i @prism
+a/client@latest              
+            Ôöé
+Building: ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöİ
+Building: Environment variabl
+es loaded from .env
+Building: Prisma schema loade
+d from prisma/schema.prisma
+Building: Datasource "db": Po
+stgreSQL database "neondb", s
+chema "public" at "ep-billowi
+ng-glade-agt0zp7m-pooler.c-2.
+eu-central-1.aws.neon.tech"
+Building: The database is alr
+eady in sync with the Prisma 
+schema.
+Building: Running generate...
+ (Use --skip-generate to skip
+ the generators)
+Building: Running generate...
+ - Prisma Client
+Building: Ô£ö Generated Prism
+a Client (v5.22.0) to ./node_
+modules/@prisma/client in 1.6
+6s
+Building: Ôû▓ Next.js 16.1.4 
+(Turbopack)
+Building: - Environments: .en
+v.production, .env
+Building: ÔÜá The "middleware
+" file convention is deprecat
+ed. Please use "proxy" instea
+d. Learn more: https://nextjs
+.org/docs/messages/middleware
+-to-proxy
+Building: Creating an optimiz
+ed production build ...
+Building: > Build error occur
+red
+Building: Error: Turbopack bu
+ild failed with 2 errors:
+Building: ./src/app/(app)/ser
+vice/new/page.tsx:11:1
+Building: Export Tool doesn't
+ exist in target module
+Building: 9 | import { useSet
+tings } from '@/contexts/Sett
+ingsContext';
+Building: 10 | import { useTh
+eme } from '@/contexts/ThemeC
+ontext';
+Building: > 11 | import { Arr
+owLeft, CheckCircle2, Info, S
+earch, Shield, X, Package, Bo
+x, MapPin, Tool, Check, Alert
+Triangle, Bike, Car, Truck } 
+from 'lucide-react';
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+Building: 12 |
+Building: 13 | function Servi
+ceAcceptanceContent() {
+Building: 14 |     const rout
+er = useRouter();
+Building: The export Tool was
+ not found in module [project
+]/node_modules/lucide-react/d
+ist/esm/lucide-react.js [app-
+client] (ecmascript).
+Building: Did you mean to imp
+ort Toolbox?
+Building: All exports of the 
+module are statically known (
+It doesn't have dynamic expor
+ts). So it's known statically
+ that the requested export do
+esn't exist.
+Building: Import traces:
+Building: Client Component Br
+owser:
+Building: ./src/app/(app)/ser
+vice/new/page.tsx [Client Com
+ponent Browser]
+Building: ./src/app/(app)/ser
+vice/new/page.tsx [Server Com
+ponent]
+Building: Client Component SS
+R:
+Building: ./src/app/(app)/ser
+vice/new/page.tsx [Client Com
+ponent SSR]
+Building: ./src/app/(app)/ser
+vice/new/page.tsx [Server Com
+ponent]
+Building: ./src/app/(app)/ser
+vice/new/page.tsx:11:1
+Building: Export Tool doesn't
+ exist in target module
+Building: 9 | import { useSet
+tings } from '@/contexts/Sett
+ingsContext';
+Building: 10 | import { useTh
+eme } from '@/contexts/ThemeC
+ontext';
+Building: > 11 | import { Arr
+owLeft, CheckCircle2, Info, S
+earch, Shield, X, Package, Bo
+x, MapPin, Tool, Check, Alert
+Triangle, Bike, Car, Truck } 
+from 'lucide-react';
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+Building: 12 |
+Building: 13 | function Servi
+ceAcceptanceContent() {
+Building: 14 |     const rout
+er = useRouter();
+Building: The export Tool was
+ not found in module [project
+]/node_modules/lucide-react/d
+ist/esm/lucide-react.js [app-
+ssr] (ecmascript).
+Building: Did you mean to imp
+ort Toolbox?
+Building: All exports of the 
+module are statically known (
+It doesn't have dynamic expor
+ts). So it's known statically
+ that the requested export do
+esn't exist.
+Building: Import traces:
+Building: Client Component Br
+owser:
+Building: ./src/app/(app)/ser
+vice/new/page.tsx [Client Com
+ponent Browser]
+Building: ./src/app/(app)/ser
+vice/new/page.tsx [Server Com
+ponent]
+Building: Client Component SS
+R:
+Building: ./src/app/(app)/ser
+vice/new/page.tsx [Client Com
+ponent SSR]
+Building: ./src/app/(app)/ser
+vice/new/page.tsx [Server Com
+ponent]
+Building: at <unknown> (./src
+/app/(app)/service/new/page.t
+sx:11:1)
+Building: at <unknown> (./src
+/app/(app)/service/new/page.t
+sx:11:1)
+Building: Error: Command "npm
+ run vercel-build" exited wit
+h 1
+2026-03-01T00:41:54.226Z  Run
+ning build in Washington, D.C
+., USA (East) ÔÇô iad1
+2026-03-01T00:41:54.227Z  Bui
+ld machine configuration: 4 c
+ores, 8 GB
+2026-03-01T00:41:54.366Z  Ret
+rieving list of deployment fi
+les...
+2026-03-01T00:41:55.112Z  Dow
+nloading 1501 deployment file
+s...
+2026-03-01T00:42:00.329Z  Res
+tored build cache from previo
+us deployment (382nA7rmkVsc5P
+Ndsf6z2iBqGV6d)
+2026-03-01T00:42:00.633Z  Run
+ning "vercel build"
+2026-03-01T00:42:01.422Z  Ver
+cel CLI 50.23.2
+2026-03-01T00:42:01.889Z  Ins
+talling dependencies...
+2026-03-01T00:42:03.402Z  
+2026-03-01T00:42:03.402Z  > p
+eriodya@0.1.0 postinstall
+2026-03-01T00:42:03.402Z  > p
+risma generate
+2026-03-01T00:42:03.402Z  
+2026-03-01T00:42:03.844Z  Env
+ironment variables loaded fro
+m .env
+2026-03-01T00:42:03.847Z  Pri
+sma schema loaded from prisma
+/schema.prisma
+2026-03-01T00:42:07.249Z  
+2026-03-01T00:42:07.249Z  Ô£ö
+ Generated Prisma Client (v5.
+22.0) to ./node_modules/@pris
+ma/client in 2.13s
+2026-03-01T00:42:07.249Z  
+2026-03-01T00:42:07.250Z  Sta
+rt by importing your Prisma C
+lient (See: https://pris.ly/d
+/importing-client)
+2026-03-01T00:42:07.250Z  
+2026-03-01T00:42:07.250Z  Tip
+: Want real-time updates to y
+our database without manual p
+olling? Discover how with Pul
+se: https://pris.ly/tip-0-pul
+se
+2026-03-01T00:42:07.250Z  
+2026-03-01T00:42:07.441Z  
+2026-03-01T00:42:07.441Z  up 
+to date in 5s
+2026-03-01T00:42:07.442Z  
+2026-03-01T00:42:07.442Z  182
+ packages are looking for fun
+ding
+2026-03-01T00:42:07.442Z  run
+ `npm fund` for details
+2026-03-01T00:42:07.474Z  Det
+ected Next.js version: 16.1.4
+2026-03-01T00:42:07.482Z  Run
+ning "npm run vercel-build"
+2026-03-01T00:42:07.580Z  
+2026-03-01T00:42:07.580Z  > p
+eriodya@0.1.0 vercel-build
+2026-03-01T00:42:07.581Z  > p
+risma generate && prisma db p
+ush --accept-data-loss && nex
+t build
+2026-03-01T00:42:07.581Z  
+2026-03-01T00:42:07.907Z  Env
+ironment variables loaded fro
+m .env
+2026-03-01T00:42:07.909Z  Pri
+sma schema loaded from prisma
+/schema.prisma
+2026-03-01T00:42:10.689Z  
+2026-03-01T00:42:10.690Z  Ô£ö
+ Generated Prisma Client (v5.
+22.0) to ./node_modules/@pris
+ma/client in 1.69s
+2026-03-01T00:42:10.690Z  
+2026-03-01T00:42:10.690Z  Sta
+rt by importing your Prisma C
+lient (See: https://pris.ly/d
+/importing-client)
+2026-03-01T00:42:10.690Z  
+2026-03-01T00:42:10.690Z  Hel
+p us improve the Prisma ORM f
+or everyone. Share your feedb
+ack in a short 2-min survey: 
+https://pris.ly/orm/survey/re
+lease-5-22
+2026-03-01T00:42:10.690Z  
+2026-03-01T00:42:10.726Z  Ôöî
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+2026-03-01T00:42:10.727Z  Ôöé
+  Update available 5.22.0 -> 
+7.4.2                       Ô
+öé
+2026-03-01T00:42:10.727Z  Ôöé
+                             
+                            Ô
+öé
+2026-03-01T00:42:10.727Z  Ôöé
+  This is a major update - pl
+ease follow the guide at    Ô
+öé
+2026-03-01T00:42:10.727Z  Ôöé
+  https://pris.ly/d/major-ver
+sion-upgrade                Ô
+öé
+2026-03-01T00:42:10.727Z  Ôöé
+                             
+                            Ô
+öé
+2026-03-01T00:42:10.727Z  Ôöé
+  Run the following to update
+                            Ô
+öé
+2026-03-01T00:42:10.727Z  Ôöé
+    npm i --save-dev prisma@l
+atest                       Ô
+öé
+2026-03-01T00:42:10.727Z  Ôöé
+    npm i @prisma/client@late
+st                          Ô
+öé
+2026-03-01T00:42:10.727Z  Ôöö
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöİ
+2026-03-01T00:42:11.247Z  Env
+ironment variables loaded fro
+m .env
+2026-03-01T00:42:11.248Z  Pri
+sma schema loaded from prisma
+/schema.prisma
+2026-03-01T00:42:11.269Z  Dat
+asource "db": PostgreSQL data
+base "neondb", schema "public
+" at "ep-billowing-glade-agt0
+zp7m-pooler.c-2.eu-central-1.
+aws.neon.tech"
+2026-03-01T00:42:17.502Z  
+2026-03-01T00:42:17.503Z  The
+ database is already in sync 
+with the Prisma schema.
+2026-03-01T00:42:17.503Z  
+2026-03-01T00:42:17.503Z  Run
+ning generate... (Use --skip-
+generate to skip the generato
+rs)
+2026-03-01T00:42:18.449Z  Run
+ning generate... - Prisma Cli
+ent
+2026-03-01T00:42:20.111Z  Ô£ö
+ Generated Prisma Client (v5.
+22.0) to ./node_modules/@pris
+ma/client in 1.66s
+2026-03-01T00:42:20.112Z  
+2026-03-01T00:42:21.344Z  Ôû▓
+ Next.js 16.1.4 (Turbopack)
+2026-03-01T00:42:21.344Z  - E
+nvironments: .env.production,
+ .env
+2026-03-01T00:42:21.345Z  
+2026-03-01T00:42:21.352Z  ÔÜá
+ The "middleware" file conven
+tion is deprecated. Please us
+e "proxy" instead. Learn more
+: https://nextjs.org/docs/mes
+sages/middleware-to-proxy
+2026-03-01T00:42:21.479Z  Cre
+ating an optimized production
+ build ...
+2026-03-01T00:43:03.263Z  
+2026-03-01T00:43:03.263Z  > B
+uild error occurred
+2026-03-01T00:43:03.267Z  Err
+or: Turbopack build failed wi
+th 2 errors:
+2026-03-01T00:43:03.267Z  ./s
+rc/app/(app)/service/new/page
+.tsx:11:1
+2026-03-01T00:43:03.267Z  Exp
+ort Tool doesn't exist in tar
+get module
+2026-03-01T00:43:03.268Z  9 |
+ import { useSettings } from 
+'@/contexts/SettingsContext';
+2026-03-01T00:43:03.268Z  10 
+| import { useTheme } from '@
+/contexts/ThemeContext';
+2026-03-01T00:43:03.268Z  > 1
+1 | import { ArrowLeft, Check
+Circle2, Info, Search, Shield
+, X, Package, Box, MapPin, To
+ol, Check, AlertTriangle, Bik
+e, Car, Truck } from 'lucide-
+react';
+2026-03-01T00:43:03.269Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^
+2026-03-01T00:43:03.269Z  12 
+|
+2026-03-01T00:43:03.271Z  13 
+| function ServiceAcceptanceC
+ontent() {
+2026-03-01T00:43:03.271Z  14 
+|     const router = useRoute
+r();
+2026-03-01T00:43:03.271Z  
+2026-03-01T00:43:03.271Z  The
+ export Tool was not found in
+ module [project]/node_module
+s/lucide-react/dist/esm/lucid
+e-react.js [app-client] (ecma
+script).
+2026-03-01T00:43:03.272Z  Did
+ you mean to import Toolbox?
+2026-03-01T00:43:03.272Z  All
+ exports of the module are st
+atically known (It doesn't ha
+ve dynamic exports). So it's 
+known statically that the req
+uested export doesn't exist.
+2026-03-01T00:43:03.272Z  
+2026-03-01T00:43:03.272Z  Imp
+ort traces:
+2026-03-01T00:43:03.272Z  Cli
+ent Component Browser:
+2026-03-01T00:43:03.273Z  ./s
+rc/app/(app)/service/new/page
+.tsx [Client Component Browse
+r]
+2026-03-01T00:43:03.273Z  ./s
+rc/app/(app)/service/new/page
+.tsx [Server Component]
+2026-03-01T00:43:03.273Z  
+2026-03-01T00:43:03.273Z  Cli
+ent Component SSR:
+2026-03-01T00:43:03.274Z  ./s
+rc/app/(app)/service/new/page
+.tsx [Client Component SSR]
+2026-03-01T00:43:03.274Z  ./s
+rc/app/(app)/service/new/page
+.tsx [Server Component]
+2026-03-01T00:43:03.274Z  
+2026-03-01T00:43:03.274Z  
+2026-03-01T00:43:03.274Z  ./s
+rc/app/(app)/service/new/page
+.tsx:11:1
+2026-03-01T00:43:03.274Z  Exp
+ort Tool doesn't exist in tar
+get module
+2026-03-01T00:43:03.274Z  9 |
+ import { useSettings } from 
+'@/contexts/SettingsContext';
+2026-03-01T00:43:03.274Z  10 
+| import { useTheme } from '@
+/contexts/ThemeContext';
+2026-03-01T00:43:03.274Z  > 1
+1 | import { ArrowLeft, Check
+Circle2, Info, Search, Shield
+, X, Package, Box, MapPin, To
+ol, Check, AlertTriangle, Bik
+e, Car, Truck } from 'lucide-
+react';
+2026-03-01T00:43:03.274Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^
+2026-03-01T00:43:03.274Z  12 
+|
+2026-03-01T00:43:03.274Z  13 
+| function ServiceAcceptanceC
+ontent() {
+2026-03-01T00:43:03.274Z  14 
+|     const router = useRoute
+r();
+2026-03-01T00:43:03.274Z  
+2026-03-01T00:43:03.274Z  The
+ export Tool was not found in
+ module [project]/node_module
+s/lucide-react/dist/esm/lucid
+e-react.js [app-ssr] (ecmascr
+ipt).
+2026-03-01T00:43:03.274Z  Did
+ you mean to import Toolbox?
+2026-03-01T00:43:03.274Z  All
+ exports of the module are st
+atically known (It doesn't ha
+ve dynamic exports). So it's 
+known statically that the req
+uested export doesn't exist.
+2026-03-01T00:43:03.275Z  
+2026-03-01T00:43:03.275Z  Imp
+ort traces:
+2026-03-01T00:43:03.275Z  Cli
+ent Component Browser:
+2026-03-01T00:43:03.275Z  ./s
+rc/app/(app)/service/new/page
+.tsx [Client Component Browse
+r]
+2026-03-01T00:43:03.275Z  ./s
+rc/app/(app)/service/new/page
+.tsx [Server Component]
+2026-03-01T00:43:03.275Z  
+2026-03-01T00:43:03.275Z  Cli
+ent Component SSR:
+2026-03-01T00:43:03.275Z  ./s
+rc/app/(app)/service/new/page
+.tsx [Client Component SSR]
+2026-03-01T00:43:03.275Z  ./s
+rc/app/(app)/service/new/page
+.tsx [Server Component]
+2026-03-01T00:43:03.275Z  
+2026-03-01T00:43:03.275Z  
+2026-03-01T00:43:03.275Z  at 
+<unknown> (./src/app/(app)/se
+rvice/new/page.tsx:11:1)
+2026-03-01T00:43:03.275Z  at 
+<unknown> (./src/app/(app)/se
+rvice/new/page.tsx:11:1)
+2026-03-01T00:43:03.431Z  Err
+or: Command "npm run vercel-b
+uild" exited with 1
+https://motoroil-exxe6edto-motoroils-projects.vercel.app

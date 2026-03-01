@@ -799,23 +799,23 @@ export default function StaffManagementContent() {
             </div>
 
             {/* --- STATS OVERVIEW --- */}
-            <div className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm flex flex-col md:flex-row mb-8 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-800 overflow-hidden">
-                <div className="flex-1 p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:scale-110 transition-transform">👥</div>
                     <div className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase mb-2">Toplam Ekip</div>
-                    <div className="text-[28px] font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-900 dark:text-white">{staff.length} <span className="text-xs font-normal opacity-40">Kişi</span></div>
+                    <div className="text-[28px] font-semibold text-slate-900 dark:text-white">{staff.length} <span className="text-xs font-normal opacity-40">Kişi</span></div>
                 </div>
-                <div className="flex-1 p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:scale-110 transition-transform">🟢</div>
                     <div className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase mb-2">Müsait Personel</div>
                     <div className="text-[28px] font-semibold text-emerald-600 dark:text-emerald-400">{staff.filter(s => s.status === 'Müsait' || s.status === 'Boşta' || !s.status).length}</div>
                 </div>
-                <div className="flex-1 p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:scale-110 transition-transform">⚒️</div>
                     <div className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase mb-2">Devam Eden İŞ</div>
                     <div className="text-[28px] font-semibold text-amber-600 dark:text-amber-400">{staff.filter(s => s.status === 'Meşgul').length}</div>
                 </div>
-                <div className="flex-1 p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[20px] shadow-sm p-6 relative overflow-hidden group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:scale-110 transition-transform">📈</div>
                     <div className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold tracking-wider uppercase mb-2">Ekip Verimliliği</div>
                     <div className="text-[28px] font-semibold text-blue-600 dark:text-blue-400">%94</div>
@@ -841,7 +841,7 @@ export default function StaffManagementContent() {
                             className={activeTab === tab.id
                                 ? "h-full px-2 py-0 text-[14px] font-semibold text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 transition-all flex items-center"
                                 : "h-full px-2 py-0 text-[14px] font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-b-2 border-transparent transition-all flex items-center"}
-                            
+
                         >
                             {tab.label}
                         </button>

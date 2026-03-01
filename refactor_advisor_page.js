@@ -1,20 +1,10 @@
-"use client";
+import fs from 'fs';
+import path from 'path';
 
-import { useState } from 'react';
-import CheckModule from '@/components/CheckModule';
-import AccountPlanContent from '@/components/AccountPlanContent';
-import TrialBalanceContent from '@/components/TrialBalanceContent';
-import IncomeStatementContent from '@/components/IncomeStatementContent';
-import VatSimulationContent from '@/components/VatSimulationContent';
-import BaBsReconciliationContent from '@/components/BaBsReconciliationContent';
-import FinancialHealthContent from '@/components/FinancialHealthContent';
-import FinancialAuditContent from '@/components/FinancialAuditContent';
+const file = 'src/app/(app)/advisor/page.tsx';
+let txt = fs.readFileSync(file, 'utf8');
 
-export default function AdvisorPage() {
-    const [activeTab, setActiveTab] = useState<'plan' | 'mizan' | 'income' | 'vat' | 'babs' | 'health' | 'audit' | 'checks'>('checks');
-
-    return (
-        <div className="p-6 md:p-10 animate-in fade-in duration-500 font-sans min-h-screen bg-[#F6F8FB] dark:bg-[#0F172A] text-slate-900 dark:text-white">
+const newHeader = `
             {/* Header Redesign: Strategic Zone */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 px-2">
                 <div>
@@ -57,11 +47,11 @@ export default function AdvisorPage() {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`pb-3 text-[14px] font-semibold transition-all relative whitespace-nowrap ${
+                                className={\`pb-3 text-[14px] font-semibold transition-all relative whitespace-nowrap \${
                                     isActive
                                         ? 'text-blue-600 dark:text-blue-400'
                                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                                }`}
+                                }\`}
                             >
                                 {tab.label}
                                 {isActive && (
@@ -72,57 +62,11 @@ export default function AdvisorPage() {
                     })}
                 </div>
             </div>
+`;
 
-            {/* Content Area */}
-            <div className="gap-y-8 flex flex-col pt-4">
-                {activeTab === 'checks' && (
-                    <div className="animate-in slide-in-from-top-4 fade-in duration-300">
-                        <CheckModule />
-                    </div>
-                )}
+txt = txt.replace(/<div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">[\s\S]*?<\/div>\s*<\/div>/, newHeader.trim());
+txt = txt.replace(/<div className="p-6 md:p-8 animate-in fade-in zoom-in-95 font-sans text-white">/g, '<div className="p-6 md:p-10 animate-in fade-in duration-500 font-sans min-h-screen bg-[#F6F8FB] dark:bg-[#0F172A] text-slate-900 dark:text-white">');
+txt = txt.replace(/mt-4/g, "gap-y-8 flex flex-col pt-4");
 
-                {activeTab === 'plan' && (
-                    <div className="animate-in slide-in-from-left-4 fade-in duration-300">
-                        <AccountPlanContent />
-                    </div>
-                )}
-
-                {activeTab === 'mizan' && (
-                    <div className="animate-in slide-in-from-right-4 fade-in duration-300">
-                        <TrialBalanceContent />
-                    </div>
-                )}
-
-                {activeTab === 'income' && (
-                    <div className="animate-in slide-in-from-bottom-4 fade-in duration-300">
-                        <IncomeStatementContent />
-                    </div>
-                )}
-
-                {activeTab === 'vat' && (
-                    <div className="animate-in zoom-in-95 fade-in duration-300">
-                        <VatSimulationContent />
-                    </div>
-                )}
-
-                {activeTab === 'babs' && (
-                    <div className="animate-in zoom-in-95 fade-in duration-300">
-                        <BaBsReconciliationContent />
-                    </div>
-                )}
-
-                {activeTab === 'health' && (
-                    <div className="animate-in zoom-in-95 fade-in duration-300">
-                        <FinancialHealthContent />
-                    </div>
-                )}
-
-                {activeTab === 'audit' && (
-                    <div className="animate-in zoom-in-95 fade-in duration-300">
-                        <FinancialAuditContent />
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-}
+fs.writeFileSync(file, txt, 'utf8');
+console.log('Advisor Page header refactored.');

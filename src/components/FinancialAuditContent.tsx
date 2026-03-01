@@ -42,13 +42,13 @@ export default function FinancialAuditContent() {
     };
 
     return (
-        <div className="animate-fade-in-up">
-            <div className="card glass mb-6">
+        <div className="animate-in fade-in duration-500">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm mb-6">
                 <div>
-                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-orange-500">
+                    <h2 className="text-[24px] font-bold text-slate-900 dark:text-white  ">
                         🕵️‍♂️ Akıllı Denetçi (Audit)
                     </h2>
-                    <p className="text-muted text-sm mt-1">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
                         Yapay zeka desekli kural motoru ile muhasebe kayıtlarındaki olası hataları ve riskleri tarar.
                     </p>
                 </div>
@@ -57,35 +57,35 @@ export default function FinancialAuditContent() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center p-20 space-y-4">
                     <div className="loading loading-spinner loading-lg text-primary"></div>
-                    <p className="text-gray-400 animate-pulse">Kayıtlar taranıyor...</p>
+                    <p className="text-slate-500 dark:text-slate-400 animate-pulse">Kayıtlar taranıyor...</p>
                 </div>
             ) : issues.length === 0 ? (
-                <div className="card glass p-12 text-center text-green-400 animate-in zoom-in">
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm p-12 text-center text-emerald-600 dark:text-emerald-400 animate-in zoom-in">
                     <div className="text-6xl mb-4">🛡️</div>
                     <h3 className="text-2xl font-bold">Harika! Hiçbir Sorun Bulunamadı.</h3>
-                    <p className="text-gray-400 mt-2">Tüm kayıtlarınız yasal mevzuata ve muhasebe standartlarına uygun görünüyor.</p>
+                    <p className="text-slate-500 dark:text-slate-400 mt-2">Tüm kayıtlarınız yasal mevzuata ve muhasebe standartlarına uygun görünüyor.</p>
                 </div>
             ) : (
                 <div className="space-y-4">
                     {issues.map((issue, idx) => (
-                        <div key={idx} className={`pricing-card p-4 rounded-lg flex items-start gap-4 ${getColor(issue.type)} border border-white/5`}>
+                        <div key={idx} className={`pricing-card p-4 rounded-lg flex items-start gap-4 ${getColor(issue.type)} border border-slate-200 dark:border-slate-800`}>
                             <div className="text-2xl mt-1">{getIcon(issue.type)}</div>
                             <div className="flex-1">
                                 <div className="flex justify-between items-start">
-                                    <h4 className="font-bold text-white text-lg">{issue.title}</h4>
-                                    <span className="text-xs font-mono text-gray-500 bg-black/30 px-2 py-1 rounded">
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-lg">{issue.title}</h4>
+                                    <span className="text-xs font-mono text-slate-500 dark:text-slate-400 bg-black/30 px-2 py-1 rounded">
                                         {new Date(issue.date).toLocaleDateString()} - Fiş: {issue.fisNo}
                                     </span>
                                 </div>
-                                <p className="text-gray-300 text-sm mt-1">{issue.description}</p>
+                                <p className="text-slate-900 dark:text-white text-sm mt-1">{issue.description}</p>
                                 <div className="mt-2 flex gap-3 text-xs">
-                                    <span className="text-gray-500 font-bold uppercase tracking-wider">{issue.category}</span>
+                                    <span className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">{issue.category}</span>
                                     {issue.account !== '-' && (
                                         <span className="text-blue-400 font-mono">{issue.account}</span>
                                     )}
                                 </div>
                             </div>
-                            <button className="btn btn-sm btn-ghost self-center text-gray-400 hover:text-white">İncele</button>
+                            <button className="btn btn-sm btn-ghost self-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white">İncele</button>
                         </div>
                     ))}
                 </div>

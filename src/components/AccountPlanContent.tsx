@@ -136,14 +136,14 @@ export default function AccountPlanContent() {
     };
 
     return (
-        <div className="animate-fade-in-up">
-            <div className="card glass mb-6">
+        <div className="animate-in fade-in duration-500">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm mb-6">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
-                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+                        <h2 className="text-[24px] font-bold text-slate-900 dark:text-white">
                             📑 Tek Düzen Hesap Planı
                         </h2>
-                        <p className="text-muted text-sm mt-1">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
                             Resmi muhasebe kayıtları için hesap ağacı yönetimi.
                         </p>
                     </div>
@@ -180,36 +180,36 @@ export default function AccountPlanContent() {
                         placeholder="Hesap Kodu veya Adı ile ara..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 pl-12 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-black/20 border border-slate-200 dark:border-slate-800 rounded-[12px] px-4 py-4 text-[13px] h-[52px] pl-12 focus:outline-none focus:border-blue-500 transition-colors"
                     />
-                    <span className="absolute left-4 top-3.5 text-gray-400">🔍</span>
+                    <span className="absolute left-4 top-3.5 text-slate-500 dark:text-slate-400">🔍</span>
                 </div>
             </div>
 
-            <div className="card glass overflow-hidden p-0">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm overflow-hidden p-0">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-white/5 text-sm font-bold text-gray-400 border-b border-white/5">
-                                <th className="p-4 w-48">HESAP KODU</th>
-                                <th className="p-4">HESAP ADI</th>
-                                <th className="p-4 w-32">SINIF</th>
-                                <th className="p-4 w-32 hidden md:table-cell">YÖN</th>
-                                <th className="p-4 text-right w-40 text-blue-300">BORÇ BAKİYESİ</th>
-                                <th className="p-4 text-right w-40 text-rose-300">ALACAK BAKİYESİ</th>
-                                <th className="p-4 w-24 text-center">İŞLEM</th>
+                        <thead className="bg-[#F6F8FB] dark:bg-[#0F172A] border-b border-slate-200 dark:border-slate-800 font-bold sticky top-0 z-10">
+                            <tr>
+                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-left">HESAP KODU</th>
+                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-left">HESAP ADI</th>
+                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-left">SINIF</th>
+                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-left">YÖN</th>
+                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-right">BORÇ BAKİYESİ</th>
+                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-right">ALACAK BAKİYESİ</th>
+                                <th className="p-4 tracking-wider uppercase text-[12px] font-semibold text-slate-500 dark:text-slate-400 text-left">İŞLEM</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={7} className="p-8 text-center text-gray-500">
+                                    <td colSpan={7} className="p-8 text-center text-slate-500 dark:text-slate-400">
                                         Hesap planı yükleniyor...
                                     </td>
                                 </tr>
                             ) : filteredAccounts.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="p-8 text-center text-gray-500">
+                                    <td colSpan={7} className="p-8 text-center text-slate-500 dark:text-slate-400">
                                         Kayıtlı hesap bulunamadı.
                                     </td>
                                 </tr>
@@ -219,17 +219,11 @@ export default function AccountPlanContent() {
                                     const isMain = depth === 0;
 
                                     return (
-                                        <tr
-                                            key={acc.id}
-                                            className={`
-                                                border-b border-white/5 hover:bg-white/5 transition-colors
-                                                ${isMain ? 'bg-white/[0.02]' : ''}
-                                            `}
-                                        >
-                                            <td className="p-4 font-mono font-bold text-blue-300">
+                                        <tr key={acc.id} className={`h-[52px] border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors ${isMain ? 'bg-slate-50/50 dark:bg-slate-800/20' : ''}`}>
+                                            <td className="px-4 py-2 font-semibold text-[13px] font-mono font-bold text-blue-600 dark:text-blue-400">
                                                 <div className="flex items-center gap-2">
-                                                    <span style={{ marginLeft: `${depth * 20}px` }}>
-                                                        {isMain ? '' : '└─ '}
+                                                    <span style={{ marginLeft: `${depth * 20}px` }} className="relative flex items-center">
+                                                        {isMain ? '' : <span className='absolute -left-3 top-[-10px] w-2 h-4 border-l border-b border-slate-300 dark:border-slate-700 rounded-bl'></span>}
                                                         {acc.code}
                                                     </span>
                                                     {acc.warnings && acc.warnings.length > 0 && (
@@ -242,14 +236,14 @@ export default function AccountPlanContent() {
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className={`p-4 ${isMain ? 'font-bold text-white' : 'text-gray-300'}`}>
+                                            <td className={`p-4 ${isMain ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-900 dark:text-white'}`}>
                                                 {acc.name}
                                             </td>
-                                            <td className="p-4">
+                                            <td className="px-4 py-2 font-semibold text-[13px]">
                                                 {acc.accountClass ? (
                                                     <span className={`
                                                         text-xs px-2 py-1 rounded-md font-bold
-                                                        ${acc.accountClass === 'AKTIF' || acc.accountClass === 'GIDER' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-orange-500/10 text-orange-400'}
+                                                        ${acc.accountClass === 'AKTIF' || acc.accountClass === 'GIDER' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-600 dark:text-blue-400 text-orange-400'}
                                                     `}>
                                                         {acc.accountClass}
                                                     </span>
@@ -257,9 +251,9 @@ export default function AccountPlanContent() {
                                                     <span className="text-gray-600 text-xs">-</span>
                                                 )}
                                             </td>
-                                            <td className="p-4 hidden md:table-cell">
+                                            <td className="px-4 py-2 font-semibold text-[13px] hidden md:table-cell">
                                                 {acc.normalBalance ? (
-                                                    <span className={`text-xs font-mono opacity-70 ${acc.normalBalance === 'BORC' ? 'text-blue-400' : 'text-rose-400'}`}>
+                                                    <span className={`text-xs font-mono opacity-70 ${acc.normalBalance === 'BORC' ? 'text-blue-600 dark:text-blue-400' : 'text-rose-400'}`}>
                                                         {acc.normalBalance}
                                                     </span>
                                                 ) : (
@@ -268,9 +262,9 @@ export default function AccountPlanContent() {
                                             </td>
 
                                             {/* BORÇ BAKİYESİ */}
-                                            <td className="p-4 text-right font-mono font-bold">
+                                            <td className="px-4 py-2 font-semibold text-[13px] text-right font-mono font-bold">
                                                 {acc.debitBalance > 0 ? (
-                                                    <span className="text-blue-300">
+                                                    <span className="text-blue-600 dark:text-blue-400">
                                                         {acc.debitBalance.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                                     </span>
                                                 ) : (
@@ -279,9 +273,9 @@ export default function AccountPlanContent() {
                                             </td>
 
                                             {/* ALACAK BAKİYESİ */}
-                                            <td className="p-4 text-right font-mono font-bold">
+                                            <td className="px-4 py-2 font-semibold text-[13px] text-right font-mono font-bold">
                                                 {acc.creditBalance > 0 ? (
-                                                    <span className="text-rose-300">
+                                                    <span className="text-rose-600 dark:text-rose-400">
                                                         {acc.creditBalance.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                                     </span>
                                                 ) : (
@@ -289,7 +283,7 @@ export default function AccountPlanContent() {
                                                 )}
                                             </td>
 
-                                            <td className="p-4 text-center">
+                                            <td className="px-4 py-2 font-semibold text-[13px] text-center">
                                                 <div className="flex justify-center gap-2">
                                                     <button
                                                         onClick={() => openLedger(acc)}
@@ -300,7 +294,7 @@ export default function AccountPlanContent() {
                                                     </button>
                                                     <button
                                                         onClick={() => prepareSubAccount(acc)}
-                                                        className="btn btn-ghost btn-xs text-blue-400 hover:bg-blue-500/10"
+                                                        className="btn btn-ghost btn-xs text-blue-600 dark:text-blue-400 hover:bg-blue-500/10"
                                                         title="Alt Hesap Ekle"
                                                     >
                                                         + Alt
@@ -319,17 +313,17 @@ export default function AccountPlanContent() {
             {/* ADD ACCOUNT MODAL */}
             {showAddModal && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowAddModal(false)}>
-                    <div className="bg-[#1a1a2e] border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[24px] w-full max-w-md p-8 shadow-2xl" onClick={e => e.stopPropagation()}>
                         <h3 className="text-xl font-bold mb-6">
                             {newAccount.parentCode ? `Alt Hesap Ekle (${newAccount.parentCode})` : 'Yeni Ana Hesap Ekle'}
                         </h3>
 
                         <div className="space-y-4">
                             <div>
-                                <label className="text-xs font-bold text-gray-500 block mb-2">HESAP KODU</label>
+                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-2">HESAP KODU</label>
                                 <input
                                     type="text"
-                                    className="w-full bg-black/30 border border-white/10 rounded-xl p-3 focus:border-blue-500 outline-none"
+                                    className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[12px] p-3 focus:border-blue-500 outline-none"
                                     placeholder={newAccount.parentCode ? `${newAccount.parentCode}.01` : '100'}
                                     value={newAccount.code}
                                     onChange={e => setNewAccount({ ...newAccount, code: e.target.value })}
@@ -337,10 +331,10 @@ export default function AccountPlanContent() {
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-gray-500 block mb-2">HESAP ADI</label>
+                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-2">HESAP ADI</label>
                                 <input
                                     type="text"
-                                    className="w-full bg-black/30 border border-white/10 rounded-xl p-3 focus:border-blue-500 outline-none"
+                                    className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[12px] p-3 focus:border-blue-500 outline-none"
                                     placeholder="Örn: AKBANK TL HESABI"
                                     value={newAccount.name}
                                     onChange={e => setNewAccount({ ...newAccount, name: e.target.value })}
@@ -349,9 +343,9 @@ export default function AccountPlanContent() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-bold text-gray-500 block mb-2">HESAP TİPİ</label>
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-2">HESAP TİPİ</label>
                                     <select
-                                        className="w-full bg-black/30 border border-white/10 rounded-xl p-3 outline-none"
+                                        className="w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[12px] p-3 outline-none"
                                         value={newAccount.type}
                                         onChange={e => setNewAccount({ ...newAccount, type: e.target.value })}
                                         disabled={!!newAccount.parentCode}
@@ -366,13 +360,13 @@ export default function AccountPlanContent() {
                         <div className="flex gap-3 mt-8">
                             <button
                                 onClick={() => setShowAddModal(false)}
-                                className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-bold transition-colors"
+                                className="flex-1 py-4 text-[13px] h-[52px] rounded-[12px] bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold transition-colors"
                             >
                                 İptal
                             </button>
                             <button
                                 onClick={handleAddAccount}
-                                className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-colors shadow-lg shadow-blue-500/20"
+                                className="flex-1 py-4 text-[13px] h-[52px] rounded-[12px] bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-white font-bold transition-colors shadow-lg shadow-blue-500/20"
                             >
                                 Kaydet
                             </button>

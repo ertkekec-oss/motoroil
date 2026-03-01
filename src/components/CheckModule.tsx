@@ -162,37 +162,72 @@ export default function CheckModule() {
     return (
         <div className="animate-fade-in space-y-6">
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="glass p-6 rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 to-transparent shadow-xl">
-                    <div className="text-[11px] font-black text-emerald-500 uppercase tracking-widest mb-1">BEKLEYEN TAHSİLATLAR</div>
-                    <div className="text-3xl font-black text-white">{stats.inPending.toLocaleString('tr-TR')} ₺</div>
-                    <div className="text-[10px] text-white/40 mt-2">Portföydeki Alınan Çekler</div>
-                </div>
-                <div className="glass p-6 rounded-3xl border border-rose-500/20 bg-gradient-to-br from-rose-500/5 to-transparent shadow-xl">
-                    <div className="text-[11px] font-black text-rose-500 uppercase tracking-widest mb-1">BEKLEYEN ÖDEMELER</div>
-                    <div className="text-3xl font-black text-white">{stats.outPending.toLocaleString('tr-TR')} ₺</div>
-                    <div className="text-[10px] text-white/40 mt-2">Vadesi Bekleyen Verilen Çekler</div>
-                </div>
-                <div className="glass p-6 rounded-3xl border border-sky-500/20 bg-gradient-to-br from-sky-500/5 to-transparent shadow-xl flex flex-col justify-center">
-                    <div className="flex gap-2">
-                        <button onClick={() => setActiveTab('list')} className={`flex-1 py-3 rounded-2xl text-[12px] font-black transition-all ${activeTab === 'list' ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20' : 'bg-white/5 text-sky-500 hover:bg-white/10'}`}>LİSTE</button>
-                        <button onClick={() => setActiveTab('calendar')} className={`flex-1 py-3 rounded-2xl text-[12px] font-black transition-all ${activeTab === 'calendar' ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20' : 'bg-white/5 text-sky-500 hover:bg-white/10'}`}>TAKVİM</button>
-                        <button onClick={() => setActiveTab('new')} className={`flex-1 py-3 rounded-2xl text-[12px] font-black transition-all ${activeTab === 'new' ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20' : 'bg-white/5 text-sky-500 hover:bg-white/10'}`}>+ YENİ</button>
+            {/* 1. Strategic Metrics Zone (Unified Strip) */}
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] flex flex-col md:flex-row shadow-sm overflow-hidden mb-8">
+                <div className="flex-1 p-6 relative group">
+                    <div className="flex justify-between items-start mb-2">
+                        <span className="text-[12px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Bekleyen Tahsilatlar</span>
+                        <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-[6px]">
+                            ↑ Tahsilat
+                        </div>
                     </div>
+                    <div className="text-[32px] font-bold text-slate-900 dark:text-white leading-none mb-1">
+                        {stats.inPending.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
+                    </div>
+                    <div className="text-[13px] text-slate-500 dark:text-slate-400 font-medium">Portföydeki Alınan Çekler</div>
+                </div>
+
+                <div className="w-px bg-slate-200 dark:bg-slate-800 hidden md:block" />
+                <div className="h-px w-full bg-slate-200 dark:bg-slate-800 block md:hidden" />
+
+                <div className="flex-1 p-6 relative group">
+                    <div className="flex justify-between items-start mb-2">
+                        <span className="text-[12px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Bekleyen Ödemeler</span>
+                        <div className="flex items-center gap-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-[6px]">
+                            ↓ Ödeme
+                        </div>
+                    </div>
+                    <div className="text-[32px] font-bold text-slate-900 dark:text-white leading-none mb-1">
+                        {stats.outPending.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
+                    </div>
+                    <div className="text-[13px] text-slate-500 dark:text-slate-400 font-medium">Vadesi Gelen Verilen Çekler</div>
+                </div>
+
+                <div className="w-px bg-slate-200 dark:bg-slate-800 hidden md:block" />
+                <div className="h-px w-full bg-slate-200 dark:bg-slate-800 block md:hidden" />
+
+                <div className="flex-1 p-6 flex flex-col justify-center">
+                    <button onClick={() => setActiveTab('new')} className="w-full h-[52px] rounded-[12px] bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center justify-center gap-2 transition-colors">
+                        <span className="text-[18px]">+</span> Yeni Çek Gönder / Al
+                    </button>
+                </div>
+            </div>
+
+            {/* 2. Navigation Zone */}
+            <div className="flex border-b border-slate-200 dark:border-slate-800 mb-8 w-full overflow-x-auto custom-scroll select-none">
+                <div className="flex h-[48px] items-end gap-8 px-2 w-full min-w-max">
+                    <button onClick={() => setActiveTab('list')} className={`pb-3 text-[14px] font-semibold transition-all relative whitespace-nowrap ${activeTab === 'list' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}>
+                        Liste Görünümü
+                        {activeTab === 'list' && <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-blue-600 dark:bg-blue-400 rounded-t-full" />}
+                    </button>
+                    <button onClick={() => setActiveTab('calendar')} className={`pb-3 text-[14px] font-semibold transition-all relative whitespace-nowrap ${activeTab === 'calendar' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}>
+                         Vade Takvimi
+                        {activeTab === 'calendar' && <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-blue-600 dark:bg-blue-400 rounded-t-full" />}
+                    </button>
                 </div>
             </div>
 
             {/* List View */}
             {activeTab === 'list' && (
-                <div className="glass rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
-                    <div className="p-6 bg-white/5 border-b border-white/5 flex flex-wrap gap-4 items-center justify-between">
+                <div className="bg-white dark:bg-[#1e293b] rounded-[24px] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl">
+                    <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 flex flex-wrap gap-4 items-center justify-between">
                         <div className="flex gap-4">
-                            <select className="bg-black/40 border border-white/10 text-white rounded-xl px-4 py-2 text-sm outline-none focus:border-sky-500" value={filterType} onChange={e => setFilterType(e.target.value)}>
+                            <select className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[12px] px-4 py-2 text-sm outline-none focus:border-blue-600 dark:focus:border-blue-400 ring-0" value={filterType} onChange={e => setFilterType(e.target.value)}>
                                 <option value="all">Tüm Yönler</option>
                                 <option value="In">⬇ Alınan Çekler</option>
                                 <option value="Out">⬆ Verilen Çekler</option>
                             </select>
-                            <select className="bg-black/40 border border-white/10 text-white rounded-xl px-4 py-2 text-sm outline-none focus:border-sky-500" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+                            <select className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[12px] px-4 py-2 text-sm outline-none focus:border-blue-600 dark:focus:border-blue-400 ring-0" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
                                 <option value="all">Tüm Durumlar</option>
                                 <option value="Portföyde">Portföyde</option>
                                 <option value="Tahsil Edildi">Tahsil Edildi</option>
@@ -200,7 +235,7 @@ export default function CheckModule() {
                                 <option value="Karşılıksız">Karşılıksız</option>
                             </select>
                         </div>
-                        <div className="text-[11px] font-bold text-white/40 uppercase tracking-widest">
+                        <div className="text-[11px] font-bold text-slate-900 dark:text-white/40 uppercase tracking-widest">
                             Toplam {checks.length} Kayıt Listeleniyor
                         </div>
                     </div>
@@ -208,7 +243,7 @@ export default function CheckModule() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
-                                <tr className="text-[10px] font-black text-white/30 uppercase tracking-[2px] border-b border-white/5">
+                                <tr className="text-[10px] font-black text-slate-900 dark:text-white/30 uppercase tracking-[2px] border-b border-slate-200 dark:border-slate-800">
                                     <th className="p-6">YÖN / DURUM</th>
                                     <th className="p-6">VADE / BANKA</th>
                                     <th className="p-6">BELGE NO</th>
@@ -220,11 +255,11 @@ export default function CheckModule() {
                             <tbody className="divide-y divide-white/5">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={6} className="p-20 text-center text-white/40 animate-pulse font-bold tracking-widest italic">VERİLER YÜKLENİYOR...</td>
+                                        <td colSpan={6} className="p-20 text-center text-slate-900 dark:text-white/40 animate-pulse font-bold tracking-widest italic">VERİLER YÜKLENİYOR...</td>
                                     </tr>
                                 ) : checks.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="p-20 text-center text-white/20 italic">Henüz kayıtlı çek bulunmuyor.</td>
+                                        <td colSpan={6} className="p-20 text-center text-slate-900 dark:text-white/20 italic">Henüz kayıtlı çek bulunmuyor.</td>
                                     </tr>
                                 ) : checks.map(item => (
                                     <tr key={item.id} className="hover:bg-white/[0.02] transition-colors group">
@@ -235,22 +270,22 @@ export default function CheckModule() {
                                                     <span className={`text-[11px] font-black ${item.type === 'In' ? 'text-emerald-400' : 'text-rose-400'}`}>
                                                         {item.type === 'In' ? 'ALINAN' : 'VERİLEN'}
                                                     </span>
-                                                    <span className="text-[10px] text-white/40 font-bold mt-0.5">{item.status}</span>
+                                                    <span className="text-[10px] text-slate-900 dark:text-white/40 font-bold mt-0.5">{item.status}</span>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="p-6">
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-black text-white">{new Date(item.dueDate).toLocaleDateString('tr-TR')}</span>
-                                                <span className="text-[11px] text-white/40 italic">{item.bank}</span>
+                                                <span className="text-sm font-black text-slate-900 dark:text-white">{new Date(item.dueDate).toLocaleDateString('tr-TR')}</span>
+                                                <span className="text-[11px] text-slate-900 dark:text-white/40 italic">{item.bank}</span>
                                             </div>
                                         </td>
-                                        <td className="p-6 text-sm font-mono text-white/60">{item.number}</td>
+                                        <td className="p-6 text-sm font-mono text-slate-900 dark:text-white/60">{item.number}</td>
                                         <td className="p-6">
-                                            <span className="text-sm font-bold text-white/80">{item.customer?.name || item.supplier?.name || '-'}</span>
+                                            <span className="text-sm font-bold text-slate-900 dark:text-white/80">{item.customer?.name || item.supplier?.name || '-'}</span>
                                         </td>
                                         <td className="p-6 text-right">
-                                            <span className="text-lg font-black text-white">
+                                            <span className="text-[14px] font-semibold text-slate-900 dark:text-white">
                                                 {Number(item.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
                                             </span>
                                         </td>
@@ -259,14 +294,14 @@ export default function CheckModule() {
                                                 {item.status === 'Portföyde' && (
                                                     <button
                                                         onClick={() => handleStatusChange(item.id, item.type === 'In' ? 'Tahsil Edildi' : 'Ödendi')}
-                                                        className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-[10px] font-black shadow-lg shadow-sky-500/20 transition-all active:scale-95"
+                                                        className="px-4 py-2 rounded-[12px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white text-[10px] font-black shadow-lg shadow-blue-500/20 transition-all active:scale-95"
                                                     >
                                                         {item.type === 'In' ? 'TAHSİL ET' : 'ÖDEME YAP'}
                                                     </button>
                                                 )}
                                                 <button
                                                     onClick={() => handleDelete(item.id)}
-                                                    className="w-10 h-10 rounded-xl bg-white/5 hover:bg-rose-500/10 text-white/20 hover:text-rose-500 transition-all flex items-center justify-center font-black"
+                                                    className="w-10 h-10 rounded-[12px] bg-slate-50 dark:bg-slate-800/50 hover:bg-rose-500/10 text-slate-900 dark:text-white/20 hover:text-rose-500 transition-all flex items-center justify-center font-black"
                                                 >
                                                     ×
                                                 </button>
@@ -282,28 +317,28 @@ export default function CheckModule() {
 
             {/* Calendar View */}
             {activeTab === 'calendar' && (
-                <div className="glass rounded-3xl p-8 border border-white/5 shadow-2xl">
+                <div className="bg-white dark:bg-[#1e293b] rounded-[24px] p-8 border border-slate-200 dark:border-slate-800 shadow-2xl">
                     <div className="flex justify-between items-center mb-8">
-                        <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))} className="w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 transition-all text-xl">←</button>
+                        <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))} className="w-12 h-12 rounded-[24px] bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:bg-slate-800 transition-all text-xl">←</button>
                         <div className="text-center">
-                            <h3 className="text-2xl font-black text-white tracking-widest uppercase">
+                            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-widest uppercase">
                                 {currentDate.toLocaleDateString('tr-TR', { month: 'long' })}
                             </h3>
-                            <div className="text-sky-500 text-sm font-black mt-1">{currentDate.getFullYear()}</div>
+                            <div className="text-blue-600 dark:text-blue-400 text-sm font-black mt-1">{currentDate.getFullYear()}</div>
                         </div>
-                        <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))} className="w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 transition-all text-xl">→</button>
+                        <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))} className="w-12 h-12 rounded-[24px] bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:bg-slate-800 transition-all text-xl">→</button>
                     </div>
 
                     <div className="grid grid-cols-7 gap-3 mb-3">
                         {['PT', 'SA', 'ÇR', 'PR', 'CU', 'CT', 'PA'].map(d => (
-                            <div key={d} className="text-center text-[10px] font-black text-white/20 tracking-widest">{d}</div>
+                            <div key={d} className="text-center text-[10px] font-black text-slate-900 dark:text-white/20 tracking-widest">{d}</div>
                         ))}
                     </div>
 
                     <div className="grid grid-cols-7 gap-3">
                         {/* Fill empty start days */}
                         {Array(daysInMonth.adjustedFirstDay).fill(0).map((_, i) => (
-                            <div key={`empty-${i}`} className="aspect-square rounded-2xl bg-transparent opacity-10 border border-dashed border-white/5" />
+                            <div key={`empty-${i}`} className="aspect-square rounded-[24px] bg-transparent opacity-10 border border-dashed border-slate-200 dark:border-slate-800" />
                         ))}
 
                         {/* Days */}
@@ -315,8 +350,8 @@ export default function CheckModule() {
                             const isToday = new Date().toDateString() === dateStr;
 
                             return (
-                                <div key={day} className={`aspect-square rounded-2xl border ${isToday ? 'border-sky-500/50 bg-sky-500/5' : 'border-white/5 bg-white/5'} p-3 relative group hover:border-sky-500/30 transition-all cursor-pointer`}>
-                                    <div className={`text-xs font-black ${isToday ? 'text-sky-500' : 'text-white/30'} group-hover:text-white transition-colors`}>{day}</div>
+                                <div key={day} className={`aspect-square rounded-[24px] border ${isToday ? 'border-sky-500/50 bg-sky-500/5' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50'} p-3 relative group hover:border-sky-500/30 transition-all cursor-pointer`}>
+                                    <div className={`text-xs font-black ${isToday ? 'text-blue-600 dark:text-blue-400' : 'text-slate-900 dark:text-white/30'} group-hover:text-slate-900 dark:text-white transition-colors`}>{day}</div>
                                     <div className="mt-2 flex flex-col gap-1 overflow-y-auto custom-scroll max-h-full pb-2">
                                         {dayChecks.map(c => (
                                             <div
@@ -337,35 +372,35 @@ export default function CheckModule() {
 
             {/* Create Form */}
             {activeTab === 'new' && (
-                <div className="glass rounded-3xl p-10 border border-white/5 shadow-2xl max-w-3xl mx-auto bg-gradient-to-br from-white/5 to-transparent">
-                    <div className="flex items-center gap-4 mb-10 border-b border-white/5 pb-6">
-                        <div className="w-16 h-16 rounded-3xl bg-sky-500/10 flex items-center justify-center text-3xl">🎫</div>
+                <div className="bg-white dark:bg-[#1e293b] rounded-[24px] p-10 border border-slate-200 dark:border-slate-800 shadow-2xl max-w-3xl mx-auto bg-gradient-to-br from-white/5 to-transparent">
+                    <div className="flex items-center gap-4 mb-10 border-b border-slate-200 dark:border-slate-800 pb-6">
+                        <div className="w-16 h-16 rounded-[24px] bg-sky-500/10 flex items-center justify-center text-3xl">🎫</div>
                         <div>
-                            <h3 className="text-xl font-black text-white">YENİ ÇEK / SENET GİRİŞİ</h3>
-                            <p className="text-xs text-white/40 font-bold uppercase tracking-widest mt-1">Sisteme yeni bir tahsilat veya ödeme planı ekleyin</p>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white">YENİ ÇEK / SENET GİRİŞİ</h3>
+                            <p className="text-xs text-slate-900 dark:text-white/40 font-bold uppercase tracking-widest mt-1">Sisteme yeni bir tahsilat veya ödeme planı ekleyin</p>
                         </div>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[2px] ml-4">İŞLEM YÖNÜ</label>
-                                <select className="w-full bg-black/40 border border-white/10 text-white rounded-2xl px-6 py-4 outline-none focus:border-sky-500 transition-all font-bold appearance-none" value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
+                                <label className="text-[10px] font-black text-slate-900 dark:text-white/30 uppercase tracking-[2px] ml-4">İŞLEM YÖNÜ</label>
+                                <select className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[24px] px-6 py-4 text-[13px] h-[52px] outline-none focus:border-blue-600 dark:focus:border-blue-400 ring-0 transition-all font-bold appearance-none" value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
                                     <option value="In">ALINAN ÇEK (Müşteri)</option>
                                     <option value="Out">VERİLEN ÇEK (Tedarikçi)</option>
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[2px] ml-4">TUTAR (TRY)</label>
-                                <input type="number" className="w-full bg-black/40 border border-white/10 text-white rounded-2xl px-6 py-4 outline-none focus:border-sky-500 transition-all font-bold" required value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })} placeholder="0.00" step="0.01" />
+                                <label className="text-[10px] font-black text-slate-900 dark:text-white/30 uppercase tracking-[2px] ml-4">TUTAR (TRY)</label>
+                                <input type="number" className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[24px] px-6 py-4 text-[13px] h-[52px] outline-none focus:border-blue-600 dark:focus:border-blue-400 ring-0 transition-all font-bold" required value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })} placeholder="0.00" step="0.01" />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-white/30 uppercase tracking-[2px] ml-4">
+                            <label className="text-[10px] font-black text-slate-900 dark:text-white/30 uppercase tracking-[2px] ml-4">
                                 {formData.type === 'In' ? 'MÜŞTERİ SEÇİMİ' : 'TEDARİKÇİ SEÇİMİ'}
                             </label>
-                            <select className="w-full bg-black/40 border border-white/10 text-white rounded-2xl px-6 py-4 outline-none focus:border-sky-500 transition-all font-bold" required value={formData.type === 'In' ? formData.customerId : formData.supplierId} onChange={e => setFormData({ ...formData, [formData.type === 'In' ? 'customerId' : 'supplierId']: e.target.value })}>
+                            <select className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[24px] px-6 py-4 text-[13px] h-[52px] outline-none focus:border-blue-600 dark:focus:border-blue-400 ring-0 transition-all font-bold" required value={formData.type === 'In' ? formData.customerId : formData.supplierId} onChange={e => setFormData({ ...formData, [formData.type === 'In' ? 'customerId' : 'supplierId']: e.target.value })}>
                                 <option value="">Bir cari seçiniz...</option>
                                 {formData.type === 'In'
                                     ? customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)
@@ -376,24 +411,24 @@ export default function CheckModule() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[2px] ml-4">VADE TARİHİ</label>
-                                <input type="date" className="w-full bg-black/40 border border-white/10 text-white rounded-2xl px-6 py-4 outline-none focus:border-sky-500 transition-all font-bold" required value={formData.dueDate} onChange={e => setFormData({ ...formData, dueDate: e.target.value })} />
+                                <label className="text-[10px] font-black text-slate-900 dark:text-white/30 uppercase tracking-[2px] ml-4">VADE TARİHİ</label>
+                                <input type="date" className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[24px] px-6 py-4 text-[13px] h-[52px] outline-none focus:border-blue-600 dark:focus:border-blue-400 ring-0 transition-all font-bold" required value={formData.dueDate} onChange={e => setFormData({ ...formData, dueDate: e.target.value })} />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-[2px] ml-4">BANKA BİLGİSİ</label>
-                                <input type="text" className="w-full bg-black/40 border border-white/10 text-white rounded-2xl px-6 py-4 outline-none focus:border-sky-500 transition-all font-bold" placeholder="Örn: Garanti BBVA" value={formData.bank} onChange={e => setFormData({ ...formData, bank: e.target.value })} />
+                                <label className="text-[10px] font-black text-slate-900 dark:text-white/30 uppercase tracking-[2px] ml-4">BANKA BİLGİSİ</label>
+                                <input type="text" className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[24px] px-6 py-4 text-[13px] h-[52px] outline-none focus:border-blue-600 dark:focus:border-blue-400 ring-0 transition-all font-bold" placeholder="Örn: Garanti BBVA" value={formData.bank} onChange={e => setFormData({ ...formData, bank: e.target.value })} />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-white/30 uppercase tracking-[2px] ml-4">BELGE NO / AÇIKLAMA</label>
+                            <label className="text-[10px] font-black text-slate-900 dark:text-white/30 uppercase tracking-[2px] ml-4">BELGE NO / AÇIKLAMA</label>
                             <div className="flex gap-4">
-                                <input type="text" className="w-48 bg-black/40 border border-white/10 text-white rounded-2xl px-6 py-4 outline-none focus:border-sky-500 transition-all font-bold" placeholder="No: 12345" value={formData.number} onChange={e => setFormData({ ...formData, number: e.target.value })} />
-                                <input type="text" className="flex-1 bg-black/40 border border-white/10 text-white rounded-2xl px-6 py-4 outline-none focus:border-sky-500 transition-all font-bold" placeholder="Not ekleyin..." value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+                                <input type="text" className="w-48 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[24px] px-6 py-4 text-[13px] h-[52px] outline-none focus:border-blue-600 dark:focus:border-blue-400 ring-0 transition-all font-bold" placeholder="No: 12345" value={formData.number} onChange={e => setFormData({ ...formData, number: e.target.value })} />
+                                <input type="text" className="flex-1 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[24px] px-6 py-4 text-[13px] h-[52px] outline-none focus:border-blue-600 dark:focus:border-blue-400 ring-0 transition-all font-bold" placeholder="Not ekleyin..." value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                             </div>
                         </div>
 
-                        <button type="submit" className="w-full py-5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-black text-[14px] shadow-2xl shadow-sky-500/20 active:scale-[0.98] transition-all">
+                        <button type="submit" className="w-full py-5 rounded-[24px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white font-black text-[14px] shadow-2xl shadow-blue-500/20 active:scale-[0.98] transition-all">
                             ✅ KAYDI SİSTEME İŞLE
                         </button>
                     </form>

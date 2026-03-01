@@ -4,17 +4,17 @@ import { useState, useEffect } from 'react';
 
 // Card Component for each Ratio
 const RatioCard = ({ title, value, unit, status, description, color, ideal }: any) => (
-    <div className="card glass p-6 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+    <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm p-6 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
         <div className={`absolute top-0 right-0 w-24 h-24 ${color} opacity-10 rounded-bl-full -mr-4 -mt-4 transition-all group-hover:opacity-20`} />
 
         <div className="relative">
-            <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">{title}</h3>
+            <h3 className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">{title}</h3>
 
             <div className="flex items-baseline gap-2 mb-4">
                 <span className={`text-4xl font-black ${color.replace('bg-', 'text-')}`}>
                     {value}
                 </span>
-                <span className="text-gray-500 font-bold">{unit}</span>
+                <span className="text-slate-500 dark:text-slate-400 font-bold">{unit}</span>
             </div>
 
             {/* Health Status Bar */}
@@ -26,16 +26,16 @@ const RatioCard = ({ title, value, unit, status, description, color, ideal }: an
             </div>
 
             <div className="flex items-center gap-2 mb-3">
-                <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${status === 'good' ? 'bg-green-500/20 text-green-400' :
-                        status === 'warning' ? 'bg-yellow-500/20 text-yellow-400' :
-                            'bg-red-500/20 text-red-400'
+                <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${status === 'good' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                        status === 'warning' ? 'bg-amber-50 dark:bg-amber-500/10 text-yellow-400' :
+                            'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400'
                     }`}>
                     {status === 'good' ? 'İYİ DURUMDA' : (status === 'warning' ? 'DİKKAT' : 'RİSKLİ')}
                 </div>
-                <span className="text-[10px] text-gray-500">Hedef: {ideal}</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">Hedef: {ideal}</span>
             </div>
 
-            <p className="text-xs text-gray-400 leading-relaxed border-t border-white/5 pt-3">
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed border-t border-slate-200 dark:border-slate-800 pt-3">
                 {description}
             </p>
         </div>
@@ -61,8 +61,8 @@ export default function FinancialHealthContent() {
         fetchHealth();
     }, []);
 
-    if (loading) return <div className="p-12 text-center text-gray-500 animate-pulse">Analiz yapılıyor...</div>;
-    if (!data) return <div className="p-12 text-center text-gray-500">Veri alınamadı.</div>;
+    if (loading) return <div className="p-12 text-center text-slate-500 dark:text-slate-400 animate-pulse">Analiz yapılıyor...</div>;
+    if (!data) return <div className="p-12 text-center text-slate-500 dark:text-slate-400">Veri alınamadı.</div>;
 
     const { ratios, data: financials } = data;
 
@@ -98,13 +98,13 @@ export default function FinancialHealthContent() {
 
 
     return (
-        <div className="animate-fade-in-up">
-            <div className="card glass mb-6">
+        <div className="animate-in fade-in duration-500">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm mb-6">
                 <div>
-                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-cyan-500">
+                    <h2 className="text-[24px] font-bold text-slate-900 dark:text-white  text-slate-900 dark:text-white">
                         🩺 Finansal Sağlık Karnesi
                     </h2>
-                    <p className="text-muted text-sm mt-1">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
                         İşletmenizin finansal röntgeni ve kritik performans göstergeleri.
                     </p>
                 </div>
@@ -154,62 +154,62 @@ export default function FinancialHealthContent() {
 
             {/* Detailed Data Summary */}
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="card glass p-6">
-                    <h4 className="text-gray-400 text-xs font-bold uppercase mb-4">VARLIK YAPISI</h4>
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm p-6">
+                    <h4 className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase mb-4">VARLIK YAPISI</h4>
                     <div className="space-y-3">
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-300">Dönen Varlıklar</span>
+                            <span className="text-slate-900 dark:text-white">Dönen Varlıklar</span>
                             <span className="font-mono">{financials.currentAssets.toLocaleString('tr-TR')} ₺</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-300">Duran Varlıklar</span>
+                            <span className="text-slate-900 dark:text-white">Duran Varlıklar</span>
                             <span className="font-mono">{(financials.totalAssets - financials.currentAssets).toLocaleString('tr-TR')} ₺</span>
                         </div>
-                        <div className="w-full h-px bg-white/10 my-2" />
-                        <div className="flex justify-between text-sm font-bold text-white">
+                        <div className="w-full h-px bg-slate-100 dark:bg-slate-800 my-2" />
+                        <div className="flex justify-between text-sm font-bold text-slate-900 dark:text-white">
                             <span>TOPLAM</span>
                             <span className="font-mono">{financials.totalAssets.toLocaleString('tr-TR')} ₺</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="card glass p-6">
-                    <h4 className="text-gray-400 text-xs font-bold uppercase mb-4">KAYNAK YAPISI</h4>
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm p-6">
+                    <h4 className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase mb-4">KAYNAK YAPISI</h4>
                     <div className="space-y-3">
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-300">Kısa Vadeli Borçlar</span>
+                            <span className="text-slate-900 dark:text-white">Kısa Vadeli Borçlar</span>
                             <span className="font-mono">{financials.shortTermLiabilities.toLocaleString('tr-TR')} ₺</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-300">Uzun Vadeli Borçlar</span>
+                            <span className="text-slate-900 dark:text-white">Uzun Vadeli Borçlar</span>
                             <span className="font-mono">{(financials.totalDebt - financials.shortTermLiabilities).toLocaleString('tr-TR')} ₺</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-300">Özkaynaklar</span>
+                            <span className="text-slate-900 dark:text-white">Özkaynaklar</span>
                             <span className="font-mono">{(financials.totalAssets - financials.totalDebt).toLocaleString('tr-TR')} ₺</span>
                         </div>
-                        <div className="w-full h-px bg-white/10 my-2" />
-                        <div className="flex justify-between text-sm font-bold text-white">
+                        <div className="w-full h-px bg-slate-100 dark:bg-slate-800 my-2" />
+                        <div className="flex justify-between text-sm font-bold text-slate-900 dark:text-white">
                             <span>TOPLAM</span>
                             <span className="font-mono">{financials.totalAssets.toLocaleString('tr-TR')} ₺</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="card glass p-6 bg-gradient-to-br from-blue-900/20 to-purple-900/20">
+                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm p-6 bg-gradient-to-br from-blue-900/20 to-purple-900/20">
                     <h4 className="text-blue-300 text-xs font-bold uppercase mb-4">PERFORMANS ÖZETİ</h4>
                     <div className="space-y-3">
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-300">Net Satışlar</span>
+                            <span className="text-slate-900 dark:text-white">Net Satışlar</span>
                             <span className="font-mono font-bold">{financials.netSales.toLocaleString('tr-TR')} ₺</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-300">Net Kar/Zarar</span>
+                            <span className="text-slate-900 dark:text-white">Net Kar/Zarar</span>
                             <span className={`font-mono font-bold ${financials.netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                                 {financials.netProfit.toLocaleString('tr-TR')} ₺
                             </span>
                         </div>
-                        <div className="mt-4 text-xs text-gray-400 italic">
+                        <div className="mt-4 text-xs text-slate-500 dark:text-slate-400 italic">
                             * Veriler genel mizan ve gelir tablosu verilerinden anlık hesaplanmıştır.
                         </div>
                     </div>

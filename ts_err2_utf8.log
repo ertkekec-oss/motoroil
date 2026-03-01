@@ -1,0 +1,7 @@
+﻿enterprise_tabs.tsx(1391,9): error TS1128: Declaration or statement expected.
+enterprise_tabs.tsx(1392,5): error TS1109: Expression expected.
+enterprise_tabs.tsx(1393,1): error TS1128: Declaration or statement expected.
+original_tabs.tsx(1391,9): error TS1128: Declaration or statement expected.
+original_tabs.tsx(1392,5): error TS1109: Expression expected.
+original_tabs.tsx(1393,1): error TS1128: Declaration or statement expected.
+src/components/StaffManagementContent.tsx(2454,1): error TS1005: '}' expected.
