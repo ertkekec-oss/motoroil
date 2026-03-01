@@ -1,0 +1,3 @@
+src/app/(app)/settings/page.tsx(871,36): error TS18004: No value exists in scope for the shorthand property 'Check'. Either declare one or provide an initializer.
+src/app/(app)/settings/page.tsx(871,591): error TS2448: Block-scoped variable 'quickRemovePaymentMethod' used before its declaration.
+src/app/(app)/settings/page.tsx(871,656): error TS2448: Block-scoped variable 'saveSmtpSettings' used before its declaration.

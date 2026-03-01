@@ -1,0 +1,17 @@
+src/app/(app)/settings/page.tsx(1051,52): error TS18004: No value exists in scope for the shorthand property 'Check'. Either declare one or provide an initializer.
+src/app/(app)/settings/page.tsx(1109,73): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1113,77): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1116,69): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1119,74): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1123,67): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1125,75): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1128,72): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1131,63): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1134,74): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1138,79): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1141,70): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1143,86): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1146,66): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1148,76): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1151,69): error TS2304: Cannot find name 'sharedProps'.
+src/app/(app)/settings/page.tsx(1278,71): error TS2304: Cannot find name 'sharedProps'.
