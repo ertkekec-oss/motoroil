@@ -497,12 +497,7 @@ export default function AdminRoutesPage() {
                                                     }}
                                                     className={`p-3 border-r last:border-0 transition-all relative flex flex-col gap-2 drag-target-cell ${borderColor} ${isToday(day) ? (isLight ? 'bg-blue-50/20' : 'bg-blue-500/[0.02]') : ''}`}
                                                 >
-                                                    <style jsx>{`
-                                                        .drag-target-cell.drag-over-active {
-                                                            background-color: ${isLight ? 'rgba(59, 130, 246, 0.05)' : 'rgba(59, 130, 246, 0.1)'};
-                                                            box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.4);
-                                                        }
-                                                    `}</style>
+
 
                                                     {dayRoutes.map(route => (
                                                         <div
@@ -811,6 +806,14 @@ export default function AdminRoutesPage() {
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
                 [data-pos-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
                 [data-pos-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+                
+                .drag-target-cell.drag-over-active {
+                    background-color: rgba(59, 130, 246, 0.05);
+                    box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.4);
+                }
+                [data-pos-theme="dark"] .drag-target-cell.drag-over-active {
+                    background-color: rgba(59, 130, 246, 0.1);
+                }
             `}</style>
         </div>
     );
