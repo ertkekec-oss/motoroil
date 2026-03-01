@@ -327,8 +327,8 @@ export default function CustomersPage() {
                             onChange={(e) => handleSearchChange(e.target.value)}
                             placeholder="Müşteri adı, telefon, vergi no veya e-posta..."
                             className={`w-full h-[40px] pl-[38px] pr-4 rounded-[10px] text-[13px] font-medium border outline-none transition-all ${isLight
-                                    ? 'bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                                    : 'bg-slate-900 border-slate-800 text-slate-200 placeholder:text-slate-500 focus:border-blue-500'
+                                ? 'bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+                                : 'bg-slate-900 border-slate-800 text-slate-200 placeholder:text-slate-500 focus:border-blue-500'
                                 }`}
                         />
                     </div>
@@ -337,8 +337,8 @@ export default function CustomersPage() {
                         <button
                             onClick={() => setShowFilters(!showFilters)}
                             className={`h-[40px] px-4 rounded-[10px] text-[13px] font-semibold border flex items-center gap-2 transition-all ${showFilters
-                                    ? (isLight ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-blue-900/20 border-blue-800/50 text-blue-400')
-                                    : (isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800')
+                                ? (isLight ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-blue-900/20 border-blue-800/50 text-blue-400')
+                                : (isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800')
                                 }`}
                         >
                             <Filter className="w-4 h-4" />
@@ -348,8 +348,8 @@ export default function CustomersPage() {
                             <button
                                 onClick={() => setViewMode('grid')}
                                 className={`w-8 h-8 flex items-center justify-center rounded-[6px] transition-colors ${viewMode === 'grid'
-                                        ? (isLight ? 'bg-white shadow-sm text-blue-600' : 'bg-slate-800 text-blue-400')
-                                        : (isLight ? 'text-slate-400 hover:text-slate-600' : 'text-slate-500 hover:text-slate-300')
+                                    ? (isLight ? 'bg-white shadow-sm text-blue-600' : 'bg-slate-800 text-blue-400')
+                                    : (isLight ? 'text-slate-400 hover:text-slate-600' : 'text-slate-500 hover:text-slate-300')
                                     }`}
                             >
                                 <Grid className="w-4 h-4" />
@@ -357,8 +357,8 @@ export default function CustomersPage() {
                             <button
                                 onClick={() => setViewMode('list')}
                                 className={`w-8 h-8 flex items-center justify-center rounded-[6px] transition-colors ${viewMode === 'list'
-                                        ? (isLight ? 'bg-white shadow-sm text-blue-600' : 'bg-slate-800 text-blue-400')
-                                        : (isLight ? 'text-slate-400 hover:text-slate-600' : 'text-slate-500 hover:text-slate-300')
+                                    ? (isLight ? 'bg-white shadow-sm text-blue-600' : 'bg-slate-800 text-blue-400')
+                                    : (isLight ? 'text-slate-400 hover:text-slate-600' : 'text-slate-500 hover:text-slate-300')
                                     }`}
                             >
                                 <List className="w-4 h-4" />
@@ -380,8 +380,8 @@ export default function CustomersPage() {
                                             key={tab.id}
                                             onClick={() => handleTabChange(tab.id)}
                                             className={`h-[32px] px-4 rounded-[10px] text-[12px] font-medium border transition-colors ${isActive
-                                                    ? (isLight ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-blue-900/20 border-blue-800/50 text-blue-400')
-                                                    : (isLight ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800')
+                                                ? (isLight ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-blue-900/20 border-blue-800/50 text-blue-400')
+                                                : (isLight ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800')
                                                 }`}
                                         >
                                             {tab.label}
@@ -451,14 +451,14 @@ export default function CustomersPage() {
                                         </td>
                                         <td className="px-4 py-3 align-middle">
                                             <div className={`font-semibold text-[14px] ${effectiveBalance > 0 ? (isLight ? 'text-blue-600' : 'text-blue-400')
-                                                    : effectiveBalance < 0 ? (isLight ? 'text-emerald-600' : 'text-emerald-500')
-                                                        : textLabelClass
+                                                : effectiveBalance < 0 ? (isLight ? 'text-emerald-600' : 'text-emerald-500')
+                                                    : textLabelClass
                                                 }`}>
                                                 {formatCurrency(Math.abs(effectiveBalance))}
                                             </div>
                                             <div className={`text-[11px] font-semibold tracking-wide uppercase mt-0.5 ${effectiveBalance > 0 ? (isLight ? 'text-blue-600/70' : 'text-blue-400/80')
-                                                    : effectiveBalance < 0 ? (isLight ? 'text-emerald-600/70' : 'text-emerald-500/80')
-                                                        : textLabelClass
+                                                : effectiveBalance < 0 ? (isLight ? 'text-emerald-600/70' : 'text-emerald-500/80')
+                                                    : textLabelClass
                                                 }`}>
                                                 {effectiveBalance > 0 ? 'Borçlu' : effectiveBalance < 0 ? 'Alacaklı' : 'Dengeli'}
                                             </div>
@@ -496,14 +496,14 @@ export default function CustomersPage() {
                                         </div>
                                         <div className="text-right">
                                             <div className={`text-[16px] font-bold ${effectiveBalance > 0 ? (isLight ? 'text-blue-600' : 'text-blue-400')
-                                                    : effectiveBalance < 0 ? (isLight ? 'text-emerald-600' : 'text-emerald-500')
-                                                        : textLabelClass
+                                                : effectiveBalance < 0 ? (isLight ? 'text-emerald-600' : 'text-emerald-500')
+                                                    : textLabelClass
                                                 }`}>
                                                 {formatCurrency(Math.abs(effectiveBalance))}
                                             </div>
                                             <div className={`text-[10px] font-bold uppercase tracking-wide mt-0.5 ${effectiveBalance > 0 ? (isLight ? 'text-blue-600/70' : 'text-blue-400/80')
-                                                    : effectiveBalance < 0 ? (isLight ? 'text-emerald-600/70' : 'text-emerald-500/80')
-                                                        : textLabelClass
+                                                : effectiveBalance < 0 ? (isLight ? 'text-emerald-600/70' : 'text-emerald-500/80')
+                                                    : textLabelClass
                                                 }`}>
                                                 {effectiveBalance > 0 ? '● Borçlu' : effectiveBalance < 0 ? '● Alacaklı' : '● Dengeli'}
                                             </div>
@@ -631,7 +631,7 @@ export default function CustomersPage() {
                             </div>
                             <div>
                                 <label className={`block text-[11px] font-semibold uppercase tracking-wide mb-1.5 ${textLabelClass}`}>Açık Adres</label>
-                                <textarea row={3} value={newCustomer.address} onChange={e => setNewCustomer({ ...newCustomer, address: e.target.value })} className={`w-full px-3 py-2 rounded-[8px] text-[13px] border outline-none resize-none ${isLight ? 'bg-white border-slate-300 text-slate-800 focus:border-blue-500' : 'bg-slate-900 border-slate-700 text-slate-200 focus:border-blue-500'}`} />
+                                <textarea rows={3} value={newCustomer.address} onChange={e => setNewCustomer({ ...newCustomer, address: e.target.value })} className={`w-full px-3 py-2 rounded-[8px] text-[13px] border outline-none resize-none ${isLight ? 'bg-white border-slate-300 text-slate-800 focus:border-blue-500' : 'bg-slate-900 border-slate-700 text-slate-200 focus:border-blue-500'}`} />
                             </div>
                             <button onClick={handleAddCustomer} disabled={isProcessing} className={`w-full py-3 rounded-[10px] text-[14px] font-semibold text-white transition-colors ${isLight ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-500'} ${isProcessing ? 'opacity-70 cursor-not-allowed' : ''}`}>
                                 {isProcessing ? 'Kaydediliyor...' : 'Müşteriyi Kaydet'}
@@ -708,7 +708,7 @@ export default function CustomersPage() {
                             </div>
                             <div>
                                 <label className={`block text-[11px] font-semibold uppercase tracking-wide mb-1.5 ${textLabelClass}`}>Adres</label>
-                                <textarea row={3} value={editCustomer.address} onChange={e => setEditCustomer({ ...editCustomer, address: e.target.value })} className={`w-full px-3 py-2 rounded-[8px] text-[13px] border outline-none resize-none ${isLight ? 'bg-white border-slate-300 text-slate-800 focus:border-blue-500' : 'bg-slate-900 border-slate-700 text-slate-200 focus:border-blue-500'}`} />
+                                <textarea rows={3} value={editCustomer.address} onChange={e => setEditCustomer({ ...editCustomer, address: e.target.value })} className={`w-full px-3 py-2 rounded-[8px] text-[13px] border outline-none resize-none ${isLight ? 'bg-white border-slate-300 text-slate-800 focus:border-blue-500' : 'bg-slate-900 border-slate-700 text-slate-200 focus:border-blue-500'}`} />
                             </div>
                             <button onClick={handleEditCustomer} disabled={isProcessing} className={`w-full py-3 rounded-[10px] text-[14px] font-semibold text-white transition-colors ${isLight ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-500'} ${isProcessing ? 'opacity-70 cursor-not-allowed' : ''}`}>
                                 {isProcessing ? 'Güncelleniyor...' : 'Değişiklikleri Kaydet'}
