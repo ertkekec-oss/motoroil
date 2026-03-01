@@ -100,7 +100,7 @@ export default function BranchSettingsPage() {
                 </button>
             </header>
 
-            <div className="card glass">
+            <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all">
                 <h3 className="mb-6">Şube - Kasa/Banka Eşleştirmeleri</h3>
                 <p className="text-muted mb-6" style={{ fontSize: '13px' }}>
                     Her şubenin hangi kasa ve banka hesaplarında işlem yapabileceğini belirleyin.

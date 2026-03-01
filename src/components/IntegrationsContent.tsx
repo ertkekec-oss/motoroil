@@ -308,7 +308,7 @@ export default function IntegrationsContent() {
                         <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
 
                         <div className="flex flex-col sm:flex-row items-center gap-5 border-b border-slate-200 dark:border-white/5 pb-8 mb-8">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center text-3xl shadow-inner border border-slate-200 dark:border-white/5">
+                            <div className="w-14 h-14 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-slate-200 dark:border-white/5">
                                 📄
                             </div>
                             <div className="text-center sm:text-left">
@@ -317,7 +317,7 @@ export default function IntegrationsContent() {
                             </div>
                             <div className="sm:ml-auto">
                                 <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border shadow-sm ${eFaturaSettings.environment === 'production'
-                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                    ? 'bg-blue-600/10 text-blue-600 dark:text-blue-500 border-blue-500/20'
                                     : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
                                     }`}>
                                     {eFaturaSettings.environment === 'production' ? '🚀 Canlı Ortam' : '🧪 Test Ortamı'}
@@ -336,7 +336,7 @@ export default function IntegrationsContent() {
                                                 key={env}
                                                 onClick={() => setEFaturaSettings({ ...eFaturaSettings, environment: env })}
                                                 className={`flex-1 py-3 rounded-lg text-xs font-black uppercase transition-all ${eFaturaSettings.environment === env
-                                                    ? (env === 'production' ? 'bg-emerald-500 !text-white shadow-lg shadow-emerald-500/20' : 'bg-amber-500 !text-white shadow-lg shadow-amber-500/20')
+                                                    ? (env === 'production' ? 'bg-blue-600 !text-white shadow-lg shadow-emerald-500/20' : 'bg-amber-500 !text-white shadow-lg shadow-amber-500/20')
                                                     : 'text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:bg-white/5'
                                                     }`}
                                             >
@@ -371,7 +371,7 @@ export default function IntegrationsContent() {
                                 </div>
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">API Adresi</label>
                                     <input type="text" className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none" value={eFaturaSettings.apiUrl} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, apiUrl: e.target.value })} />
@@ -441,8 +441,8 @@ export default function IntegrationsContent() {
                                 )}
                             </button>
                             {testResults.efatura && (
-                                <div className={`mt-5 p-5 rounded-2xl border animate-in zoom-in-95 flex items-center gap-4 ${testResults.efatura.includes('✅') ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 ${testResults.efatura.includes('✅') ? 'bg-emerald-500/20' : 'bg-red-500/20'}`}>
+                                <div className={`mt-5 p-5 rounded-2xl border animate-in zoom-in-95 flex items-center gap-4 ${testResults.efatura.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 ${testResults.efatura.includes('✅') ? 'bg-blue-600/20' : 'bg-red-500/20'}`}>
                                         {testResults.efatura.includes('✅') ? '✓' : '!'}
                                     </div>
                                     <span className="font-bold text-sm tracking-wide">{testResults.efatura.replace('✅ ', '').replace('❌ ', '')}</span>
@@ -461,13 +461,13 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-24 -right-24 w-64 h-64 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
 
                             <div className="flex flex-col sm:flex-row items-center gap-5 border-b border-slate-200 dark:border-white/5 pb-8 mb-4">
-                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center text-3xl shadow-inner border border-slate-200 dark:border-white/5">💳</div>
+                                <div className="w-14 h-14 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-slate-200 dark:border-white/5">💳</div>
                                 <div className="text-center sm:text-left">
                                     <h3 className="text-xl font-black text-slate-900 dark:text-white">Ödeal Yazar Kasa POS</h3>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">Ödeme sistemleri ve yazar kasa POS entegrasyonu</p>
                                 </div>
                                 <div className="sm:ml-auto">
-                                    <span className="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm">
+                                    <span className="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-blue-600/10 text-blue-600 dark:text-blue-500 border border-blue-500/20 shadow-sm">
                                         Durum: AKTİF
                                     </span>
                                 </div>
@@ -553,7 +553,7 @@ export default function IntegrationsContent() {
                                 VERİLERİ TAZELE 🔄
                             </button>
                         </div>
-                        <div className="bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm-plus p-6 space-y-6 border-l-4 border-l-primary/50">
+                        <div className="bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm-plus p-6 space-y-4 border-l-4 border-l-primary/50">
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-4">
                                     <div className="text-4xl">🏍️</div>
@@ -563,7 +563,7 @@ export default function IntegrationsContent() {
                                     </div>
                                 </div>
                                 <label className="flex items-center gap-2 cursor-pointer select-none">
-                                    <input type="checkbox" className="accent-primary w-5 h-5 rounded-md" checked={marketplaceSettings.custom.enabled} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, enabled: e.target.checked } })} />
+                                    <input type="checkbox" className="accent-blue-600 w-5 h-5 rounded-md" checked={marketplaceSettings.custom.enabled} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, enabled: e.target.checked } })} />
                                     <span className="font-bold text-sm text-slate-900 dark:text-white">Aktif</span>
                                 </label>
                             </div>
@@ -576,7 +576,7 @@ export default function IntegrationsContent() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">İşlem Deposu</label>
-                                            <select className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none appearance-none cursor-pointer"
+                                            <select className="w-full h-[44px] px-[12px] bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-700 rounded-[12px] text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all outline-none appearance-none cursor-pointer"
                                                 value={marketplaceSettings.custom.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, branch: e.target.value } })}
                                             >
@@ -588,7 +588,7 @@ export default function IntegrationsContent() {
                                         </div>
                                     </div>
                                     <label className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all select-none">
-                                        <input type="checkbox" className="accent-primary w-5 h-5" checked={marketplaceSettings.custom.autoSync} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, autoSync: e.target.checked } })} />
+                                        <input type="checkbox" className="accent-blue-600 w-5 h-5" checked={marketplaceSettings.custom.autoSync} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, autoSync: e.target.checked } })} />
                                         <div>
                                             <div className="text-sm font-bold text-slate-900 dark:text-white">Otomatik Senkronizasyon</div>
                                             <div className="text-xs text-slate-500 dark:text-slate-400">XML'den verileri otomatik çek</div>
@@ -599,7 +599,7 @@ export default function IntegrationsContent() {
                                             {isTesting ? '⏳ Test Ediliyor...' : '📥 Verileri Çek ve Test Et'}
                                         </button>
                                         {testResults.custom && (
-                                            <div className={`mt-3 p-3 rounded-lg text-sm font-bold ${testResults.custom.includes('✅') ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                                            <div className={`mt-3 p-3 rounded-lg text-sm font-bold ${testResults.custom.includes('✅') ? 'bg-blue-600/10 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-500'}`}>
                                                 {testResults.custom}
                                             </div>
                                         )}
@@ -609,10 +609,10 @@ export default function IntegrationsContent() {
                         </div>
 
                         <div className="bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm p-8 relative overflow-hidden group border border-slate-200 dark:border-white/10">
-                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#f27a1a]/5 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -top-16 -right-16 w-48 h-48 bg-slate-50 dark:bg-slate-800/30 rounded-full blur-3xl pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#f27a1a]/20 to-transparent flex items-center justify-center text-3xl shadow-inner border border-[#f27a1a]/10">
+                                    <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-[#f27a1a]/10">
                                         🟠
                                     </div>
                                     <div>
@@ -621,7 +621,7 @@ export default function IntegrationsContent() {
                                     </div>
                                 </div>
                                 <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all group/toggle">
-                                    <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.trendyol.enabled ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                                    <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.trendyol.enabled ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                         <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.trendyol.enabled ? 'left-5.5' : 'left-0.5'}`} />
                                     </div>
                                     <input type="checkbox" className="hidden" checked={marketplaceSettings.trendyol.enabled} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, enabled: e.target.checked } })} />
@@ -646,7 +646,7 @@ export default function IntegrationsContent() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
-                                            <select className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none appearance-none cursor-pointer"
+                                            <select className="w-full h-[44px] px-[12px] bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-700 rounded-[12px] text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all outline-none appearance-none cursor-pointer"
                                                 value={marketplaceSettings.trendyol.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, branch: e.target.value } })}
                                             >
@@ -674,7 +674,7 @@ export default function IntegrationsContent() {
                                     </div>
 
                                     {testResults.trendyol && (
-                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.trendyol.includes('✅') ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.trendyol.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                             <span className="text-sm font-bold tracking-tight">{testResults.trendyol}</span>
                                         </div>
                                     )}
@@ -686,7 +686,7 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#ff6000]/5 rounded-full blur-3xl pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#ff6000]/20 to-transparent flex items-center justify-center text-3xl shadow-inner border border-[#ff6000]/10">
+                                    <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-[#ff6000]/10">
                                         🟧
                                     </div>
                                     <div>
@@ -702,7 +702,7 @@ export default function IntegrationsContent() {
                                         </label>
                                     )}
                                     <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
-                                        <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.hepsiburada.enabled ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                                        <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.hepsiburada.enabled ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                             <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.hepsiburada.enabled ? 'left-5.5' : 'left-0.5'}`} />
                                         </div>
                                         <input type="checkbox" className="hidden" checked={marketplaceSettings.hepsiburada.enabled} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, enabled: e.target.checked } })} />
@@ -728,7 +728,7 @@ export default function IntegrationsContent() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
-                                            <select className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none appearance-none cursor-pointer"
+                                            <select className="w-full h-[44px] px-[12px] bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-700 rounded-[12px] text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all outline-none appearance-none cursor-pointer"
                                                 value={marketplaceSettings.hepsiburada.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, branch: e.target.value } })}
                                             >
@@ -756,7 +756,7 @@ export default function IntegrationsContent() {
                                     </div>
 
                                     {testResults.hepsiburada && (
-                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.hepsiburada.includes('✅') ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.hepsiburada.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                             <span className="text-sm font-bold tracking-tight">{testResults.hepsiburada}</span>
                                         </div>
                                     )}
@@ -768,7 +768,7 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#603996]/5 rounded-full blur-3xl pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#603996]/20 to-transparent flex items-center justify-center text-3xl shadow-inner border border-[#603996]/10">
+                                    <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-[#603996]/10">
                                         🐞
                                     </div>
                                     <div>
@@ -777,7 +777,7 @@ export default function IntegrationsContent() {
                                     </div>
                                 </div>
                                 <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
-                                    <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.n11.enabled ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                                    <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.n11.enabled ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                         <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.n11.enabled ? 'left-5.5' : 'left-0.5'}`} />
                                     </div>
                                     <input type="checkbox" className="hidden" checked={marketplaceSettings.n11.enabled} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, enabled: e.target.checked } })} />
@@ -798,7 +798,7 @@ export default function IntegrationsContent() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
-                                            <select className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none appearance-none cursor-pointer"
+                                            <select className="w-full h-[44px] px-[12px] bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-700 rounded-[12px] text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all outline-none appearance-none cursor-pointer"
                                                 value={marketplaceSettings.n11.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, branch: e.target.value } })}
                                             >
@@ -826,7 +826,7 @@ export default function IntegrationsContent() {
                                     </div>
 
                                     {testResults.n11 && (
-                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.n11.includes('✅') ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.n11.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                             <span className="text-sm font-bold tracking-tight">{testResults.n11}</span>
                                         </div>
                                     )}
@@ -838,7 +838,7 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#232f3e]/5 rounded-full blur-3xl pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#232f3e]/20 to-transparent flex items-center justify-center text-3xl shadow-inner border border-[#232f3e]/10">
+                                    <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-[#232f3e]/10">
                                         🅰️
                                     </div>
                                     <div>
@@ -847,7 +847,7 @@ export default function IntegrationsContent() {
                                     </div>
                                 </div>
                                 <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
-                                    <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.amazon.enabled ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                                    <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.amazon.enabled ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                         <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.amazon.enabled ? 'left-5.5' : 'left-0.5'}`} />
                                     </div>
                                     <input type="checkbox" className="hidden" checked={marketplaceSettings.amazon.enabled} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, enabled: e.target.checked } })} />
@@ -876,7 +876,7 @@ export default function IntegrationsContent() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
-                                            <select className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none appearance-none cursor-pointer"
+                                            <select className="w-full h-[44px] px-[12px] bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-700 rounded-[12px] text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all outline-none appearance-none cursor-pointer"
                                                 value={marketplaceSettings.amazon.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, branch: e.target.value } })}
                                             >
@@ -904,7 +904,7 @@ export default function IntegrationsContent() {
                                     </div>
 
                                     {testResults.amazon && (
-                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.amazon.includes('✅') ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.amazon.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                             <span className="text-sm font-bold tracking-tight">{testResults.amazon}</span>
                                         </div>
                                     )}
@@ -916,7 +916,7 @@ export default function IntegrationsContent() {
                             <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#006BFF]/5 rounded-full blur-3xl pointer-events-none" />
                             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#006BFF]/20 to-transparent flex items-center justify-center text-3xl shadow-inner border border-[#006BFF]/10">
+                                    <div className="w-16 h-16 rounded-2xl  flex items-center justify-center text-3xl shadow-inner border border-[#006BFF]/10">
                                         🔵
                                     </div>
                                     <div>
@@ -932,7 +932,7 @@ export default function IntegrationsContent() {
                                         </label>
                                     )}
                                     <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 cursor-pointer hover:bg-slate-200 dark:bg-slate-700 transition-all">
-                                        <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.pazarama.enabled ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                                        <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${marketplaceSettings.pazarama.enabled ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                                             <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${marketplaceSettings.pazarama.enabled ? 'left-5.5' : 'left-0.5'}`} />
                                         </div>
                                         <input type="checkbox" className="hidden" checked={marketplaceSettings.pazarama.enabled} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, enabled: e.target.checked } })} />
@@ -954,7 +954,7 @@ export default function IntegrationsContent() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-1">İşlem Deposu</label>
-                                            <select className="w-full h-[44px] px-[12px] rounded-[12px] bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-slate-300 dark:hover:border-slate-600 transition-all outline-none appearance-none cursor-pointer"
+                                            <select className="w-full h-[44px] px-[12px] bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-700 rounded-[12px] text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all outline-none appearance-none cursor-pointer"
                                                 value={marketplaceSettings.pazarama.branch || (branches[0]?.name || 'Merkez')}
                                                 onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, branch: e.target.value } })}
                                             >
@@ -982,7 +982,7 @@ export default function IntegrationsContent() {
                                     </div>
 
                                     {testResults.pazarama && (
-                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.pazarama.includes('✅') ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                                        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 ${testResults.pazarama.includes('✅') ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
                                             <span className="text-sm font-bold tracking-tight">{testResults.pazarama}</span>
                                         </div>
                                     )}

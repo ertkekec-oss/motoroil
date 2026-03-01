@@ -1408,7 +1408,7 @@ export default function SettingsPage() {
                                                 <button onClick={addPaymentMethodDefinition} className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors btn-sm flex-1 font-bold">
                                                     {editingPaymentMethodId ? 'GÜNCELLE' : 'EKLE'}
                                                 </button>
-                                                {editingPaymentMethodId && <button onClick={() => { setEditingPaymentMethodId(null); setNewPaymentMethod({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' }); }} className="btn btn-ghost btn-sm">İptal</button>}
+                                                {editingPaymentMethodId && <button onClick={() => { setEditingPaymentMethodId(null); setNewPaymentMethod({ label: '', type: 'cash', icon: '💰', linkedKasaId: '' }); }} className="px-6 h-[44px] rounded-[14px] font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 btn-sm">İptal</button>}
                                             </div>
                                         </div>
                                     </div>
@@ -1426,12 +1426,12 @@ export default function SettingsPage() {
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                                    <button onClick={() => startEditingPaymentMethod(pm)} className="text-primary p-2 hover:bg-primary/20 rounded-lg">✏️</button>
+                                                    <button onClick={() => startEditingPaymentMethod(pm)} className="text-primary p-2 hover:bg-blue-600 hover:bg-blue-700 text-white shadow-sm/20 rounded-lg">✏️</button>
                                                     <button onClick={() => removePaymentMethodDefinition(pm.id)} className="text-danger p-2 hover:bg-danger/20 rounded-lg">×</button>
                                                 </div>
                                             </div>
                                         ))}
-                                        <div className="flex-between p-3 bg-primary/10 border border-primary/20 rounded-xl">
+                                        <div className="flex-between p-3 bg-blue-600 hover:bg-blue-700 text-white shadow-sm/10 border border-primary/20 rounded-xl">
                                             <div className="flex items-center gap-3">
                                                 <span className="text-xl p-2 bg-white/5 rounded-lg">📖</span>
                                                 <div>
@@ -1529,7 +1529,7 @@ export default function SettingsPage() {
                         <h2 style={{ marginBottom: '20px' }}>Masraf & Komisyon Yönetimi</h2>
 
                         {/* POS KOMİSYONLARI */}
-                        <div className="card glass mb-8">
+                        <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all mb-8">
                             <div className="flex-between mb-4">
                                 <div>
                                     <h3>POS / Banka Komisyon Oranları</h3>
@@ -1582,7 +1582,7 @@ export default function SettingsPage() {
                                         <button onClick={() => {
                                             const newComms = salesExpenses.posCommissions.filter((_: any, i: number) => i !== idx);
                                             updateSalesExpenses({ ...salesExpenses, posCommissions: newComms });
-                                        }} className="btn btn-ghost text-danger ml-4">🗑️</button>
+                                        }} className="px-6 h-[44px] rounded-[14px] font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 text-danger ml-4">🗑️</button>
                                     </div>
                                 ))}
                             </div>
@@ -1629,7 +1629,7 @@ export default function SettingsPage() {
                             </div>
 
                             {/* PASSWORD CHANGE */}
-                            <div className="card glass p-6">
+                            <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all p-6">
                                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                                     🔐 Şifre Değiştir
                                 </h3>
@@ -1808,7 +1808,7 @@ export default function SettingsPage() {
                         </p>
 
                         {/* POS KOMİSYON ORANLARI */}
-                        <div className="card glass mb-6">
+                        <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all mb-6">
                             <div className="flex-between mb-4">
                                 <div>
                                     <h3>💳 POS Komisyon Oranları</h3>
@@ -1847,8 +1847,8 @@ export default function SettingsPage() {
 
                             {/* Commission Table */}
                             <table style={{ width: '100%', textAlign: 'left' }}>
-                                <thead className="text-muted" style={{ fontSize: '11px', borderBottom: '1px solid var(--border-light)' }}>
-                                    <tr><th style={{ padding: '10px' }}>TAKSİT TİPİ</th><th>KOMİSYON ORANI</th><th style={{ textAlign: 'right' }}>İŞLEM</th></tr>
+                                <thead className="h-[52px] px-6 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
+<tr><th style={{ padding: '10px' }}>TAKSİT TİPİ</th><th>KOMİSYON ORANI</th><th style={{ textAlign: 'right' }}>İŞLEM</th></tr>
                                 </thead>
                                 <tbody>
                                     {(salesExpenses?.posCommissions || []).map((comm: any, idx: number) => (
@@ -1999,7 +1999,7 @@ export default function SettingsPage() {
                         <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '24px', height: '100%' }}>
 
                             {/* SIDEBAR */}
-                            <div className="card glass-dark" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
+                            <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all-dark" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
                                 <h3 style={{ fontSize: '12px', fontWeight: '900', color: "#64748B", marginBottom: '8px', paddingLeft: '8px' }}>TANIMLAR</h3>
                                 {[
                                     { id: 'brands', label: 'Markalar', icon: '🏷️', desc: 'Ürün markaları' },
@@ -2040,7 +2040,7 @@ export default function SettingsPage() {
                             <div className="flex-col gap-6" style={{ overflowY: 'auto', paddingRight: '10px' }}>
 
                                 {/* Header & Input */}
-                                <div className="card glass p-6">
+                                <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all p-6">
                                     <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px' }}>
                                         {definitionTab === 'brands' && 'Marka Tanımları'}
                                         {definitionTab === 'prod_cat' && 'Ürün Kategorileri'}
@@ -2158,7 +2158,7 @@ export default function SettingsPage() {
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
                                     {definitionTab === 'payment_methods' ?
                                         (paymentMethods || []).map((pm: any, i: number) => (
-                                            <div key={pm.id || i} className="card glass-hover animate-scale-in" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                            <div key={pm.id || i} className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all-hover animate-scale-in" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
                                                 <div className="flex items-center gap-3">
                                                     <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
                                                         {pm.icon || '💰'}
@@ -2185,7 +2185,7 @@ export default function SettingsPage() {
                                                         definitionTab === 'supp_class' ? (suppClasses || []) :
                                                             definitionTab === 'vehicle_types' ? (vehicleTypes || []) : (warranties || [])
                                             ).map((item: string, i: number) => (
-                                                <div key={i} className="card glass-hover animate-scale-in" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div key={i} className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all-hover animate-scale-in" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <span style={{ fontWeight: '600' }}>{item}</span>
                                                     <button
                                                         onClick={() => {
@@ -2304,8 +2304,8 @@ export default function SettingsPage() {
 
                         <div className="p-8 bg-white dark:bg-[#111827] rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '0', overflow: 'hidden' }}>
                             <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', fontSize: '12px' }}>
-                                <thead>
-                                    <tr style={{ background: 'rgba(255,255,255,0.02)', fontWeight: '900', fontSize: '10px', opacity: 0.4 }}>
+                                <thead className="h-[52px] px-6 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
+<tr style={{ background: 'rgba(255,255,255,0.02)', fontWeight: '900', fontSize: '10px', opacity: 0.4 }}>
                                         <th style={{ padding: '12px 16px' }}>TARİH / KULLANICI</th>
                                         <th>İŞLEM</th>
                                         <th>NESNE</th>
@@ -2639,8 +2639,8 @@ export default function SettingsPage() {
                                                                 <div style={{ fontSize: '9px', fontWeight: '800', opacity: 0.4 }}>{camp.type === 'buy_x_get_free' ? 'ADET' : 'ORAN'}</div>
                                                             </div>
                                                             <div style={{ display: 'flex', gap: '4px' }}>
-                                                                <button onClick={() => startEditingCampaign(camp)} className="btn btn-ghost btn-sm" style={{ padding: '8px' }}>✏️</button>
-                                                                <button onClick={() => deleteCampaign(camp.id)} className="btn btn-ghost btn-sm" style={{ padding: '8px', color: 'var(--danger)' }}>🗑️</button>
+                                                                <button onClick={() => startEditingCampaign(camp)} className="px-6 h-[44px] rounded-[14px] font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 btn-sm" style={{ padding: '8px' }}>✏️</button>
+                                                                <button onClick={() => deleteCampaign(camp.id)} className="px-6 h-[44px] rounded-[14px] font-bold text-sm bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-none border border-transparent flex items-center justify-center gap-2 btn-sm" style={{ padding: '8px', color: 'var(--danger)' }}>🗑️</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -2850,7 +2850,7 @@ export default function SettingsPage() {
                                     </div>
 
                                     <div className="col-span-12 lg:col-span-7">
-                                        <div className="card glass flex-col items-center justify-center" style={{ padding: '60px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))' }}>
+                                        <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all flex-col items-center justify-center" style={{ padding: '60px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))' }}>
                                             <div style={{ fontSize: '64px', marginBottom: '20px', filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.3))' }}>🎫</div>
                                             <h3 style={{ fontSize: '24px', fontWeight: '900', color: 'white', letterSpacing: '0.5px' }}>Hediye Çeki Yönetimi</h3>
                                             <p style={{ opacity: 0.6, maxWidth: '380px', margin: '15px auto 35px', fontSize: '14px', lineHeight: '1.6' }}>
@@ -3035,8 +3035,8 @@ export default function SettingsPage() {
                             {/* Modal Table */}
                             <div style={{ flex: 1, overflowY: 'auto', padding: '32px' }}>
                                 <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'separate', borderSpacing: '0 12px' }}>
-                                    <thead>
-                                        <tr style={{ opacity: 0.4, fontSize: '12px', fontWeight: '800' }}>
+                                    <thead className="h-[52px] px-6 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
+<tr style={{ opacity: 0.4, fontSize: '12px', fontWeight: '800' }}>
                                             <th style={{ padding: '0 15px' }}>KOD BİLGİSİ</th>
                                             <th>İNDİRİM</th>
                                             <th>KULLANIM / LİMİT</th>
@@ -3127,15 +3127,15 @@ export default function SettingsPage() {
 
                 {/* SYSTEM SETTINGS TAB */}
                 {activeTab === 'system' && (
-                    <div className="animate-fade-in-up space-y-6 max-w-4xl p-8" style={{ padding: '32px' }}>
+                    <div className="animate-fade-in-up space-y-4 max-w-4xl p-8" style={{ padding: '32px' }}>
                         <div>
-                            <h1 className="text-2xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50" style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px', background: '-webkit-linear-gradient(left, #fff, rgba(255,255,255,0.5))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                            <h1 className="text-2xl font-black mb-2 bg-clip-text text-transparent" style={{ fontSize: '24px', fontWeight: '900', marginBottom: '8px', background: '-webkit-linear-gradient(left, #fff, rgba(255,255,255,0.5))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                                 📧 Mail Ayarları
                             </h1>
                             <p className="text-sm text-white/40" style={{ fontSize: '13px', opacity: 0.4 }}>Mail sunucu yapılandırması ve SMTP entegrasyon ayarları.</p>
                         </div>
 
-                        <div className="card glass p-8" style={{ padding: '32px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '16px' }}>
+                        <div className="bg-white dark:bg-[#111827] rounded-[20px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all p-8" style={{ padding: '32px', backgroundColor: "transparent", border: '1px solid var(--border-light)', borderRadius: '16px' }}>
                             <div className="flex justify-between items-center border-b border-white/5 pb-6 mb-6" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '24px', marginBottom: '24px' }}>
                                 <div>
                                     <h3 className="text-lg font-black flex items-center gap-2" style={{ fontSize: '18px', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -3143,7 +3143,7 @@ export default function SettingsPage() {
                                     </h3>
                                     <p className="text-xs text-white/40 mt-1" style={{ fontSize: '12px', opacity: 0.4, marginTop: '4px' }}>Personel şifreleri ve bildirimlerin gönderileceği mail hesabı.</p>
                                 </div>
-                                <div className={`px-3 py-1 rounded-full text-[10px] font-bold ${smtpSettings.email ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`} style={{ padding: '4px 12px', borderRadius: '50px', fontSize: '10px', fontWeight: 'bold', background: smtpSettings.email ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: smtpSettings.email ? '#10b981' : '#ef4444' }}>
+                                <div className={`px-3 py-1 rounded-full text-[10px] font-bold ${smtpSettings.email ? 'bg-blue-600/10 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 text-red-500'}`} style={{ padding: '4px 12px', borderRadius: '50px', fontSize: '10px', fontWeight: 'bold', background: smtpSettings.email ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: smtpSettings.email ? '#10b981' : '#ef4444' }}>
                                     {smtpSettings.email ? 'YAPILANDIRILDI' : 'AYARLANMADI'}
                                 </div>
                             </div>
@@ -3177,7 +3177,7 @@ export default function SettingsPage() {
                             <div className="flex justify-end mt-6" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
                                 <button
                                     onClick={saveSmtpSettings}
-                                    className="px-6 py-3 rounded-xl bg-primary text-white font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                                    className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-white font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
                                     style={{ padding: '12px 24px', borderRadius: '12px', background: 'var(--primary)', color: 'white', fontWeight: '900', border: 'none', cursor: 'pointer', boxShadow: '0 10px 20px -10px var(--primary)' }}
                                 >
                                     KAYDET
