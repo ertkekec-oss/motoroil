@@ -905,7 +905,7 @@ export default function SalesPage() {
 
                 {/* DEBUG LABEL MODAL */}
                 {debugLabelData && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 ">
                         <div className={`w-[800px] max-w-full rounded-[16px] overflow-hidden flex flex-col max-h-[90vh] ${theme === 'light' ? 'bg-white shadow-2xl' : 'bg-[#0f111a] border border-[#1e2332] shadow-2xl'}`}>
                             <div className="flex justify-between items-center p-6 border-b border-[#1e2332] dark:border-white/5">
                                 <h3 className={`text-[16px] font-semibold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
@@ -947,7 +947,7 @@ export default function SalesPage() {
                                                 showError('Hata', `❌ Etiket decode edilemedi!\n\nHata: ${decodeError.message}`);
                                             }
                                         }}
-                                        className="px-6 py-2 rounded-[8px] text-[13px] font-medium bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-lg shadow-blue-500/20"
+                                        className="px-6 py-2 rounded-[8px] text-[13px] font-medium bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-sm "
                                     >
                                         Etiketi Yazdır (PDF)
                                     </button>

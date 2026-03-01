@@ -13,7 +13,7 @@ export default function Stats() {
                     {STATS.map(s => (
                         <div key={s.label}
                             className="text-center p-6 rounded-2xl border border-white/5 hover:border-orange-500/20 transition-all group"
-                            style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                            style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>
                             <div className="text-2xl mb-2">{s.icon}</div>
                             <div className="text-3xl font-black text-white mb-1 group-hover:text-orange-400 transition-colors">{s.val}</div>
                             <div className="text-xs text-gray-500 font-bold">{s.label}</div>

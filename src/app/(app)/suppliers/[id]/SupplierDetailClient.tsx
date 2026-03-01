@@ -170,7 +170,7 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
             {/* ADJUSTMENT MODAL */}
             {isAdjustModalOpen && (
                 <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div className="card glass" style={{ width: '400px', background: '#111', padding: '24px', borderRadius: '12px', border: '1px solid #333' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ width: '400px', background: '#111', padding: '24px', borderRadius: '12px', border: '1px solid #333' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                             <h3 style={{ color: 'white' }}>⚖️ Bakiye Düzeltme</h3>
                             <button onClick={() => setIsAdjustModalOpen(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>
@@ -201,7 +201,7 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
 
                 {/* LEFT: Info Card */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div className="card glass" style={{ padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 0', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                             <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: 'bold', color: 'white' }}>
                                 {supplier.name.charAt(0)}
@@ -224,7 +224,7 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                         </div>
                     </div>
 
-                    <div className="card glass" style={{ padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px' }}>
                         <h4 style={{ marginBottom: '16px', color: 'white' }}>İletişim Bilgileri</h4>
                         <div style={{ fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -248,7 +248,7 @@ export default function SupplierDetailClient({ supplierId, supplierData, display
                 </div>
 
                 {/* RIGHT: Movements Table */}
-                <div className="card glass" style={{ padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
                         <div style={{ display: 'flex', gap: '20px' }}>
                             <button onClick={() => setActiveTab('all')} style={{ background: 'none', border: 'none', color: activeTab === 'all' ? '#3b82f6' : '#888', borderBottom: activeTab === 'all' ? '2px solid #3b82f6' : 'none', padding: '8px 0', cursor: 'pointer', fontWeight: 'bold' }}>Tüm Hareketler</button>

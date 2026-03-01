@@ -52,12 +52,12 @@ export default async function SupportPage() {
                     <h1 className="text-3xl font-black text-white">Taleplerim</h1>
                     <p className="text-gray-400 text-sm mt-1">Sormuş olduğunuz tüm destek taleplerinin durumu.</p>
                 </div>
-                <Link href="/support/new" className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl shadow-lg shadow-orange-500/20 transition-all flex items-center gap-2">
+                <Link href="/support/new" className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl shadow-sm  transition-all flex items-center gap-2">
                     <span>+</span> Yeni Talep
                 </Link>
             </div>
 
-            <div className="bg-[#0f111a] border border-white/5 rounded-2xl shadow-xl overflow-hidden">
+            <div className="bg-[#0f111a] border border-white/5 rounded-2xl shadow-sm overflow-hidden">
                 {tickets.length === 0 ? (
                     <div className="p-12 text-center">
                         <span className="text-4xl mb-4 block">🎧</span>

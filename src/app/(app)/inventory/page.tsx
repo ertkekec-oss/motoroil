@@ -987,11 +987,11 @@ function InventoryContent() {
 
         /* Cards & Glass */
         [data-theme="light"] .card,
-        [data-theme="light"] .glass {
+        [data-theme="light"] .bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm {
           background: #ffffff !important;
           border: 1px solid #e6ebf2 !important;
           box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
-          backdrop-filter: none !important;
+          
         }
 
         /* Text & Headings */
@@ -1069,7 +1069,7 @@ function InventoryContent() {
         }
 
         /* Tabs */
-        [data-theme="light"] .bg-white dark:bg-[#111c30] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-[#1e293b].backdrop-blur-md {
+        [data-theme="light"] .bg-white dark:bg-[#111c30] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-[#1e293b]. {
           background: #ffffff !important;
           border: 1px solid #e6ebf2 !important;
           padding: 4px !important;
@@ -1152,7 +1152,7 @@ function InventoryContent() {
         [data-theme="light"] .fixed.inset-0.bg-black\/90,
         [data-theme="light"] .fixed.inset-0.bg-black\/80 {
           background: rgba(15, 23, 42, 0.4) !important;
-          backdrop-filter: blur(12px) !important;
+          
         }
         [data-theme="light"] .bg-\[\#0f172a\],
         [data-theme="light"] .bg-\[\#0a0a0b\],
@@ -1161,7 +1161,7 @@ function InventoryContent() {
           background: #ffffff !important;
           border: 1px solid #e6ebf2 !important;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2) !important;
-          backdrop-filter: none !important;
+          
         }
 
         /* Specific Label Fixes */
@@ -1207,9 +1207,9 @@ function InventoryContent() {
         [data-theme="light"] .animate-pulsate {
           animation: none !important;
         }
-        [data-theme="light"] .backdrop-blur-sm,
-        [data-theme="light"] .backdrop-blur-md {
-          backdrop-filter: none !important;
+        [data-theme="light"] .,
+        [data-theme="light"] . {
+          
         }
       `}</style>
       <style jsx>{`
@@ -1412,7 +1412,7 @@ function InventoryContent() {
             </button>
             <button
               onClick={finishCount}
-              className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white shadow-xl shadow-emerald-500/20 font-black text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+              className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white shadow-sm  font-black text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
             >
               <span>KONTROL ET & BİTİR</span>
               <span className="text-lg">→</span>
@@ -1509,7 +1509,7 @@ function InventoryContent() {
             transform: "translateX(-50%)",
             zIndex: 99999,
           }}
-          className="flex items-center gap-6 px-6 py-3 rounded-full bg-slate-900 dark:bg-slate-800 border border-slate-700/50 dark:border-white/10 shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-8 duration-500"
+          className="flex items-center gap-6 px-6 py-3 rounded-full bg-slate-900 dark:bg-slate-800 border border-slate-700/50 dark:border-white/10 shadow-2xl  animate-in slide-in-from-bottom-8 duration-500"
         >
           <div className="flex items-center gap-3">
             <div className="bg-blue-600 text-white text-[13px] font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-inner">
@@ -1685,7 +1685,7 @@ function InventoryContent() {
       />
 
       {showAddModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[3000] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/50  z-[3000] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#0f172a] w-full max-w-3xl max-h-[90vh] h-full overflow-hidden rounded-[24px] border border-slate-200 dark:border-white/10 shadow-2xl flex flex-col animate-in relative">
 
             {/* Header */}
@@ -2244,7 +2244,7 @@ function InventoryContent() {
                               }
                             }}
                             className={`px-3 py-1.5 rounded-[10px] text-[11px] font-semibold uppercase tracking-wide border transition-all ${selectedAttributes.includes(attr.id)
-                              ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20"
+                              ? "bg-blue-600 border-blue-600 text-white shadow-sm "
                               : "bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 shadow-sm"
                               }`}
                           >
@@ -2376,7 +2376,7 @@ function InventoryContent() {
       )}
 
       {auditReport && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[3000] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/50  z-[3000] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#0f172a] rounded-[24px] max-w-5xl w-full max-h-[90vh] flex flex-col border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden animate-in">
             <div className="p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e293b]/50">
               <div className="flex justify-between items-center">

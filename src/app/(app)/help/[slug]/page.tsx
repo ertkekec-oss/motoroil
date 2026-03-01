@@ -42,7 +42,7 @@ export default async function HelpTopicPage({ params }: { params: Promise<{ slug
                 </div>
             </div>
 
-            <div className="bg-[#0f111a] border border-white/5 rounded-3xl p-8 md:p-12 shadow-xl shadow-black/50">
+            <div className="bg-[#0f111a] border border-white/5 rounded-3xl p-8 md:p-12 shadow-sm shadow-black/50">
                 <h1 className="text-3xl md:text-4xl font-black text-white mb-6 leading-tight">{topic.title}</h1>
 
                 {topic.excerpt && (
@@ -73,7 +73,7 @@ export default async function HelpTopicPage({ params }: { params: Promise<{ slug
 
                         <div className="text-center md:text-right bg-orange-500/5 p-4 rounded-2xl border border-orange-500/10">
                             <p className="text-sm text-gray-400 mb-2">Sorun devam ediyor mu?</p>
-                            <Link href={`/support/new?topicId=${topic.id}`} className="inline-block px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-orange-500/20">
+                            <Link href={`/support/new?topicId=${topic.id}`} className="inline-block px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold rounded-xl transition-all shadow-sm ">
                                 Destek Talebi Oluştur →
                             </Link>
                         </div>

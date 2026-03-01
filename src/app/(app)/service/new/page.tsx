@@ -270,13 +270,13 @@ function ServiceAcceptanceContent() {
     const cardBg = isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/5';
     const inputBg = isLight ? 'bg-slate-50 border-slate-200 focus:border-blue-500 hover:bg-white text-slate-900 placeholder:text-slate-400' : 'bg-white/[0.02] border-white/10 focus:border-blue-500/50 hover:bg-white/[0.04] text-white placeholder:text-white/20';
     const pageBg = isLight ? 'min-h-screen bg-[#fafafa]' : 'min-h-screen bg-[#020617] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/40 via-[#020617] to-[#020617]';
-    const dropdownBg = isLight ? 'bg-white border-slate-200 shadow-lg' : 'bg-[#1e293b] border-white/10 shadow-2xl';
+    const dropdownBg = isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#1e293b] border-white/10 shadow-2xl';
 
     return (
         <div data-pos-theme={theme} className={`${pageBg} p-8 font-sans transition-colors duration-300`}>
             {/* WARRANTY MODAL */}
             {warrantyModalOpen && (
-                <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
+                <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6  animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
                     <div className={`w-full max-w-[500px] overflow-hidden rounded-[24px] border shadow-2xl flex flex-col ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
                         <div className={`p-6 border-b flex items-center gap-4 ${isLight ? 'border-slate-200' : 'border-white/10'}`}>
                             <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center text-xl shadow-sm border ${isLight ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'}`}>
@@ -564,8 +564,8 @@ function ServiceAcceptanceContent() {
 
                     {/* RIGHT: SUMMARY CARD */}
                     <div className="w-full lg:w-[380px] xl:w-[420px] sticky top-8 shrink-0 space-y-6">
-                        <div className={`rounded-[24px] border shadow-xl p-6 sm:p-8 relative overflow-hidden ${isLight ? 'bg-white border-slate-200' : 'bg-[#1a1c2e] border-white/10'}`}>
-                            <div className={`hidden dark:block absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none`}></div>
+                        <div className={`rounded-[24px] border shadow-sm p-6 sm:p-8 relative overflow-hidden ${isLight ? 'bg-white border-slate-200' : 'bg-[#1a1c2e] border-white/10'}`}>
+                            <div className={`hidden dark:block absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full  -translate-y-1/2 translate-x-1/2 pointer-events-none`}></div>
                             <h3 className={`text-[16px] font-bold mb-6 border-b pb-4 ${isLight ? 'border-slate-200 text-slate-900' : 'border-white/10 text-white'}`}>İş Emri Özeti</h3>
 
                             <div className="space-y-4">

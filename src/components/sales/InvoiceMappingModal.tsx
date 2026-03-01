@@ -93,8 +93,8 @@ export function InvoiceMappingModal({
     };
 
     return (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.82)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
-            <div className="card glass" style={{ width: '760px', maxHeight: '92vh', overflowY: 'auto', background: 'var(--bg-card)', borderRadius: '20px', border: '1px solid var(--border-light)' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.82)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ width: '760px', maxHeight: '92vh', overflowY: 'auto', background: 'var(--bg-card)', borderRadius: '20px', border: '1px solid var(--border-light)' }}>
 
                 {/* Header */}
                 <div className="flex-between" style={{ padding: '24px 28px', borderBottom: '1px solid var(--border-light)' }}>

@@ -26,7 +26,7 @@ export default function Features() {
                     {FEATURES.map(f => (
                         <div key={f.title}
                             className="p-5 rounded-2xl border border-white/5 hover:border-orange-500/20 transition-all group cursor-default"
-                            style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                            style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>
                             <div className="text-2xl mb-3">{f.icon}</div>
                             <h3 className="font-bold text-white text-sm mb-1.5 group-hover:text-orange-400 transition-colors">{f.title}</h3>
                             <p className="text-xs text-gray-500 leading-relaxed font-medium">{f.desc}</p>

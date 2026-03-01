@@ -56,14 +56,14 @@ export default function DailyReportContent() {
     return (
         <div className="animate-fade-in">
             <style jsx>{`
-                .glass-card {
+                .bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card {
                     background: var(--bg-card);
-                    backdrop-filter: blur(20px);
+                    
                     border: 1px solid var(--border-light);
                     border-radius: 24px;
                     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 }
-                .glass-card:hover {
+                .bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card:hover {
                     border-color: var(--primary);
                     transform: translateY(-5px);
                     background: var(--bg-hover);
@@ -133,13 +133,13 @@ export default function DailyReportContent() {
                         <div className="flex bg-main/20 rounded-xl p-1">
                             <button
                                 onClick={() => setAdminActiveTab('overall')}
-                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'overall' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-main'}`}
+                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'overall' ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'text-muted hover:text-main'}`}
                             >
                                 KONSOLİDE
                             </button>
                             <button
                                 onClick={() => setAdminActiveTab('branch')}
-                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'branch' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-main'}`}
+                                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${adminActiveTab === 'branch' ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'text-muted hover:text-main'}`}
                             >
                                 ŞUBE BAZLI
                             </button>
@@ -149,7 +149,7 @@ export default function DailyReportContent() {
             </header>
 
             <div className="stat-grid mb-10">
-                <div className="glass-card p-8 group">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group">
                     <div className="text-[10px] font-black tracking-widest text-primary mb-6 flex justify-between">
                         <span>TOPLAM CİRO</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
@@ -163,7 +163,7 @@ export default function DailyReportContent() {
                     </div>
                 </div>
 
-                <div className="glass-card p-8 group">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group">
                     <div className="text-[10px] font-black tracking-widest text-emerald-400 mb-6 flex justify-between">
                         <span>TOPLAM TAHSİLAT</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
@@ -177,7 +177,7 @@ export default function DailyReportContent() {
                     </div>
                 </div>
 
-                <div className="glass-card p-8 group">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group">
                     <div className="text-[10px] font-black tracking-widest text-red-500 mb-6 flex justify-between">
                         <span>TOPLAM GİDER</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↘</span>
@@ -191,8 +191,8 @@ export default function DailyReportContent() {
                     </div>
                 </div>
 
-                <div className="glass-card p-8 group relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5  -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
                     <div className="text-[10px] font-black tracking-widest text-cyan-400 mb-6 flex justify-between">
                         <span>BAKİYE DEĞİŞİMİ</span>
                         <span className="px-2 py-0.5 rounded-full bg-cyan-400/10 text-[8px]">NET</span>
@@ -208,7 +208,7 @@ export default function DailyReportContent() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 glass-card p-10">
+                <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-10">
                     <div className="flex justify-between items-center mb-10">
                         <div>
                             <h3 className="text-xl font-black text-white mb-1">Anlık İşlem Takibi</h3>
@@ -224,9 +224,9 @@ export default function DailyReportContent() {
                             filteredTransactions.slice(0, 20).map((t, i) => (
                                 <div key={i} className="flex-between p-5 group rounded-2xl bg-subtle border border-subtle hover:bg-hover hover:border-main hover:translate-x-1 transition-all">
                                     <div className="flex gap-5 items-center">
-                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-lg ${t.type === 'Sales' ? 'bg-orange-500/10 text-orange-400 shadow-orange-500/5' :
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-sm ${t.type === 'Sales' ? 'bg-orange-500/10 text-orange-400 ' :
                                             t.type === 'Expense' ? 'bg-red-500/10 text-red-400 shadow-red-500/5' :
-                                                t.type === 'Collection' ? 'bg-emerald-500/10 text-emerald-400 shadow-emerald-500/5' :
+                                                t.type === 'Collection' ? 'bg-emerald-500/10 text-emerald-400 ' :
                                                     'bg-white/10 text-white shadow-white/5'
                                             }`}>
                                             {t.type === 'Sales' ? '💰' : t.type === 'Expense' ? '🧾' : t.type === 'Collection' ? '📥' : '💼'}
@@ -259,7 +259,7 @@ export default function DailyReportContent() {
                 </div>
 
                 <div className="space-y-8">
-                    <div className="glass-card p-10">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-10">
                         <h3 className="text-lg font-black text-white mb-6">Kasa Dağılımı</h3>
                         <div className="space-y-7">
                             {kasalar.filter(k => (canViewAll && adminActiveTab === 'overall') ? true : k.branch === selectedBranch).slice(0, 6).map((kasa, i) => {
@@ -288,7 +288,7 @@ export default function DailyReportContent() {
                         </div>
                     </div>
 
-                    <div className="glass-card p-10 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent relative overflow-hidden group">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-10 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:rotate-12 transition-transform">💡</div>
                         <h3 className="text-lg font-black text-white mb-4">Analitik Özet</h3>
                         <div className="space-y-4">
@@ -307,7 +307,7 @@ export default function DailyReportContent() {
                                 </p>
                             </div>
                         </div>
-                        <button className="w-full mt-8 py-3 rounded-xl bg-primary text-white text-[10px] font-black tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20">
+                        <button className="w-full mt-8 py-3 rounded-xl bg-primary text-white text-[10px] font-black tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-sm shadow-primary/20">
                             DETAYLI RAPOR İNDİR
                         </button>
                     </div>

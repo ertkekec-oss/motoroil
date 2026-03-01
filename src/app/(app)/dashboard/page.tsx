@@ -113,7 +113,7 @@ export default function TenantNetworkDashboard() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                             {/* Box 1 */}
-                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/network/seller/orders')}>
+                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-sm hover:border-blue-400 dark:hover:border-blue-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/network/seller/orders')}>
                                 <div className="w-14 h-14 rounded-[16px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-transform group-hover:scale-105">
                                     <ShoppingCart className="w-6 h-6" />
                                 </div>
@@ -124,7 +124,7 @@ export default function TenantNetworkDashboard() {
                             </div>
 
                             {/* Box 2 */}
-                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-md hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/network/finance')}>
+                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-sm hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/network/finance')}>
                                 <div className="w-14 h-14 rounded-[16px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-transform group-hover:scale-105">
                                     <Landmark className="w-6 h-6" />
                                 </div>
@@ -137,7 +137,7 @@ export default function TenantNetworkDashboard() {
                             </div>
 
                             {/* Box 3 */}
-                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-md hover:border-indigo-400 dark:hover:border-indigo-500/50 transition-all cursor-pointer flex items-center gap-4 group">
+                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-sm hover:border-indigo-400 dark:hover:border-indigo-500/50 transition-all cursor-pointer flex items-center gap-4 group">
                                 <div className="w-14 h-14 rounded-[16px] bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center transition-transform group-hover:scale-105">
                                     <Package className="w-6 h-6" />
                                 </div>
@@ -150,7 +150,7 @@ export default function TenantNetworkDashboard() {
                             </div>
 
                             {/* Box 4 */}
-                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-md hover:border-amber-400 dark:hover:border-amber-500/50 transition-all cursor-pointer flex items-center gap-4 group">
+                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-sm hover:border-amber-400 dark:hover:border-amber-500/50 transition-all cursor-pointer flex items-center gap-4 group">
                                 <div className="w-14 h-14 rounded-[16px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center transition-transform group-hover:scale-105">
                                     <ShieldCheck className="w-6 h-6" />
                                 </div>
@@ -161,7 +161,7 @@ export default function TenantNetworkDashboard() {
                             </div>
 
                             {/* Box 5 */}
-                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-md hover:border-fuchsia-400 dark:hover:border-fuchsia-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/seller/boost')}>
+                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-sm hover:border-fuchsia-400 dark:hover:border-fuchsia-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/seller/boost')}>
                                 <div className="w-14 h-14 rounded-[16px] bg-fuchsia-50 dark:bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 flex items-center justify-center transition-transform group-hover:scale-105">
                                     <Zap className="w-6 h-6" />
                                 </div>
@@ -172,7 +172,7 @@ export default function TenantNetworkDashboard() {
                             </div>
 
                             {/* Box 6 */}
-                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-md hover:border-red-400 dark:hover:border-red-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/support/tickets')}>
+                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-sm hover:border-red-400 dark:hover:border-red-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/support/tickets')}>
                                 <div className="w-14 h-14 rounded-[16px] bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center transition-transform group-hover:scale-105">
                                     <AlertTriangle className="w-6 h-6" />
                                 </div>

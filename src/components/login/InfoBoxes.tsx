@@ -24,8 +24,8 @@ export default function InfoBoxes() {
                     {INFO_BOXES.map(b => (
                         <div key={b.title}
                             className="p-6 rounded-2xl border border-white/5 relative overflow-hidden group hover:border-white/10 transition-all"
-                            style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                            <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-10 blur-2xl -translate-y-1/2 translate-x-1/2"
+                            style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>
+                            <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-10  -translate-y-1/2 translate-x-1/2"
                                 style={{ background: b.color }} />
                             <div className="text-3xl mb-4">{b.icon}</div>
                             <h3 className="font-bold text-white text-sm mb-2">{b.title}</h3>

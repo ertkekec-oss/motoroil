@@ -62,9 +62,9 @@ export default function CustomModal({
     };
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-black/85 backdrop-blur-xl animate-fade-in" onClick={onClose}>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-black/85  animate-fade-in" onClick={onClose}>
             <div
-                className={`w-full ${sizeClasses[size]} glass-plus rounded-[40px] p-12 border shadow-[0_50px_100px_rgba(0,0,0,0.9)] animate-in relative overflow-hidden text-center`}
+                className={`w-full ${sizeClasses[size]} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus rounded-[40px] p-12 border shadow-[0_50px_100px_rgba(0,0,0,0.9)] animate-in relative overflow-hidden text-center`}
                 style={{ borderColor: `${current.color}40` }}
                 onClick={(e) => e.stopPropagation()}
             >

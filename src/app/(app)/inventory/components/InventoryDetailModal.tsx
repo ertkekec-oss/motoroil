@@ -33,7 +33,7 @@ export default function InventoryDetailModal({
     if (!isOpen || !selectedProduct) return null;
 
     return (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[3000] flex items-center justify-center p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-900/50  z-[3000] flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-white dark:bg-[#0f172a] w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-[24px] border border-slate-200 dark:border-white/10 shadow-2xl flex flex-col">
 
                 {/* Header */}

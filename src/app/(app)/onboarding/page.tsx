@@ -93,9 +93,9 @@ export default function OnboardingPage() {
                     color: white;
                     padding: 20px;
                 }
-                .glass-card {
+                .bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card {
                     background: rgba(30, 41, 59, 0.5);
-                    backdrop-filter: blur(20px);
+                    
                     border: 1px solid rgba(255, 255, 255, 0.1);
                     border-radius: 32px;
                     padding: 48px;
@@ -253,7 +253,7 @@ export default function OnboardingPage() {
                 .selected .checkbox-custom { background: #3b82f6; border-color: #3b82f6; }
             `}</style>
 
-            <div className="glass-card">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card">
                 <div className="step-indicator">
                     {[1, 2, 3, 4, 5].map(s => (
                         <div

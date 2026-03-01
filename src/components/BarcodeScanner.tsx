@@ -126,7 +126,7 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/95  animate-in fade-in duration-300">
             <div className="w-full max-w-lg bg-[#0a0a0b] rounded-[40px] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden flex flex-col relative">
 
                 {/* Header */}
@@ -153,14 +153,14 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
 
                         {/* Overlay elements */}
                         {!isCameraReady && !cameraError && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/40 backdrop-blur-md">
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/40 ">
                                 <div className="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
                                 <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Kamera Hazırlanıyor</span>
                             </div>
                         )}
 
                         {cameraError && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8 bg-rose-500/10 backdrop-blur-md text-center">
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8 bg-rose-500/10  text-center">
                                 <span className="text-4xl text-rose-500">⚠️</span>
                                 <p className="text-xs font-bold text-rose-400 leading-relaxed">{cameraError}</p>
                                 <div className="flex flex-col gap-2 w-full mt-4">

@@ -100,7 +100,7 @@ export default function PdksDisplayPage() {
     if (status === "PAIRING") {
         return (
             <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-900/10 via-slate-950 to-slate-950">
-                <div className="max-w-md w-full bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[3rem] shadow-2xl shadow-indigo-500/10">
+                <div className="max-w-md w-full bg-white/5  border border-white/10 p-10 rounded-[3rem] shadow-2xl shadow-indigo-500/10">
                     <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mb-8 mx-auto">
                         <IconDeviceTablet className="w-10 h-10 text-indigo-400" />
                     </div>
@@ -121,7 +121,7 @@ export default function PdksDisplayPage() {
                                 {error}
                             </div>
                         )}
-                        <button className="w-full py-5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        <button className="w-full py-5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-sm shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all">
                             SİSTEME BAĞLAN
                         </button>
                     </form>
@@ -144,7 +144,7 @@ export default function PdksDisplayPage() {
 
                     {/* Header Site Info */}
                     <div className="mb-8 w-full">
-                        <div className="px-5 py-2 bg-white/5 border border-white/10 rounded-full flex items-center gap-3 backdrop-blur-xl mb-6 ml-0 w-fit shadow-2xl shadow-indigo-500/10">
+                        <div className="px-5 py-2 bg-white/5 border border-white/10 rounded-full flex items-center gap-3  mb-6 ml-0 w-fit shadow-2xl shadow-indigo-500/10">
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">SİSTEM ÇEVRİMİÇİ</span>
                         </div>
@@ -156,7 +156,7 @@ export default function PdksDisplayPage() {
 
                     {/* QR Code Container */}
                     <div className="relative group">
-                        <div className="absolute -inset-10 bg-indigo-500/20 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute -inset-10 bg-indigo-500/20 rounded-full  opacity-50 group-hover:opacity-100 transition-opacity" />
 
                         <div className="relative bg-white p-8 md:p-10 rounded-[3rem] shadow-2xl shadow-black/80 ring-1 ring-white/10 overflow-hidden transform transition-all duration-700 hover:scale-[1.02]">
                             <div className="relative">
@@ -168,7 +168,7 @@ export default function PdksDisplayPage() {
                                     className="transition-opacity duration-300"
                                 />
                                 {countdown === 0 && (
-                                    <div className="absolute inset-0 bg-white/90 backdrop-blur-md flex items-center justify-center rounded-2xl">
+                                    <div className="absolute inset-0 bg-white/90  flex items-center justify-center rounded-2xl">
                                         <div className="flex flex-col items-center gap-4">
                                             <IconRefresh className="w-14 h-14 text-indigo-600 animate-spin" />
                                             <span className="text-indigo-900 font-black text-xs uppercase tracking-widest">Yükleniyor</span>
@@ -183,7 +183,7 @@ export default function PdksDisplayPage() {
                         </div>
 
                         {/* Dynamic Progress Indicator */}
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-3xl border border-white/10 px-10 py-4 rounded-3xl shadow-2xl flex items-center gap-6 min-w-[280px] justify-center transition-all group-hover:-translate-y-2">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-slate-900/90  border border-white/10 px-10 py-4 rounded-3xl shadow-2xl flex items-center gap-6 min-w-[280px] justify-center transition-all group-hover:-translate-y-2">
                             <div className="flex flex-col items-center flex-1">
                                 <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">GÜVENLİK ANAHTARI YENİLENME</span>
                                 <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
@@ -212,7 +212,7 @@ export default function PdksDisplayPage() {
                 </div>
 
                 {/* Right Side: Announcements and Clock */}
-                <div className="bg-white/5 backdrop-blur-3xl flex flex-col p-10 md:p-16 relative overflow-hidden h-full">
+                <div className="bg-white/5  flex flex-col p-10 md:p-16 relative overflow-hidden h-full">
 
                     {/* Main Clock Display */}
                     <div className="mb-10 lg:mb-16">
@@ -239,7 +239,7 @@ export default function PdksDisplayPage() {
                     {/* Announcements Section */}
                     <div className="flex-1 flex flex-col min-h-0">
                         <div className="flex items-center gap-4 mb-8">
-                            <div className="px-5 py-2.5 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-600/30">
+                            <div className="px-5 py-2.5 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-indigo-600/30">
                                 DUYURULAR
                             </div>
                             <div className="flex-1 h-[1px] bg-white/10" />

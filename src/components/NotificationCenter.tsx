@@ -47,7 +47,6 @@ export default function NotificationCenter() {
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
                     background: 'var(--bg-card)',
-                    backdropFilter: 'blur(10px)',
                     border: '1px solid var(--primary)',
                     padding: '10px 14px',
                     borderRadius: '12px',
@@ -98,7 +97,6 @@ export default function NotificationCenter() {
                     width: '320px',
                     maxHeight: '400px',
                     background: 'var(--bg-card)',
-                    backdropFilter: 'blur(20px)',
                     border: '1px solid var(--primary)',
                     borderRadius: '20px',
                     boxShadow: 'var(--shadow-premium)',

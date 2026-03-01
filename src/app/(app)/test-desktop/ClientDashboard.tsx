@@ -215,7 +215,7 @@ export default function ClientDashboard() {
             {/* L E F T   P A N E L  (MODÜL GRID - 10% Scaled Up) */}
             {isDesktopSidebarCollapsed && (
                 <div className="w-[310px] xl:w-[400px] flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/50 dark:border-white/5 flex flex-col h-full z-10 shadow-[8px_0_30px_-15px_rgba(0,0,0,0.05)] hidden md:flex overflow-hidden">
-                    <div className="p-7 pb-5 bg-gradient-to-b from-white to-white/90 dark:from-slate-900 dark:to-slate-900/90 backdrop-blur-md z-20">
+                    <div className="p-7 pb-5 bg-gradient-to-b from-white to-white/90 dark:from-slate-900 dark:to-slate-900/90  z-20">
                         <h2 className="text-[22px] font-extrabold tracking-tight text-[#0F172A] dark:text-white mb-4">Sistem Modülleri</h2>
                         <div className="relative">
                             <Search className="w-[18px] h-[18px] absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -245,7 +245,7 @@ export default function ClientDashboard() {
                                             trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
                                             router.push(feat.href);
                                         }}
-                                        className="text-left flex flex-col items-start p-5 rounded-[18px] transition-transform active:scale-95 border border-slate-200/60 hover:border-slate-300 dark:border-slate-700/50 dark:hover:border-slate-600 focus:outline-none shadow-sm hover:shadow-md cursor-pointer bg-white dark:bg-slate-800 group"
+                                        className="text-left flex flex-col items-start p-5 rounded-[18px] transition-transform active:scale-95 border border-slate-200/60 hover:border-slate-300 dark:border-slate-700/50 dark:hover:border-slate-600 focus:outline-none shadow-sm hover:shadow-sm cursor-pointer bg-white dark:bg-slate-800 group"
                                     >
                                         <div className={`p-3 rounded-xl mb-3.5 shadow-sm ${feat.color.replace('border-', 'border border-')}`}>
                                             <div className="scale-90 origin-top-left -mx-0.5 -my-0.5">
@@ -303,12 +303,12 @@ export default function ClientDashboard() {
                         .pdy-executive-surface {
                             background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,250,252,0.85));
                             border: 1px solid rgba(37,99,235,0.12);
-                            backdrop-filter: blur(10px);
+                            
                         }
                         [data-theme="dark"] .pdy-executive-surface {
                             background: linear-gradient(180deg, rgba(15,23,42,0.75), rgba(15,23,42,0.55));
                             border: 1px solid rgba(96,165,250,0.18);
-                            backdrop-filter: blur(12px);
+                            
                         }
                         .pdy-executive-glow {
                             background: radial-gradient(circle at top left, rgba(37,99,235,0.08), transparent 60%);
@@ -380,7 +380,7 @@ export default function ClientDashboard() {
                                 {showOnboardingModal && (
                                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-3.5">
                                         <div
-                                            className="absolute inset-0 bg-[#0F172A]/[0.35] backdrop-blur-[6px] transition-opacity duration-200"
+                                            className="absolute inset-0 bg-[#0F172A]/[0.35]  transition-opacity duration-200"
                                             style={{ opacity: showOnboardingModal ? 1 : 0 }}
                                             onClick={() => completionPhase === 'none' && setShowOnboardingModal(false)}
                                         ></div>
@@ -466,7 +466,7 @@ export default function ClientDashboard() {
                                                     <p className="text-[13.5px] font-medium text-slate-500 dark:text-slate-400 mb-5 max-w-[320px] animate-in slide-in-from-bottom-2 duration-700 delay-200">Sisteminiz artık tam kapasiteyle çalışmaya hazır.</p>
 
                                                     <button
-                                                        className="px-5 py-3.5 bg-[#0F172A] hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white text-[13.5px] font-bold rounded-2xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95 animate-in slide-in-from-bottom-2 duration-700 delay-300"
+                                                        className="px-5 py-3.5 bg-[#0F172A] hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 text-white text-[13.5px] font-bold rounded-2xl transition-all shadow-sm hover:shadow-sm hover:-translate-y-0.5 active:scale-95 animate-in slide-in-from-bottom-2 duration-700 delay-300"
                                                         onClick={() => {
                                                             setShowOnboardingModal(false);
                                                             setTimeout(() => {
@@ -561,7 +561,7 @@ export default function ClientDashboard() {
                             </div>
 
                             <div className="pl-2 mt-auto">
-                                <div className="bg-white/50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-white/5 rounded-xl p-3 backdrop-blur-sm">
+                                <div className="bg-white dark:bg-slate-900 dark:bg-slate-800/30 border border-slate-200/50 dark:border-white/5 rounded-xl p-3 ">
                                     <div className="flex justify-between items-center mb-1.5">
                                         <span className="text-[11px] uppercase tracking-[0.08em] font-semibold text-slate-500">Kasa Durumu</span>
                                     </div>

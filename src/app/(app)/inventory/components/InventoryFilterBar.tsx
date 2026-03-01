@@ -80,7 +80,7 @@ export default function InventoryFilterBar({
 
                 {/* DROPDOWN MENU */}
                 {isFilterOpen && (
-                    <div className="absolute top-[48px] right-0 w-[400px] bg-white dark:bg-[#0f172a] rounded-xl p-6 z-[1000] shadow-xl border border-slate-200 dark:border-white/10">
+                    <div className="absolute top-[48px] right-0 w-[400px] bg-white dark:bg-[#0f172a] rounded-xl p-6 z-[1000] shadow-sm border border-slate-200 dark:border-white/10">
                         <div className="flex flex-col gap-6">
                             {/* Category Select */}
                             <div className="flex flex-col gap-2">

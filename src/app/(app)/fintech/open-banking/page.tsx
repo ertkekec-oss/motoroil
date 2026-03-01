@@ -100,7 +100,7 @@ export default function OpenBankingDashboard() {
     return (
         <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {selectingBank && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[3000] flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/80  z-[3000] flex items-center justify-center p-4">
                     <div className="bg-[#111] border border-white/10 p-2 rounded-[2rem] max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-in zoom-in-95 relative">
                         <button
                             onClick={() => {
@@ -132,14 +132,14 @@ export default function OpenBankingDashboard() {
                     <button
                         onClick={handleSync}
                         disabled={syncing}
-                        className="btn-glass flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all font-bold text-sm"
+                        className="btn-bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all font-bold text-sm"
                     >
                         <IconRefresh className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
                         {syncing ? 'Senkronize Ediliyor...' : 'Tümünü Güncelle'}
                     </button>
                     <button
                         onClick={() => setSelectingBank(true)}
-                        className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white transition-all font-bold text-sm shadow-xl shadow-indigo-500/20"
+                        className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white transition-all font-bold text-sm shadow-sm shadow-indigo-500/20"
                     >
                         <Plus className="w-4 h-4" />
                         Yeni Banka Bağla
@@ -149,7 +149,7 @@ export default function OpenBankingDashboard() {
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="card glass p-6">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                     <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Total Bank Balance</h3>
                     <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-black text-white">173.540,50</span>
@@ -160,7 +160,7 @@ export default function OpenBankingDashboard() {
                         2 Active Connections Secure
                     </div>
                 </div>
-                <div className="card glass p-6">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                     <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Unmatched Flows</h3>
                     <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-black text-rose-400">12</span>
@@ -171,7 +171,7 @@ export default function OpenBankingDashboard() {
                         Action required for 3.250 ₺
                     </div>
                 </div>
-                <div className="card glass p-6 bg-gradient-to-br from-indigo-900/20 to-transparent">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 bg-gradient-to-br from-indigo-900/20 to-transparent">
                     <h3 className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-4">Last Sync Health</h3>
                     <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-black text-white">100</span>
@@ -191,7 +191,7 @@ export default function OpenBankingDashboard() {
                         <IconBank className="w-4 h-4 text-cyan-400" /> Active Connections
                     </h2>
                     {connections.map(conn => (
-                        <div key={conn.id} className="card glass p-4 hover:border-cyan-500/30 transition-all group">
+                        <div key={conn.id} className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-4 hover:border-cyan-500/30 transition-all group">
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-lg text-cyan-400">
@@ -225,7 +225,7 @@ export default function OpenBankingDashboard() {
                         </div>
                     </div>
 
-                    <div className="card glass divide-y divide-white/5 overflow-hidden">
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm divide-y divide-white/5 overflow-hidden">
                         {[
                             { id: 1, bank: 'Akbank', desc: 'TRENDYOL HAKEDIS 2026/FEB/12', amount: 1540.50, type: 'MARKETPLACE', status: 'MATCHED' },
                             { id: 2, bank: 'Akbank', desc: 'KIRA ODEMESI - SUBAT 2026', amount: -2500.00, type: 'EXPENSE', status: 'MATCHED' },
@@ -266,7 +266,7 @@ export default function OpenBankingDashboard() {
             </div>
 
             {/* Bottom Insight */}
-            <div className="card glass p-6 border-indigo-500/10 flex items-center justify-between bg-gradient-to-r from-indigo-900/10 to-transparent">
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-indigo-500/10 flex items-center justify-between bg-gradient-to-r from-indigo-900/10 to-transparent">
                 <div className="flex items-center gap-4">
                     <IconZap className="w-5 h-5 text-yellow-400 animate-pulse" />
                     <div>

@@ -24,7 +24,7 @@ export default function TopNav({ onDemoClick }: TopNavProps) {
     return (
         <nav
             className="sticky top-0 z-50 w-full border-b border-white/5"
-            style={{ backgroundColor: 'rgba(8,9,17,0.88)', backdropFilter: 'blur(20px)' }}
+            style={{ backgroundColor: 'rgba(8,9,17,0.88)' }}
             aria-label="Ana Navigasyon"
         >
             <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-6">

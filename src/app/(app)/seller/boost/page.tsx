@@ -55,8 +55,8 @@ export default function BoostPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Active Plan Card */}
                     <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-indigo-500 rounded-full blur-3xl opacity-20"></div>
-                        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-blue-500 rounded-full blur-3xl opacity-20"></div>
+                        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-indigo-500 rounded-full  opacity-20"></div>
+                        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-blue-500 rounded-full  opacity-20"></div>
 
                         <div className="relative z-10">
                             <div className="flex justify-between items-start mb-6">
@@ -74,7 +74,7 @@ export default function BoostPage() {
                                 <span className="text-indigo-200 font-medium text-sm ml-1">/ ay</span>
                             </div>
 
-                            <div className="bg-white/10 rounded-2xl p-5 backdrop-blur-sm border border-white/10 mb-6">
+                            <div className="bg-white/10 rounded-2xl p-5  border border-white/10 mb-6">
                                 <div className="flex justify-between text-sm mb-2 font-medium">
                                     <span className="text-indigo-100">Kota Kullanımı (Gösterim)</span>
                                     <span className="text-white">{boostData.quotaUsed.toLocaleString()} / {boostData.quotaMax.toLocaleString()}</span>
@@ -85,7 +85,7 @@ export default function BoostPage() {
                                 <p className="text-xs text-indigo-300">Yenilenme Tarihi: <span className="text-indigo-100 font-semibold">{formatDate(boostData.renewalDate)}</span></p>
                             </div>
 
-                            <button className="w-full bg-white text-indigo-900 font-bold py-3 rounded-xl hover:bg-indigo-50 transition-colors shadow-lg shadow-indigo-900/50 relative overflow-hidden group">
+                            <button className="w-full bg-white text-indigo-900 font-bold py-3 rounded-xl hover:bg-indigo-50 transition-colors shadow-sm shadow-indigo-900/50 relative overflow-hidden group">
                                 <span className="relative z-10">Planı Değiştir (Yakında)</span>
                             </button>
                         </div>

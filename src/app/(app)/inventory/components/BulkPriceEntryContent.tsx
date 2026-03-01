@@ -227,7 +227,7 @@ export default function BulkPriceEntryContent({
 
             {/* Footer Save Area */}
             <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[4000] w-full max-w-3xl px-4 animate-in slide-in-from-bottom-10 duration-500">
-                <div className="bg-white/95 dark:bg-[#0f172a]/95 border border-slate-200 dark:border-white/10 rounded-[20px] p-5 shadow-xl backdrop-blur-md flex items-center justify-between">
+                <div className="bg-white dark:bg-slate-900 dark:bg-[#0f172a]/95 border border-slate-200 dark:border-white/10 rounded-[20px] p-5 shadow-sm  flex items-center justify-between">
                     <div className="flex flex-col">
                         <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Bekleyen Değişiklikler</span>
                         <div className="text-slate-900 dark:text-white text-[16px] font-semibold">

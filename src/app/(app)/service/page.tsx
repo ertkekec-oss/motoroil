@@ -324,10 +324,10 @@ export default function ServiceDashboard() {
 
             {/* --- SERVICE DETAIL MODAL --- */}
             {selectedService && (
-                <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
+                <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6  animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
                     <div className={`w-full max-w-[800px] max-h-[90vh] overflow-y-auto rounded-[24px] border shadow-2xl relative flex flex-col ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
                         {/* Modal Header */}
-                        <div className={`p-6 flex justify-between items-start sticky top-0 z-10 border-b backdrop-blur-md ${isLight ? 'bg-white/95 border-slate-200' : 'bg-[#0f172a]/95 border-white/10'}`}>
+                        <div className={`p-6 flex justify-between items-start sticky top-0 z-10 border-b  ${isLight ? 'bg-white dark:bg-slate-900 border-slate-200' : 'bg-[#0f172a]/95 border-white/10'}`}>
                             <div className="flex items-center gap-4">
                                 <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center text-xl shadow-sm border ${isLight ? 'bg-slate-50 border-slate-200 text-slate-500' : 'bg-white/5 border-white/10 text-slate-300'}`}>
                                     <FileText size={20} />

@@ -48,23 +48,23 @@ export function InventoryStats({ products }: InventoryStatsProps) {
 
     return (
         <div className="grid-cols-4 gap-4 mb-6">
-            <div className="card glass" style={{ padding: '20px' }}>
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '20px' }}>
                 <div className="text-muted" style={{ fontSize: '11px', fontWeight: '800' }}>TOPLAM ÜRÜN</div>
                 <div style={{ fontSize: '32px', fontWeight: '900', marginTop: '8px' }}>{products.length}</div>
             </div>
-            <div className="card glass" style={{ padding: '20px' }}>
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '20px' }}>
                 <div className="text-muted" style={{ fontSize: '11px', fontWeight: '800' }}>ALIŞ DEĞERİ (KDV Hariç)</div>
                 <div style={{ fontSize: '32px', fontWeight: '900', marginTop: '8px', color: 'var(--success)' }}>
                     {formatCurrency(stats.buyExt)}
                 </div>
             </div>
-            <div className="card glass" style={{ padding: '20px' }}>
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '20px' }}>
                 <div className="text-muted" style={{ fontSize: '11px', fontWeight: '800' }}>SATIŞ DEĞERİ (KDV Hariç)</div>
                 <div style={{ fontSize: '32px', fontWeight: '900', marginTop: '8px', color: 'var(--primary)' }}>
                     {formatCurrency(stats.sellExt)}
                 </div>
             </div>
-            <div className="card glass" style={{ padding: '20px' }}>
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '20px' }}>
                 <div className="text-muted" style={{ fontSize: '11px', fontWeight: '800' }}>TAHMİNİ KAR</div>
                 <div style={{ fontSize: '32px', fontWeight: '900', marginTop: '8px', color: 'var(--warning)' }}>
                     {formatCurrency(stats.sellExt - stats.buyExt)}

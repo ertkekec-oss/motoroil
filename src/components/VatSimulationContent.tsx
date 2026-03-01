@@ -148,13 +148,13 @@ export default function VatSimulationContent() {
                 {kdvData.odenecek > 0 ? (
                     <div className="bg-rose-50 border border-rose-200 dark:bg-rose-900/10 dark:border-rose-500/30 rounded-[20px] border border-rose-500/30 p-8 text-center animate-pulse">
                         <div className="text-sm font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest mb-2">BU AY ÖDENECEK KDV VAR</div>
-                        <div className="text-6xl font-black text-rose-700 dark:text-rose-100 font-mono drop-shadow-xl">{formatMoney(kdvData.odenecek)}</div>
+                        <div className="text-6xl font-black text-rose-700 dark:text-rose-100 font-mono drop-shadow-sm">{formatMoney(kdvData.odenecek)}</div>
                         <p className="mt-4 text-rose-600 dark:text-rose-400 text-sm">Dikkat: Bu tutar tahmini olup, resmi beyanname ile kesinleşecektir.</p>
                     </div>
                 ) : (
                     <div className="bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/10 dark:border-emerald-500/30 rounded-[20px] border border-emerald-500/30 p-8 text-center">
                         <div className="text-sm font-bold text-emerald-300 uppercase tracking-widest mb-2">SONRAKİ AYA DEVREDEN KDV</div>
-                        <div className="text-6xl font-black text-emerald-700 dark:text-emerald-100 font-mono drop-shadow-xl">{formatMoney(kdvData.sonrakiDevreden)}</div>
+                        <div className="text-6xl font-black text-emerald-700 dark:text-emerald-100 font-mono drop-shadow-sm">{formatMoney(kdvData.sonrakiDevreden)}</div>
                         <p className="mt-4 text-emerald-300 text-sm">Bu ay KDV ödemesi çıkmıyor. Aradaki fark 190 hesabına devredilecek.</p>
                     </div>
                 )}

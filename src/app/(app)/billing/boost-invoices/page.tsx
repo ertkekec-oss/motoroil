@@ -53,7 +53,7 @@ export default function BoostInvoicesPage() {
                         <h3 className="text-amber-800 font-bold text-lg">Ödeme İçin Ek Süreniz (Grace Period) Devam Ediyor</h3>
                         <p className="text-amber-700 text-sm mt-1">Boost üyeliğinizin askıya alınmaması için <strong className="font-extrabold">{graceDaysRemaining} gün</strong> içerisinde ödemenizi tamamlayınız.</p>
                     </div>
-                    <button className="mt-4 md:mt-0 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-lg transition-transform transform active:scale-95 shadow-md">
+                    <button className="mt-4 md:mt-0 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-lg transition-transform transform active:scale-95 shadow-sm">
                         Hemen Öde
                     </button>
                 </div>
@@ -65,7 +65,7 @@ export default function BoostInvoicesPage() {
                         <h3 className="text-red-800 font-bold text-lg flex items-center gap-2">⚠️ Aboneliğiniz Askıya Alındı (Overdue)</h3>
                         <p className="text-red-700 text-sm mt-1">Gecikmiş faturalarınızdan dolayı hesap görünürlüğünüz düşürüldü. Aktifleştirmek için lütfen ödeme yapınız.</p>
                     </div>
-                    <button className="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-transform transform active:scale-95 shadow-md">
+                    <button className="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-transform transform active:scale-95 shadow-sm">
                         Gecikmiş Faturayı Öde
                     </button>
                 </div>

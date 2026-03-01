@@ -557,7 +557,7 @@ export default function CustomersPage() {
 
             {/* MODALS */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
                     <div className={`w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[16px] shadow-2xl animate-in fade-in zoom-in-95 ${cardClass}`}>
                         <div className={`p-6 border-b flex justify-between items-center sticky top-0 bg-inherit z-10 ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
                             <h3 className={`text-[18px] font-semibold ${textValueClass}`}>Yeni Müşteri Ekle</h3>
@@ -642,7 +642,7 @@ export default function CustomersPage() {
             )}
 
             {isEditModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
                     <div className={`w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[16px] shadow-2xl animate-in fade-in zoom-in-95 ${cardClass}`}>
                         <div className={`p-6 border-b flex justify-between items-center sticky top-0 bg-inherit z-10 ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
                             <h3 className={`text-[18px] font-semibold ${textValueClass}`}>Müşteri Düzenle</h3>

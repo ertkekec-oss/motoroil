@@ -52,7 +52,7 @@ export default async function AdminCategoriesPage() {
                                     ))}
                                 </select>
                             </div>
-                            <button className="w-full bg-[#1F3A5F] text-white py-2 rounded font-bold hover:bg-[#152a45] transition-colors shadow-md">Create Category</button>
+                            <button className="w-full bg-[#1F3A5F] text-white py-2 rounded font-bold hover:bg-[#152a45] transition-colors shadow-sm">Create Category</button>
                         </form>
                     </div>
 

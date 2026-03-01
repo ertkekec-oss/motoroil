@@ -171,11 +171,11 @@ export default function NotificationsPage() {
                     <p className="text-slate-400 mt-2 font-medium">İş akışınızdaki bekleyen onaylar ve kritik uyarılar</p>
                 </div>
 
-                <div className="flex p-1.5 bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-white/5 shadow-2xl">
+                <div className="flex p-1.5 bg-slate-800/50  rounded-2xl border border-white/5 shadow-2xl">
                     <button
                         onClick={() => setActiveTab('approvals')}
                         className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'approvals'
-                                ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                                ? 'bg-primary text-white shadow-sm shadow-primary/30'
                                 : 'text-slate-400 hover:text-white hover:bg-white/5'
                             }`}
                     >
@@ -187,7 +187,7 @@ export default function NotificationsPage() {
                     <button
                         onClick={() => setActiveTab('alerts')}
                         className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'alerts'
-                                ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                                ? 'bg-primary text-white shadow-sm shadow-primary/30'
                                 : 'text-slate-400 hover:text-white hover:bg-white/5'
                             }`}
                     >
@@ -262,12 +262,12 @@ function ApprovalCard({ item, onAction, isProcessing }: any) {
     };
 
     return (
-        <div className={`group relative bg-gradient-to-br ${colorMap[item.color]} border rounded-3xl p-6 shadow-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl overflow-hidden`}>
+        <div className={`group relative bg-gradient-to-br ${colorMap[item.color]} border rounded-3xl p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl overflow-hidden`}>
             {/* Background Decoration */}
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-all"></div>
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full  group-hover:bg-white/10 transition-all"></div>
 
             <div className="flex justify-between items-start mb-4">
-                <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl shadow-inner">
+                <div className="w-12 h-12 bg-white/10  rounded-2xl flex items-center justify-center text-3xl shadow-inner">
                     {item.icon}
                 </div>
                 <div className="text-right">
@@ -297,7 +297,7 @@ function ApprovalCard({ item, onAction, isProcessing }: any) {
                 <button
                     disabled={isProcessing}
                     onClick={() => onAction(item.type, item.id, 'approve')}
-                    className="py-3 px-4 rounded-xl bg-primary text-white text-xs font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="py-3 px-4 rounded-xl bg-primary text-white text-xs font-bold shadow-sm shadow-primary/20 hover:shadow-primary/40 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                     {isProcessing ? (
                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

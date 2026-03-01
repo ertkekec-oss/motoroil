@@ -88,7 +88,7 @@
 
 .m-nav.scrolled {
     background: #ffffff !important;
-    backdrop-filter: blur(20px);
+    
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     height: 76px;
 }

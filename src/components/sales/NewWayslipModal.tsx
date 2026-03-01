@@ -28,7 +28,7 @@ export function NewWayslipModal({
 
     return (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="card glass" style={{ width: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ width: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
                 <div className="flex-between mb-6">
                     <h3>🚚 Yeni İrsaliye Düzenle</h3>
                     <button onClick={() => setView('list')} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px' }}>×</button>
@@ -87,7 +87,7 @@ export function NewWayslipModal({
                     </div>
                 </div>
 
-                <div className="card glass mb-6">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm mb-6">
                     <h4 className="mb-4">📦 Ürün Ekle</h4>
                     <div className="flex gap-2 mb-4">
                         <select id="irs-item-select" className="flex-1 p-2 bg-black/20 border border-white/10 rounded-lg text-white">

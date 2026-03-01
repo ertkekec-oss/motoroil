@@ -154,7 +154,7 @@ export default function AdminPlans() {
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md active:scale-95"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm active:scale-95"
                 >
                     + Yeni Paket Ekle
                 </button>
@@ -256,7 +256,7 @@ export default function AdminPlans() {
             )}
 
             {showModal && (
-                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4  animate-in fade-in duration-200">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full p-8 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[95vh] border border-slate-200">
                         <div className="flex justify-between items-start mb-8">
                             <div>
@@ -382,7 +382,7 @@ export default function AdminPlans() {
                                                 <label
                                                     key={feat.id}
                                                     className={`group flex items-start gap-3 p-4 border-2 rounded-2xl cursor-pointer transition-all ${isSelected
-                                                        ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                                                        ? 'border-indigo-500 bg-indigo-50 shadow-sm'
                                                         : 'border-white bg-white hover:border-slate-200'
                                                         }`}
                                                 >

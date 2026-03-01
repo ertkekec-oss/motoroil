@@ -46,7 +46,7 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
 
     return createPortal(
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6 md:p-10 no-print">
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/80 " onClick={onClose} />
 
             <div className="bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/10 w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
                 {/* MODAL HEADER */}
@@ -176,7 +176,7 @@ export default function QuotePreviewModal({ isOpen, onClose, quote, branches = [
                                     <span>Toplam KDV</span>
                                     <span>{formatCurrency(Number(quote.taxAmount))}</span>
                                 </div>
-                                <div className="flex justify-between items-center px-4 py-3 bg-primary text-white rounded-xl shadow-lg shadow-primary/20">
+                                <div className="flex justify-between items-center px-4 py-3 bg-primary text-white rounded-xl shadow-sm shadow-primary/20">
                                     <span className="text-[10px] font-black uppercase tracking-widest">Genel Toplam</span>
                                     <span className="text-xl font-black">{formatCurrency(Number(quote.totalAmount))}</span>
                                 </div>

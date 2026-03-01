@@ -79,7 +79,6 @@ function MobileHeader() {
             right: 0,
             height: '64px',
             background: 'var(--bg-card)',
-            backdropFilter: 'blur(20px)',
             borderBottom: '1px solid var(--border-light)',
             display: 'flex',
             alignItems: 'center',
@@ -219,7 +218,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                             position: 'fixed',
                             inset: 0,
                             background: 'rgba(0,0,0,0.5)',
-                            backdropFilter: 'blur(4px)',
                             zIndex: 1900
                         }}
                         className="show-mobile"

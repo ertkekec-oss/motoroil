@@ -316,7 +316,7 @@ export default function LandingPage() {
               <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">{content.title}</h2>
               <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">{content.desc}</p>
               <div className="flex justify-center gap-4">
-                <Link href={content.btnLink || '/register'} className="m-btn m-btn-primary text-lg px-8 py-4 shadow-xl shadow-blue-500/30">
+                <Link href={content.btnLink || '/register'} className="m-btn m-btn-primary text-lg px-8 py-4 shadow-sm shadow-blue-500/30">
                   {content.btnText || 'Get Started Now'}
                 </Link>
               </div>
@@ -801,7 +801,7 @@ export default function LandingPage() {
               {secondaryBtnText}
             </Link>
           )}
-          <Link href={primaryBtnUrl} className="m-btn m-btn-primary shadow-lg shadow-blue-200">
+          <Link href={primaryBtnUrl} className="m-btn m-btn-primary shadow-sm shadow-blue-200">
             {primaryBtnText}
           </Link>
         </div>

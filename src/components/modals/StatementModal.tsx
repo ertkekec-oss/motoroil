@@ -352,7 +352,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
                             position: fixed;
                             inset: 0;
                             background: rgba(15, 23, 42, 0.85); /* Deep navy background from Dark mode rule */
-                            backdrop-filter: blur(16px);
+                            
                             display: flex;
                             align-items: center;
                             justify-content: center;
@@ -496,7 +496,7 @@ export default function StatementModal({ isOpen, onClose, title, entity, transac
     html, body { height: auto!important; overflow: visible!important; background: white!important; }
     body * { visibility: hidden; }
         .statement-modal-overlay, .statement-modal-overlay *, #printable-area, #printable-area * { visibility: visible; }
-            .statement-modal-overlay { position: absolute!important; top: 0!important; left: 0!important; width: 100 % !important; height: auto!important; background: white!important; backdrop-filter: none!important; padding: 0!important; margin: 0!important; display: block!important; }
+            .statement-modal-overlay { position: absolute!important; top: 0!important; left: 0!important; width: 100 % !important; height: auto!important; background: white!important;  padding: 0!important; margin: 0!important; display: block!important; }
                     .statement-modal-container { position: static!important; width: 100 % !important; height: auto!important; background: white!important; border: none!important; box-shadow: none!important; display: block!important; }
                     .document-scroller { position: static!important; height: auto!important; overflow: visible!important; background: white!important; padding: 0!important; margin: 0!important; display: block!important; }
                     .paper-document { width: 100 % !important; max-width: none!important; padding: 0!important; margin: 0!important; box-shadow: none!important; border: none!important; height: auto!important; min-height: 0!important; }

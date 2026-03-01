@@ -141,7 +141,7 @@ export default function BankOnboardingHub() {
 
     return (
         <div className="space-y-6">
-            <div className="card glass p-6 border-l-4 border-l-blue-500">
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-l-4 border-l-blue-500">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 className="text-xl font-black text-white">🏦 Banka Entegrasyon Merkezi</h3>
@@ -150,13 +150,13 @@ export default function BankOnboardingHub() {
                     <div className="flex bg-white/5 p-1 rounded-xl">
                         <button
                             onClick={() => setActiveSubTab('apply')}
-                            className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeSubTab === 'apply' ? 'bg-primary text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                            className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeSubTab === 'apply' ? 'bg-primary text-white shadow-sm' : 'text-white/40 hover:text-white'}`}
                         >
                             1. FORM ÜRET & BAŞVUR
                         </button>
                         <button
                             onClick={() => setActiveSubTab('connect')}
-                            className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeSubTab === 'connect' ? 'bg-primary text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+                            className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeSubTab === 'connect' ? 'bg-primary text-white shadow-sm' : 'text-white/40 hover:text-white'}`}
                         >
                             2. BAĞLANTIYI TANIMLA
                         </button>
@@ -167,14 +167,14 @@ export default function BankOnboardingHub() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Banka Seçimi */}
                 <div className="md:col-span-1 space-y-4">
-                    <div className="card glass p-4">
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-4">
                         <label className="text-[10px] font-black text-white/40 uppercase mb-2 block">Banka Seçiniz</label>
                         <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                             {Object.values(BANK_FORM_DEFINITIONS).map(bank => (
                                 <button
                                     key={bank.id}
                                     onClick={() => setSelectedBankId(bank.id)}
-                                    className={`w-full p-3 rounded-xl border transition-all flex items-center justify-between group ${selectedBankId === bank.id ? 'bg-primary/20 border-primary shadow-lg shadow-primary/10' : 'bg-white/5 border-white/5 hover:border-white/20'}`}
+                                    className={`w-full p-3 rounded-xl border transition-all flex items-center justify-between group ${selectedBankId === bank.id ? 'bg-primary/20 border-primary shadow-sm shadow-primary/10' : 'bg-white/5 border-white/5 hover:border-white/20'}`}
                                 >
                                     <span className={`font-bold text-sm ${selectedBankId === bank.id ? 'text-white' : 'text-white/60 group-hover:text-white'}`}>{bank.displayName}</span>
                                     {selectedBankId === bank.id && <span className="text-primary">✓</span>}
@@ -187,7 +187,7 @@ export default function BankOnboardingHub() {
                 {/* İşlem Alanı */}
                 <div className="md:col-span-2">
                     {!selectedBank ? (
-                        <div className="card glass h-full flex flex-col items-center justify-center p-12 text-center opacity-40">
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm h-full flex flex-col items-center justify-center p-12 text-center opacity-40">
                             <div className="text-6xl mb-4">🏦</div>
                             <h4 className="text-lg font-bold text-white">İşlem Yapmak İçin Banka Seçin</h4>
                             <p className="text-sm max-w-xs">Sol taraftaki listeden entegre etmek istediğiniz bankayı seçerek devam edebilirsiniz.</p>
@@ -195,7 +195,7 @@ export default function BankOnboardingHub() {
                     ) : (
                         <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                             {activeSubTab === 'apply' ? (
-                                <div className="card glass p-6 space-y-6">
+                                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
                                     <div className="flex items-center gap-4 border-b border-white/5 pb-4">
                                         <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-2xl">📄</div>
                                         <div>
@@ -236,13 +236,13 @@ export default function BankOnboardingHub() {
 
                                     <button
                                         onClick={handleDownloadForm}
-                                        className="w-full h-14 bg-primary hover:bg-primary/80 text-white rounded-xl font-black text-sm tracking-widest shadow-xl shadow-primary/20 transition-all flex items-center justify-center gap-3"
+                                        className="w-full h-14 bg-primary hover:bg-primary/80 text-white rounded-xl font-black text-sm tracking-widest shadow-sm shadow-primary/20 transition-all flex items-center justify-center gap-3"
                                     >
                                         📥 BAŞVURU PAKETİNİ İNDİR (PDF)
                                     </button>
                                 </div>
                             ) : (
-                                <form onSubmit={handleSaveCredentials} className="card glass p-6 space-y-6">
+                                <form onSubmit={handleSaveCredentials} className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
                                     <div className="flex items-center gap-4 border-b border-white/5 pb-4">
                                         <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-2xl">🔑</div>
                                         <div>
@@ -345,7 +345,7 @@ export default function BankOnboardingHub() {
                                         <button
                                             type="submit"
                                             disabled={isSaving || !isFormValid() || testResults?.permission.status !== 'PASS'}
-                                            className={`flex-1 h-14 rounded-xl font-black text-sm tracking-widest transition-all ${isSaving || !isFormValid() || testResults?.permission.status !== 'PASS' ? 'bg-white/5 text-white/20 cursor-not-allowed' : 'bg-primary text-white shadow-xl shadow-primary/20'}`}
+                                            className={`flex-1 h-14 rounded-xl font-black text-sm tracking-widest transition-all ${isSaving || !isFormValid() || testResults?.permission.status !== 'PASS' ? 'bg-white/5 text-white/20 cursor-not-allowed' : 'bg-primary text-white shadow-sm shadow-primary/20'}`}
                                         >
                                             {isSaving ? 'KAYDEDİLİYOR...' : '🚀 AKTİF ET & KAYDET'}
                                         </button>
@@ -353,7 +353,7 @@ export default function BankOnboardingHub() {
 
                                     <div className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-2 h-2 rounded-full shadow-[0_0_8px] ${currentStepStatus === 'ACTIVE' ? 'bg-emerald-500 shadow-emerald-500/60' : currentStepStatus === 'PENDING_ACTIVATION' ? 'bg-amber-500 shadow-amber-500/60' : 'bg-blue-500 shadow-blue-500/60'}`}></div>
+                                            <div className={`w-2 h-2 rounded-full shadow-[0_0_8px] ${currentStepStatus === 'ACTIVE' ? 'bg-emerald-500 ' : currentStepStatus === 'PENDING_ACTIVATION' ? 'bg-amber-500 shadow-amber-500/60' : 'bg-blue-500 shadow-blue-500/60'}`}></div>
                                             <span className="text-[10px] font-black text-white/60 uppercase">Mevcut Durum:</span>
                                         </div>
                                         <span className={`px-2 py-1 rounded text-[10px] font-black ${currentStepStatus === 'ACTIVE' ? 'bg-emerald-500/20 text-emerald-400' : currentStepStatus === 'PENDING_ACTIVATION' ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-500/20 text-slate-400'}`}>

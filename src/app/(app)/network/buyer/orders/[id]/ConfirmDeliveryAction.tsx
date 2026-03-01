@@ -59,7 +59,7 @@ export default function ConfirmDeliveryAction({
                     className={`w-full py-3 px-4 rounded-xl text-sm font-semibold transition-all flex justify-center items-center gap-2
               ${!allShipmentsDelivered
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
-                            : 'bg-black text-white hover:bg-gray-800 active:scale-[0.98] shadow-md border border-gray-900'}`}
+                            : 'bg-black text-white hover:bg-gray-800 active:scale-[0.98] shadow-sm border border-gray-900'}`}
                 >
                     {loading ? <span className="animate-spin border-2 border-white/20 border-t-white rounded-full w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                     {loading ? 'Onaylanıyor...' : 'Alımı Onaylıyorum'}

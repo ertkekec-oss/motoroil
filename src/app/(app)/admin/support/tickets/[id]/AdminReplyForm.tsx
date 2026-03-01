@@ -160,7 +160,7 @@ export default function AdminReplyForm({ ticketId, currentStatus }: { ticketId: 
                 <button
                     type="submit"
                     disabled={loading || uploading || (!body.trim() && files.length === 0)}
-                    className={`px-6 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 ${isInternal ? 'bg-yellow-600 hover:bg-yellow-500 shadow-yellow-500/20' : 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/20'}`}
+                    className={`px-6 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-sm disabled:opacity-50 ${isInternal ? 'bg-yellow-600 hover:bg-yellow-500 shadow-yellow-500/20' : 'bg-orange-600 hover:bg-orange-500 '}`}
                 >
                     {loading ? 'Gönderiliyor...' : isInternal ? 'İç Not Ekle' : 'Müşteriye Gönder'}
                 </button>

@@ -65,7 +65,7 @@ export default async function SellerProductsPage() {
 
                     <div className="overflow-auto flex-1 relative custom-scrollbar">
                         <table className="min-w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-slate-50/80 dark:bg-slate-900/80 text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold border-b border-slate-100 dark:border-white/5 sticky top-0 z-10 backdrop-blur-md">
+                            <thead className="bg-slate-50/80 dark:bg-slate-900/80 text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold border-b border-slate-100 dark:border-white/5 sticky top-0 z-10 ">
                                 <tr>
                                     <th className="px-6 py-4 font-bold">ERP Code</th>
                                     <th className="px-6 py-4 font-bold">Product Name</th>

@@ -581,7 +581,7 @@ export default function Sidebar() {
                     background: var(--sb-surface);
                     color: var(--sb-text);
                     border: 1px solid var(--sb-border);
-                    backdrop-filter: blur(6px);
+                    
                 }
                 :global([data-theme="dark"]) .pdy-sb-avatar {
                     background: rgba(255,255,255,0.03);

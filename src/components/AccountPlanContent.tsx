@@ -312,7 +312,7 @@ export default function AccountPlanContent() {
 
             {/* ADD ACCOUNT MODAL */}
             {showAddModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowAddModal(false)}>
+                <div className="fixed inset-0 bg-black/80  z-50 flex items-center justify-center p-4" onClick={() => setShowAddModal(false)}>
                     <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[24px] w-full max-w-md p-8 shadow-2xl" onClick={e => e.stopPropagation()}>
                         <h3 className="text-xl font-bold mb-6">
                             {newAccount.parentCode ? `Alt Hesap Ekle (${newAccount.parentCode})` : 'Yeni Ana Hesap Ekle'}
@@ -366,7 +366,7 @@ export default function AccountPlanContent() {
                             </button>
                             <button
                                 onClick={handleAddAccount}
-                                className="flex-1 py-4 text-[13px] h-[52px] rounded-[12px] bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-white font-bold transition-colors shadow-lg shadow-blue-500/20"
+                                className="flex-1 py-4 text-[13px] h-[52px] rounded-[12px] bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-white font-bold transition-colors shadow-sm "
                             >
                                 Kaydet
                             </button>

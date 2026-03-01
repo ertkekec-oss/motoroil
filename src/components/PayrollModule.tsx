@@ -71,7 +71,7 @@ export default function PayrollModule() {
                 </div>
             </div>
 
-            <div className="overflow-x-auto card glass p-0">
+            <div className="overflow-x-auto card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-0">
                 <table className="table w-full">
                     <thead className="bg-black/20 text-gray-400">
                         <tr>

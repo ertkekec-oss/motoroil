@@ -98,22 +98,22 @@ export default function SupplierReportContent() {
             </header>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '30px' }}>
-                <div className="card glass-plus" style={{ padding: '24px', borderLeft: '4px solid var(--primary)' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderLeft: '4px solid var(--primary)' }}>
                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 'bold' }}>DÖNEMLİK ALIM HACMİ</div>
                     <div style={{ fontSize: '32px', fontWeight: '900', marginTop: '5px' }}>₺{totalStats.totalPurchase.toLocaleString()}</div>
                 </div>
-                <div className="card glass-plus" style={{ padding: '24px', borderLeft: '4px solid var(--success)' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderLeft: '4px solid var(--success)' }}>
                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 'bold' }}>DÖNEMLİK ÖDEMELER</div>
                     <div style={{ fontSize: '32px', fontWeight: '900', marginTop: '5px' }}>₺{totalStats.totalPayment.toLocaleString()}</div>
                 </div>
-                <div className="card glass-plus" style={{ padding: '24px', borderLeft: '4px solid var(--error)' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderLeft: '4px solid var(--error)' }}>
                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 'bold' }}>GÜNCEL TOPLAM BORÇ</div>
                     <div style={{ fontSize: '32px', fontWeight: '900', marginTop: '5px', color: 'var(--error)' }}>₺{totalStats.totalDebt.toLocaleString()}</div>
                 </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '30px' }}>
-                <div className="card glass" style={{ padding: '24px' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '24px' }}>
                     <h3 style={{ marginBottom: '20px' }}>📊 En Çok Alım Yapılan Tedarikçiler</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={supplierStats.slice(0, 8)}>
@@ -126,7 +126,7 @@ export default function SupplierReportContent() {
                     </ResponsiveContainer>
                 </div>
 
-                <div className="card glass" style={{ padding: '24px' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '24px' }}>
                     <h3 style={{ marginBottom: '20px' }}>🥧 Tedarikçi Dağılımı</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
@@ -148,7 +148,7 @@ export default function SupplierReportContent() {
                 </div>
             </div>
 
-            <div className="card glass" style={{ padding: '0', overflow: 'hidden' }}>
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '0', overflow: 'hidden' }}>
                 <div style={{ padding: '20px', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between' }}>
                     <h3 style={{ margin: 0 }}>📝 Tedarikçi Detay Listesi</h3>
                 </div>

@@ -93,7 +93,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                         <span>🖨️</span>
                         Yazdır
                     </button>
-                    <button className="px-6 py-3 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                    <button className="px-6 py-3 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest shadow-sm shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
                         E-Fatura Gönder
                     </button>
                 </div>
@@ -160,7 +160,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                     </div>
 
                     {/* PARTS & LABOR TABLE */}
-                    <div className="bg-white/5 border border-white/10 rounded-[40px] overflow-hidden shadow-xl">
+                    <div className="bg-white/5 border border-white/10 rounded-[40px] overflow-hidden shadow-sm">
                         <div className="p-8 border-b border-white/5 flex justify-between items-center">
                             <h3 className="text-sm font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
                                 <span className="w-8 h-[2px] bg-primary"></span>
@@ -234,7 +234,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
 
                     {/* SUMMARY CARD */}
                     <div className="bg-[#1a1c2e] rounded-[40px] border border-white/10 p-8 shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full  -translate-y-1/2 translate-x-1/2"></div>
 
                         <h3 className="text-lg font-black text-white mb-8 border-b border-white/5 pb-4">Finansal Özet</h3>
 

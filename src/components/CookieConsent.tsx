@@ -102,7 +102,7 @@ export default function CookieConsent() {
             {showPreferences && (
                 <div
                     className="fixed inset-0 z-[9998]"
-                    style={{ backgroundColor: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
+                    style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
                     onClick={() => setShowPreferences(false)}
                     aria-hidden="true"
                 />

@@ -20,7 +20,7 @@ export default function Roles() {
                     {ROLES.map(r => (
                         <div key={r.title}
                             className="p-5 rounded-2xl border border-white/5 hover:border-orange-500/20 transition-all group"
-                            style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                            style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>
                             <div className="text-3xl mb-3">{r.icon}</div>
                             <h3 className="font-bold text-white text-sm mb-1.5 group-hover:text-orange-400 transition-colors">{r.title}</h3>
                             <p className="text-xs text-gray-500 leading-relaxed">{r.desc}</p>

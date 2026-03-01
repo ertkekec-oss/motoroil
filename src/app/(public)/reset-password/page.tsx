@@ -47,7 +47,7 @@ function ResetPasswordContent() {
     }
 
     return (
-        <div className="card glass-plus animate-scale-up" style={{
+        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus animate-scale-up" style={{
             width: '100%', maxWidth: '440px',
             padding: '50px 40px',
             borderRadius: '24px',

@@ -265,7 +265,7 @@ export default function CheckModule() {
                                     <tr key={item.id} className="hover:bg-white/[0.02] transition-colors group">
                                         <td className="p-6">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-2 h-2 rounded-full ${item.type === 'In' ? 'bg-emerald-500' : 'bg-rose-500 shadow-lg shadow-rose-500/50 pulse-error'}`} />
+                                                <div className={`w-2 h-2 rounded-full ${item.type === 'In' ? 'bg-emerald-500' : 'bg-rose-500 shadow-sm  pulse-error'}`} />
                                                 <div className="flex flex-col">
                                                     <span className={`text-[11px] font-black ${item.type === 'In' ? 'text-emerald-400' : 'text-rose-400'}`}>
                                                         {item.type === 'In' ? 'ALINAN' : 'VERİLEN'}
@@ -294,7 +294,7 @@ export default function CheckModule() {
                                                 {item.status === 'Portföyde' && (
                                                     <button
                                                         onClick={() => handleStatusChange(item.id, item.type === 'In' ? 'Tahsil Edildi' : 'Ödendi')}
-                                                        className="px-4 py-2 rounded-[12px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white text-[10px] font-black shadow-lg shadow-blue-500/20 transition-all active:scale-95"
+                                                        className="px-4 py-2 rounded-[12px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white text-[10px] font-black shadow-sm  transition-all active:scale-95"
                                                     >
                                                         {item.type === 'In' ? 'TAHSİL ET' : 'ÖDEME YAP'}
                                                     </button>
@@ -428,7 +428,7 @@ export default function CheckModule() {
                             </div>
                         </div>
 
-                        <button type="submit" className="w-full py-5 rounded-[24px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white font-black text-[14px] shadow-2xl shadow-blue-500/20 active:scale-[0.98] transition-all">
+                        <button type="submit" className="w-full py-5 rounded-[24px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white font-black text-[14px] shadow-2xl  active:scale-[0.98] transition-all">
                             ✅ KAYDI SİSTEME İŞLE
                         </button>
                     </form>

@@ -92,7 +92,7 @@ export default function FieldSalesAgentDashboard() {
                     <div className="flex flex-wrap gap-3">
                         <button
                             onClick={() => router.push('/field-mobile/routes')}
-                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg shadow-blue-900/20 flex items-center gap-2 text-sm"
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-sm shadow-blue-900/20 flex items-center gap-2 text-sm"
                         >
                             <span>📱</span> MOBİL GÖRÜNÜM
                         </button>
@@ -277,7 +277,7 @@ export default function FieldSalesAgentDashboard() {
                                 key={card.path}
                                 onClick={() => router.push(card.path)}
                                 className={`p-6 rounded-2xl cursor-pointer hover:scale-[1.02] transition-all group ${card.featured
-                                    ? `bg-gradient-to-br ${card.accent} shadow-xl shadow-blue-900/20`
+                                    ? `bg-gradient-to-br ${card.accent} shadow-sm shadow-blue-900/20`
                                     : 'bg-[#161b22] border border-white/5 hover:border-white/15'
                                     }`}
                             >

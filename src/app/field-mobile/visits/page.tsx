@@ -178,7 +178,7 @@ export default function MobileVisitsPage() {
 
             {/* Edit Modal */}
             {editingVisit && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-end">
+                <div className="fixed inset-0 bg-black/90  z-50 flex items-end">
                     <div className="w-full bg-[#0f111a] border border-white/10 rounded-t-[2rem] p-6 space-y-5 max-h-[85vh] overflow-y-auto">
                         <div className="flex justify-between items-center">
                             <div>

@@ -498,7 +498,7 @@ export default function AdminPdksPage() {
 
             {/* Modal for Creating/Editing Display */}
             {isModalOpen && (
-                <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
+                <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4  animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
                     <div className={`w-full max-w-lg overflow-hidden rounded-[20px] border shadow-2xl ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
                         <div className="p-6 md:p-8">
                             <div className="flex justify-between items-start mb-6">

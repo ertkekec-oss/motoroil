@@ -94,7 +94,7 @@ export default function PartialShipmentManager({
             <button
                 onClick={handleShipItems}
                 disabled={loading}
-                className="w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-xl shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
                 {loading ? <span className="animate-spin border-2 border-white/20 border-t-white rounded-full w-4 h-4" /> : <FileText className="w-4 h-4" />}
                 {loading ? 'Barkod Üretiliyor...' : 'Barkod Üret & Gönder'}

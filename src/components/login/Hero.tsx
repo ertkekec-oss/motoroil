@@ -77,7 +77,7 @@ export default function Hero({ onDemoClick }: HeroProps) {
                         </div>
                     </div>
                     {/* Glow beneath */}
-                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-20 blur-2xl opacity-30 rounded-full"
+                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-20  opacity-30 rounded-full"
                         style={{ background: '#FF5500' }} />
                 </div>
             </div>

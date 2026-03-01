@@ -262,7 +262,7 @@ function PaymentContent() {
                                         transition: 'all 0.2s',
                                         position: 'relative'
                                     }}
-                                    className="hover:-translate-y-1 hover:shadow-md"
+                                    className="hover:-translate-y-1 hover:shadow-sm"
                                 >
                                     <div style={{
                                         width: '40px', height: '40px', borderRadius: '12px',
@@ -447,7 +447,7 @@ function PaymentContent() {
                             gap: '12px',
                             boxShadow: `0 8px 32px ${paymentType === 'payable' ? 'rgba(239, 68, 68, 0.4)' : 'rgba(59, 130, 246, 0.4)'}`
                         }}
-                        className="hover:-translate-y-1 hover:shadow-lg"
+                        className="hover:-translate-y-1 hover:shadow-sm"
                     >
                         {isProcessing ? (
                             <>

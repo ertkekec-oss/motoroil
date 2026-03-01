@@ -14,7 +14,7 @@ export default function Partners() {
                     {PARTNERS.map(p => (
                         <div key={p}
                             className="px-4 py-2 rounded-xl border border-white/5 text-xs font-bold text-gray-500 hover:text-gray-300 hover:border-white/15 transition-all"
-                            style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                            style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>
                             {p}
                         </div>
                     ))}

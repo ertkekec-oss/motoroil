@@ -78,7 +78,7 @@ export default function InvoicedSalesPage() {
                 <div className="flex-col gap-6">
 
                     {/* 1. FATURA AYARLARI */}
-                    <div className="card glass grid-cols-3 gap-4">
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm grid-cols-3 gap-4">
                         <div className="flex-col gap-2">
                             <label className="text-muted" style={{ fontSize: '11px' }}>FATURA TÜRÜ</label>
                             <select value={invoiceType} onChange={(e: any) => setInvoiceType(e.target.value)} style={{ padding: '10px', background: 'var(--bg-deep)', border: '1px solid var(--border-light)', color: 'white', borderRadius: '6px' }}>
@@ -102,7 +102,7 @@ export default function InvoicedSalesPage() {
                     </div>
 
                     {/* 2. MÜŞTERİ SEÇİMİ / BİLGİSİ */}
-                    <div className="card glass">
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                         <h3 className="mb-4">Müşteri / Cari Bilgileri</h3>
 
                         {customerType === 'registered' && (
@@ -129,7 +129,7 @@ export default function InvoicedSalesPage() {
                     </div>
 
                     {/* 3. ÜRÜN KALEMLERİ */}
-                    <div className="card glass">
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                         <h3 className="mb-4">Ürünler & Kalemler</h3>
 
                         <div className="flex-center gap-2 mb-6" style={{ background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '8px' }}>
@@ -173,7 +173,7 @@ export default function InvoicedSalesPage() {
 
                 {/* RIGHT: SUMMARY AREA */}
                 <div className="flex-col gap-6">
-                    <div className="card glass" style={{ position: 'sticky', top: '20px', border: '1px solid var(--primary)' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ position: 'sticky', top: '20px', border: '1px solid var(--primary)' }}>
                         <h3 className="mb-6">Özet & Toplam</h3>
 
                         <div className="flex-col gap-3 mb-6" style={{ fontSize: '14px' }}>

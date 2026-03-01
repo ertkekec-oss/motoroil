@@ -118,7 +118,7 @@ export default function FieldSalesConfigPage() {
                             <button
                                 onClick={handleSaveConfig}
                                 disabled={saving}
-                                className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-black transition-all shadow-lg shadow-blue-900/20"
+                                className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-black transition-all shadow-sm shadow-blue-900/20"
                             >
                                 {saving ? 'KAYDEDİLİYOR...' : 'AYARLARI KAYDET'}
                             </button>

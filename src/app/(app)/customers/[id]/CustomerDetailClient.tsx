@@ -544,7 +544,6 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 background: 'var(--bg-panel, rgba(15, 23, 42, 0.6))',
                 borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))',
                 padding: '24px 40px',
-                backdropFilter: 'blur(12px)',
                 position: 'sticky',
                 top: 0,
                 zIndex: 40
@@ -811,8 +810,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 <div style={{
                                     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
                                     background: 'rgba(15, 23, 42, 0.85)', zIndex: 9999,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    backdropFilter: 'blur(12px)'
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
                                 }} onClick={() => setQrPlate(null)}>
                                     <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-card, #1e293b)', padding: '40px', borderRadius: '24px', textAlign: 'center', maxWidth: '360px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }} className="animate-scale-in">
                                         <div style={{ fontSize: '48px', marginBottom: '16px' }}>📱</div>
@@ -924,7 +922,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             ) : (
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
                                     {documents.map(doc => (
-                                        <div key={doc.id} className="glass hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-xl" style={{ padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', background: 'var(--bg-card, rgba(255,255,255,0.03))', display: 'flex', flexDirection: 'column', alignItems: 'center', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                        <div key={doc.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-sm" style={{ padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', background: 'var(--bg-card, rgba(255,255,255,0.03))', display: 'flex', flexDirection: 'column', alignItems: 'center', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                                             <div style={{ fontSize: '48px', marginBottom: '16px', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))' }}>
                                                 {doc.fileType?.includes('pdf') ? '📄' : '🖼️'}
                                             </div>
@@ -967,7 +965,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             ) : (
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                     {warranties.map(w => (
-                                        <div key={w.id} className="glass hover:border-blue-500/30" style={{
+                                        <div key={w.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-500/30" style={{
                                             padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color, rgba(255,255,255,0.08))',
                                             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                                             background: 'linear-gradient(90deg, var(--bg-card, rgba(255,255,255,0.03)) 0%, rgba(255,255,255,0) 100%)',
@@ -1327,8 +1325,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* INVOICE MODAL (Professional E-Fatura Style) */}
             {
                 invoiceModalOpen && selectedOrder && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
-                        <div className="card glass animate-scale-in" style={{ width: '1200px', maxWidth: '98vw', padding: 0, border: '1px solid rgba(59, 130, 246, 0.4)', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(59, 130, 246, 0.1)' }}>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '1200px', maxWidth: '98vw', padding: 0, border: '1px solid rgba(59, 130, 246, 0.4)', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(59, 130, 246, 0.1)' }}>
                             {/* Header */}
                             <div style={{ padding: '24px 40px', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%)', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
@@ -1634,7 +1632,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             </div>
 
                             {/* Footer Actions */}
-                            <div style={{ padding: '24px 40px', background: 'var(--bg-panel, rgba(15, 23, 42, 0.95))', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', gap: '20px', justifyContent: 'flex-end', backdropFilter: 'blur(20px)' }}>
+                            <div style={{ padding: '24px 40px', background: 'var(--bg-panel, rgba(15, 23, 42, 0.95))', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', gap: '20px', justifyContent: 'flex-end' }}>
                                 <button onClick={() => setInvoiceModalOpen(false)} className="btn btn-outline" style={{ minWidth: '160px', height: '60px', borderRadius: '16px', fontWeight: '800', fontSize: '15px', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', color: 'var(--text-main, #fff)', background: 'var(--bg-card, rgba(255,255,255,0.05))', letterSpacing: '1px' }}>İPTAL ET</button>
                                 <button
                                     disabled={isConverting}
@@ -1667,8 +1665,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
             {/* INVOICE SUCCESS & SHARE MODAL */}
             {shareModalOpen && lastInvoice && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.9)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(20px)' }}>
-                    <div className="card glass animate-scale-in" style={{ width: '480px', padding: '48px 40px', borderRadius: '32px', textAlign: 'center', border: '1px solid rgba(16, 185, 129, 0.4)', background: 'var(--bg-panel, #0f172a)', boxShadow: '0 24px 60px rgba(0,0,0,0.5), 0 0 60px rgba(16, 185, 129, 0.15)' }}>
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.9)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '480px', padding: '48px 40px', borderRadius: '32px', textAlign: 'center', border: '1px solid rgba(16, 185, 129, 0.4)', background: 'var(--bg-panel, #0f172a)', boxShadow: '0 24px 60px rgba(0,0,0,0.5), 0 0 60px rgba(16, 185, 129, 0.15)' }}>
                         <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%)', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '64px', margin: '0 auto 32px', boxShadow: '0 12px 30px rgba(16, 185, 129, 0.2)' }}>
                             🎉
                         </div>
@@ -1719,8 +1717,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* ADDITIONAL TAX MODAL */}
             {
                 taxEditIndex !== null && invoiceItems[taxEditIndex] && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 5000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
-                        <div className="card glass animate-scale-in" style={{ width: '480px', padding: '40px', borderRadius: '24px', background: 'var(--bg-panel, #0f172a)', border: '1px solid rgba(59, 130, 246, 0.4)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 5000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '480px', padding: '40px', borderRadius: '24px', background: 'var(--bg-panel, #0f172a)', border: '1px solid rgba(59, 130, 246, 0.4)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
                             <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
                                 <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
                                     <span style={{ fontSize: '24px' }}>⚙️</span> Ek Vergi Parametreleri
@@ -1784,7 +1782,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                 <button
                                     onClick={() => setTaxEditIndex(null)}
                                     style={{ width: '100%', marginTop: '24px', padding: '18px', borderRadius: '16px', border: 'none', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', fontWeight: '900', cursor: 'pointer', boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)', fontSize: '15px', letterSpacing: '1px', transition: 'all 0.2s' }}
-                                    className="hover:-translate-y-1 hover:shadow-lg"
+                                    className="hover:-translate-y-1 hover:shadow-sm"
                                 >
                                     AYARLARI ONAYLA ✅
                                 </button>
@@ -1796,8 +1794,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
             {/* WARRANTY START MODAL */}
             {warrantyModalOpen && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
-                    <div className="card glass animate-scale-in" style={{ width: '520px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 24px 60px rgba(0,0,0,0.4)', }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '520px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 24px 60px rgba(0,0,0,0.4)', }}>
                         <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
                             <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
                                 <span style={{ fontSize: '24px' }}>🛡️</span> Garanti Başlat
@@ -1895,7 +1893,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                             <button
                                 onClick={handleStartWarranty}
-                                className="btn btn-primary hover:-translate-y-1 hover:shadow-xl"
+                                className="btn btn-primary hover:-translate-y-1 hover:shadow-sm"
                                 style={{ marginTop: '24px', padding: '18px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', transition: 'all 0.2s', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                             >
                                 <span>✅</span> GARANTİYİ BAŞLAT VE ONAYLA
@@ -1908,8 +1906,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             {/* PRODUCT PICKER MODAL */}
             {
                 isProductPickerOpen && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
-                        <div className="card glass animate-scale-in" style={{ width: '700px', maxWidth: '95vw', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', background: 'var(--bg-panel, #0f172a)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '700px', maxWidth: '95vw', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', background: 'var(--bg-panel, #0f172a)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                                 <div>
                                     <h3 style={{ margin: 0, fontSize: '24px', fontWeight: '900', color: 'var(--text-main, white)' }}>Envanterden Ürün Seçimi</h3>
@@ -1976,7 +1974,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                                     setProductSearchTerm('');
                                                 }}
                                                 style={{ padding: '20px', borderRadius: '20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.2s' }}
-                                                className="hover:border-blue-500/50 hover:bg-blue-500/5 hover:-translate-y-0.5 hover:shadow-lg"
+                                                className="hover:border-blue-500/50 hover:bg-blue-500/5 hover:-translate-y-0.5 hover:shadow-sm"
                                             >
                                                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                                                     <div style={{ width: '52px', height: '52px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', color: '#3b82f6', fontWeight: '800', boxShadow: 'inset 0 0 12px rgba(59, 130, 246, 0.2)' }}>
@@ -2020,10 +2018,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 <div style={{
                     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
                     background: 'rgba(15, 23, 42, 0.85)', zIndex: 10000,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    backdropFilter: 'blur(16px)'
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
-                    <div className="card glass animate-scale-in" style={{ background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', width: '100%', maxWidth: '440px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', width: '100%', maxWidth: '440px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                             <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-main, #fff)', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
                                 <span>{activeCheck.type.includes('Alınan') ? '📥' : '📤'}</span>
@@ -2064,7 +2061,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                                     boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', letterSpacing: '1px',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
                                 }}
-                                className={(!isProcessingCollection && targetKasaId) ? "hover:-translate-y-1 hover:shadow-xl" : ""}
+                                className={(!isProcessingCollection && targetKasaId) ? "hover:-translate-y-1 hover:shadow-sm" : ""}
                             >
                                 {isProcessingCollection ? (
                                     <><div className="loader border-t-white w-4 h-4 rounded-full border-2 border-white/20 animate-spin"></div> İŞLENİYOR...</>
@@ -2079,8 +2076,8 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
             {/* PLAN MODAL */}
             {showPlanModal && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(16px)' }}>
-                    <div className="card glass animate-scale-in" style={{ width: '520px', maxWidth: '90vw', border: '1px solid rgba(245, 158, 11, 0.3)', background: 'var(--bg-panel, #0f172a)', padding: '0', borderRadius: '32px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '520px', maxWidth: '90vw', border: '1px solid rgba(245, 158, 11, 0.3)', background: 'var(--bg-panel, #0f172a)', padding: '0', borderRadius: '32px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
                         <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%)' }}>
                             <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
                                 <span style={{ padding: '8px', background: '#f59e0b', borderRadius: '12px', fontSize: '18px', boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)' }}>📅</span>
@@ -2148,7 +2145,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
                             <button
                                 onClick={handleSavePlan}
-                                className="btn btn-primary hover:-translate-y-1 hover:shadow-xl"
+                                className="btn btn-primary hover:-translate-y-1 hover:shadow-sm"
                                 style={{ marginTop: '20px', padding: '18px', width: '100%', justifyContent: 'center', borderRadius: '16px', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(245, 158, 11, 0.3)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}
                             >
                                 <span>✅</span> ÖDEME PLANINI OLUŞTUR

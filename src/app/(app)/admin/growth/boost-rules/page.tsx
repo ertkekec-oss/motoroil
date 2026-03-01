@@ -167,7 +167,7 @@ export default function AdminBoostRules() {
 
             {showModal && (
                 <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg border">
+                    <div className="bg-white rounded-xl shadow-sm p-6 w-full max-w-lg border">
                         <h2 className="text-lg font-bold text-slate-800 mb-4">Yeni Boost Kuralı Ekle</h2>
 
                         {(targetType === 'SELLER') && (

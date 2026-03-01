@@ -125,7 +125,7 @@ export default function CommandPalette({ isAdmin = false }: CommandPaletteProps)
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-[15vh] px-4 bg-slate-900/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-[15vh] px-4 bg-slate-900/50 ">
             <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden flex flex-col font-sans">
                 <Command
                     className="w-full h-full"

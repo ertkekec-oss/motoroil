@@ -15,7 +15,7 @@ export default function TransactionDetailModal({ isOpen, onClose, transaction }:
 
     return (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
-            <div className="card glass animate-in" style={{ width: '600px', background: 'var(--bg-card)', padding: '24px' }}>
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-in" style={{ width: '600px', background: 'var(--bg-card)', padding: '24px' }}>
                 <div className="flex-between mb-6">
                     <h3>📄 İşlem Detayı</h3>
                     <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>×</button>

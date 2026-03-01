@@ -39,7 +39,7 @@ export default function InvoicesPage() {
             </header>
 
             {/* Main Content Card */}
-            <div className="card glass" style={{ minHeight: '600px' }}>
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ minHeight: '600px' }}>
 
                 {/* Tabs */}
                 <div className="flex-center" style={{ justifyContent: 'flex-start', borderBottom: '1px solid var(--border-light)', marginBottom: '24px' }}>

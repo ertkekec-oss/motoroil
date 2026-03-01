@@ -30,7 +30,7 @@ export default function CashflowForecastChart() {
 
     if (loading) {
         return (
-            <div className="card glass p-8 animate-pulse flex flex-col items-center justify-center min-h-[300px]">
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-8 animate-pulse flex flex-col items-center justify-center min-h-[300px]">
                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                 <div className="text-gray-400">Yapay Zeka Nakit Akışını Hesaplıyor...</div>
             </div>
@@ -52,7 +52,7 @@ export default function CashflowForecastChart() {
     }));
 
     return (
-        <div className="card glass p-6 relative overflow-hidden group">
+        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 relative overflow-hidden group">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 z-10 relative">
                 <div>

@@ -107,7 +107,7 @@ export default function HelpManager({ initialCategories, tenantId }: { initialCa
                 <button
                     onClick={() => openTopicModal()}
                     disabled={categories.length === 0}
-                    className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl shadow-lg shadow-orange-500/20 transition-all disabled:opacity-50 disabled:bg-slate-300 disabled:shadow-none"
+                    className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl shadow-sm  transition-all disabled:opacity-50 disabled:bg-slate-300 disabled:shadow-none"
                     title={categories.length === 0 ? "Önce bir kategori eklemelisiniz" : ""}
                 >
                     + Konu Ekle (Makale)
@@ -165,7 +165,7 @@ export default function HelpManager({ initialCategories, tenantId }: { initialCa
             </div>
 
             {showCatModal && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center z-[3000] p-4">
+                <div className="fixed inset-0 bg-slate-900/60  flex justify-center items-center z-[3000] p-4">
                     <form onSubmit={saveCategory} className="bg-white border border-slate-200 p-8 rounded-2xl shadow-2xl w-full max-w-md">
                         <h3 className="text-xl font-bold text-slate-900 mb-6">Yeni Kategori Ekle</h3>
                         {error && <div className="mb-4 text-rose-600 text-sm bg-rose-50 border border-rose-100 p-3 rounded-xl">{error}</div>}
@@ -185,14 +185,14 @@ export default function HelpManager({ initialCategories, tenantId }: { initialCa
                         </div>
                         <div className="flex justify-end gap-3 mt-8">
                             <button type="button" onClick={() => setShowCatModal(false)} className="px-6 py-2.5 text-slate-500 font-bold hover:text-slate-700">İptal</button>
-                            <button type="submit" disabled={loading} className="px-8 py-2.5 bg-orange-600 text-white rounded-xl font-bold shadow-lg shadow-orange-500/20 disabled:opacity-50">Kaydet</button>
+                            <button type="submit" disabled={loading} className="px-8 py-2.5 bg-orange-600 text-white rounded-xl font-bold shadow-sm  disabled:opacity-50">Kaydet</button>
                         </div>
                     </form>
                 </div>
             )}
 
             {showTopicModal && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center z-[3000] p-4">
+                <div className="fixed inset-0 bg-slate-900/60  flex justify-center items-center z-[3000] p-4">
                     <form onSubmit={saveTopic} className="bg-white border border-slate-200 p-8 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
                         <h3 className="text-2xl font-black text-slate-900 mb-6">{topicForm.id ? 'Makale Düzenle' : 'Yeni Makale Ekle'}</h3>
                         {error && <div className="mb-6 text-rose-600 text-sm bg-rose-50 border border-rose-100 p-4 rounded-xl font-medium">{error}</div>}
@@ -247,7 +247,7 @@ export default function HelpManager({ initialCategories, tenantId }: { initialCa
 
                         <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-slate-100">
                             <button type="button" onClick={() => setShowTopicModal(false)} className="px-6 py-2.5 text-slate-500 font-bold hover:text-slate-700">İptal</button>
-                            <button type="submit" disabled={loading} className="px-10 py-2.5 bg-orange-600 text-white rounded-xl font-bold shadow-lg shadow-orange-500/20 disabled:opacity-50">Değişiklikleri Kaydet</button>
+                            <button type="submit" disabled={loading} className="px-10 py-2.5 bg-orange-600 text-white rounded-xl font-bold shadow-sm  disabled:opacity-50">Değişiklikleri Kaydet</button>
                         </div>
                     </form>
                 </div>

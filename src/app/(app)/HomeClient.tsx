@@ -377,7 +377,7 @@ function POSContent() {
             ) : <div className="h-24 flex items-center justify-center text-xs opacity-30">Veri yükleniyor...</div>}
           </div>
 
-          <div className={theme === 'light' ? "lg:col-span-3 card flex flex-col justify-center relative cursor-pointer" : "lg:col-span-3 bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/30 rounded-2xl p-4 shadow-lg min-h-[160px] relative cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-center"}>
+          <div className={theme === 'light' ? "lg:col-span-3 card flex flex-col justify-center relative cursor-pointer" : "lg:col-span-3 bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/30 rounded-2xl p-4 shadow-sm min-h-[160px] relative cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-center"}>
             <div className={theme === 'light' ? "w-4 h-4 rounded-full bg-emerald-500 mb-4" : "hidden"}></div>
             <div className={theme === 'light' ? "text-4xl font-black text-pos leading-none" : "text-4xl font-black text-amber-500"}>{stats.criticalStock + stats.inTransit}</div>
             <div className={theme === 'light' ? "text-xs font-medium text-muted-pos mt-2" : "text-[10px] opacity-60 mt-2"}>Kritik Stok & Bekleyen</div>
@@ -395,7 +395,7 @@ function POSContent() {
               value={searchInput} onChange={e => setSearchInput(e.target.value)}
               className={theme === 'light' ? "flex-1 bg-transparent border-none px-2 text-sm text-pos focus:outline-none placeholder:text-muted-pos/50" : "flex-1 bg-transparent border-none px-4 text-sm text-antigravity focus:outline-none"}
             />
-            <button type="submit" className={theme === 'light' ? "bg-primary hover:opacity-90 text-white px-6 py-2.5 rounded-lg text-xs font-bold transition-all shadow-md mr-1" : "bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-xs font-bold transition-colors"}>EKLE</button>
+            <button type="submit" className={theme === 'light' ? "bg-primary hover:opacity-90 text-white px-6 py-2.5 rounded-lg text-xs font-bold transition-all shadow-sm mr-1" : "bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-xs font-bold transition-colors"}>EKLE</button>
 
             {/* DYNAMIC PRODUCT LIST */}
             {filteredProducts.length > 0 && (
@@ -440,7 +440,7 @@ function POSContent() {
           ) : (
             <div className="space-y-3">
               {cart.map((item, idx) => (
-                <div key={idx} className={theme === 'light' ? "flex items-center gap-4 bg-white p-4 rounded-xl border border-border-pos shadow-sm hover:shadow-md transition-all group" : "flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5"}>
+                <div key={idx} className={theme === 'light' ? "flex items-center gap-4 bg-white p-4 rounded-xl border border-border-pos shadow-sm hover:shadow-sm transition-all group" : "flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5"}>
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-sm truncate">{item.name}</div>
                     <div className="text-[10px] opacity-40">{item.barcode}</div>
@@ -583,7 +583,7 @@ function POSContent() {
                   key={m.id}
                   onClick={() => setPaymentMode(m.id as any)}
                   className={`p-5 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${paymentMode === m.id
-                    ? (theme === 'light' ? 'bg-white border-primary shadow-lg ring-1 ring-primary/20 scale-[1.02] text-primary' : 'bg-white/10 border-primary text-white shadow-lg')
+                    ? (theme === 'light' ? 'bg-white border-primary shadow-sm ring-1 ring-primary/20 scale-[1.02] text-primary' : 'bg-white/10 border-primary text-white shadow-sm')
                     : (theme === 'light' ? 'bg-gray-50/50 border-gray-100 hover:bg-white hover:border-gray-200 text-gray-400' : 'bg-black/20 border-white/5 hover:bg-white/5 text-white/50')
                     }`}
                 >
@@ -637,8 +637,8 @@ function POSContent() {
           <button
             onClick={handleFinalize}
             disabled={isProcessing || cart.length === 0}
-            className={`w-full py-5 rounded-2xl font-black text-white shadow-xl transition-all duration-300 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed hover:scale-[1.03] active:scale-95 ${cart.length > 0
-              ? (theme === 'light' ? 'bg-primary shadow-primary/20' : 'bg-gradient-to-r from-orange-600 to-orange-400 shadow-orange-600/20')
+            className={`w-full py-5 rounded-2xl font-black text-white shadow-sm transition-all duration-300 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed hover:scale-[1.03] active:scale-95 ${cart.length > 0
+              ? (theme === 'light' ? 'bg-primary shadow-primary/20' : 'bg-gradient-to-r from-orange-600 to-orange-400 ')
               : 'bg-white/10 border border-white/5 text-white/30'
               }`}
           >
@@ -662,7 +662,7 @@ function POSContent() {
 
       {/* Customer Modal */}
       {isCustomerModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60  z-[100] flex items-center justify-center p-4">
           <div className={theme === 'light' ? "card w-full max-w-lg !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg p-6 shadow-2xl"}>
             <h3 className="text-xl font-bold mb-4">Müşteri Seçimi</h3>
             <input autoFocus placeholder="Müşteri ara..." value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 mb-4 text-white" />
@@ -684,7 +684,7 @@ function POSContent() {
 
       {/* Suspend Modal */}
       {showSuspendModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60  z-[100] flex items-center justify-center p-4">
           <div className={theme === 'light' ? "card w-full max-w-md !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-md p-6"}>
             <h3 className="text-xl font-bold mb-4">Satışı Beklemeye Al</h3>
             <input autoFocus placeholder="Etiket / İsim (Örn: Masa 5)" value={suspenseLabel} onChange={e => setSuspenseLabel(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 mb-4 text-white" />
@@ -698,7 +698,7 @@ function POSContent() {
 
       {/* Resumption Modal */}
       {showResumptionModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60  z-[100] flex items-center justify-center p-4">
           <div className={theme === 'light' ? "card w-full max-w-lg !p-8" : "bg-[#0f111a] border border-white/10 rounded-2xl w-full max-w-lg p-6"}>
             <h3 className="text-xl font-bold mb-4">Bekleyen Satışlar</h3>
             {suspendedSales.length === 0 ? (

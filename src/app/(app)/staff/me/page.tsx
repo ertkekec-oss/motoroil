@@ -23,7 +23,7 @@ import { v4 as uuidv4 } from 'uuid';
 // --- UI COMPONENTS ---
 
 const Card = ({ children, title, icon: Icon, className = "", theme }: any) => (
-    <div className={`card glass p-6 relative overflow-hidden group ${className}`}>
+    <div className={`card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 relative overflow-hidden group ${className}`}>
         <div className="flex justify-between items-center mb-6">
             <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
                 {Icon && <Icon className={`w-4 h-4 ${theme === 'light' ? 'text-primary' : 'text-emerald-500'}`} />} {title}
@@ -64,25 +64,25 @@ const DashboardView = ({
     <div className="space-y-8 animate-in fade-in duration-500">
         {/* Top Summary */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="card glass p-6 border-emerald-500/20">
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-emerald-500/20">
                 <IconActivity className={theme === 'light' ? "w-6 h-6 text-primary mb-4" : "w-6 h-6 text-emerald-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Performans Skoru</h4>
                 <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>92.4</p>
                 <p className={theme === 'light' ? "text-[10px] text-primary mt-2" : "text-[10px] text-emerald-500 mt-2"}>↑ %2.1 geçen aya göre</p>
             </div>
-            <div className="card glass p-6 border-indigo-500/20">
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-indigo-500/20">
                 <IconTrendingUp className={theme === 'light' ? "w-6 h-6 text-primary mb-4" : "w-6 h-6 text-indigo-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hedef Gerçekleşme</h4>
                 <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>%88</p>
                 <p className="text-[10px] text-gray-500 mt-2">Bu ayki hedefler</p>
             </div>
-            <div className="card glass p-6 border-amber-500/20">
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-amber-500/20">
                 <IconClock className={theme === 'light' ? "w-6 h-6 text-amber-600 mb-4" : "w-6 h-6 text-amber-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kalan İzin</h4>
                 <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>14</p>
                 <p className="text-[10px] text-gray-500 mt-2">Günlük bakiye</p>
             </div>
-            <div className="card glass p-6 border-rose-500/20">
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-rose-500/20">
                 <IconZap className={theme === 'light' ? "w-6 h-6 text-rose-500 mb-4" : "w-6 h-6 text-rose-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Aylık Mesai</h4>
                 <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>12.5</p>
@@ -169,7 +169,7 @@ const DashboardView = ({
                             <p className={theme === 'light' ? "text-sm font-black text-pos" : "text-sm font-black text-white"}>₺31,200</p>
                         </div>
                     </div>
-                    <button className={theme === 'light' ? "bg-primary text-white w-full py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg" : "btn-premium w-full py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2"}>
+                    <button className={theme === 'light' ? "bg-primary text-white w-full py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm" : "btn-premium w-full py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2"}>
                         <IconShield className="w-4 h-4" /> Kâğıtsız Bordro (PDF) İndir
                     </button>
                 </div>
@@ -182,7 +182,7 @@ const DashboardView = ({
                             onClick={handleQrCheckin}
                             className={theme === 'light' ? "bg-primary/10 hover:bg-primary/20 border border-primary/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group" : "bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group"}
                         >
-                            <div className={theme === 'light' ? "w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform" : "w-10 h-10 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform"}>
+                            <div className={theme === 'light' ? "w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-sm shadow-primary/20 group-hover:scale-110 transition-transform" : "w-10 h-10 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-sm shadow-indigo-500/20 group-hover:scale-110 transition-transform"}>
                                 <IconShield className="w-5 h-5 text-white" />
                             </div>
                             <span className={theme === 'light' ? "text-[10px] font-black text-pos uppercase tracking-widest text-center" : "text-[10px] font-black text-white uppercase tracking-widest text-center"}>Ofis Girişi (QR)</span>
@@ -192,7 +192,7 @@ const DashboardView = ({
                             onClick={handleGpsCheckin}
                             className={theme === 'light' ? "bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group" : "bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 p-4 rounded-3xl transition-all flex flex-col items-center gap-2 group"}
                         >
-                            <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform text-white">
+                            <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-sm  group-hover:scale-110 transition-transform text-white">
                                 <IconActivity className="w-5 h-5 text-white" />
                             </div>
                             <span className={theme === 'light' ? "text-[10px] font-black text-pos uppercase tracking-widest text-center" : "text-[10px] font-black text-white uppercase tracking-widest text-center"}>Saha Girişi (GPS)</span>
@@ -534,19 +534,19 @@ export default function PersonelPanel() {
             <div className="flex items-center gap-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl w-fit">
                 <button
                     onClick={() => setActiveTab('dashboard')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'dashboard' ? (theme === 'light' ? 'bg-primary text-white shadow-lg' : 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20') : 'text-gray-500 hover:text-white'}`}
+                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'dashboard' ? (theme === 'light' ? 'bg-primary text-white shadow-sm' : 'bg-indigo-500 text-white shadow-sm shadow-indigo-500/20') : 'text-gray-500 hover:text-white'}`}
                 >
                     <IconActivity className="w-4 h-4" /> Genel Durum
                 </button>
                 <button
                     onClick={() => setActiveTab('leave')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'leave' ? (theme === 'light' ? 'bg-primary text-white shadow-lg' : 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20') : 'text-gray-500 hover:text-white'}`}
+                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'leave' ? (theme === 'light' ? 'bg-primary text-white shadow-sm' : 'bg-indigo-500 text-white shadow-sm shadow-indigo-500/20') : 'text-gray-500 hover:text-white'}`}
                 >
                     <IconClock className="w-4 h-4" /> İzin Taleplerim
                 </button>
                 <button
                     onClick={() => setActiveTab('profile')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'profile' ? (theme === 'light' ? 'bg-primary text-white shadow-lg' : 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20') : 'text-gray-500 hover:text-white'}`}
+                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'profile' ? (theme === 'light' ? 'bg-primary text-white shadow-sm' : 'bg-indigo-500 text-white shadow-sm shadow-indigo-500/20') : 'text-gray-500 hover:text-white'}`}
                 >
                     <IconShield className="w-4 h-4" /> Profil & Hesap
                 </button>
@@ -567,7 +567,7 @@ export default function PersonelPanel() {
             {activeTab === 'profile' && <ProfileSettingsView user={currentUser} theme={theme} />}
 
             {/* Branding Footer */}
-            <div className={`fixed bottom-0 left-0 right-0 p-4 ${theme === 'light' ? 'bg-white/80 border-gray-200' : 'bg-black/60 border-white/5'} backdrop-blur-xl border-t z-50 flex justify-center transition-colors duration-300`}>
+            <div className={`fixed bottom-0 left-0 right-0 p-4 ${theme === 'light' ? 'bg-white dark:bg-slate-900 border-gray-200' : 'bg-black/60 border-white/5'}  border-t z-50 flex justify-center transition-colors duration-300`}>
                 <div className="max-w-7xl w-full flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                     <span>© 2026 PERIODYA OS • İNSAN KAYNAKLARI MODÜLÜ</span>
                     <span className={theme === 'light' ? "text-primary" : "text-indigo-400"}>Verileriniz End-to-End Şifrelenmiştir</span>

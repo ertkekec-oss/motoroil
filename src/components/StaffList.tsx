@@ -66,7 +66,7 @@ export default function StaffList() {
             </div>
 
             {isAddOpen && (
-                <div className="card glass p-6 mb-6">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 mb-6">
                     <h4 className="font-bold mb-4">Yeni Personel Ekle</h4>
                     <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="form-control">

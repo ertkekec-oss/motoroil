@@ -212,7 +212,7 @@ export default function MobileCreateOrderPage() {
                         <button
                             onClick={handleSaveOrder}
                             disabled={cart.length === 0 || saving}
-                            className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-900/20 transition-all"
+                            className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-bold py-4 rounded-xl shadow-sm shadow-green-900/20 transition-all"
                         >
                             {saving ? 'Kaydediliyor...' : 'SİPARİŞİ TAMAMLA'}
                         </button>

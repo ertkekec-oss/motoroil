@@ -80,7 +80,7 @@ export default function ReplyForm({ ticketId }: { ticketId: string }) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-[#0f111a] border border-white/5 p-4 rounded-2xl shadow-xl flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="bg-[#0f111a] border border-white/5 p-4 rounded-2xl shadow-sm flex flex-col gap-4">
             {error && <div className="text-red-400 text-xs font-medium px-4">{error}</div>}
 
             {files.length > 0 && (
@@ -113,7 +113,7 @@ export default function ReplyForm({ ticketId }: { ticketId: string }) {
                 <button
                     type="submit"
                     disabled={loading || uploading || (!body.trim() && files.length === 0)}
-                    className="px-6 py-2.5 bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-orange-500/20 disabled:opacity-50"
+                    className="px-6 py-2.5 bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold rounded-xl transition-all shadow-sm  disabled:opacity-50"
                 >
                     {loading ? 'Gönderiliyor...' : 'Yanıt Gönder'}
                 </button>

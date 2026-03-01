@@ -189,12 +189,11 @@ export default function AccountingModals({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 2000,
-                backdropFilter: 'blur(4px)'
+                zIndex: 2000
             }}
             data-pos-theme={theme}
         >
-            <div className={`card glass border border-white/10 p-6 rounded-3xl w-full max-w-lg relative animate-in zoom-in-95 transaction-modal max-h-[90vh] overflow-y-auto ${theme === 'light' ? 'bg-white' : 'bg-[#1a1a1a]'}`}>
+            <div className={`card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm border border-white/10 p-6 rounded-3xl w-full max-w-lg relative animate-in zoom-in-95 transaction-modal max-h-[90vh] overflow-y-auto ${theme === 'light' ? 'bg-white' : 'bg-[#1a1a1a]'}`}>
                 <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white">✕</button>
 
                 <h2 className={theme === 'light' ? "text-xl font-black text-pos mb-6" : "text-xl font-bold text-white mb-6"}>
@@ -454,7 +453,7 @@ export default function AccountingModals({
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full ${theme === 'light' ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-blue-600'} hover:opacity-90 text-white font-black py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50 mt-4 uppercase tracking-widest text-xs`}
+                            className={`w-full ${theme === 'light' ? 'bg-primary shadow-sm shadow-primary/20' : 'bg-blue-600'} hover:opacity-90 text-white font-black py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50 mt-4 uppercase tracking-widest text-xs`}
                         >
                             {loading ? 'Kaydediliyor...' : 'Kaydet'}
                         </button>

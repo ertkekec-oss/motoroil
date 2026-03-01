@@ -24,7 +24,7 @@ const Layers = ({ className }: any) => <svg className={className} fill="none" vi
 
 // --- CONTROL CENTER COMPONENTS ---
 const MetricCard = ({ title, value, unit, subtitle, color, icon: Icon, trend }: any) => (
-    <div className="card glass p-6 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
         <div className={`absolute top-0 right-0 w-24 h-24 ${color} opacity-10 rounded-bl-full -mr-4 -mt-4 transition-all group-hover:opacity-20`} />
         <div className="relative">
             <div className="flex justify-between items-start mb-4">
@@ -47,7 +47,7 @@ const MetricCard = ({ title, value, unit, subtitle, color, icon: Icon, trend }: 
 );
 
 const HealthSnapshot = ({ data }: any) => (
-    <div className="card glass p-6 space-y-4">
+    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-4">
         <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider">Sistem Sağlık Özeti</h3>
         <div className="space-y-3">
             <div className="flex justify-between items-center">
@@ -75,7 +75,7 @@ const ConfidenceChart = ({ dist }: any) => {
     const lp = ((dist?.low || 0) / total) * 100;
 
     return (
-        <div className="card glass p-6">
+        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6">
             <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">Eşleşme Doğruluğu</h3>
             <div className="h-4 w-full bg-white/5 rounded-full overflow-hidden flex mb-4">
                 <div style={{ width: `${hp}%` }} className="h-full bg-emerald-500" title="Yüksek" />
@@ -94,7 +94,7 @@ const ConfidenceChart = ({ dist }: any) => {
 const FlowAccuracy = ({ data }: any) => {
     const accuracy = data?.forecast > 0 ? (1 - Math.abs(data.actual - data.forecast) / data.forecast) * 100 : 0;
     return (
-        <div className="card glass p-6">
+        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6">
             <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">Tahmin vs Gerçekleşen</h3>
             <div className="space-y-3">
                 <div className="flex justify-between items-end">
@@ -140,7 +140,7 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
                 <HealthSnapshot data={metrics.healthSnapshot} />
                 <ConfidenceChart dist={metrics.confidenceDist} />
                 <FlowAccuracy data={metrics.flowReality} />
-                <div className="card glass p-6 flex flex-col items-center justify-center text-center">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col items-center justify-center text-center">
                     <div className="flex items-center gap-2 mb-2">
                         <IconActivity className="w-4 h-4 text-emerald-500" />
                         <span className="text-xs font-black text-white">GÜVENLİK ŞALTERİ</span>
@@ -184,7 +184,7 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
             {/* Orta Bölüm: Nakit Akışı ve Yaşlandırma */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Nakit Akışı Projeksiyonu */}
-                <div className="card glass p-8 border-l-4 border-indigo-500">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-8 border-l-4 border-indigo-500">
                     <div className="mb-8">
                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
                             <IconTrendingUp className="w-5 h-5 text-indigo-400" /> Nakit Akışı Projeksiyonu
@@ -225,7 +225,7 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
                 </div>
 
                 {/* Yaşlandırma Analizi */}
-                <div className="lg:col-span-2 card glass p-8">
+                <div className="lg:col-span-2 card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-8">
                     <div className="flex justify-between items-center mb-8">
                         <div>
                             <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -258,7 +258,7 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
 
             {/* Alt Bölüm: Akıllı Sinyaller ve Motor Performansı */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 card glass p-6 border-amber-500/10 hover:border-amber-500/30 transition-colors">
+                <div className="lg:col-span-2 card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-amber-500/10 hover:border-amber-500/30 transition-colors">
                     <h3 className="text-xs font-bold text-amber-400 mb-3 uppercase tracking-widest flex items-center gap-2">
                         <IconShield className="w-4 h-4" /> Sistem Zekası Sinyalleri
                     </h3>
@@ -278,7 +278,7 @@ const ControlCenterContent = ({ metrics, toggling, toggleLiveMode }: any) => {
                     </div>
                 </div>
 
-                <div className="card glass p-6 bg-gradient-to-br from-indigo-900/10 to-transparent border-indigo-500/20">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 bg-gradient-to-br from-indigo-900/10 to-transparent border-indigo-500/20">
                     <h3 className="text-sm font-bold text-white mb-6 uppercase tracking-wider flex items-center gap-2">
                         <IconZap className="w-4 h-4 text-yellow-400" /> Motor Performansı
                     </h3>
@@ -377,7 +377,7 @@ const ProfitabilityHeatmapContent = () => {
             {/* Heatmap Grid */}
             <div className="grid grid-cols-1 gap-4">
                 {filteredData.map((item) => (
-                    <div key={item.id} className="card glass p-4 group hover:scale-[1.005] transition-all duration-300 relative border-l-4 border-l-transparent hover:border-l-emerald-500">
+                    <div key={item.id} className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-4 group hover:scale-[1.005] transition-all duration-300 relative border-l-4 border-l-transparent hover:border-l-emerald-500">
                         <div className="grid grid-cols-12 gap-6 items-center">
                             {/* Product Info */}
                             <div className="col-span-3 space-y-1">
@@ -440,7 +440,7 @@ const ProfitabilityHeatmapContent = () => {
                 ))}
 
                 {filteredData.length === 0 && (
-                    <div className="p-12 card glass text-center space-y-4">
+                    <div className="p-12 card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center space-y-4">
                         <IconAlert className="w-12 h-12 text-gray-600 mx-auto" />
                         <h3 className="text-xl font-bold text-gray-400">P&L Verisi Bulunamadı</h3>
                         <p className="text-sm text-gray-500 max-w-sm mx-auto">
@@ -524,32 +524,32 @@ const SmartPricingContent = () => {
                         onClick={() => setIsAutoPilot(!isAutoPilot)}
                         className={`relative w-14 h-7 rounded-full transition-all duration-300 ${isAutoPilot ? 'bg-emerald-500' : 'bg-gray-700'}`}
                     >
-                        <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-lg transition-all duration-300 ${isAutoPilot ? 'left-8' : 'left-1'}`} />
+                        <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-300 ${isAutoPilot ? 'left-8' : 'left-1'}`} />
                     </button>
                 </div>
             </div>
 
             {/* Strategy Insight */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="card glass p-6 border-orange-500/20">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-orange-500/20">
                     <IconActivity className="w-6 h-6 text-orange-500 mb-4" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Rules</h4>
                     <p className="text-2xl font-black text-white">42</p>
                     <p className="text-[10px] text-gray-500 mt-2">Across 3 Marketplaces</p>
                 </div>
-                <div className="card glass p-6 border-emerald-500/20">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-emerald-500/20">
                     <IconShield className="w-6 h-6 text-emerald-500 mb-4" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Margin Protected</h4>
                     <p className="text-2xl font-black text-white">12,450 ₺</p>
                     <p className="text-[10px] text-emerald-500 mt-2">+4.2% since yesterday</p>
                 </div>
-                <div className="card glass p-6 border-rose-500/20">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-rose-500/20">
                     <IconAlert className="w-6 h-6 text-rose-500 mb-4" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loss Prevention</h4>
                     <p className="text-2xl font-black text-rose-400">8 Critical</p>
                     <p className="text-[10px] text-gray-500 mt-2">Prices below cost!</p>
                 </div>
-                <div className="card glass p-6 bg-gradient-to-br from-orange-900/10 to-transparent">
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 bg-gradient-to-br from-orange-900/10 to-transparent">
                     <IconRefresh className="w-6 h-6 text-orange-400 mb-4 animate-spin-slow" />
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Next Re-calc</h4>
                     <p className="text-2xl font-black text-white">14:02</p>
@@ -565,7 +565,7 @@ const SmartPricingContent = () => {
 
                 <div className="grid grid-cols-1 gap-4">
                     {recommendations.map(rec => (
-                        <div key={rec.productId} className="card glass p-6 hover:border-orange-500/30 transition-all group overflow-hidden relative">
+                        <div key={rec.productId} className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 hover:border-orange-500/30 transition-all group overflow-hidden relative">
                             <div className={`absolute top-0 right-0 w-32 h-full opacity-5 bg-gradient-to-l ${rec.change > 5 ? 'from-rose-500' : 'from-orange-500'}`} />
 
                             <div className="grid grid-cols-12 gap-8 items-center relative">
@@ -703,19 +703,19 @@ export default function FintechControlTower() {
             <div className="flex items-center gap-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl w-fit">
                 <button
                     onClick={() => setActiveTab('control')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'control' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-gray-500 hover:text-white'}`}
+                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'control' ? 'bg-emerald-500 text-white shadow-sm ' : 'text-gray-500 hover:text-white'}`}
                 >
                     <IconActivity className="w-4 h-4" /> Komuta Merkezi
                 </button>
                 <button
                     onClick={() => setActiveTab('heatmap')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'heatmap' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-gray-500 hover:text-white'}`}
+                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'heatmap' ? 'bg-emerald-500 text-white shadow-sm ' : 'text-gray-500 hover:text-white'}`}
                 >
                     <IconZap className="w-4 h-4" /> Kârlılık Isı Haritası
                 </button>
                 <button
                     onClick={() => setActiveTab('pricing')}
-                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'pricing' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-gray-500 hover:text-white'}`}
+                    className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'pricing' ? 'bg-emerald-500 text-white shadow-sm ' : 'text-gray-500 hover:text-white'}`}
                 >
                     <IconTrendingUp className="w-4 h-4" /> Otonom Fiyatlandırma
                 </button>
@@ -733,7 +733,7 @@ export default function FintechControlTower() {
             {activeTab === 'pricing' && <SmartPricingContent />}
 
             {/* Sticky Alt Çubuk */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/60 backdrop-blur-xl border-t border-white/5 z-50 flex justify-center">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/60  border-t border-white/5 z-50 flex justify-center">
                 <div className="max-w-7xl w-full flex justify-between items-center">
                     <div className="flex items-center gap-6">
                         <div className="flex flex-col">

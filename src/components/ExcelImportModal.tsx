@@ -138,7 +138,7 @@ export default function ExcelImportModal({ isOpen, onClose, type, onSuccess }: E
 
     return (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
-            <div className="card glass animate-in" style={{ width: '800px', background: '#1e1e1e', maxHeight: '90vh', overflowY: 'auto', border: '1px solid #333', color: '#fff' }}>
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-in" style={{ width: '800px', background: '#1e1e1e', maxHeight: '90vh', overflowY: 'auto', border: '1px solid #333', color: '#fff' }}>
                 <div className="flex-between mb-6" style={{ borderBottom: '1px solid #333', paddingBottom: '15px' }}>
                     <h3 style={{ fontSize: '18px', fontWeight: 'bold' }}>📂 {getTitle()}</h3>
                     <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '24px', cursor: 'pointer' }}>×</button>

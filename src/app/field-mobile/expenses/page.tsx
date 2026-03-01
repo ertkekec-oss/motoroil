@@ -60,7 +60,7 @@ export default function MobileExpensesPage() {
                 <h1 className="text-2xl font-black">Masraflarım</h1>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-2xl shadow-lg shadow-blue-900/40"
+                    className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-2xl shadow-sm shadow-blue-900/40"
                 >
                     +
                 </button>
@@ -93,7 +93,7 @@ export default function MobileExpensesPage() {
 
             {/* Entry Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[100] flex items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
+                <div className="fixed inset-0 bg-black/90  z-[100] flex items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
                     <div className="bg-[#161b22] w-full max-w-md rounded-[3rem] p-10 border border-white/10 relative">
                         <h2 className="text-2xl font-black mb-8 text-center tracking-tighter uppercase">Yeni Masraf Kaydı</h2>
 
@@ -145,7 +145,7 @@ export default function MobileExpensesPage() {
                                 </button>
                                 <button
                                     disabled={isSaving}
-                                    className="flex-1 py-4 bg-blue-600 rounded-2xl font-black text-sm uppercase shadow-xl shadow-blue-900/40"
+                                    className="flex-1 py-4 bg-blue-600 rounded-2xl font-black text-sm uppercase shadow-sm shadow-blue-900/40"
                                 >
                                     {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
                                 </button>

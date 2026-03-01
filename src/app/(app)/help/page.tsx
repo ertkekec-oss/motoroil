@@ -65,7 +65,7 @@ export default async function HelpCenterPage() {
             <div className="mt-12 text-center bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 p-8 rounded-2xl">
                 <h3 className="text-xl font-bold text-white mb-2">Aradığınızı bulamadınız mı?</h3>
                 <p className="text-gray-400 mb-6 text-sm">Destek ekibimiz size yardımcı olmaktan memnuniyet duyar.</p>
-                <Link href="/support/new" className="px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-500/20 inline-block">
+                <Link href="/support/new" className="px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition-all shadow-sm  inline-block">
                     Destek Talebi Oluştur
                 </Link>
                 <Link href="/support" className="px-6 py-3 ml-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl border border-white/10 transition-all inline-block">

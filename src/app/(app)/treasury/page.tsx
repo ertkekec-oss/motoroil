@@ -74,25 +74,25 @@ export default function TreasuryPage() {
 
             {/* MAIN METRICS */}
             <div className="grid-cols-2 gap-8 mb-10">
-                <div className="card glass animate-slide-up" style={{ padding: '40px', borderLeft: '6px solid #4ade80' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up" style={{ padding: '40px', borderLeft: '6px solid #4ade80' }}>
                     <div className="text-muted" style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '2px', marginBottom: '15px' }}>TOPLAM ALACAKLAR (Cari)</div>
                     <div style={{ fontSize: '48px', fontWeight: '1000', color: 'var(--text-main)' }}>₺ {totalReceivables.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                     <p style={{ color: '#4ade80', fontSize: '12px', marginTop: '10px', fontWeight: '700' }}>📈 Tahsilat Bekleyen Toplam Tutar</p>
                 </div>
 
-                <div className="card glass animate-slide-up" style={{ padding: '40px', borderLeft: '6px solid #f87171', animationDelay: '0.1s' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up" style={{ padding: '40px', borderLeft: '6px solid #f87171', animationDelay: '0.1s' }}>
                     <div className="text-muted" style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '2px', marginBottom: '15px' }}>TOPLAM BORÇLAR (Tedarikçi)</div>
                     <div style={{ fontSize: '48px', fontWeight: '1000', color: 'var(--text-main)' }}>₺ {totalPayables.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                     <p style={{ color: '#f87171', fontSize: '12px', marginTop: '10px', fontWeight: '700' }}>📉 Ödenmesi Gereken Toplam Tutar</p>
                 </div>
 
-                <div className="card glass animate-slide-up" style={{ padding: '40px', borderLeft: '6px solid #60a5fa', animationDelay: '0.2s' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up" style={{ padding: '40px', borderLeft: '6px solid #60a5fa', animationDelay: '0.2s' }}>
                     <div className="text-muted" style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '2px', marginBottom: '15px' }}>ENVANTER SERMAYESİ</div>
                     <div style={{ fontSize: '48px', fontWeight: '1000', color: 'var(--text-main)' }}>₺ {inventoryValue.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                     <p style={{ color: '#60a5fa', fontSize: '12px', marginTop: '10px', fontWeight: '700' }}>💎 Rafta Bekleyen Değer (Maliyet Bazlı)</p>
                 </div>
 
-                <div className="card glass animate-slide-up" style={{ padding: '40px', borderLeft: '6px solid #fbbf24', animationDelay: '0.3s' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up" style={{ padding: '40px', borderLeft: '6px solid #fbbf24', animationDelay: '0.3s' }}>
                     <div className="flex-between mb-4">
                         <div className="text-muted" style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '2px' }}>GİDERLER TOPLAMI</div>
                         <select
@@ -112,7 +112,7 @@ export default function TreasuryPage() {
             </div>
 
             {/* NET WORTH SUMMARY */}
-            <div className="card glass" style={{
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{
                 background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%)',
                 padding: '50px',
                 textAlign: 'center',

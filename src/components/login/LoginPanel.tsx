@@ -93,7 +93,7 @@ export default function LoginPanel({ className = '' }: LoginPanelProps) {
                                     placeholder="ornek@firma.com"
                                     className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-medium text-white placeholder-gray-600 outline-none transition-all focus:ring-2"
                                     style={{
-                                        backgroundColor: 'rgba(255,255,255,0.05)',
+                                        backgroundColor: 'var(--bg-primary, #ffffff)',
                                         border: formState === 'error' && !username ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)',
                                         // @ts-ignore
                                         '--tw-ring-color': '#FF5500',
@@ -120,7 +120,7 @@ export default function LoginPanel({ className = '' }: LoginPanelProps) {
                                     placeholder="••••••••"
                                     className="w-full pl-10 pr-10 py-3 rounded-xl text-sm font-medium text-white placeholder-gray-600 outline-none transition-all focus:ring-2"
                                     style={{
-                                        backgroundColor: 'rgba(255,255,255,0.05)',
+                                        backgroundColor: 'var(--bg-primary, #ffffff)',
                                         border: formState === 'error' && !password ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)',
                                     }}
                                     aria-required="true"
@@ -225,7 +225,7 @@ export default function LoginPanel({ className = '' }: LoginPanelProps) {
                                 onChange={e => setForgotEmail(e.target.value)}
                                 placeholder="ornek@firma.com"
                                 className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-gray-600 outline-none transition-all"
-                                style={{ backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+                                style={{ backgroundColor: 'var(--bg-primary, #ffffff)', border: '1px solid rgba(255,255,255,0.08)' }}
                                 required
                             />
                             <button

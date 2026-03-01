@@ -11,7 +11,7 @@ export default function MobileProfilePage() {
     return (
         <div className="p-4 space-y-8 pb-20">
             <div className="text-center pt-8">
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-2xl shadow-blue-500/20 mb-4">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-2xl  mb-4">
                     👤
                 </div>
                 <h1 className="text-2xl font-black text-white">{user?.name}</h1>

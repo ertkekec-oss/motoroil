@@ -791,7 +791,7 @@ export default function StaffManagementContent() {
 
                 <div className="flex gap-3">
                     {hasPermission('create_staff') && (
-                        <button onClick={() => setShowAddStaffModal(true)} style={{ height: '44px', padding: '0 24px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '14px', fontWeight: '700', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', boxShadow: '0 8px 16px rgba(59, 130, 246, 0.25)', transition: 'all 0.2s' }} className="hover:-translate-y-0.5 hover:shadow-xl">
+                        <button onClick={() => setShowAddStaffModal(true)} style={{ height: '44px', padding: '0 24px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '14px', fontWeight: '700', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', boxShadow: '0 8px 16px rgba(59, 130, 246, 0.25)', transition: 'all 0.2s' }} className="hover:-translate-y-0.5 hover:shadow-sm">
                             <span style={{ fontSize: '18px' }}>+</span> Yeni Personel
                         </button>
                     )}
@@ -866,7 +866,7 @@ export default function StaffManagementContent() {
             {activeTab === 'list' && (
                 <div className="staff-grid">
                     {filteredStaff.map(person => (
-                        <div key={person.id} style={{ background: 'var(--bg-card)', backdropFilter: 'none' }} className="bg-white dark:bg-[#0f172a] rounded-[20px] p-6 border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-500/50 transition-all duration-300 group shadow-sm">
+                        <div key={person.id} style={{ background: 'var(--bg-card)' }} className="bg-white dark:bg-[#0f172a] rounded-[20px] p-6 border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-500/50 transition-all duration-300 group shadow-sm">
                             <div className="flex items-start justify-between mb-6">
                                 <div className="flex items-center gap-4">
                                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-2xl font-black text-blue-500">
@@ -1121,7 +1121,7 @@ export default function StaffManagementContent() {
                             </button>
                             <button
                                 onClick={() => setShowShiftModal(true)}
-                                className="px-4 py-2 rounded-lg bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white text-xs font-bold transition-all ml-2 shadow-lg shadow-sm">+ YENİ PLAN</button>
+                                className="px-4 py-2 rounded-lg bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white text-xs font-bold transition-all ml-2 shadow-sm shadow-sm">+ YENİ PLAN</button>
                         </div>
                     </div>
 
@@ -1174,7 +1174,7 @@ export default function StaffManagementContent() {
                                                             )}
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); handleDeleteShift(shift.id); }}
-                                                                className="absolute -top-3 -right-3 w-5 h-5 bg-red-500 rounded-full text-slate-900 dark:text-slate-900 dark:text-white text-[10px] flex items-center justify-center opacity-0 group-hover/shift:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
+                                                                className="absolute -top-3 -right-3 w-5 h-5 bg-red-500 rounded-full text-slate-900 dark:text-slate-900 dark:text-white text-[10px] flex items-center justify-center opacity-0 group-hover/shift:opacity-100 transition-opacity shadow-sm z-10 hover:bg-red-600"
                                                                 title="Vardiyayı Sil"
                                                             >
                                                                 ✕
@@ -1299,11 +1299,11 @@ export default function StaffManagementContent() {
                             <button
                                 onClick={handleGeneratePayrolls}
                                 disabled={isProcessing}
-                                className="px-5 py-2 rounded-lg bg-blue-500 text-slate-900 dark:text-slate-900 dark:text-white text-[11px] font-semibold tracking-wider hover:bg-blue-400 transition-all shadow-lg shadow-blue-500/20 active:scale-95 disabled:opacity-50"
+                                className="px-5 py-2 rounded-lg bg-blue-500 text-slate-900 dark:text-slate-900 dark:text-white text-[11px] font-semibold tracking-wider hover:bg-blue-400 transition-all shadow-sm  active:scale-95 disabled:opacity-50"
                             >
                                 {isProcessing ? 'İŞLENİYOR...' : 'BORDROLARI OLUŞTUR ⚙️'}
                             </button>
-                            <button onClick={handlePayAll} className="px-5 py-2 rounded-lg bg-emerald-500 text-black text-[11px] font-semibold tracking-wider hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20 active:scale-95">TÜMÜNÜ ÖDE</button>
+                            <button onClick={handlePayAll} className="px-5 py-2 rounded-lg bg-emerald-500 text-black text-[11px] font-semibold tracking-wider hover:bg-emerald-400 transition-all shadow-sm  active:scale-95">TÜMÜNÜ ÖDE</button>
                         </div>
                     </div>
                     <table className="w-full text-left">
@@ -1342,7 +1342,7 @@ export default function StaffManagementContent() {
                                                         <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">BEKLİYOR</span>
                                                         <button
                                                             onClick={() => handleMarkAsPaid(payroll)}
-                                                            className="px-4 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold hover:bg-emerald-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all shadow-lg shadow-emerald-500/10 text-[10px]"
+                                                            className="px-4 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold hover:bg-emerald-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all shadow-sm  text-[10px]"
                                                         >
                                                             ÖDE 💸
                                                         </button>
@@ -1382,11 +1382,11 @@ export default function StaffManagementContent() {
             {activeTab === 'attendance' && (
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="card glass p-6 border-l-4 border-emerald-500">
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-l-4 border-emerald-500">
                             <div className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase mb-2">ŞU AN ÇALIŞAN</div>
                             <div className="text-[28px] font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-900 dark:text-white">{attendance.filter(a => !a.checkOut).length}</div>
                         </div>
-                        <div className="card glass p-6 border-l-4 border-blue-500">
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-l-4 border-blue-500">
                             <div className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase mb-2">GEÇ KALANLAR</div>
                             <div className="text-[28px] font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-900 dark:text-white">0</div>
                         </div>
@@ -1431,7 +1431,7 @@ export default function StaffManagementContent() {
             {/* --- PUANTAJ TAB --- */}
             {activeTab === 'puantaj' && (
                 <div className="space-y-6">
-                    <div className="card glass p-6 flex flex-wrap gap-4 items-center justify-between">
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-wrap gap-4 items-center justify-between">
                         <div className="flex items-center gap-4">
                             <div className="text-lg font-black">Aylık Puantaj Çizelgesi</div>
                             <input
@@ -1449,7 +1449,7 @@ export default function StaffManagementContent() {
                         </div>
                     </div>
 
-                    <div className="card glass p-0 overflow-x-auto">
+                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-0 overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-slate-50 dark:bg-slate-800/50 text-[9px] text-slate-500 dark:text-slate-400 font-black uppercase border-b border-slate-100 dark:border-slate-800">
@@ -1493,7 +1493,7 @@ export default function StaffManagementContent() {
 
             {/* 1. TASK ASSIGN MODAL */}
             {showTaskModal && selectedStaff && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80  animate-in fade-in zoom-in duration-200">
                     <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[24px] w-full max-w-md overflow-hidden shadow-2xl shadow-sm">
                         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                             <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
@@ -1537,7 +1537,7 @@ export default function StaffManagementContent() {
                             <button
                                 onClick={handleAssignTask}
                                 disabled={isProcessing || !taskContent}
-                                className="w-full h-[44px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-[14px] font-semibold text-[14px] transition-all shadow-lg shadow-sm hover:shadow-md transition-all disabled:opacity-50"
+                                className="w-full h-[44px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-[14px] font-semibold text-[14px] transition-all shadow-sm shadow-sm hover:shadow-sm transition-all disabled:opacity-50"
                             >
                                 {isProcessing ? 'ATANIYOR...' : 'GÖREVİ İLET'}
                             </button>
@@ -1548,7 +1548,7 @@ export default function StaffManagementContent() {
 
             {/* 2. PERMISSIONS MODAL */}
             {showPermissionModal && selectedStaff && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80  animate-in fade-in zoom-in duration-200">
                     <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[24px] w-full max-w-4xl h-[80vh] flex flex-col shadow-2xl shadow-sm">
                         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                             <div>
@@ -1647,7 +1647,7 @@ export default function StaffManagementContent() {
                                                     setSelectedStaff({ ...selectedStaff, assignedCategoryIds: newIds });
                                                 }}
                                                 className={`px-4 py-2 rounded-[12px] text-[10px] font-black uppercase transition-all border ${isActive
-                                                    ? 'bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white border-blue-500/50 shadow-lg shadow-sm'
+                                                    ? 'bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white border-blue-500/50 shadow-sm shadow-sm'
                                                     : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800 hover:bg-white/10'
                                                     }`}
                                             >
@@ -1663,7 +1663,7 @@ export default function StaffManagementContent() {
                             <button onClick={() => setShowPermissionModal(false)} className="px-6 h-12 rounded-[12px] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-900 dark:text-white font-bold hover:bg-slate-50 dark:bg-slate-800/50 transition-all">
                                 VAZGEÇ
                             </button>
-                            <button onClick={savePermissions} disabled={isProcessing} className="px-8 h-[44px] rounded-[14px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white font-semibold transition-all shadow-lg shadow-sm hover:shadow-md hover:scale-105 transition-all">
+                            <button onClick={savePermissions} disabled={isProcessing} className="px-8 h-[44px] rounded-[14px] bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white font-semibold transition-all shadow-sm shadow-sm hover:shadow-sm hover:scale-105 transition-all">
                                 {isProcessing ? 'KAYDEDİLİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
                             </button>
                         </div>
@@ -1673,7 +1673,7 @@ export default function StaffManagementContent() {
 
             {/* 3. ADD STAFF MODAL */}
             {showAddStaffModal && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80  animate-in fade-in zoom-in duration-200">
                     <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-[24px] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl shadow-sm flex flex-col">
                         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 shrink-0">
                             <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
@@ -1856,7 +1856,7 @@ export default function StaffManagementContent() {
                                     </div>
                                 </section>
 
-                                <button onClick={handleSaveStaff} disabled={isProcessing} className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-lg shadow-sm hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
+                                <button onClick={handleSaveStaff} disabled={isProcessing} className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-sm shadow-sm hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
                                     {isProcessing ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>KAYDEDİLİYOR...</span></> : <span>💾 PERSONELİ KAYDET VE ÖZLÜK DOSYASI OLUŞTUR</span>}
                                 </button>
                             </div>
@@ -1867,7 +1867,7 @@ export default function StaffManagementContent() {
 
             {/* 4. EDIT STAFF MODAL */}
             {showEditStaffModal && editStaff && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80  animate-in fade-in zoom-in duration-200">
                     <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl shadow-sm h-[90vh] flex flex-col">
                         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 shrink-0">
                             <div>
@@ -1970,7 +1970,7 @@ export default function StaffManagementContent() {
                                                     <span className="text-[11px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">Ehliyet</span>
                                                     <button
                                                         onClick={() => setEditStaff({ ...editStaff, hasDriverLicense: !editStaff.hasDriverLicense })}
-                                                        className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${editStaff.hasDriverLicense ? 'bg-emerald-500 text-slate-900 dark:text-slate-900 dark:text-white shadow-lg shadow-emerald-500/20' : 'bg-white/10 text-slate-500 dark:text-slate-400'}`}
+                                                        className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${editStaff.hasDriverLicense ? 'bg-emerald-500 text-slate-900 dark:text-slate-900 dark:text-white shadow-sm ' : 'bg-white/10 text-slate-500 dark:text-slate-400'}`}
                                                     >
                                                         {editStaff.hasDriverLicense ? 'VAR' : 'YOK'}
                                                     </button>
@@ -2011,7 +2011,7 @@ export default function StaffManagementContent() {
                                                             setEditStaff({ ...editStaff, assignedCategoryIds: newIds });
                                                         }}
                                                         className={`px-4 py-2 rounded-[12px] text-[10px] font-black uppercase transition-all border ${isActive
-                                                            ? 'bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white border-blue-500/50 shadow-lg shadow-sm'
+                                                            ? 'bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white border-blue-500/50 shadow-sm shadow-sm'
                                                             : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800 hover:bg-white/10'
                                                             }`}
                                                     >
@@ -2022,7 +2022,7 @@ export default function StaffManagementContent() {
                                         </div>
                                     </div>
 
-                                    <button onClick={handleEditStaff} disabled={isProcessing} className="w-full h-14 bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-xs tracking-[0.2em] shadow-xl shadow-sm hover:scale-[1.01] active:scale-[0.99] transition-all">
+                                    <button onClick={handleEditStaff} disabled={isProcessing} className="w-full h-14 bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-xs tracking-[0.2em] shadow-sm shadow-sm hover:scale-[1.01] active:scale-[0.99] transition-all">
                                         {isProcessing ? 'GÜNCELLENİYOR...' : 'ÖZLÜK BİLGİLERİNİ GÜNCELLE'}
                                     </button>
                                 </div>
@@ -2085,7 +2085,7 @@ export default function StaffManagementContent() {
             {/* --- SHIFT CREATION MODAL --- */}
             {
                 showShiftModal && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80  animate-in fade-in zoom-in duration-200">
                         <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-sm">
                             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                                 <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
@@ -2151,7 +2151,7 @@ export default function StaffManagementContent() {
                                 <button
                                     onClick={handleCreateShift}
                                     disabled={isProcessing}
-                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-sm shadow-sm hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
                                 >
                                     {isProcessing ? (
                                         <>
@@ -2173,7 +2173,7 @@ export default function StaffManagementContent() {
             {/* --- LEAVE REQUEST MODAL --- */}
             {
                 showLeaveModal && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80  animate-in fade-in zoom-in duration-200">
                         <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-sm">
                             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                                 <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
@@ -2249,7 +2249,7 @@ export default function StaffManagementContent() {
                                 <button
                                     onClick={handleCreateLeave}
                                     disabled={isProcessing}
-                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-sm shadow-sm hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
                                 >
                                     {isProcessing ? (
                                         <>
@@ -2271,7 +2271,7 @@ export default function StaffManagementContent() {
             {/* --- PAYROLL MODAL --- */}
             {
                 showPayrollModal && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80  animate-in fade-in zoom-in duration-200">
                         <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-sm">
                             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                                 <div>
@@ -2341,7 +2341,7 @@ export default function StaffManagementContent() {
                                 <button
                                     onClick={handleSavePayroll}
                                     disabled={isProcessing}
-                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                                    className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 hover:to-primary text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-sm shadow-sm hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
                                 >
                                     {isProcessing ? (
                                         <>
@@ -2361,7 +2361,7 @@ export default function StaffManagementContent() {
             }
             {/* 6. TARGET MODAL */}
             {showTargetModal && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80  animate-in fade-in zoom-in duration-200">
                     <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-sm">
                         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                             <h2 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
@@ -2469,7 +2469,7 @@ export default function StaffManagementContent() {
                             <button
                                 onClick={handleSaveTarget}
                                 disabled={isProcessing}
-                                className="w-full h-14 bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                                className="w-full h-14 bg-blue-600 text-slate-900 dark:text-slate-900 dark:text-white rounded-[12px] font-black text-sm tracking-widest shadow-sm shadow-sm hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
                             >
                                 {isProcessing ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

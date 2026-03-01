@@ -23,7 +23,7 @@ export default function FAQ() {
                     {FAQS.map((faq, i) => (
                         <div key={i}
                             className="rounded-2xl border border-white/5 overflow-hidden transition-all hover:border-white/10"
-                            style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                            style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>
                             <button
                                 onClick={() => setOpen(open === i ? null : i)}
                                 className="w-full flex items-center justify-between gap-4 p-5 text-left"

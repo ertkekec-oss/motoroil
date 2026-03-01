@@ -135,7 +135,7 @@ export default function ChatWidget() {
 
             {/* Chat Window */}
             {isOpen && (
-                <div className={`fixed z-[9000] w-[350px] max-md:w-[90vw] max-md:left-[5vw] h-[500px] max-md:h-[60vh] bg-[#0c0e14] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in duration-300 backdrop-blur-xl bg-opacity-95
+                <div className={`fixed z-[9000] w-[350px] max-md:w-[90vw] max-md:left-[5vw] h-[500px] max-md:h-[60vh] bg-[#0c0e14] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in duration-300  bg-opacity-95
                     bottom-40 right-6 md:bottom-24 md:right-6
                     max-md:top-20 max-md:bottom-auto
                     ${view === 'chat' ? 'slide-in-from-right-10' : 'slide-in-from-bottom-10'}

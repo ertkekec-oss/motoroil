@@ -215,13 +215,13 @@ export default function MobileRouteDetailPage() {
                     <div className="grid grid-cols-2 gap-3 mt-3">
                         <button
                             onClick={() => router.push(`/field-mobile/order/create?visitId=${activeVisit.id}&customerId=${activeVisit.customer?.id}&customerName=${activeVisit.customer?.name}`)}
-                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2"
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-sm shadow-blue-900/20 transition-all flex items-center justify-center gap-2"
                         >
                             <span>🛒</span> SİPARİŞ
                         </button>
                         <button
                             onClick={() => router.push(`/field-mobile/collection/create?visitId=${activeVisit.id}&customerId=${activeVisit.customer?.id}&customerName=${activeVisit.customer?.name}`)}
-                            className="bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-amber-900/20 transition-all flex items-center justify-center gap-2"
+                            className="bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-lg shadow-sm shadow-amber-900/20 transition-all flex items-center justify-center gap-2"
                         >
                             <span>💰</span> TAHSİLAT
                         </button>
@@ -230,7 +230,7 @@ export default function MobileRouteDetailPage() {
                     <button
                         onClick={() => setShowCheckoutModal(true)}
                         disabled={actionLoading}
-                        className="mt-3 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-green-900/20 transition-all"
+                        className="mt-3 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg shadow-sm shadow-green-900/20 transition-all"
                     >
                         {actionLoading ? 'İşleniyor...' : 'ZİYARETİ BİTİR (CHECK-OUT)'}
                     </button>
@@ -257,7 +257,7 @@ export default function MobileRouteDetailPage() {
                         <button
                             onClick={handleCheckOut}
                             disabled={actionLoading}
-                            className="w-full bg-green-600 hover:bg-green-500 text-white font-black py-4 rounded-xl shadow-lg shadow-green-900/20 transition-all flex items-center justify-center gap-2"
+                            className="w-full bg-green-600 hover:bg-green-500 text-white font-black py-4 rounded-xl shadow-sm shadow-green-900/20 transition-all flex items-center justify-center gap-2"
                         >
                             {actionLoading ? 'KAYDEDİLİYOR...' : 'ZİYARETİ TAMAMLA'}
                         </button>
@@ -310,7 +310,7 @@ export default function MobileRouteDetailPage() {
                                                 ? 'bg-gray-800 text-gray-500 cursor-not-allowed opacity-50'
                                                 : isVisited
                                                     ? 'bg-amber-600/20 border border-amber-500/30 text-amber-400 hover:bg-amber-600/30'
-                                                    : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
+                                                    : 'bg-blue-600 hover:bg-blue-500 text-white shadow-sm shadow-blue-900/20'
                                                 }`}
                                         >
                                             {!!activeVisit

@@ -117,7 +117,7 @@ export function ResponsiveCard({ children, className = '', onClick }: Responsive
 
     return (
         <div
-            className={`card glass ${className}`}
+            className={`card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm ${className}`}
             onClick={onClick}
             style={{
                 padding: getPadding(),

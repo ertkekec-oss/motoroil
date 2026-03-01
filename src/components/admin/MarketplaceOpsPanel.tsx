@@ -271,7 +271,7 @@ export function MarketplaceOpsPanel() {
                                 { label: "Retrying", value: data?.counts?.failed ?? 0, icon: RefreshCw, color: "orange" },
                                 { label: "Killed (DLQ)", value: data?.counts?.dlq ?? 0, icon: Skull, color: "rose" },
                             ].map((s, i) => (
-                                <div key={i} className="bg-white p-5 rounded-3xl border border-slate-100 hover:shadow-md transition-all group overflow-hidden relative">
+                                <div key={i} className="bg-white p-5 rounded-3xl border border-slate-100 hover:shadow-sm transition-all group overflow-hidden relative">
                                     <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity`}>
                                         <s.icon className={`h-12 w-12 text-${s.color}-600`} />
                                     </div>
@@ -298,7 +298,7 @@ export function MarketplaceOpsPanel() {
                                     </div>
                                     <div className="overflow-x-auto max-h-[700px] overflow-y-auto custom-scrollbar">
                                         <table className="w-full text-left text-sm">
-                                            <thead className="sticky top-0 bg-white/95 backdrop-blur z-10 border-b border-slate-100">
+                                            <thead className="sticky top-0 bg-white dark:bg-slate-900  z-10 border-b border-slate-100">
                                                 <tr className="text-slate-400 text-[10px] font-black uppercase tracking-tight">
                                                     <th className="px-8 py-4">Time</th>
                                                     <th className="px-8 py-4">Channel</th>
@@ -361,7 +361,7 @@ export function MarketplaceOpsPanel() {
                                                 <p className="text-[11px] text-slate-400 italic line-clamp-2 leading-relaxed">"{f.errorMessage}"</p>
                                                 <div className="pt-3 border-t border-white/5 flex items-center justify-between">
                                                     <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Try {f.attempts} • {new Date(f.failedAt).toLocaleTimeString()}</div>
-                                                    <Button size="sm" onClick={() => handleAction(f.id, "REPLAY_DLQ")} className="bg-rose-600 hover:bg-rose-500 text-white font-black text-[10px] h-8 px-4 rounded-xl shadow-lg shadow-rose-900/40">REPLAY</Button>
+                                                    <Button size="sm" onClick={() => handleAction(f.id, "REPLAY_DLQ")} className="bg-rose-600 hover:bg-rose-500 text-white font-black text-[10px] h-8 px-4 rounded-xl shadow-sm ">REPLAY</Button>
                                                 </div>
                                             </div>
                                         ))}
@@ -403,7 +403,7 @@ export function MarketplaceOpsPanel() {
                         </div>
 
                         {/* Runbook Section */}
-                        <div className="bg-slate-900 p-8 rounded-[2.5rem] shadow-xl space-y-8">
+                        <div className="bg-slate-900 p-8 rounded-[2.5rem] shadow-sm space-y-8">
                             <div className="flex items-center gap-3 border-b pb-6 border-white/5">
                                 <FileText className="h-6 w-6 text-amber-500" />
                                 <h2 className="text-xl font-black text-white tracking-tight uppercase">Operational Runbook</h2>

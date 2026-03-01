@@ -83,7 +83,7 @@ export default function RegisterPage() {
 
                 <div className="relative z-10 max-w-xl animate-in fade-in slide-in-from-left-8 duration-700">
                     {cmsData?.badgeText && (
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold text-white mb-6 border border-white/10">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10  rounded-full text-[10px] font-bold text-white mb-6 border border-white/10">
                             <Zap className="w-3 h-3 text-blue-400 fill-blue-400" />
                             {cmsData.badgeText}
                         </div>
@@ -219,7 +219,7 @@ export default function RegisterPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full group relative overflow-hidden rounded-2xl py-4 font-black transition-all ${loading ? 'bg-slate-700 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-900/40 hover:-translate-y-0.5'}`}
+                            className={`w-full group relative overflow-hidden rounded-2xl py-4 font-black transition-all ${loading ? 'bg-slate-700 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-900/40 hover:-translate-y-0.5'}`}
                         >
                             <span className="relative z-10 flex items-center justify-center gap-2 uppercase tracking-widest">
                                 {loading ? 'HESAP OLUŞTURULUYOR...' : 'ÜCRETSİZ BAŞLAT'}

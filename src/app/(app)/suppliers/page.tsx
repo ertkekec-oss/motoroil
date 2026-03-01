@@ -469,7 +469,7 @@ export default function SuppliersPage() {
             return (
               <div
                 key={sup.id}
-                className={`rounded-[14px] p-5 flex flex-col gap-4 border transition-all ${cardClass} hover:shadow-md ${isLight ? 'hover:border-blue-200' : 'hover:border-blue-800'}`}
+                className={`rounded-[14px] p-5 flex flex-col gap-4 border transition-all ${cardClass} hover:shadow-sm ${isLight ? 'hover:border-blue-200' : 'hover:border-blue-800'}`}
               >
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
@@ -672,7 +672,7 @@ export default function SuppliersPage() {
 
       {/* ADD/EDIT MODAL FORMS */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 ">
           <div className={`w-[600px] max-w-full rounded-[16px] overflow-hidden flex flex-col max-h-[90vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
             <div className={`flex justify-between items-center px-6 py-4 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
               <h2 className={`text-[16px] font-semibold ${textValueClass}`}>Yeni Tedarikçi Ekle</h2>
@@ -759,7 +759,7 @@ export default function SuppliersPage() {
       )}
 
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 ">
           <div className={`w-[600px] max-w-full rounded-[16px] overflow-hidden flex flex-col max-h-[90vh] ${modalClass} animate-in zoom-in-95 duration-200`}>
             <div className={`flex justify-between items-center px-6 py-4 border-b ${isLight ? "border-slate-100" : "border-slate-800"}`}>
               <h2 className={`text-[16px] font-semibold ${textValueClass}`}>Tedarikçi Düzenle</h2>

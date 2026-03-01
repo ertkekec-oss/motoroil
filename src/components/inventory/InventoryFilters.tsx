@@ -34,7 +34,7 @@ export function InventoryFilters({
     setIsFilterOpen
 }: InventoryFiltersProps) {
     return (
-        <div className="card glass mb-6" style={{ padding: '20px' }}>
+        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm mb-6" style={{ padding: '20px' }}>
             <div className="flex-between mb-4">
                 <h3 style={{ fontSize: '16px', fontWeight: '800' }}>🔍 Gelişmiş Filtreler</h3>
                 <button

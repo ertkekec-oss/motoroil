@@ -105,7 +105,7 @@ export default function PurchasingPage() {
             </header>
 
             {/* --- LIST VIEW --- */}
-            <div className="card glass">
+            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                         <tr className="text-muted" style={{ borderBottom: '1px solid var(--border-light)', fontSize: '12px' }}>
@@ -188,7 +188,7 @@ export default function PurchasingPage() {
                         </div>
 
                         {/* ITEMS ADDER */}
-                        <div className="card glass mb-6">
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm mb-6">
                             <h4 className="text-muted mb-4" style={{ fontSize: '14px' }}>Ürünleri Giriniz</h4>
                             <div className="flex-center gap-2 mb-4">
                                 <select

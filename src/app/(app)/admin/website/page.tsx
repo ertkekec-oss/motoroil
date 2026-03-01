@@ -320,7 +320,7 @@ export default function WebsiteManagerPage() {
                     <button
                         onClick={() => activeTab === 'general' ? saveSettings() : savePage()}
                         disabled={saving}
-                        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 shadow-lg shadow-blue-200"
+                        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 shadow-sm shadow-blue-200"
                     >
                         {saving ? 'KAYDEDİLİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
                     </button>
@@ -456,7 +456,7 @@ export default function WebsiteManagerPage() {
                                             {p.slug !== 'index' && p.slug !== 'login' && p.slug !== 'register' && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); deletePage(p.id); }}
-                                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-[10px] items-center justify-center hidden group-hover:flex shadow-lg"
+                                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-[10px] items-center justify-center hidden group-hover:flex shadow-sm"
                                                 >
                                                     ✕
                                                 </button>
@@ -663,7 +663,7 @@ export default function WebsiteManagerPage() {
                                                                             value={section.content.visualUrl || ''}
                                                                             onChange={(e) => updateSectionContent(idx, 'visualUrl', e.target.value)}
                                                                         />
-                                                                        <label className="bg-blue-600 text-white px-4 py-3 rounded-lg cursor-pointer text-xs font-black shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center justify-center min-w-[100px]">
+                                                                        <label className="bg-blue-600 text-white px-4 py-3 rounded-lg cursor-pointer text-xs font-black shadow-sm shadow-blue-200 hover:bg-blue-700 transition flex items-center justify-center min-w-[100px]">
                                                                             {uploading ? '⌛...' : '📁 YÜKLE'}
                                                                             <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'visualUrl', url))} />
                                                                         </label>
@@ -943,7 +943,7 @@ export default function WebsiteManagerPage() {
                                                                                                         updateSectionContent(idx, 'items', newItems);
                                                                                                     }}
                                                                                                 />
-                                                                                                <label className="bg-slate-900 text-white px-3 py-2 rounded-lg cursor-pointer transition flex items-center gap-1 font-bold text-[10px] hover:bg-slate-800 shadow-lg shadow-slate-200">
+                                                                                                <label className="bg-slate-900 text-white px-3 py-2 rounded-lg cursor-pointer transition flex items-center gap-1 font-bold text-[10px] hover:bg-slate-800 shadow-sm shadow-slate-200">
                                                                                                     {uploading ? '⌛' : '📁 YÜKLE'}
                                                                                                     <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => {
                                                                                                         const newItems = [...section.content.items];
@@ -1073,7 +1073,7 @@ export default function WebsiteManagerPage() {
                                                                                                             updateSectionContent(idx, 'items', newItems);
                                                                                                         }}
                                                                                                     />
-                                                                                                    <label className="bg-slate-900 text-white px-3 py-2 rounded-lg cursor-pointer transition flex items-center gap-1 font-bold text-[10px] hover:bg-slate-800 shadow-lg shadow-slate-200">
+                                                                                                    <label className="bg-slate-900 text-white px-3 py-2 rounded-lg cursor-pointer transition flex items-center gap-1 font-bold text-[10px] hover:bg-slate-800 shadow-sm shadow-slate-200">
                                                                                                         {uploading ? '⌛' : '📁 YÜKLE'}
                                                                                                         <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => {
                                                                                                             const newItems = [...section.content.items];
@@ -1150,7 +1150,7 @@ export default function WebsiteManagerPage() {
                                                                                 value={section.content.footerLogoUrl || ''}
                                                                                 onChange={(e) => updateSectionContent(idx, 'footerLogoUrl', e.target.value)}
                                                                             />
-                                                                            <label className="bg-slate-900 text-white p-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-200">
+                                                                            <label className="bg-slate-900 text-white p-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition shadow-sm shadow-slate-200">
                                                                                 {uploading ? '⌛' : '📁 YÜKLE'}
                                                                                 <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => updateSectionContent(idx, 'footerLogoUrl', url))} />
                                                                             </label>
@@ -1212,7 +1212,7 @@ export default function WebsiteManagerPage() {
                                                                             value={settings.logoUrl || ''}
                                                                             onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
                                                                         />
-                                                                        <label className="bg-slate-900 text-white px-4 py-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-300 flex items-center gap-2">
+                                                                        <label className="bg-slate-900 text-white px-4 py-3 rounded-lg cursor-pointer text-xs font-bold hover:bg-slate-800 transition shadow-sm shadow-slate-300 flex items-center gap-2">
                                                                             {uploading ? '⌛' : '📁 LOGO YÜKLE'}
                                                                             <input type="file" className="sr-only" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setSettings({ ...settings, logoUrl: url }))} />
                                                                         </label>
@@ -1309,7 +1309,7 @@ export default function WebsiteManagerPage() {
                                                                                     }}
                                                                                 />
                                                                                 <button
-                                                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition shadow-lg"
+                                                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition shadow-sm"
                                                                                     onClick={() => updateSectionContent(idx, 'visualUrl', '')}
                                                                                     title="Görseli Kaldır"
                                                                                 >❌</button>
@@ -1532,7 +1532,7 @@ export default function WebsiteManagerPage() {
                                 <button
                                     onClick={saveMenus}
                                     disabled={saving}
-                                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 shadow-lg shadow-blue-200"
+                                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 shadow-sm shadow-blue-200"
                                 >
                                     {saving ? 'KAYDEDİLİYOR...' : 'DEĞİŞİKLİKLERİ KAYDET'}
                                 </button>

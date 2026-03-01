@@ -22,7 +22,7 @@ export function DespatchModal({
 
     return (
         <div className="modal-backdrop px-4">
-            <div className="modal-content glass shadow-2xl" style={{ maxWidth: '600px', width: '100%', borderRadius: '24px', overflow: 'hidden' }}>
+            <div className="modal-content bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm shadow-2xl" style={{ maxWidth: '600px', width: '100%', borderRadius: '24px', overflow: 'hidden' }}>
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                         <h3 className="text-xl font-bold m-0 flex items-center gap-2">
@@ -134,7 +134,7 @@ export function DespatchModal({
                         <button
                             onClick={handleFinalSendDespatch}
                             disabled={isSendingDespatch}
-                            className="px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all"
+                            className="px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold shadow-sm shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all"
                         >
                             {isSendingDespatch ? 'GÖNDERİLİYOR...' : 'Resmileştir ve Gönder'}
                         </button>
@@ -149,16 +149,16 @@ export function DespatchModal({
                     right: 0;
                     bottom: 0;
                     background: rgba(0,0,0,0.85);
-                    backdrop-filter: blur(12px);
+                    
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     z-index: 1000;
                 }
-                .glass {
+                .bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm {
                     background: rgba(23, 23, 23, 0.8);
                     border: 1px solid rgba(255, 255, 255, 0.1);
-                    backdrop-filter: blur(20px);
+                    
                 }
             `}</style>
         </div>

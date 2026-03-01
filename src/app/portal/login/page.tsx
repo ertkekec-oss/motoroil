@@ -81,7 +81,7 @@ export default function PortalLoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-lg shadow-blue-900/20"
+                        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-sm shadow-blue-900/20"
                     >
                         {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap →'}
                     </button>

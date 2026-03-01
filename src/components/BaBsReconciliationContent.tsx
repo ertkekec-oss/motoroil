@@ -38,7 +38,7 @@ export default function BaBsReconciliationContent() {
     ];
 
     const TableSection = ({ title, items, colorClass, emptyText }: any) => (
-        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm-plus p-0 overflow-hidden flex flex-col h-full border border-slate-200 dark:border-slate-800 shadow-xl">
+        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-sm-plus p-0 overflow-hidden flex flex-col h-full border border-slate-200 dark:border-slate-800 shadow-sm">
             <div className={`p-4 border-b border-slate-200 dark:border-slate-800 ${colorClass} bg-slate-50 dark:bg-slate-800/50`}>
                 <h3 className="text-xl font-bold flex justify-between items-center">
                     {title}

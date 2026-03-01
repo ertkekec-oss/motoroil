@@ -164,7 +164,7 @@ export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, sup
             <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
 
                 {/* MAIN PURCHASE MODAL */}
-                <div className="card glass animate-in" style={{ width: '900px', maxWidth: '95vw', background: 'var(--bg-card)', display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 1.5fr', gap: '20px', padding: '24px' }}>
+                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-in" style={{ width: '900px', maxWidth: '95vw', background: 'var(--bg-card)', display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 1.5fr', gap: '20px', padding: '24px' }}>
                     <div className="flex-col gap-4">
                         <div className="flex-between">
                             <h3>🛒 Alış Faturası Girişi</h3>
@@ -263,8 +263,8 @@ export default function SupplierPurchaseModal({ isOpen, onClose, supplierId, sup
 
                 {/* ADVANCED ADD PRODUCT MODAL (MATCHING INVENTORY PAGE) */}
                 {isProductModalOpen && (
-                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, backdropFilter: 'blur(10px)' }}>
-                        <div className="card glass animate-slide-up" style={{ width: '700px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', borderRadius: '24px', maxHeight: '90vh', overflowY: 'auto' }}>
+                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up" style={{ width: '700px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', borderRadius: '24px', maxHeight: '90vh', overflowY: 'auto' }}>
                             <div className="flex-between mb-8">
                                 <div className="flex-center gap-4">
                                     <div style={{ width: '48px', height: '48px', background: 'var(--primary)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>✨</div>

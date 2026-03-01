@@ -123,7 +123,6 @@ export default function SetupWizard() {
                 width: '100%',
                 maxWidth: '800px',
                 background: 'rgba(255,255,255,0.03)',
-                backdropFilter: 'blur(20px)',
                 borderRadius: '24px',
                 border: '1px solid rgba(255,255,255,0.1)',
                 padding: '48px',

@@ -136,7 +136,7 @@ export default async function SellerAutomationPage() {
                         </div>
 
                         <div className="p-6 bg-slate-50 flex justify-end">
-                            <button type="submit" className="px-10 py-2.5 bg-[#1F3A5F] text-white font-bold rounded-lg shadow-md hover:bg-[#1F3A5F]/90 active:scale-95 transition-all">
+                            <button type="submit" className="px-10 py-2.5 bg-[#1F3A5F] text-white font-bold rounded-lg shadow-sm hover:bg-[#1F3A5F]/90 active:scale-95 transition-all">
                                 Ayarları Kaydet
                             </button>
                         </div>

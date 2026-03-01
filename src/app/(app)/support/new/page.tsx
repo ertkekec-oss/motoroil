@@ -65,7 +65,7 @@ export default function NewTicketPage() {
                 <p className="text-gray-400 text-sm mt-1">Sorununuzu detaylı bir şekilde açıklayın, size en kısa sürede dönüş yapacağız.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-[#0f111a] border border-white/5 p-6 md:p-8 rounded-3xl shadow-xl shadow-black/50 space-y-6">
+            <form onSubmit={handleSubmit} className="bg-[#0f111a] border border-white/5 p-6 md:p-8 rounded-3xl shadow-sm shadow-black/50 space-y-6">
                 {error && (
                     <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm font-medium flex items-start gap-2">
                         <span className="mt-0.5">⚠️</span> <span>{error}</span>
@@ -131,7 +131,7 @@ export default function NewTicketPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="px-8 py-3.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-500/20 disabled:opacity-50 flex items-center gap-2"
+                        className="px-8 py-3.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition-all shadow-sm  disabled:opacity-50 flex items-center gap-2"
                     >
                         {loading ? 'Gönderiliyor...' : 'Talebi Gönder →'}
                     </button>

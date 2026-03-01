@@ -120,7 +120,7 @@ export default function VariantsPage() {
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {attributes.map(attr => (
-                                <div key={attr.id} className="bg-white dark:bg-[#0f172a] rounded-[20px] p-5 border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md transition-all group">
+                                <div key={attr.id} className="bg-white dark:bg-[#0f172a] rounded-[20px] p-5 border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-sm transition-all group">
                                     <div className="flex justify-between items-start mb-4">
                                         <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">{attr.name}</h4>
                                         <button className="text-slate-300 dark:text-white/20 hover:text-red-500 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">

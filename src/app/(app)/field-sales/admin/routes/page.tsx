@@ -578,7 +578,7 @@ export default function AdminRoutesPage() {
 
             {/* Rota Atama Modalı */}
             {showAssignModal && (
-                <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
+                <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4  animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
                     <div className={`w-full max-w-lg overflow-hidden rounded-[24px] border shadow-2xl relative ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
                         <div className="p-6 md:p-8 relative z-10">
                             <h2 className={`text-[20px] font-bold mb-1 ${textMain}`}>Rota Ataması</h2>
@@ -646,7 +646,7 @@ export default function AdminRoutesPage() {
 
             {/* Şablon Oluştur Modalı */}
             {showCreateTemplateModal && (
-                <div className={`fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/60' : 'bg-slate-900/80'}`}>
+                <div className={`fixed inset-0 z-[110] flex items-center justify-center p-4  animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/60' : 'bg-slate-900/80'}`}>
                     <div className={`w-full max-w-4xl overflow-hidden rounded-[24px] border shadow-2xl flex flex-col max-h-[90vh] ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
                         <div className={`p-6 md:p-8 flex-1 overflow-y-auto ${isLight ? 'bg-slate-50' : 'bg-[#020617]'}`}>
                             <div className="flex justify-between items-start mb-8">
@@ -761,7 +761,7 @@ export default function AdminRoutesPage() {
 
             {/* Şablon Adı Düzenleme Modalı */}
             {editingTemplate && (
-                <div className={`fixed inset-0 z-[120] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
+                <div className={`fixed inset-0 z-[120] flex items-center justify-center p-4  animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/40' : 'bg-slate-900/60'}`}>
                     <div className={`w-full max-w-md overflow-hidden rounded-[24px] border shadow-2xl p-6 md:p-8 ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
                         <div className="flex justify-between items-center mb-6">
                             <h2 className={`text-[20px] font-bold ${textMain}`}>Adı Değiştir</h2>

@@ -364,7 +364,7 @@ export default function QuoteForm({ initialData, onSave, onCancel }: any) {
                 </div>
 
                 {/* Sticky Action Footer */}
-                <div className="sticky bottom-0 z-10 bg-white/90 dark:bg-[#0a0a0b]/90 backdrop-blur-md border-t border-slate-200 dark:border-white/10 py-4 -mx-4 sm:mx-0 sm:px-0 flex justify-end gap-3 px-4">
+                <div className="sticky bottom-0 z-10 bg-white/90 dark:bg-[#0a0a0b]/90  border-t border-slate-200 dark:border-white/10 py-4 -mx-4 sm:mx-0 sm:px-0 flex justify-end gap-3 px-4">
                     <button type="button" onClick={onCancel} className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 px-6 h-[42px] rounded-[12px] text-[13px] font-medium transition-colors">
                         İptal Et
                     </button>

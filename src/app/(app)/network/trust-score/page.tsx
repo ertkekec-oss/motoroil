@@ -170,7 +170,7 @@ export default function TrustScorePage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex-shrink-0 bg-white p-4 rounded-xl border border-indigo-200 text-center shadow-lg shadow-indigo-100/50">
+                            <div className="flex-shrink-0 bg-white p-4 rounded-xl border border-indigo-200 text-center shadow-sm shadow-indigo-100/50">
                                 <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1">Avantaj Durumu</p>
                                 {scoreData.tier === 'A' || scoreData.tier === 'B' ? (
                                     <p className="text-xl font-black text-green-600">AKTİF</p>

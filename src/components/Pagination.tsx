@@ -46,7 +46,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                     onClick={() => typeof p === 'number' ? onPageChange(p) : null}
                     disabled={typeof p !== 'number'}
                     className={`min-w-[40px] h-[40px] px-2 rounded-lg text-sm font-bold transition-all border ${p === currentPage
-                            ? 'bg-[var(--primary)] border-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20'
+                            ? 'bg-[var(--primary)] border-[var(--primary)] text-white shadow-sm shadow-[var(--primary)]/20'
                             : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10'
                         } ${typeof p !== 'number' ? 'cursor-default !bg-transparent !border-transparent' : ''}`}
                 >

@@ -406,7 +406,7 @@ export default function SalesMonitor({
                     right: 24px;
                     width: 320px;
                     background: var(--bg-card);
-                    backdrop-filter: blur(25px) saturate(200%);
+                    
                     border: 1px solid var(--border-rich);
                     border-radius: 24px;
                     padding: 24px;

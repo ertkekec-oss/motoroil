@@ -16,12 +16,12 @@ export default function Analytics() {
                 </div>
                 <div className="space-y-5">
                     {METRICS.map(m => (
-                        <div key={m.label} className="p-5 rounded-2xl border border-white/5" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                        <div key={m.label} className="p-5 rounded-2xl border border-white/5" style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>
                             <div className="flex justify-between items-center mb-3">
                                 <span className="text-sm font-bold text-white">{m.label}</span>
                                 <span className="text-xs font-black text-orange-400">{m.after}{m.unit.replace('%', '').trim() !== 'azalma' ? '+' : ''} {m.unit}</span>
                             </div>
-                            <div className="relative h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                            <div className="relative h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--bg-primary, #ffffff)' }}>
                                 <div
                                     className="absolute left-0 top-0 h-full rounded-full transition-all"
                                     style={{ width: `${m.after}%`, background: 'linear-gradient(90deg,#FF5500,#FF8C42)' }}

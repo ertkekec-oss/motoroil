@@ -78,7 +78,7 @@ function DemoModal({ onClose }: { onClose: () => void }) {
                     placeholder={placeholder}
                     className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-medium text-white placeholder-gray-600 outline-none transition-all focus:ring-2"
                     style={{
-                        backgroundColor: 'rgba(255,255,255,0.05)',
+                        backgroundColor: 'var(--bg-primary, #ffffff)',
                         border: '1px solid rgba(255,255,255,0.08)',
                     }}
                 />
@@ -90,7 +90,7 @@ function DemoModal({ onClose }: { onClose: () => void }) {
         /* Backdrop */
         <div
             className="fixed inset-0 z-[999] flex items-center justify-center p-4"
-            style={{ backgroundColor: 'rgba(0,0,0,0.80)', backdropFilter: 'blur(12px)' }}
+            style={{ backgroundColor: 'rgba(0,0,0,0.80)' }}
             onClick={e => { if (e.target === e.currentTarget) onClose(); }}
             aria-modal="true"
             role="dialog"

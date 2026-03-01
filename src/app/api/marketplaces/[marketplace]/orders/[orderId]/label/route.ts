@@ -208,7 +208,7 @@ function pendingHtml(retryAfterSec: number, message: string) {
   <title>Etiket hazırlanıyor...</title>
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto; padding: 0; margin: 0; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
-    .card { max-width: 480px; padding: 2rem; border-radius: 1.5rem; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .card { max-width: 480px; padding: 2rem; border-radius: 1.5rem; background: rgba(30, 41, 59, 0.7);  border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
     .loader { width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem; }
     h2 { font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 600; }
     .muted { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; }
@@ -237,7 +237,7 @@ function errorHtml(message: string) {
   <title>Etiket Sistem Hatası</title>
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto; padding: 0; margin: 0; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
-    .card { max-width: 800px; width: 90%; padding: 2rem; border-radius: 1.5rem; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(239, 68, 68, 0.3); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .card { max-width: 800px; width: 90%; padding: 2rem; border-radius: 1.5rem; background: rgba(30, 41, 59, 0.7);  border: 1px solid rgba(239, 68, 68, 0.3); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
     h2 { font-size: 1.7rem; margin-bottom: 0.5rem; font-weight: 600; color: #ef4444; }
     .muted { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; }
     .debug-box { background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 1rem; text-align: left; overflow-x: auto; border: 1px solid rgba(255,255,255,0.05); }

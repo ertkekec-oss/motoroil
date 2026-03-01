@@ -217,7 +217,7 @@ export default function AccountingPage() {
                 {cards.map((card, idx) => (
                     <div
                         key={idx}
-                        className={`p-6 rounded-2xl border ${card.border} ${card.bg} card glass backdrop-blur-sm relative overflow-hidden group hover:scale-[1.02] transition-all duration-300`}
+                        className={`p-6 rounded-2xl border ${card.border} ${card.bg} card glass  relative overflow-hidden group hover:scale-[1.02] transition-all duration-300`}
                     >
                         <div className="flex justify-between items-start mb-4">
                             <span className="text-xs font-bold tracking-wider text-white/40">{card.title}</span>
@@ -257,7 +257,7 @@ export default function AccountingPage() {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-sm ${activeTab === tab.id
-                            ? `${tab.color} text-white shadow-lg scale-105`
+                            ? `${tab.color} text-white shadow-sm scale-105`
                             : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
                             }`}
                     >
@@ -274,7 +274,7 @@ export default function AccountingPage() {
                             <h3 className="text-xl font-bold text-white">Alacak Takibi (Cari & Çek)</h3>
                             <button
                                 onClick={() => setModalType('collection')}
-                                className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium text-sm transition-colors shadow-lg shadow-orange-900/20"
+                                className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium text-sm transition-colors shadow-sm "
                             >
                                 + Tahsilat Ekle
                             </button>
@@ -340,7 +340,7 @@ export default function AccountingPage() {
                             <h3 className="text-xl font-bold text-white">Borç Takibi (Tedarikçi & Çek)</h3>
                             <button
                                 onClick={() => setModalType('debt')}
-                                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium text-sm transition-colors shadow-lg shadow-rose-900/20"
+                                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium text-sm transition-colors shadow-sm "
                             >
                                 + Borç Ekle
                             </button>
@@ -515,7 +515,7 @@ export default function AccountingPage() {
                                 <div
                                     key={i}
                                     className={`group relative p-6 rounded-2xl border transition-all duration-300 hover:scale-[1.02] ${kasa.bankConnectionId
-                                        ? 'bg-emerald-500/5 border-emerald-500/20 shadow-lg shadow-emerald-500/5'
+                                        ? 'bg-emerald-500/5 border-emerald-500/20 shadow-sm '
                                         : 'bg-white/5 border-white/10'
                                         }`}
                                 >
@@ -650,7 +650,7 @@ export default function AccountingPage() {
                                 </button>
                                 <button
                                     onClick={() => setModalType('expense')}
-                                    className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium text-sm transition-colors shadow-lg shadow-rose-900/20"
+                                    className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium text-sm transition-colors shadow-sm "
                                 >
                                     + Gider Ekle
                                 </button>

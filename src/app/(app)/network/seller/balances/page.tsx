@@ -67,7 +67,7 @@ export default async function SellerBalancesPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-black text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+                <div className="bg-black text-white p-6 rounded-2xl shadow-sm relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-20">
                         <Wallet className="w-24 h-24" />
                     </div>

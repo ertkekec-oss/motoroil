@@ -32,7 +32,7 @@ export default async function AdminHealthDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Component 1: Engine/DB */}
-                <div className="p-5 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md transition-shadow">
+                <div className="p-5 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-sm transition-shadow">
                     <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Database Engine</p>
                     <div className="flex items-center gap-3">
                         <div className={`p-2.5 rounded-lg ${healthData.components?.db?.status === 'up' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
@@ -46,7 +46,7 @@ export default async function AdminHealthDashboard() {
                 </div>
 
                 {/* Component 2: Redis / BullMQ */}
-                <div className="p-5 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md transition-shadow">
+                <div className="p-5 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-sm transition-shadow">
                     <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Rate Limit & Queue</p>
                     <div className="flex items-center gap-3">
                         <div className={`p-2.5 rounded-lg ${healthData.components?.redis?.status === 'up' ? 'bg-blue-100 text-blue-600' : 'bg-rose-100 text-rose-600'}`}>
@@ -60,7 +60,7 @@ export default async function AdminHealthDashboard() {
                 </div>
 
                 {/* Component 3: Schema Drift */}
-                <div className="p-5 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md transition-shadow">
+                <div className="p-5 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-sm transition-shadow">
                     <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Schema Drift Guard</p>
                     <div className="flex items-center gap-3">
                         <div className={`p-2.5 rounded-lg ${healthData.components?.migrations?.status === 'synced' ? 'bg-indigo-100 text-indigo-600' : 'bg-amber-100 text-amber-600'}`}>
@@ -76,7 +76,7 @@ export default async function AdminHealthDashboard() {
                 </div>
 
                 {/* Component 4: Escrow Activity Pulse */}
-                <div className="p-5 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md transition-shadow">
+                <div className="p-5 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-sm transition-shadow">
                     <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Escrow Pulse (15m)</p>
                     <div className="flex items-center gap-3">
                         <div className={`p-2.5 rounded-lg ${healthData.components?.activity?.recentPayoutReleased ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>

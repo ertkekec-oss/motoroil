@@ -52,7 +52,7 @@ export default function AdminGrowthRevenue() {
                                     <div className="w-full bg-blue-100 absolute bottom-0 z-0" style={{ height: `${(pt.impressions / 30000) * 100}%` }}></div>
                                     <div className="w-full bg-blue-600 transition-all z-10" style={{ height: `${Math.max((pt.revenue / (data.totalBoostRev || 1)) * 100, 5)}%` }}></div>
 
-                                    <div className="opacity-0 group-hover:opacity-100 absolute bottom-full mb-2 bg-slate-900 text-white text-[10px] p-2 rounded whitespace-nowrap shadow-xl z-20 transition-opacity pointers-events-none">
+                                    <div className="opacity-0 group-hover:opacity-100 absolute bottom-full mb-2 bg-slate-900 text-white text-[10px] p-2 rounded whitespace-nowrap shadow-sm z-20 transition-opacity pointers-events-none">
                                         <div className="font-bold border-b border-slate-700 pb-1 mb-1">{pt.date}</div>
                                         <div className="text-blue-300">Gösterim Payı: {pt.impressions.toLocaleString()}</div>
                                         <div className="text-emerald-400">Boost Ciro: {pt.revenue.toFixed(2)} TRY</div>

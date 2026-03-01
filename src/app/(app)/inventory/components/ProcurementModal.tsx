@@ -92,7 +92,7 @@ export default function ProcurementModal({ isOpen, onClose, products }: Procurem
     };
 
     return (
-        <div className="fixed inset-0 z-[4000] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[4000] flex items-center justify-center p-4 bg-slate-900/50  animate-in fade-in duration-200">
             <div className="w-full max-w-5xl bg-white dark:bg-[#0f172a] rounded-[24px] border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
 
                 {/* Header */}

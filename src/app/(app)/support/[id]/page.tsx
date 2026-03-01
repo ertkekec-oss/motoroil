@@ -91,7 +91,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
             {/* Conversation Area */}
             <div className="flex-1 overflow-y-auto space-y-6 pr-4 pb-4 custom-scrollbar">
                 {/* Original Description */}
-                <div className="bg-[#0f111a] border border-white/5 p-6 rounded-2xl shadow-xl">
+                <div className="bg-[#0f111a] border border-white/5 p-6 rounded-2xl shadow-sm">
                     <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-4">
                         <div className="font-bold text-white flex items-center gap-2">
                             <span className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-xs">SEN</span>
@@ -120,7 +120,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                     const isMe = msg.authorType === 'CUSTOMER';
 
                     return (
-                        <div key={msg.id} className={`p-6 rounded-2xl shadow-xl w-full border ${isSystem ? 'bg-blue-900/10 border-blue-500/20' : isAdmin ? 'bg-orange-900/10 border-orange-500/20' : 'bg-[#0f111a] border-white/5'}`}>
+                        <div key={msg.id} className={`p-6 rounded-2xl shadow-sm w-full border ${isSystem ? 'bg-blue-900/10 border-blue-500/20' : isAdmin ? 'bg-orange-900/10 border-orange-500/20' : 'bg-[#0f111a] border-white/5'}`}>
                             <div className={`flex items-center justify-between mb-4 border-b pb-4 ${isSystem ? 'border-blue-500/10' : isAdmin ? 'border-orange-500/10' : 'border-white/5'}`}>
                                 <div className="font-bold text-white flex items-center gap-2">
                                     {isMe && <span className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-xs">SEN</span>}

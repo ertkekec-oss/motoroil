@@ -72,7 +72,7 @@ export default function LedgerDetailModal({ isOpen, onClose, account }: LedgerDe
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/80 " onClick={onClose} />
             <div className="bg-[#121212] border border-white/10 rounded-2xl w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95">
 
                 {/* HEADER */}
@@ -105,7 +105,7 @@ export default function LedgerDetailModal({ isOpen, onClose, account }: LedgerDe
                         <div className="absolute inset-0 flex items-center justify-center text-gray-500">Yükleniyor...</div>
                     ) : (
                         <table className="w-full text-left font-mono text-xs md:text-sm">
-                            <thead className="text-[10px] uppercase text-gray-500 bg-white/5 sticky top-0 z-10 backdrop-blur-md">
+                            <thead className="text-[10px] uppercase text-gray-500 bg-white/5 sticky top-0 z-10 ">
                                 <tr>
                                     <th className="p-4 w-[120px]">Tarih</th>
                                     <th className="p-4 w-[100px]">Fiş No</th>
@@ -147,7 +147,7 @@ export default function LedgerDetailModal({ isOpen, onClose, account }: LedgerDe
                                     </tr>
                                 ))}
                             </tbody>
-                            <tfoot className="bg-white/5 sticky bottom-0 z-10 backdrop-blur-md font-bold text-white border-t border-white/10">
+                            <tfoot className="bg-white/5 sticky bottom-0 z-10  font-bold text-white border-t border-white/10">
                                 <tr>
                                     <td colSpan={3} className="p-4 text-right text-gray-400 uppercase tracking-widest text-[10px]">Genel Toplam</td>
                                     <td className="p-4 text-right text-emerald-500">

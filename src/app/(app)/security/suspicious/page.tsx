@@ -64,14 +64,14 @@ export default function SuspiciousActivityPage() {
     return (
         <div className="p-6 pb-32 animate-fade-in min-h-screen bg-[#080911]">
             <style jsx>{`
-                .glass-card {
+                .bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card {
                     background: rgba(15, 17, 30, 0.4);
-                    backdrop-filter: blur(20px);
+                    
                     border: 1px solid rgba(255, 255, 255, 0.05);
                     border-radius: 24px;
                     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 }
-                .glass-card:hover {
+                .bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card:hover {
                     border-color: var(--primary);
                     background: rgba(15, 17, 30, 0.6);
                 }
@@ -115,14 +115,14 @@ export default function SuspiciousActivityPage() {
                 <div className="flex bg-white/5 p-1 rounded-2xl border border-white/5 animate-in slide-in-from-right duration-700">
                     <button
                         onClick={() => setActiveSecurityTab('suspicious')}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all relative ${activeSecurityTab === 'suspicious' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all relative ${activeSecurityTab === 'suspicious' ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'text-white/40 hover:text-white'}`}
                     >
                         🚨 ŞÜPHELİ İŞLEMLER
                         {stats.today > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#FF416C] rounded-full text-[8px] flex items-center justify-center border-2 border-[#080911]">{stats.today}</span>}
                     </button>
                     <button
                         onClick={() => setActiveSecurityTab('approvals')}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all relative ${activeSecurityTab === 'approvals' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all relative ${activeSecurityTab === 'approvals' ? 'bg-primary text-white shadow-sm shadow-primary/20' : 'text-white/40 hover:text-white'}`}
                     >
                         📋 ONAY BEKLEYENLER
                         {stats.pendingApprovals > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full text-[8px] flex items-center justify-center border-2 border-[#080911]">{stats.pendingApprovals}</span>}
@@ -133,22 +133,22 @@ export default function SuspiciousActivityPage() {
             {activeSecurityTab === 'suspicious' ? (
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 animate-in fade-in duration-1000">
-                        <div className="glass-card p-6 border-l-4 border-l-[#FF416C]">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-6 border-l-4 border-l-[#FF416C]">
                             <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">Bugün</div>
                             <div className="text-3xl font-black text-white">{stats.today}</div>
                             <div className="text-[10px] font-bold text-[#FF416C]/60 mt-1 uppercase">Tespit Edilen Olay</div>
                         </div>
-                        <div className="glass-card p-6 border-l-4 border-l-amber-500">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-6 border-l-4 border-l-amber-500">
                             <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">Son 7 Gün</div>
                             <div className="text-3xl font-black text-white">{stats.week}</div>
                             <div className="text-[10px] font-bold text-amber-500/60 mt-1 uppercase">Haftalık Toplam</div>
                         </div>
-                        <div className="glass-card p-6">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-6">
                             <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">Tüm Zamanlar</div>
                             <div className="text-3xl font-black text-white">{stats.total}</div>
                             <div className="text-[10px] font-bold text-white/20 mt-1 uppercase">Kayıtlı Olay</div>
                         </div>
-                        <div className="glass-card p-4 flex flex-col justify-center">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-4 flex flex-col justify-center">
                             <select
                                 value={branchFilter}
                                 onChange={(e) => setBranchFilter(e.target.value)}
@@ -186,7 +186,7 @@ export default function SuspiciousActivityPage() {
                         )}
                     </div>
 
-                    <div className="glass-card overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card overflow-hidden">
                         <div className="p-8 border-b border-white/5 flex justify-between items-center group/header">
                             <div className="flex items-center gap-4">
                                 <h3 className="text-xl font-black text-white tracking-tight group-hover/header:text-primary transition-colors">Olay Günlüğü</h3>
@@ -274,16 +274,16 @@ export default function SuspiciousActivityPage() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {pendingProducts.filter(p => p.status === 'pending').length === 0 ? (
-                            <div className="col-span-full glass-card py-32 flex flex-col items-center justify-center text-white/10">
+                            <div className="col-span-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card py-32 flex flex-col items-center justify-center text-white/10">
                                 <span className="text-6xl mb-4">✨</span>
                                 <p className="text-sm font-black uppercase tracking-widest">Tüm talepler işlendi.</p>
                             </div>
                         ) : (
                             pendingProducts.filter(p => p.status === 'pending').map((pending, idx) => (
-                                <div key={pending.id} className="glass-card p-8 group border-t-4 border-t-amber-500/50 hover:border-t-amber-500 transition-all animate-in zoom-in-95 duration-500" style={{ animationDelay: `${idx * 100}ms` }}>
+                                <div key={pending.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group border-t-4 border-t-amber-500/50 hover:border-t-amber-500 transition-all animate-in zoom-in-95 duration-500" style={{ animationDelay: `${idx * 100}ms` }}>
                                     <div className="flex justify-between items-start mb-8">
                                         <div className="flex gap-5 items-center">
-                                            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center text-3xl border border-amber-500/20 shadow-lg shadow-amber-500/5 group-hover:scale-110 transition-transform">
+                                            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center text-3xl border border-amber-500/20 shadow-sm shadow-amber-500/5 group-hover:scale-110 transition-transform">
                                                 📦
                                             </div>
                                             <div>
@@ -300,7 +300,7 @@ export default function SuspiciousActivityPage() {
                                                     approveProduct(pending.id);
                                                     showSuccess('Başarılı', 'Ürün kartı onaylandı.');
                                                 }}
-                                                className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg shadow-emerald-500/20" title="Onayla">
+                                                className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm " title="Onayla">
                                                 ✓
                                             </button>
                                             <button
@@ -308,7 +308,7 @@ export default function SuspiciousActivityPage() {
                                                     rejectProduct(pending.id);
                                                     showError('Reddedildi', 'Talep reddedildi.');
                                                 }}
-                                                className="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg shadow-red-500/20" title="Reddet">
+                                                className="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm shadow-red-500/20" title="Reddet">
                                                 ✕
                                             </button>
                                         </div>

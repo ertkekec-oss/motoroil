@@ -20,7 +20,7 @@ export default function CTA({ onDemoClick }: { onDemoClick?: () => void }) {
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link
                                 href="/login"
-                                className="px-8 py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-105 hover:shadow-xl inline-block"
+                                className="px-8 py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-105 hover:shadow-sm inline-block"
                                 style={{ background: 'linear-gradient(135deg,#FF5500,#E64A00)', boxShadow: '0 8px 30px rgba(255,85,0,0.3)' }}
                             >
                                 Ücretsiz Başla →

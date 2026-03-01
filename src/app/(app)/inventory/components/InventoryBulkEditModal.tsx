@@ -71,7 +71,7 @@ export default function InventoryBulkEditModal({
     };
 
     return (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-slate-900/50  animate-fade-in">
             <div
                 className={`bg-white dark:bg-[#0f172a] flex flex-col border border-slate-200 dark:border-white/10 rounded-[24px] shadow-2xl animate-in ${(mode === 'barcode' || mode === 'price') ? 'w-full max-w-7xl h-[85vh]' : 'w-full max-w-lg'
                     }`}

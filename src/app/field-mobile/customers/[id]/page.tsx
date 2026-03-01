@@ -115,13 +115,13 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                             <div className="grid grid-cols-2 gap-2">
                                 <button
                                     onClick={() => router.push(`/field-mobile/order/create?visitId=${activeVisit.id}&customerId=${id}&customerName=${customer.name}`)}
-                                    className="bg-blue-600 py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-900/20"
+                                    className="bg-blue-600 py-3 rounded-xl font-bold text-sm shadow-sm shadow-blue-900/20"
                                 >
                                     Sipariş Al
                                 </button>
                                 <button
                                     onClick={() => router.push(`/field-mobile/collection/create?visitId=${activeVisit.id}&customerId=${id}&customerName=${customer.name}`)}
-                                    className="bg-green-600 py-3 rounded-xl font-bold text-sm shadow-lg shadow-green-900/20"
+                                    className="bg-green-600 py-3 rounded-xl font-bold text-sm shadow-sm shadow-green-900/20"
                                 >
                                     Tahsilat Gir
                                 </button>
@@ -135,7 +135,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                         <button
                             onClick={handleStartVisit}
                             disabled={actionLoading}
-                            className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2"
+                            className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-sm shadow-blue-900/20 transition-all flex items-center justify-center gap-2"
                         >
                             {actionLoading ? 'İŞLENİYOR...' : '📍 ZİYARETİ BAŞLAT'}
                         </button>

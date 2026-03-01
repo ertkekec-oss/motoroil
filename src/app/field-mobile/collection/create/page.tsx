@@ -160,7 +160,7 @@ export default function MobileCreateCollectionPage() {
                 <button
                     onClick={handleSave}
                     disabled={saving || !amount}
-                    className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-black py-5 rounded-2xl shadow-xl shadow-green-900/20 transition-all text-sm tracking-widest"
+                    className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-black py-5 rounded-2xl shadow-sm shadow-green-900/20 transition-all text-sm tracking-widest"
                 >
                     {saving ? 'KAYDEDİLİYOR...' : 'TAHSİLATI TAMAMLA'}
                 </button>

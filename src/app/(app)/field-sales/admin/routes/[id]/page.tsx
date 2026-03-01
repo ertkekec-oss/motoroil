@@ -219,7 +219,7 @@ export default function AdminRouteDetailPage() {
                     </button>
                     <button
                         onClick={() => { setShowAddModal(true); fetchCustomers(); }}
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg shadow-blue-900/20 text-sm"
+                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-sm shadow-blue-900/20 text-sm"
                     >
                         + Durak Ekle
                     </button>
@@ -303,7 +303,7 @@ export default function AdminRouteDetailPage() {
 
             {/* Durak Ekleme Modalı */}
             {showAddModal && (
-                <div className="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/85  z-50 flex items-center justify-center p-4">
                     <div className="bg-[#161b22] border border-white/10 w-full max-w-lg h-[80vh] flex flex-col rounded-3xl shadow-2xl">
                         <div className="p-6 border-b border-white/5 flex justify-between items-center">
                             <h2 className="text-xl font-black">Durak Ekle</h2>
@@ -358,7 +358,7 @@ export default function AdminRouteDetailPage() {
 
             {/* Rota Düzenleme Modalı */}
             {showEditModal && (
-                <div className="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/85  z-50 flex items-center justify-center p-4">
                     <div className="bg-[#161b22] border border-white/10 w-full max-w-md rounded-3xl shadow-2xl p-8">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-black">Rotayı Düzenle</h2>
