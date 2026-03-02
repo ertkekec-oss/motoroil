@@ -13,10 +13,10 @@ function FinanceTabs() {
     const activeTab = searchParams.get('tab') || 'earnings';
 
     const tabs = [
-        { id: 'earnings', label: 'Earnings (Kazançlar)' },
-        { id: 'payouts', label: 'Payouts (Para Çekme)' },
-        { id: 'invoices', label: 'Invoices (Boost/Hub)' },
-        { id: 'payments', label: 'Transactions (Ödemeler)' }
+        { id: 'earnings', label: 'Hak Ediş & Karlılık' },
+        { id: 'payouts', label: 'Mali Çıkış (Payout)' },
+        { id: 'invoices', label: 'B2B Finansal Matbuular' },
+        { id: 'payments', label: 'Platform İçi Transferler' }
     ];
 
     const renderContent = () => {
@@ -30,35 +30,34 @@ function FinanceTabs() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto w-full pb-10">
-            {/* Header & Tabs */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4 mb-6 px-6 pt-6">
+        <div className="bg-slate-50 min-h-screen w-full font-sans">
+            <div className="max-w-[1600px] mx-auto pt-8">
+                {/* Header & Tabs */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8 px-4 sm:px-6 lg:px-8">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">
+                            B2B Finansal Operasyon Merkezi (Finance Gateway)
+                        </h1>
+                        <p className="text-sm text-slate-600">
+                            Pazaryeri tahsilatları, escrow hakediş blokajları, komisyon faturaları ve nakit (payout) çıkış talepleri paneli.
+                        </p>
+                    </div>
+
+                    <div className="flex bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden p-1 shrink-0">
+                        {tabs.map(tab => (
+                            <button
+                                key={tab.id}
+                                onClick={() => router.push(`?tab=${tab.id}`)}
+                                className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${activeTab === tab.id ? 'bg-slate-900 text-white shadow-sm' : 'bg-transparent text-slate-700 hover:text-slate-900 hover:bg-slate-50'}`}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Content Area */}
                 <div>
-                    <h1 className="text-2xl font-black tracking-tight text-slate-900">Ağ Finansı & Faturalar</h1>
-                    <p className="text-slate-500 mt-1 text-sm">Escrow, hakedişler, faturalar ve tahsilat durumları.</p>
-                </div>
-
-                <div className="flex gap-1 bg-slate-100 p-1.5 rounded-lg border border-slate-200 shadow-sm w-fit overflow-x-auto">
-                    {tabs.map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => router.push(`?tab=${tab.id}`)}
-                            className={`px-4 py-2 text-sm font-bold rounded-md transition-colors whitespace-nowrap ${activeTab === tab.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Content Area */}
-            <div className="px-6">
-                {/* 
-                  Instead of double padding from the inner pages, we just render them 
-                  directly. The inner pages have their own max-w-7xl and p-6 wrapper.
-                  We can let them render naturally.
-                */}
-                <div className="-mx-6 -mt-6">
                     {renderContent()}
                 </div>
             </div>
@@ -68,7 +67,14 @@ function FinanceTabs() {
 
 export default function UnifiedFinancePage() {
     return (
-        <Suspense fallback={<div className="p-10 text-center font-bold text-slate-400">Finans verileri yükleniyor...</div>}>
+        <Suspense fallback={
+            <div className="bg-slate-50 min-h-screen flex items-center justify-center p-12">
+                <div className="bg-white p-12 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center items-center">
+                    <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-4"></div>
+                    <span className="text-sm font-medium text-slate-500 uppercase tracking-widest">Finans Modülleri Başlatılıyor...</span>
+                </div>
+            </div>
+        }>
             <FinanceTabs />
         </Suspense>
     );

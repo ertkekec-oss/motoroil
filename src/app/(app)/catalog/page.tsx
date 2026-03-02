@@ -25,6 +25,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
             },
             // If we are NOT showing out of stock, enforce availableQty > 0
             // More strict minQty check handled in JS loop for better precision
+            // ...(SHOW_OOS ? {} : { availableQty: { gt: 0 } }) // TS Issue workaround -> Prisma does not perfectly handle conditional where spread with relation. We filter it anyway in map.
             ...(SHOW_OOS ? {} : { availableQty: { gt: 0 } })
         },
         include: {
@@ -67,78 +68,125 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
     const items = Array.from(catalogMap.values());
 
     return (
-        <div className="min-h-screen bg-[#F6F7F9] text-slate-900 p-6 font-sans">
-            <div className="max-w-[1200px] mx-auto space-y-6">
-
-                <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <div className="bg-slate-50 min-h-screen pb-16 w-full font-sans">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-[#1F3A5F]">B2B Product Catalog</h1>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Browse products and available sellers on the network.
+                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">
+                            B2B Tedarik Kataloğu <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 tracking-widest uppercase">Global Ağ</span>
+                        </h1>
+                        <p className="text-sm text-slate-600">
+                            Pazaryerindeki onaylı tedarikçilerin stoklarında bulunan ve anında sipariş edilebilir hazır ürünler tablosu.
                         </p>
+                    </div>
+
+                    <div className="flex bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden p-1 shrink-0">
+                        <Link
+                            href="/catalog"
+                            className="px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors bg-slate-900 text-white shadow-sm"
+                        >
+                            Tüm Lüks Konsorsiyum Ağı
+                        </Link>
                     </div>
                 </div>
 
-                {/* Filters Mockup Header */}
-                <div className="bg-white border border-slate-200 rounded-md p-4 flex gap-4 items-center">
-                    <input type="text" placeholder="Search by name or code..." className="text-sm border border-slate-300 rounded-md px-3 py-1.5 focus:outline-none focus:border-[#1F3A5F] w-64" />
-                    <button className="px-4 py-1.5 bg-black text-white text-sm font-medium rounded-md hover:opacity-90 active:scale-95 transition-transform">
-                        Filter
-                    </button>
+                {/* Filtre Strip */}
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                    <div className="relative w-full sm:w-80">
+                        <input
+                            type="text"
+                            placeholder="Marka, kod, isim veya SKU ile arayın..."
+                            className="w-full text-sm border border-slate-300 rounded-lg px-4 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-all font-medium placeholder:text-slate-400"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <button className="px-5 py-2 bg-slate-900 text-white text-[13px] font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm">
+                            Filtreyi Uygula
+                        </button>
+                        <button className="px-5 py-2 border border-slate-300 text-slate-700 text-[13px] font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-sm bg-white">
+                            Kategori Seç
+                        </button>
+                    </div>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-md overflow-hidden flex flex-col h-[calc(100vh-280px)]">
-                    <div className="overflow-auto flex-1 relative">
-                        <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-[#1F3A5F] text-white sticky top-0 z-10">
+                {/* Ana Veri Tablosu */}
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                        <h2 className="text-base font-semibold text-slate-900">Endüstriyel Parça İndeksi</h2>
+                        <span className="inline-flex items-center justify-center min-w-8 h-8 px-2 bg-slate-200/50 text-[12px] font-bold text-slate-700 rounded-lg border border-slate-200 shadow-sm">
+                            {items.length} Kayıt
+                        </span>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left table-auto">
+                            <thead className="bg-white border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold tracking-wide">
                                 <tr>
-                                    <th className="px-3 py-2 font-semibold">SKU / Code</th>
-                                    <th className="px-3 py-2 font-semibold">Product Name</th>
-                                    <th className="px-3 py-2 font-semibold">Category</th>
-                                    <th className="px-3 py-2 font-semibold text-right">Price Range (TRY)</th>
-                                    <th className="px-3 py-2 font-semibold text-center">Sellers</th>
-                                    <th className="px-3 py-2 font-semibold text-center">Total Stock</th>
-                                    <th className="px-3 py-2 font-semibold text-center w-24">Action</th>
+                                    <th className="px-6 py-4 font-bold">Referans / Barkod</th>
+                                    <th className="px-6 py-4 font-bold">Ürün Tanımı</th>
+                                    <th className="px-6 py-4 font-bold text-right">Maliyet Bandı (TRY)</th>
+                                    <th className="px-6 py-4 font-bold text-center">Tedarikçi Kapasitesi</th>
+                                    <th className="px-6 py-4 font-bold text-center">Stok Havuzu</th>
+                                    <th className="px-6 py-4 font-bold text-center">Operasyon</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200 text-slate-700">
+                            <tbody className="divide-y divide-slate-100 text-[14px]">
                                 {items.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="px-3 py-6 text-center text-slate-500">No active products found in the catalog.</td>
+                                        <td colSpan={6} className="px-6 py-16 text-center text-slate-500">
+                                            <div className="text-3xl mb-4">🏪</div>
+                                            <p className="text-[15px] font-semibold text-slate-900">Katalog Boş</p>
+                                            <p className="text-[13px] text-slate-500 max-w-sm mx-auto mt-1">Platform üzerinde aktif satışta olan ürün kaydı bulunumadı.</p>
+                                        </td>
                                     </tr>
                                 ) : (
                                     items.map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                                            <td className="px-3 py-2 font-mono text-slate-500">{item.product.barcode || item.product.id.slice(0, 8)}</td>
-                                            <td className="px-3 py-2 font-medium text-slate-900">{item.product.name}</td>
-                                            <td className="px-3 py-2">{item.product.category || '-'}</td>
-                                            <td className="px-3 py-2 font-mono font-medium text-right">
-                                                {item.minPrice === item.maxPrice
-                                                    ? item.minPrice.toFixed(2)
-                                                    : `${item.minPrice.toFixed(2)} - ${item.maxPrice.toFixed(2)}`}
-                                            </td>
-                                            <td className="px-3 py-2 text-center text-slate-500">
-                                                <span className="inline-block px-2 py-0.5 rounded border border-slate-200 bg-white shadow-sm text-xs font-medium">
-                                                    {item.sellersCount} Suppliers
+                                        <tr key={idx} className="hover:bg-slate-50 transition-colors group">
+                                            <td className="px-6 py-4 font-mono text-[13px] text-slate-500 bg-white group-hover:bg-slate-50">
+                                                <span className="px-2 py-0.5 border border-slate-200 rounded text-slate-600 font-semibold bg-slate-50">
+                                                    {item.product.barcode || item.product.id.slice(0, 8)}
                                                 </span>
                                             </td>
-                                            <td className="px-3 py-2 text-center">
+
+                                            <td className="px-6 py-4">
+                                                <div className="font-semibold text-slate-900">{item.product.name}</div>
+                                                <div className="text-[12px] text-slate-500 mt-0.5">{item.product.category || 'Genel Kategori'}</div>
+                                            </td>
+
+                                            <td className="px-6 py-4 font-mono font-semibold text-right text-[15px] text-slate-900">
+                                                {item.minPrice === item.maxPrice
+                                                    ? item.minPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                                    : `${item.minPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} - ${item.maxPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}`
+                                                }
+                                                <span className="text-slate-400 text-[12px] ml-1">₺</span>
+                                            </td>
+
+                                            <td className="px-6 py-4 text-center">
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 border border-slate-200 text-[12px] font-bold text-slate-700">
+                                                    <span className="text-slate-400">🏢</span> {item.sellersCount} Satıcı
+                                                </span>
+                                            </td>
+
+                                            <td className="px-6 py-4 text-center">
                                                 {item.availableQty > 0 ? (
-                                                    <span className="text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-xs">
-                                                        {item.availableQty} available
+                                                    <span className="inline-flex px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 text-[12px] font-bold uppercase tracking-widest border border-emerald-200">
+                                                        {item.availableQty} Adet
                                                     </span>
                                                 ) : (
-                                                    <span className="text-amber-700 font-bold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-xs">
-                                                        Out of Stock
+                                                    <span className="inline-flex px-2.5 py-1 rounded bg-red-100 text-red-800 text-[12px] font-bold uppercase tracking-widest border border-red-200">
+                                                        Tükendi
                                                     </span>
                                                 )}
                                             </td>
-                                            <td className="px-3 py-2 text-center">
+
+                                            <td className="px-6 py-4 text-center">
                                                 <Link
                                                     href={`/catalog/${item.product.id}`}
-                                                    className="inline-block px-3 py-1 bg-black text-white text-xs font-semibold rounded-md hover:bg-slate-800 active:scale-95 transition-transform"
+                                                    className="inline-flex items-center justify-center h-8 px-4 bg-white border border-slate-300 text-slate-700 text-[13px] font-semibold rounded-lg hover:bg-slate-900 hover:border-slate-900 hover:text-white transition-colors shadow-sm"
                                                 >
-                                                    View
+                                                    İncele
                                                 </Link>
                                             </td>
                                         </tr>
@@ -147,8 +195,13 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                             </tbody>
                         </table>
                     </div>
-                </div>
 
+                    <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                        <div className="text-[13px] font-medium text-slate-500">
+                            Sayfa 1 / 1
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

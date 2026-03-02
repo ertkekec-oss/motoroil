@@ -44,145 +44,196 @@ export default function TrustScorePage() {
 
     const getTierBadge = (tier: string) => {
         switch (tier) {
-            case "A": return "bg-green-100 text-green-800 border-green-500 shadow-green-100";
-            case "B": return "bg-blue-100 text-blue-800 border-blue-500 shadow-blue-100";
-            case "C": return "bg-amber-100 text-amber-800 border-amber-500 shadow-amber-100";
-            case "D": return "bg-red-100 text-red-800 border-red-500 shadow-red-100";
-            default: return "bg-slate-100 text-slate-800 border-slate-500 shadow-slate-100";
+            case "A": return "bg-emerald-100 text-emerald-800 border-emerald-500 shadow-sm";
+            case "B": return "bg-blue-100 text-blue-800 border-blue-500 shadow-sm";
+            case "C": return "bg-amber-100 text-amber-800 border-amber-500 shadow-sm";
+            case "D": return "bg-red-100 text-red-800 border-red-500 shadow-sm";
+            default: return "bg-slate-100 text-slate-800 border-slate-300 shadow-sm";
         }
     };
 
     const getStatusStyle = (status: string) => {
         switch (status) {
-            case "EXCELLENT": return "text-green-600 bg-green-50";
-            case "GOOD": return "text-blue-600 bg-blue-50";
-            case "AVERAGE": return "text-amber-600 bg-amber-50";
-            case "POOR": return "text-red-600 bg-red-50";
-            default: return "text-slate-600 bg-slate-50";
+            case "EXCELLENT": return "text-emerald-700 bg-emerald-50 border-emerald-200";
+            case "GOOD": return "text-blue-700 bg-blue-50 border-blue-200";
+            case "AVERAGE": return "text-amber-700 bg-amber-50 border-amber-200";
+            case "POOR": return "text-red-700 bg-red-50 border-red-200";
+            default: return "text-slate-700 bg-slate-50 border-slate-200";
         }
     };
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-6">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">⭐ Güven Skorum (Trust Score)</h1>
-            <FinanceStatusBanner />
-
-            {loading ? (
-                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
-                    Skor verileriniz yükleniyor...
+        <div className="bg-slate-50 min-h-screen pb-16 w-full font-sans">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-2">Satıcı Güven Skoru (Trust Score)</h1>
+                    <p className="text-sm text-slate-600">Platform içerisindeki performansınızı ve finansal itibarınızı belirleyen temel metrikler.</p>
                 </div>
-            ) : !scoreData ? (
-                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center py-12 text-slate-500">
-                    Henüz güven skorunuz hesaplanmamış. İlerleyen günlerde tekrar kontrol ediniz.
+
+                <div className="mb-8">
+                    <FinanceStatusBanner />
                 </div>
-            ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                    {/* Main Score Card */}
-                    <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm relative overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
-                        <div className="absolute top-0 w-full h-2 bg-gradient-to-r from-blue-400 via-indigo-500 to-green-400"></div>
-                        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-6">Mevcut Skorum</h2>
-
-                        <div className="relative flex items-center justify-center">
-                            {/* Circular progress simulated */}
-                            <svg className="w-48 h-48 transform -rotate-90">
-                                <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-100" />
-                                <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="553" strokeDashoffset={553 - (553 * scoreData.score) / 100} className="text-indigo-600 transition-all duration-1000 ease-in-out" />
-                            </svg>
-                            <div className="absolute flex flex-col items-center justify-center">
-                                <span className="text-5xl font-black text-slate-900">{scoreData.score}</span>
-                                <span className="text-sm font-medium text-slate-400">/ 100</span>
-                            </div>
-                        </div>
-
-                        <div className="mt-8 flex items-center gap-3">
-                            <span className="text-slate-600 font-semibold text-sm">Seviye:</span>
-                            <span className={`px-4 py-1.5 rounded-full text-lg font-black tracking-wider border-2 shadow-sm ${getTierBadge(scoreData.tier)}`}>Segment {scoreData.tier}</span>
-                        </div>
-                        <p className="text-xs text-slate-400 mt-6 bg-slate-50 px-3 py-1 rounded w-full text-center truncate">Son Güncelleme: {formatDate(scoreData.lastCalculatedAt)}</p>
+                {loading ? (
+                    <div className="bg-white p-12 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center items-center">
+                        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-4"></div>
+                        <span className="text-sm font-medium text-slate-500 uppercase tracking-widest">GÜVEN VERİLERİ SORGULANIYOR...</span>
                     </div>
-
-                    {/* Breakdown List */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm mb-6">
-                            <h3 className="text-lg font-bold text-slate-800 mb-5">📈 Skor Bileşenleri</h3>
-
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-indigo-100 transition-colors">
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-slate-800">Zamanında Teslimat (On-Time Ratio)</span>
-                                        <span className="text-xs text-slate-500 mt-0.5">Ağırlık: %{scoreData.components.onTimeRatio.weight}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-lg font-black text-slate-900">{scoreData.components.onTimeRatio.value}</span>
-                                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${getStatusStyle(scoreData.components.onTimeRatio.status)}`}>{scoreData.components.onTimeRatio.status}</span>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-indigo-100 transition-colors">
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-slate-800">İhtilaf Oranı (Dispute Rate)</span>
-                                        <span className="text-xs text-slate-500 mt-0.5">Ağırlık: %{scoreData.components.disputeRate.weight}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-lg font-black text-slate-900">{scoreData.components.disputeRate.value}</span>
-                                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${getStatusStyle(scoreData.components.disputeRate.status)}`}>{scoreData.components.disputeRate.status}</span>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-indigo-100 transition-colors">
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-slate-800">SLA İhlali (SLA Breach Count)</span>
-                                        <span className="text-xs text-slate-500 mt-0.5">Ağırlık: %{scoreData.components.slaBreachCount.weight}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-lg font-black text-slate-900">{scoreData.components.slaBreachCount.value}</span>
-                                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${getStatusStyle(scoreData.components.slaBreachCount.status)}`}>{scoreData.components.slaBreachCount.status}</span>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-indigo-100 transition-colors">
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-slate-800">Chargeback / İade Risk Oranı</span>
-                                        <span className="text-xs text-slate-500 mt-0.5">Ağırlık: %{scoreData.components.chargebackRate.weight}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-lg font-black text-slate-900">{scoreData.components.chargebackRate.value}</span>
-                                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${getStatusStyle(scoreData.components.chargebackRate.status)}`}>{scoreData.components.chargebackRate.status}</span>
-                                    </div>
-                                </div>
-                            </div>
+                ) : !scoreData ? (
+                    <div className="bg-white p-16 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center items-center text-center">
+                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mb-4 border border-slate-200 shadow-sm">
+                            📊
                         </div>
+                        <h2 className="text-[15px] font-semibold text-slate-900">Güven Skoru Bekliyor</h2>
+                        <p className="text-[13px] text-slate-500 mt-2 max-w-md">
+                            Yeterli ağ hareketi olmadığından henüz skorunuz hesaplanmamış. İlerleyen günlerde yeni sipariş ve teslimat verileriyle birlikte oluşacaktır.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        {/* Sol Panel: Main Score Card */}
+                        <div className="lg:col-span-4 flex flex-col gap-6">
+                            <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm relative flex flex-col items-center justify-center min-h-[360px]">
+                                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-8">GLOBAL İTİBAR İNDEKSİ</h2>
 
-                        {/* Bu Skor Neyi Etkiler? */}
-                        <div className="bg-indigo-50 rounded-3xl p-8 border border-indigo-100 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
-                            <div>
-                                <h3 className="text-lg font-bold text-indigo-900 mb-2">Bu Skor Neyi Etkiler?</h3>
-                                <div className="space-y-2">
-                                    <div className="flex items-start gap-2">
-                                        <span className="text-indigo-500 mt-0.5">✅</span>
-                                        <p className="text-sm text-indigo-800 font-medium">B2B Kataloğunda "Güvenilir Tedarikçi" olarak üst sıralarda listelenme.</p>
-                                    </div>
-                                    <div className="flex items-start gap-2">
-                                        <span className="text-indigo-500 mt-0.5">✅</span>
-                                        <p className="text-sm text-indigo-800 font-medium">Escrow serbest bırakma süreleri (Hold Days) skorunuza göre otomatik düşürülür.</p>
-                                    </div>
-                                    <div className="flex items-start gap-2">
-                                        <span className="text-indigo-500 mt-0.5">✅</span>
-                                        <p className="text-sm text-indigo-800 font-medium">Erken ödeme işlemi (Early Release) kesinti komisyonları A seviyesinde çok uygundur.</p>
+                                <div className="relative flex items-center justify-center mb-8">
+                                    <svg className="w-48 h-48 transform -rotate-90">
+                                        <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-100" />
+                                        <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="553" strokeDashoffset={553 - (553 * scoreData.score) / 100} className={scoreData.score >= 80 ? "text-emerald-500 transition-all duration-1000" : scoreData.score >= 50 ? "text-amber-500 transition-all duration-1000" : "text-red-500 transition-all duration-1000"} />
+                                    </svg>
+                                    <div className="absolute flex flex-col items-center justify-center">
+                                        <span className={`text-[56px] font-bold tracking-tighter ${scoreData.score >= 80 ? 'text-emerald-600' : scoreData.score >= 50 ? 'text-amber-600' : 'text-red-600'}`}>{scoreData.score}</span>
+                                        <span className="text-sm font-semibold text-slate-400">/ 100</span>
                                     </div>
                                 </div>
+
+                                <div className="w-full flex items-center justify-between px-2 py-4 bg-slate-50 rounded-xl border border-slate-100 mb-4">
+                                    <span className="text-slate-600 font-semibold text-[13px] ml-2">Risk Segmenti:</span>
+                                    <span className={`px-4 py-1.5 rounded-lg text-lg font-black tracking-wider border mr-2 ${getTierBadge(scoreData.tier)}`}>Segment {scoreData.tier}</span>
+                                </div>
+                                <div className="w-full text-center">
+                                    <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Son Değerleme</p>
+                                    <p className="text-[13px] font-medium text-slate-700 mt-1">{formatDate(scoreData.lastCalculatedAt)}</p>
+                                </div>
                             </div>
-                            <div className="flex-shrink-0 bg-white p-4 rounded-xl border border-indigo-200 text-center shadow-sm shadow-indigo-100/50">
-                                <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1">Avantaj Durumu</p>
+
+                            {/* Avantaj Durumu Modülü */}
+                            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm text-center">
+                                <h3 className="text-[13px] font-bold text-slate-900 mb-4 uppercase tracking-widest">Ayrıcalık Statüsü</h3>
                                 {scoreData.tier === 'A' || scoreData.tier === 'B' ? (
-                                    <p className="text-xl font-black text-green-600">AKTİF</p>
+                                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl py-6 px-4">
+                                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-[0_2px_10px_rgba(16,185,129,0.2)]">
+                                            <span className="text-emerald-600 text-xl font-black">✓</span>
+                                        </div>
+                                        <p className="text-[15px] font-bold text-emerald-800">Tam Yetkili Erişim Aktif</p>
+                                        <p className="text-[12px] text-emerald-600 mt-2 font-medium">B2B avantajları ve erken finansman seçenekleri firmanız için onaylandı.</p>
+                                    </div>
                                 ) : (
-                                    <p className="text-xl font-black text-red-600">PASİF</p>
+                                    <div className="bg-red-50 border border-red-200 rounded-xl py-6 px-4">
+                                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-[0_2px_10px_rgba(239,68,68,0.2)]">
+                                            <span className="text-red-600 text-xl font-black">✗</span>
+                                        </div>
+                                        <p className="text-[15px] font-bold text-red-800">Sınırlı Erişim</p>
+                                        <p className="text-[12px] text-red-600 mt-2 font-medium">Skorunuz düşük olduğu için erken finansman (Early Payout) kapalı.</p>
+                                    </div>
                                 )}
                             </div>
                         </div>
 
+                        {/* Sağ Panel: Breakdown List */}
+                        <div className="lg:col-span-8 flex flex-col gap-6">
+                            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                                <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
+                                    <h3 className="text-base font-semibold text-slate-900">Algoritma Metrikleri & Bileşen İncelemesi</h3>
+                                    <p className="text-[13px] text-slate-500 mt-1">Sistem tarafından hesaplanan operasyonel sağlık değişkenleriniz.</p>
+                                </div>
+
+                                <div className="p-6">
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {[
+                                            {
+                                                title: "Zamanında Teslimat Başarısı (On-Time Ratio)",
+                                                weight: scoreData.components.onTimeRatio.weight,
+                                                val: scoreData.components.onTimeRatio.value,
+                                                status: scoreData.components.onTimeRatio.status,
+                                                icon: "⏱"
+                                            },
+                                            {
+                                                title: "İhtilaf ve Anlaşmazlık Oranı (Dispute Rate)",
+                                                weight: scoreData.components.disputeRate.weight,
+                                                val: scoreData.components.disputeRate.value,
+                                                status: scoreData.components.disputeRate.status,
+                                                icon: "⚖️"
+                                            },
+                                            {
+                                                title: "SLA (Hizmet Seviyesi) İhlali Sayısı",
+                                                weight: scoreData.components.slaBreachCount.weight,
+                                                val: scoreData.components.slaBreachCount.value,
+                                                status: scoreData.components.slaBreachCount.status,
+                                                icon: "⏳"
+                                            },
+                                            {
+                                                title: "Finansal Ters İbraz / İade Oranı",
+                                                weight: scoreData.components.chargebackRate.weight,
+                                                val: scoreData.components.chargebackRate.value,
+                                                status: scoreData.components.chargebackRate.status,
+                                                icon: "💳"
+                                            }
+                                        ].map((item, idx) => (
+                                            <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-slate-300 transition-colors gap-4">
+                                                <div className="flex items-start gap-4">
+                                                    <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-lg shrink-0 mt-0.5">
+                                                        {item.icon}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-semibold text-slate-900 text-[14px]">{item.title}</h4>
+                                                        <p className="text-[12px] font-medium text-slate-500 mt-1">Platform Etki Ağırlığı: <span className="text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded ml-1">% {item.weight}</span></p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-4 border-t border-slate-100 pt-3 sm:border-0 sm:pt-0">
+                                                    <div className="text-right">
+                                                        <div className="text-[20px] font-bold text-slate-900">{item.val}</div>
+                                                    </div>
+                                                    <div className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border ${getStatusStyle(item.status)}`}>
+                                                        {item.status}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Ekstra Bilgi Modülü - Semantic Nötr Info (Blue) */}
+                            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 shadow-sm">
+                                <h3 className="text-[15px] font-bold text-blue-900 mb-3 flex items-center gap-2">
+                                    <span>💡</span> Bilgilendirme: Skor Politikası ve Etkileri
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    <div className="bg-white border border-blue-100 rounded-xl p-4">
+                                        <p className="text-[13px] font-bold text-slate-800 mb-1">Katalog Görünürlüğü</p>
+                                        <p className="text-[12px] text-slate-600 leading-relaxed">Özellikle "A" ve "B" segment satıcıların ürünleri B2B arama dizininde Boost özelliğine bağımsız olarak %40 daha fazla organik gösterim alır.</p>
+                                    </div>
+                                    <div className="bg-white border border-blue-100 rounded-xl p-4">
+                                        <p className="text-[13px] font-bold text-slate-800 mb-1">Finansman Limitleri</p>
+                                        <p className="text-[12px] text-slate-600 leading-relaxed">Early Payout (Erken Fon Çekimi) işlem maliyetleri, yüksek güven skoruna sahip tedarikçiler için daha düşük faiz bareminden hesaplanır.</p>
+                                    </div>
+                                    <div className="bg-white border border-blue-100 rounded-xl p-4">
+                                        <p className="text-[13px] font-bold text-slate-800 mb-1">Escrow Bekleme Süresi</p>
+                                        <p className="text-[12px] text-slate-600 leading-relaxed">Kargo tesliminden sonra havuzda bekleyen paranın serbest hesabınıza düşmesi (Auto-Release) skor durumuna göre kısaltılır.</p>
+                                    </div>
+                                    <div className="bg-white border border-blue-100 rounded-xl p-4">
+                                        <p className="text-[13px] font-bold text-slate-800 mb-1">SLA Limitleri</p>
+                                        <p className="text-[12px] text-slate-600 leading-relaxed">Art arda sipariş reddeden veya gönderim tarihini aksatan firmaların skoru 24 saat içerisinde "D" segmentine degrade edilir.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

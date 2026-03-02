@@ -31,23 +31,24 @@ function formatMoney(amount: any, currency: string) {
     }
 }
 
+// B2B 9-10 Level Premium Semantic Color System Status Badge
 function StatusBadge({ status }: { status: string }) {
-    const map: Record<string, string> = {
-        PENDING_PAYMENT: "bg-amber-50 text-amber-700 border-amber-200",
-        PAID: "bg-blue-50 text-blue-700 border-blue-200",
-        SHIPPED: "bg-indigo-50 text-indigo-700 border-indigo-200",
-        DELIVERED: "bg-emerald-50 text-emerald-700 border-emerald-200",
-        COMPLETED: "bg-emerald-50 text-emerald-700 border-emerald-200",
-        DISPUTED: "bg-rose-50 text-rose-700 border-rose-200",
-        CANCELLED: "bg-gray-50 text-gray-700 border-gray-200",
-        RETURNED: "bg-gray-50 text-gray-700 border-gray-200",
+    const statusMap: Record<string, { label: string, colorClass: string }> = {
+        PENDING_PAYMENT: { label: "Ödeme Bekleniyor", colorClass: "bg-amber-100 text-amber-700" },
+        PAID: { label: "Ödendi (İşleniyor)", colorClass: "bg-emerald-100 text-emerald-700" },
+        SHIPPED: { label: "Kargoda", colorClass: "bg-blue-100 text-blue-700" },
+        DELIVERED: { label: "Teslim Edildi", colorClass: "bg-emerald-100 text-emerald-700" },
+        COMPLETED: { label: "Tamamlandı", colorClass: "bg-emerald-100 text-emerald-700" },
+        DISPUTED: { label: "İhtilaflı", colorClass: "bg-red-100 text-red-700" },
+        CANCELLED: { label: "İptal Edildi", colorClass: "bg-slate-100 text-slate-600" },
+        RETURNED: { label: "İade", colorClass: "bg-slate-100 text-slate-600" },
     };
 
-    const cls = map[status] ?? "bg-gray-50 text-gray-700 border-gray-200";
+    const s = statusMap[status] || { label: status, colorClass: "bg-slate-100 text-slate-600" };
 
     return (
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${cls}`}>
-            {status}
+        <span className={`inline-flex px-2 py-1 text-[11px] font-bold uppercase tracking-widest rounded ${s.colorClass}`}>
+            {s.label}
         </span>
     );
 }
@@ -66,7 +67,6 @@ export default async function BuyerOrdersPage({
 
     if (!user) redirect("/login");
 
-    // Buyer ekranı için permission gate
     const perms: string[] = user.permissions || [];
     if (!perms.includes("network_buy") && user.role !== "SUPER_ADMIN" && user.role !== "admin") {
         redirect("/403");
@@ -74,7 +74,6 @@ export default async function BuyerOrdersPage({
 
     const pageSize = 20;
 
-    // Cursor pagination (createdAt desc)
     const where: any = {};
     if (status) where.status = status;
 
@@ -109,146 +108,155 @@ export default async function BuyerOrdersPage({
     const nextCursor = hasNext ? data[data.length - 1]?.id : null;
 
     return (
-        <div className="max-w-7xl mx-auto p-6 space-y-5">
-            <div className="flex items-center justify-between gap-3">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-gray-900">Siparişlerim</h1>
-                    <p className="text-sm text-gray-500 mt-1">
-                        Periodya Network üzerinden verdiğin siparişleri burada takip edebilirsin.
-                    </p>
+        <div className="bg-slate-50 min-h-screen pb-16 w-full font-sans">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">
+                            Verilen Siparişler (Açık Siparişler)
+                        </h1>
+                        <p className="text-sm text-slate-600">
+                            Satın alma operasyonları dahilinde verdiğiniz tüm tedarik taleplerini ve sipariş durumlarını izleyin.
+                        </p>
+                    </div>
+
+                    {/* Filtre Strip */}
+                    <div className="flex bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden p-1 shrink-0">
+                        <Link
+                            href="/network/buyer/orders"
+                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${!status ? "bg-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 hover:text-slate-900 hover:bg-slate-50"}`}
+                        >
+                            Tümü
+                        </Link>
+                        <Link
+                            href="/network/buyer/orders?status=PENDING_PAYMENT"
+                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "PENDING_PAYMENT" ? "bg-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 hover:text-slate-900 hover:bg-slate-50"}`}
+                        >
+                            Ödeme Bekleyen
+                        </Link>
+                        <Link
+                            href="/network/buyer/orders?status=PAID"
+                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "PAID" ? "bg-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 hover:text-slate-900 hover:bg-slate-50"}`}
+                        >
+                            Ödendi (İşleniyor)
+                        </Link>
+                        <Link
+                            href="/network/buyer/orders?status=DELIVERED"
+                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "DELIVERED" ? "bg-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 hover:text-slate-900 hover:bg-slate-50"}`}
+                        >
+                            Teslim Alındı
+                        </Link>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <Link
-                        className={`px-3 py-2 rounded-lg text-sm border ${!status ? "bg-black text-white border-black" : "bg-white text-gray-700 border-gray-200"
-                            }`}
-                        href="/network/buyer/orders"
-                    >
-                        Tümü
-                    </Link>
-                    <Link
-                        className={`px-3 py-2 rounded-lg text-sm border ${status === "PAID" ? "bg-black text-white border-black" : "bg-white text-gray-700 border-gray-200"
-                            }`}
-                        href="/network/buyer/orders?status=PAID"
-                    >
-                        Ödendi
-                    </Link>
-                    <Link
-                        className={`px-3 py-2 rounded-lg text-sm border ${status === "DELIVERED" ? "bg-black text-white border-black" : "bg-white text-gray-700 border-gray-200"
-                            }`}
-                        href="/network/buyer/orders?status=DELIVERED"
-                    >
-                        Teslim Edildi
-                    </Link>
-                </div>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                    <p className="text-sm font-semibold text-gray-900">Sipariş Listesi</p>
-                    <p className="text-xs text-gray-500">{data.length} kayıt</p>
-                </div>
-
-                <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm">
-                        <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
-                            <tr>
-                                <th className="text-left px-4 py-3 font-semibold">Sipariş</th>
-                                <th className="text-left px-4 py-3 font-semibold">Satıcı</th>
-                                <th className="text-left px-4 py-3 font-semibold">Durum</th>
-                                <th className="text-right px-4 py-3 font-semibold">Tutar</th>
-                                <th className="text-left px-4 py-3 font-semibold">Oluşturma</th>
-                                <th className="text-left px-4 py-3 font-semibold">Ödeme</th>
-                                <th className="text-left px-4 py-3 font-semibold">Onay</th>
-                            </tr>
-                        </thead>
-
-                        <tbody className="divide-y divide-gray-100">
-                            {data.length === 0 ? (
+                {/* Ana Tablo Konteyner */}
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left table-auto">
+                            <thead className="bg-slate-50/50 border-b border-slate-100 text-xs uppercase text-slate-500 font-semibold tracking-wide">
                                 <tr>
-                                    <td className="px-4 py-10 text-center text-gray-500" colSpan={7}>
-                                        Henüz sipariş yok.
-                                    </td>
+                                    <th className="px-6 py-4 font-bold">Referans No / P.O.</th>
+                                    <th className="px-6 py-4 font-bold">Tedarikçi (Satıcı)</th>
+                                    <th className="px-6 py-4 font-bold">Lojistik Durumu</th>
+                                    <th className="px-6 py-4 font-bold text-right">Tutar</th>
+                                    <th className="px-6 py-4 font-bold">Oluşturma</th>
+                                    <th className="px-6 py-4 font-bold">Ödeme / Onay</th>
                                 </tr>
-                            ) : (
-                                data.map((o) => (
-                                    <tr key={o.id} className="hover:bg-gray-50/50">
-                                        <td className="px-4 py-3">
-                                            <Link
-                                                href={`/network/buyer/orders/${o.id}`}
-                                                className="font-semibold text-gray-900 hover:underline"
-                                            >
-                                                #{o.id.slice(-8).toUpperCase()}
-                                            </Link>
-                                            <div className="text-xs text-gray-500">{o.id}</div>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 text-sm">
+                                {data.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-16 text-center">
+                                            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-200 shadow-sm">
+                                                🛒
+                                            </div>
+                                            <p className="text-[15px] font-semibold text-slate-900">Satın Alma Kaydı Yok</p>
+                                            <p className="text-[13px] text-slate-500 max-w-sm mx-auto mt-1">
+                                                Belirtilen filtre kriterlerine uygun açık bir siparişiniz bulunamadı.
+                                            </p>
                                         </td>
-
-                                        <td className="px-4 py-3">
-                                            <div className="font-medium text-gray-900">{(companyMap.get(o.sellerCompanyId) as string) ?? "-"}</div>
-                                            <div className="text-xs text-gray-500">{o.sellerCompanyId}</div>
-                                        </td>
-
-                                        <td className="px-4 py-3">
-                                            <StatusBadge status={o.status} />
-                                        </td>
-                                        <td className="px-4 py-3 text-right font-semibold text-gray-900">
-                                            {formatMoney(o.totalAmount, o.currency)}
-                                        </td>
-
-                                        <td className="px-4 py-3 text-gray-700">{formatDateTR(o.createdAt)}</td>
-                                        <td className="px-4 py-3 text-gray-700">{formatDateTR((o as any).paidAt)}</td>
-                                        <td className="px-4 py-3 text-gray-700">{formatDateTR((o as any).confirmedAt)}</td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                ) : (
+                                    data.map((o) => (
+                                        <tr key={o.id} className="hover:bg-slate-50 transition-colors group">
+                                            <td className="px-6 py-4">
+                                                <Link
+                                                    href={`/network/buyer/orders/${o.id}`}
+                                                    className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors"
+                                                >
+                                                    #{o.id.slice(0, 8).toUpperCase()}
+                                                </Link>
+                                                <div className="text-[11px] font-mono text-slate-400 mt-1">{o.id}</div>
+                                            </td>
 
-                <div className="px-4 py-4 border-t border-gray-100 flex items-center justify-between">
-                    <div className="text-xs text-gray-500">
-                        {status ? (
-                            <>
-                                Filtre: <span className="font-semibold text-gray-700">{status}</span>
-                            </>
-                        ) : (
-                            "Filtre yok"
-                        )}
+                                            <td className="px-6 py-4">
+                                                <div className="font-semibold text-slate-900">{(companyMap.get(o.sellerCompanyId) as string) ?? "-"}</div>
+                                                <div className="text-[12px] text-slate-500 mt-0.5">ID: {o.sellerCompanyId.substring(0, 8)}...</div>
+                                            </td>
+
+                                            <td className="px-6 py-4">
+                                                <StatusBadge status={o.status} />
+                                            </td>
+
+                                            <td className="px-6 py-4 text-right">
+                                                <span className="font-bold text-slate-900 text-[15px]">
+                                                    {formatMoney(o.totalAmount, o.currency)}
+                                                </span>
+                                            </td>
+
+                                            <td className="px-6 py-4 text-[13px] font-medium text-slate-600">
+                                                {formatDateTR(o.createdAt)}
+                                            </td>
+                                            <td className="px-6 py-4 text-[13px] font-medium text-slate-600">
+                                                {formatDateTR((o as any).paidAt)}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        {cursor ? (
-                            <Link
-                                href={status ? `/network/buyer/orders?status=${status}` : "/network/buyer/orders"}
-                                className="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white hover:bg-gray-50"
-                            >
-                                Baştan
-                            </Link>
-                        ) : (
-                            <span className="px-3 py-2 text-sm text-gray-400 border border-gray-100 rounded-lg">
-                                Baştan
-                            </span>
-                        )}
+                    <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="text-[13px] font-medium text-slate-500">
+                            {data.length} satın alma kaydı görüntüleniyor.
+                        </div>
 
-                        {hasNext && nextCursor ? (
-                            <Link
-                                href={
-                                    status
-                                        ? `/network/buyer/orders?status=${status}&cursor=${nextCursor}`
-                                        : `/network/buyer/orders?cursor=${nextCursor}`
-                                }
-                                className="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white hover:bg-gray-50"
-                            >
-                                Sonraki
-                            </Link>
-                        ) : (
-                            <span className="px-3 py-2 text-sm text-gray-400 border border-gray-100 rounded-lg">
-                                Sonraki
-                            </span>
-                        )}
+                        <div className="flex items-center gap-2 shrink-0">
+                            {cursor ? (
+                                <Link
+                                    href={status ? `/network/buyer/orders?status=${status}` : "/network/buyer/orders"}
+                                    className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+                                >
+                                    Baştan
+                                </Link>
+                            ) : (
+                                <span className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed">
+                                    Baştan
+                                </span>
+                            )}
+
+                            {hasNext && nextCursor ? (
+                                <Link
+                                    href={
+                                        status
+                                            ? `/network/buyer/orders?status=${status}&cursor=${nextCursor}`
+                                            : `/network/buyer/orders?cursor=${nextCursor}`
+                                    }
+                                    className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+                                >
+                                    Daha Fazla Kayıt
+                                </Link>
+                            ) : (
+                                <span className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed">
+                                    Daha Fazla Kayıt
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 }
