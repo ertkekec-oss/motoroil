@@ -55,6 +55,7 @@ export default function Sidebar() {
             ],
             'field-sales-parent': ['/field-sales'],
             'reports-parent': ['/reports'],
+            'customers-parent': ['/customers', '/suppliers'],
         };
 
         const newOpen = { ...openSections };
@@ -128,7 +129,7 @@ export default function Sidebar() {
             items: [
                 { name: 'POS Terminal', href: '/terminal', icon: Terminal },
                 {
-                    name: 'B2B Global',
+                    name: 'Periodya Hub',
                     icon: Globe,
                     isParent: true,
                     id: 'b2b-global-parent',
@@ -165,15 +166,23 @@ export default function Sidebar() {
             group: "Operasyonlar",
             items: [
                 { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
-                { name: 'Muhasebe', href: '/accounting', icon: Landmark },
-                { name: 'Satış', href: '/sales', icon: Receipt },
-                { name: 'Cari Hesaplar (Müşteriler)', href: '/customers', icon: Users },
-                { name: 'Tedarikçiler', href: '/suppliers', icon: Truck },
+                { name: 'Finansal Yönetim', href: '/accounting', icon: Landmark },
+                { name: 'Satış Yönetimi', href: '/sales', icon: Receipt },
+                {
+                    name: 'Cariler',
+                    icon: Users,
+                    isParent: true,
+                    id: 'customers-parent',
+                    subItems: [
+                        { name: 'Müşteriler', href: '/customers' },
+                        { name: 'Tedarikçiler', href: '/suppliers' },
+                    ]
+                },
                 { name: 'Envanter', href: '/inventory', icon: Box },
                 { name: 'Teklifler', href: '/quotes', icon: FileText },
-                { name: 'Servis', href: '/service', icon: Wrench },
+                { name: 'TechoPs', href: '/service', icon: Wrench },
                 {
-                    name: 'Saha Satış',
+                    name: 'SalesX',
                     icon: Map,
                     isParent: true,
                     id: 'field-sales-parent',
@@ -184,7 +193,7 @@ export default function Sidebar() {
                     ]
                 },
                 { name: 'PDKS', href: '/staff/pdks', icon: Clock },
-                { name: 'Ekipler (İnsan Kaynakları)', href: '/staff', icon: Users },
+                { name: 'İnsan Kaynakları', href: '/staff', icon: Users },
             ]
         },
         {
