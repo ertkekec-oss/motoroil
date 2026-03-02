@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const EnterpriseCard = ({ children, className = '', noPadding = false, borderLeftColor = '' }: any) => {
+export const EnterpriseCard = ({ children, className = '', noPadding = false, borderLeftColor = '' }) => {
     return (
         <div
             className={`bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm ${noPadding ? '' : 'p-8'} ${className}`}
@@ -11,7 +11,7 @@ export const EnterpriseCard = ({ children, className = '', noPadding = false, bo
     );
 };
 
-export const EnterpriseSectionHeader = ({ title, subtitle, icon, rightElement }: any) => {
+export const EnterpriseSectionHeader = ({ title, subtitle, icon, rightElement }) => {
     return (
         <div className="flex flex-col sm:flex-row items-center gap-5 border-b border-slate-200 dark:border-slate-800 pb-8 mb-8">
             {icon && (
@@ -32,7 +32,7 @@ export const EnterpriseSectionHeader = ({ title, subtitle, icon, rightElement }:
     );
 };
 
-export const EnterpriseField = ({ label, children, className = '' }: any) => {
+export const EnterpriseField = ({ label, children, className = '' }) => {
     return (
         <div className={`space-y-2 ${className}`}>
             {label && <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
@@ -41,7 +41,7 @@ export const EnterpriseField = ({ label, children, className = '' }: any) => {
     );
 };
 
-export const EnterpriseInput = React.forwardRef(({ className = '', label, ...props }: any, ref: any) => {
+export const EnterpriseInput = React.forwardRef(({ className = '', label, ...props }, ref) => {
     const inputEl = (
         <input
             ref={ref}
@@ -56,7 +56,7 @@ export const EnterpriseInput = React.forwardRef(({ className = '', label, ...pro
 });
 EnterpriseInput.displayName = 'EnterpriseInput';
 
-export const EnterpriseSelect = React.forwardRef(({ className = '', label, children, ...props }: any, ref: any) => {
+export const EnterpriseSelect = React.forwardRef(({ className = '', label, children, ...props }, ref) => {
     const selectEl = (
         <select
             ref={ref}
@@ -73,7 +73,7 @@ export const EnterpriseSelect = React.forwardRef(({ className = '', label, child
 });
 EnterpriseSelect.displayName = 'EnterpriseSelect';
 
-export const EnterpriseTextarea = React.forwardRef(({ className = '', label, ...props }: any, ref: any) => {
+export const EnterpriseTextarea = React.forwardRef(({ className = '', label, ...props }, ref) => {
     const textareaEl = (
         <textarea
             ref={ref}
@@ -88,10 +88,10 @@ export const EnterpriseTextarea = React.forwardRef(({ className = '', label, ...
 });
 EnterpriseTextarea.displayName = 'EnterpriseTextarea';
 
-export const EnterpriseButton = ({ children, variant = 'primary', className = '', ...props }: any) => {
-    let baseStyles = "h-11 px-5 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer outline-none shadow-sm";
+export const EnterpriseButton = ({ children, variant = 'primary', className = '', ...props }) => {
+    const baseStyles = "h-11 px-5 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer outline-none shadow-sm";
 
-    let variants: any = {
+    const variants = {
         primary: "bg-blue-600 hover:bg-blue-700 text-white",
         secondary: "bg-slate-900/5 hover:bg-slate-900/10 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300",
         danger: "bg-rose-600 hover:bg-rose-700 text-white"
@@ -104,7 +104,7 @@ export const EnterpriseButton = ({ children, variant = 'primary', className = ''
     );
 };
 
-export const EnterpriseSwitch = ({ checked, onChange, label, description, className = '' }: any) => {
+export const EnterpriseSwitch = ({ checked, onChange, label, description, className = '' }) => {
     return (
         <label className={`flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 cursor-pointer transition-all select-none group ${className}`}>
             <div className={`w-11 h-6 rounded-full relative transition-all duration-300 shrink-0 ${checked ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-600'}`}>
@@ -119,13 +119,13 @@ export const EnterpriseSwitch = ({ checked, onChange, label, description, classN
     );
 };
 
-export const EnterpriseTable = ({ headers, children, className = '' }: any) => {
+export const EnterpriseTable = ({ headers, children, className = '' }) => {
     return (
         <div className={`w-full overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] shadow-sm ${className}`}>
             <table className="w-full text-left border-collapse">
                 <thead className="bg-slate-50 dark:bg-slate-900/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
                     <tr>
-                        {headers.map((h: any, i: number) => (
+                        {headers.map((h, i: number) => (
                             <th key={i} className={`h-11 px-5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap ${h.alignRight ? 'text-right' : ''}`}>
                                 {h.label || h}
                             </th>
