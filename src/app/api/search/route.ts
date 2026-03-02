@@ -54,13 +54,19 @@ export async function GET(req: NextRequest) {
     try {
         const orders = await prisma.networkOrder.findMany({
             where: {
-                OR: [
-                    { sellerId: companyId },
-                    { buyerId: companyId }
-                ],
-                OR: [
-                    { id: { contains: q, mode: 'insensitive' } },
-                    { refNumber: { contains: q, mode: 'insensitive' } }
+                AND: [
+                    {
+                        OR: [
+                            { sellerId: companyId },
+                            { buyerId: companyId }
+                        ]
+                    },
+                    {
+                        OR: [
+                            { id: { contains: q, mode: 'insensitive' } },
+                            { refNumber: { contains: q, mode: 'insensitive' } }
+                        ]
+                    }
                 ]
             },
             take,
