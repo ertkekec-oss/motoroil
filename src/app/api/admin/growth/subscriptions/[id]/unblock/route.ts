@@ -22,7 +22,7 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
         if (!idempotencyKey) return NextResponse.json({ error: 'x-idempotency-key is required' }, { status: 400 });
         if (!reason || reason.length < 5) return NextResponse.json({ error: 'A valid reason is required' }, { status: 400 });
 
-        const result = await withIdempotency(idempotencyKey, 'PLATFORM_ADMIN', async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'ADMIN_ACTION', 'PLATFORM_ADMIN', async () => {
             const sub = await prisma.boostSubscription.findUnique({ where: { id } });
             if (!sub) throw new Error('Subscription not found');
 

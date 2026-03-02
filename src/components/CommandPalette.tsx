@@ -43,7 +43,7 @@ export default function CommandPalette({ isAdmin = false }: CommandPaletteProps)
     const [apiResults, setApiResults] = useState<{ type: string; id: string; title: string; subtitle?: string; href: string }[]>([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const { currentUser, isSystemAdmin, hasPermission } = useApp();
+    const { currentUser, isSystemAdmin, hasPermission } = useApp() as any;
 
     const isBuyer = isSystemAdmin || hasPermission('supplier_view') || currentUser?.type === 'buying';
     const isSeller = isSystemAdmin || hasPermission('sales_archive') || currentUser?.type === 'selling';

@@ -28,7 +28,7 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
         if (!idempotencyKey) return NextResponse.json({ error: 'x-idempotency-key is required' }, { status: 400 });
         if (!reason || reason.length < 5) return NextResponse.json({ error: 'A valid reason is required' }, { status: 400 });
 
-        const result = await withIdempotency(idempotencyKey, 'PLATFORM_ADMIN', async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'ADMIN_ACTION', 'PLATFORM_ADMIN', async () => {
             const rule = await prisma.boostRule.findUnique({ where: { id } });
             if (!rule) throw new Error('Rule not found');
             if (rule.status === 'DISABLED') throw new Error('Rule is already disabled');

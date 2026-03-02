@@ -56,7 +56,7 @@ export async function POST(request: Request) {
         if (!idempotencyKey) return NextResponse.json({ error: 'x-idempotency-key is required' }, { status: 400 });
         if (!reason || reason.length < 5) return NextResponse.json({ error: 'A valid reason is required' }, { status: 400 });
 
-        const result = await withIdempotency(idempotencyKey, 'PLATFORM_ADMIN', async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'ADMIN_ACTION', 'PLATFORM_ADMIN', async () => {
             return await prisma.$transaction(async (tx) => {
                 const policy = await tx.boostPolicyConfig.upsert({
                     where: { id: 'GLOBAL' },

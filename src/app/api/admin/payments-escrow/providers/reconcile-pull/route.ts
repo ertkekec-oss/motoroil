@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         }
 
         // Just mock trigger a reconcile pull
-        const result = await withIdempotency(idempotencyKey, 'PLATFORM_ADMIN', async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'ADMIN_ACTION', 'PLATFORM_ADMIN', async () => {
             await prisma.financeAuditLog.create({
                 data: {
                     tenantId: 'PLATFORM_ADMIN',

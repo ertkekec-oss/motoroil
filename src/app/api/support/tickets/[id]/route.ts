@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: any
 ) {
     const auth = await authorize();
     if (!auth.authorized || !auth.user?.companyId || !auth.user?.tenantId) {
@@ -49,7 +49,7 @@ export async function GET(
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: any
 ) {
     const auth = await authorize();
     if (!auth.authorized || !auth.user?.companyId || !auth.user?.tenantId) {

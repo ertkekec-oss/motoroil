@@ -139,14 +139,14 @@ describe('FIN-2B: External Payout Orchestration (Iyzico)', () => {
         // Process
         const res = await finalizePayoutLedger({ providerPayoutId: providerPayoutIdMock });
         expect(res.success).toBe(true);
-        expect(res.groupId).toBeDefined();
+        expect((res as any).groupId).toBeDefined();
 
         // Double call yields fast-return "Already processed"
         const res2 = await finalizePayoutLedger({ providerPayoutId: providerPayoutIdMock });
-        expect(res2.message).toBe('Already processed');
+        expect((res2 as any).message).toBe('Already processed');
 
         // Ledgers were created (Group + Comm Entry + Wallet Entry)
-        const entries = await prisma.ledgerEntry.findMany({ where: { groupId: res.groupId! } });
+        const entries = await prisma.ledgerEntry.findMany({ where: { groupId: (res as any).groupId! } });
         expect(entries.length).toBe(2);
 
         // Check platform and seller accounting lines

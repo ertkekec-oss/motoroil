@@ -12,7 +12,7 @@ beforeAll(async () => {
     const t = await prisma.tenant.create({ data: { name: `t1_${ts}`, ownerEmail: `opskit_${ts}@test.com` } });
     tenant1 = t.id;
     await prisma.company.create({ data: { id: tenant1, tenantId: tenant1, name: 'C1', taxNumber: `${ts}C1`, vkn: `${ts}C1` } });
-    
+
     const p = await prisma.tenant.findUnique({ where: { id: 'PLATFORM' } });
     if (!p) {
         await prisma.tenant.create({ data: { id: 'PLATFORM', name: 'PLATFORM', ownerEmail: `sys3-${ts}@biz.com` } });
@@ -74,7 +74,7 @@ describe('Go-Live OPS KIT', () => {
             alertId: alert.id,
             note: 'checking now'
         });
-        
+
         expect(ackRes.success).toBe(true);
         const savedAck = await prisma.opsAlertAck.findUnique({
             where: { alertType_alertId: { alertType: 'WALLET_DRIFT', alertId: alert.id } }
@@ -123,7 +123,7 @@ describe('Go-Live OPS KIT', () => {
 
         const res = await forceFinalizeSucceededPayout({ adminUserId: 'ADM', providerPayoutId: po.providerPayoutId });
         expect(res.success).toBe(true);
-        expect(res.finalizeRes.groupId).toBeDefined();
+        expect((res.finalizeRes as any).groupId).toBeDefined();
 
         // Check if Opslog created
         const ops = await prisma.financeOpsLog.findFirst({
@@ -164,8 +164,8 @@ describe('Go-Live OPS KIT', () => {
     });
 
     it('6) rerunOutboxForPayout idempotency', async () => {
-         const ts = Date.now();
-         const po = await prisma.providerPayout.create({
+        const ts = Date.now();
+        const po = await prisma.providerPayout.create({
             data: {
                 sellerTenantId: tenant1,
                 providerPayoutId: `PO_OPS_RRO_${ts}`,

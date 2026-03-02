@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
         if (!idempotencyKey) return NextResponse.json({ error: 'x-idempotency-key is required' }, { status: 400 });
 
-        const result = await withIdempotency(idempotencyKey, 'PLATFORM_ADMIN', async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'ADMIN_ACTION', 'PLATFORM_ADMIN', async () => {
             // Calculate snapshot
             const allOpen = await prisma.boostInvoice.groupBy({
                 by: ['collectionStatus'],

@@ -18,7 +18,7 @@ beforeAll(async () => {
     tenant1 = t.id;
     await prisma.company.create({ data: { id: tenant1, tenantId: tenant1, name: 'C1', taxNumber: `${ts}C1`, vkn: `${ts}C1` } });
     await prisma.ledgerAccount.create({ data: { companyId: tenant1, availableBalance: 100 } });
-    
+
     // Ensure platform exists for finalization
     const p = await prisma.tenant.findUnique({ where: { id: 'PLATFORM' } });
     if (!p) {
@@ -106,12 +106,12 @@ describe('FIN-2B.1: Production Hardening', () => {
         const res = await runProviderPayoutReconcileCycle();
         expect(res.correctedCount).toBeGreaterThanOrEqual(1);
 
-        const updated = await prisma.providerPayout.findUnique({ where: { id: oldSent.id }});
+        const updated = await prisma.providerPayout.findUnique({ where: { id: oldSent.id } });
         expect(updated!.status).toBe('SUCCEEDED');
 
         // Check it finalized
         const group = await prisma.ledgerGroup.findUnique({
-             where: { idempotencyKey: `PAYOUT_FINALIZE:${oldSent.providerPayoutId}` }
+            where: { idempotencyKey: `PAYOUT_FINALIZE:${oldSent.providerPayoutId}` }
         });
         expect(group).toBeDefined();
     });
@@ -133,7 +133,7 @@ describe('FIN-2B.1: Production Hardening', () => {
         const payloadStr = JSON.stringify({ iyziEventType: 'REPLAY_TEST', iyziEventTime: ts });
         const secret = process.env.IYZICO_SECRET_KEY || 'dummy_secret';
         const signature = crypto.createHmac('sha256', secret).update(payloadStr).digest('hex');
-        
+
         // First should succeed
         const res1 = await ingestWebhook(signature, payloadStr, JSON.parse(payloadStr), ts.toString());
         expect(res1).toBeDefined();
@@ -164,13 +164,13 @@ describe('FIN-2B.1: Production Hardening', () => {
         const res = await runStuckPayoutRepair();
         expect(res.correctedCount).toBeGreaterThanOrEqual(1);
 
-        const reset = await prisma.payoutOutbox.findUnique({ where: { id: oldSending.id }});
+        const reset = await prisma.payoutOutbox.findUnique({ where: { id: oldSending.id } });
         expect(reset!.status).toBe('PENDING');
         expect(reset!.attemptCount).toBe(1);
     });
 
     it('7) Idempotent finalize not duplicated', async () => {
-         const payout = await prisma.providerPayout.create({
+        const payout = await prisma.providerPayout.create({
             data: {
                 sellerTenantId: tenant1,
                 providerPayoutId: `PO_IDEMP_${Date.now()}`,
@@ -184,11 +184,11 @@ describe('FIN-2B.1: Production Hardening', () => {
 
         const r1 = await finalizePayoutLedger({ providerPayoutId: payout.providerPayoutId });
         expect(r1.success).toBe(true);
-        expect(r1.groupId).toBeDefined();
+        expect((r1 as any).groupId).toBeDefined();
 
         const r2 = await finalizePayoutLedger({ providerPayoutId: payout.providerPayoutId });
-        expect(r2.message).toBe('Already processed');
-        
+        expect((r2 as any).message).toBe('Already processed');
+
         const groups = await prisma.ledgerGroup.count({
             where: { idempotencyKey: `PAYOUT_FINALIZE:${payout.providerPayoutId}` }
         });

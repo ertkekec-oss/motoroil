@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function POST(req: NextRequest, { params }: { params: { tenantId: string } }) {
+export async function POST(req: NextRequest, { params }: any) {
     try {
         const session = await requirePlatformFinanceAdmin();
         const body = await req.json().catch(() => ({}));

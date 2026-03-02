@@ -67,7 +67,7 @@ export async function GET(request: Request) {
             }
         });
 
-        const caseMap = new Map(cases.map(c => [c.ticketId, c]));
+        const caseMap = new Map<string, any>(cases.map(c => [c.ticketId as string, c as any]));
 
         // Filter tickets that match dispute filters
         let items = tickets.map(t => {

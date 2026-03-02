@@ -56,7 +56,7 @@ export async function POST(request: Request) {
         if (!reason || reason.length < 5) return NextResponse.json({ error: 'A valid reason is required' }, { status: 400 });
         if (!endsAt) return NextResponse.json({ error: 'endsAt is required' }, { status: 400 });
 
-        const result = await withIdempotency(idempotencyKey, 'PLATFORM_ADMIN', async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'ADMIN_ACTION', 'PLATFORM_ADMIN', async () => {
             const policy = await prisma.boostPolicyConfig.findUnique({ where: { id: 'GLOBAL' } }) || { maxRuleDurationDays: 90, multiplierMin: 1.0, multiplierMax: 3.0 };
 
             const sDate = new Date(startsAt);

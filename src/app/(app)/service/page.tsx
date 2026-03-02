@@ -123,7 +123,7 @@ export default function ServiceDashboard() {
                         { label: 'Açık İş Emri', value: filteredJobs.length, unit: 'Araç', icon: <FileText size={18} />, color: isLight ? 'text-blue-600' : 'text-blue-400' },
                         { label: 'Bugün Tamamlanan', value: activeJobs.filter(j => j.status === 'Tamamlandı').length, unit: 'Araç', icon: <CheckCircle2 size={18} />, color: isLight ? 'text-emerald-600' : 'text-emerald-400' },
                         { label: 'Bekleyen Randevu', value: appointments.length, unit: 'Randevu', icon: <Calendar size={18} />, color: isLight ? 'text-amber-500' : 'text-amber-400' },
-                        { label: 'Ortalama Teslimat', value: '3.2', unit: 'Saat', icon: <Clock size={18} />, color: isLight ? 'text-slate-600' : 'text-slate-300' },
+                        { label: 'Ortalama Teslimat', value: 3.2, unit: 'Saat', icon: <Clock size={18} />, color: isLight ? 'text-slate-600' : 'text-slate-300' },
                     ].map((stat, i) => (
                         <div key={i} className={`p-5 rounded-[18px] border shadow-sm flex flex-col justify-between relative overflow-hidden group transition-all hover:border-blue-500/30 ${cardBg}`}>
                             <div className="flex justify-between items-start mb-4">

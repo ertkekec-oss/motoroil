@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requirePlatformFinanceAdmin } from "@/lib/auth";
 import { activatePilotSubMerchant } from "@/services/rollout/onboardingGuard";
 
-export async function POST(req: NextRequest, { params }: { params: { tenantId: string } }) {
+export async function POST(req: NextRequest, { params }: any) {
     try {
         const session = await requirePlatformFinanceAdmin();
         const res = await activatePilotSubMerchant({ adminUserId: session.id, tenantId: params.tenantId });

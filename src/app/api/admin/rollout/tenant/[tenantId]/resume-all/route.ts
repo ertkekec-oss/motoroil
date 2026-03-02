@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requirePlatformFinanceAdmin } from "@/lib/auth";
 import { resumeAll } from "@/services/rollout/rollback";
 
-export async function POST(req: NextRequest, { params }: { params: { tenantId: string } }) {
+export async function POST(req: NextRequest, { params }: any) {
     try {
         const session = await requirePlatformFinanceAdmin();
         const res = await resumeAll(session.id, params.tenantId);

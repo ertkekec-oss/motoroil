@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         if (!idempotencyKey) return NextResponse.json({ error: 'x-idempotency-key is required' }, { status: 400 });
         if (!reason || reason.length < 10) return NextResponse.json({ error: 'Reason must be at least 10 chars' }, { status: 400 });
 
-        const result = await withIdempotency(idempotencyKey, 'PLATFORM_ADMIN', async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'ADMIN_ACTION', 'PLATFORM_ADMIN', async () => {
             // Mock executing the action since this delegates to workers/other modules usually
             let summary = {};
             if (actionType === 'RUN_COLLECTION_GUARD') {

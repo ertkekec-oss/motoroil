@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { rejectPayoutRequest } from "@/services/finance/payout/requests";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: any) {
     const session = await getSession();
     if (!session || !session.userId) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

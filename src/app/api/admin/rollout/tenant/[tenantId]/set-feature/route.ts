@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requirePlatformFinanceAdmin } from "@/lib/auth";
 import { setTenantFeature } from "@/services/rollout/featureFlags";
 
-export async function POST(req: NextRequest, { params }: { params: { tenantId: string } }) {
+export async function POST(req: NextRequest, { params }: any) {
     try {
         const session = await requirePlatformFinanceAdmin();
         const body = await req.json().catch(() => ({}));

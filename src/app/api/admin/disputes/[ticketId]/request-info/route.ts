@@ -35,7 +35,7 @@ export async function POST(request: Request, props: { params: Promise<{ ticketId
             return NextResponse.json({ error: 'fieldsRequested array is missing or empty' }, { status: 400 });
         }
 
-        const result = await withIdempotency(idempotencyKey, 'PLATFORM_ADMIN', async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'ADMIN_ACTION', 'PLATFORM_ADMIN', async () => {
             const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
             if (!ticket) throw new Error('Ticket not found');
 

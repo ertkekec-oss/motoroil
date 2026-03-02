@@ -5,7 +5,7 @@ import { withIdempotency } from '@/lib/idempotency';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: any) {
     try {
         const session: any = await getSession();
         const role = session?.role?.toUpperCase() || '';
@@ -20,7 +20,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
         const payoutId = params.id;
 
-        const result = await withIdempotency(idempotencyKey, 'PLATFORM_ADMIN', async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'ADMIN_ACTION', 'PLATFORM_ADMIN', async () => {
             const req = await prisma.payoutRequest.findUnique({ where: { id: payoutId } });
             if (!req) throw new Error('Payout request not found');
             if (req.status !== 'REQUESTED') throw new Error(`Cannot approve, status is ${req.status}`);

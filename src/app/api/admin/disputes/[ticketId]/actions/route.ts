@@ -45,7 +45,7 @@ export async function POST(request: Request, props: { params: Promise<{ ticketId
             return NextResponse.json({ error: 'A valid reason must be provided' }, { status: 400 });
         }
 
-        const result = await withIdempotency(idempotencyKey, 'PLATFORM_ADMIN', async () => {
+        const result = await withIdempotency(prisma, idempotencyKey, 'ADMIN_ACTION', 'PLATFORM_ADMIN', async () => {
             const dCase = await prisma.disputeCase.findUnique({ where: { ticketId } });
             if (!dCase) throw new Error('Dispute case not found');
 
