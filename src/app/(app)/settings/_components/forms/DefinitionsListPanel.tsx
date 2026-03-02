@@ -1,37 +1,56 @@
 import React from 'react';
-import {
-    EnterpriseCard,
-    EnterprisePageShell,
-    EnterpriseButton,
-    EnterpriseInput,
-    EnterpriseSelect,
-    EnterpriseEmptyState,
-    EnterpriseTabs,
-} from '@/components/ui/enterprise';
 
 // ─── ZERO LOGIC CHANGE ────────────────────────────────────────────────────────
 // State, handler, submit, API, validation → HİÇBİR ŞEY DEĞİŞMEDİ.
-// Yalnızca UI katmanı Enterprise primitive'lere geçirildi.
+// Yalnızca UI katmanı Financial Control (ERP) standardına geçirildi.
 // ─────────────────────────────────────────────────────────────────────────────
 
+function ERPInput(props: any) {
+    return (
+        <input
+            {...props}
+            className={`w-full h-10 px-3 bg-white border border-slate-300 rounded-lg text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all shadow-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 ${props.className || ''}`}
+        />
+    );
+}
+
+function ERPSelect(props: any) {
+    return (
+        <select
+            {...props}
+            className={`w-full h-10 px-3 bg-white border border-slate-300 rounded-lg text-[14px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all shadow-sm disabled:bg-slate-50 disabled:text-slate-500 ${props.className || ''}`}
+        />
+    );
+}
+
 const DEF_TABS = [
-    { id: 'brands', label: 'Markalar', icon: '🏷️' },
-    { id: 'prod_cat', label: 'Ürün Kategorileri', icon: '📂' },
-    { id: 'cust_class', label: 'Cari Sınıfları', icon: '👥' },
-    { id: 'supp_class', label: 'Tedarikçi Sınıfları', icon: '🏭' },
-    { id: 'warranties', label: 'Garanti Süreleri', icon: '🛡️' },
-    { id: 'vehicle_types', label: 'Taşıt Türleri', icon: '🛵' },
-    { id: 'payment_methods', label: 'Ödeme Yöntemleri', icon: '💳' },
+    { id: 'brands', label: 'Markalar' },
+    { id: 'prod_cat', label: 'Ürün Kategorileri' },
+    { id: 'cust_class', label: 'Cari Sınıfları' },
+    { id: 'supp_class', label: 'Tedarikçi Sınıfları' },
+    { id: 'warranties', label: 'Garanti Parametreleri' },
+    { id: 'vehicle_types', label: 'Taşıt Türleri' },
+    { id: 'payment_methods', label: 'Tahsilat Kanalları' },
 ];
 
 const TAB_TITLE: Record<string, string> = {
-    brands: 'Marka Tanımları',
-    prod_cat: 'Ürün Kategorileri',
-    cust_class: 'Cari Sınıfları',
-    supp_class: 'Tedarikçi Sınıfları',
-    warranties: 'Garanti Seçenekleri',
-    vehicle_types: 'Taşıt Türleri',
-    payment_methods: 'Ödeme Yöntemleri',
+    brands: 'Marka & Üretici Tanımları',
+    prod_cat: 'Stok Kategori Ağacı',
+    cust_class: 'Müşteri Derecelendirme Sınıfları',
+    supp_class: 'Tedarikçi Nitelik Sınıfları',
+    warranties: 'Yasal Garanti Süreçleri',
+    vehicle_types: 'Filo & Taşıt Tipolojisi',
+    payment_methods: 'Finansal Tahsilat Kanalları',
+};
+
+const TAB_DESC: Record<string, string> = {
+    brands: 'Sisteme işlenen ürünlere ait global veya yerel marka listesi.',
+    prod_cat: 'Stok kartlarını hiyerarşik yapılandırmak için ana başlıklar.',
+    cust_class: 'B2B ve B2C müşterilerinizin fiyatlandırma grupları.',
+    supp_class: 'Mal ve hizmet tedariği sağladığınız paydaş sınıfları.',
+    warranties: 'Satış sonrası hizmetlerde geçerli yasal teminat süreleri.',
+    vehicle_types: 'Servis modülünde araca atanacak geçerli şasi formları.',
+    payment_methods: 'Nakit, banka kartı ve transfer odaklı yasal ödeme yolları.',
 };
 
 export default function DefinitionsListPanel(props: any) {
@@ -47,7 +66,7 @@ export default function DefinitionsListPanel(props: any) {
         definitionTab, setDefinitionTab,
     } = props;
 
-    // ── helpers (zero logic — unchanged from original) ───────────────────────
+    // ── helpers (zero logic — unchanged) ───────────────────────
     const getActiveList = () => {
         if (definitionTab === 'brands') return brands || [];
         if (definitionTab === 'prod_cat') return prodCats || [];
@@ -92,104 +111,163 @@ export default function DefinitionsListPanel(props: any) {
     const isPayment = definitionTab === 'payment_methods';
 
     return (
-        <EnterprisePageShell
-            title="Tanımlar & Listeler"
-            description="Markalar, kategoriler, cari sınıfları ve diğer sistem listelerini yönetin."
-        >
-            {/* Tab bar */}
-            <EnterpriseTabs
-                tabs={DEF_TABS}
-                activeTab={definitionTab}
-                onTabChange={(id: string) => { setDefinitionTab(id); setNewItemInput(''); }}
-            />
-
-            {/* Add form */}
-            <EnterpriseCard>
-                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
-                    {TAB_TITLE[definitionTab]} — Yeni Ekle
-                </p>
-                <div className="flex items-end gap-3">
-                    {/* Payment method type selector */}
-                    {isPayment && (
-                        <div className="w-40 shrink-0">
-                            <EnterpriseSelect
-                                value={newPaymentMethod.type}
-                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                                    setNewPaymentMethod({ ...newPaymentMethod, type: e.target.value as any })
-                                }
-                            >
-                                <option value="cash">💵 Nakit</option>
-                                <option value="card">💳 Kredi Kartı</option>
-                                <option value="transfer">🏦 Havale/EFT</option>
-                            </EnterpriseSelect>
-                        </div>
-                    )}
-                    <div className="flex-1">
-                        <EnterpriseInput
-                            type="text"
-                            placeholder={isPayment ? 'Hesap adı (örn: Akbank)' : 'Yeni değer yazın...'}
-                            value={newItemInput}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewItemInput(e.target.value)}
-                            onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter') handleAdd(); }}
-                        />
-                    </div>
-                    <EnterpriseButton variant="primary" onClick={handleAdd} className="shrink-0">
-                        + Ekle
-                    </EnterpriseButton>
+        <div className="max-w-6xl animate-in fade-in duration-300">
+            {/* Header Alanı */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h2 className="text-[24px] font-semibold text-slate-900 tracking-tight">Sistem Parametreleri & Alt Tablolar</h2>
+                    <p className="text-[14px] text-slate-500 mt-1">Sistemdeki modüllerin beslendiği anahtar/değer sözlüklerini ve evrensel listeleri yönetin.</p>
                 </div>
-            </EnterpriseCard>
+            </div>
 
-            {/* List */}
-            <EnterpriseCard noPadding>
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                        {TAB_TITLE[definitionTab]}
-                    </h3>
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
-                        {activeList.length} kayıt
-                    </span>
-                </div>
+            {/* Yatay Minimal Strip Navigation */}
+            <div className="flex bg-white rounded-t-2xl border-b border-slate-200 mb-6 shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-x-auto whitespace-nowrap hide-scrollbar">
+                {DEF_TABS.map(tab => {
+                    const isActive = definitionTab === tab.id;
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => { setDefinitionTab(tab.id); setNewItemInput(''); }}
+                            className={`relative px-5 py-3.5 text-[14px] font-semibold transition-colors focus:outline-none ${isActive ? 'text-slate-900 bg-slate-50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50/50'}`}
+                        >
+                            {tab.label}
+                            {isActive && (
+                                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-slate-900" />
+                            )}
+                        </button>
+                    );
+                })}
+            </div>
 
-                {activeList.length === 0 ? (
-                    <EnterpriseEmptyState
-                        icon="📝"
-                        title="Liste boş"
-                        description="Yeni eklemek için yukarıdaki alanı kullanın."
-                    />
-                ) : (
-                    <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
-                        {activeList.map((item: any, i: number) => (
-                            <div
-                                key={isPayment ? (item.id || i) : i}
-                                className="flex items-center justify-between px-6 py-3.5 group hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
-                            >
-                                <div className="flex items-center gap-3 min-w-0">
-                                    {isPayment && (
-                                        <span className="text-xl shrink-0">{item.icon || '💰'}</span>
-                                    )}
-                                    <div className="min-w-0">
-                                        <div className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                                            {isPayment ? item.label : item}
-                                        </div>
-                                        {isPayment && (
-                                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 uppercase tracking-wide">
-                                                {item.type === 'card' ? 'Kredi Kartı' : item.type === 'transfer' ? 'Banka' : 'Nakit'}
-                                            </div>
-                                        )}
-                                    </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* SOL: YENİ KAYIT FORMU (4 Kolon) */}
+                <div className="lg:col-span-4 space-y-6">
+                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-[0px_1px_2px_rgba(0,0,0,0.02)]">
+                        <h3 className="text-[15px] font-semibold text-slate-900 mb-1">Deklarasyon Ekle</h3>
+                        <p className="text-[13px] text-slate-500 mb-5">Sisteme yeni bir parametre kaydedin.</p>
+
+                        <div className="space-y-4">
+                            {isPayment && (
+                                <div className="flex flex-col gap-1.5 focus-within:text-slate-900">
+                                    <label className="text-[12px] font-medium text-slate-500 uppercase tracking-widest transition-colors">YÖNTEM SINIFI</label>
+                                    <ERPSelect
+                                        value={newPaymentMethod.type}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                                            setNewPaymentMethod({ ...newPaymentMethod, type: e.target.value as any })
+                                        }
+                                    >
+                                        <option value="cash">Nakit (Kasa Transferi)</option>
+                                        <option value="card">Kredi Kartı (Fiziki/Sanal POS)</option>
+                                        <option value="transfer">Bankasal Havale/EFT (Ertesi Gün)</option>
+                                    </ERPSelect>
                                 </div>
-                                <button
-                                    onClick={() => handleRemove(item)}
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 flex items-center justify-center rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20"
-                                    title="Kaldır"
-                                >
-                                    🗑️
-                                </button>
+                            )}
+
+                            <div className="flex flex-col gap-1.5 focus-within:text-slate-900">
+                                <label className="text-[12px] font-medium text-slate-500 uppercase tracking-widest transition-colors">
+                                    {isPayment ? 'HESAP veya ENSTRÜMAN ADI' : 'PARAMETRE DEĞERİ (VALUE)'}
+                                </label>
+                                <div className="flex gap-2">
+                                    <ERPInput
+                                        type="text"
+                                        placeholder={isPayment ? 'Örn: Ana Kasa, Yapı Kredi' : 'Kayıt ismini yazın'}
+                                        value={newItemInput}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewItemInput(e.target.value)}
+                                        onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter') handleAdd(); }}
+                                        className="flex-1"
+                                    />
+                                    <button
+                                        onClick={handleAdd}
+                                        className="w-10 h-10 shrink-0 bg-slate-900 text-white rounded-lg flex items-center justify-center font-bold hover:bg-slate-800 shadow-sm transition-colors"
+                                    >
+                                        +
+                                    </button>
+                                </div>
                             </div>
-                        ))}
+                        </div>
                     </div>
-                )}
-            </EnterpriseCard>
-        </EnterprisePageShell>
+
+                    {/* Info Card */}
+                    <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="text-lg">📚</span>
+                            <span className="text-[13px] font-bold text-slate-800">Sistem Referansı</span>
+                        </div>
+                        <p className="text-[12px] text-slate-600 leading-relaxed">
+                            Buradaki veriler global drop-down alanlarında sergilenmektedir. Bir silme işlemi yapıldığında geçmişteki fatura ve stok fişlerindeki "kayıtlı string metinler" etkilenmez; ancak yeni açılacak kayıtlarda seçilemez hale gelir.
+                        </p>
+                    </div>
+                </div>
+
+                {/* SAĞ: LİSTE VE TABLO (8 Kolon) */}
+                <div className="lg:col-span-8">
+                    <div className="bg-white border border-slate-200 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
+                        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-[16px] font-semibold text-slate-900">{TAB_TITLE[definitionTab]}</h3>
+                                <p className="text-[13px] text-slate-500 mt-0.5">{TAB_DESC[definitionTab]}</p>
+                            </div>
+                            <span className="inline-flex px-2.5 py-1 bg-slate-100 text-[11px] font-semibold text-slate-600 border border-slate-200 rounded uppercase tracking-widest shrink-0">
+                                {activeList.length} TEYİTLİ
+                            </span>
+                        </div>
+
+                        {activeList.length === 0 ? (
+                            <div className="p-16 text-center">
+                                <div className="w-12 h-12 bg-slate-50 mx-auto rounded-xl flex items-center justify-center text-xl mb-3 shadow-sm border border-slate-100">
+                                    📭
+                                </div>
+                                <p className="text-[15px] font-semibold text-slate-900 mb-1">Veri Bulunamadı</p>
+                                <p className="text-[13px] text-slate-500 max-w-sm mx-auto">
+                                    Bu kategoriye ait mevcut bir kayıt yok. Sol taraftaki menüyü kullanarak ekleme yapabilirsiniz.
+                                </p>
+                            </div>
+                        ) : (
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr className="bg-slate-50/50 border-b border-slate-200">
+                                        <th className="px-6 py-3 text-[12px] font-semibold text-slate-500 uppercase tracking-widest">Veri Değeri</th>
+                                        {isPayment && (
+                                            <th className="px-6 py-3 text-[12px] font-semibold text-slate-500 uppercase tracking-widest">Enstrüman Fonksiyonu</th>
+                                        )}
+                                        <th className="px-6 py-3 text-[12px] font-semibold text-slate-500 uppercase tracking-widest text-right">Aksiyon</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {activeList.map((item: any, i: number) => {
+                                        const uniqueKey = isPayment ? (item.id || i) : i;
+                                        return (
+                                            <tr key={uniqueKey} className="hover:bg-slate-50/50 group transition-colors">
+                                                <td className="px-6 py-3">
+                                                    <div className="flex items-center gap-3">
+                                                        {isPayment && <span className="text-xl w-6 text-center shrink-0">{item.icon || '■'}</span>}
+                                                        <span className="text-[14px] font-medium text-slate-900">{isPayment ? item.label : item}</span>
+                                                    </div>
+                                                </td>
+                                                {isPayment && (
+                                                    <td className="px-6 py-3">
+                                                        <span className="inline-flex px-2 py-1 text-[11px] font-semibold rounded bg-white border border-slate-200 text-slate-700 uppercase tracking-widest">
+                                                            {item.type === 'card' ? 'Kredi Kartı' : item.type === 'transfer' ? 'EFT / Banka' : 'Nakit'}
+                                                        </span>
+                                                    </td>
+                                                )}
+                                                <td className="px-6 py-3 text-right">
+                                                    <button
+                                                        onClick={() => handleRemove(item)}
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-[13px] font-semibold text-red-600 hover:text-red-700 bg-white border border-red-200 px-3 py-1.5 rounded shadow-sm hover:shadow"
+                                                    >
+                                                        Sistemden Sil
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
