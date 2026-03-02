@@ -1243,59 +1243,56 @@ function InventoryContent() {
         }
       `}</style>
       {/* --- HEADER (ÜST OPERASYON BAR) --- */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-30 pt-4">
-        <div>
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-8 relative z-30 pt-4 w-full">
+        <div className="flex-1 text-left">
           {!isCounting ? (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <h1 className="text-[26px] font-black text-slate-900 tracking-tight flex items-center gap-2">
                 Envanter Yönetimi
               </h1>
-              <p className="text-sm text-slate-500 font-medium">
+              <p className="text-[13px] text-slate-500 font-bold tracking-wide mt-1">
                 Ürün, stok ve fiyat yönetim merkezi
               </p>
             </div>
           ) : (
-            <div className="flex items-center gap-4 py-2 px-6 bg-amber-50 border border-amber-200 rounded-[20px]">
-              <div className="text-3xl animate-bounce">🔍</div>
-              <div>
-                <h1 className="text-xl font-black text-amber-600 uppercase tracking-tight">
-                  STOK SAYIM MODU AKTİF
-                </h1>
-                <p className="text-xs text-amber-500 font-bold uppercase tracking-widest">
-                  Lütfen fiziksel stok miktarlarını girin.
-                </p>
+            <div className="flex items-center justify-between w-full p-4 bg-amber-50 border border-amber-200 rounded-[12px] shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="text-3xl animate-bounce">🔍</div>
+                <div>
+                  <h1 className="text-[18px] font-black text-amber-600 uppercase tracking-tight">
+                    STOK SAYIM MODU AKTİF
+                  </h1>
+                  <p className="text-[12px] text-amber-500 font-bold uppercase tracking-widest">
+                    Lütfen fiziksel stok miktarlarını girin.
+                  </p>
+                </div>
               </div>
             </div>
           )}
         </div>
 
         {!isCounting && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+          <div className="flex items-center justify-start xl:justify-end gap-3 flex-wrap xl:flex-nowrap w-full xl:w-auto">
             <input type="file" ref={fileInputRef} onChange={handleExcelUpload} accept=".xlsx, .xls" className="hidden" />
-            <button onClick={() => fileInputRef.current?.click()} className="px-4 py-2 border border-slate-200 text-slate-700 font-semibold rounded-lg text-xs hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center gap-2 whitespace-nowrap">
+            <button onClick={() => fileInputRef.current?.click()} className="h-[42px] px-5 border border-slate-200 text-slate-700 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
               Yükle
             </button>
-            <button onClick={exportToExcel} className="px-4 py-2 border border-slate-200 text-slate-700 font-semibold rounded-lg text-xs hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center gap-2 whitespace-nowrap">
+            <button onClick={exportToExcel} className="h-[42px] px-5 border border-slate-200 text-slate-700 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
               İndir
             </button>
-            <button onClick={startCount} className="px-4 py-2 border border-slate-200 text-slate-700 font-semibold rounded-lg text-xs hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center gap-2 whitespace-nowrap">
+            <button onClick={startCount} className="h-[42px] px-5 border border-slate-200 text-slate-700 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
               Stok Sayımı
             </button>
-            <button onClick={() => setShowScanner(true)} className="px-4 py-2 border border-slate-200 text-slate-700 font-semibold rounded-lg text-xs hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center gap-2 whitespace-nowrap">
+            <button onClick={() => setShowScanner(true)} className="h-[42px] px-5 border border-slate-200 text-slate-700 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
               Barkod Tara
             </button>
-            <button onClick={() => setShowAddModal(true)} className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap border border-blue-600">
+            <button onClick={() => setShowAddModal(true)} className="h-[42px] px-6 bg-blue-600 hover:bg-blue-700 !text-white font-black rounded-[10px] text-[13px] uppercase tracking-widest transition-colors shadow-sm flex items-center justify-center gap-2 whitespace-nowrap border border-blue-600">
               Yeni Ürün
             </button>
-            <button onClick={() => setShowHealthReport(true)} className="px-4 py-2 border border-slate-200 text-slate-700 font-semibold rounded-lg text-xs hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center gap-1.5 whitespace-nowrap group">
+            <button onClick={() => setShowHealthReport(true)} className="h-[42px] px-5 border border-slate-200 text-slate-700 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap group relative">
               Health Raporu
-              <div className="group relative inline-flex items-center justify-center pointer-events-auto align-middle">
-                <span className="text-slate-400 group-hover:text-slate-600 w-3.5 h-3.5 inline-flex items-center justify-center border border-current rounded-full text-[9px] font-bold">?</span>
-                <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-3 bg-white border border-slate-200 rounded-xl shadow-md text-slate-600 text-[11px] leading-relaxed z-[100] pointer-events-none font-normal text-center whitespace-normal">
-                  Stok sağlığı ve devir analiz raporunu görüntüler.
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-[1px] border-[6px] border-transparent border-b-white z-10"></div>
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-[7px] border-transparent border-b-slate-200"></div>
-                </div>
+              <div className="absolute opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-3 bg-white border border-slate-200 rounded-[12px] shadow-lg text-slate-600 text-[11px] leading-relaxed z-[100] pointer-events-none font-normal text-center whitespace-normal">
+                Stok sağlığı ve devir analiz raporunu görüntüler.
               </div>
             </button>
           </div>
@@ -1304,9 +1301,9 @@ function InventoryContent() {
 
       {/* --- SEKMELER + STRATEJİK MOD SEÇİMİ --- */}
       {!isCounting ? (
-        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 mb-6 z-20 relative border-b border-slate-200 pb-0">
-          <div className="flex-shrink-0 w-full xl:w-auto overflow-x-auto scrollbar-hide">
-            <div className="flex whitespace-nowrap w-max gap-8 px-2 h-10 items-end">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-6 z-20 relative border-b border-slate-200 pb-0 w-full">
+          <div className="w-full flex-1 overflow-x-auto scrollbar-hide">
+            <div className="flex w-full xl:w-max gap-8 px-1 h-12 items-end">
               {[
                 { id: 'all', label: 'Envanter Listesi' },
                 { id: 'focus', label: 'Focus Queue' },
@@ -1317,8 +1314,8 @@ function InventoryContent() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`h-full text-[13px] font-bold transition-all duration-200 flex items-center gap-2 border-b-2 pb-2 
-                    ${activeTab === tab.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                  className={`h-full text-[14px] font-bold uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 border-b-[3px] pb-3 whitespace-nowrap
+                    ${activeTab === tab.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-900 border-b-transparent hover:border-slate-300'}`}
                 >
                   {tab.label}
                 </button>
@@ -1349,20 +1346,20 @@ function InventoryContent() {
         </div>
       ) : null}
       {isCounting && (
-        <div className="flex items-center justify-between mb-6 p-4 bg-amber-50 border border-amber-200 rounded-[20px]">
+        <div className="flex items-center justify-between mb-6 p-4 bg-amber-50 border border-amber-200 rounded-[12px] shadow-sm w-full">
           <div className="flex items-center gap-4">
-            <div className="flex bg-white border border-amber-300 shadow-sm p-1 rounded-xl">
+            <div className="flex bg-white border border-amber-300 shadow-sm p-1 rounded-[10px]">
               <input
                 type="text"
                 placeholder="Sayılacak ürünü ara..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-transparent border-none outline-none px-4 py-2 text-sm text-slate-900 w-64"
+                className="bg-transparent border-none outline-none px-4 py-2 text-[14px] font-bold text-slate-900 w-64 placeholder:text-slate-400 placeholder:font-medium"
               />
             </div>
-            <div className="text-xs text-amber-700 font-bold uppercase">
+            <div className="text-[12px] text-amber-700 font-bold uppercase tracking-widest">
               Sayım Başlangıcı:{" "}
-              <span className="text-amber-900">
+              <span className="text-amber-900 ml-1">
                 {new Date().toLocaleTimeString()}
               </span>
             </div>
@@ -1370,13 +1367,13 @@ function InventoryContent() {
           <div className="flex items-center gap-3">
             <button
               onClick={cancelReport}
-              className="px-8 py-3 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 font-black text-sm uppercase tracking-widest transition-all"
+              className="h-[46px] px-8 rounded-[10px] border-2 border-red-200 text-red-600 hover:bg-red-50 font-black text-[13px] uppercase tracking-widest transition-all shadow-sm"
             >
               İPTAL ET
             </button>
             <button
               onClick={finishCount}
-              className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm font-black text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+              className="h-[46px] px-8 rounded-[10px] bg-blue-600 hover:bg-blue-700 !text-white shadow-sm font-black text-[13px] uppercase tracking-widest transition-all flex items-center gap-2"
             >
               <span>KONTROL ET & BİTİR</span>
               <span className="text-lg">→</span>
