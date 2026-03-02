@@ -1,0 +1,1456 @@
+Vercel CLI 50.22.0
+WARN! Build not running on Vercel. System environment variables will not be available.
+Installing dependencies...
+
+> periodya@0.1.0 postinstall
+> prisma generate
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 2.91s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+
+up to date in 7s
+
+179 packages are looking for funding
+  run `npm fund` for details
+Detected Next.js version: 16.1.4
+Running "npm run vercel-build"
+
+> periodya@0.1.0 vercel-build
+> prisma generate && prisma db push --accept-data-loss && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 2.27s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-billowing-glade-agt0zp7m-pooler.c-2.eu-central-1.aws.neon.tech"
+
+The database is already in sync with the Prisma schema.
+
+Running generate... (Use --skip-generate to skip the generators)
+[2K[1A[2K[GRunning generate... - Prisma Client
+[2K[1A[2K[G✔ Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 3.30s
+
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+▲ Next.js 16.1.4 (Turbopack)
+- Environments: .env.production.local, .env.local, .env.production, .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 44s
+  Skipping validation of types
+  Collecting page data using 7 workers ...
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+⚠️ REDIS_URL is missing. Redis functionality will be limited.
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+{"event":"redis_error","timestamp":"2026-03-02T11:56:08.391Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\.next\server\chunks\_827e14ae._.js:139:84660)
+{"event":"redis_error","timestamp":"2026-03-02T11:56:08.687Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+⚠️ REDIS_URL is missing. Redis functionality will be limited.
+{"event":"redis_error","timestamp":"2026-03-02T11:56:08.815Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:09.327Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ETIMEDOUT'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\.next\server\chunks\_ad15eb8e._.js:139:74117)
+{"event":"redis_error","timestamp":"2026-03-02T11:56:09.648Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:09.730Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ETIMEDOUT'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:10.003Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:10.248Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:10.322Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+⚠️ REDIS_URL is missing. Redis functionality will be limited.
+{"event":"redis_error","timestamp":"2026-03-02T11:56:10.698Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:10.741Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\.next\server\chunks\_ad15eb8e._.js:139:74117)
+⚠️ REDIS_URL is missing. Redis functionality will be limited.
+{"event":"redis_error","timestamp":"2026-03-02T11:56:10.874Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+⚠️ REDIS_URL is missing. Redis functionality will be limited.
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+⚠️ REDIS_URL is missing. Redis functionality will be limited.
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+{"event":"redis_error","timestamp":"2026-03-02T11:56:12.050Z","error":"","status":"error"}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:12.061Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.i (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\.next\server\chunks\ssr\_2529a379._.js:139:84686)
+{"event":"redis_error","timestamp":"2026-03-02T11:56:12.097Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:12.138Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:12.142Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+  Generating static pages using 7 workers (0/240) ...
+  Generating static pages using 7 workers (60/240) 
+{"event":"redis_error","timestamp":"2026-03-02T11:56:12.594Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:13.135Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:13.315Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ETIMEDOUT'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ETIMEDOUT'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ETIMEDOUT'
+}
+  Generating static pages using 7 workers (120/240) 
+{"event":"redis_error","timestamp":"2026-03-02T11:56:13.464Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+⚠️ REDIS_URL is missing. Redis functionality will be limited.
+{"event":"redis_error","timestamp":"2026-03-02T11:56:13.601Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:13.967Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\.next\server\chunks\_ad15eb8e._.js:139:74117)
+{"event":"redis_error","timestamp":"2026-03-02T11:56:13.986Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.055Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.055Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.137Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+  Generating static pages using 7 workers (180/240) 
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.180Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.185Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.363Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.410Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.419Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.426Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.591Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.692Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.725Z","error":"","status":"error"}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.725Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.858Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:14.902Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:15.001Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:15.091Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","timestamp":"2026-03-02T11:56:15.174Z","error":"","status":"error"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+✓ Generating static pages using 7 workers (240/240) in 3.0s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /accounting
+├ ƒ /admin
+├ ƒ /admin/audit-logs
+├ ƒ /admin/catalog/categories
+├ ƒ /admin/companies
+├ ƒ /admin/dashboard
+├ ƒ /admin/disputes
+├ ƒ /admin/disputes/[ticketId]
+├ ƒ /admin/growth/audit
+├ ƒ /admin/growth/billing-health
+├ ƒ /admin/growth/boost-rules
+├ ƒ /admin/growth/revenue
+├ ƒ /admin/growth/subscriptions
+├ ƒ /admin/health
+├ ƒ /admin/logs
+├ ƒ /admin/marketplace/ops
+├ ƒ /admin/ops/ledgers
+├ ƒ /admin/ops/orders
+├ ƒ /admin/ops/payments
+├ ƒ /admin/ops/providers
+├ ƒ /admin/ops/shipments
+├ ƒ /admin/payments-escrow/audit
+├ ƒ /admin/payments-escrow/commissions
+├ ƒ /admin/payments-escrow/policies
+├ ƒ /admin/payments-escrow/providers
+├ ƒ /admin/payouts
+├ ƒ /admin/plans
+├ ƒ /admin/platform-finance
+├ ƒ /admin/products
+├ ƒ /admin/sales-radar
+├ ƒ /admin/security
+├ ƒ /admin/support/tickets
+├ ƒ /admin/support/tickets/[id]
+├ ƒ /admin/tenants
+├ ƒ /admin/tenants/[id]
+├ ƒ /admin/tenants/[id]/help
+├ ƒ /admin/transactions
+├ ƒ /admin/trust-monitor
+├ ƒ /admin/website
+├ ○ /advisor
+├ ƒ /api/admin/audit-logs
+├ ƒ /api/admin/automation/run
+├ ƒ /api/admin/billing/boost/charge/run
+├ ƒ /api/admin/billing/boost/collection/run
+├ ƒ /api/admin/billing/boost/health
+├ ƒ /api/admin/billing/boost/health/snapshot
+├ ƒ /api/admin/billing/boost/invoices
+├ ƒ /api/admin/billing/boost/meter/run
+├ ƒ /api/admin/billing/boost/rollover/run
+├ ƒ /api/admin/billing/boost/subscriptions/activate
+├ ƒ /api/admin/billing/boost/subscriptions/cancel
+├ ƒ /api/admin/billing/boost/subscriptions/pause
+├ ƒ /api/admin/control-hub
+├ ƒ /api/admin/dashboard/actions
+├ ƒ /api/admin/dashboard/overview
+├ ƒ /api/admin/dashboard/timeseries
+├ ƒ /api/admin/discovery/boost-rules
+├ ƒ /api/admin/discovery/boost-rules/[id]/deactivate
+├ ƒ /api/admin/disputes
+├ ƒ /api/admin/disputes/[ticketId]
+├ ƒ /api/admin/disputes/[ticketId]/actions
+├ ƒ /api/admin/disputes/[ticketId]/request-info
+├ ƒ /api/admin/features
+├ ƒ /api/admin/finance/commission/plans
+├ ƒ /api/admin/finance/commission/plans/[id]/activate
+├ ƒ /api/admin/finance/earnings/[earningId]/release
+├ ƒ /api/admin/finance/ledger
+├ ƒ /api/admin/finance/overview
+├ ƒ /api/admin/finance/payout/outbox/run
+├ ƒ /api/admin/finance/payout/requests
+├ ƒ /api/admin/finance/payout/requests/[id]/approve
+├ ƒ /api/admin/finance/payout/requests/[id]/process-internal
+├ ƒ /api/admin/finance/payout/requests/[id]/reject
+├ ƒ /api/admin/finance/payout/trigger-release/[shipmentId]
+├ ƒ /api/admin/finance/payout/webhooks/process
+├ ƒ /api/admin/finance/shipping/invoices
+├ ƒ /api/admin/finance/shipping/invoices/[id]
+├ ƒ /api/admin/finance/shipping/lines/[lineId]/dispute
+├ ƒ /api/admin/finance/shipping/lines/[lineId]/match
+├ ƒ /api/admin/finance/shipping/lines/queue
+├ ƒ /api/admin/finance/trust-scores/[sellerTenantId]/recalc
+├ ƒ /api/admin/growth/audit
+├ ƒ /api/admin/growth/billing-health
+├ ƒ /api/admin/growth/billing-health/run-collection-guard
+├ ƒ /api/admin/growth/billing-health/snapshot
+├ ƒ /api/admin/growth/boost-rules
+├ ƒ /api/admin/growth/boost-rules/[id]/disable
+├ ƒ /api/admin/growth/boost-rules/[id]/expire-now
+├ ƒ /api/admin/growth/enforcement
+├ ƒ /api/admin/growth/enforcement/[tenantId]
+├ ƒ /api/admin/growth/policy
+├ ƒ /api/admin/growth/revenue
+├ ƒ /api/admin/growth/subscriptions
+├ ƒ /api/admin/growth/subscriptions/[id]/unblock
+├ ƒ /api/admin/health
+├ ƒ /api/admin/help/categories
+├ ƒ /api/admin/help/topics
+├ ƒ /api/admin/help/topics/[id]
+├ ƒ /api/admin/marketplace/ops
+├ ƒ /api/admin/marketplace/queue/health
+├ ƒ /api/admin/marketplace/queue/replay
+├ ƒ /api/admin/marketplace/queue/status
+├ ƒ /api/admin/metrics/cohorts/daily
+├ ƒ /api/admin/metrics/platform/daily
+├ ƒ /api/admin/metrics/run
+├ ƒ /api/admin/metrics/tenants/daily
+├ ƒ /api/admin/normalize-marketplaces
+├ ƒ /api/admin/ops/alerts/[id]/ack
+├ ƒ /api/admin/ops/alerts/[id]/resolve
+├ ƒ /api/admin/ops/health
+├ ƒ /api/admin/ops/health/snapshot
+├ ƒ /api/admin/ops/payouts/[id]/force-finalize
+├ ƒ /api/admin/ops/payouts/[id]/force-reconcile
+├ ƒ /api/admin/ops/payouts/[id]/quarantine
+├ ƒ /api/admin/ops/payouts/[id]/rerun-outbox
+├ ƒ /api/admin/ops/run/outbox
+├ ƒ /api/admin/ops/run/reconcile-pull
+├ ƒ /api/admin/ops/run/repair
+├ ƒ /api/admin/ops/run/sentinel
+├ ƒ /api/admin/payments-escrow/audit
+├ ƒ /api/admin/payments-escrow/commissions/plans
+├ ƒ /api/admin/payments-escrow/commissions/plans/[id]
+├ ƒ /api/admin/payments-escrow/commissions/plans/[id]/archive
+├ ƒ /api/admin/payments-escrow/commissions/preview
+├ ƒ /api/admin/payments-escrow/policies
+├ ƒ /api/admin/payments-escrow/providers/reconcile-pull
+├ ƒ /api/admin/payments-escrow/providers/status
+├ ƒ /api/admin/payouts/queue
+├ ƒ /api/admin/payouts/queue/[id]/approve
+├ ƒ /api/admin/payouts/queue/[id]/reject
+├ ƒ /api/admin/pdks/displays
+├ ƒ /api/admin/pdks/events
+├ ƒ /api/admin/pdks/events/approve
+├ ƒ /api/admin/reset-data
+├ ƒ /api/admin/rollout/tenant/[tenantId]
+├ ƒ /api/admin/rollout/tenant/[tenantId]/activate-pilot
+├ ƒ /api/admin/rollout/tenant/[tenantId]/pause-boost
+├ ƒ /api/admin/rollout/tenant/[tenantId]/pause-escrow
+├ ƒ /api/admin/rollout/tenant/[tenantId]/pause-payout
+├ ƒ /api/admin/rollout/tenant/[tenantId]/resume-all
+├ ƒ /api/admin/rollout/tenant/[tenantId]/set-feature
+├ ƒ /api/admin/rollout/tenant/[tenantId]/set-risk-caps
+├ ƒ /api/admin/sales-radar
+├ ƒ /api/admin/search
+├ ƒ /api/admin/tenants
+├ ƒ /api/admin/tenants/[id]
+├ ƒ /api/admin/tenants/[id]/actions
+├ ƒ /api/admin/tickets/[id]/reply
+├ ƒ /api/admin/tickets/[id]/update
+├ ƒ /api/admin/tickets/queue
+├ ƒ /api/admin/website
+├ ƒ /api/admin/website/menus
+├ ƒ /api/admin/website/pages
+├ ƒ /api/admin/website/pages/[id]
+├ ƒ /api/admin/website/upload
+├ ƒ /api/analytics/summary
+├ ƒ /api/analytics/upsell
+├ ƒ /api/auth/change-password
+├ ƒ /api/auth/demo
+├ ƒ /api/auth/forgot-password
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/register
+├ ƒ /api/auth/reset-password-confirm
+├ ƒ /api/automation/run
+├ ƒ /api/backup
+├ ƒ /api/billing/boost-invoices
+├ ƒ /api/billing/boost/invoices
+├ ƒ /api/billing/boost/subscription
+├ ƒ /api/billing/checkout
+├ ƒ /api/billing/overview
+├ ƒ /api/billing/plans
+├ ƒ /api/billing/plans/[id]
+├ ƒ /api/billing/subscription
+├ ƒ /api/branches
+├ ƒ /api/branches/[id]
+├ ƒ /api/branches/documents
+├ ƒ /api/buyer/recommendations/action
+├ ƒ /api/campaigns
+├ ƒ /api/checks
+├ ƒ /api/checks/[id]
+├ ƒ /api/checks/collect
+├ ƒ /api/contracts/create
+├ ƒ /api/coupons
+├ ƒ /api/cron/payout-reconciliation
+├ ƒ /api/cron/reconcile-transactions
+├ ƒ /api/cron/recurring-orders
+├ ƒ /api/cron/shipment-sync
+├ ƒ /api/cron/sync-all
+├ ƒ /api/customers
+├ ƒ /api/customers/[id]
+├ ƒ /api/customers/[id]/documents
+├ ƒ /api/customers/[id]/pricing
+├ ƒ /api/customers/[id]/statement
+├ ƒ /api/customers/[id]/warranties
+├ ƒ /api/customers/categories
+├ ƒ /api/customers/import
+├ ƒ /api/dashboard/stats
+├ ƒ /api/dashboard/summary
+├ ƒ /api/db-ping
+├ ƒ /api/debug/nilvera-series
+├ ƒ /api/documents/[id]
+├ ƒ /api/field-sales/admin/live-status
+├ ƒ /api/field-sales/admin/location-requests
+├ ƒ /api/field-sales/admin/location-requests/process
+├ ƒ /api/field-sales/admin/settings
+├ ƒ /api/field-sales/collections
+├ ƒ /api/field-sales/location-request
+├ ƒ /api/field-sales/orders/[id]
+├ ƒ /api/field-sales/orders/create
+├ ƒ /api/field-sales/routes
+├ ƒ /api/field-sales/routes/[id]
+├ ƒ /api/field-sales/routes/[id]/stops
+├ ƒ /api/field-sales/routes/[id]/stops/batch
+├ ƒ /api/field-sales/stops/[id]
+├ ƒ /api/field-sales/templates
+├ ƒ /api/field-sales/templates/[id]
+├ ƒ /api/field-sales/visits
+├ ƒ /api/field-sales/visits/active
+├ ƒ /api/field-sales/visits/end
+├ ƒ /api/field-sales/visits/start
+├ ƒ /api/finance/payout/destinations
+├ ƒ /api/finance/payout/requests
+├ ƒ /api/finance/payout/status
+├ ƒ /api/finance/payout/submerchant/onboard
+├ ƒ /api/finance/trust-score
+├ ƒ /api/financials/accounts
+├ ƒ /api/financials/accounts/[id]/ledger
+├ ƒ /api/financials/accounts/sync
+├ ƒ /api/financials/audit
+├ ƒ /api/financials/checks
+├ ƒ /api/financials/checks/[id]
+├ ƒ /api/financials/checks/[id]/status
+├ ƒ /api/financials/forecast
+├ ƒ /api/financials/payment-plans
+├ ƒ /api/financials/payment-plans/pay
+├ ƒ /api/financials/reports/ba-bs
+├ ƒ /api/financials/reports/health
+├ ƒ /api/financials/reports/income-statement
+├ ƒ /api/financials/reports/trial-balance
+├ ƒ /api/financials/statements/parse
+├ ƒ /api/financials/transactions
+├ ƒ /api/financials/transactions/[id]
+├ ƒ /api/fintech/banking/connect
+├ ƒ /api/fintech/banking/credentials
+├ ƒ /api/fintech/banking/duplicates
+├ ƒ /api/fintech/banking/import-xml
+├ ƒ /api/fintech/banking/match
+├ ƒ /api/fintech/banking/merge
+├ ƒ /api/fintech/banking/replay
+├ ƒ /api/fintech/banking/run-tests
+├ ƒ /api/fintech/banking/sync
+├ ƒ /api/fintech/banking/test-connection
+├ ƒ /api/fintech/banking/test-pipeline
+├ ƒ /api/fintech/banking/transactions
+├ ƒ /api/fintech/dashboard/heatmap
+├ ƒ /api/fintech/dashboard/metrics
+├ ƒ /api/health-check
+├ ƒ /api/health/prisma
+├ ƒ /api/integrations/ecommerce/sync
+├ ƒ /api/integrations/marketplace/check-mapping
+├ ƒ /api/integrations/marketplace/hydrate
+├ ƒ /api/integrations/marketplace/save-mapping
+├ ƒ /api/integrations/marketplace/stats
+├ ƒ /api/integrations/marketplace/sync
+├ ƒ /api/integrations/marketplace/test
+├ ƒ /api/integrations/nilvera/test
+├ ƒ /api/integrations/send
+├ ƒ /api/integrations/settings/save
+├ ƒ /api/inventory/audit
+├ ƒ /api/inventory/pending
+├ ƒ /api/inventory/transfer
+├ ƒ /api/kasalar
+├ ƒ /api/kasalar/[id]
+├ ƒ /api/logs
+├ ƒ /api/marketplaces/[marketplace]/orders/[orderId]/actions
+├ ƒ /api/marketplaces/[marketplace]/orders/[orderId]/label
+├ ƒ /api/marketplaces/actions/[auditId]
+├ ƒ /api/messages
+├ ƒ /api/metrics/daily
+├ ƒ /api/metrics/track
+├ ƒ /api/network/demands
+├ ƒ /api/network/demands/[id]/offers
+├ ƒ /api/network/discovery
+├ ƒ /api/network/earnings
+├ ƒ /api/network/listings
+├ ƒ /api/network/listings/[id]
+├ ƒ /api/network/offers/[id]/accept
+├ ƒ /api/network/orders
+├ ƒ /api/network/orders/[id]/confirm-delivery
+├ ƒ /api/network/orders/[id]/payments/init
+├ ƒ /api/network/orders/[id]/shipments/init
+├ ƒ /api/network/payouts/destinations
+├ ƒ /api/network/payouts/requests
+├ ƒ /api/network/payouts/summary
+├ ƒ /api/network/trust-score
+├ ƒ /api/notifications
+├ ƒ /api/notifications/summary
+├ ƒ /api/onboarding/init
+├ ƒ /api/ops-internal/queue-health
+├ ƒ /api/orders/[id]
+├ ƒ /api/orders/collect
+├ ƒ /api/orders/get-label
+├ ƒ /api/orders/pending
+├ ƒ /api/orders/update-cargo
+├ ƒ /api/portal/auth/login
+├ ƒ /api/portal/auth/logout
+├ ƒ /api/pos/odeal/pay
+├ ƒ /api/pricing/bulk-update
+├ ƒ /api/pricing/initialize
+├ ƒ /api/pricing/lists
+├ ƒ /api/pricing/lists/[id]
+├ ƒ /api/pricing/lists/[id]/prices
+├ ƒ /api/pricing/products/[productId]/prices
+├ ƒ /api/pricing/resolve-customer
+├ ƒ /api/products
+├ ƒ /api/products/[id]
+├ ƒ /api/products/attributes
+├ ƒ /api/products/bulk
+├ ƒ /api/products/import
+├ ƒ /api/public/cms/page/[slug]
+├ ƒ /api/public/landing
+├ ƒ /api/public/recovery
+├ ƒ /api/purchasing/[id]/approve
+├ ƒ /api/purchasing/[id]/reject
+├ ƒ /api/purchasing/create
+├ ƒ /api/purchasing/import
+├ ƒ /api/purchasing/list
+├ ƒ /api/quotes
+├ ƒ /api/quotes/[id]
+├ ƒ /api/quotes/[id]/convert
+├ ƒ /api/reports/ceo-metrics
+├ ƒ /api/rollout/features
+├ ƒ /api/sales/create
+├ ƒ /api/sales/formal-invoice-send
+├ ƒ /api/sales/formal-invoice-test
+├ ƒ /api/sales/formal-send
+├ ƒ /api/sales/formal-test
+├ ƒ /api/sales/history
+├ ƒ /api/sales/invoices
+├ ƒ /api/sales/invoices/[id]
+├ ƒ /api/sales/invoices/[id]/approve
+├ ƒ /api/sales/invoices/convert
+├ ƒ /api/sales/wayslips
+├ ƒ /api/search
+├ ƒ /api/security/anomalies
+├ ƒ /api/security/events
+├ ƒ /api/seller/boost
+├ ƒ /api/seller/boost/analytics
+├ ƒ /api/services
+├ ƒ /api/services/[id]
+├ ƒ /api/services/upcoming
+├ ƒ /api/settings
+├ ƒ /api/settings/mail
+├ ƒ /api/setup
+├ ƒ /api/staff
+├ ƒ /api/staff/attendance
+├ ƒ /api/staff/documents
+├ ƒ /api/staff/expenses
+├ ƒ /api/staff/leaves
+├ ƒ /api/staff/my-customers
+├ ƒ /api/staff/payroll
+├ ƒ /api/staff/puantaj
+├ ƒ /api/staff/reports
+├ ƒ /api/staff/shifts
+├ ƒ /api/staff/targets
+├ ƒ /api/suppliers
+├ ƒ /api/suppliers/[id]
+├ ƒ /api/suppliers/import
+├ ƒ /api/suppliers/transaction
+├ ƒ /api/support/attachments/[id]
+├ ƒ /api/support/attachments/upload-url
+├ ƒ /api/support/tickets
+├ ƒ /api/support/tickets/[id]
+├ ƒ /api/support/tickets/[id]/reply
+├ ƒ /api/suspended-sales
+├ ƒ /api/tickets
+├ ƒ /api/tickets/[id]
+├ ƒ /api/tickets/[id]/messages
+├ ƒ /api/user/insights
+├ ƒ /api/v1/pdks/check-in
+├ ƒ /api/v1/pdks/check-out
+├ ƒ /api/v1/pdks/display/pair
+├ ƒ /api/v1/pdks/display/token
+├ ƒ /api/warranties
+├ ƒ /api/warranties/[id]
+├ ƒ /api/webhooks/iyzico
+├ ƒ /api/webhooks/iyzico/callback
+├ ƒ /api/webhooks/payments/iyzico
+├ ƒ /api/webhooks/payments/odel
+├ ƒ /api/webhooks/shipments/[carrier]
+├ ○ /billing
+├ ○ /billing/boost-invoices
+├ ƒ /buyer/recommendations
+├ ƒ /catalog
+├ ƒ /catalog/[productId]
+├ ƒ /catalog/cart
+├ ƒ /catalog/checkout
+├ ƒ /contracts
+├ ƒ /contracts/[id]
+├ ○ /customers
+├ ƒ /customers/[id]
+├ ○ /dashboard
+├ ○ /field-mobile/collection/create
+├ ○ /field-mobile/customers
+├ ƒ /field-mobile/customers/[id]
+├ ○ /field-mobile/expenses
+├ ○ /field-mobile/order/create
+├ ○ /field-mobile/profile
+├ ○ /field-mobile/reports
+├ ○ /field-mobile/routes
+├ ƒ /field-mobile/routes/[id]
+├ ○ /field-mobile/targets
+├ ○ /field-mobile/visits
+├ ○ /field-sales
+├ ○ /field-sales/admin/config
+├ ○ /field-sales/admin/live
+├ ○ /field-sales/admin/routes
+├ ƒ /field-sales/admin/routes/[id]
+├ ○ /fintech/control-tower
+├ ○ /fintech/open-banking
+├ ○ /fintech/profitability-heatmap
+├ ○ /fintech/smart-pricing
+├ ƒ /formal-invoice/send
+├ ƒ /formal-invoice/test
+├ ƒ /help
+├ ƒ /help/[slug]
+├ ○ /integrations
+├ ○ /inventory
+├ ○ /inventory/variants
+├ ○ /invoices
+├ ○ /login
+├ ƒ /network/buyer/orders
+├ ƒ /network/buyer/orders/[id]
+├ ○ /network/earnings
+├ ○ /network/finance
+├ ○ /network/payments
+├ ○ /network/payouts
+├ ƒ /network/seller/balances
+├ ƒ /network/seller/orders
+├ ƒ /network/seller/orders/[id]
+├ ○ /network/stock-risks
+├ ○ /network/trust-score
+├ ○ /notifications
+├ ○ /onboarding
+├ ○ /payment
+├ ○ /pdks/display
+├ ƒ /portal/dashboard
+├ ƒ /portal/login
+├ ○ /purchasing
+├ ○ /quotes
+├ ○ /register
+├ ○ /reports
+├ ○ /reports/ceo
+├ ○ /reports/daily
+├ ○ /reports/suppliers
+├ ○ /reset-password
+├ ƒ /rfq
+├ ƒ /rfq/[id]
+├ ○ /robots.txt
+├ ○ /sales
+├ ○ /sales/invoice
+├ ○ /security/suspicious
+├ ƒ /seller/automation
+├ ƒ /seller/automation/decisions
+├ ○ /seller/boost
+├ ○ /seller/boost/analytics
+├ ƒ /seller/contracts
+├ ƒ /seller/products
+├ ƒ /seller/products/[id]
+├ ƒ /seller/rfqs
+├ ƒ /seller/rfqs/[id]
+├ ƒ /seller/suggestions
+├ ○ /service
+├ ƒ /service/[id]
+├ ○ /service/new
+├ ○ /settings
+├ ○ /settings/branch
+├ ○ /settings/pricing
+├ ○ /setup
+├ ○ /sitemap.xml
+├ ○ /staff
+├ ○ /staff/me
+├ ○ /staff/pdks
+├ ○ /suppliers
+├ ƒ /suppliers/[id]
+├ ƒ /support
+├ ƒ /support/[id]
+├ ○ /support/new
+├ ○ /support/tickets
+├ ○ /terminal
+├ ƒ /test-desktop
+├ ○ /theme-test
+├ ○ /treasury
+└ ƒ /vehicle/[plate]
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+Tracing initial Next.js server files due to missing build trace: 12.596s
+Traced Next.js server files in: 13.334s
+Tracing entries due to missing build traces:
+[
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/accounting/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/audit-logs/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/catalog/categories/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/companies/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/dashboard/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/disputes/[ticketId]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/disputes/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/growth/audit/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/growth/billing-health/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/growth/boost-rules/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/growth/revenue/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/growth/subscriptions/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/health/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/logs/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/marketplace/ops/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/ops/ledgers/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/ops/orders/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/ops/payments/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/ops/providers/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/ops/shipments/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/payments-escrow/audit/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/payments-escrow/commissions/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/payments-escrow/policies/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/payments-escrow/providers/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/payouts/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/plans/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/platform-finance/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/products/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/sales-radar/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/security/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/support/tickets/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/support/tickets/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/tenants/[id]/help/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/tenants/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/tenants/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/transactions/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/trust-monitor/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/admin/website/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/advisor/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/billing/boost-invoices/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/billing/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/buyer/recommendations/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/catalog/[productId]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/catalog/cart/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/catalog/checkout/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/catalog/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/contracts/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/contracts/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/customers/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/customers/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/dashboard/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/field-sales/admin/config/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/field-sales/admin/live/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/field-sales/admin/routes/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/field-sales/admin/routes/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/field-sales/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/fintech/control-tower/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/fintech/open-banking/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/fintech/profitability-heatmap/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/fintech/smart-pricing/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/help/[slug]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/help/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/integrations/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/inventory/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/inventory/variants/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/invoices/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/buyer/orders/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/buyer/orders/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/earnings/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/finance/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/payments/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/payouts/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/seller/balances/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/seller/orders/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/seller/orders/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/stock-risks/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/network/trust-score/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/notifications/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/onboarding/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/payment/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/purchasing/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/quotes/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/reports/ceo/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/reports/daily/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/reports/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/reports/suppliers/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/rfq/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/rfq/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/sales/invoice/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/sales/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/security/suspicious/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/seller/automation/decisions/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/seller/automation/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/seller/boost/analytics/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/seller/boost/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/seller/contracts/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/seller/products/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/seller/products/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/seller/rfqs/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/seller/rfqs/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/seller/suggestions/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/service/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/service/new/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/service/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/settings/branch/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/settings/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/settings/pricing/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/setup/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/staff/me/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/staff/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/staff/pdks/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/suppliers/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/suppliers/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/support/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/support/new/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/support/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/support/tickets/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/terminal/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/test-desktop/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/theme-test/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/treasury/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(app)/vehicle/[plate]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(public)/login/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(public)/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(public)/pdks/display/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(public)/register/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/(public)/reset-password/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/_global-error/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/_not-found/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/collection/create/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/customers/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/customers/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/expenses/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/order/create/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/profile/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/reports/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/routes/[id]/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/routes/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/targets/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/field-mobile/visits/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/portal/dashboard/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/portal/login/page.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/audit-logs/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/automation/run/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/billing/boost/charge/run/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/billing/boost/collection/run/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/billing/boost/health/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/billing/boost/health/snapshot/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/billing/boost/invoices/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/billing/boost/meter/run/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/billing/boost/rollover/run/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/billing/boost/subscriptions/activate/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/billing/boost/subscriptions/cancel/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/billing/boost/subscriptions/pause/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/control-hub/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/dashboard/actions/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/dashboard/overview/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/dashboard/timeseries/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/discovery/boost-rules/[id]/deactivate/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/discovery/boost-rules/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/disputes/[ticketId]/actions/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/disputes/[ticketId]/request-info/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/disputes/[ticketId]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/disputes/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/features/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/commission/plans/[id]/activate/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/commission/plans/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/earnings/[earningId]/release/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/ledger/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/overview/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/payout/outbox/run/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/payout/requests/[id]/approve/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/payout/requests/[id]/process-internal/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/payout/requests/[id]/reject/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/payout/requests/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/payout/trigger-release/[shipmentId]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/payout/webhooks/process/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/shipping/invoices/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/shipping/invoices/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/shipping/lines/[lineId]/dispute/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/shipping/lines/[lineId]/match/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/shipping/lines/queue/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/finance/trust-scores/[sellerTenantId]/recalc/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/audit/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/billing-health/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/billing-health/run-collection-guard/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/billing-health/snapshot/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/boost-rules/[id]/disable/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/boost-rules/[id]/expire-now/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/boost-rules/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/enforcement/[tenantId]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/enforcement/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/policy/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/revenue/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/subscriptions/[id]/unblock/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/growth/subscriptions/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/health/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/help/categories/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/help/topics/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/help/topics/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/marketplace/ops/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/marketplace/queue/health/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/marketplace/queue/replay/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/marketplace/queue/status/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/metrics/cohorts/daily/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/metrics/platform/daily/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/metrics/run/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/metrics/tenants/daily/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/normalize-marketplaces/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/alerts/[id]/ack/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/alerts/[id]/resolve/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/health/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/health/snapshot/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/payouts/[id]/force-finalize/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/payouts/[id]/force-reconcile/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/payouts/[id]/quarantine/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/payouts/[id]/rerun-outbox/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/run/outbox/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/run/reconcile-pull/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/run/repair/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/ops/run/sentinel/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payments-escrow/audit/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payments-escrow/commissions/plans/[id]/archive/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payments-escrow/commissions/plans/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payments-escrow/commissions/plans/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payments-escrow/commissions/preview/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payments-escrow/policies/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payments-escrow/providers/reconcile-pull/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payments-escrow/providers/status/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payouts/queue/[id]/approve/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payouts/queue/[id]/reject/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/payouts/queue/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/pdks/displays/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/pdks/events/approve/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/pdks/events/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/reset-data/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/rollout/tenant/[tenantId]/activate-pilot/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/rollout/tenant/[tenantId]/pause-boost/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/rollout/tenant/[tenantId]/pause-escrow/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/rollout/tenant/[tenantId]/pause-payout/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/rollout/tenant/[tenantId]/resume-all/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/rollout/tenant/[tenantId]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/rollout/tenant/[tenantId]/set-feature/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/rollout/tenant/[tenantId]/set-risk-caps/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/sales-radar/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/search/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/tenants/[id]/actions/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/tenants/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/tenants/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/tickets/[id]/reply/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/tickets/[id]/update/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/tickets/queue/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/website/menus/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/website/pages/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/website/pages/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/website/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/admin/website/upload/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/analytics/summary/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/analytics/upsell/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/auth/change-password/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/auth/demo/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/auth/forgot-password/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/auth/login/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/auth/logout/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/auth/register/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/auth/reset-password-confirm/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/automation/run/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/backup/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/billing/boost-invoices/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/billing/boost/invoices/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/billing/boost/subscription/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/billing/checkout/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/billing/overview/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/billing/plans/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/billing/plans/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/billing/subscription/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/branches/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/branches/documents/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/branches/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/buyer/recommendations/action/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/campaigns/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/checks/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/checks/collect/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/checks/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/contracts/create/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/coupons/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/cron/payout-reconciliation/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/cron/reconcile-transactions/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/cron/recurring-orders/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/cron/shipment-sync/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/cron/sync-all/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/customers/[id]/documents/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/customers/[id]/pricing/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/customers/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/customers/[id]/statement/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/customers/[id]/warranties/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/customers/categories/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/customers/import/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/customers/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/dashboard/stats/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/dashboard/summary/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/db-ping/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/debug/nilvera-series/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/documents/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/admin/live-status/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/admin/location-requests/process/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/admin/location-requests/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/admin/settings/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/collections/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/location-request/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/orders/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/orders/create/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/routes/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/routes/[id]/stops/batch/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/routes/[id]/stops/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/routes/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/stops/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/templates/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/templates/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/visits/active/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/visits/end/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/visits/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/field-sales/visits/start/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/finance/payout/destinations/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/finance/payout/requests/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/finance/payout/status/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/finance/payout/submerchant/onboard/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/finance/trust-score/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/accounts/[id]/ledger/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/accounts/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/accounts/sync/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/audit/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/checks/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/checks/[id]/status/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/checks/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/forecast/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/payment-plans/pay/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/payment-plans/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/reports/ba-bs/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/reports/health/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/reports/income-statement/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/reports/trial-balance/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/statements/parse/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/transactions/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/financials/transactions/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/connect/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/credentials/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/duplicates/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/import-xml/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/match/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/merge/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/replay/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/run-tests/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/sync/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/test-connection/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/test-pipeline/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/banking/transactions/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/dashboard/heatmap/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/fintech/dashboard/metrics/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/health-check/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/health/prisma/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/integrations/ecommerce/sync/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/integrations/marketplace/check-mapping/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/integrations/marketplace/hydrate/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/integrations/marketplace/save-mapping/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/integrations/marketplace/stats/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/integrations/marketplace/sync/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/integrations/marketplace/test/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/integrations/nilvera/test/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/integrations/send/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/integrations/settings/save/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/inventory/audit/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/inventory/pending/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/inventory/transfer/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/kasalar/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/kasalar/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/logs/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/marketplaces/[marketplace]/orders/[orderId]/actions/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/marketplaces/[marketplace]/orders/[orderId]/label/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/marketplaces/actions/[auditId]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/messages/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/metrics/daily/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/metrics/track/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/demands/[id]/offers/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/demands/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/discovery/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/earnings/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/listings/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/listings/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/offers/[id]/accept/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/orders/[id]/confirm-delivery/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/orders/[id]/payments/init/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/orders/[id]/shipments/init/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/orders/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/payouts/destinations/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/payouts/requests/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/payouts/summary/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/network/trust-score/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/notifications/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/notifications/summary/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/onboarding/init/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/ops-internal/queue-health/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/orders/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/orders/collect/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/orders/get-label/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/orders/pending/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/orders/update-cargo/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/portal/auth/login/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/portal/auth/logout/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/pos/odeal/pay/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/pricing/bulk-update/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/pricing/initialize/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/pricing/lists/[id]/prices/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/pricing/lists/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/pricing/lists/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/pricing/products/[productId]/prices/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/pricing/resolve-customer/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/products/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/products/attributes/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/products/bulk/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/products/import/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/products/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/public/cms/page/[slug]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/public/landing/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/public/recovery/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/purchasing/[id]/approve/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/purchasing/[id]/reject/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/purchasing/create/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/purchasing/import/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/purchasing/list/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/quotes/[id]/convert/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/quotes/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/quotes/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/reports/ceo-metrics/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/rollout/features/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/create/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/formal-invoice-send/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/formal-invoice-test/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/formal-send/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/formal-test/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/history/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/invoices/[id]/approve/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/invoices/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/invoices/convert/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/invoices/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/sales/wayslips/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/search/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/security/anomalies/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/security/events/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/seller/boost/analytics/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/seller/boost/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/services/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/services/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/services/upcoming/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/settings/mail/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/settings/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/setup/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/attendance/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/documents/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/expenses/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/leaves/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/my-customers/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/payroll/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/puantaj/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/reports/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/shifts/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/staff/targets/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/suppliers/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/suppliers/import/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/suppliers/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/suppliers/transaction/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/support/attachments/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/support/attachments/upload-url/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/support/tickets/[id]/reply/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/support/tickets/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/support/tickets/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/suspended-sales/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/tickets/[id]/messages/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/tickets/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/tickets/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/user/insights/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/v1/pdks/check-in/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/v1/pdks/check-out/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/v1/pdks/display/pair/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/v1/pdks/display/token/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/warranties/[id]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/warranties/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/webhooks/iyzico/callback/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/webhooks/iyzico/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/webhooks/payments/iyzico/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/webhooks/payments/odel/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/api/webhooks/shipments/[carrier]/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/favicon.ico/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/formal-invoice/send/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/formal-invoice/test/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/robots.txt/route.js",
+  "C:/Users/ertke/OneDrive/Masaüstü/periodya/muhasebeapp/motoroil/.next/server/app/sitemap.xml/route.js"
+]: 478.219ms
+Created all serverless functions in: 708.688ms
+Error: Unable to find lambda for route: /billing/boost-invoices
