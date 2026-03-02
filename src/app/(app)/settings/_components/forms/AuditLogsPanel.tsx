@@ -1,55 +1,83 @@
 import React from 'react';
+import {
+    EnterpriseCard,
+    EnterprisePageShell,
+    EnterpriseButton,
+    EnterpriseTable,
+    EnterpriseEmptyState,
+} from '@/components/ui/enterprise';
+
+// ─── ZERO LOGIC CHANGE ────────────────────────────────────────────────────────
+// State, handler, submit, API, validation → HİÇBİR ŞEY DEĞİŞMEDİ.
+// Yalnızca UI katmanı Enterprise primitive'lere geçirildi.
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function AuditLogsPanel(props: any) {
-    const { Check, TURKISH_CITIES, TURKISH_DISTRICTS, setSelectedBranchDocs, selectedBranchDocs, handleFileUpload, isDocsLoading, branchDocs, deleteBranchDoc, setShowKasaDefinitions, showKasaDefinitions, addPaymentMethodDefinition, editingPaymentMethodId, setEditingPaymentMethodId, startEditingPaymentMethod, removePaymentMethodDefinition, kasaTypes, contextBranches, products, allBrands, allCats, campaigns, addCoupon, setNewItemInput, newItemInput, addDefinition, brands, setBrands, prodCats, setProdCats, warranties, setWarranties, vehicleTypes, setVehicleTypes, quickRemovePaymentMethod, removeDefinition, IntegrationsContent, saveSmtpSettings, salesExpenses, updateSalesExpenses, addKdv, activeTab, setActiveTab, appSettings, tempCompanyInfo, setTempCompanyInfo, isSaving, handleSaveCompany, newCampaign, setNewCampaign, editingCampaignId, setEditingCampaignId, addCampaign, startEditingCampaign, deleteCampaign, newCoupon, setNewCoupon, showCouponModal, setShowCouponModal, couponSearch, setCouponSearch, couponPage, setCouponPage, exportCouponsExcel, exportCouponsPDF, totalCouponPages, paginatedCouponsList, referralSettings, setReferralSettings, saveReferralSettings, coupons, refreshCoupons, newKdv, setNewKdv, invoiceSettings, updateInvoiceSettings, customers, custClasses, setCustClasses, suppliers, suppClasses, setSuppClasses, kasalar, setKasalar, newKasa, setNewKasa, editingKasa, setEditingKasa, kasalarTotalBalance, isProcessingKasa, showKasaModal, setShowKasaModal, handleSaveKasa, handleDeleteKasa, startEditingKasa, newPaymentMethod, setNewPaymentMethod, paymentMethods, updatePaymentMethods, serviceSettings, updateServiceSettings, localServiceSettings, setLocalServiceSettings, handleSaveServiceSettings, branches, newBranch, setNewBranch, editingBranchId, setEditingBranchId, addBranch, editBranch, deleteBranch, branchDefaults, updateBranchDefault, saveBranchDefaults, users, refreshStaff, newUser, setNewUser, addUser, deleteUser, editingUserPerms, setEditingUserPerms, availablePermissions, permissionTemplates, notifSettings, setNotifSettings, saveNotifSettings, logs, isLogsLoading, fetchLogs, smtpSettings, setSmtpSettings, resetOptions, setResetOptions, showSuccess, showError, showWarning, showConfirm, definitionTab, setDefinitionTab, campaignSubTab, setCampaignSubTab, refreshKasalar, refreshBranches, kasalarLoading, currentUser, profilePass, setProfilePass, handlePasswordChange, resetSettings, ...rest } = props;
+    const {
+        logs,
+        isLogsLoading,
+        fetchLogs,
+    } = props;
 
     return (
-        (
-                    <div className="animate-fade-in-up">
-                        <div className="flex justify-between items-center mb-4">
-                            <div>
-                                <h2 >İşlem Günlükleri</h2>
-                                <p >Sistemdeki son değişiklikler</p>
-                            </div>
-                            <button className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold transition-colors"  onClick={fetchLogs} disabled={isLogsLoading}>
-                                {isLogsLoading ? '...' : '🔄 YENİLE'}
-                            </button>
-                        </div>
-
-                        <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
-                            <table >
-                                <thead className="h-[52px] px-6 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
-<tr >
-                                        <th >TARİH / KULLANICI</th>
-                                        <th>İŞLEM</th>
-                                        <th>NESNE</th>
-                                        <th >DETAY</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {logs.length === 0 ? (
-                                        <tr><td colSpan={4} >Kayıt bulunamadı.</td></tr>
-                                    ) : (
-                                        logs.map(log => (
-                                            <tr key={log.id} >
-                                                <td >
-                                                    <div >{new Date(log.createdAt).toLocaleString('tr-TR')}</div>
-                                                    <div >{log.userName || 'Sistem'}</div>
-                                                </td>
-                                                <td>
-                                                    <span>
-                                                        {log.action}
-                                                    </span>
-                                                </td>
-                                                <td >{log.entity}</td>
-                                                <td >{log.details}</td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )
+        <EnterprisePageShell
+            title="İşlem Günlükleri"
+            description="Sistemdeki son değişiklikler ve kullanıcı eylemleri."
+            actions={
+                <EnterpriseButton variant="secondary" onClick={fetchLogs} disabled={isLogsLoading}>
+                    {isLogsLoading ? (
+                        <><div className="w-3.5 h-3.5 border-2 border-current/30 border-t-current rounded-full animate-spin" /> Yükleniyor</>
+                    ) : (
+                        <><span>🔄</span> Yenile</>
+                    )}
+                </EnterpriseButton>
+            }
+        >
+            {logs?.length === 0 ? (
+                <EnterpriseEmptyState
+                    icon="📜"
+                    title="Kayıt bulunamadı"
+                    description="Henüz herhangi bir işlem günlüğü oluşturulmamış."
+                    action={
+                        <EnterpriseButton variant="secondary" onClick={fetchLogs}>
+                            🔄 Günlükleri Yükle
+                        </EnterpriseButton>
+                    }
+                />
+            ) : (
+                <EnterpriseTable
+                    headers={[
+                        'Tarih / Kullanıcı',
+                        'İşlem',
+                        'Nesne',
+                        'Detay',
+                    ]}
+                >
+                    {(logs || []).map((log: any) => (
+                        <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-4 py-3">
+                                <div className="text-xs font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    {new Date(log.createdAt).toLocaleString('tr-TR')}
+                                </div>
+                                <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                    {log.userName || 'Sistem'}
+                                </div>
+                            </td>
+                            <td className="px-4 py-3">
+                                <span className="px-2 py-1 text-[10px] font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                                    {log.action}
+                                </span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">
+                                {log.entity}
+                            </td>
+                            <td className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400 max-w-xs truncate">
+                                {log.details}
+                            </td>
+                        </tr>
+                    ))}
+                </EnterpriseTable>
+            )}
+        </EnterprisePageShell>
     );
 }

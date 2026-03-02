@@ -1,82 +1,111 @@
 import React from 'react';
+import {
+    EnterpriseCard,
+    EnterprisePageShell,
+    EnterpriseField,
+    EnterpriseInput,
+    EnterpriseButton,
+} from '@/components/ui/enterprise';
+
+// ─── ZERO LOGIC CHANGE ────────────────────────────────────────────────────────
+// State, handler, submit, API, validation → HİÇBİR ŞEY DEĞİŞMEDİ.
+// Yalnızca UI katmanı Enterprise primitive'lere geçirildi.
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function AccountPanel(props: any) {
-    const { Check, TURKISH_CITIES, TURKISH_DISTRICTS, setSelectedBranchDocs, selectedBranchDocs, handleFileUpload, isDocsLoading, branchDocs, deleteBranchDoc, setShowKasaDefinitions, showKasaDefinitions, addPaymentMethodDefinition, editingPaymentMethodId, setEditingPaymentMethodId, startEditingPaymentMethod, removePaymentMethodDefinition, kasaTypes, contextBranches, products, allBrands, allCats, campaigns, addCoupon, setNewItemInput, newItemInput, addDefinition, brands, setBrands, prodCats, setProdCats, warranties, setWarranties, vehicleTypes, setVehicleTypes, quickRemovePaymentMethod, removeDefinition, IntegrationsContent, saveSmtpSettings, salesExpenses, updateSalesExpenses, addKdv, activeTab, setActiveTab, appSettings, tempCompanyInfo, setTempCompanyInfo, isSaving, handleSaveCompany, newCampaign, setNewCampaign, editingCampaignId, setEditingCampaignId, addCampaign, startEditingCampaign, deleteCampaign, newCoupon, setNewCoupon, showCouponModal, setShowCouponModal, couponSearch, setCouponSearch, couponPage, setCouponPage, exportCouponsExcel, exportCouponsPDF, totalCouponPages, paginatedCouponsList, referralSettings, setReferralSettings, saveReferralSettings, coupons, refreshCoupons, newKdv, setNewKdv, invoiceSettings, updateInvoiceSettings, customers, custClasses, setCustClasses, suppliers, suppClasses, setSuppClasses, kasalar, setKasalar, newKasa, setNewKasa, editingKasa, setEditingKasa, kasalarTotalBalance, isProcessingKasa, showKasaModal, setShowKasaModal, handleSaveKasa, handleDeleteKasa, startEditingKasa, newPaymentMethod, setNewPaymentMethod, paymentMethods, updatePaymentMethods, serviceSettings, updateServiceSettings, localServiceSettings, setLocalServiceSettings, handleSaveServiceSettings, branches, newBranch, setNewBranch, editingBranchId, setEditingBranchId, addBranch, editBranch, deleteBranch, branchDefaults, updateBranchDefault, saveBranchDefaults, users, refreshStaff, newUser, setNewUser, addUser, deleteUser, editingUserPerms, setEditingUserPerms, availablePermissions, permissionTemplates, notifSettings, setNotifSettings, saveNotifSettings, logs, isLogsLoading, fetchLogs, smtpSettings, setSmtpSettings, resetOptions, setResetOptions, showSuccess, showError, showWarning, showConfirm, definitionTab, setDefinitionTab, campaignSubTab, setCampaignSubTab, refreshKasalar, refreshBranches, kasalarLoading, currentUser, profilePass, setProfilePass, handlePasswordChange, resetSettings, ...rest } = props;
+    const {
+        users,
+        currentUser,
+        profilePass,
+        setProfilePass,
+        handlePasswordChange,
+    } = props;
+
+    const initials =
+        users?.find((u: any) => u.name === (currentUser?.name || ''))?.name
+            ?.substring(0, 1)
+            .toUpperCase() || 'A';
 
     return (
-        (
-                    <div className="animate-fade-in-up" >
-                        <h1 >Profilim</h1>
-                        <p >Hesap bilgilerinizi ve profil ayarlarınızı görüntüleyin</p>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* INFO CARD */}
-                            <div className="p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
-                                <div className="flex items-center gap-6 mb-8">
-                                    <div>
-                                        {users.find((u: any) => u.name === (currentUser?.name || ''))?.name?.substring(0, 1).toUpperCase() || 'A'}
-                                    </div>
-                                    <div>
-                                        <h2 >{currentUser?.name || 'Yönetici'}</h2>
-                                        <div >{currentUser?.role || 'Sistem Yöneticisi'}</div>
-                                    </div>
-                                </div>
-
-                                <div className="flex-col gap-4">
-                                    <div className="flex-col gap-1.5">
-                                        <label >KULLANICI ADI</label>
-                                        <input type="text" readOnly value={currentUser?.username || '-'} className="input-field"  />
-                                    </div>
-                                    <div className="flex-col gap-1.5">
-                                        <label >ŞUBE</label>
-                                        <input type="text" readOnly value={currentUser?.branch || 'Merkez'} className="input-field"  />
-                                    </div>
-                                </div>
+        <EnterprisePageShell
+            title="Hesabım"
+            description="Profil bilgilerinizi ve hesap güvenlik ayarlarınızı yönetin."
+        >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Profil kartı */}
+                <EnterpriseCard>
+                    <div className="flex items-center gap-4 mb-6 pb-5 border-b border-slate-200 dark:border-slate-800">
+                        <div className="w-14 h-14 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center text-2xl font-bold shrink-0">
+                            {initials}
+                        </div>
+                        <div>
+                            <div className="text-base font-semibold text-slate-900 dark:text-white">
+                                {currentUser?.name || 'Yönetici'}
                             </div>
-
-                            {/* PASSWORD CHANGE */}
-                            <div className="bg-white dark:bg-[#0F172A] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all p-6">
-                                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                    🔐 Şifre Değiştir
-                                </h3>
-                                <div className="flex flex-col gap-3">
-                                    <div>
-                                        <label className="text-xs font-bold opacity-60">Mevcut Şifre</label>
-                                        <input
-                                            type="password"
-                                            className="input-field w-full"
-                                            value={profilePass.old}
-                                            onChange={e => setProfilePass({ ...profilePass, old: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold opacity-60">Yeni Şifre</label>
-                                        <input
-                                            type="password"
-                                            className="input-field w-full"
-                                            value={profilePass.new}
-                                            onChange={e => setProfilePass({ ...profilePass, new: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold opacity-60">Yeni Şifre (Tekrar)</label>
-                                        <input
-                                            type="password"
-                                            className="input-field w-full"
-                                            value={profilePass.confirm}
-                                            onChange={e => setProfilePass({ ...profilePass, confirm: e.target.value })}
-                                        />
-                                    </div>
-                                    <button
-                                        onClick={handlePasswordChange}
-                                        className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors mt-2 font-bold"
-                                    >
-                                        Şifreyi Güncelle
-                                    </button>
-                                </div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                                {currentUser?.role || 'Sistem Yöneticisi'}
                             </div>
                         </div>
                     </div>
-                )
+                    <div className="space-y-4">
+                        <EnterpriseField label="KULLANICI ADI">
+                            <EnterpriseInput
+                                type="text"
+                                readOnly
+                                value={currentUser?.username || '-'}
+                            />
+                        </EnterpriseField>
+                        <EnterpriseField label="ŞUBE">
+                            <EnterpriseInput
+                                type="text"
+                                readOnly
+                                value={currentUser?.branch || 'Merkez'}
+                            />
+                        </EnterpriseField>
+                    </div>
+                </EnterpriseCard>
+
+                {/* Şifre değiştir */}
+                <EnterpriseCard>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
+                        🔐 Şifre Değiştir
+                    </p>
+                    <div className="space-y-4">
+                        <EnterpriseField label="MEVCUT ŞİFRE">
+                            <EnterpriseInput
+                                type="password"
+                                value={profilePass.old}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    setProfilePass({ ...profilePass, old: e.target.value })
+                                }
+                            />
+                        </EnterpriseField>
+                        <EnterpriseField label="YENİ ŞİFRE">
+                            <EnterpriseInput
+                                type="password"
+                                value={profilePass.new}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    setProfilePass({ ...profilePass, new: e.target.value })
+                                }
+                            />
+                        </EnterpriseField>
+                        <EnterpriseField label="YENİ ŞİFRE (TEKRAR)">
+                            <EnterpriseInput
+                                type="password"
+                                value={profilePass.confirm}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    setProfilePass({ ...profilePass, confirm: e.target.value })
+                                }
+                            />
+                        </EnterpriseField>
+                        <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+                            <EnterpriseButton variant="primary" onClick={handlePasswordChange}>
+                                🔒 Şifreyi Güncelle
+                            </EnterpriseButton>
+                        </div>
+                    </div>
+                </EnterpriseCard>
+            </div>
+        </EnterprisePageShell>
     );
 }

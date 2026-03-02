@@ -1046,11 +1046,11 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="flex h-screen bg-transparent text-slate-900 dark:text-white overflow-hidden">
+        <div className="flex min-h-screen text-slate-900 dark:text-white">
             <div className="fixed inset-0 -z-10 bg-slate-50 dark:bg-[#0B1220]" />
 
-            {/* LEFT SIDEBAR MENU */}
-            <div className="w-[280px] shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] flex flex-col overflow-y-auto">
+            {/* LEFT SIDEBAR MENU — sticky */}
+            <div className="w-[280px] shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] flex flex-col sticky top-0 h-screen overflow-y-auto">
                 <div className="p-5 border-b border-slate-200 dark:border-slate-800">
                     <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Ayarlar</h2>
                 </div>
@@ -1077,8 +1077,8 @@ export default function SettingsPage() {
                                 key={item.id}
                                 onClick={() => setActiveTab(item.id)}
                                 className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all text-left text-sm ${isActive
-                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-medium'
-                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-medium'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                                     }`}
                             >
                                 <span className={isActive ? 'opacity-100' : 'opacity-60'}>{item.icon}</span>
@@ -1092,8 +1092,8 @@ export default function SettingsPage() {
                     <button
                         onClick={() => setActiveTab('reset')}
                         className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all text-left text-sm ${activeTab === 'reset'
-                                ? 'bg-rose-600 text-white font-medium'
-                                : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20'
+                            ? 'bg-rose-600 text-white font-medium'
+                            : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20'
                             }`}
                     >
                         <span>🚨</span> Sistem Sıfırlama
@@ -1101,8 +1101,8 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            {/* RIGHT CONTENT AREA */}
-            <div className="flex-1 min-w-0 overflow-auto">
+            {/* RIGHT CONTENT AREA — scrolls naturally */}
+            <div className="flex-1 min-w-0 overflow-y-auto">
 
                 {/* 0. FİRMA PROFİLİ */}
                 {activeTab === 'company' && <CompanyProfileForm {...sharedProps} />}

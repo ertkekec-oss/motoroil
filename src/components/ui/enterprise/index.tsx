@@ -242,7 +242,7 @@ export const EnterprisePageShell = ({
     className?: string;
 }) => {
     return (
-        <div className={`max-w-6xl mx-auto px-6 py-8 w-full ${className}`}>
+        <div className={`w-full px-8 py-10 ${className}`}>
             {(title || actions) && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                     <div>
@@ -285,8 +285,8 @@ export const EnterpriseTabs = ({
                     key={tab.id}
                     onClick={() => onTabChange(tab.id)}
                     className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-wide transition-all flex items-center gap-2 ${activeTab === tab.id
-                            ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-900/5 dark:hover:bg-white/5'
+                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-900/5 dark:hover:bg-white/5'
                         }`}
                 >
                     {tab.icon && <span>{tab.icon}</span>}
