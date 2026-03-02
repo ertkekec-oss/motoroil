@@ -1151,76 +1151,85 @@ export default function SettingsPage() {
 
                 {/* 10.4 HEDİYE ÇEKİ YÖNETİM MODALI */}
                 {showCouponModal && (
-                    <div onClick={() => setShowCouponModal(false)}>
-                        <div onClick={e => e.stopPropagation()}>
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/80 animate-in fade-in"
+                        onClick={() => setShowCouponModal(false)}
+                    >
+                        <div
+                            className="bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm w-[800px] max-w-[95vw] h-[600px] max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+                            onClick={e => e.stopPropagation()}
+                        >
                             {/* Modal Header */}
-                            <div >
+                            <div className="flex justify-between items-center p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
                                 <div>
-                                    <h2 >🎫 Hediye Çeki Yönetimi</h2>
-                                    <p >Toplam {filteredCouponsList.length} kod bulundu.</p>
+                                    <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">🎫 Hediye Çeki Yönetimi</h2>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Toplam <strong className="text-slate-700 dark:text-slate-300">{filteredCouponsList.length}</strong> kod bulundu.</p>
                                 </div>
-                                <div >
-                                    <button onClick={exportCouponsExcel} className="btn" >📊 EXCEL</button>
-                                    <button onClick={exportCouponsPDF} className="btn" >📄 PDF</button>
-                                    <button onClick={() => setShowCouponModal(false)} >✕</button>
+                                <div className="flex gap-2 items-center">
+                                    <button onClick={exportCouponsExcel} className="h-9 px-4 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">📊 EXCEL</button>
+                                    <button onClick={exportCouponsPDF} className="h-9 px-4 rounded-xl font-bold text-sm bg-rose-600 hover:bg-rose-700 text-white transition-colors">📄 PDF</button>
+                                    <button onClick={() => setShowCouponModal(false)} className="h-9 w-9 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 transition-colors ml-2">✕</button>
                                 </div>
                             </div>
 
                             {/* Modal Search & Filters */}
-                            <div >
-                                <div >
+                            <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A]">
+                                <div className="relative">
                                     <input
                                         type="text"
                                         placeholder="Kod veya kampanya adı ile ara..."
                                         value={couponSearch}
                                         onChange={e => { setCouponSearch(e.target.value); setCouponPage(1); }}
-
+                                        className="w-full h-11 pl-11 pr-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                                     />
-                                    <span >🔍</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
                                 </div>
                             </div>
 
                             {/* Modal Table */}
-                            <div >
-                                <table >
-                                    <thead className="h-[52px] px-6 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
-                                        <tr >
-                                            <th >KOD BİLGİSİ</th>
-                                            <th>İNDİRİM</th>
-                                            <th>KULLANIM / LİMİT</th>
-                                            <th>GEÇERLİLİK</th>
-                                            <th >İŞLEM</th>
+                            <div className="flex-1 overflow-auto bg-white dark:bg-[#0B1220]">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="h-12 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap bg-slate-50 dark:bg-slate-800/80 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
+                                        <tr>
+                                            <th className="px-6 placeholder-slate-400 font-bold max-w-[200px]">KOD BİLGİSİ</th>
+                                            <th className="px-6 font-bold">İNDİRİM</th>
+                                            <th className="px-6 font-bold">KULLANIM / LİMİT</th>
+                                            <th className="px-6 font-bold">GEÇERLİLİK</th>
+                                            <th className="px-6 font-bold text-right">İŞLEM</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
                                         {paginatedCouponsList.map((c: any) => (
-                                            <tr key={c.id} >
-                                                <td >
-                                                    <div >{c.code}</div>
-                                                    <div >{c.campaignName || 'Genel Kampanya'}</div>
+                                            <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                                                <td className="px-6 py-4">
+                                                    <div className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">{c.code}</div>
+                                                    <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-1" title={c.campaignName}>{c.campaignName || 'Genel Kampanya'}</div>
                                                 </td>
-                                                <td>
-                                                    <div >
+                                                <td className="px-6 py-4">
+                                                    <div className="inline-flex items-center px-2 py-1 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-sm font-bold border border-blue-200 dark:border-blue-800/30">
                                                         {c.type === 'amount' ? `₺${c.value.toLocaleString()}` : `%${c.value}`}
                                                     </div>
                                                 </td>
-                                                <td>
-                                                    <div >
-                                                        <div >
-                                                            <div />
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex-1 max-w-[80px] h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                            <div
+                                                                className={`h-full rounded-full ${c.usageLimit > 0 && c.usedCount >= c.usageLimit ? 'bg-rose-500' : 'bg-emerald-500'}`}
+                                                                style={{ width: c.usageLimit === 0 ? '50%' : `${Math.min(100, (c.usedCount / c.usageLimit) * 100)}%` }}
+                                                            />
                                                         </div>
-                                                        <span >
-                                                            {c.usedCount} / {c.usageLimit === 0 ? '∞' : c.usageLimit}
+                                                        <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                                                            {c.usedCount} <span className="opacity-50 text-[10px]">/</span> {c.usageLimit === 0 ? '∞' : c.usageLimit}
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td>
-                                                    <div >
+                                                <td className="px-6 py-4">
+                                                    <div className={`text-sm font-medium ${!c.expiryDate || new Date(c.expiryDate) > new Date() ? 'text-slate-700 dark:text-slate-300' : 'text-rose-500'}`}>
                                                         {c.expiryDate ? new Date(c.expiryDate).toLocaleDateString('tr-TR') : 'Süresiz'}
                                                     </div>
-                                                    {c.minPurchaseAmount > 0 && <div >Min: ₺{c.minPurchaseAmount.toLocaleString()}</div>}
+                                                    {c.minPurchaseAmount > 0 && <div className="text-[10px] text-slate-500 mt-1">Min: ₺{c.minPurchaseAmount.toLocaleString()}</div>}
                                                 </td>
-                                                <td >
+                                                <td className="px-6 py-4 text-right">
                                                     <button
                                                         onClick={() => {
                                                             showConfirm('Kupon Silinsin mi?', 'Bu kupon kalıcı olarak silinecektir.', async () => {
@@ -1228,9 +1237,10 @@ export default function SettingsPage() {
                                                                 refreshCoupons();
                                                             });
                                                         }}
-                                                        className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors"
-
-                                                    >🗑️</button>
+                                                        className="w-8 h-8 rounded-lg flex items-center justify-center text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors ml-auto opacity-0 group-hover:opacity-100"
+                                                    >
+                                                        🗑️
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -1238,32 +1248,34 @@ export default function SettingsPage() {
                                 </table>
 
                                 {filteredCouponsList.length === 0 && (
-                                    <div >
-                                        <div >🔎</div>
-                                        <p >Aranan kriterlere uygun kod bulunamadı.</p>
+                                    <div className="flex flex-col items-center justify-center py-16 text-slate-400">
+                                        <div className="text-3xl mb-3">🔎</div>
+                                        <p className="text-sm">Aranan kriterlere uygun kod bulunamadı.</p>
                                     </div>
                                 )}
                             </div>
 
                             {/* Modal Footer / Pagination */}
-                            <div >
+                            <div className="flex justify-between items-center p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
                                 <button
                                     disabled={couponPage === 1}
                                     onClick={() => setCouponPage(p => p - 1)}
-                                    className="btn"
+                                    className="h-9 px-4 rounded-xl text-sm font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                >
+                                    ◀ Geri
+                                </button>
 
-                                >◀ Geri</button>
-
-                                <span >
-                                    SAYFA <span >{couponPage}</span> / {totalCouponPages || 1}
+                                <span className="text-xs font-bold text-slate-500 tracking-wider">
+                                    SAYFA <span className="text-slate-900 dark:text-white px-1">{couponPage}</span> / {totalCouponPages || 1}
                                 </span>
 
                                 <button
                                     disabled={couponPage >= totalCouponPages}
                                     onClick={() => setCouponPage(p => p + 1)}
-                                    className="btn"
-
-                                >İleri ▶</button>
+                                    className="h-9 px-4 rounded-xl text-sm font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                >
+                                    İleri ▶
+                                </button>
                             </div>
                         </div>
                     </div>
