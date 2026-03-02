@@ -1,0 +1,30 @@
+﻿
+> periodya@0.1.0 build
+> prisma generate && prisma migrate deploy && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Ô£ö Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 2.33s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-billowing-glade-agt0zp7m-pooler.c-2.eu-central-1.aws.neon.tech"
+
+20 migrations found in prisma/migrations
+
+node.exe : Error: P3005
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Error: P3005:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+The database schema is not empty. Read more about how to baseline an existing production database: ht
+tps://pris.ly/d/migrate-baseline
+

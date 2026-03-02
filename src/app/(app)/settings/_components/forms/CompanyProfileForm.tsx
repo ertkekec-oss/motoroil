@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     EnterpriseCard,
-    EnterpriseSectionHeader,
+    EnterprisePageShell,
     EnterpriseField,
     EnterpriseInput,
     EnterpriseSelect,
@@ -26,15 +26,10 @@ export default function CompanyProfileForm(props: any) {
     } = props;
 
     return (
-        <div className="animate-fade-in-up max-w-5xl mx-auto">
-            {/* ── Header ── */}
-            <EnterpriseSectionHeader
-                icon="🏢"
-                title="Firma Profili"
-                subtitle="Belgelerde ve tekliflerde görünecek genel firma bilgilerini düzenleyin."
-            />
-
-            {/* ── Form Card ── */}
+        <EnterprisePageShell
+            title="Firma Profili"
+            description="Belgelerde ve tekliflerde görünecek genel firma bilgilerini düzenleyin."
+        >
             <EnterpriseCard>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -165,6 +160,6 @@ export default function CompanyProfileForm(props: any) {
 
                 </div>
             </EnterpriseCard>
-        </div>
+        </EnterprisePageShell>
     );
 }

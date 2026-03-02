@@ -1,36 +1,60 @@
 import React from 'react';
+import {
+    EnterpriseCard,
+    EnterprisePageShell,
+    EnterpriseButton,
+    EnterpriseSwitch,
+} from '@/components/ui/enterprise';
+
+// ─── ZERO LOGIC CHANGE ────────────────────────────────────────────────────────
+// State, handler, submit, API, validation → HİÇBİR ŞEY DEĞİŞMEDİ.
+// Yalnızca UI katmanı Enterprise primitive'lere geçirildi.
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function NotificationSettingsPanel(props: any) {
-    const { Check, TURKISH_CITIES, TURKISH_DISTRICTS, setSelectedBranchDocs, selectedBranchDocs, handleFileUpload, isDocsLoading, branchDocs, deleteBranchDoc, setShowKasaDefinitions, showKasaDefinitions, addPaymentMethodDefinition, editingPaymentMethodId, setEditingPaymentMethodId, startEditingPaymentMethod, removePaymentMethodDefinition, kasaTypes, contextBranches, products, allBrands, allCats, campaigns, addCoupon, setNewItemInput, newItemInput, addDefinition, brands, setBrands, prodCats, setProdCats, warranties, setWarranties, vehicleTypes, setVehicleTypes, quickRemovePaymentMethod, removeDefinition, IntegrationsContent, saveSmtpSettings, salesExpenses, updateSalesExpenses, addKdv, activeTab, setActiveTab, appSettings, tempCompanyInfo, setTempCompanyInfo, isSaving, handleSaveCompany, newCampaign, setNewCampaign, editingCampaignId, setEditingCampaignId, addCampaign, startEditingCampaign, deleteCampaign, newCoupon, setNewCoupon, showCouponModal, setShowCouponModal, couponSearch, setCouponSearch, couponPage, setCouponPage, exportCouponsExcel, exportCouponsPDF, totalCouponPages, paginatedCouponsList, referralSettings, setReferralSettings, saveReferralSettings, coupons, refreshCoupons, newKdv, setNewKdv, invoiceSettings, updateInvoiceSettings, customers, custClasses, setCustClasses, suppliers, suppClasses, setSuppClasses, kasalar, setKasalar, newKasa, setNewKasa, editingKasa, setEditingKasa, kasalarTotalBalance, isProcessingKasa, showKasaModal, setShowKasaModal, handleSaveKasa, handleDeleteKasa, startEditingKasa, newPaymentMethod, setNewPaymentMethod, paymentMethods, updatePaymentMethods, serviceSettings, updateServiceSettings, localServiceSettings, setLocalServiceSettings, handleSaveServiceSettings, branches, newBranch, setNewBranch, editingBranchId, setEditingBranchId, addBranch, editBranch, deleteBranch, branchDefaults, updateBranchDefault, saveBranchDefaults, users, refreshStaff, newUser, setNewUser, addUser, deleteUser, editingUserPerms, setEditingUserPerms, availablePermissions, permissionTemplates, notifSettings, setNotifSettings, saveNotifSettings, logs, isLogsLoading, fetchLogs, smtpSettings, setSmtpSettings, resetOptions, setResetOptions, showSuccess, showError, showWarning, showConfirm, definitionTab, setDefinitionTab, campaignSubTab, setCampaignSubTab, refreshKasalar, refreshBranches, kasalarLoading, currentUser, profilePass, setProfilePass, handlePasswordChange, resetSettings, ...rest } = props;
+    const {
+        notifSettings,
+        setNotifSettings,
+        saveNotifSettings,
+    } = props;
+
+    const notifications = [
+        {
+            id: 'notif_on_delete',
+            label: 'Kritik Silme İşlemleri',
+            description: 'Bir kayıt silindiğinde Admin e-postasına bildirim gönderilir.',
+        },
+        {
+            id: 'notif_on_approval',
+            label: 'Yeni Ürün Onay Talebi',
+            description: 'Personel ürün eklediğinde yönetici onay gereksinimi bildirilir.',
+        },
+    ];
 
     return (
-        (
-                    <div  className="animate-fade-in-up">
-                        <h2 >Bildirim Tercihleri</h2>
+        <EnterprisePageShell
+            title="Bildirim Ayarları"
+            description="Sistem olaylarına ilişkin bildirim tercihlerinizi yönetin."
+        >
+            <EnterpriseCard>
+                <div className="space-y-3 mb-6">
+                    {notifications.map((notif) => (
+                        <EnterpriseSwitch
+                            key={notif.id}
+                            checked={(notifSettings as any)[notif.id] ?? true}
+                            onChange={(e) => setNotifSettings({ ...notifSettings, [notif.id]: e.target.checked })}
+                            label={notif.label}
+                            description={notif.description}
+                        />
+                    ))}
+                </div>
 
-                        <div className="flex flex-col gap-4 p-8 bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
-                            <div className="flex-col gap-3">
-                                {[
-                                    { id: 'notif_on_delete', label: 'Kritik Silme İşlemleri', desc: 'Bir kayıt silindiğinde Admin e-postası' },
-                                    { id: 'notif_on_approval', label: 'Yeni Ürün Onay Talebi', desc: 'Personel ürün eklediğinde onay gereksinimi' }
-                                ].map(notif => (
-                                    <label key={notif.id} >
-                                        <input
-                                            type="checkbox"
-                                            checked={(notifSettings as any)[notif.id]}
-                                            onChange={e => setNotifSettings({ ...notifSettings, [notif.id]: e.target.checked })}
-                                            
-                                        />
-                                        <div>
-                                            <div >{notif.label}</div>
-                                            <div >{notif.desc}</div>
-                                        </div>
-                                    </label>
-                                ))}
-                            </div>
-                            <button className="btn bg-blue-600 hover:bg-blue-700 text-white !border-none transition-colors"  onClick={saveNotifSettings}>DEĞİŞİKLİKLERİ KAYDET</button>
-                        </div>
-                    </div>
-                )
+                <div className="border-t border-slate-200 dark:border-slate-800 pt-5 flex justify-end">
+                    <EnterpriseButton variant="primary" onClick={saveNotifSettings}>
+                        💾 Değişiklikleri Kaydet
+                    </EnterpriseButton>
+                </div>
+            </EnterpriseCard>
+        </EnterprisePageShell>
     );
 }

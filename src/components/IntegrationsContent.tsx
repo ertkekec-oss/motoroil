@@ -9,6 +9,8 @@ import {
     EnterpriseSectionHeader,
     EnterpriseButton,
     EnterpriseField,
+    EnterprisePageShell,
+    EnterpriseTabs,
 } from "@/components/ui/enterprise";
 
 // ─── ZERO LOGIC CHANGE ────────────────────────────────────────────────────────
@@ -209,47 +211,31 @@ export default function IntegrationsContent() {
 
     // ── UI ──────────────────────────────────────────────────────────────────
     return (
-        <div className="max-w-5xl animate-in fade-in duration-500">
-
-            {/* Page Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                <EnterpriseSectionHeader
-                    icon="🔌"
-                    title="Entegrasyonlar"
-                    subtitle="E-Fatura, Ödeal ve Pazaryeri bağlantılarınızı bu panelden yönetebilir, senkronizasyon ayarlarınızı yapılandırabilirsiniz."
-                />
-                <div className="shrink-0">
-                    <EnterpriseButton variant="primary" onClick={saveSettings} disabled={isSaving}>
-                        {isSaving ? (
-                            <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> KAYDEDİLİYOR</>
-                        ) : (
-                            <><span>💾</span> AYARLARI KAYDET</>
-                        )}
-                    </EnterpriseButton>
-                </div>
-            </div>
+        <EnterprisePageShell
+            title="Entegrasyonlar"
+            description="E-Fatura, Ödeal ve Pazaryeri bağlantılarınızı bu panelden yönetin."
+            actions={
+                <EnterpriseButton variant="primary" onClick={saveSettings} disabled={isSaving}>
+                    {isSaving ? (
+                        <><div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> Kaydediliyor</>
+                    ) : (
+                        <><span>💾</span> Ayarları Kaydet</>
+                    )}
+                </EnterpriseButton>
+            }
+        >
 
             {/* Tab Bar */}
-            <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 w-fit mb-8">
-                {[
+            <EnterpriseTabs
+                tabs={[
                     { id: 'efatura', label: 'E-Fatura (Nilvera)', icon: '📄' },
                     { id: 'marketplace', label: 'Pazaryerleri', icon: '🛒' },
                     { id: 'pos', label: 'Yazar Kasa POS', icon: '💳' },
-                    { id: 'banking', label: 'Banka Entegrasyonu', icon: '🏦' }
-                ].map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
-                        className={`px-5 py-2.5 rounded-xl text-xs font-black tracking-wider transition-all flex items-center gap-2.5 ${activeTab === tab.id
-                            ? 'bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white shadow-sm'
-                            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-900/5 dark:hover:bg-white/5'
-                            }`}
-                    >
-                        <span className="text-base">{tab.icon}</span>
-                        <span>{tab.label.toUpperCase()}</span>
-                    </button>
-                ))}
-            </div>
+                    { id: 'banking', label: 'Banka Entegrasyonu', icon: '🏦' },
+                ]}
+                activeTab={activeTab}
+                onTabChange={(id) => setActiveTab(id as any)}
+            />
 
             {/* ── E-Fatura Tab ── */}
             {activeTab === 'efatura' && (
@@ -593,6 +579,6 @@ export default function IntegrationsContent() {
                     <BankIntegrationOnboarding />
                 </div>
             )}
-        </div>
+        </EnterprisePageShell>
     );
 }
