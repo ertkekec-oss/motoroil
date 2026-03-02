@@ -36,7 +36,7 @@ export default async function SellerProductsPage() {
         <div className="bg-slate-50 min-h-screen pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
                     <div>
                         <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">
                             Katalog (Ürünlerim) / B2B Mağaza
@@ -181,8 +181,8 @@ export default async function SellerProductsPage() {
                                                     <Link
                                                         href={`/seller/products/${p.id}`}
                                                         className={`inline-flex items-center justify-center h-8 px-4 border text-[13px] font-semibold rounded-lg transition-colors shadow-sm focus:outline-none ${isListed
-                                                                ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900'
-                                                                : 'bg-slate-900 border-transparent text-white hover:bg-slate-800'
+                                                            ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                                                            : 'bg-slate-900 border-transparent text-white hover:bg-slate-800'
                                                             }`}
                                                     >
                                                         {isListed ? "Yönet / İncele" : "B2B'de Yayınla"}

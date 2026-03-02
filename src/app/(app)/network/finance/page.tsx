@@ -33,7 +33,7 @@ function FinanceTabs() {
         <div className="bg-slate-50 min-h-screen w-full font-sans">
             <div className="max-w-[1600px] mx-auto pt-8">
                 {/* Header & Tabs */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8 px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8 px-4 sm:px-6 lg:px-8">
                     <div>
                         <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">
                             B2B Finansal Operasyon Merkezi (Finance Gateway)

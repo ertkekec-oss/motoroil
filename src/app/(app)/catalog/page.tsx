@@ -71,7 +71,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
         <div className="bg-slate-50 min-h-screen pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
                     <div>
                         <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">
                             B2B Tedarik Kataloğu <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 tracking-widest uppercase">Global Ağ</span>

@@ -59,7 +59,7 @@ export default function DisputeQueuePage() {
         <div className="w-full bg-slate-50 min-h-screen pb-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 {/* Header */}
-                <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Uyuşmazlık Çözüm Merkezi</h1>
                         <p className="text-sm text-slate-600 mt-1">B2B işlemlerindeki finansal riskleri ve yasal bildirimleri (Escrow arbitration) değerlendirin.</p>
