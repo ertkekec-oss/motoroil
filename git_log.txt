@@ -1,0 +1,20 @@
+﻿b3b2f61 fix(vercel): add force-dynamic layout to billing/boost-invoices route
+e46735e fix(build): fix vercel build api lambda errors & ts errors
+aa0e71f fix(api): typecheck and build fixes
+2601cbd refactor(ui): redesign CompanyProfileForm to enterprise grid layout
+df0fc97 refactor(ui): update Coupon modal in settings page to enterprise primitives
+fb4313e refactor(ui): migrate BranchesPanel to enterprise primitives
+31158dc refactor(ui): lock enterprise settings layout (sidebar/content grid/spacing), zero logic change
+e9415be chore: remove temp build/refactor scripts from root
+56855da refactor(ui): enforce enterprise console identity across settings (layout/tabs/buttons), zero logic change
+0b7831e refactor(ui): migrate integrations settings to enterprise primitives (zero logic change)
+886f8ac refactor(ui): migrate company profile settings to enterprise primitives (zero logic change)
+aa24fe4 merge(chore-ui-settings-safe): enterprise ui primitives + eslint fix + search route fix
+2bc0ba6 fix(config): remove unsupported eslint key from next.config, override rules in eslint.config.mjs
+bbe494e fix(ui): remove implicit any blocking Vercel build and branch name slash
+19c6114 fix(build): resolve duplicate OR object literal in route.ts causing SWC parser error and ignore eslint on verify during build
+876a064 chore(ui): add enterprise ui primitives (no logic change)
+12917f2 fix(ui): global shell cleanup, removed glass, blur, translucent elements and large shadows
+7f7860f fix(settings): Apply strict enterprise design parameters to settings module
+c567921 refactor(ui): redesign settings module to enterprise console identity (zero logic change, multi-tenant safe)
+64f894e fix(settings): Apply Enterprise Design UI to IntegrationsContent
