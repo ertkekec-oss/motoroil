@@ -1,0 +1,61 @@
+﻿node.exe : file:///C:/Users/e
+rtke/AppData/Roaming/npm/node
+_modules/vercel/dist/chunks/c
+hunk-3J2XL77M.js:279
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (file://  
+  /C:/User...3J2XL77M.js:2   
+ 79:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+                throw new Arg
+Error(`option requires argume
+nt: ${originalArgName}${exten
+ded}`, "ARG_MISSING_REQUIRED_
+LONGARG");
+                      ^
+
+_ArgError: option requires ar
+gument: --token
+    at arg2 (file:///C:/Users
+/ertke/AppData/Roaming/npm/no
+de_modules/vercel/dist/chunks
+/chunk-3J2XL77M.js:279:23)
+    at getArgs (file:///C:/Us
+ers/ertke/AppData/Roaming/npm
+/node_modules/vercel/dist/chu
+nks/chunk-3J2XL77M.js:1013:33
+)
+    at getGlobalPathConfig (f
+ile:///C:/Users/ertke/AppData
+/Roaming/npm/node_modules/ver
+cel/dist/chunks/chunk-BNSR2EP
+5.js:35774:16)
+    at file:///C:/Users/ertke
+/AppData/Roaming/npm/node_mod
+ules/vercel/dist/chunks/chunk
+-E37ZEXRP.js:2747:19
+    at ModuleJob.run (node:in
+ternal/modules/esm/module_job
+:345:25)
+    at async onImport.tracePr
+omise.__proto__ (node:interna
+l/modules/esm/loader:651:26)
+    at async file:///C:/Users
+/ertke/AppData/Roaming/npm/no
+de_modules/vercel/dist/vc.js:
+36:1 {
+  code: 'ARG_MISSING_REQUIRED
+_LONGARG'
+}
+
+Node.js v22.19.0

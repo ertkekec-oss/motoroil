@@ -42,3 +42,11 @@ next-env.d.ts
 
 .vercel
 .env*.local
+
+# build logs & debug files
+vercel_build_errors.txt
+git_log.txt
+big_files.txt
+diff_files.txt
+build.log
+eslint_errors.txt
