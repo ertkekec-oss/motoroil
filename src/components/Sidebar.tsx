@@ -101,6 +101,7 @@ export default function Sidebar() {
         '/integrations': { perm: 'settings_manage', feature: 'e_invoice' },
         '/settings/branch': { perm: 'settings_manage' },
         '/settings': { perm: 'settings_manage' },
+        '/settings/pricing': { perm: 'settings_manage' },
         '/staff': { perm: 'staff_manage', feature: 'team_management' },
         '/advisor': { perm: 'finance_view', feature: 'accountant' },
         '/admin/audit-logs': { perm: 'audit_view' },
@@ -225,6 +226,7 @@ export default function Sidebar() {
                 { name: 'Destek', href: '/support', icon: HelpCircle },
                 { name: 'Sistem', href: '/settings/branch', icon: Terminal },
                 { name: 'Abonelik', href: '/billing', icon: CreditCard },
+                { name: 'Fiyatlandırma', href: '/settings/pricing', icon: ShoppingCart },
                 ...(isPlatformAdmin ? [
                     { name: 'Support Inbox', href: '/admin/support/tickets', icon: Inbox }
                 ] : []),

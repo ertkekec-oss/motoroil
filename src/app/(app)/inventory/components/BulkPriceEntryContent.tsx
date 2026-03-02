@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Product } from '@/contexts/AppContext';
 
 interface BulkPriceEntryContentProps {
@@ -14,11 +13,8 @@ export default function BulkPriceEntryContent({
     isProcessing
 }: BulkPriceEntryContentProps) {
     const [priceData, setPriceData] = useState<Record<string, any>>({});
-    const [adjValue, setAdjValue] = useState<number>(0);
-    const [adjType, setAdjType] = useState<'percent' | 'amount'>('percent');
-    const [adjTarget, setAdjTarget] = useState<'buy' | 'sell' | 'both'>('sell');
+    const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
-    // Initialize local state with current product data
     useEffect(() => {
         const initialData: Record<string, any> = {};
         products.forEach(p => {
@@ -26,10 +22,7 @@ export default function BulkPriceEntryContent({
                 id: p.id,
                 buyPrice: p.buyPrice || 0,
                 price: p.price || 0,
-                purchaseVatIncluded: p.purchaseVatIncluded ?? true,
-                salesVatIncluded: p.salesVatIncluded ?? true,
-                purchaseVat: p.purchaseVat ?? 20,
-                salesVat: p.salesVat ?? 20,
+                newPrice: p.price || 0 // Initial new price same as current
             };
         });
         setPriceData(initialData);
@@ -45,211 +38,168 @@ export default function BulkPriceEntryContent({
         }));
     };
 
-    const applyWizard = () => {
-        if (!adjValue) return;
-        const newData = { ...priceData };
-        Object.keys(newData).forEach(id => {
-            const current = newData[id];
-            if (adjTarget === 'buy' || adjTarget === 'both') {
-                const diff = adjType === 'percent' ? (current.buyPrice * adjValue / 100) : adjValue;
-                current.buyPrice = Math.max(0, Number((current.buyPrice + diff).toFixed(2)));
-            }
-            if (adjTarget === 'sell' || adjTarget === 'both') {
-                const diff = adjType === 'percent' ? (current.price * adjValue / 100) : adjValue;
-                current.price = Math.max(0, Number((current.price + diff).toFixed(2)));
-            }
-        });
-        setPriceData(newData);
-        setAdjValue(0);
-    };
-
-    const handleSaveAll = async () => {
-        const updates = Object.values(priceData);
+    const handleSaveList = async () => {
+        if (selectedRows.length === 0) return;
+        const updates = selectedRows.map(id => priceData[id]);
         await onSave(updates);
     };
 
-    return (
-        <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Wizard Box */}
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[24px] p-6 shadow-sm">
-                <div className="flex flex-wrap items-center gap-6 justify-between">
-                    <div className="flex flex-col">
-                        <h3 className="text-[18px] font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 text-[16px]">⚡</span> Akıllı Fiyat Sihirbazı
-                        </h3>
-                        <p className="text-[11px] text-slate-500 font-medium tracking-wider mt-1">
-                            Listelenen {products.length} ürüne toplu kural uygula
-                        </p>
-                    </div>
+    const toggleRow = (id: string, checked: boolean) => {
+        if (checked) {
+            setSelectedRows(prev => [...prev, id]);
+        } else {
+            setSelectedRows(prev => prev.filter(rId => rId !== id));
+        }
+    };
 
-                    <div className="flex flex-wrap items-center gap-3 bg-slate-50 dark:bg-[#1e293b] p-2 rounded-[16px] border border-slate-200 dark:border-white/10">
-                        <select
-                            className="bg-transparent text-slate-700 dark:text-slate-300 text-[12px] font-semibold tracking-wider px-3 py-2 outline-none cursor-pointer"
-                            value={adjTarget}
-                            onChange={e => setAdjTarget(e.target.value as any)}
-                        >
-                            <option value="sell">SATIŞ FİYATLARI</option>
-                            <option value="buy">ALIŞ FİYATLARI</option>
-                            <option value="both">TÜM FİYATLAR</option>
-                        </select>
-                        <div className="w-px h-6 bg-slate-200 dark:bg-white/10"></div>
-                        <select
-                            className="bg-transparent text-slate-700 dark:text-slate-300 text-[12px] font-medium px-3 py-2 outline-none cursor-pointer"
-                            value={adjType}
-                            onChange={e => setAdjType(e.target.value as any)}
-                        >
-                            <option value="percent">Yüzde (%)</option>
-                            <option value="amount">Tutar (₺)</option>
-                        </select>
-                        <div className="w-px h-6 bg-slate-200 dark:bg-white/10"></div>
-                        <input
-                            type="number"
-                            placeholder="Değer..."
-                            className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 w-28 px-3 py-2 rounded-[12px] text-[13px] font-semibold text-center text-slate-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-300 shadow-sm"
-                            value={adjValue || ''}
-                            onChange={e => setAdjValue(parseFloat(e.target.value) || 0)}
-                        />
-                        <button
-                            onClick={applyWizard}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-[12px] text-[12px] font-semibold tracking-wider transition-all shadow-sm"
-                        >
-                            UYGULA
-                        </button>
-                    </div>
+    const toggleAll = (checked: boolean) => {
+        if (checked) {
+            setSelectedRows(products.map(p => String(p.id)));
+        } else {
+            setSelectedRows([]);
+        }
+    };
+
+    return (
+        <div className="flex flex-col gap-4 animate-in fade-in h-[calc(100vh-240px)] min-h-[500px]">
+            {/* Top Toolbar */}
+            <div className="bg-white rounded-[20px] border border-slate-200 shadow-sm p-4 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-4">
+                    <h3 className="text-[14px] font-bold text-slate-900">Fiyat Yönetim Çizelgesi</h3>
+                    <div className="h-6 w-px bg-slate-200"></div>
+                    <span className="text-[12px] font-semibold text-slate-500">
+                        Seçilen: <strong className="text-blue-600">{selectedRows.length}</strong> / {products.length}
+                    </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <button className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors">Yüzde/Tutar Uygula</button>
+                    <button className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors text-blue-400">Pazaryerlerine Gönder</button>
+                    <button
+                        onClick={handleSaveList}
+                        disabled={selectedRows.length === 0 || isProcessing}
+                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 shadow-sm
+                            ${selectedRows.length === 0 ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}
+                        `}
+                    >
+                        {isProcessing ? 'Kaydediliyor...' : 'Liste Olarak Kaydet'}
+                    </button>
                 </div>
             </div>
 
-            {/* Price Table */}
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-[24px] overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[800px]">
-                        <thead>
-                            <tr className="bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/10">
-                                <th className="px-6 py-4 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ürün Detayı</th>
-                                <th className="px-6 py-4 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Alış Fiyatı</th>
-                                <th className="px-6 py-4 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Alış KDV</th>
-                                <th className="px-6 py-4 text-[11px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Satış Fiyatı</th>
-                                <th className="px-6 py-4 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Satış KDV</th>
+            {/* Price Table - Spreadsheet Style */}
+            <div className="bg-white border border-slate-200 rounded-[20px] flex-1 overflow-hidden shadow-sm flex flex-col">
+                <div className="flex-1 overflow-y-auto custom-scroll relative z-0">
+                    <table className="w-full text-left border-collapse text-[12px] relative">
+                        <thead className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200 shadow-sm">
+                            <tr>
+                                <th className="px-3 py-2 w-10 text-center">
+                                    <input
+                                        type="checkbox"
+                                        className="w-3.5 h-3.5 rounded border-slate-300 accent-blue-600 cursor-pointer"
+                                        checked={selectedRows.length === products.length && products.length > 0}
+                                        onChange={(e) => toggleAll(e.target.checked)}
+                                    />
+                                </th>
+                                <th className="px-3 py-2 font-bold text-slate-600 uppercase tracking-widest min-w-[200px]">Ürün</th>
+                                <th className="px-3 py-2 font-bold text-slate-600 uppercase tracking-widest text-right w-28">Alış Fiyatı</th>
+                                <th className="px-3 py-2 font-bold text-slate-600 uppercase tracking-widest text-right w-28">KKM <span className="text-[10px] lowercase font-normal">(Tahmini)</span></th>
+                                <th className="px-3 py-2 font-bold text-slate-600 uppercase tracking-widest text-right w-28">Tavsiye Fiyat</th>
+                                <th className="px-3 py-2 font-bold text-slate-600 uppercase tracking-widest text-right w-28">Mevcut Fiyat</th>
+                                <th className="px-3 py-2 font-bold text-blue-600 uppercase tracking-widest text-right w-36 bg-blue-50/50">Yeni Fiyat</th>
+                                <th className="px-3 py-2 font-bold text-slate-600 uppercase tracking-widest text-center w-24">Marj Etkisi</th>
+                                <th className="px-3 py-2 font-bold text-slate-600 uppercase tracking-widest text-center w-20">Durum</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                            {products.map(product => {
-                                const current = priceData[product.id] || {};
-                                return (
-                                    <tr key={product.id} className="h-[52px] border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">
-                                        <td className="px-6 py-4">
-                                            <div className="font-semibold text-slate-900 dark:text-white text-[13px] mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{product.name}</div>
-                                            <div className="text-[11px] text-slate-500 flex items-center gap-2">
-                                                <span className="font-medium tracking-wider">{product.code}</span>
-                                                <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20"></span>
-                                                <span className="tracking-wider uppercase font-medium">{product.category}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 min-w-[140px]">
-                                            <div className="relative">
+                        <tbody className="divide-y divide-slate-100">
+                            {products.length === 0 ? (
+                                <tr>
+                                    <td colSpan={9} className="py-12 text-center text-slate-400 font-medium bg-slate-50/50">Listelenecek ürün bulanamadı.</td>
+                                </tr>
+                            ) : (
+                                products.map(product => {
+                                    const current = priceData[product.id] || { buyPrice: 0, price: 0, newPrice: 0 };
+                                    const isSelected = selectedRows.includes(String(product.id));
+
+                                    // Mocks for spreadsheet metrics
+                                    const kkm = current.buyPrice * 1.05;
+                                    const suggested = kkm * 1.4;
+
+                                    const diff = current.newPrice - current.price;
+                                    const marginChange = current.price > 0 ? (diff / current.price) * 100 : 0;
+
+                                    const hasChange = current.newPrice !== current.price;
+
+                                    return (
+                                        <tr key={product.id} className={`h-[36px] hover:bg-slate-50 transition-colors group ${isSelected ? 'bg-blue-50/20' : ''}`}>
+                                            <td className="px-3 text-center border-r border-slate-100">
+                                                <input
+                                                    type="checkbox"
+                                                    className="w-3.5 h-3.5 rounded border-slate-300 accent-blue-600 cursor-pointer"
+                                                    checked={isSelected}
+                                                    onChange={(e) => toggleRow(String(product.id), e.target.checked)}
+                                                />
+                                            </td>
+                                            <td className="px-3 border-r border-slate-100">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="font-bold text-slate-900 truncate max-w-[200px]">{product.name}</span>
+                                                    <span className="text-[10px] text-slate-400 font-mono ml-2">{product.code}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-3 text-right border-r border-slate-100">
+                                                <span className="font-semibold text-slate-600 tabular-nums">₺{Number(current.buyPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            </td>
+                                            <td className="px-3 text-right border-r border-slate-100 bg-slate-50/30">
+                                                <span className="font-bold text-indigo-600 tabular-nums">₺{Number(kkm).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            </td>
+                                            <td className="px-3 text-right border-r border-slate-100 bg-slate-50/30">
+                                                <span className="font-bold text-emerald-600 tabular-nums">₺{Number(suggested).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            </td>
+                                            <td className="px-3 text-right border-r border-slate-100">
+                                                <span className={`font-semibold tabular-nums ${hasChange ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
+                                                    ₺{Number(current.price).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </span>
+                                            </td>
+                                            <td className="p-0 border-r border-slate-100 bg-blue-50/20 relative">
                                                 <input
                                                     type="number"
-                                                    value={current.buyPrice || ''}
-                                                    onChange={e => handleUpdate(product.id, 'buyPrice', parseFloat(e.target.value) || 0)}
-                                                    className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 h-[44px] rounded-[12px] px-3 text-[13px] font-semibold text-slate-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-colors pr-8"
+                                                    className={`w-full h-[35px] text-right px-3 font-bold bg-transparent outline-none focus:bg-white focus:ring-1 focus:ring-inset focus:ring-blue-500 tabular-nums
+                                                        ${hasChange ? 'text-blue-600' : 'text-slate-900'}
+                                                    `}
+                                                    value={current.newPrice === 0 ? '' : current.newPrice}
+                                                    onChange={e => {
+                                                        const val = parseFloat(e.target.value) || 0;
+                                                        handleUpdate(product.id, 'newPrice', val);
+                                                        if (val !== current.price && !isSelected) {
+                                                            toggleRow(String(product.id), true);
+                                                        } else if (val === current.price && isSelected) {
+                                                            toggleRow(String(product.id), false);
+                                                        }
+                                                    }}
                                                 />
-                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-semibold pointer-events-none">₺</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <select
-                                                    value={current.purchaseVat || 20}
-                                                    onChange={e => handleUpdate(product.id, 'purchaseVat', parseInt(e.target.value))}
-                                                    className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 h-[44px] rounded-[12px] px-3 text-[13px] font-medium text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-colors"
-                                                >
-                                                    <option value="1">%1</option>
-                                                    <option value="10">%10</option>
-                                                    <option value="20">%20</option>
-                                                </select>
-                                                <button
-                                                    onClick={() => handleUpdate(product.id, 'purchaseVatIncluded', !current.purchaseVatIncluded)}
-                                                    className={`px-3 py-2.5 rounded-[12px] text-[10px] font-semibold uppercase tracking-wider transition-colors ${current.purchaseVatIncluded
-                                                        ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
-                                                        : 'bg-slate-50 text-slate-500 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'
-                                                        }`}
-                                                >
-                                                    {current.purchaseVatIncluded ? 'KDV DAHİL' : 'KDV HARİÇ'}
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 min-w-[140px]">
-                                            <div className="relative">
-                                                <input
-                                                    type="number"
-                                                    value={current.price || ''}
-                                                    onChange={e => handleUpdate(product.id, 'price', parseFloat(e.target.value) || 0)}
-                                                    className="w-full bg-blue-50/50 dark:bg-blue-500/5 hover:bg-blue-50 dark:hover:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 h-[44px] rounded-[12px] px-3 text-[13px] font-bold text-blue-600 dark:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-colors pr-8 placeholder:text-blue-300 dark:placeholder:text-blue-800"
-                                                />
-                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 dark:text-blue-500 text-xs font-bold pointer-events-none">₺</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <select
-                                                    value={current.salesVat || 20}
-                                                    onChange={e => handleUpdate(product.id, 'salesVat', parseInt(e.target.value))}
-                                                    className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 h-[44px] rounded-[12px] px-3 text-[13px] font-medium text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-colors"
-                                                >
-                                                    <option value="1">%1</option>
-                                                    <option value="10">%10</option>
-                                                    <option value="20">%20</option>
-                                                </select>
-                                                <button
-                                                    onClick={() => handleUpdate(product.id, 'salesVatIncluded', !current.salesVatIncluded)}
-                                                    className={`px-3 py-2.5 rounded-[12px] text-[10px] font-semibold uppercase tracking-wider transition-colors ${current.salesVatIncluded
-                                                        ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
-                                                        : 'bg-slate-50 text-slate-500 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'
-                                                        }`}
-                                                >
-                                                    {current.salesVatIncluded ? 'KDV DAHİL' : 'KDV HARİÇ'}
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
+                                            </td>
+                                            <td className="px-3 text-center border-r border-slate-100">
+                                                {hasChange ? (
+                                                    <span className={`font-bold tabular-nums text-[11px] px-1.5 py-0.5 rounded ${marginChange > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                                                        {marginChange > 0 ? '+' : ''}{marginChange.toFixed(1)}%
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-slate-300">-</span>
+                                                )}
+                                            </td>
+                                            <td className="px-3 text-center">
+                                                {hasChange ? (
+                                                    <div className="w-2 h-2 rounded-full bg-blue-500 mx-auto"></div>
+                                                ) : (
+                                                    <div className="w-2 h-2 rounded-full bg-slate-200 mx-auto"></div>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
                         </tbody>
                     </table>
-                </div>
-
-                {products.length === 0 && (
-                    <div className="p-16 text-center text-slate-400 dark:text-slate-500 italic font-medium">
-                        Kriterlere uygun ürün bulunamadı. Lütfen filtreleri kontrol edin.
-                    </div>
-                )}
-            </div>
-
-            {/* Footer Save Area */}
-            <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[4000] w-full max-w-3xl px-4 animate-in slide-in-from-bottom-10 duration-500">
-                <div className="bg-white dark:bg-slate-900 dark:bg-[#0f172a]/95 border border-slate-200 dark:border-white/10 rounded-[20px] p-5 shadow-sm  flex items-center justify-between">
-                    <div className="flex flex-col">
-                        <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Bekleyen Değişiklikler</span>
-                        <div className="text-slate-900 dark:text-white text-[16px] font-semibold">
-                            <span className="text-blue-600 dark:text-blue-400">{Object.keys(priceData).length}</span> Ürün Güncelleniyor
-                        </div>
-                    </div>
-                    <div className="flex gap-4">
-                        <button
-                            disabled={isProcessing}
-                            className="px-8 py-3.5 rounded-[12px] bg-blue-600 hover:bg-blue-700 text-white font-semibold tracking-wider text-[13px] transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                            onClick={handleSaveAll}
-                        >
-                            {isProcessing ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                    KAYDEDİLİYOR...
-                                </>
-                            ) : (
-                                <>TÜMÜNÜ SİSTEME İŞLE</>
-                            )}
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

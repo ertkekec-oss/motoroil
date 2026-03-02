@@ -26,6 +26,7 @@ import {
 const LoginPageContent = dynamic(() => import('@/components/login/LoginPageContent'), { ssr: false });
 import NotificationCenter from '@/components/NotificationCenter';
 
+
 function POSContent() {
   const router = useRouter();
   const { currentUser, activeBranchName } = useApp();
@@ -731,7 +732,12 @@ function POSContent() {
 
 export default function HomeClient() {
   const { isAuthenticated, isLoading } = useAuth();
-  if (isLoading) return <div className="h-screen flex items-center justify-center bg-[var(--bg-deep)] text-white text-2xl">?</div>;
+  if (isLoading) return <div className="h-screen flex items-center justify-center bg-[var(--bg-deep)] text-white text-2xl">⏳</div>;
   if (!isAuthenticated) return <LoginPageContent />;
-  return <Suspense fallback={<div>Yükleniyor...</div>}><POSContent /></Suspense>;
+
+  return (
+    <Suspense fallback={<div>Yükleniyor...</div>}>
+      <POSContent />
+    </Suspense>
+  );
 }
