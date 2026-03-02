@@ -11,22 +11,6 @@ import {
 // Yalnızca UI katmanı: Split-layout (liste sol / form sağ) kurumsal tasarım.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ── Shared UI atoms ──────────────────────────────────────────────────────────
-
-function StatCard({ label, value, icon }: { label: string; value: number | string; icon: string }) {
-    return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm flex items-center gap-3">
-            <div className="w-9 h-9 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-base shrink-0">
-                {icon}
-            </div>
-            <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{label}</p>
-                <p className="text-lg font-semibold text-slate-900 dark:text-white leading-tight">{value}</p>
-            </div>
-        </div>
-    );
-}
-
 function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <div className="space-y-3">
@@ -138,76 +122,85 @@ export default function BranchesPanel(props: any) {
     };
 
     return (
-        <div className="space-y-8 max-w-[1200px] animate-in fade-in duration-300">
+        <div className="space-y-5 max-w-3xl animate-in fade-in duration-300">
 
-            {/* ── PAGE HEADER ────────────────────────────────────────────────── */}
+            {/* ── PAGE HEADER ─────────────────────────────────────────── */}
             <div className="flex items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Şubeler & Depo Yönetimi</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Firma şubelerini, depoları ve konumlarını yönetin.</p>
+                    <h1 className="text-xl font-semibold text-slate-900 dark:text-white">Şubeler & Depo Yönetimi</h1>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Firma şubelerini, depoları ve konumlarını yönetin.</p>
                 </div>
                 <EnterpriseButton variant="primary" onClick={openAddPanel}>
                     + Yeni Şube Ekle
                 </EnterpriseButton>
             </div>
 
-            {/* ── STAT CARDS ─────────────────────────────────────────────────── */}
-            <div className="grid grid-cols-3 gap-4">
-                <StatCard label="Toplam Şube" value={totalBranches} icon="🏪" />
-                <StatCard label="Aktif" value={activeBranches} icon="✅" />
-                <StatCard label="Depo" value={depots} icon="📦" />
+            {/* ── INLINE STAT STRIP ───────────────────────────────────── */}
+            <div className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+                {[
+                    { label: 'Toplam', value: totalBranches, icon: '🏪' },
+                    { label: 'Aktif', value: activeBranches, icon: '✅' },
+                    { label: 'Depo', value: depots, icon: '📦' },
+                ].map((s, i) => (
+                    <React.Fragment key={s.label}>
+                        {i > 0 && <div className="w-px h-5 bg-slate-200 dark:bg-slate-700" />}
+                        <div className="flex items-center gap-2">
+                            <span className="text-base">{s.icon}</span>
+                            <div>
+                                <span className="text-sm font-semibold text-slate-900 dark:text-white">{s.value}</span>
+                                <span className="text-xs text-slate-400 dark:text-slate-500 ml-1">{s.label}</span>
+                            </div>
+                        </div>
+                    </React.Fragment>
+                ))}
             </div>
 
-            {/* ── MAIN SPLIT LAYOUT ──────────────────────────────────────────── */}
-            <div className={`grid gap-6 transition-all duration-300 ${isPanelOpen ? 'grid-cols-[1fr_420px]' : 'grid-cols-1'}`}>
+            {/* ── MAIN SPLIT LAYOUT ───────────────────────────────────── */}
+            <div className={`grid gap-5 transition-all duration-300 ${isPanelOpen ? 'grid-cols-[1fr_360px]' : 'grid-cols-1'}`}>
 
-                {/* ═══ LEFT — BRANCH LIST ════════════════════════════════════ */}
+                {/* ═══ LEFT — BRANCH LIST ═══════════════════════════════ */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
-                    {/* Card header */}
-                    <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800">
-                        <div className="flex items-center justify-between gap-3 mb-3">
-                            <h3 className="text-base font-semibold text-slate-900 dark:text-white">
-                                Kayıtlı Şubeler
-                                <span className="ml-2 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-medium text-slate-500 dark:text-slate-400">
-                                    {filteredBranches.length}
-                                </span>
-                            </h3>
+                    {/* Card header + inline filters */}
+                    <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center gap-2">
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white mr-1">
+                            Kayıtlı Şubeler
+                            <span className="ml-1.5 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[11px] font-medium text-slate-500">
+                                {filteredBranches.length}
+                            </span>
+                        </h3>
+                        <div className="flex-1" />
+                        {/* 🔍 Search */}
+                        <div className="relative">
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+                            <input
+                                type="text"
+                                placeholder="Ara..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="h-8 w-36 pl-7 pr-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 transition-all"
+                            />
                         </div>
-
-                        {/* Filters */}
-                        <div className="flex flex-col sm:flex-row gap-2">
-                            <div className="relative flex-1">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
-                                <input
-                                    type="text"
-                                    placeholder="Şube veya şehir ara..."
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full h-9 pl-9 pr-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 focus:border-slate-300 dark:focus:border-slate-600 transition-all"
-                                />
-                            </div>
-                            <select
-                                value={filterType}
-                                onChange={(e) => setFilterType(e.target.value)}
-                                className="h-9 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 cursor-pointer"
-                            >
-                                <option value="">Tüm Türler</option>
-                                <option value="Şube">Şube</option>
-                                <option value="Depo">Depo</option>
-                                <option value="Merkez Ofis">Merkez Ofis</option>
-                                <option value="Home Office">Home Office</option>
-                            </select>
-                            <select
-                                value={filterStatus}
-                                onChange={(e) => setFilterStatus(e.target.value)}
-                                className="h-9 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 cursor-pointer"
-                            >
-                                <option value="">Tüm Durumlar</option>
-                                <option value="Aktif">Aktif</option>
-                                <option value="Tadilat">Tadilat</option>
-                                <option value="Kapalı">Kapalı</option>
-                            </select>
-                        </div>
+                        <select
+                            value={filterType}
+                            onChange={(e) => setFilterType(e.target.value)}
+                            className="h-8 px-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-600 dark:text-slate-300 focus:outline-none cursor-pointer"
+                        >
+                            <option value="">Tüm Türler</option>
+                            <option value="Şube">Şube</option>
+                            <option value="Depo">Depo</option>
+                            <option value="Merkez Ofis">Merkez Ofis</option>
+                            <option value="Home Office">Home Office</option>
+                        </select>
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                            className="h-8 px-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-600 dark:text-slate-300 focus:outline-none cursor-pointer"
+                        >
+                            <option value="">Tüm Durumlar</option>
+                            <option value="Aktif">Aktif</option>
+                            <option value="Tadilat">Tadilat</option>
+                            <option value="Kapalı">Kapalı</option>
+                        </select>
                     </div>
 
                     {/* Branch cards */}
@@ -224,55 +217,48 @@ export default function BranchesPanel(props: any) {
                         ) : (
                             filteredBranches.map((branch: any) => (
                                 <div key={branch.id}>
-                                    <div className="px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                                        <div className="flex items-start gap-3">
+                                    <div className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
+                                        <div className="flex items-center gap-2.5">
                                             {/* Icon */}
-                                            <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-base shrink-0 mt-0.5">
+                                            <div className="w-8 h-8 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-sm shrink-0">
                                                 {TYPE_ICON[branch.type] || '🏪'}
                                             </div>
 
                                             {/* Info */}
                                             <div className="flex-1 min-w-0">
-                                                <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                <div className="flex flex-wrap items-center gap-1.5">
                                                     <TypeBadge type={branch.type} />
-                                                    <span className="text-base font-semibold text-slate-900 dark:text-white truncate">{branch.name}</span>
+                                                    <span className="text-sm font-semibold text-slate-900 dark:text-white truncate">{branch.name}</span>
                                                     <StatusBadge status={branch.status || 'Aktif'} />
                                                 </div>
-                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-slate-500 dark:text-slate-400">
+                                                <div className="flex flex-wrap items-center gap-x-2.5 text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                                                     {(branch.city || branch.district) && (
                                                         <span>📍 {branch.city}{branch.district ? ` / ${branch.district}` : ''}</span>
                                                     )}
                                                     {branch.phone && <span>📞 {branch.phone}</span>}
                                                     {branch.manager && <span>👤 {branch.manager}</span>}
                                                 </div>
-                                                {branch.address && (
-                                                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate">{branch.address}</p>
-                                                )}
                                             </div>
 
                                             {/* Actions — visible on hover */}
-                                            <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => setSelectedBranchDocs(selectedBranchDocs === branch.id ? null : branch.id)}
-                                                    className={`h-8 px-2.5 rounded-lg border text-xs font-medium transition-colors ${selectedBranchDocs === branch.id
-                                                            ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900'
-                                                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                                    className={`h-7 px-2 rounded border text-[11px] font-medium transition-colors ${selectedBranchDocs === branch.id
+                                                        ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900'
+                                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50'
                                                         }`}
                                                 >
-                                                    📁 Evraklar{(branch.docs || 0) > 0 ? ` (${branch.docs})` : ''}
+                                                    📁{(branch.docs || 0) > 0 ? ` ${branch.docs}` : ''}
                                                 </button>
                                                 <button
                                                     onClick={() => openEditPanel(branch)}
-                                                    className="h-8 w-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
-                                                >
-                                                    ✏️
-                                                </button>
+                                                    className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs"
+                                                >✏️</button>
                                                 <button
                                                     onClick={() => deleteBranch(branch.id)}
-                                                    className="h-8 w-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:border-rose-200 dark:hover:border-rose-500/30 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all"
-                                                >
-                                                    ×
-                                                </button>
+                                                    className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50 transition-all text-sm"
+                                                >×</button>
                                             </div>
                                         </div>
                                     </div>
