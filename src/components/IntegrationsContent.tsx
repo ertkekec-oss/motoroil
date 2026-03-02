@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useModal } from '@/contexts/ModalContext';
 import BankIntegrationOnboarding from './Banking/BankIntegrationOnboarding';
@@ -6,36 +8,46 @@ import {
     EnterpriseInput,
     EnterpriseSelect,
     EnterpriseCard,
-    EnterpriseSectionHeader,
     EnterpriseButton,
     EnterpriseField,
     EnterprisePageShell,
-    EnterpriseTabs,
+    EnterpriseSwitch,
 } from "@/components/ui/enterprise";
 
-// ─── ZERO LOGIC CHANGE ────────────────────────────────────────────────────────
-// Tüm state, handler, API, fetch, context akışı aynıdır.
-// Yalnızca UI katmanı (className + wrapper) Enterprise primitive'lere geçirildi.
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Sub-components ──────────────────────────────────────────────────────────
 
-// ──── Shared sub-components ────────────────────────────────────────────────
-function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
+function StatusBadge({ active, activeLabel = 'Aktif', inactiveLabel = 'Pasif' }: { active: boolean; activeLabel?: string; inactiveLabel?: string }) {
     return (
-        <label className="flex items-center cursor-pointer select-none">
-            <div className={`w-11 h-6 rounded-full relative transition-all duration-300 ${checked ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
-                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-sm ${checked ? 'left-6' : 'left-1'}`} />
-            </div>
-            <input type="checkbox" className="hidden" checked={checked} onChange={onChange} />
-        </label>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${active
+            ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30'
+            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+            }`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+            {active ? activeLabel : inactiveLabel}
+        </span>
     );
 }
 
-function TestResult({ result }: { result?: string }) {
+function TestResultBanner({ result }: { result?: string }) {
     if (!result) return null;
     const ok = result.includes('✅');
     return (
-        <div className={`mt-4 p-4 rounded-xl border flex items-center gap-3 animate-in zoom-in-95 text-sm font-bold ${ok ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-500' : 'bg-red-50 dark:bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
-            {result}
+        <div className={`flex items-start gap-3 p-4 rounded-xl border text-sm font-medium animate-in fade-in slide-in-from-bottom-2 duration-200 ${ok
+            ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400'
+            : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400'
+            }`}>
+            <span className="text-base shrink-0">{ok ? '✅' : '❌'}</span>
+            <span>{result.replace('✅', '').replace('❌', '').trim()}</span>
+        </div>
+    );
+}
+
+function SectionDivider({ label }: { label: string }) {
+    return (
+        <div className="flex items-center gap-3 py-1">
+            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
+            <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">{label}</span>
+            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
         </div>
     );
 }
@@ -49,12 +61,497 @@ function BranchSelect({ value, onChange, branches }: { value: string; onChange: 
     );
 }
 
-// ──── Main Component ───────────────────────────────────────────────────────
+// ─── Tab Navigation ──────────────────────────────────────────────────────────
+
+type TabId = 'efatura' | 'marketplace' | 'pos' | 'banking';
+
+const TABS: { id: TabId; icon: string; label: string; desc: string; color: string }[] = [
+    { id: 'efatura', icon: '📄', label: 'E-Fatura', desc: 'Nilvera GİB Entegrasyonu', color: 'blue' },
+    { id: 'marketplace', icon: '🛒', label: 'Pazaryerleri', desc: 'Trendyol, n11, Amazon…', color: 'orange' },
+    { id: 'pos', icon: '💳', label: 'Yazar Kasa POS', desc: 'Ödeal POS Entegrasyonu', color: 'violet' },
+    { id: 'banking', icon: '🏦', label: 'Banka Entegrasyonu', desc: 'XML / MT940 / SFTP', color: 'emerald' },
+];
+
+const tabColorMap: Record<string, string> = {
+    blue: 'border-blue-500 bg-blue-500/5 text-blue-600 dark:text-blue-400',
+    orange: 'border-orange-500 bg-orange-500/5 text-orange-600 dark:text-orange-400',
+    violet: 'border-violet-500 bg-violet-500/5 text-violet-600 dark:text-violet-400',
+    emerald: 'border-emerald-500 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400',
+};
+
+function TabNav({ activeTab, onTabChange }: { activeTab: TabId; onTabChange: (id: TabId) => void }) {
+    return (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+            {TABS.map(tab => {
+                const isActive = activeTab === tab.id;
+                return (
+                    <button
+                        key={tab.id}
+                        onClick={() => onTabChange(tab.id)}
+                        className={`group flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${isActive
+                            ? `${tabColorMap[tab.color]} shadow-sm`
+                            : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                            }`}
+                    >
+                        <span className={`text-2xl shrink-0 transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-105'}`}>{tab.icon}</span>
+                        <div>
+                            <div className={`font-semibold text-sm ${isActive ? '' : 'text-slate-700 dark:text-slate-200'}`}>{tab.label}</div>
+                            <div className={`text-[10px] mt-0.5 ${isActive ? 'opacity-80' : 'text-slate-400 dark:text-slate-500'}`}>{tab.desc}</div>
+                        </div>
+                    </button>
+                );
+            })}
+        </div>
+    );
+}
+
+// ─── E-Fatura Tab ─────────────────────────────────────────────────────────────
+
+function EFaturaTab({ settings, onChange, onTest, isTesting, testResult }: any) {
+    return (
+        <div className="animate-in fade-in duration-200 space-y-6">
+            {/* Header Card */}
+            <EnterpriseCard>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center text-2xl shrink-0">📄</div>
+                        <div>
+                            <h2 className="text-base font-semibold text-slate-900 dark:text-white">E-Fatura Entegrasyonu</h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Nilvera aracılığıyla GİB uyumlu e-fatura gönderimi</p>
+                        </div>
+                    </div>
+                    <StatusBadge
+                        active={settings.environment === 'production'}
+                        activeLabel="Canlı Ortam"
+                        inactiveLabel="Test Ortamı"
+                    />
+                </div>
+
+                {/* Environment Toggle */}
+                <div className="mb-6">
+                    <label className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Çalışma Ortamı</label>
+                    <div className="inline-flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                        {[
+                            { value: 'test', label: '🧪 Test Ortamı' },
+                            { value: 'production', label: '🚀 Canlı Ortam' },
+                        ].map(env => (
+                            <button
+                                key={env.value}
+                                onClick={() => onChange({ ...settings, environment: env.value })}
+                                className={`px-5 py-2.5 rounded-lg text-xs font-semibold transition-all ${settings.environment === env.value
+                                    ? env.value === 'production'
+                                        ? 'bg-blue-600 text-white shadow-sm'
+                                        : 'bg-slate-900 dark:bg-slate-600 text-white shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                                    }`}
+                            >
+                                {env.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Main Form Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Şirket Bilgileri */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Şirket Bilgileri</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <EnterpriseField label="Şirket VKN / TCKN">
+                                <EnterpriseInput
+                                    placeholder="1234567890"
+                                    value={settings.companyVkn}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...settings, companyVkn: e.target.value })}
+                                />
+                            </EnterpriseField>
+                            <EnterpriseField label="Şirket Ünvanı">
+                                <EnterpriseInput
+                                    placeholder="Firma A.Ş."
+                                    value={settings.companyTitle}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...settings, companyTitle: e.target.value })}
+                                />
+                            </EnterpriseField>
+                        </div>
+                        <div className="p-3.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-xl">
+                            <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+                                <strong>⚠️ Önemli:</strong> VKN/TCKN bilgisi Nilvera panelindeki &quot;Şirket Bilgileri&quot; ile birebir aynı olmalıdır. Yanlış VKN fatura reddine neden olur.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* API Bağlantısı */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">API Bağlantısı</h3>
+                        <EnterpriseField label="API Adresi">
+                            <EnterpriseInput
+                                value={settings.apiUrl}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...settings, apiUrl: e.target.value })}
+                            />
+                        </EnterpriseField>
+                        <EnterpriseField label="API Key (Opsiyonel)">
+                            <EnterpriseInput
+                                placeholder="Opsiyonel API anahtarı"
+                                value={settings.apiKey}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...settings, apiKey: e.target.value })}
+                            />
+                        </EnterpriseField>
+
+                        <SectionDivider label="Kullanıcı Bilgileri" />
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <EnterpriseField label="Kullanıcı Adı">
+                                <EnterpriseInput
+                                    placeholder="ornek@firma.com"
+                                    value={settings.username}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...settings, username: e.target.value })}
+                                />
+                            </EnterpriseField>
+                            <EnterpriseField label="Portal Şifresi">
+                                <EnterpriseInput
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={settings.password}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...settings, password: e.target.value })}
+                                />
+                            </EnterpriseField>
+                        </div>
+                    </div>
+                </div>
+            </EnterpriseCard>
+
+            {/* Otomasyon Ayarları */}
+            <EnterpriseCard>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Otomasyon Ayarları</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <EnterpriseSwitch
+                        checked={settings.autoSend}
+                        onChange={(e) => onChange({ ...settings, autoSend: e.target.checked })}
+                        label="Otomatik Gönderim"
+                        description="Satış tamamlandığında faturayı otomatik oluşturur."
+                    />
+                    <EnterpriseSwitch
+                        checked={settings.autoApprove}
+                        onChange={(e) => onChange({ ...settings, autoApprove: e.target.checked })}
+                        label="Otomatik Onay"
+                        description="Gelen faturaları otomatik olarak yanıtla/onayla."
+                    />
+                </div>
+            </EnterpriseCard>
+
+            {/* Test & Action */}
+            <EnterpriseCard>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Bağlantı Testi</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">API kimlik bilgilerinizi doğrulamak için testi çalıştırın.</p>
+                    </div>
+                    <EnterpriseButton variant="secondary" onClick={onTest} disabled={isTesting}>
+                        {isTesting
+                            ? <><div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />Test Ediliyor...</>
+                            : <>🔍 Bağlantıyı Test Et</>
+                        }
+                    </EnterpriseButton>
+                </div>
+                <TestResultBanner result={testResult} />
+            </EnterpriseCard>
+        </div>
+    );
+}
+
+// ─── Marketplace Tab ──────────────────────────────────────────────────────────
+
+const MARKETPLACE_CONFIGS = [
+    {
+        key: 'custom', icon: '🏍️', title: 'Periodya E-Ticaret', desc: 'Özel XML entegrasyonu',
+        fields: (settings: any, branches: any[], onChange: Function) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <EnterpriseField label="XML URL">
+                    <EnterpriseInput placeholder="https://site.com/xml.php" value={settings.url}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ url: e.target.value })} />
+                </EnterpriseField>
+                <EnterpriseField label="İşlem Deposu">
+                    <BranchSelect value={settings.branch || 'Merkez'} onChange={(e) => onChange({ branch: e.target.value })} branches={branches} />
+                </EnterpriseField>
+            </div>
+        )
+    },
+    {
+        key: 'trendyol', icon: '🟠', title: 'Trendyol', desc: "Türkiye'nin lider pazaryeri",
+        fields: (settings: any, branches: any[], onChange: Function) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                    { label: 'API Key', field: 'apiKey', type: 'text' },
+                    { label: 'API Secret', field: 'apiSecret', type: 'password' },
+                    { label: 'Supplier ID', field: 'supplierId', type: 'text' },
+                ].map(({ label, field, type }) => (
+                    <EnterpriseField key={field} label={label}>
+                        <EnterpriseInput type={type} value={settings[field] || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ [field]: e.target.value })} />
+                    </EnterpriseField>
+                ))}
+                <EnterpriseField label="İşlem Deposu">
+                    <BranchSelect value={settings.branch || 'Merkez'} onChange={(e) => onChange({ branch: e.target.value })} branches={branches} />
+                </EnterpriseField>
+            </div>
+        )
+    },
+    {
+        key: 'hepsiburada', icon: '🟧', title: 'Hepsiburada', desc: 'Teknoloji ve yaşam pazaryeri',
+        fields: (settings: any, branches: any[], onChange: Function) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                    { label: 'Merchant ID', field: 'merchantId', placeholder: 'f225561c-...', type: 'text' },
+                    { label: 'API User', field: 'username', placeholder: 'Portal API Kullanıcısı', type: 'text' },
+                    { label: 'Secret Key', field: 'password', placeholder: 'DTSF5...', type: 'password' },
+                ].map(({ label, field, placeholder, type }) => (
+                    <EnterpriseField key={field} label={label}>
+                        <EnterpriseInput type={type} placeholder={placeholder} value={settings[field] || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ [field]: e.target.value })} />
+                    </EnterpriseField>
+                ))}
+                <EnterpriseField label="İşlem Deposu">
+                    <BranchSelect value={settings.branch || 'Merkez'} onChange={(e) => onChange({ branch: e.target.value })} branches={branches} />
+                </EnterpriseField>
+            </div>
+        )
+    },
+    {
+        key: 'n11', icon: '🐞', title: 'N11', desc: 'Hayat Sana Gelir - Global pazaryeri',
+        fields: (settings: any, branches: any[], onChange: Function) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                    { label: 'API Application Key', field: 'apiKey', type: 'text' },
+                    { label: 'API Secret', field: 'apiSecret', type: 'password' },
+                ].map(({ label, field, type }) => (
+                    <EnterpriseField key={field} label={label}>
+                        <EnterpriseInput type={type} value={settings[field] || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ [field]: e.target.value })} />
+                    </EnterpriseField>
+                ))}
+                <EnterpriseField label="İşlem Deposu">
+                    <BranchSelect value={settings.branch || 'Merkez'} onChange={(e) => onChange({ branch: e.target.value })} branches={branches} />
+                </EnterpriseField>
+            </div>
+        )
+    },
+    {
+        key: 'amazon', icon: '🅰️', title: 'Amazon TR', desc: 'Amazon Türkiye Marketplace',
+        fields: (settings: any, branches: any[], onChange: Function) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                    { label: 'Seller ID', field: 'sellerId', type: 'text' },
+                    { label: 'MWS Auth Token', field: 'mwsAuthToken', type: 'password' },
+                    { label: 'Access Key', field: 'accessKey', type: 'text' },
+                    { label: 'Secret Key', field: 'secretKey', type: 'password' },
+                ].map(({ label, field, type }) => (
+                    <EnterpriseField key={field} label={label}>
+                        <EnterpriseInput type={type} value={settings[field] || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ [field]: e.target.value })} />
+                    </EnterpriseField>
+                ))}
+                <EnterpriseField label="İşlem Deposu">
+                    <BranchSelect value={settings.branch || 'Merkez'} onChange={(e) => onChange({ branch: e.target.value })} branches={branches} />
+                </EnterpriseField>
+            </div>
+        )
+    },
+    {
+        key: 'pazarama', icon: '🔵', title: 'Pazarama', desc: 'İş Bankası iştiraki pazaryeri',
+        fields: (settings: any, branches: any[], onChange: Function) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                    { label: 'App Key', field: 'apiKey', type: 'text' },
+                    { label: 'App Secret', field: 'apiSecret', type: 'password' },
+                ].map(({ label, field, type }) => (
+                    <EnterpriseField key={field} label={label}>
+                        <EnterpriseInput type={type} value={settings[field] || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ [field]: e.target.value })} />
+                    </EnterpriseField>
+                ))}
+                <EnterpriseField label="İşlem Deposu">
+                    <BranchSelect value={settings.branch || 'Merkez'} onChange={(e) => onChange({ branch: e.target.value })} branches={branches} />
+                </EnterpriseField>
+            </div>
+        )
+    },
+];
+
+function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, stats, onRefreshStats, branches }: any) {
+    const activeCount = MARKETPLACE_CONFIGS.filter(m => (settings as any)[m.key]?.enabled).length;
+
+    return (
+        <div className="animate-in fade-in duration-200 space-y-4">
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                {[
+                    { label: 'Açık Alacaklar', value: `₺${stats?.financials?.openReceivables?.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) ?? '—'}`, icon: '💰', sub: 'Tahsilat Bekleyen' },
+                    { label: 'Askıda Settlement', value: `${stats?.financials?.pendingSettlements || 0} İşlem`, icon: '⏳', sub: 'Muhasebe Bekleyen' },
+                    { label: '24 Saatlik Sipariş', value: `${stats?.orders?.last24h || 0} Adet`, icon: '📦', sub: 'Gerçek Zamanlı' },
+                    { label: 'Aktif Entegrasyon', value: `${activeCount} / ${MARKETPLACE_CONFIGS.length}`, icon: '🔗', sub: 'Pazaryeri Bağlı' },
+                ].map((s, i) => (
+                    <EnterpriseCard key={i} className="!p-4">
+                        <div className="flex items-start justify-between mb-2">
+                            <span className="text-xl">{s.icon}</span>
+                        </div>
+                        <div className="text-lg font-semibold text-slate-900 dark:text-white">{s.value}</div>
+                        <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">{s.label}</div>
+                        <div className="text-[10px] text-slate-400 dark:text-slate-500">{s.sub}</div>
+                    </EnterpriseCard>
+                ))}
+            </div>
+
+            {/* Refresh Bar */}
+            <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <span>🛰️</span>
+                    <span className="font-medium">Pazaryeri verileri gerçek zamanlı izleniyor.</span>
+                </div>
+                <EnterpriseButton variant="secondary" onClick={onRefreshStats}>
+                    🔄 Verileri Tazele
+                </EnterpriseButton>
+            </div>
+
+            {/* Marketplace Cards */}
+            {MARKETPLACE_CONFIGS.map(({ key, icon, title, desc, fields }) => {
+                const mktSettings = (settings as any)[key] || {};
+                const enabled = mktSettings.enabled ?? false;
+                return (
+                    <EnterpriseCard key={key}>
+                        {/* Card Header */}
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3.5">
+                                <div className="w-11 h-11 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shrink-0">
+                                    {icon}
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h3>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 shrink-0">
+                                <StatusBadge active={enabled} />
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={enabled}
+                                        onChange={(e) => onChange({ ...settings, [key]: { ...mktSettings, enabled: e.target.checked } })}
+                                    />
+                                    <div className="w-10 h-5.5 bg-slate-200 dark:bg-slate-700 peer-checked:bg-slate-900 dark:peer-checked:bg-white rounded-full relative transition-colors duration-200">
+                                        <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white dark:bg-slate-900 shadow transition-all duration-200 ${enabled ? 'left-5' : 'left-0.5'}`} />
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Expanded Form */}
+                        {enabled && (
+                            <div className="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800 space-y-5 animate-in fade-in duration-200">
+                                {fields(mktSettings, branches, (partial: any) => onChange({ ...settings, [key]: { ...mktSettings, ...partial } }))}
+
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                                    <EnterpriseSwitch
+                                        checked={mktSettings.autoSync ?? false}
+                                        onChange={(e) => onChange({ ...settings, [key]: { ...mktSettings, autoSync: e.target.checked } })}
+                                        label="Otomatik Senkronizasyon"
+                                        description="Belirli aralıklarla siparişleri çeker."
+                                        className="flex-1 !py-2.5"
+                                    />
+                                    <EnterpriseButton variant="secondary" onClick={() => onTest(key)} disabled={isTesting}>
+                                        {isTesting ? <><div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />Test...</> : <>🔍 Bağlantıyı Test Et</>}
+                                    </EnterpriseButton>
+                                </div>
+                                <TestResultBanner result={testResults[key]} />
+                            </div>
+                        )}
+                    </EnterpriseCard>
+                );
+            })}
+        </div>
+    );
+}
+
+// ─── POS Tab ──────────────────────────────────────────────────────────────────
+
+function POSTab({ settings, onChange }: any) {
+    return (
+        <div className="animate-in fade-in duration-200 space-y-6">
+            <EnterpriseCard>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/30 flex items-center justify-center text-2xl shrink-0">💳</div>
+                        <div>
+                            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Ödeal Yazar Kasa POS</h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Ödeme sistemleri ve yazar kasa POS entegrasyonu</p>
+                        </div>
+                    </div>
+                    <StatusBadge active={true} activeLabel="Aktif" />
+                </div>
+
+                <div className="space-y-6">
+                    <div>
+                        <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">API Kimlik Bilgileri</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <EnterpriseField label="Ödeal API Token (Canlı)">
+                                <EnterpriseInput
+                                    placeholder="Od_Live_••••••••••••"
+                                    value={settings.apiKey}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...settings, apiKey: e.target.value })}
+                                />
+                            </EnterpriseField>
+                            <EnterpriseField label="Terminal / Cihaz Seri No">
+                                <EnterpriseInput
+                                    placeholder="9988XXXX"
+                                    value={settings.terminalId}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...settings, terminalId: e.target.value })}
+                                />
+                            </EnterpriseField>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">POS Davranış Ayarları</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <EnterpriseSwitch
+                                checked={settings.autoReceipt}
+                                onChange={(e) => onChange({ ...settings, autoReceipt: e.target.checked })}
+                                label="Otomatik Fiş Kes"
+                                description="Başarılı ödeme sonrası otomatik döküm alır."
+                            />
+                            <EnterpriseSwitch
+                                checked={settings.testMode}
+                                onChange={(e) => onChange({ ...settings, testMode: e.target.checked })}
+                                label="Geliştirici Modu"
+                                description="Sanal bir işlem akışı simüle eder."
+                            />
+                        </div>
+                    </div>
+                </div>
+            </EnterpriseCard>
+
+            {/* İşlem Akışı Bilgisi */}
+            <EnterpriseCard>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">ℹ️ POS Entegrasyon Akışı</h3>
+                <div className="space-y-3">
+                    {[
+                        { step: '1', text: 'Satış POS ekranında "Ödeal POS" seçildiğinde tutar otomatik olarak cihaz ekranına düşer.' },
+                        { step: '2', text: 'Kart çekimi başarılı olduğu anda Periodya\'da "Satış Onaylandı" durumuna geçer ve kasa kaydı oluşur.' },
+                        { step: '3', text: 'Cihaz üzerinden Z raporu ve EKÜ dökümleri için Ödeal panelini kullanınız.' },
+                    ].map(item => (
+                        <div key={item.step} className="flex items-start gap-3">
+                            <span className="mt-0.5 w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 text-[10px] font-bold flex items-center justify-center shrink-0">
+                                {item.step}
+                            </span>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">{item.text}</p>
+                        </div>
+                    ))}
+                </div>
+            </EnterpriseCard>
+        </div>
+    );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export default function IntegrationsContent() {
     const { showSuccess, showError } = useModal();
-    const [activeTab, setActiveTab] = useState<'efatura' | 'marketplace' | 'pos' | 'banking'>('efatura');
+    const [activeTab, setActiveTab] = useState<TabId>('efatura');
 
-    // ── State (unchanged) ──
     const [eFaturaSettings, setEFaturaSettings] = useState({
         provider: 'nilvera',
         apiUrl: 'https://api.nilvera.com/v1',
@@ -93,7 +590,6 @@ export default function IntegrationsContent() {
     const [isTesting, setIsTesting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
-    // ── Handlers (unchanged) ──
     const fetchBranches = async () => {
         try {
             const res = await apiFetch('/api/branches');
@@ -168,7 +664,6 @@ export default function IntegrationsContent() {
                     if (data.marketplaceSettings) setMarketplaceSettings(prev => ({ ...prev, ...data.marketplaceSettings }));
                 }
             } catch (e) {
-                console.error('Fetch error:', e);
                 const savedEFatura = localStorage.getItem('periodya_efatura_settings');
                 const savedMarketplace = localStorage.getItem('periodya_marketplace_settings');
                 const savedPos = localStorage.getItem('periodya_pos_settings');
@@ -209,373 +704,47 @@ export default function IntegrationsContent() {
         setIsSaving(false);
     };
 
-    // ── UI ──────────────────────────────────────────────────────────────────
     return (
         <EnterprisePageShell
             title="Entegrasyonlar"
-            description="E-Fatura, Ödeal ve Pazaryeri bağlantılarınızı bu panelden yönetin."
+            description="E-Fatura, pazaryeri, POS ve banka bağlantılarınızı bu panelden yönetin."
             actions={
                 <EnterpriseButton variant="primary" onClick={saveSettings} disabled={isSaving}>
-                    {isSaving ? (
-                        <><div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> Kaydediliyor</>
-                    ) : (
-                        <><span>💾</span> Ayarları Kaydet</>
-                    )}
+                    {isSaving
+                        ? <><div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />Kaydediliyor</>
+                        : <>💾 Ayarları Kaydet</>
+                    }
                 </EnterpriseButton>
             }
         >
+            <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
 
-            {/* Tab Bar */}
-            <EnterpriseTabs
-                tabs={[
-                    { id: 'efatura', label: 'E-Fatura (Nilvera)', icon: '📄' },
-                    { id: 'marketplace', label: 'Pazaryerleri', icon: '🛒' },
-                    { id: 'pos', label: 'Yazar Kasa POS', icon: '💳' },
-                    { id: 'banking', label: 'Banka Entegrasyonu', icon: '🏦' },
-                ]}
-                activeTab={activeTab}
-                onTabChange={(id) => setActiveTab(id as any)}
-            />
-
-            {/* ── E-Fatura Tab ── */}
             {activeTab === 'efatura' && (
-                <div className="animate-in fade-in duration-300">
-                    <EnterpriseCard>
-                        {/* Header row */}
-                        <div className="flex flex-col sm:flex-row items-center gap-5 border-b border-slate-200 dark:border-slate-800 pb-6 mb-6">
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">📄</div>
-                            <div className="text-center sm:text-left">
-                                <h3 className="text-lg font-black text-slate-900 dark:text-white">E-Fatura Entegrasyonu</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Nilvera GİB uyumlu e-fatura servis sağlayıcı ayarları</p>
-                            </div>
-                            <div className="sm:ml-auto">
-                                <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${eFaturaSettings.environment === 'production' ? 'bg-blue-600/10 text-blue-600 dark:text-blue-500 border-blue-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}>
-                                    {eFaturaSettings.environment === 'production' ? '🚀 Canlı Ortam' : '🧪 Test Ortamı'}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                            {/* Left column */}
-                            <div className="space-y-6">
-                                {/* Ortam seçici */}
-                                <EnterpriseField label="ÇALIŞMA ORTAMI SEÇİMİ">
-                                    <div className="flex gap-2 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                                        {['test', 'production'].map((env) => (
-                                            <button
-                                                key={env}
-                                                onClick={() => setEFaturaSettings({ ...eFaturaSettings, environment: env })}
-                                                className={`flex-1 py-2.5 rounded-lg text-xs font-black uppercase transition-all ${eFaturaSettings.environment === env
-                                                    ? (env === 'production' ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-800 dark:bg-slate-600 text-white shadow-sm')
-                                                    : 'text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                                    }`}
-                                            >
-                                                {env === 'production' ? 'Canlı Ortam' : 'Test Ortamı'}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </EnterpriseField>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <EnterpriseField label="ŞİRKET VKN / TCKN">
-                                        <EnterpriseInput value={eFaturaSettings.companyVkn} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEFaturaSettings({ ...eFaturaSettings, companyVkn: e.target.value })} />
-                                    </EnterpriseField>
-                                    <EnterpriseField label="ŞİRKET ÜNVANI">
-                                        <EnterpriseInput placeholder="Fatura başlığı..." value={eFaturaSettings.companyTitle} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEFaturaSettings({ ...eFaturaSettings, companyTitle: e.target.value })} />
-                                    </EnterpriseField>
-                                </div>
-
-                                <div className="p-4 bg-blue-600/5 border border-blue-500/20 rounded-xl text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                    💡 Bilgileri Nilvera panelindeki "Şirket Bilgileri" alanıyla birebir aynı doldurmalısınız. Yanlış VKN kullanımı fatura reddine sebep olabilir.
-                                </div>
-                            </div>
-
-                            {/* Right column */}
-                            <div className="space-y-4">
-                                <EnterpriseField label="API ADRESİ">
-                                    <EnterpriseInput value={eFaturaSettings.apiUrl} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEFaturaSettings({ ...eFaturaSettings, apiUrl: e.target.value })} />
-                                </EnterpriseField>
-                                <EnterpriseField label="API KEY (OPSİYONEL)">
-                                    <EnterpriseInput placeholder="🔑 Opsiyonel anahtar" value={eFaturaSettings.apiKey} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEFaturaSettings({ ...eFaturaSettings, apiKey: e.target.value })} />
-                                </EnterpriseField>
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest py-2">
-                                    <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />VEYA KULLANICI BİLGİLERİ<div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <EnterpriseField label="KULLANICI ADI">
-                                        <EnterpriseInput placeholder="test01@nilvera.com" value={eFaturaSettings.username} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEFaturaSettings({ ...eFaturaSettings, username: e.target.value })} />
-                                    </EnterpriseField>
-                                    <EnterpriseField label="PORTAL ŞİFRESİ">
-                                        <EnterpriseInput type="password" placeholder="••••••••" value={eFaturaSettings.password} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEFaturaSettings({ ...eFaturaSettings, password: e.target.value })} />
-                                    </EnterpriseField>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Toggle switches */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 mt-6 border-t border-slate-200 dark:border-slate-800">
-                            {[
-                                { key: 'autoSend', label: 'Otomatik Gönderim', desc: 'Satış tamamlandığında faturayı otomatik oluşturur.' },
-                                { key: 'autoApprove', label: 'Otomatik Onay', desc: 'Gelen faturaları otomatik olarak yanıtla/onayla.' }
-                            ].map(({ key, label, desc }) => (
-                                <label key={key} className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-all select-none">
-                                    <ToggleSwitch checked={(eFaturaSettings as any)[key]} onChange={(e) => setEFaturaSettings({ ...eFaturaSettings, [key]: e.target.checked })} />
-                                    <div>
-                                        <div className="text-sm font-bold text-slate-900 dark:text-white">{label}</div>
-                                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</div>
-                                    </div>
-                                </label>
-                            ))}
-                        </div>
-
-                        {/* Test button */}
-                        <div className="mt-6">
-                            <EnterpriseButton variant="secondary" onClick={testEFaturaConnection} disabled={isTesting} className="w-full">
-                                {isTesting ? <><div className="w-4 h-4 border-2 border-slate-400/30 border-t-slate-600 rounded-full animate-spin" />Test Ediliyor...</> : <>🔍 BAĞLANTIYI ŞİMDİ TEST ET</>}
-                            </EnterpriseButton>
-                            <TestResult result={testResults.efatura} />
-                        </div>
-                    </EnterpriseCard>
-                </div>
+                <EFaturaTab
+                    settings={eFaturaSettings}
+                    onChange={setEFaturaSettings}
+                    onTest={testEFaturaConnection}
+                    isTesting={isTesting}
+                    testResult={testResults.efatura}
+                />
             )}
-
-            {/* ── POS Tab ── */}
-            {activeTab === 'pos' && (
-                <div className="animate-in fade-in duration-300">
-                    <EnterpriseCard>
-                        <div className="flex flex-col sm:flex-row items-center gap-5 border-b border-slate-200 dark:border-slate-800 pb-6 mb-6">
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">💳</div>
-                            <div className="text-center sm:text-left">
-                                <h3 className="text-lg font-black text-slate-900 dark:text-white">Ödeal Yazar Kasa POS</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Ödeme sistemleri ve yazar kasa POS entegrasyonu</p>
-                            </div>
-                            <div className="sm:ml-auto">
-                                <span className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-600/10 text-blue-600 dark:text-blue-500 border border-blue-500/20">
-                                    Durum: AKTİF
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <EnterpriseField label="ÖDEAL API TOKEN (CANLI)">
-                                <EnterpriseInput placeholder="Od_Live_••••••••••••" value={posSettings.apiKey} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPosSettings({ ...posSettings, apiKey: e.target.value })} />
-                            </EnterpriseField>
-                            <EnterpriseField label="TERMİNAL / CİHAZ SERİ NO">
-                                <EnterpriseInput placeholder="9988XXXX" value={posSettings.terminalId} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPosSettings({ ...posSettings, terminalId: e.target.value })} />
-                            </EnterpriseField>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 bg-blue-500/5 border border-blue-500/10 rounded-xl">
-                            {[
-                                { key: 'autoReceipt', label: 'Otomatik Fiş Kes', desc: 'Başarılı ödeme sonrası otomatik döküm alır.' },
-                                { key: 'testMode', label: 'Geliştirici Modu', desc: 'Sanal bir işlem akışı simüle eder.' }
-                            ].map(({ key, label, desc }) => (
-                                <label key={key} className="flex items-center gap-4 cursor-pointer select-none">
-                                    <ToggleSwitch checked={(posSettings as any)[key]} onChange={(e) => setPosSettings({ ...posSettings, [key]: e.target.checked })} />
-                                    <div>
-                                        <div className="text-sm font-bold text-slate-900 dark:text-white">{label}</div>
-                                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 italic">{desc}</div>
-                                    </div>
-                                </label>
-                            ))}
-                        </div>
-
-                        <div className="mt-5 p-5 bg-slate-50 dark:bg-slate-800/50 rounded-xl text-xs text-slate-500 dark:text-slate-400 space-y-2 border border-slate-200 dark:border-slate-700">
-                            <div className="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest text-[10px] mb-2">ℹ️ İşlem Akışı</div>
-                            <p>• Satış POS ekranında "Ödeal POS" seçildiğinde tutar otomatik olarak cihaz ekranına düşer.</p>
-                            <p>• Kart çekimi başarılı olduğu anda Periodya&apos;da "Satış Onaylandı" durumuna geçer ve kasa kaydı oluşur.</p>
-                            <p>• Cihaz üzerinden Z raporu ve EKÜ dökümleri için Ödeal panelini kullanınız.</p>
-                        </div>
-                    </EnterpriseCard>
-                </div>
-            )}
-
-            {/* ── Marketplace Tab ── */}
             {activeTab === 'marketplace' && (
-                <div className="space-y-6 animate-in fade-in duration-300">
-                    {/* Stats row */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {[
-                            { label: 'Açık Alacaklar', val: `₺${stats?.financials?.openReceivables?.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) ?? '—'}`, sub: 'Tahsilat Bekleyen Brüt', trend: '↑' },
-                            { label: 'Askıda Settlement', val: `${stats?.financials?.pendingSettlements || 0} İşlem`, sub: 'Muhasebe bekleyenler', trend: '⏳' },
-                            { label: '24 Saatlik Sipariş', val: `${stats?.orders?.last24h || 0} Adet`, sub: 'Gerçek Zamanlı Akış', trend: '📦' },
-                            { label: 'Son Sync Status', val: stats?.configs?.some((c: any) => c.lastSync) ? new Date(Math.max(...stats.configs.filter((c: any) => c.lastSync).map((c: any) => new Date(c.lastSync).getTime()))).toLocaleTimeString('tr-TR') : 'Beklemede', sub: 'Bağlantı Aktif ✅', trend: '🔄' }
-                        ].map((s, i) => (
-                            <div key={i} className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
-                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{s.label}</div>
-                                <div className="text-lg font-black text-slate-900 dark:text-white mb-1">{s.val}</div>
-                                <div className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">{s.sub}</div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Integration Hub banner */}
-                    <EnterpriseCard>
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                            <div className="flex items-center gap-5">
-                                <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-2xl border border-slate-200 dark:border-slate-700">🛰️</div>
-                                <div>
-                                    <h4 className="text-lg font-black text-slate-900 dark:text-white">Enterprise Marketplace Control</h4>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed max-w-sm">Tüm pazaryeri akışları, muhasebe entegrasyonu ve FIFO maliyet katmanları gerçek zamanlı olarak izlenmektedir.</p>
-                                </div>
-                            </div>
-                            <EnterpriseButton variant="secondary" onClick={fetchStats}>VERİLERİ TAZELE 🔄</EnterpriseButton>
-                        </div>
-                    </EnterpriseCard>
-
-                    {/* Marketplace cards */}
-                    {[
-                        {
-                            key: 'custom', icon: '🏍️', title: 'Periodya E-Ticaret', desc: 'Özel XML entegrasyonu',
-                            fields: (enabled: boolean) => enabled && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <EnterpriseField label="XML URL">
-                                        <EnterpriseInput placeholder="https://site.com/xml.php" value={marketplaceSettings.custom.url} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, url: e.target.value } })} />
-                                    </EnterpriseField>
-                                    <EnterpriseField label="İŞLEM DEPOSU">
-                                        <BranchSelect value={marketplaceSettings.custom.branch || branches[0]?.name || 'Merkez'} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, custom: { ...marketplaceSettings.custom, branch: e.target.value } })} branches={branches} />
-                                    </EnterpriseField>
-                                </div>
-                            )
-                        },
-                        {
-                            key: 'trendyol', icon: '🟠', title: 'Trendyol', desc: "Türkiye'nin lider pazaryeri platformu",
-                            fields: (enabled: boolean) => enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {[
-                                        { label: 'API KEY', field: 'apiKey', type: 'text' },
-                                        { label: 'API SECRET', field: 'apiSecret', type: 'password' },
-                                        { label: 'SUPPLIER ID', field: 'supplierId', type: 'text' },
-                                    ].map(({ label, field, type }) => (
-                                        <EnterpriseField key={field} label={label}>
-                                            <EnterpriseInput type={type} value={(marketplaceSettings.trendyol as any)[field]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, [field]: e.target.value } })} />
-                                        </EnterpriseField>
-                                    ))}
-                                    <EnterpriseField label="İŞLEM DEPOSU">
-                                        <BranchSelect value={marketplaceSettings.trendyol.branch || branches[0]?.name || 'Merkez'} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, trendyol: { ...marketplaceSettings.trendyol, branch: e.target.value } })} branches={branches} />
-                                    </EnterpriseField>
-                                </div>
-                            )
-                        },
-                        {
-                            key: 'hepsiburada', icon: '🟧', title: 'Hepsiburada', desc: 'Teknoloji ve yaşam odaklı pazaryeri',
-                            fields: (enabled: boolean) => enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {[
-                                        { label: 'MERCHANT ID (PORTAL)', field: 'merchantId', placeholder: 'f225561c-...', type: 'text' },
-                                        { label: 'API USER (PORTAL)', field: 'username', placeholder: "Portal'da 'API Kullanıcısı' olarak geçer", type: 'text' },
-                                        { label: 'SECRET KEY (API)', field: 'password', placeholder: 'DTSF5...', type: 'password' },
-                                    ].map(({ label, field, placeholder, type }) => (
-                                        <EnterpriseField key={field} label={label}>
-                                            <EnterpriseInput type={type} placeholder={placeholder} value={(marketplaceSettings.hepsiburada as any)[field] || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, [field]: e.target.value } as any })} />
-                                        </EnterpriseField>
-                                    ))}
-                                    <EnterpriseField label="İŞLEM DEPOSU">
-                                        <BranchSelect value={marketplaceSettings.hepsiburada.branch || branches[0]?.name || 'Merkez'} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, hepsiburada: { ...marketplaceSettings.hepsiburada, branch: e.target.value } })} branches={branches} />
-                                    </EnterpriseField>
-                                </div>
-                            )
-                        },
-                        {
-                            key: 'n11', icon: '🐞', title: 'N11', desc: 'Hayat Sana Gelir - Global pazaryeri ortağı',
-                            fields: (enabled: boolean) => enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    {[
-                                        { label: 'API APPLICATION KEY', field: 'apiKey', type: 'text' },
-                                        { label: 'API SECRET', field: 'apiSecret', type: 'password' },
-                                    ].map(({ label, field, type }) => (
-                                        <EnterpriseField key={field} label={label}>
-                                            <EnterpriseInput type={type} value={(marketplaceSettings.n11 as any)[field]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, [field]: e.target.value } })} />
-                                        </EnterpriseField>
-                                    ))}
-                                    <EnterpriseField label="İŞLEM DEPOSU">
-                                        <BranchSelect value={marketplaceSettings.n11.branch || branches[0]?.name || 'Merkez'} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, n11: { ...marketplaceSettings.n11, branch: e.target.value } })} branches={branches} />
-                                    </EnterpriseField>
-                                </div>
-                            )
-                        },
-                        {
-                            key: 'amazon', icon: '🅰️', title: 'Amazon TR', desc: 'Amazon Türkiye Marketplace',
-                            fields: (enabled: boolean) => enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {[
-                                        { label: 'SELLER ID', field: 'sellerId', type: 'text' },
-                                        { label: 'MWS AUTH TOKEN', field: 'mwsAuthToken', type: 'password' },
-                                        { label: 'ACCESS KEY', field: 'accessKey', type: 'text' },
-                                        { label: 'SECRET KEY', field: 'secretKey', type: 'password' },
-                                    ].map(({ label, field, type }) => (
-                                        <EnterpriseField key={field} label={label}>
-                                            <EnterpriseInput type={type} value={(marketplaceSettings.amazon as any)[field]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, [field]: e.target.value } })} />
-                                        </EnterpriseField>
-                                    ))}
-                                    <EnterpriseField label="İŞLEM DEPOSU">
-                                        <BranchSelect value={marketplaceSettings.amazon.branch || branches[0]?.name || 'Merkez'} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, amazon: { ...marketplaceSettings.amazon, branch: e.target.value } })} branches={branches} />
-                                    </EnterpriseField>
-                                </div>
-                            )
-                        },
-                        {
-                            key: 'pazarama', icon: '🔵', title: 'Pazarama', desc: 'İş Bankası iştiraki pazaryeri platformu',
-                            fields: (enabled: boolean) => enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {[
-                                        { label: 'APP KEY', field: 'apiKey', type: 'text' },
-                                        { label: 'APP SECRET', field: 'apiSecret', type: 'password' },
-                                    ].map(({ label, field, type }) => (
-                                        <EnterpriseField key={field} label={label}>
-                                            <EnterpriseInput type={type} value={(marketplaceSettings.pazarama as any)[field]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, [field]: e.target.value } })} />
-                                        </EnterpriseField>
-                                    ))}
-                                    <EnterpriseField label="İŞLEM DEPOSU">
-                                        <BranchSelect value={marketplaceSettings.pazarama.branch || branches[0]?.name || 'Merkez'} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, pazarama: { ...marketplaceSettings.pazarama, branch: e.target.value } })} branches={branches} />
-                                    </EnterpriseField>
-                                </div>
-                            )
-                        },
-                    ].map(({ key, icon, title, desc, fields }) => {
-                        const enabled = (marketplaceSettings as any)[key]?.enabled ?? false;
-                        return (
-                            <EnterpriseCard key={key}>
-                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">{icon}</div>
-                                        <div>
-                                            <h3 className="text-lg font-black text-slate-900 dark:text-white">{title}</h3>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
-                                        </div>
-                                    </div>
-                                    <label className="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
-                                        <ToggleSwitch checked={enabled} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, [key]: { ...(marketplaceSettings as any)[key], enabled: e.target.checked } })} />
-                                        <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{enabled ? 'AKTİF' : 'PASİF'}</span>
-                                    </label>
-                                </div>
-
-                                {enabled && (
-                                    <div className="pt-6 mt-6 border-t border-slate-200 dark:border-slate-800 space-y-4 animate-in fade-in duration-200">
-                                        {fields(enabled)}
-
-                                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                            <label className="flex items-center gap-3 cursor-pointer select-none">
-                                                <ToggleSwitch checked={(marketplaceSettings as any)[key]?.autoSync} onChange={(e) => setMarketplaceSettings({ ...marketplaceSettings, [key]: { ...(marketplaceSettings as any)[key], autoSync: e.target.checked } })} />
-                                                <span className="text-xs font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase">Otomatik Senkronizasyon</span>
-                                            </label>
-                                            <EnterpriseButton variant="secondary" onClick={() => testMarketplaceConnection(key)} disabled={isTesting}>
-                                                {isTesting ? <><div className="w-3 h-3 border-2 border-slate-400/30 border-t-slate-600 rounded-full animate-spin" /></> : <span>🔍</span>}
-                                                BAĞLANTIYI TEST ET
-                                            </EnterpriseButton>
-                                        </div>
-                                        <TestResult result={testResults[key]} />
-                                    </div>
-                                )}
-                            </EnterpriseCard>
-                        );
-                    })}
-                </div>
+                <MarketplaceTab
+                    settings={marketplaceSettings}
+                    onChange={setMarketplaceSettings}
+                    onTest={testMarketplaceConnection}
+                    isTesting={isTesting}
+                    testResults={testResults}
+                    stats={stats}
+                    onRefreshStats={fetchStats}
+                    branches={branches}
+                />
             )}
-
-            {/* ── Banking Tab ── */}
+            {activeTab === 'pos' && (
+                <POSTab settings={posSettings} onChange={setPosSettings} />
+            )}
             {activeTab === 'banking' && (
-                <div className="animate-in fade-in duration-300">
+                <div className="animate-in fade-in duration-200">
                     <BankIntegrationOnboarding />
                 </div>
             )}

@@ -1,11 +1,58 @@
 "use client";
 
 import React, { useState } from 'react';
-import { BANK_FORM_DEFINITIONS, BankDefinition } from '@/services/banking/bank-definitions';
+import { BANK_FORM_DEFINITIONS } from '@/services/banking/bank-definitions';
 import { useModal } from '@/contexts/ModalContext';
 import { jsPDF } from 'jspdf';
-import { BankConnectionStatus } from '@/services/banking/bank-connection-service';
 import { apiFetch } from '@/lib/api-client';
+import {
+    EnterpriseCard,
+    EnterpriseButton,
+    EnterpriseField,
+} from "@/components/ui/enterprise";
+
+// ─── Step Indicator ───────────────────────────────────────────────────────────
+
+function StepIndicator({ active, done, step, label }: { active: boolean; done: boolean; step: number; label: string }) {
+    return (
+        <div className={`flex items-center gap-2.5 ${active ? '' : 'opacity-40'}`}>
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 border-2 transition-all ${done
+                ? 'bg-emerald-500 border-emerald-500 text-white'
+                : active
+                    ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900'
+                    : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-400'
+                }`}>
+                {done ? '✓' : step}
+            </div>
+            <span className={`text-xs font-medium hidden sm:block ${active ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>{label}</span>
+        </div>
+    );
+}
+
+function StepConnector({ done }: { done: boolean }) {
+    return (
+        <div className={`flex-1 h-0.5 mx-1 rounded-full transition-colors ${done ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700'}`} />
+    );
+}
+
+// ─── Status Badge ─────────────────────────────────────────────────────────────
+
+const STATUS_STYLES: Record<string, string> = {
+    ACTIVE: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30',
+    PENDING_ACTIVATION: 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30',
+    DRAFT: 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+};
+
+function ConnectionStatusBadge({ status }: { status: string }) {
+    return (
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${STATUS_STYLES[status] || STATUS_STYLES.DRAFT}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${status === 'ACTIVE' ? 'bg-emerald-500' : status === 'PENDING_ACTIVATION' ? 'bg-amber-500' : 'bg-slate-400'}`} />
+            {status.replace(/_/g, ' ')}
+        </span>
+    );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function BankOnboardingHub() {
     const { showSuccess, showError } = useModal();
@@ -29,34 +76,24 @@ export default function BankOnboardingHub() {
 
     const handleDownloadForm = () => {
         if (!selectedBank) return;
-
         const doc = new jsPDF();
-
-        // Header
         doc.setFontSize(22);
         doc.text("BANKA ENTEGRASYON BAŞVURU FORMU", 105, 20, { align: "center" });
-
         doc.setFontSize(14);
         doc.text(`Banka: ${selectedBank.displayName}`, 20, 40);
         doc.text(`Tarih: ${new Date().toLocaleDateString('tr-TR')}`, 20, 50);
-
         doc.setFontSize(12);
         doc.text("Aşağıdaki alanların banka tarafından tanımlanması ve taraflara iletilmesi rica olunur.", 20, 70);
-
         let y = 85;
         selectedBank.onboardingFields.forEach((field) => {
             const isRequired = selectedBank.requiredCredentials.includes(field.key);
             let statusText = isRequired ? "[ZORUNLU]" : "[OPSİYONEL - VARSA]";
-
-            // Special rule for Kuveyt Turk
             if (selectedBank.id === 'KUVEYT_TURK' && (field.key === 'serviceUsername' || field.key === 'servicePassword')) {
                 statusText = "[OPSİYONEL - VARSA DOLDURUNUZ]";
             }
-
             doc.text(`${field.label}: ____________________ ${statusText}`, 20, y);
             y += 10;
         });
-
         y += 10;
         doc.setFontSize(10);
         doc.text("Teknik Notlar:", 20, y);
@@ -65,7 +102,6 @@ export default function BankOnboardingHub() {
             doc.text(`- ${note}`, 25, y);
             y += 5;
         });
-
         doc.save(`${selectedBank.id}_Basvuru_Formu.pdf`);
         showSuccess('Başarılı', `${selectedBank.displayName} için başvuru dokümanları (PDF) indirildi.`);
         setCurrentStepStatus('PENDING_ACTIVATION');
@@ -79,31 +115,21 @@ export default function BankOnboardingHub() {
             const res = await apiFetch('/api/fintech/banking/test-connection', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    bankId: selectedBankId,
-                    credentials
-                })
+                body: JSON.stringify({ bankId: selectedBankId, credentials })
             });
             const data = await res.json();
             if (data.success) {
-                setTestResults({
-                    connectivity: data.connectivity,
-                    permission: data.permission
-                });
-
+                setTestResults({ connectivity: data.connectivity, permission: data.permission });
                 if (data.connectivity.status === 'PASS' && data.permission.status === 'PASS') {
                     showSuccess('Bağlantı Başarılı', 'Banka API erişimi ve yetkilendirme doğrulandı.');
                 } else {
                     showError('Doğrulama Sorunu', data.permission.message || data.connectivity.message);
                 }
-
-                if (data.recommendedStatus) {
-                    setCurrentStepStatus(data.recommendedStatus);
-                }
+                if (data.recommendedStatus) setCurrentStepStatus(data.recommendedStatus);
             } else {
                 showError('Hata', data.error || 'Test yapılamadı.');
             }
-        } catch (err) {
+        } catch {
             showError('Hata', 'Test sırasında bir iletişim hatası oluştu.');
         } finally {
             setIsTesting(false);
@@ -113,18 +139,12 @@ export default function BankOnboardingHub() {
     const handleSaveCredentials = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedBank) return;
-
         setIsSaving(true);
         try {
             const res = await apiFetch('/api/fintech/banking/credentials', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    bankId: selectedBankId,
-                    integrationMethod: selectedBank.integrationMethod,
-                    credentials,
-                    status: currentStepStatus
-                })
+                body: JSON.stringify({ bankId: selectedBankId, integrationMethod: selectedBank.integrationMethod, credentials, status: currentStepStatus })
             });
             const data = await res.json();
             if (data.success) {
@@ -132,196 +152,270 @@ export default function BankOnboardingHub() {
             } else {
                 showError('Hata', data.error || 'Kaydedilemedi');
             }
-        } catch (err) {
+        } catch {
             showError('Hata', 'Sunucu bağlantı hatası.');
         } finally {
             setIsSaving(false);
         }
     };
 
+    const bankList = Object.values(BANK_FORM_DEFINITIONS);
+
     return (
-        <div className="space-y-6">
-            <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-l-4 border-l-blue-500">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h3 className="text-xl font-black text-white">🏦 Banka Entegrasyon Merkezi</h3>
-                        <p className="text-xs text-white/40 font-bold mt-1 uppercase tracking-tighter">BizimHesap Tarzı Entegrasyon (XML / MT940 / SFTP)</p>
-                    </div>
-                    <div className="flex bg-white/5 p-1 rounded-xl">
-                        <button
-                            onClick={() => setActiveSubTab('apply')}
-                            className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeSubTab === 'apply' ? 'bg-primary text-white shadow-sm' : 'text-white/40 hover:text-white'}`}
-                        >
-                            1. FORM ÜRET & BAŞVUR
-                        </button>
-                        <button
-                            onClick={() => setActiveSubTab('connect')}
-                            className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeSubTab === 'connect' ? 'bg-primary text-white shadow-sm' : 'text-white/40 hover:text-white'}`}
-                        >
-                            2. BAĞLANTIYI TANIMLA
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Banka Seçimi */}
-                <div className="md:col-span-1 space-y-4">
-                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-4">
-                        <label className="text-[10px] font-black text-white/40 uppercase mb-2 block">Banka Seçiniz</label>
-                        <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-                            {Object.values(BANK_FORM_DEFINITIONS).map(bank => (
-                                <button
-                                    key={bank.id}
-                                    onClick={() => setSelectedBankId(bank.id)}
-                                    className={`w-full p-3 rounded-xl border transition-all flex items-center justify-between group ${selectedBankId === bank.id ? 'bg-primary/20 border-primary shadow-sm shadow-primary/10' : 'bg-white/5 border-white/5 hover:border-white/20'}`}
-                                >
-                                    <span className={`font-bold text-sm ${selectedBankId === bank.id ? 'text-white' : 'text-white/60 group-hover:text-white'}`}>{bank.displayName}</span>
-                                    {selectedBankId === bank.id && <span className="text-primary">✓</span>}
-                                </button>
-                            ))}
+        <div className="space-y-5">
+            {/* Page Header */}
+            <EnterpriseCard>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5 pb-5 border-b border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 flex items-center justify-center text-2xl shrink-0">🏦</div>
+                        <div>
+                            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Banka Entegrasyon Merkezi</h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">XML / MT940 / SFTP protokolleriyle banka bağlantısı kurun</p>
                         </div>
                     </div>
+                    {selectedBank && <ConnectionStatusBadge status={currentStepStatus} />}
                 </div>
 
-                {/* İşlem Alanı */}
-                <div className="md:col-span-2">
+                {/* Step Indicator */}
+                <div className="flex items-center gap-1">
+                    <StepIndicator
+                        step={1}
+                        label="Banka Seç"
+                        active={true}
+                        done={!!selectedBankId}
+                    />
+                    <StepConnector done={!!selectedBankId} />
+                    <StepIndicator
+                        step={2}
+                        label="Başvuru Yap"
+                        active={!!selectedBankId}
+                        done={currentStepStatus === 'PENDING_ACTIVATION' || currentStepStatus === 'ACTIVE'}
+                    />
+                    <StepConnector done={currentStepStatus === 'PENDING_ACTIVATION' || currentStepStatus === 'ACTIVE'} />
+                    <StepIndicator
+                        step={3}
+                        label="Bağlantı Tanımla"
+                        active={currentStepStatus === 'PENDING_ACTIVATION' || currentStepStatus === 'ACTIVE'}
+                        done={currentStepStatus === 'ACTIVE'}
+                    />
+                    <StepConnector done={currentStepStatus === 'ACTIVE'} />
+                    <StepIndicator
+                        step={4}
+                        label="Aktif"
+                        active={currentStepStatus === 'ACTIVE'}
+                        done={currentStepStatus === 'ACTIVE'}
+                    />
+                </div>
+            </EnterpriseCard>
+
+            {/* Main Content */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
+                {/* Bank List */}
+                <EnterpriseCard className="lg:col-span-1 !p-0">
+                    <div className="p-4 border-b border-slate-200 dark:border-slate-800">
+                        <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Banka Seçin</h3>
+                    </div>
+                    <div className="p-2 max-h-[480px] overflow-y-auto">
+                        {bankList.map(bank => (
+                            <button
+                                key={bank.id}
+                                onClick={() => {
+                                    setSelectedBankId(bank.id);
+                                    setCredentials({});
+                                    setTestResults(null);
+                                    setCurrentStepStatus('DRAFT');
+                                }}
+                                className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-between group mb-1 ${selectedBankId === bank.id
+                                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                    }`}
+                            >
+                                <span>{bank.displayName}</span>
+                                {selectedBankId === bank.id && <span className="text-xs">✓</span>}
+                            </button>
+                        ))}
+                    </div>
+                </EnterpriseCard>
+
+                {/* Action Area */}
+                <div className="lg:col-span-3">
                     {!selectedBank ? (
-                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm h-full flex flex-col items-center justify-center p-12 text-center opacity-40">
-                            <div className="text-6xl mb-4">🏦</div>
-                            <h4 className="text-lg font-bold text-white">İşlem Yapmak İçin Banka Seçin</h4>
-                            <p className="text-sm max-w-xs">Sol taraftaki listeden entegre etmek istediğiniz bankayı seçerek devam edebilirsiniz.</p>
-                        </div>
+                        <EnterpriseCard className="h-full flex flex-col items-center justify-center py-20 text-center">
+                            <div className="text-5xl mb-4 opacity-20">🏦</div>
+                            <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Banka Seçin</h4>
+                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-xs">
+                                Sol listeden entegre etmek istediğiniz bankayı seçerek devam edebilirsiniz.
+                            </p>
+                        </EnterpriseCard>
                     ) : (
-                        <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                            {activeSubTab === 'apply' ? (
-                                <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
-                                    <div className="flex items-center gap-4 border-b border-white/5 pb-4">
-                                        <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-2xl">📄</div>
+                        <div className="space-y-4 animate-in fade-in slide-in-from-right-3 duration-300">
+                            {/* Sub-tab Switcher */}
+                            <div className="flex gap-2 p-1.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 w-fit">
+                                {[
+                                    { id: 'apply' as const, label: '📄 Başvuru & Doküman', step: '1' },
+                                    { id: 'connect' as const, label: '🔑 Bağlantı Tanımla', step: '2' },
+                                ].map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveSubTab(tab.id)}
+                                        className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${activeSubTab === tab.id
+                                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                                            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                            }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Apply Tab */}
+                            {activeSubTab === 'apply' && (
+                                <EnterpriseCard>
+                                    <div className="flex items-center gap-3.5 pb-5 mb-5 border-b border-slate-200 dark:border-slate-800">
+                                        <div className="w-11 h-11 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shrink-0">📄</div>
                                         <div>
-                                            <h4 className="font-black text-white">{selectedBank.displayName} Başvuru Süreci</h4>
-                                            <p className="text-xs text-white/40">Gerekli dokümanları hazırlayın ve şubenize iletin.</p>
+                                            <h4 className="font-semibold text-slate-900 dark:text-white">{selectedBank.displayName} — Başvuru Süreci</h4>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gerekli dokümanları hazırlayın ve şubenize iletin.</p>
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div className="p-4 bg-white/5 rounded-xl border border-white/5">
-                                            <span className="text-[10px] font-black text-primary uppercase">Entegrasyon Yöntemi</span>
-                                            <div className="font-bold text-white mt-1">{selectedBank.integrationMethod}</div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl">
+                                            <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Entegrasyon Yöntemi</div>
+                                            <div className="font-semibold text-slate-900 dark:text-white text-sm">{selectedBank.integrationMethod}</div>
                                         </div>
-                                        <div className="p-4 bg-white/5 rounded-xl border border-white/5">
-                                            <span className="text-[10px] font-black text-amber-500 uppercase">IP Whitelist Gerekli</span>
-                                            <div className="font-bold text-white mt-1">{selectedBank.requiredNetwork === 'STATIC_IP' ? 'EVET' : 'HAYIR'}</div>
+                                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl">
+                                            <div className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1">IP Whitelist</div>
+                                            <div className="font-semibold text-slate-900 dark:text-white text-sm">
+                                                {selectedBank.requiredNetwork === 'STATIC_IP' ? '✅ Gerekli' : '❌ Gerekli Değil'}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-4">
-                                        <h5 className="text-xs font-black text-white/40 uppercase">Gerekli Belgeler</h5>
-                                        <div className="flex flex-wrap gap-2">
-                                            {selectedBank.requiredDocs.map(doc => (
-                                                <span key={doc} className="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-bold text-white/60 border border-white/5">
-                                                    {doc.replace(/_/g, ' ')}
-                                                </span>
+                                    <div className="space-y-4 mb-5">
+                                        <div>
+                                            <h5 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Gerekli Belgeler</h5>
+                                            <div className="flex flex-wrap gap-2">
+                                                {selectedBank.requiredDocs.map(doc => (
+                                                    <span key={doc} className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-400">
+                                                        {doc.replace(/_/g, ' ')}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded-xl">
+                                            <h5 className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-2">Banka IT Notu</h5>
+                                            <ul className="space-y-1">
+                                                {selectedBank.technicalAppendix.protocolNotes.map((note, i) => (
+                                                    <li key={i} className="text-xs text-blue-600 dark:text-blue-300/70 flex items-start gap-2">
+                                                        <span className="shrink-0 mt-0.5">•</span>
+                                                        <span>{note}</span>
+                                                    </li>
+                                                ))}
+                                                <li className="text-xs text-blue-600 dark:text-blue-300/70 flex items-start gap-2">
+                                                    <span className="shrink-0 mt-0.5">•</span>
+                                                    <span>Erişim IP Listesi: {selectedBank.technicalAppendix.ipWhitelist.join(', ')}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <EnterpriseButton variant="primary" onClick={handleDownloadForm} className="w-full h-11">
+                                        📥 Başvuru Paketini İndir (PDF)
+                                    </EnterpriseButton>
+                                </EnterpriseCard>
+                            )}
+
+                            {/* Connect Tab */}
+                            {activeSubTab === 'connect' && (
+                                <form onSubmit={handleSaveCredentials} className="space-y-4">
+                                    <EnterpriseCard>
+                                        <div className="flex items-center gap-3.5 pb-5 mb-5 border-b border-slate-200 dark:border-slate-800">
+                                            <div className="w-11 h-11 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shrink-0">🔑</div>
+                                            <div>
+                                                <h4 className="font-semibold text-slate-900 dark:text-white">{selectedBank.displayName} — Bağlantı Tanımla</h4>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Bankadan gelen servis kullanıcı bilgilerini giriniz.</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {selectedBank.onboardingFields.map(field => (
+                                                <EnterpriseField
+                                                    key={field.key}
+                                                    label={`${field.label}${selectedBank.requiredCredentials.includes(field.key) ? ' *' : ''}`}
+                                                    hint={field.helperText}
+                                                >
+                                                    {field.type === 'select' ? (
+                                                        <select
+                                                            required={selectedBank.requiredCredentials.includes(field.key)}
+                                                            className="w-full h-10 px-3.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-slate-400/20 focus:border-slate-400 dark:focus:border-slate-600 transition-all outline-none"
+                                                            value={credentials[field.key] || field.default || ''}
+                                                            onChange={e => {
+                                                                setCredentials({ ...credentials, [field.key]: e.target.value });
+                                                                setTestResults(null);
+                                                            }}
+                                                        >
+                                                            <option value="">Seçiniz</option>
+                                                            {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                        </select>
+                                                    ) : (
+                                                        <input
+                                                            type={field.type}
+                                                            required={selectedBank.requiredCredentials.includes(field.key)}
+                                                            placeholder={field.placeholder}
+                                                            className="w-full h-10 px-3.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-slate-400/20 focus:border-slate-400 dark:focus:border-slate-600 transition-all outline-none font-mono placeholder:font-sans placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                                            value={credentials[field.key] || ''}
+                                                            onChange={e => {
+                                                                setCredentials({ ...credentials, [field.key]: e.target.value });
+                                                                setTestResults(null);
+                                                            }}
+                                                        />
+                                                    )}
+                                                </EnterpriseField>
                                             ))}
                                         </div>
-                                    </div>
+                                    </EnterpriseCard>
 
-                                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl space-y-2">
-                                        <h5 className="text-xs font-black text-blue-400 uppercase">Banka IT Notu</h5>
-                                        <ul className="text-xs text-blue-200/60 list-disc list-inside space-y-1">
-                                            {selectedBank.technicalAppendix.protocolNotes.map((note, i) => <li key={i}>{note}</li>)}
-                                            <li>Erişim IP Listesi: {selectedBank.technicalAppendix.ipWhitelist.join(', ')}</li>
-                                        </ul>
-                                    </div>
-
-                                    <button
-                                        onClick={handleDownloadForm}
-                                        className="w-full h-14 bg-primary hover:bg-primary/80 text-white rounded-xl font-black text-sm tracking-widest shadow-sm shadow-primary/20 transition-all flex items-center justify-center gap-3"
-                                    >
-                                        📥 BAŞVURU PAKETİNİ İNDİR (PDF)
-                                    </button>
-                                </div>
-                            ) : (
-                                <form onSubmit={handleSaveCredentials} className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
-                                    <div className="flex items-center gap-4 border-b border-white/5 pb-4">
-                                        <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-2xl">🔑</div>
-                                        <div>
-                                            <h4 className="font-black text-white">{selectedBank.displayName} Bağlantı Tanımla</h4>
-                                            <p className="text-xs text-white/40">Bankadan gelen servis kullanıcı bilgilerini giriniz.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {selectedBank.onboardingFields.map(field => (
-                                            <div key={field.key} className="space-y-2">
-                                                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">
-                                                    {field.label} {selectedBank.requiredCredentials.includes(field.key) && <span className="text-rose-500">*</span>}
-                                                </label>
-                                                {field.type === 'select' ? (
-                                                    <select
-                                                        required={selectedBank.requiredCredentials.includes(field.key)}
-                                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none"
-                                                        value={credentials[field.key] || field.default || ''}
-                                                        onChange={e => {
-                                                            setCredentials({ ...credentials, [field.key]: e.target.value });
-                                                            setTestResults(null);
-                                                        }}
-                                                    >
-                                                        <option value="">Seçiniz</option>
-                                                        {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                                    </select>
-                                                ) : (
-                                                    <input
-                                                        type={field.type}
-                                                        required={selectedBank.requiredCredentials.includes(field.key)}
-                                                        placeholder={field.placeholder}
-                                                        className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:border-primary/50 outline-none font-mono"
-                                                        value={credentials[field.key] || ''}
-                                                        onChange={e => {
-                                                            setCredentials({ ...credentials, [field.key]: e.target.value });
-                                                            setTestResults(null);
-                                                        }}
-                                                    />
-                                                )}
-                                                {field.helperText && <p className="text-[10px] text-white/40 italic pl-1">{field.helperText}</p>}
-                                            </div>
-                                        ))}
-                                    </div>
-
+                                    {/* Test Results */}
                                     {testResults && (
-                                        <div className="space-y-3">
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                <div className={`p-4 rounded-xl border flex items-center justify-between ${testResults.connectivity.status === 'PASS' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}>
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="text-lg">{testResults.connectivity.status === 'PASS' ? '✅' : '❌'}</span>
-                                                        <div>
-                                                            <p className="text-[10px] font-black text-white/40 uppercase">Erişim (Connectivity)</p>
-                                                            <p className={`text-xs font-bold ${testResults.connectivity.status === 'PASS' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                                                {testResults.connectivity.status === 'PASS' ? `Aktif (${testResults.connectivity.latencyMs}ms)` : 'Erişim Yok'}
-                                                            </p>
-                                                        </div>
+                                        <EnterpriseCard>
+                                            <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Test Sonuçları</h4>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                                                <div className={`p-4 rounded-xl border flex items-center gap-3 ${testResults.connectivity.status === 'PASS'
+                                                    ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30'
+                                                    : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30'
+                                                    }`}>
+                                                    <span className="text-xl">{testResults.connectivity.status === 'PASS' ? '✅' : '❌'}</span>
+                                                    <div>
+                                                        <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase">Erişim (Connectivity)</p>
+                                                        <p className={`text-sm font-medium ${testResults.connectivity.status === 'PASS' ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
+                                                            {testResults.connectivity.status === 'PASS' ? `Aktif (${testResults.connectivity.latencyMs}ms)` : 'Erişim Yok'}
+                                                        </p>
                                                     </div>
                                                 </div>
-                                                <div className={`p-4 rounded-xl border flex items-center justify-between ${testResults.permission.status === 'PASS' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}>
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="text-lg">{testResults.permission.status === 'PASS' ? '✅' : '❌'}</span>
-                                                        <div>
-                                                            <p className="text-[10px] font-black text-white/40 uppercase">Yetki (Permission)</p>
-                                                            <p className={`text-xs font-bold ${testResults.permission.status === 'PASS' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                                                {testResults.permission.status === 'PASS' ? 'Doğrulandı' : 'Hatalı'}
-                                                            </p>
-                                                        </div>
+
+                                                <div className={`p-4 rounded-xl border flex items-center gap-3 ${testResults.permission.status === 'PASS'
+                                                    ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30'
+                                                    : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30'
+                                                    }`}>
+                                                    <span className="text-xl">{testResults.permission.status === 'PASS' ? '✅' : '❌'}</span>
+                                                    <div>
+                                                        <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase">Yetki (Permission)</p>
+                                                        <p className={`text-sm font-medium ${testResults.permission.status === 'PASS' ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
+                                                            {testResults.permission.status === 'PASS' ? 'Doğrulandı' : 'Hatalı'}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {(testResults.connectivity.status === 'FAIL' || testResults.permission.status === 'FAIL') && (
-                                                <div className="p-4 bg-white/5 border-l-4 border-l-amber-500 rounded-xl space-y-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-amber-500">🛡️</span>
-                                                        <h5 className="text-xs font-black text-white uppercase">Ne yapmalıyım?</h5>
+                                                <div className="p-4 bg-amber-50 dark:bg-amber-500/10 border-l-4 border-l-amber-500 border border-amber-200 dark:border-amber-500/20 rounded-xl">
+                                                    <div className="flex items-center gap-2 mb-1.5">
+                                                        <span>🛡️</span>
+                                                        <h5 className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">Ne yapmalıyım?</h5>
                                                     </div>
-                                                    <p className="text-xs text-white/60 font-medium">
+                                                    <p className="text-xs text-amber-600 dark:text-amber-400/70">
                                                         {testResults.connectivity.errorCode === 'IP_NOT_WHITELISTED' && "Bankaya Periodya IP'lerini whitelist ettirmeniz gerekmektedir. Teknik dokümandaki IP listesini banka temsilcinize iletin."}
                                                         {testResults.permission.errorCode === 'AUTH_FAILED' && "Kullanıcı adı veya şifre banka sisteminde geçersiz. Lütfen bilgileri kontrol edip tekrar deneyin."}
                                                         {testResults.connectivity.errorCode === 'TIMEOUT' && "Banka servisi yanıt vermiyor. Lütfen kısa süre sonra tekrar deneyin veya banka servis durumunu kontrol edin."}
@@ -329,37 +423,48 @@ export default function BankOnboardingHub() {
                                                     </p>
                                                 </div>
                                             )}
-                                        </div>
+                                        </EnterpriseCard>
                                     )}
 
-                                    <div className="flex gap-4">
-                                        <button
-                                            type="button"
-                                            onClick={handleTestConnection}
-                                            disabled={isTesting || !isFormValid()}
-                                            className={`flex-1 h-14 rounded-xl font-black text-sm tracking-widest transition-all flex items-center justify-center gap-2 ${isTesting || !isFormValid() ? 'bg-white/5 text-white/20' : testResults?.permission.status === 'PASS' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-white/10 text-white hover:bg-white/20'}`}
-                                        >
-                                            {isTesting ? '🌐 PING...' : testResults?.permission.status === 'PASS' ? '✅ TEST BAŞARILI' : testResults?.permission.status === 'FAIL' ? '❌ TEST BAŞARISIZ' : '🧪 BAĞLANTIYI TEST ET'}
-                                        </button>
+                                    {/* Action Buttons */}
+                                    <EnterpriseCard>
+                                        <div className="flex flex-col sm:flex-row gap-3">
+                                            <EnterpriseButton
+                                                type="button"
+                                                variant="secondary"
+                                                onClick={handleTestConnection}
+                                                disabled={isTesting || !isFormValid()}
+                                                className={`flex-1 h-11 ${testResults?.permission.status === 'PASS' ? '!border-emerald-300 dark:!border-emerald-500/30 !text-emerald-600 dark:!text-emerald-400 !bg-emerald-50 dark:!bg-emerald-500/10' : ''}`}
+                                            >
+                                                {isTesting
+                                                    ? <><div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />Bağlantı Test Ediliyor...</>
+                                                    : testResults?.permission.status === 'PASS'
+                                                        ? '✅ Test Başarılı'
+                                                        : testResults?.permission.status === 'FAIL'
+                                                            ? '❌ Tekrar Test Et'
+                                                            : '🧪 Bağlantıyı Test Et'
+                                                }
+                                            </EnterpriseButton>
 
-                                        <button
-                                            type="submit"
-                                            disabled={isSaving || !isFormValid() || testResults?.permission.status !== 'PASS'}
-                                            className={`flex-1 h-14 rounded-xl font-black text-sm tracking-widest transition-all ${isSaving || !isFormValid() || testResults?.permission.status !== 'PASS' ? 'bg-white/5 text-white/20 cursor-not-allowed' : 'bg-primary text-white shadow-sm shadow-primary/20'}`}
-                                        >
-                                            {isSaving ? 'KAYDEDİLİYOR...' : '🚀 AKTİF ET & KAYDET'}
-                                        </button>
-                                    </div>
-
-                                    <div className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-2 h-2 rounded-full shadow-[0_0_8px] ${currentStepStatus === 'ACTIVE' ? 'bg-emerald-500 ' : currentStepStatus === 'PENDING_ACTIVATION' ? 'bg-amber-500 shadow-amber-500/60' : 'bg-blue-500 shadow-blue-500/60'}`}></div>
-                                            <span className="text-[10px] font-black text-white/60 uppercase">Mevcut Durum:</span>
+                                            <EnterpriseButton
+                                                type="submit"
+                                                variant="primary"
+                                                disabled={isSaving || !isFormValid() || testResults?.permission.status !== 'PASS'}
+                                                className="flex-1 h-11"
+                                            >
+                                                {isSaving
+                                                    ? <><div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />Kaydediliyor...</>
+                                                    : <>🚀 Aktif Et & Kaydet</>
+                                                }
+                                            </EnterpriseButton>
                                         </div>
-                                        <span className={`px-2 py-1 rounded text-[10px] font-black ${currentStepStatus === 'ACTIVE' ? 'bg-emerald-500/20 text-emerald-400' : currentStepStatus === 'PENDING_ACTIVATION' ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-500/20 text-slate-400'}`}>
-                                            {currentStepStatus.replace(/_/g, ' ')}
-                                        </span>
-                                    </div>
+
+                                        {/* Status Row */}
+                                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Bağlantı Durumu</span>
+                                            <ConnectionStatusBadge status={currentStepStatus} />
+                                        </div>
+                                    </EnterpriseCard>
                                 </form>
                             )}
                         </div>
