@@ -23,7 +23,7 @@ export default function RefundsPage() {
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
     const queryUrl = useMemo(() => {
-        const u = new URL("/api/staff/refunds", "http://localhost");
+        const u = new URL("/api/admin/refunds", "http://localhost");
         if (status) u.searchParams.set("status", status);
         if (q.trim()) u.searchParams.set("q", q.trim());
         u.searchParams.set("take", "25");
@@ -147,7 +147,7 @@ function RefundDetail({ id }: { id: string | null }) {
         }
         (async () => {
             setLoading(true);
-            const res = await fetch(`/api/staff/refunds/${encodeURIComponent(id)}`, { cache: "no-store" });
+            const res = await fetch(`/api/admin/refunds/${encodeURIComponent(id)}`, { cache: "no-store" });
             const json = await res.json().catch(() => null);
             setLoading(false);
             if (res.ok && json?.ok) setData(json.refund);

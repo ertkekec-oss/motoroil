@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma"
 import { authorize, hasPermission } from "@/lib/auth"
 import { auditLog } from "@/lib/audit/log"
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const auth = await authorize()
         if (!auth.authorized || !auth.user) {

@@ -9,12 +9,12 @@ export function PendingDealerOrdersCard() {
 
     useEffect(() => {
         ; (async () => {
-            const res = await fetch("/api/staff/dealer-orders/count?status=PENDING_APPROVAL", { cache: "no-store" })
+            const res = await fetch("/api/admin/dealer-orders/count?status=PENDING_APPROVAL", { cache: "no-store" })
             const data = await res.json().catch(() => null)
             if (res.ok && data?.ok) setCount(Number(data.count ?? 0))
             else setCount(null)
 
-            const resPaid = await fetch("/api/staff/dealer-orders/count?status=PAID_PENDING_APPROVAL", { cache: "no-store" })
+            const resPaid = await fetch("/api/admin/dealer-orders/count?status=PAID_PENDING_APPROVAL", { cache: "no-store" })
             const dataPaid = await resPaid.json().catch(() => null)
             if (resPaid.ok && dataPaid?.ok) setPaidCount(Number(dataPaid.count ?? 0))
             else setPaidCount(null)
@@ -45,7 +45,7 @@ export function PendingDealerOrdersCard() {
 
             <div className="mt-4">
                 <Link
-                    href="/staff/dealer-orders"
+                    href="/admin/dealer-orders"
                     className="h-10 px-4 inline-flex items-center rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-95"
                 >
                     Kuyruğa Git

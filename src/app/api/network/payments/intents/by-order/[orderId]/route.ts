@@ -4,11 +4,11 @@ import { requireDealerContext } from "@/lib/network/context";
 
 export async function GET(
     req: Request,
-    { params }: { params: { orderId: string } }
+    { params }: { params: Promise<{ orderId: string }> }
 ) {
     try {
         const ctx = await requireDealerContext();
-        const orderId = params.orderId;
+        const { orderId } = await params;
 
         const intent = await prisma.dealerPaymentIntent.findFirst({
             where: {

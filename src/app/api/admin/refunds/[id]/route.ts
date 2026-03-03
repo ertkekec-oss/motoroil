@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { authorize, hasPermission } from "@/lib/auth";
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
     const auth = await authorize();
     if (!auth.authorized || !auth.user) {
         return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
@@ -11,7 +11,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
         return NextResponse.json({ ok: false, error: "FORBIDDEN" }, { status: 403 });
     }
     const staff = auth.user;
-    const id = params.id;
+    const { id } = await params;
 
     const r = await prisma.dealerRefund.findFirst({
         where: { id, supplierTenantId: staff.tenantId },

@@ -1,0 +1,56 @@
+﻿.next/types/validator.ts(1611,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/admin/dealer-orders/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/dealer-orders/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ ok: boolean; error: string; }> | NextResponse<{ ok: boolean; order: any; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(2331,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/admin/refunds/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/refunds/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(_req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ ok: boolean; error: string; }> | NextResponse<{ ok: boolean; refund: any; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(3744,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/network/cart/items/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/network/cart/items/[id]">'.
+  Types of property 'DELETE' are incompatible.
+    Type '(req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ ok: boolean; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(3915,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/network/orders/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/network/orders/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ ok: boolean; order: any; }> | NextResponse<{ ok: boolean; error: any; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(3969,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/network/payments/intents/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/network/payments/intents/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(_req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ ok: boolean; error: string; }> | NextResponse<{ ok: boolean; intent: any; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(3978,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/network/payments/intents/by-order/[orderId]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/network/payments/intents/by-order/[orderId]">'.
+  Types of property 'GET' are incompatible.
+    Type '(req: Request, { params }: { params: { orderId: string; }; }) => Promise<NextResponse<{ ok: boolean; error: string; }> | NextResponse<{ ok: boolean; intent: any; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ orderId: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ orderId: string; }>; }' is not assignable to type '{ params: { orderId: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'orderId' is missing in type 'Promise<{ orderId: string; }>' but required in type '{ orderId: string; }'.
+.next/types/validator.ts(4599,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/staff/dealer-orders/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/staff/dealer-orders/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ ok: boolean; error: string; }> | NextResponse<{ ok: boolean; order: any; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(4689,31): error TS2344: Type 'typeof import("C:/Users/ertke/OneDrive/Masa\u00FCst\u00FC/periodya/muhasebeapp/motoroil/src/app/api/staff/refunds/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/staff/refunds/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(_req: Request, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ ok: boolean; error: string; }> | NextResponse<{ ok: boolean; refund: any; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.

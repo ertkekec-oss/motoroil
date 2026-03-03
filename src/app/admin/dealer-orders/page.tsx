@@ -27,7 +27,7 @@ export default function StaffDealerOrdersPage() {
     async function load() {
         setLoading(true)
         setErr(null)
-        const res = await fetch("/api/staff/dealer-orders?status=PENDING_APPROVAL,PAID_PENDING_APPROVAL", { cache: "no-store" })
+        const res = await fetch("/api/admin/dealer-orders?status=PENDING_APPROVAL,PAID_PENDING_APPROVAL", { cache: "no-store" })
         const data = await res.json().catch(() => null)
         if (!res.ok || !data?.ok) {
             setErr("Onay kuyruğu yüklenemedi.")
@@ -42,7 +42,7 @@ export default function StaffDealerOrdersPage() {
         setSelected(o)
         setDetail(null)
         setRejectReason("")
-        const res = await fetch(`/api/staff/dealer-orders/${encodeURIComponent(o.id)}`, { cache: "no-store" })
+        const res = await fetch(`/api/admin/dealer-orders/${encodeURIComponent(o.id)}`, { cache: "no-store" })
         const data = await res.json().catch(() => null)
         if (!res.ok || !data?.ok) {
             setErr("Sipariş detayı alınamadı.")
@@ -53,7 +53,7 @@ export default function StaffDealerOrdersPage() {
 
     async function approve(id: string) {
         setBusy(true); setErr(null)
-        const res = await fetch(`/api/staff/dealer-orders/${encodeURIComponent(id)}/approve`, {
+        const res = await fetch(`/api/admin/dealer-orders/${encodeURIComponent(id)}/approve`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             cache: "no-store",
@@ -76,7 +76,7 @@ export default function StaffDealerOrdersPage() {
             return
         }
         setBusy(true); setErr(null)
-        const res = await fetch(`/api/staff/dealer-orders/${encodeURIComponent(id)}/reject`, {
+        const res = await fetch(`/api/admin/dealer-orders/${encodeURIComponent(id)}/reject`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             cache: "no-store",
@@ -95,7 +95,7 @@ export default function StaffDealerOrdersPage() {
 
     async function doRefund(id: string, amount: string) {
         setBusy(true); setErr(null)
-        const res = await fetch(`/api/staff/dealer-orders/${encodeURIComponent(id)}/refund`, {
+        const res = await fetch(`/api/admin/dealer-orders/${encodeURIComponent(id)}/refund`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             cache: "no-store",
@@ -138,7 +138,7 @@ export default function StaffDealerOrdersPage() {
                             Yenile
                         </button>
                         <Link
-                            href="/staff"
+                            href="/admin"
                             className="h-10 px-4 inline-flex items-center rounded-xl border bg-card text-sm font-medium hover:bg-muted/40"
                         >
                             Panel

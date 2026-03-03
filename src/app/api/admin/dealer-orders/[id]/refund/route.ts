@@ -17,7 +17,7 @@ function decStr(v: any, name: string) {
     return s;
 }
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const auth = await authorize();
     if (!auth.authorized || !auth.user) {
         return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
@@ -26,7 +26,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         return NextResponse.json({ ok: false, error: "FORBIDDEN" }, { status: 403 });
     }
     const staff = auth.user;
-    const orderId = params.id;
+    const { id: orderId } = await params;
 
     try {
         const body = await req.json();
