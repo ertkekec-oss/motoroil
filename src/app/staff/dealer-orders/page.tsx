@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
 
 export default function StaffDealerOrdersRedirect() {
-    redirect("/admin/dealer-orders")
+    redirect("/admin/b2b/dealer-orders")
 }
