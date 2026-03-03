@@ -22,7 +22,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     if (!auth.authorized || !auth.user) {
         return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
     }
-    if (!hasPermission(auth.user, "admin_manage")) {
+    if (!hasPermission(auth.user, "admin_manage") && !hasPermission(auth.user, "b2b_manage")) {
         return NextResponse.json({ ok: false, error: "FORBIDDEN" }, { status: 403 });
     }
     const staff = auth.user;

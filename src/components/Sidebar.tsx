@@ -9,7 +9,7 @@ import {
     Terminal, Globe, ShoppingCart, Package, Briefcase, TrendingUp, Handshake,
     UserCircle, Landmark, Receipt, Users, Truck, Activity, Box, Map, FileText,
     Wrench, BarChart2, Clock, Search, ShieldAlert, LifeBuoy, Settings, CreditCard,
-    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle
+    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -106,9 +106,9 @@ export default function Sidebar() {
         '/advisor': { perm: 'finance_view', feature: 'accountant' },
         '/admin/audit-logs': { perm: 'audit_view' },
         '/staff/pdks': { perm: 'staff_manage' },
-        '/admin/b2b/dealer-orders': { perm: 'admin_manage' },
-        '/admin/b2b/refunds': { perm: 'admin_manage' },
-        '/admin/b2b/settings': { perm: 'admin_manage' },
+        '/b2b/orders/approvals': { perm: 'b2b_manage' },
+        '/b2b/refunds': { perm: 'b2b_manage' },
+        '/b2b/settings': { perm: 'b2b_manage' },
         '/security/suspicious': { perm: 'security_access' },
         '/billing': { perm: 'settings_manage' },
         '/field-mobile/routes': { perm: 'field_sales_access' },
@@ -203,9 +203,10 @@ export default function Sidebar() {
         {
             group: "B2B Network",
             items: [
-                { name: 'Sipariş Onayı', href: '/admin/b2b/dealer-orders', icon: Inbox },
-                { name: 'İadeler', href: '/admin/b2b/refunds', icon: Receipt },
-                { name: 'Ayarlar', href: '/admin/b2b/settings', icon: Settings },
+                { name: 'Dashboard', href: '/b2b/dashboard', icon: LayoutDashboard },
+                { name: 'Sipariş Onayı', href: '/b2b/orders/approvals', icon: Inbox },
+                { name: 'İadeler', href: '/b2b/refunds', icon: Receipt },
+                { name: 'Ayarlar', href: '/b2b/settings', icon: Settings },
             ]
         },
         {

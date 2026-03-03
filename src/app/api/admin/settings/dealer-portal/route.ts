@@ -8,7 +8,7 @@ export async function GET(req: Request) {
     if (!auth.authorized || !auth.user) {
         return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 })
     }
-    if (!hasPermission(auth.user, "admin_manage")) {
+    if (!hasPermission(auth.user, "admin_manage") && !hasPermission(auth.user, "tenant_manage_security") && !hasPermission(auth.user, "b2b_manage")) {
         return NextResponse.json({ ok: false, error: "FORBIDDEN" }, { status: 403 })
     }
 
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     if (!auth.authorized || !auth.user) {
         return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 })
     }
-    if (!hasPermission(auth.user, "admin_manage")) {
+    if (!hasPermission(auth.user, "admin_manage") && !hasPermission(auth.user, "tenant_manage_security") && !hasPermission(auth.user, "b2b_manage")) {
         return NextResponse.json({ ok: false, error: "FORBIDDEN" }, { status: 403 })
     }
 

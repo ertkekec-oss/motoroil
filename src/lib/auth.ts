@@ -147,7 +147,7 @@ export function hasPermission(session: any, permission: string): boolean {
 
     // Super admins have all permissions
     const role = user.role?.toUpperCase() || '';
-    if (role === 'SUPER_ADMIN' || role.includes('ADMIN')) return true;
+    if (role === 'SUPER_ADMIN' || role.includes('ADMIN') || role.includes('OWNER')) return true;
 
     // Check permissions array
     const permissions = user.permissions || [];
@@ -219,7 +219,7 @@ export async function resolveCompanyId(user: any): Promise<string | undefined> {
 export async function requirePlatformFinanceAdmin() {
     const session = await getSession();
     if (!session) throw new Error('Unauthorized - User not logged in');
-    
+
     // For test context & dummy platform admin check
     const role = session.role?.toUpperCase() || '';
     if (role !== 'PLATFORM_ADMIN' && role !== 'SUPER_ADMIN') {

@@ -11,7 +11,7 @@ export async function GET(req: Request) {
         { status: 401 },
       );
     }
-    if (!hasPermission(auth.user, "admin_manage")) {
+    if (!hasPermission(auth.user, "admin_manage") && !hasPermission(auth.user, "b2b_manage")) {
       return NextResponse.json(
         { ok: false, error: "FORBIDDEN" },
         { status: 403 },
@@ -41,3 +41,4 @@ export async function GET(req: Request) {
     );
   }
 }
+

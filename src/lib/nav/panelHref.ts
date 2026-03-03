@@ -1,6 +1,5 @@
-export function getPanelHref(pathname: string): string {
-    if (pathname.startsWith("/admin")) return "/admin";
-    if (pathname.startsWith("/staff")) return "/staff";
-    if (pathname.startsWith("/b2b")) return "/b2b/dashboard";
-    return "/";
+export function getPanelHref(role?: string | null, isDealer?: boolean): string {
+    if (role === 'SUPER_ADMIN' || role === 'PLATFORM_ADMIN') return '/admin/dashboard';
+    if (isDealer) return '/network';
+    return '/dashboard';
 }

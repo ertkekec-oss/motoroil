@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function RedirectPage() {
-    redirect('/admin/b2b/dealer-orders');
+    redirect('/b2b/orders/approvals');
 }

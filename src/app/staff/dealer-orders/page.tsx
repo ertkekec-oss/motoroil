@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation"
+import { redirect } from 'next/navigation';
 
-export default function StaffDealerOrdersRedirect() {
-    redirect("/admin/b2b/dealer-orders")
+export default function RedirectPage() {
+    redirect('/b2b/orders/approvals');
 }
