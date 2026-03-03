@@ -15,7 +15,8 @@
     "worker": "tsx src/services/marketplaces/actions/worker.ts",
     "replay-actions": "tsx scripts/replay-market-actions.ts",
     "test:safety": "tsx scripts/safety-tests.ts",
-    "test:shipping": "vitest run tests/shipping"
+    "test:shipping": "vitest run tests/shipping",
+    "test:links": "node scripts/check-admin-links.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
