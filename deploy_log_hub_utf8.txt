@@ -1,0 +1,1069 @@
+﻿node.exe : Vercel CLI 50.22.0
+At C:\Users\ertke\AppData\Roa
+ming\npm\vercel.ps1:24 char:5
++     & "node$exe"  "$basedir
+/node_modules/vercel/dist/vc.
+js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Vercel   
+  CLI 50.22.0:String) [],    
+ RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Retrieving projectÔÇĞ
+Deploying motoroils-projects/
+motoroil
+Uploading [------------------
+--] (0.0B/436.7KB)
+Uploading [=====-------------
+--] (113.2KB/436.7KB)
+Uploading [==========--------
+--] (222.3KB/436.7KB)
+Uploading [===============---
+--] (331.9KB/436.7KB)
+Uploading [==================
+==] (436.7KB/436.7KB)
+Inspect: https://vercel.com/m
+otoroils-projects/motoroil/G6
+EcbEXYbzcWa5pPiwUWhGa8Pppq [1
+1s]
+Production: https://motoroil-
+lznomoof2-motoroils-projects.
+vercel.app [11s]
+Building...
+Building...
+Building: Running build in Wa
+shington, D.C., USA (East) ÔÇ
+ô iad1
+Building: Build machine confi
+guration: 4 cores, 8 GB
+Building: Retrieving list of 
+deployment files...
+Building: Downloading 1762 de
+ployment files...
+Building: Restored build cach
+e from previous deployment (G
+QMYzPcd1HnVbgrreStowJzb3qeC)
+Building: Running "vercel bui
+ld"
+Building: Installing dependen
+cies...
+Building: > periodya@0.1.0 po
+stinstall
+Building: > prisma generate
+Building: Environment variabl
+es loaded from .env
+Building: Prisma schema loade
+d from prisma/schema.prisma
+Building: Ô£ö Generated Prism
+a Client (v5.22.0) to ./node_
+modules/@prisma/client in 2.4
+8s
+Building: Start by importing 
+your Prisma Client (See: http
+s://pris.ly/d/importing-clien
+t)
+Building: Tip: Curious about 
+the SQL queries Prisma ORM ge
+nerates? Optimize helps you e
+nhance your visibility: https
+://pris.ly/tip-2-optimize
+Building: up to date in 6s
+Building: 183 packages are lo
+oking for funding
+Building: run `npm fund` for 
+details
+Building: Detected Next.js ve
+rsion: 16.1.4
+Building: Running "npm run ve
+rcel-build"
+Building: > periodya@0.1.0 ve
+rcel-build
+Building: > prisma generate &
+& next build
+Building: Environment variabl
+es loaded from .env
+Building: Prisma schema loade
+d from prisma/schema.prisma
+Building: Ô£ö Generated Prism
+a Client (v5.22.0) to ./node_
+modules/@prisma/client in 1.9
+9s
+Building: Start by importing 
+your Prisma Client (See: http
+s://pris.ly/d/importing-clien
+t)
+Building: Tip: Need your data
+base queries to be 1000x fast
+er? Accelerate offers you tha
+t and more: https://pris.ly/t
+ip-2-accelerate
+Building: ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÉ
+Building: Ôöé  Update availab
+le 5.22.0 -> 7.4.2           
+            Ôöé
+Building: Ôöé                
+                             
+            Ôöé
+Building: Ôöé  This is a majo
+r update - please follow the 
+guide at    Ôöé
+Building: Ôöé  https://pris.l
+y/d/major-version-upgrade    
+            Ôöé
+Building: Ôöé                
+                             
+            Ôöé
+Building: Ôöé  Run the follow
+ing to update                
+            Ôöé
+Building: Ôöé    npm i --save
+-dev prisma@latest           
+            Ôöé
+Building: Ôöé    npm i @prism
+a/client@latest              
+            Ôöé
+Building: ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöİ
+Building: Ôû▓ Next.js 16.1.4 
+(Turbopack)
+Building: - Environments: .en
+v.production, .env
+Building: ÔÜá The "middleware
+" file convention is deprecat
+ed. Please use "proxy" instea
+d. Learn more: https://nextjs
+.org/docs/messages/middleware
+-to-proxy
+Building: Creating an optimiz
+ed production build ...
+Building: > Build error occur
+red
+Building: Error: Turbopack bu
+ild failed with 8 errors:
+Building: ./src/app/api/netwo
+rk/payments/intents/route.ts:
+4:1
+Building: Module not found: C
+an't resolve '@/lib/hub/payme
+nts/config'
+Building: 2 | import prisma f
+rom "@/lib/prisma"
+Building: 3 | import { requir
+eDealerContext } from "@/lib/
+network/context"
+Building: > 4 | import { getS
+upplierPaymentConfigOrThrow }
+ from "@/lib/hub/payments/con
+fig"
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 |
+Building: 6 | export async fu
+nction POST(req: Request) {
+Building: 7 |     try {
+Building: Import map: aliased
+ to relative './src/lib/hub/p
+ayments/config' inside of [pr
+oject]/
+Building: https://nextjs.org/
+docs/messages/module-not-foun
+d
+Building: ./src/app/api/deale
+r-network/orders/[id]/refund/
+route.ts:4:1
+Building: Module not found: C
+an't resolve '@/lib/hub/payme
+nts/getProvider'
+Building: 2 | import prisma f
+rom "@/lib/prisma";
+Building: 3 | import { author
+ize, hasPermission } from "@/
+lib/auth";
+Building: > 4 | import { getP
+aymentProviderAdapter } from 
+"@/lib/hub/payments/getProvid
+er";
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 | import { auditL
+og } from "@/lib/audit/log";
+Building: 6 | import { enqueu
+eAccountingEvent } from "@/li
+b/network/accounting/outbox";
+Building: 7 |
+Building: Import map: aliased
+ to relative './src/lib/hub/p
+ayments/getProvider' inside o
+f [project]/
+Building: https://nextjs.org/
+docs/messages/module-not-foun
+d
+Building: ./src/app/api/netwo
+rk/payments/callback/iyzico/r
+oute.ts:3:1
+Building: Module not found: C
+an't resolve '@/lib/hub/payme
+nts/getProvider'
+Building: 1 | import { NextRe
+sponse } from "next/server";
+Building: 2 | import prisma f
+rom "@/lib/prisma";
+Building: > 3 | import { getP
+aymentProviderAdapter } from 
+"@/lib/hub/payments/getProvid
+er";
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 4 | import { markOr
+derPaidIfEligible } from "@/l
+ib/hub/payments/orderStatus";
+Building: 5 | import { releas
+eReservationForOrder } from "
+@/lib/network/inventory/reser
+vation";
+Building: 6 | import { enqueu
+eAccountingEvent } from "@/li
+b/network/accounting/outbox";
+Building: Import map: aliased
+ to relative './src/lib/hub/p
+ayments/getProvider' inside o
+f [project]/
+Building: https://nextjs.org/
+docs/messages/module-not-foun
+d
+Building: ./src/app/api/netwo
+rk/payments/callback/odeal/ro
+ute.ts:3:1
+Building: Module not found: C
+an't resolve '@/lib/hub/payme
+nts/getProvider'
+Building: 1 | import { NextRe
+sponse } from "next/server";
+Building: 2 | import prisma f
+rom "@/lib/prisma";
+Building: > 3 | import { getP
+aymentProviderAdapter } from 
+"@/lib/hub/payments/getProvid
+er";
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 4 | import { markOr
+derPaidIfEligible } from "@/l
+ib/hub/payments/orderStatus";
+Building: 5 | import { releas
+eReservationForOrder } from "
+@/lib/network/inventory/reser
+vation";
+Building: 6 | import { enqueu
+eAccountingEvent } from "@/li
+b/network/accounting/outbox";
+Building: Import map: aliased
+ to relative './src/lib/hub/p
+ayments/getProvider' inside o
+f [project]/
+Building: https://nextjs.org/
+docs/messages/module-not-foun
+d
+Building: ./src/app/api/netwo
+rk/payments/intent/route.ts:4
+:1
+Building: Module not found: C
+an't resolve '@/lib/hub/payme
+nts/getProvider'
+Building: 2 | import prisma f
+rom "@/lib/prisma";
+Building: 3 | import { requir
+eDealerContext } from "@/lib/
+network/context";
+Building: > 4 | import { getP
+aymentProviderAdapter } from 
+"@/lib/hub/payments/getProvid
+er";
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 | import { Paymen
+tScope } from "@/lib/hub/paym
+ents/types";
+Building: 6 |
+Building: 7 | function assert
+String(x: any, name: string) 
+{
+Building: Import map: aliased
+ to relative './src/lib/hub/p
+ayments/getProvider' inside o
+f [project]/
+Building: https://nextjs.org/
+docs/messages/module-not-foun
+d
+Building: ./src/app/api/netwo
+rk/payments/callback/iyzico/r
+oute.ts:4:1
+Building: Module not found: C
+an't resolve '@/lib/hub/payme
+nts/orderStatus'
+Building: 2 | import prisma f
+rom "@/lib/prisma";
+Building: 3 | import { getPay
+mentProviderAdapter } from "@
+/lib/hub/payments/getProvider
+";
+Building: > 4 | import { mark
+OrderPaidIfEligible } from "@
+/lib/hub/payments/orderStatus
+";
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 | import { releas
+eReservationForOrder } from "
+@/lib/network/inventory/reser
+vation";
+Building: 6 | import { enqueu
+eAccountingEvent } from "@/li
+b/network/accounting/outbox";
+Building: 7 |
+Building: Import map: aliased
+ to relative './src/lib/hub/p
+ayments/orderStatus' inside o
+f [project]/
+Building: https://nextjs.org/
+docs/messages/module-not-foun
+d
+Building: ./src/app/api/netwo
+rk/payments/callback/odeal/ro
+ute.ts:4:1
+Building: Module not found: C
+an't resolve '@/lib/hub/payme
+nts/orderStatus'
+Building: 2 | import prisma f
+rom "@/lib/prisma";
+Building: 3 | import { getPay
+mentProviderAdapter } from "@
+/lib/hub/payments/getProvider
+";
+Building: > 4 | import { mark
+OrderPaidIfEligible } from "@
+/lib/hub/payments/orderStatus
+";
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 | import { releas
+eReservationForOrder } from "
+@/lib/network/inventory/reser
+vation";
+Building: 6 | import { enqueu
+eAccountingEvent } from "@/li
+b/network/accounting/outbox";
+Building: 7 |
+Building: Import map: aliased
+ to relative './src/lib/hub/p
+ayments/orderStatus' inside o
+f [project]/
+Building: https://nextjs.org/
+docs/messages/module-not-foun
+d
+Building: ./src/app/network/p
+ayment/result/page.tsx:6:1
+Building: Module not found: C
+an't resolve '@/lib/hub/payme
+nts/usePaymentIntentPoll'
+Building: 4 | import { Suspen
+se } from "react";
+Building: 5 | import Link fro
+m "next/link";
+Building: > 6 | import { useP
+aymentIntentPoll } from "@/li
+b/hub/payments/usePaymentInte
+ntPoll";
+Building: | ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^
+Building: 7 |
+Building: 8 | function Result
+Content() {
+Building: 9 |     const sp = 
+useSearchParams();
+Building: Import map: aliased
+ to relative './src/lib/hub/p
+ayments/usePaymentIntentPoll'
+ inside of [project]/
+Building: Import traces:
+Building: Client Component Br
+owser:
+Building: ./src/app/network/p
+ayment/result/page.tsx [Clien
+t Component Browser]
+Building: ./src/app/network/p
+ayment/result/page.tsx [Serve
+r Component]
+Building: Client Component SS
+R:
+Building: ./src/app/network/p
+ayment/result/page.tsx [Clien
+t Component SSR]
+Building: ./src/app/network/p
+ayment/result/page.tsx [Serve
+r Component]
+Building: https://nextjs.org/
+docs/messages/module-not-foun
+d
+Building: at <unknown> (./src
+/app/api/network/payments/int
+ents/route.ts:4:1)
+Building: at <unknown> (https
+://nextjs.org/docs/messages/m
+odule-not-found)
+Building: at <unknown> (./src
+/app/api/dealer-network/order
+s/[id]/refund/route.ts:4:1)
+Building: at <unknown> (https
+://nextjs.org/docs/messages/m
+odule-not-found)
+Building: at <unknown> (./src
+/app/api/network/payments/cal
+lback/iyzico/route.ts:3:1)
+Building: at <unknown> (https
+://nextjs.org/docs/messages/m
+odule-not-found)
+Building: at <unknown> (./src
+/app/api/network/payments/cal
+lback/odeal/route.ts:3:1)
+Building: at <unknown> (https
+://nextjs.org/docs/messages/m
+odule-not-found)
+Building: at <unknown> (./src
+/app/api/network/payments/int
+ent/route.ts:4:1)
+Building: at <unknown> (https
+://nextjs.org/docs/messages/m
+odule-not-found)
+Building: at <unknown> (./src
+/app/api/network/payments/cal
+lback/iyzico/route.ts:4:1)
+Building: at <unknown> (https
+://nextjs.org/docs/messages/m
+odule-not-found)
+Building: at <unknown> (./src
+/app/api/network/payments/cal
+lback/odeal/route.ts:4:1)
+Building: at <unknown> (https
+://nextjs.org/docs/messages/m
+odule-not-found)
+Building: at <unknown> (./src
+/app/network/payment/result/p
+age.tsx:6:1)
+Building: at <unknown> (https
+://nextjs.org/docs/messages/m
+odule-not-found)
+Building: Error: Command "npm
+ run vercel-build" exited wit
+h 1
+2026-03-03T23:31:48.622Z  Run
+ning build in Washington, D.C
+., USA (East) ÔÇô iad1
+2026-03-03T23:31:48.623Z  Bui
+ld machine configuration: 4 c
+ores, 8 GB
+2026-03-03T23:31:48.751Z  Ret
+rieving list of deployment fi
+les...
+2026-03-03T23:31:49.557Z  Dow
+nloading 1762 deployment file
+s...
+2026-03-03T23:31:56.040Z  Res
+tored build cache from previo
+us deployment (GQMYzPcd1HnVbg
+rreStowJzb3qeC)
+2026-03-03T23:31:56.356Z  Run
+ning "vercel build"
+2026-03-03T23:31:57.550Z  Ins
+talling dependencies...
+2026-03-03T23:31:59.207Z  
+2026-03-03T23:31:59.207Z  > p
+eriodya@0.1.0 postinstall
+2026-03-03T23:31:59.207Z  > p
+risma generate
+2026-03-03T23:31:59.207Z  
+2026-03-03T23:31:59.686Z  Env
+ironment variables loaded fro
+m .env
+2026-03-03T23:31:59.689Z  Pri
+sma schema loaded from prisma
+/schema.prisma
+2026-03-03T23:32:03.522Z  
+2026-03-03T23:32:03.522Z  Ô£ö
+ Generated Prisma Client (v5.
+22.0) to ./node_modules/@pris
+ma/client in 2.48s
+2026-03-03T23:32:03.522Z  
+2026-03-03T23:32:03.523Z  Sta
+rt by importing your Prisma C
+lient (See: https://pris.ly/d
+/importing-client)
+2026-03-03T23:32:03.523Z  
+2026-03-03T23:32:03.523Z  Tip
+: Curious about the SQL queri
+es Prisma ORM generates? Opti
+mize helps you enhance your v
+isibility: https://pris.ly/ti
+p-2-optimize
+2026-03-03T23:32:03.523Z  
+2026-03-03T23:32:03.725Z  
+2026-03-03T23:32:03.725Z  up 
+to date in 6s
+2026-03-03T23:32:03.726Z  
+2026-03-03T23:32:03.726Z  183
+ packages are looking for fun
+ding
+2026-03-03T23:32:03.726Z  run
+ `npm fund` for details
+2026-03-03T23:32:03.759Z  Det
+ected Next.js version: 16.1.4
+2026-03-03T23:32:03.766Z  Run
+ning "npm run vercel-build"
+2026-03-03T23:32:03.880Z  
+2026-03-03T23:32:03.880Z  > p
+eriodya@0.1.0 vercel-build
+2026-03-03T23:32:03.880Z  > p
+risma generate && next build
+2026-03-03T23:32:03.880Z  
+2026-03-03T23:32:04.236Z  Env
+ironment variables loaded fro
+m .env
+2026-03-03T23:32:04.238Z  Pri
+sma schema loaded from prisma
+/schema.prisma
+2026-03-03T23:32:07.394Z  
+2026-03-03T23:32:07.394Z  Ô£ö
+ Generated Prisma Client (v5.
+22.0) to ./node_modules/@pris
+ma/client in 1.99s
+2026-03-03T23:32:07.395Z  
+2026-03-03T23:32:07.395Z  Sta
+rt by importing your Prisma C
+lient (See: https://pris.ly/d
+/importing-client)
+2026-03-03T23:32:07.395Z  
+2026-03-03T23:32:07.395Z  Tip
+: Need your database queries 
+to be 1000x faster? Accelerat
+e offers you that and more: h
+ttps://pris.ly/tip-2-accelera
+te
+2026-03-03T23:32:07.395Z  
+2026-03-03T23:32:07.436Z  Ôöî
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+2026-03-03T23:32:07.436Z  Ôöé
+  Update available 5.22.0 -> 
+7.4.2                       Ô
+öé
+2026-03-03T23:32:07.436Z  Ôöé
+                             
+                            Ô
+öé
+2026-03-03T23:32:07.437Z  Ôöé
+  This is a major update - pl
+ease follow the guide at    Ô
+öé
+2026-03-03T23:32:07.437Z  Ôöé
+  https://pris.ly/d/major-ver
+sion-upgrade                Ô
+öé
+2026-03-03T23:32:07.437Z  Ôöé
+                             
+                            Ô
+öé
+2026-03-03T23:32:07.437Z  Ôöé
+  Run the following to update
+                            Ô
+öé
+2026-03-03T23:32:07.437Z  Ôöé
+    npm i --save-dev prisma@l
+atest                       Ô
+öé
+2026-03-03T23:32:07.437Z  Ôöé
+    npm i @prisma/client@late
+st                          Ô
+öé
+2026-03-03T23:32:07.437Z  Ôöö
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöİ
+2026-03-03T23:32:08.694Z  Ôû▓
+ Next.js 16.1.4 (Turbopack)
+2026-03-03T23:32:08.695Z  - E
+nvironments: .env.production,
+ .env
+2026-03-03T23:32:08.695Z  
+2026-03-03T23:32:08.703Z  ÔÜá
+ The "middleware" file conven
+tion is deprecated. Please us
+e "proxy" instead. Learn more
+: https://nextjs.org/docs/mes
+sages/middleware-to-proxy
+2026-03-03T23:32:08.839Z  Cre
+ating an optimized production
+ build ...
+2026-03-03T23:32:52.681Z  
+2026-03-03T23:32:52.681Z  > B
+uild error occurred
+2026-03-03T23:32:52.686Z  Err
+or: Turbopack build failed wi
+th 8 errors:
+2026-03-03T23:32:52.686Z  ./s
+rc/app/api/network/payments/i
+ntents/route.ts:4:1
+2026-03-03T23:32:52.686Z  Mod
+ule not found: Can't resolve 
+'@/lib/hub/payments/config'
+2026-03-03T23:32:52.686Z  2 |
+ import prisma from "@/lib/pr
+isma"
+2026-03-03T23:32:52.686Z  3 |
+ import { requireDealerContex
+t } from "@/lib/network/conte
+xt"
+2026-03-03T23:32:52.686Z  > 4
+ | import { getSupplierPaymen
+tConfigOrThrow } from "@/lib/
+hub/payments/config"
+2026-03-03T23:32:52.687Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+2026-03-03T23:32:52.687Z  5 |
+2026-03-03T23:32:52.687Z  6 |
+ export async function POST(r
+eq: Request) {
+2026-03-03T23:32:52.687Z  7 |
+     try {
+2026-03-03T23:32:52.687Z  
+2026-03-03T23:32:52.687Z  Imp
+ort map: aliased to relative 
+'./src/lib/hub/payments/confi
+g' inside of [project]/
+2026-03-03T23:32:52.687Z  
+2026-03-03T23:32:52.687Z  
+2026-03-03T23:32:52.688Z  htt
+ps://nextjs.org/docs/messages
+/module-not-found
+2026-03-03T23:32:52.688Z  
+2026-03-03T23:32:52.688Z  
+2026-03-03T23:32:52.688Z  ./s
+rc/app/api/dealer-network/ord
+ers/[id]/refund/route.ts:4:1
+2026-03-03T23:32:52.688Z  Mod
+ule not found: Can't resolve 
+'@/lib/hub/payments/getProvid
+er'
+2026-03-03T23:32:52.688Z  2 |
+ import prisma from "@/lib/pr
+isma";
+2026-03-03T23:32:52.688Z  3 |
+ import { authorize, hasPermi
+ssion } from "@/lib/auth";
+2026-03-03T23:32:52.688Z  > 4
+ | import { getPaymentProvide
+rAdapter } from "@/lib/hub/pa
+yments/getProvider";
+2026-03-03T23:32:52.688Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+2026-03-03T23:32:52.689Z  5 |
+ import { auditLog } from "@/
+lib/audit/log";
+2026-03-03T23:32:52.689Z  6 |
+ import { enqueueAccountingEv
+ent } from "@/lib/network/acc
+ounting/outbox";
+2026-03-03T23:32:52.689Z  7 |
+2026-03-03T23:32:52.689Z  
+2026-03-03T23:32:52.689Z  Imp
+ort map: aliased to relative 
+'./src/lib/hub/payments/getPr
+ovider' inside of [project]/
+2026-03-03T23:32:52.689Z  
+2026-03-03T23:32:52.689Z  
+2026-03-03T23:32:52.689Z  htt
+ps://nextjs.org/docs/messages
+/module-not-found
+2026-03-03T23:32:52.690Z  
+2026-03-03T23:32:52.690Z  
+2026-03-03T23:32:52.690Z  ./s
+rc/app/api/network/payments/c
+allback/iyzico/route.ts:3:1
+2026-03-03T23:32:52.690Z  Mod
+ule not found: Can't resolve 
+'@/lib/hub/payments/getProvid
+er'
+2026-03-03T23:32:52.690Z  1 |
+ import { NextResponse } from
+ "next/server";
+2026-03-03T23:32:52.690Z  2 |
+ import prisma from "@/lib/pr
+isma";
+2026-03-03T23:32:52.690Z  > 3
+ | import { getPaymentProvide
+rAdapter } from "@/lib/hub/pa
+yments/getProvider";
+2026-03-03T23:32:52.690Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+2026-03-03T23:32:52.690Z  4 |
+ import { markOrderPaidIfElig
+ible } from "@/lib/hub/paymen
+ts/orderStatus";
+2026-03-03T23:32:52.690Z  5 |
+ import { releaseReservationF
+orOrder } from "@/lib/network
+/inventory/reservation";
+2026-03-03T23:32:52.690Z  6 |
+ import { enqueueAccountingEv
+ent } from "@/lib/network/acc
+ounting/outbox";
+2026-03-03T23:32:52.690Z  
+2026-03-03T23:32:52.691Z  Imp
+ort map: aliased to relative 
+'./src/lib/hub/payments/getPr
+ovider' inside of [project]/
+2026-03-03T23:32:52.691Z  
+2026-03-03T23:32:52.691Z  
+2026-03-03T23:32:52.691Z  htt
+ps://nextjs.org/docs/messages
+/module-not-found
+2026-03-03T23:32:52.691Z  
+2026-03-03T23:32:52.691Z  
+2026-03-03T23:32:52.691Z  ./s
+rc/app/api/network/payments/c
+allback/odeal/route.ts:3:1
+2026-03-03T23:32:52.691Z  Mod
+ule not found: Can't resolve 
+'@/lib/hub/payments/getProvid
+er'
+2026-03-03T23:32:52.691Z  1 |
+ import { NextResponse } from
+ "next/server";
+2026-03-03T23:32:52.691Z  2 |
+ import prisma from "@/lib/pr
+isma";
+2026-03-03T23:32:52.691Z  > 3
+ | import { getPaymentProvide
+rAdapter } from "@/lib/hub/pa
+yments/getProvider";
+2026-03-03T23:32:52.691Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+2026-03-03T23:32:52.692Z  4 |
+ import { markOrderPaidIfElig
+ible } from "@/lib/hub/paymen
+ts/orderStatus";
+2026-03-03T23:32:52.692Z  5 |
+ import { releaseReservationF
+orOrder } from "@/lib/network
+/inventory/reservation";
+2026-03-03T23:32:52.692Z  6 |
+ import { enqueueAccountingEv
+ent } from "@/lib/network/acc
+ounting/outbox";
+2026-03-03T23:32:52.692Z  
+2026-03-03T23:32:52.692Z  Imp
+ort map: aliased to relative 
+'./src/lib/hub/payments/getPr
+ovider' inside of [project]/
+2026-03-03T23:32:52.692Z  
+2026-03-03T23:32:52.692Z  
+2026-03-03T23:32:52.692Z  htt
+ps://nextjs.org/docs/messages
+/module-not-found
+2026-03-03T23:32:52.692Z  
+2026-03-03T23:32:52.692Z  
+2026-03-03T23:32:52.692Z  ./s
+rc/app/api/network/payments/i
+ntent/route.ts:4:1
+2026-03-03T23:32:52.692Z  Mod
+ule not found: Can't resolve 
+'@/lib/hub/payments/getProvid
+er'
+2026-03-03T23:32:52.692Z  2 |
+ import prisma from "@/lib/pr
+isma";
+2026-03-03T23:32:52.692Z  3 |
+ import { requireDealerContex
+t } from "@/lib/network/conte
+xt";
+2026-03-03T23:32:52.692Z  > 4
+ | import { getPaymentProvide
+rAdapter } from "@/lib/hub/pa
+yments/getProvider";
+2026-03-03T23:32:52.692Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+2026-03-03T23:32:52.693Z  5 |
+ import { PaymentScope } from
+ "@/lib/hub/payments/types";
+2026-03-03T23:32:52.693Z  6 |
+2026-03-03T23:32:52.693Z  7 |
+ function assertString(x: any
+, name: string) {
+2026-03-03T23:32:52.693Z  
+2026-03-03T23:32:52.693Z  Imp
+ort map: aliased to relative 
+'./src/lib/hub/payments/getPr
+ovider' inside of [project]/
+2026-03-03T23:32:52.693Z  
+2026-03-03T23:32:52.693Z  
+2026-03-03T23:32:52.693Z  htt
+ps://nextjs.org/docs/messages
+/module-not-found
+2026-03-03T23:32:52.693Z  
+2026-03-03T23:32:52.693Z  
+2026-03-03T23:32:52.693Z  ./s
+rc/app/api/network/payments/c
+allback/iyzico/route.ts:4:1
+2026-03-03T23:32:52.693Z  Mod
+ule not found: Can't resolve 
+'@/lib/hub/payments/orderStat
+us'
+2026-03-03T23:32:52.693Z  2 |
+ import prisma from "@/lib/pr
+isma";
+2026-03-03T23:32:52.693Z  3 |
+ import { getPaymentProviderA
+dapter } from "@/lib/hub/paym
+ents/getProvider";
+2026-03-03T23:32:52.694Z  > 4
+ | import { markOrderPaidIfEl
+igible } from "@/lib/hub/paym
+ents/orderStatus";
+2026-03-03T23:32:52.694Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+2026-03-03T23:32:52.694Z  5 |
+ import { releaseReservationF
+orOrder } from "@/lib/network
+/inventory/reservation";
+2026-03-03T23:32:52.694Z  6 |
+ import { enqueueAccountingEv
+ent } from "@/lib/network/acc
+ounting/outbox";
+2026-03-03T23:32:52.694Z  7 |
+2026-03-03T23:32:52.694Z  
+2026-03-03T23:32:52.694Z  Imp
+ort map: aliased to relative 
+'./src/lib/hub/payments/order
+Status' inside of [project]/
+2026-03-03T23:32:52.694Z  
+2026-03-03T23:32:52.694Z  
+2026-03-03T23:32:52.694Z  htt
+ps://nextjs.org/docs/messages
+/module-not-found
+2026-03-03T23:32:52.694Z  
+2026-03-03T23:32:52.695Z  
+2026-03-03T23:32:52.695Z  ./s
+rc/app/api/network/payments/c
+allback/odeal/route.ts:4:1
+2026-03-03T23:32:52.696Z  Mod
+ule not found: Can't resolve 
+'@/lib/hub/payments/orderStat
+us'
+2026-03-03T23:32:52.696Z  2 |
+ import prisma from "@/lib/pr
+isma";
+2026-03-03T23:32:52.696Z  3 |
+ import { getPaymentProviderA
+dapter } from "@/lib/hub/paym
+ents/getProvider";
+2026-03-03T23:32:52.696Z  > 4
+ | import { markOrderPaidIfEl
+igible } from "@/lib/hub/paym
+ents/orderStatus";
+2026-03-03T23:32:52.696Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+2026-03-03T23:32:52.696Z  5 |
+ import { releaseReservationF
+orOrder } from "@/lib/network
+/inventory/reservation";
+2026-03-03T23:32:52.696Z  6 |
+ import { enqueueAccountingEv
+ent } from "@/lib/network/acc
+ounting/outbox";
+2026-03-03T23:32:52.696Z  7 |
+2026-03-03T23:32:52.696Z  
+2026-03-03T23:32:52.696Z  Imp
+ort map: aliased to relative 
+'./src/lib/hub/payments/order
+Status' inside of [project]/
+2026-03-03T23:32:52.696Z  
+2026-03-03T23:32:52.696Z  
+2026-03-03T23:32:52.696Z  htt
+ps://nextjs.org/docs/messages
+/module-not-found
+2026-03-03T23:32:52.696Z  
+2026-03-03T23:32:52.696Z  
+2026-03-03T23:32:52.696Z  ./s
+rc/app/network/payment/result
+/page.tsx:6:1
+2026-03-03T23:32:52.696Z  Mod
+ule not found: Can't resolve 
+'@/lib/hub/payments/usePaymen
+tIntentPoll'
+2026-03-03T23:32:52.696Z  4 |
+ import { Suspense } from "re
+act";
+2026-03-03T23:32:52.696Z  5 |
+ import Link from "next/link"
+;
+2026-03-03T23:32:52.696Z  > 6
+ | import { usePaymentIntentP
+oll } from "@/lib/hub/payment
+s/usePaymentIntentPoll";
+2026-03-03T23:32:52.697Z  | ^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
+2026-03-03T23:32:52.697Z  7 |
+2026-03-03T23:32:52.697Z  8 |
+ function ResultContent() {
+2026-03-03T23:32:52.697Z  9 |
+     const sp = useSearchPara
+ms();
+2026-03-03T23:32:52.697Z  
+2026-03-03T23:32:52.697Z  Imp
+ort map: aliased to relative 
+'./src/lib/hub/payments/usePa
+ymentIntentPoll' inside of [p
+roject]/
+2026-03-03T23:32:52.697Z  
+2026-03-03T23:32:52.697Z  
+2026-03-03T23:32:52.697Z  Imp
+ort traces:
+2026-03-03T23:32:52.697Z  Cli
+ent Component Browser:
+2026-03-03T23:32:52.697Z  ./s
+rc/app/network/payment/result
+/page.tsx [Client Component B
+rowser]
+2026-03-03T23:32:52.697Z  ./s
+rc/app/network/payment/result
+/page.tsx [Server Component]
+2026-03-03T23:32:52.697Z  
+2026-03-03T23:32:52.697Z  Cli
+ent Component SSR:
+2026-03-03T23:32:52.697Z  ./s
+rc/app/network/payment/result
+/page.tsx [Client Component S
+SR]
+2026-03-03T23:32:52.697Z  ./s
+rc/app/network/payment/result
+/page.tsx [Server Component]
+2026-03-03T23:32:52.697Z  
+2026-03-03T23:32:52.697Z  htt
+ps://nextjs.org/docs/messages
+/module-not-found
+2026-03-03T23:32:52.697Z  
+2026-03-03T23:32:52.697Z  
+2026-03-03T23:32:52.697Z  at 
+<unknown> (./src/app/api/netw
+ork/payments/intents/route.ts
+:4:1)
+2026-03-03T23:32:52.697Z  at 
+<unknown> (https://nextjs.org
+/docs/messages/module-not-fou
+nd)
+2026-03-03T23:32:52.697Z  at 
+<unknown> (./src/app/api/deal
+er-network/orders/[id]/refund
+/route.ts:4:1)
+2026-03-03T23:32:52.697Z  at 
+<unknown> (https://nextjs.org
+/docs/messages/module-not-fou
+nd)
+2026-03-03T23:32:52.697Z  at 
+<unknown> (./src/app/api/netw
+ork/payments/callback/iyzico/
+route.ts:3:1)
+2026-03-03T23:32:52.697Z  at 
+<unknown> (https://nextjs.org
+/docs/messages/module-not-fou
+nd)
+2026-03-03T23:32:52.697Z  at 
+<unknown> (./src/app/api/netw
+ork/payments/callback/odeal/r
+oute.ts:3:1)
+2026-03-03T23:32:52.697Z  at 
+<unknown> (https://nextjs.org
+/docs/messages/module-not-fou
+nd)
+2026-03-03T23:32:52.698Z  at 
+<unknown> (./src/app/api/netw
+ork/payments/intent/route.ts:
+4:1)
+2026-03-03T23:32:52.698Z  at 
+<unknown> (https://nextjs.org
+/docs/messages/module-not-fou
+nd)
+2026-03-03T23:32:52.698Z  at 
+<unknown> (./src/app/api/netw
+ork/payments/callback/iyzico/
+route.ts:4:1)
+2026-03-03T23:32:52.698Z  at 
+<unknown> (https://nextjs.org
+/docs/messages/module-not-fou
+nd)
+2026-03-03T23:32:52.698Z  at 
+<unknown> (./src/app/api/netw
+ork/payments/callback/odeal/r
+oute.ts:4:1)
+2026-03-03T23:32:52.698Z  at 
+<unknown> (https://nextjs.org
+/docs/messages/module-not-fou
+nd)
+2026-03-03T23:32:52.698Z  at 
+<unknown> (./src/app/network/
+payment/result/page.tsx:6:1)
+2026-03-03T23:32:52.698Z  at 
+<unknown> (https://nextjs.org
+/docs/messages/module-not-fou
+nd)
+2026-03-03T23:32:52.855Z  Err
+or: Command "npm run vercel-b
+uild" exited with 1
+https://motoroil-lznomoof2-motoroils-projects.vercel.app

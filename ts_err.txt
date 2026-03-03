@@ -1,8 +1,0 @@
-src/app/api/network/checkout/route.ts(124,42): error TS2339: Property 'stock' does not exist on type 'unknown'.
-src/app/api/network/checkout/route.ts(126,81): error TS2339: Property 'id' does not exist on type 'unknown'.
-src/app/api/network/checkout/route.ts(129,46): error TS2339: Property 'price' does not exist on type 'unknown'.
-src/app/api/network/checkout/route.ts(136,34): error TS2339: Property 'id' does not exist on type 'unknown'.
-src/app/api/network/checkout/route.ts(137,29): error TS2339: Property 'name' does not exist on type 'unknown'.
-src/app/api/network/checkout/route.ts(138,29): error TS2339: Property 'code' does not exist on type 'unknown'.
-src/app/api/network/checkout/route.ts(139,32): error TS2339: Property 'barcode' does not exist on type 'unknown'.
-src/app/api/network/checkout/route.ts(141,29): error TS2339: Property 'unit' does not exist on type 'unknown'.

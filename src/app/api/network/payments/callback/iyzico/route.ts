@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getPaymentProviderAdapter } from "@/lib/hub/payments/getProvider";
-import { markOrderPaidIfEligible } from "@/lib/hub/payments/orderStatus";
+import { getPaymentProviderAdapter } from "@/lib/network/payments/getProvider";
+import { markOrderPaidIfEligible } from "@/lib/network/payments/orderStatus";
 import { releaseReservationForOrder } from "@/lib/network/inventory/reservation";
 import { enqueueAccountingEvent } from "@/lib/network/accounting/outbox";
 
