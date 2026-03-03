@@ -201,12 +201,12 @@ export default function Sidebar() {
             ]
         },
         {
-            group: "B2B Network",
+            group: "Dealer Network",
             items: [
-                { name: 'Dashboard', href: '/b2b/dashboard', icon: LayoutDashboard },
-                { name: 'Sipariş Onayı', href: '/b2b/orders/approvals', icon: Inbox },
-                { name: 'İadeler', href: '/b2b/refunds', icon: Receipt },
-                { name: 'Ayarlar', href: '/b2b/settings', icon: Settings },
+                { name: 'Dashboard', href: '/dealer-network/dashboard', icon: LayoutDashboard },
+                { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals', icon: Inbox },
+                { name: 'İadeler', href: '/dealer-network/refunds', icon: Receipt },
+                { name: 'Ayarlar', href: '/dealer-network/settings', icon: Settings },
             ]
         },
         {

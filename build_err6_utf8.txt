@@ -1,0 +1,1682 @@
+﻿
+> periodya@0.1.0 build
+> prisma generate && prisma migrate deploy && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Ô£ö Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 4.31s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-billowing-glade-agt0zp7m-pooler.c-2.eu-central-1.aws.neon.tech"
+
+26 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+Ôû▓ Next.js 16.1.4 (Turbopack)
+- Environments: .env.production.local, .env.local, .env.production, .env
+
+node.exe : ÔÜá The "middlewar
+e" file convention is depreca
+ted. Please use "proxy" inste
+ad. Learn more: https://nextj
+s.org/docs/messages/middlewar
+e-to-proxy
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (ÔÜá The  
+   "middle...leware-to-pro   
+ xy:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 43s
+  Skipping validation of types
+  Collecting page data using 7 workers ...
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:40.51
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_827e14a
+e._.js:139:84660)
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:40.88
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:41.32
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_ad15eb8
+e._.js:139:74117)
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:41.50
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:41.75
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:41.76
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:42.14
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:42.49
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:42.59
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_827e14a
+e._.js:139:84660)
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:42.89
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:42.90
+9Z","error":"","status":"erro
+r"}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_ad15eb8
+e._.js:139:74117)
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_ad15eb8
+e._.js:139:74117)
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:42.97
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:43.00
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:43.12
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:43.29
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:43.40
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:43.63
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:43.66
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:44.07
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:44.08
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:44.30
+4Z","error":"","status":"erro
+r"}
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:44.56
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:44.57
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:44.62
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:44.70
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:44.73
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:45.11
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:45.12
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:45.29
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:45.34
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:45.43
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:45.44
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:45.56
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:45.60
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+  Generating static pages using 7 workers (0/291) ...
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:45.63
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.i (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\ssr\_252
+9a379._.js:139:84686)
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:45.94
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:46.06
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+  Generating static pages using 7 workers (72/291) 
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:46.36
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:46.68
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:46.86
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:46.92
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+  Generating static pages using 7 workers (145/291) 
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:46.97
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.23
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.29
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_ad15eb8
+e._.js:139:74117)
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.41
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.50
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.51
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.64
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.74
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.74
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.85
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.87
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.93
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:47.95
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.00
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.05
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.19
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.32
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.37
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+  Generating static pages using 7 workers (218/291) 
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.46
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.54
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.76
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.81
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.82
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.84
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.94
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:48.95
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:49.18
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:49.19
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:49.19
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:49.41
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:49.51
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:49.63
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:49.66
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:49.77
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:49.87
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:49.89
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:50.04
+1Z","error":"","status":"erro
+r"}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:50.04
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:50.13
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:50.19
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:50.57
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:50.61
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:50.67
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:50.67
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:50.81
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:50.83
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:51.03
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:51.15
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:51.27
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:51.35
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:51.43
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:51.48
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:51.60
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:51.73
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:51.80
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T23:05:51.89
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Ô£ô Generating static pages using 7 workers (291/291) in 6.4s
+  Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /
+Ôö£ Ôùï /_not-found
+Ôö£ Ôùï /accounting
+Ôö£ ãÆ /admin
+Ôö£ ãÆ /admin/audit-logs
+Ôö£ Ôùï /admin/b2b/dealer-orders
+Ôö£ Ôùï /admin/b2b/refunds
+Ôö£ Ôùï /admin/b2b/settings
+Ôö£ ãÆ /admin/catalog/categories
+Ôö£ ãÆ /admin/companies
+Ôö£ ãÆ /admin/dashboard
+Ôö£ Ôùï /admin/dealer-network/settings
+Ôö£ Ôùï /admin/dealer-orders
+Ôö£ ãÆ /admin/disputes
+Ôö£ ãÆ /admin/disputes/[ticketId]
+Ôö£ Ôùï /admin/finance/refunds
+Ôö£ ãÆ /admin/growth/audit
+Ôö£ ãÆ /admin/growth/billing-health
+Ôö£ ãÆ /admin/growth/boost-rules
+Ôö£ ãÆ /admin/growth/revenue
+Ôö£ ãÆ /admin/growth/subscriptions
+Ôö£ ãÆ /admin/health
+Ôö£ ãÆ /admin/logs
+Ôö£ ãÆ /admin/marketplace/ops
+Ôö£ ãÆ /admin/ops/ledgers
+Ôö£ ãÆ /admin/ops/orders
+Ôö£ ãÆ /admin/ops/payments
+Ôö£ ãÆ /admin/ops/providers
+Ôö£ ãÆ /admin/ops/shipments
+Ôö£ ãÆ /admin/payments-escrow/audit
+Ôö£ ãÆ /admin/payments-escrow/commissions
+Ôö£ ãÆ /admin/payments-escrow/policies
+Ôö£ ãÆ /admin/payments-escrow/providers
+Ôö£ ãÆ /admin/payouts
+Ôö£ ãÆ /admin/plans
+Ôö£ ãÆ /admin/platform-finance
+Ôö£ ãÆ /admin/products
+Ôö£ ãÆ /admin/sales-radar
+Ôö£ ãÆ /admin/security
+Ôö£ Ôùï /admin/settings/dealer-portal
+Ôö£ ãÆ /admin/support/tickets
+Ôö£ ãÆ /admin/support/tickets/[id]
+Ôö£ ãÆ /admin/tenants
+Ôö£ ãÆ /admin/tenants/[id]
+Ôö£ ãÆ /admin/tenants/[id]/help
+Ôö£ ãÆ /admin/transactions
+Ôö£ ãÆ /admin/trust-monitor
+Ôö£ ãÆ /admin/website
+Ôö£ Ôùï /advisor
+Ôö£ ãÆ /api/admin/audit-logs
+Ôö£ ãÆ /api/admin/automation/run
+Ôö£ ãÆ /api/admin/billing/boost/charge/run
+Ôö£ ãÆ /api/admin/billing/boost/collection/run
+Ôö£ ãÆ /api/admin/billing/boost/health
+Ôö£ ãÆ /api/admin/billing/boost/health/snapshot
+Ôö£ ãÆ /api/admin/billing/boost/invoices
+Ôö£ ãÆ /api/admin/billing/boost/meter/run
+Ôö£ ãÆ /api/admin/billing/boost/rollover/run
+Ôö£ ãÆ /api/admin/billing/boost/subscriptions/activate
+Ôö£ ãÆ /api/admin/billing/boost/subscriptions/cancel
+Ôö£ ãÆ /api/admin/billing/boost/subscriptions/pause
+Ôö£ ãÆ /api/admin/control-hub
+Ôö£ ãÆ /api/admin/dashboard/actions
+Ôö£ ãÆ /api/admin/dashboard/overview
+Ôö£ ãÆ /api/admin/dashboard/timeseries
+Ôö£ ãÆ /api/admin/dealer-orders
+Ôö£ ãÆ /api/admin/dealer-orders/[id]
+Ôö£ ãÆ /api/admin/dealer-orders/[id]/approve
+Ôö£ ãÆ /api/admin/dealer-orders/[id]/refund
+Ôö£ ãÆ /api/admin/dealer-orders/[id]/reject
+Ôö£ ãÆ /api/admin/dealer-orders/count
+Ôö£ ãÆ /api/admin/discovery/boost-rules
+Ôö£ ãÆ /api/admin/discovery/boost-rules/[id]/deactivate
+Ôö£ ãÆ /api/admin/disputes
+Ôö£ ãÆ /api/admin/disputes/[ticketId]
+Ôö£ ãÆ /api/admin/disputes/[ticketId]/actions
+Ôö£ ãÆ /api/admin/disputes/[ticketId]/request-info
+Ôö£ ãÆ /api/admin/features
+Ôö£ ãÆ /api/admin/finance/commission/plans
+Ôö£ ãÆ /api/admin/finance/commission/plans/[id]/activate
+Ôö£ ãÆ /api/admin/finance/earnings/[earningId]/release
+Ôö£ ãÆ /api/admin/finance/ledger
+Ôö£ ãÆ /api/admin/finance/overview
+Ôö£ ãÆ /api/admin/finance/payout/outbox/run
+Ôö£ ãÆ /api/admin/finance/payout/requests
+Ôö£ ãÆ /api/admin/finance/payout/requests/[id]/approve
+Ôö£ ãÆ /api/admin/finance/payout/requests/[id]/process-internal
+Ôö£ ãÆ /api/admin/finance/payout/requests/[id]/reject
+Ôö£ ãÆ /api/admin/finance/payout/trigger-release/[shipmentId]
+Ôö£ ãÆ /api/admin/finance/payout/webhooks/process
+Ôö£ ãÆ /api/admin/finance/shipping/invoices
+Ôö£ ãÆ /api/admin/finance/shipping/invoices/[id]
+Ôö£ ãÆ /api/admin/finance/shipping/lines/[lineId]/dispute
+Ôö£ ãÆ /api/admin/finance/shipping/lines/[lineId]/match
+Ôö£ ãÆ /api/admin/finance/shipping/lines/queue
+Ôö£ ãÆ /api/admin/finance/trust-scores/[sellerTenantId]/recalc
+Ôö£ ãÆ /api/admin/growth/audit
+Ôö£ ãÆ /api/admin/growth/billing-health
+Ôö£ ãÆ /api/admin/growth/billing-health/run-collection-guard
+Ôö£ ãÆ /api/admin/growth/billing-health/snapshot
+Ôö£ ãÆ /api/admin/growth/boost-rules
+Ôö£ ãÆ /api/admin/growth/boost-rules/[id]/disable
+Ôö£ ãÆ /api/admin/growth/boost-rules/[id]/expire-now
+Ôö£ ãÆ /api/admin/growth/enforcement
+Ôö£ ãÆ /api/admin/growth/enforcement/[tenantId]
+Ôö£ ãÆ /api/admin/growth/policy
+Ôö£ ãÆ /api/admin/growth/revenue
+Ôö£ ãÆ /api/admin/growth/subscriptions
+Ôö£ ãÆ /api/admin/growth/subscriptions/[id]/unblock
+Ôö£ ãÆ /api/admin/health
+Ôö£ ãÆ /api/admin/help/categories
+Ôö£ ãÆ /api/admin/help/topics
+Ôö£ ãÆ /api/admin/help/topics/[id]
+Ôö£ ãÆ /api/admin/marketplace/ops
+Ôö£ ãÆ /api/admin/marketplace/queue/health
+Ôö£ ãÆ /api/admin/marketplace/queue/replay
+Ôö£ ãÆ /api/admin/marketplace/queue/status
+Ôö£ ãÆ /api/admin/metrics/cohorts/daily
+Ôö£ ãÆ /api/admin/metrics/platform/daily
+Ôö£ ãÆ /api/admin/metrics/run
+Ôö£ ãÆ /api/admin/metrics/tenants/daily
+Ôö£ ãÆ /api/admin/normalize-marketplaces
+Ôö£ ãÆ /api/admin/ops/alerts/[id]/ack
+Ôö£ ãÆ /api/admin/ops/alerts/[id]/resolve
+Ôö£ ãÆ /api/admin/ops/health
+Ôö£ ãÆ /api/admin/ops/health/snapshot
+Ôö£ ãÆ /api/admin/ops/payouts/[id]/force-finalize
+Ôö£ ãÆ /api/admin/ops/payouts/[id]/force-reconcile
+Ôö£ ãÆ /api/admin/ops/payouts/[id]/quarantine
+Ôö£ ãÆ /api/admin/ops/payouts/[id]/rerun-outbox
+Ôö£ ãÆ /api/admin/ops/run/outbox
+Ôö£ ãÆ /api/admin/ops/run/reconcile-pull
+Ôö£ ãÆ /api/admin/ops/run/repair
+Ôö£ ãÆ /api/admin/ops/run/sentinel
+Ôö£ ãÆ /api/admin/payments-escrow/audit
+Ôö£ ãÆ /api/admin/payments-escrow/commissions/plans
+Ôö£ ãÆ /api/admin/payments-escrow/commissions/plans/[id]
+Ôö£ ãÆ /api/admin/payments-escrow/commissions/plans/[id]/archive
+Ôö£ ãÆ /api/admin/payments-escrow/commissions/preview
+Ôö£ ãÆ /api/admin/payments-escrow/policies
+Ôö£ ãÆ /api/admin/payments-escrow/providers/reconcile-pull
+Ôö£ ãÆ /api/admin/payments-escrow/providers/status
+Ôö£ ãÆ /api/admin/payouts/queue
+Ôö£ ãÆ /api/admin/payouts/queue/[id]/approve
+Ôö£ ãÆ /api/admin/payouts/queue/[id]/reject
+Ôö£ ãÆ /api/admin/pdks/displays
+Ôö£ ãÆ /api/admin/pdks/events
+Ôö£ ãÆ /api/admin/pdks/events/approve
+Ôö£ ãÆ /api/admin/refunds
+Ôö£ ãÆ /api/admin/refunds/[id]
+Ôö£ ãÆ /api/admin/reset-data
+Ôö£ ãÆ /api/admin/rollout/tenant/[tenantId]
+Ôö£ ãÆ /api/admin/rollout/tenant/[tenantId]/activate-pilot
+Ôö£ ãÆ /api/admin/rollout/tenant/[tenantId]/pause-boost
+Ôö£ ãÆ /api/admin/rollout/tenant/[tenantId]/pause-escrow
+Ôö£ ãÆ /api/admin/rollout/tenant/[tenantId]/pause-payout
+Ôö£ ãÆ /api/admin/rollout/tenant/[tenantId]/resume-all
+Ôö£ ãÆ /api/admin/rollout/tenant/[tenantId]/set-feature
+Ôö£ ãÆ /api/admin/rollout/tenant/[tenantId]/set-risk-caps
+Ôö£ ãÆ /api/admin/sales-radar
+Ôö£ ãÆ /api/admin/search
+Ôö£ ãÆ /api/admin/settings/dealer-portal
+Ôö£ ãÆ /api/admin/tenants
+Ôö£ ãÆ /api/admin/tenants/[id]
+Ôö£ ãÆ /api/admin/tenants/[id]/actions
+Ôö£ ãÆ /api/admin/tickets/[id]/reply
+Ôö£ ãÆ /api/admin/tickets/[id]/update
+Ôö£ ãÆ /api/admin/tickets/queue
+Ôö£ ãÆ /api/admin/website
+Ôö£ ãÆ /api/admin/website/menus
+Ôö£ ãÆ /api/admin/website/pages
+Ôö£ ãÆ /api/admin/website/pages/[id]
+Ôö£ ãÆ /api/admin/website/upload
+Ôö£ ãÆ /api/analytics/summary
+Ôö£ ãÆ /api/analytics/upsell
+Ôö£ ãÆ /api/auth/change-password
+Ôö£ ãÆ /api/auth/demo
+Ôö£ ãÆ /api/auth/forgot-password
+Ôö£ ãÆ /api/auth/login
+Ôö£ ãÆ /api/auth/logout
+Ôö£ ãÆ /api/auth/register
+Ôö£ ãÆ /api/auth/reset-password-confirm
+Ôö£ ãÆ /api/automation/run
+Ôö£ ãÆ /api/backup
+Ôö£ ãÆ /api/billing/boost-invoices
+Ôö£ ãÆ /api/billing/boost/invoices
+Ôö£ ãÆ /api/billing/boost/subscription
+Ôö£ ãÆ /api/billing/checkout
+Ôö£ ãÆ /api/billing/overview
+Ôö£ ãÆ /api/billing/plans
+Ôö£ ãÆ /api/billing/plans/[id]
+Ôö£ ãÆ /api/billing/subscription
+Ôö£ ãÆ /api/branches
+Ôö£ ãÆ /api/branches/[id]
+Ôö£ ãÆ /api/branches/documents
+Ôö£ ãÆ /api/buyer/recommendations/action
+Ôö£ ãÆ /api/campaigns
+Ôö£ ãÆ /api/checks
+Ôö£ ãÆ /api/checks/[id]
+Ôö£ ãÆ /api/checks/collect
+Ôö£ ãÆ /api/contracts/create
+Ôö£ ãÆ /api/coupons
+Ôö£ ãÆ /api/cron/payout-reconciliation
+Ôö£ ãÆ /api/cron/reconcile-transactions
+Ôö£ ãÆ /api/cron/recurring-orders
+Ôö£ ãÆ /api/cron/shipment-sync
+Ôö£ ãÆ /api/cron/sync-all
+Ôö£ ãÆ /api/customers
+Ôö£ ãÆ /api/customers/[id]
+Ôö£ ãÆ /api/customers/[id]/documents
+Ôö£ ãÆ /api/customers/[id]/pricing
+Ôö£ ãÆ /api/customers/[id]/statement
+Ôö£ ãÆ /api/customers/[id]/warranties
+Ôö£ ãÆ /api/customers/categories
+Ôö£ ãÆ /api/customers/import
+Ôö£ ãÆ /api/dashboard/stats
+Ôö£ ãÆ /api/dashboard/summary
+Ôö£ ãÆ /api/db-ping
+Ôö£ ãÆ /api/dealer-network/orders/[id]
+Ôö£ ãÆ /api/dealer-network/orders/[id]/approve
+Ôö£ ãÆ /api/dealer-network/orders/[id]/refund
+Ôö£ ãÆ /api/dealer-network/orders/[id]/reject
+Ôö£ ãÆ /api/dealer-network/orders/approvals
+Ôö£ ãÆ /api/dealer-network/orders/approvals/count
+Ôö£ ãÆ /api/dealer-network/refunds
+Ôö£ ãÆ /api/dealer-network/refunds/[id]
+Ôö£ ãÆ /api/dealer-network/settings
+Ôö£ ãÆ /api/debug/nilvera-series
+Ôö£ ãÆ /api/documents/[id]
+Ôö£ ãÆ /api/field-sales/admin/live-status
+Ôö£ ãÆ /api/field-sales/admin/location-requests
+Ôö£ ãÆ /api/field-sales/admin/location-requests/process
+Ôö£ ãÆ /api/field-sales/admin/settings
+Ôö£ ãÆ /api/field-sales/collections
+Ôö£ ãÆ /api/field-sales/location-request
+Ôö£ ãÆ /api/field-sales/orders/[id]
+Ôö£ ãÆ /api/field-sales/orders/create
+Ôö£ ãÆ /api/field-sales/routes
+Ôö£ ãÆ /api/field-sales/routes/[id]
+Ôö£ ãÆ /api/field-sales/routes/[id]/stops
+Ôö£ ãÆ /api/field-sales/routes/[id]/stops/batch
+Ôö£ ãÆ /api/field-sales/stops/[id]
+Ôö£ ãÆ /api/field-sales/templates
+Ôö£ ãÆ /api/field-sales/templates/[id]
+Ôö£ ãÆ /api/field-sales/visits
+Ôö£ ãÆ /api/field-sales/visits/active
+Ôö£ ãÆ /api/field-sales/visits/end
+Ôö£ ãÆ /api/field-sales/visits/start
+Ôö£ ãÆ /api/finance/payout/destinations
+Ôö£ ãÆ /api/finance/payout/requests
+Ôö£ ãÆ /api/finance/payout/status
+Ôö£ ãÆ /api/finance/payout/submerchant/onboard
+Ôö£ ãÆ /api/finance/trust-score
+Ôö£ ãÆ /api/financials/accounts
+Ôö£ ãÆ /api/financials/accounts/[id]/ledger
+Ôö£ ãÆ /api/financials/accounts/sync
+Ôö£ ãÆ /api/financials/audit
+Ôö£ ãÆ /api/financials/checks
+Ôö£ ãÆ /api/financials/checks/[id]
+Ôö£ ãÆ /api/financials/checks/[id]/status
+Ôö£ ãÆ /api/financials/forecast
+Ôö£ ãÆ /api/financials/payment-plans
+Ôö£ ãÆ /api/financials/payment-plans/pay
+Ôö£ ãÆ /api/financials/reports/ba-bs
+Ôö£ ãÆ /api/financials/reports/health
+Ôö£ ãÆ /api/financials/reports/income-statement
+Ôö£ ãÆ /api/financials/reports/trial-balance
+Ôö£ ãÆ /api/financials/statements/parse
+Ôö£ ãÆ /api/financials/transactions
+Ôö£ ãÆ /api/financials/transactions/[id]
+Ôö£ ãÆ /api/fintech/banking/connect
+Ôö£ ãÆ /api/fintech/banking/credentials
+Ôö£ ãÆ /api/fintech/banking/duplicates
+Ôö£ ãÆ /api/fintech/banking/import-xml
+Ôö£ ãÆ /api/fintech/banking/match
+Ôö£ ãÆ /api/fintech/banking/merge
+Ôö£ ãÆ /api/fintech/banking/replay
+Ôö£ ãÆ /api/fintech/banking/run-tests
+Ôö£ ãÆ /api/fintech/banking/sync
+Ôö£ ãÆ /api/fintech/banking/test-connection
+Ôö£ ãÆ /api/fintech/banking/test-pipeline
+Ôö£ ãÆ /api/fintech/banking/transactions
+Ôö£ ãÆ /api/fintech/dashboard/heatmap
+Ôö£ ãÆ /api/fintech/dashboard/metrics
+Ôö£ ãÆ /api/health-check
+Ôö£ ãÆ /api/health/prisma
+Ôö£ ãÆ /api/integrations/ecommerce/sync
+Ôö£ ãÆ /api/integrations/marketplace/check-mapping
+Ôö£ ãÆ /api/integrations/marketplace/hydrate
+Ôö£ ãÆ /api/integrations/marketplace/save-mapping
+Ôö£ ãÆ /api/integrations/marketplace/stats
+Ôö£ ãÆ /api/integrations/marketplace/sync
+Ôö£ ãÆ /api/integrations/marketplace/test
+Ôö£ ãÆ /api/integrations/nilvera/test
+Ôö£ ãÆ /api/integrations/send
+Ôö£ ãÆ /api/integrations/settings/save
+Ôö£ ãÆ /api/internal/accounting/process
+Ôö£ ãÆ /api/inventory/audit
+Ôö£ ãÆ /api/inventory/pending
+Ôö£ ãÆ /api/inventory/transfer
+Ôö£ ãÆ /api/kasalar
+Ôö£ ãÆ /api/kasalar/[id]
+Ôö£ ãÆ /api/logs
+Ôö£ ãÆ /api/marketplaces/[marketplace]/orders/[orderId]/actions
+Ôö£ ãÆ /api/marketplaces/[marketplace]/orders/[orderId]/label
+Ôö£ ãÆ /api/marketplaces/actions/[auditId]
+Ôö£ ãÆ /api/messages
+Ôö£ ãÆ /api/metrics/daily
+Ôö£ ãÆ /api/metrics/track
+Ôö£ ãÆ /api/network/auth/logout
+Ôö£ ãÆ /api/network/auth/mode
+Ôö£ ãÆ /api/network/auth/otp/request
+Ôö£ ãÆ /api/network/auth/otp/verify
+Ôö£ ãÆ /api/network/auth/password/login
+Ôö£ ãÆ /api/network/cart
+Ôö£ ãÆ /api/network/cart/items
+Ôö£ ãÆ /api/network/cart/items/[id]
+Ôö£ ãÆ /api/network/catalog/products
+Ôö£ ãÆ /api/network/checkout
+Ôö£ ãÆ /api/network/context/switch
+Ôö£ ãÆ /api/network/credit
+Ôö£ ãÆ /api/network/demands
+Ôö£ ãÆ /api/network/demands/[id]/offers
+Ôö£ ãÆ /api/network/discovery
+Ôö£ ãÆ /api/network/earnings
+Ôö£ ãÆ /api/network/invites/redeem
+Ôö£ ãÆ /api/network/listings
+Ôö£ ãÆ /api/network/listings/[id]
+Ôö£ ãÆ /api/network/me
+Ôö£ ãÆ /api/network/memberships
+Ôö£ ãÆ /api/network/offers/[id]/accept
+Ôö£ ãÆ /api/network/orders
+Ôö£ ãÆ /api/network/orders/[id]
+Ôö£ ãÆ /api/network/orders/[id]/confirm-delivery
+Ôö£ ãÆ /api/network/orders/[id]/payments/init
+Ôö£ ãÆ /api/network/orders/[id]/shipments/init
+Ôö£ ãÆ /api/network/payments/callback/iyzico
+Ôö£ ãÆ /api/network/payments/callback/odeal
+Ôö£ ãÆ /api/network/payments/intent
+Ôö£ ãÆ /api/network/payments/intents
+Ôö£ ãÆ /api/network/payments/intents/[id]
+Ôö£ ãÆ /api/network/payments/intents/by-order/[orderId]
+Ôö£ ãÆ /api/network/payouts/destinations
+Ôö£ ãÆ /api/network/payouts/requests
+Ôö£ ãÆ /api/network/payouts/summary
+Ôö£ ãÆ /api/network/trust-score
+Ôö£ ãÆ /api/notifications
+Ôö£ ãÆ /api/notifications/summary
+Ôö£ ãÆ /api/onboarding/init
+Ôö£ ãÆ /api/ops-internal/queue-health
+Ôö£ ãÆ /api/orders/[id]
+Ôö£ ãÆ /api/orders/collect
+Ôö£ ãÆ /api/orders/get-label
+Ôö£ ãÆ /api/orders/pending
+Ôö£ ãÆ /api/orders/update-cargo
+Ôö£ ãÆ /api/portal/auth/login
+Ôö£ ãÆ /api/portal/auth/logout
+Ôö£ ãÆ /api/pos/odeal/pay
+Ôö£ ãÆ /api/pricing/bulk-update
+Ôö£ ãÆ /api/pricing/initialize
+Ôö£ ãÆ /api/pricing/lists
+Ôö£ ãÆ /api/pricing/lists/[id]
+Ôö£ ãÆ /api/pricing/lists/[id]/prices
+Ôö£ ãÆ /api/pricing/products/[productId]/prices
+Ôö£ ãÆ /api/pricing/resolve-customer
+Ôö£ ãÆ /api/products
+Ôö£ ãÆ /api/products/[id]
+Ôö£ ãÆ /api/products/attributes
+Ôö£ ãÆ /api/products/bulk
+Ôö£ ãÆ /api/products/import
+Ôö£ ãÆ /api/public/cms/page/[slug]
+Ôö£ ãÆ /api/public/landing
+Ôö£ ãÆ /api/public/recovery
+Ôö£ ãÆ /api/purchasing/[id]/approve
+Ôö£ ãÆ /api/purchasing/[id]/reject
+Ôö£ ãÆ /api/purchasing/create
+Ôö£ ãÆ /api/purchasing/import
+Ôö£ ãÆ /api/purchasing/list
+Ôö£ ãÆ /api/quotes
+Ôö£ ãÆ /api/quotes/[id]
+Ôö£ ãÆ /api/quotes/[id]/convert
+Ôö£ ãÆ /api/reports/ceo-metrics
+Ôö£ ãÆ /api/rollout/features
+Ôö£ ãÆ /api/sales/create
+Ôö£ ãÆ /api/sales/formal-invoice-send
+Ôö£ ãÆ /api/sales/formal-invoice-test
+Ôö£ ãÆ /api/sales/formal-send
+Ôö£ ãÆ /api/sales/formal-test
+Ôö£ ãÆ /api/sales/history
+Ôö£ ãÆ /api/sales/invoices
+Ôö£ ãÆ /api/sales/invoices/[id]
+Ôö£ ãÆ /api/sales/invoices/[id]/approve
+Ôö£ ãÆ /api/sales/invoices/convert
+Ôö£ ãÆ /api/sales/wayslips
+Ôö£ ãÆ /api/search
+Ôö£ ãÆ /api/security/anomalies
+Ôö£ ãÆ /api/security/events
+Ôö£ ãÆ /api/seller/boost
+Ôö£ ãÆ /api/seller/boost/analytics
+Ôö£ ãÆ /api/services
+Ôö£ ãÆ /api/services/[id]
+Ôö£ ãÆ /api/services/upcoming
+Ôö£ ãÆ /api/settings
+Ôö£ ãÆ /api/settings/mail
+Ôö£ ãÆ /api/setup
+Ôö£ ãÆ /api/staff
+Ôö£ ãÆ /api/staff/attendance
+Ôö£ ãÆ /api/staff/dealer-orders
+Ôö£ ãÆ /api/staff/dealer-orders/[id]
+Ôö£ ãÆ /api/staff/dealer-orders/[id]/approve
+Ôö£ ãÆ /api/staff/dealer-orders/[id]/refund
+Ôö£ ãÆ /api/staff/dealer-orders/[id]/reject
+Ôö£ ãÆ /api/staff/dealer-orders/count
+Ôö£ ãÆ /api/staff/dealers/invites
+Ôö£ ãÆ /api/staff/documents
+Ôö£ ãÆ /api/staff/expenses
+Ôö£ ãÆ /api/staff/leaves
+Ôö£ ãÆ /api/staff/my-customers
+Ôö£ ãÆ /api/staff/payroll
+Ôö£ ãÆ /api/staff/puantaj
+Ôö£ ãÆ /api/staff/refunds
+Ôö£ ãÆ /api/staff/refunds/[id]
+Ôö£ ãÆ /api/staff/reports
+Ôö£ ãÆ /api/staff/shifts
+Ôö£ ãÆ /api/staff/targets
+Ôö£ ãÆ /api/suppliers
+Ôö£ ãÆ /api/suppliers/[id]
+Ôö£ ãÆ /api/suppliers/import
+Ôö£ ãÆ /api/suppliers/transaction
+Ôö£ ãÆ /api/support/attachments/[id]
+Ôö£ ãÆ /api/support/attachments/upload-url
+Ôö£ ãÆ /api/support/tickets
+Ôö£ ãÆ /api/support/tickets/[id]
+Ôö£ ãÆ /api/support/tickets/[id]/reply
+Ôö£ ãÆ /api/suspended-sales
+Ôö£ ãÆ /api/tickets
+Ôö£ ãÆ /api/tickets/[id]
+Ôö£ ãÆ /api/tickets/[id]/messages
+Ôö£ ãÆ /api/user/insights
+Ôö£ ãÆ /api/v1/pdks/check-in
+Ôö£ ãÆ /api/v1/pdks/check-out
+Ôö£ ãÆ /api/v1/pdks/display/pair
+Ôö£ ãÆ /api/v1/pdks/display/token
+Ôö£ ãÆ /api/warranties
+Ôö£ ãÆ /api/warranties/[id]
+Ôö£ ãÆ /api/webhooks/iyzico
+Ôö£ ãÆ /api/webhooks/iyzico/callback
+Ôö£ ãÆ /api/webhooks/shipments/[carrier]
+Ôö£ Ôùï /b2b/dashboard
+Ôö£ Ôùï /b2b/orders/approvals
+Ôö£ Ôùï /b2b/refunds
+Ôö£ Ôùï /b2b/settings
+Ôö£ Ôùï /billing
+Ôö£ ãÆ /billing/boost-invoices
+Ôö£ ãÆ /buyer/recommendations
+Ôö£ ãÆ /catalog
+Ôö£ ãÆ /catalog/[productId]
+Ôö£ ãÆ /catalog/cart
+Ôö£ ãÆ /catalog/checkout
+Ôö£ ãÆ /contracts
+Ôö£ ãÆ /contracts/[id]
+Ôö£ Ôùï /customers
+Ôö£ ãÆ /customers/[id]
+Ôö£ Ôùï /dashboard
+Ôö£ Ôùï /dealer-network/dashboard
+Ôö£ Ôùï /dealer-network/orders/approvals
+Ôö£ Ôùï /dealer-network/refunds
+Ôö£ Ôùï /dealer-network/settings
+Ôö£ Ôùï /field-mobile/collection/create
+Ôö£ Ôùï /field-mobile/customers
+Ôö£ ãÆ /field-mobile/customers/[id]
+Ôö£ Ôùï /field-mobile/expenses
+Ôö£ Ôùï /field-mobile/order/create
+Ôö£ Ôùï /field-mobile/profile
+Ôö£ Ôùï /field-mobile/reports
+Ôö£ Ôùï /field-mobile/routes
+Ôö£ ãÆ /field-mobile/routes/[id]
+Ôö£ Ôùï /field-mobile/targets
+Ôö£ Ôùï /field-mobile/visits
+Ôö£ Ôùï /field-sales
+Ôö£ Ôùï /field-sales/admin/config
+Ôö£ Ôùï /field-sales/admin/live
+Ôö£ Ôùï /field-sales/admin/routes
+Ôö£ ãÆ /field-sales/admin/routes/[id]
+Ôö£ Ôùï /fintech/control-tower
+Ôö£ Ôùï /fintech/open-banking
+Ôö£ Ôùï /fintech/profitability-heatmap
+Ôö£ Ôùï /fintech/smart-pricing
+Ôö£ ãÆ /formal-invoice/send
+Ôö£ ãÆ /formal-invoice/test
+Ôö£ ãÆ /help
+Ôö£ ãÆ /help/[slug]
+Ôö£ Ôùï /integrations
+Ôö£ Ôùï /inventory
+Ôö£ Ôùï /inventory/variants
+Ôö£ Ôùï /invoices
+Ôö£ Ôùï /login
+Ôö£ Ôùï /network
+Ôö£ ãÆ /network/buyer/orders
+Ôö£ ãÆ /network/buyer/orders/[id]
+Ôö£ Ôùï /network/cart
+Ôö£ Ôùï /network/catalog
+Ôö£ Ôùï /network/earnings
+Ôö£ Ôùï /network/finance
+Ôö£ ãÆ /network/invite/[token]
+Ôö£ Ôùï /network/orders
+Ôö£ ãÆ /network/orders/[id]
+Ôö£ Ôùï /network/payment/result
+Ôö£ Ôùï /network/payments
+Ôö£ Ôùï /network/payouts
+Ôö£ Ôùï /network/select-supplier
+Ôö£ ãÆ /network/seller/balances
+Ôö£ ãÆ /network/seller/orders
+Ôö£ ãÆ /network/seller/orders/[id]
+Ôö£ Ôùï /network/stock-risks
+Ôö£ Ôùï /network/trust-score
+Ôö£ Ôùï /notifications
+Ôö£ Ôùï /onboarding
+Ôö£ Ôùï /payment
+Ôö£ Ôùï /pdks/display
+Ôö£ ãÆ /portal/dashboard
+Ôö£ ãÆ /portal/login
+Ôö£ Ôùï /purchasing
+Ôö£ Ôùï /quotes
+Ôö£ Ôùï /register
+Ôö£ Ôùï /reports
+Ôö£ Ôùï /reports/ceo
+Ôö£ Ôùï /reports/daily
+Ôö£ Ôùï /reports/suppliers
+Ôö£ Ôùï /reset-password
+Ôö£ ãÆ /rfq
+Ôö£ ãÆ /rfq/[id]
+Ôö£ Ôùï /robots.txt
+Ôö£ Ôùï /sales
+Ôö£ Ôùï /sales/invoice
+Ôö£ Ôùï /security/suspicious
+Ôö£ ãÆ /seller/automation
+Ôö£ ãÆ /seller/automation/decisions
+Ôö£ Ôùï /seller/boost
+Ôö£ Ôùï /seller/boost/analytics
+Ôö£ ãÆ /seller/contracts
+Ôö£ ãÆ /seller/products
+Ôö£ ãÆ /seller/products/[id]
+Ôö£ ãÆ /seller/rfqs
+Ôö£ ãÆ /seller/rfqs/[id]
+Ôö£ ãÆ /seller/suggestions
+Ôö£ Ôùï /service
+Ôö£ ãÆ /service/[id]
+Ôö£ Ôùï /service/new
+Ôö£ Ôùï /settings
+Ôö£ Ôùï /settings/branch
+Ôö£ Ôùï /settings/pricing
+Ôö£ Ôùï /setup
+Ôö£ Ôùï /sitemap.xml
+Ôö£ Ôùï /staff
+Ôö£ Ôùï /staff/dealer-orders
+Ôö£ Ôùï /staff/finance/refunds
+Ôö£ Ôùï /staff/me
+Ôö£ Ôùï /staff/pdks
+Ôö£ Ôùï /suppliers
+Ôö£ ãÆ /suppliers/[id]
+Ôö£ ãÆ /support
+Ôö£ ãÆ /support/[id]
+Ôö£ Ôùï /support/new
+Ôö£ Ôùï /support/tickets
+Ôö£ Ôùï /terminal
+Ôö£ ãÆ /test-desktop
+Ôö£ Ôùï /theme-test
+Ôö£ Ôùï /treasury
+Ôöö ãÆ /vehicle/[plate]
+
+
+ãÆ Proxy (Middleware)
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+

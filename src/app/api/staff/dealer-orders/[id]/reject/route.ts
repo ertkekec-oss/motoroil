@@ -1,1 +1,1 @@
-export { POST } from "@/app/api/admin/dealer-orders/[id]/reject/route"
+export { POST } from "@/app/api/dealer-network/orders/[id]/reject/route"

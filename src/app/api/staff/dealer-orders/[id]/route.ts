@@ -1,1 +1,1 @@
-export { GET } from "@/app/api/admin/dealer-orders/[id]/route"
+export { GET } from "@/app/api/dealer-network/orders/[id]/route"

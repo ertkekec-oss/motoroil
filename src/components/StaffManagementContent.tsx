@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinancials } from '@/contexts/FinancialContext';
-import { PendingDealerOrdersCard } from '@/components/staff/PendingDealerOrdersCard';
+
 
 export default function StaffManagementContent() {
     const [activeTab, setActiveTab] = useState('list'); // list, roles, performance, shifts, leaves, payroll, attendance, puantaj
@@ -829,7 +829,7 @@ export default function StaffManagementContent() {
 
             {/* --- DASHBOARD QUICK ACTIONS --- */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-                <PendingDealerOrdersCard />
+
             </div>
 
             {/* --- STATS OVERVIEW (KPI KARTLARI) --- */}

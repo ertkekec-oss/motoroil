@@ -1,0 +1,46 @@
+﻿­şöı Checking /admin, /dealer-network, and /staff directories for link boundaries...
+node.exe : file:///C:/Users/e
+rtke/OneDrive/Masa%C3%BCst%C3
+%BC/periodya/muhasebeapp/moto
+roil/scripts/check-links.ts:1
+8
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (file://  
+  /C:/User...eck-links.ts:   
+ 18:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+    const srcPath = path.join
+(__dirname, '../src');
+                             
+ ^
+ReferenceError: __dirname is 
+not defined in ES module scop
+e
+    at checkRoutes (file:///C
+:/Users/ertke/OneDrive/Masa%C
+3%BCst%C3%BC/periodya/muhaseb
+eapp/motoroil/scripts/check-l
+inks.ts:18:31)
+    at file:///C:/Users/ertke
+/OneDrive/Masa%C3%BCst%C3%BC/
+periodya/muhasebeapp/motoroil
+/scripts/check-links.ts:96:1
+    at ModuleJob.run (node:in
+ternal/modules/esm/module_job
+:345:25)
+    at async onImport.tracePr
+omise.__proto__ (node:interna
+l/modules/esm/loader:651:26)
+    at async asyncRunEntryPoi
+ntWithESMLoader (node:interna
+l/modules/run_main:117:5)
