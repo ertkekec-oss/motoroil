@@ -1,0 +1,1 @@
+﻿src/app/network/payment/result/page.tsx(3,38): error TS2305: Module '"next/navigation"' has no exported member 'Suspense'.

@@ -1,68 +1,50 @@
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
-import { networkOrderQuerySchema } from '@/lib/validation/network';
-import { ApiError, ApiSuccess } from '@/services/network/helpers';
+import { NextResponse } from "next/server"
+import prisma from "@/lib/prisma"
+import { requireDealerContext } from "@/lib/network/context"
 
-export async function GET(req: NextRequest) {
+const TAKE = 20
+
+export async function GET(req: Request) {
     try {
-        const session: any = await getSession();
-        const user = session?.user || session;
-        if (!user) {
-            return ApiError('Unauthorized mapping', 403);
+        const ctx = await requireDealerContext()
+        const url = new URL(req.url)
+        const cursor = url.searchParams.get("cursor")
+
+        const orders = await prisma.order.findMany({
+            where: { dealerMembershipId: ctx.activeMembershipId },
+            take: TAKE + 1,
+            ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+            orderBy: { orderDate: "desc" },
+            select: {
+                id: true,
+                orderNumber: true,
+                status: true,
+                orderDate: true,
+                totalAmount: true,
+                currency: true,
+            },
+        })
+
+        const hasMore = orders.length > TAKE
+        const page = hasMore ? orders.slice(0, TAKE) : orders
+        const nextCursor = hasMore ? page[page.length - 1]?.id ?? null : null
+
+        return NextResponse.json({
+            ok: true,
+            items: page.map((o) => ({
+                id: o.id,
+                orderNumber: o.orderNumber,
+                status: o.status,
+                orderDate: o.orderDate,
+                totalAmount: typeof o.totalAmount === "object" ? Number(o.totalAmount) : Number(o.totalAmount),
+                currency: o.currency ?? "TRY",
+            })),
+            nextCursor,
+        })
+    } catch (error: any) {
+        if (error.message === "UNAUTHORIZED" || error.message === "NO_ACTIVE_MEMBERSHIP" || error.message === "INVALID_MEMBERSHIP_CONTEXT") {
+            return NextResponse.json({ ok: false, error: error.message }, { status: 403 })
         }
-
-        const currentCompanyId = user.companyId || session?.companyId;
-        if (!currentCompanyId) return ApiError('Tenant context missing', 400);
-
-        // Map params to validated schema
-        const queryParams = Object.fromEntries(req.nextUrl.searchParams);
-        const parseResult = networkOrderQuerySchema.safeParse(queryParams);
-
-        if (!parseResult.success) {
-            return ApiError(parseResult.error.issues[0].message, 400);
-        }
-
-        const data = parseResult.data;
-
-        const whereClause: any = {};
-
-        // Prisma Extension already handles OR restrictions (buyer || seller) globally.
-        // Implementing filter based on parameters passed if any
-        if (data.status) {
-            whereClause.status = data.status;
-        }
-
-        // Filtering by roles locally mapping DB schemas
-        if (data.role === 'buyer') {
-            // Let the extension intersect: OR[buyer=A, seller=A] AND buyerCompanyId=A
-            whereClause.buyerCompanyId = currentCompanyId;
-        } else if (data.role === 'seller') {
-            whereClause.sellerCompanyId = currentCompanyId;
-        }
-
-        const args: any = {
-            where: whereClause,
-            take: data.take,
-            orderBy: { createdAt: 'desc' },
-            include: {
-                buyerCompany: { select: { id: true, name: true, vkn: true } },
-                sellerCompany: { select: { id: true, name: true, vkn: true } },
-                shipments: true // includes top-level shipping entities dynamically
-            }
-        };
-
-        if (data.cursor) {
-            args.cursor = { id: data.cursor };
-            args.skip = 1; // skip cursor
-        }
-
-        const orders = await prisma.networkOrder.findMany(args);
-
-        const nextCursor = orders.length === data.take ? orders[orders.length - 1].id : undefined;
-
-        return ApiSuccess({ items: orders, nextCursor }, 200);
-    } catch (e: any) {
-        return ApiError(e.message ?? 'Server error', 500);
+        return NextResponse.json({ ok: false, error: "FETCH_ORDERS_FAILED" }, { status: 500 })
     }
 }

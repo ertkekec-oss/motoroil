@@ -22,6 +22,9 @@ model Tenant {
   subscription Subscription?
   upsellEvents UpsellEvent[]
   users        User[]
+  dealerMemberships DealerMembership[]
+  dealerPriceRules  DealerPriceRule[]
+  dealerInvites     DealerInvite[]
 }
 
 model Company {
@@ -255,6 +258,15 @@ model Order {
   staffId           String?
   company           Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   staff             Staff?    @relation("StaffStoreOrders", fields: [staffId], references: [id])
+  dealerMembershipId String?
+  salesChannel       SalesChannel @default(POS)
+  dealerPrice        Decimal?     @db.Decimal(12, 2)
+  dealerMembership   DealerMembership? @relation("OrderDealerMembership", fields: [dealerMembershipId], references: [id])
+  reservationReleasedAt DateTime?
+  accountingPostedAt DateTime?
+  isLimitExceeded    Boolean?     @default(false)
+  creditExceededAmount Decimal?   @db.Decimal(12, 2)
+  paymentRequired    Boolean?     @default(false)
 
   @@unique([companyId, orderNumber])
   @@index([marketplace, orderNumber])
@@ -274,6 +286,7 @@ model Product {
   price               Decimal                 @db.Decimal(10, 2)
   buyPrice            Decimal                 @default(0) @db.Decimal(10, 2)
   stock               Int                     @default(0)
+  reservedStock       Int                     @default(0)
   category            String?
   description         String?
   imageUrl            String?
@@ -315,6 +328,7 @@ model Product {
   pricingRules        SmartPricingRule[]
   stocks              Stock[]
   movements           StockMovement[]
+  dealerCartItems     DealerCartItem[]
 
   @@unique([code, branch, companyId])
   @@index([name])
@@ -323,6 +337,7 @@ model Product {
   @@index([category])
   @@index([parentId])
   @@index([companyId])
+  @@index([reservedStock])
   @@index([companyId, deletedAt, category])
   @@index([companyId, isParent, deletedAt])
 }
@@ -3896,4 +3911,389 @@ model BoostTenantEnforcement {
   quotaCapOverride  Int?
   effectiveFrom     DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+}
+
+enum DealerMembershipStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+}
+
+enum DealerPaymentProvider {
+  IYZICO
+  ODEAL
+  BANK_TRANSFER
+}
+
+enum DealerPaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum DealerRole {
+  DEALER_ADMIN
+  DEALER_STAFF
+}
+
+enum SalesChannel {
+  POS
+  FIELD
+  ECOM
+  GLOBAL_B2B
+  DEALER_B2B
+}
+
+model DealerUser {
+  id                    String             @id @default(uuid())
+  email                 String             @unique
+  phone                 String?
+  passwordHash          String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  defaultDealerCompanyId String?
+  
+  memberships           DealerMembership[]
+  sessions              DealerSession[]
+}
+
+model DealerOtpChallenge {
+  id         String   @id @default(uuid())
+  phoneE164  String   @unique
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int      @default(0)
+  createdAt  DateTime @default(now())
+  
+  @@index([phoneE164])
+}
+
+model DealerSession {
+  id           String     @id @default(uuid())
+  tokenHash    String     @unique
+  dealerUserId String
+  expiresAt    DateTime
+  createdAt    DateTime   @default(now())
+  
+  dealerUser   DealerUser @relation(fields: [dealerUserId], references: [id], onDelete: Cascade)
+  
+  @@index([dealerUserId])
+}
+
+model DealerCompany {
+  id              String             @id @default(uuid())
+  companyName     String
+  taxOffice       String?
+  taxNumber       String?
+  address         String?
+  city            String?
+  district        String?
+  createdAt       DateTime           @default(now())
+  
+  memberships     DealerMembership[]
+  invites         DealerInvite[]
+}
+
+enum DealerFinancialMode {
+  ISOLATED
+  ERP_POSTING
+}
+
+model DealerMembership {
+  id              String                 @id @default(uuid())
+  dealerUserId    String
+  dealerCompanyId String?
+  tenantId        String
+  
+  status          DealerMembershipStatus @default(ACTIVE)
+  creditLimit     Decimal                @default(0.0) @db.Decimal(12, 2)
+  financialMode   DealerFinancialMode    @default(ISOLATED)
+  priceRuleId     String?
+  
+  dealerUser      DealerUser             @relation(fields: [dealerUserId], references: [id])
+  dealerCompany   DealerCompany?         @relation(fields: [dealerCompanyId], references: [id])
+  tenant          Tenant                 @relation(fields: [tenantId], references: [id])
+  priceRule       DealerPriceRule?       @relation(fields: [priceRuleId], references: [id])
+  orders          Order[]                @relation("OrderDealerMembership")
+  carts           DealerCart[]
+  checkoutAttempts DealerCheckoutAttempt[]
+  
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@unique([dealerUserId, tenantId])
+  @@index([tenantId])
+}
+
+model DealerPriceRule {
+  id              String             @id @default(uuid())
+  tenantId        String
+  ruleName        String
+  discount        Decimal            @default(0.0) @db.Decimal(5, 2)
+  isActive        Boolean            @default(true)
+  
+  tenant          Tenant             @relation(fields: [tenantId], references: [id])
+  memberships     DealerMembership[]
+  
+  @@index([tenantId, isActive])
+}
+
+model DealerCheckoutAttempt {
+  id             String           @id @default(cuid())
+  membershipId   String
+  idempotencyKey String
+  orderId        String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  membership     DealerMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([membershipId, idempotencyKey])
+}
+
+model DealerPaymentIntent {
+  id                 String                  @id @default(uuid())
+  supplierTenantId   String
+  dealerMembershipId String?
+  amount             Decimal                 @db.Decimal(12, 2)
+  currency           String                  @default("TRY")
+  provider           DealerPaymentProvider?
+  status             String                  @default("CREATED")
+  referenceCode      String?
+  redirectUrl        String?
+  providerData       Json?
+  providerResult     Json?
+  paidAmount         String?
+  verifiedAt         DateTime?
+  idempotencyKey     String                  @unique
+  scope              String                  @default("DEALER_B2B")
+  orderId            String?
+  accountingPostedAt DateTime?
+
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  
+  @@index([provider, referenceCode])
+}
+
+enum DealerInviteStatus {
+  ISSUED
+  REDEEMED
+  REVOKED
+}
+
+model DealerInvite {
+  id                 String             @id @default(uuid())
+  supplierTenantId   String
+  tokenHash          String             @unique
+  status             DealerInviteStatus @default(ISSUED)
+  expiresAt          DateTime
+  dealerCompanyId    String? 
+  issuedToPhoneE164  String? 
+  issuedToEmail      String?
+  maxRedemptions     Int                @default(1)
+  redemptionCount    Int                @default(0)
+  createdByUserId    String?
+  redeemedAt         DateTime?
+  
+  tenant             Tenant             @relation(fields: [supplierTenantId], references: [id])
+  dealerCompany      DealerCompany?     @relation(fields: [dealerCompanyId], references: [id])
+
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  
+  @@index([supplierTenantId, status])
+  @@index([expiresAt])
+}
+
+model RateLimitEvent {
+  id        String   @id @default(uuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+enum CartStatus {
+  ACTIVE
+  CHECKED_OUT
+  ABANDONED
+}
+
+model DealerCart {
+  id               String   @id @default(uuid())
+  membershipId     String
+  supplierTenantId String
+
+  membership       DealerMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  status           CartStatus @default(ACTIVE)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  items            DealerCartItem[]
+
+  // A membership can only have 1 active cart at a time.
+  // Partial unique index trick for Postgres or general index for standard usage.
+  @@index([membershipId, status])
+  @@index([supplierTenantId])
+}
+
+model DealerCartItem {
+  id         String   @id @default(uuid())
+  cartId     String
+  productId  String
+  quantity   Int
+
+  cart       DealerCart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product    Product    @relation(fields: [productId], references: [id])
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([cartId, productId])
+}
+
+model TenantPaymentConfig {
+  id          String @id @default(uuid())
+  tenantId    String @unique
+  provider    DealerPaymentProvider
+  isEnabled   Boolean @default(false)
+
+  // secrets: encrypt-at-rest önerilir (uygulama seviyesinde)
+  configJson  Json
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId, provider])
+}
+
+model WebhookReplay {
+  id          String   @id @default(uuid())
+  provider    DealerPaymentProvider
+  nonce       String
+  seenAt      DateTime @default(now())
+
+  @@unique([provider, nonce])
+  @@index([provider, seenAt])
+}
+
+enum RefundStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+model DealerRefund {
+  id               String                @id @default(uuid())
+  supplierTenantId String
+  orderId          String
+  provider         DealerPaymentProvider
+  amount           Decimal               @db.Decimal(12, 2)
+  currency         String                @default("TRY")
+
+  reason           String?
+  idempotencyKey   String                @unique
+
+  providerRefundId String?
+  providerResult   Json?
+  status           RefundStatus          @default(PENDING)
+  accountingPostedAt DateTime?
+
+  createdByUserId  String?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@index([supplierTenantId, orderId])
+  @@index([supplierTenantId, status])
+}
+
+enum AuditEventType {
+  DEALER_INVITE_ISSUED
+  DEALER_INVITE_REDEEMED
+  OTP_REQUESTED
+  OTP_VERIFIED
+  CONTEXT_SWITCHED
+
+  CHECKOUT_RESERVED
+  ORDER_APPROVED
+  ORDER_REJECTED
+  RESERVATION_RELEASED
+
+  PAYMENT_INTENT_CREATED
+  PAYMENT_CALLBACK_VERIFIED
+  PAYMENT_FAILED
+
+  REFUND_REQUESTED
+  REFUND_SUCCEEDED
+  REFUND_FAILED
+
+  ACCOUNTING_POST_ATTEMPT
+  ACCOUNTING_POST_SUCCEEDED
+  ACCOUNTING_POST_FAILED
+
+  CREDIT_LIMIT_EXCEEDED
+  CREDIT_LIMIT_OVERRIDE_APPROVE
+  CREDIT_LIMIT_FORCE_PAYMENT
+  DEALER_AUTH_MODE_CHANGED
+}
+
+model AuditEvent {
+  id              String         @id @default(uuid())
+  tenantId        String         // supplier tenant scope
+  actorUserId     String?        // staff user id (if any)
+  actorDealerUserId String?      // dealer user id (if any)
+  actorIp         String?
+  actorUa         String?
+
+  type            AuditEventType
+  entityType      String?        // "Order" | "DealerRefund" | ...
+  entityId        String?
+  membershipId    String?        // dealerMembershipId (if relevant)
+
+  meta            Json?
+  createdAt       DateTime       @default(now())
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, type, createdAt])
+  @@index([tenantId, entityType, entityId])
+  @@index([membershipId, createdAt])
+}
+
+enum AccountingOutboxStatus {
+  PENDING
+  PROCESSING
+  DONE
+  FAILED
+}
+
+model AccountingOutbox {
+  id           String   @id @default(cuid())
+  tenantId     String
+  event        String
+  entityId     String
+  dedupeKey    String   @unique
+  status       AccountingOutboxStatus @default(PENDING)
+  attempts     Int      @default(0)
+  nextRetryAt  DateTime?
+  lastError    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([tenantId, status])
+  @@index([nextRetryAt])
+}
+
+enum DealerAuthMode {
+  PASSWORD_ONLY
+  OTP_ONLY
+  OTP_OR_PASSWORD
+}
+
+model TenantPortalConfig {
+  tenantId       String         @id
+  dealerAuthMode DealerAuthMode @default(PASSWORD_ONLY)
+  updatedAt      DateTime       @updatedAt
 }

@@ -106,6 +106,8 @@ export default function Sidebar() {
         '/advisor': { perm: 'finance_view', feature: 'accountant' },
         '/admin/audit-logs': { perm: 'audit_view' },
         '/staff/pdks': { perm: 'staff_manage' },
+        '/admin/dealer-orders': { perm: 'admin_manage' },
+        '/admin/finance/refunds': { perm: 'admin_manage' },
         '/security/suspicious': { perm: 'security_access' },
         '/billing': { perm: 'settings_manage' },
         '/field-mobile/routes': { perm: 'field_sales_access' },
@@ -194,7 +196,9 @@ export default function Sidebar() {
                     ]
                 },
                 { name: 'PDKS', href: '/staff/pdks', icon: Clock },
+                { name: 'B2B Sipariş Onayı', href: '/admin/dealer-orders', icon: Inbox },
                 { name: 'İnsan Kaynakları', href: '/staff', icon: Users },
+                { name: 'İade İşlemleri', href: '/admin/finance/refunds', icon: Receipt },
             ]
         },
         {

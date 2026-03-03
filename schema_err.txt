@@ -1,0 +1,66 @@
+﻿Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (:String  
+  ) [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Error: Prisma schema validati
+on - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mError v
+alidating field `membership` 
+in model `DealerCart`: The re
+lation field `membership` on 
+model `DealerCart` is missing
+ an opposite relation field o
+n the model `DealerMembership
+`. Either run `prisma format`
+ or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:4089[0m
+[1;94m   | [0m
+[1;94m4088 | [0m
+[1;94m4089 | [0m  [1;91mme
+mbership       DealerMembersh
+ip @relation(fields: [members
+hipId], references: [id], onD
+elete: Cascade)[0m
+[1;94m4090 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError v
+alidating field `product` in 
+model `DealerCartItem`: The r
+elation field `product` on mo
+del `DealerCartItem` is missi
+ng an opposite relation field
+ on the model `Product`. Eith
+er run `prisma format` or add
+ it manually.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:4111[0m
+[1;94m   | [0m
+[1;94m4110 | [0m  cart     
+  DealerCart @relation(fields
+: [cartId], references: [id],
+ onDelete: Cascade)
+[1;94m4111 | [0m  [1;91mpr
+oduct    Product    @relation
+(fields: [productId], referen
+ces: [id])[0m
+[1;94m4112 | [0m
+[1;94m   | [0m
+
+Validation Error Count: 2
+[Context: validate]
+
+Prisma CLI Version : 5.22.0

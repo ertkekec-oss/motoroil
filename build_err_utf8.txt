@@ -1,0 +1,831 @@
+﻿
+> periodya@0.1.0 build
+> prisma generate && prisma migrate deploy && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Ô£ö Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 2.81s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-billowing-glade-agt0zp7m-pooler.c-2.eu-central-1.aws.neon.tech"
+
+26 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+Ôû▓ Next.js 16.1.4 (Turbopack)
+- Environments: .env.production.local, .env.local, .env.production, .env
+
+node.exe : ÔÜá The "middlewar
+e" file convention is depreca
+ted. Please use "proxy" inste
+ad. Learn more: https://nextj
+s.org/docs/messages/middlewar
+e-to-proxy
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (ÔÜá The  
+   "middle...leware-to-pro   
+ xy:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 42s
+  Skipping validation of types
+  Collecting page data using 7 workers ...
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:04.51
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_ad15eb8
+e._.js:139:74117)
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:04.60
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_827e14a
+e._.js:139:84660)
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:04.63
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:04.83
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:05.05
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:05.11
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:05.26
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:05.49
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:05.59
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_827e14a
+e._.js:139:84660)
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:05.71
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:05.75
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_ad15eb8
+e._.js:139:74117)
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:05.87
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:05.91
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:06.38
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:06.55
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:06.69
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:06.83
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:06.84
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+ÔÜá´©Å REDIS_URL is missing. 
+Redis functionality will be l
+imited.
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:07.11
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:07.20
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ETIMEDOUT'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:07.25
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:07.28
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:07.28
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.i (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\ssr\_252
+9a379._.js:139:84686)
+  Generating static pages using 7 workers (0/275) ...
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:07.75
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:07.89
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:07.89
+6Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+  Generating static pages using 7 workers (68/275) 
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:08.24
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:08.55
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:08.55
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:08.81
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+  Generating static pages using 7 workers (137/275) 
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:08.92
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:08.99
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.13
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.28
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.36
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.45
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.46
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.62
+3Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.62
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error: Connection is closed.
+    at EventEmitter.l (C:\Use
+rs\ertke\OneDrive\Masa├╝st├╝\
+periodya\muhasebeapp\motoroil
+\.next\server\chunks\_827e14a
+e._.js:139:84660)
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.73
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.75
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.83
+7Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.88
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:09.93
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+[Prisma] Initializing PrismaClientSingleton v2 (Robust Isolation)
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.01
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.18
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.19
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.24
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.27
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.29
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+  Generating static pages using 7 workers (206/275) 
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.41
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.47
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.66
+0Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.68
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.74
+4Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:10.83
+2Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:11.01
+5Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:11.05
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:11.23
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:11.26
+9Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:11.32
+8Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+{"event":"redis_error","times
+tamp":"2026-03-03T21:05:11.39
+1Z","error":"","status":"erro
+r"}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED'
+}
+Error occurred prerendering p
+age "/admin/finance/refunds".
+ Read more: https://nextjs.or
+g/docs/messages/prerender-err
+or
+ReferenceError: window is not
+ defined
+    at <unknown> (C:\Users\er
+tke\OneDrive\Masa├╝st├╝\perio
+dya\muhasebeapp\motoroil\.nex
+t\server\chunks\ssr\src_app_a
+dmin_finance_refunds_page_tsx
+_f879e7c6._.js:1:299)
+    at d (C:\Users\ertke\OneD
+rive\Masa├╝st├╝\periodya\muha
+sebeapp\motoroil\.next\server
+\chunks\ssr\src_app_admin_fin
+ance_refunds_page_tsx_f879e7c
+6._.js:1:258) {
+  digest: '671514518'
+}
+Export encountered an error o
+n /admin/finance/refunds/page
+: /admin/finance/refunds, exi
+ting the build.
+Ô¿» Next.js build worker exit
+ed with code: 1 and signal: n
+ull

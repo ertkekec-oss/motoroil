@@ -1,0 +1,62 @@
+﻿node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (:String  
+  ) [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+[1m[31mError: [39m[22m[3
+1m[1mPrisma schema validatio
+n[22m[39m - (validate wasm)
+Error code: P1012
+[31m[1m[1;91merror[0m: [
+1mThe enum "PaymentProvider" 
+cannot be defined because a e
+num with that name already ex
+ists.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:3913[0m
+[1;94m   | [0m
+[1;94m3912 | [0m
+[1;94m3913 | [0menum [1;91
+mPaymentProvider[0m {
+[1;94m   | [0m
+[1;91merror[0m: [1mThe enu
+m "PaymentStatus" cannot be d
+efined because a enum with th
+at name already exists.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:3919[0m
+[1;94m   | [0m
+[1;94m3918 | [0m
+[1;94m3919 | [0menum [1;91
+mPaymentStatus[0m {
+[1;94m   | [0m
+[1;91merror[0m: [1mError p
+arsing attribute "@default": 
+The defined default value `IN
+ITIATED` is not a valid value
+ of the enum specified for th
+e field.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:2068[0m
+[1;94m   | [0m
+[1;94m2067 | [0m  mode     
+          PaymentMode
+[1;94m2068 | [0m  status   
+          PaymentStatus   [1
+;91m@default(INITIATED)[0m
+[1;94m   | [0m
+
+Validation Error Count: 3[22
+m[39m
+[Context: validate]
+
+Prisma CLI Version : 5.22.0
