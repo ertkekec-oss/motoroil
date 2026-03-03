@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 function walkDir(dir, callback) {
+    if (!fs.existsSync(dir)) return;
     fs.readdirSync(dir).forEach(f => {
         let dirPath = path.join(dir, f);
         let isDirectory = fs.statSync(dirPath).isDirectory();
@@ -9,42 +10,63 @@ function walkDir(dir, callback) {
     });
 }
 
-function checkAdminLinks() {
-    console.log('🔍 Checking /admin directory for forbidden /staff links...');
+function checkRoutes() {
+    console.log('🔍 Checking /admin and /b2b directories for forbidden links...');
     const adminPath = path.join(__dirname, '../src/app/admin');
-
-    if (!fs.existsSync(adminPath)) {
-        console.log('No /admin directory found, skipping.');
-        return;
-    }
+    const b2bPath = path.join(__dirname, '../src/app/(app)/b2b');
 
     let hasError = false;
 
+    // Check /admin
     walkDir(adminPath, (filePath) => {
         if (!filePath.endsWith('.tsx') && !filePath.endsWith('.ts')) return;
-
         const content = fs.readFileSync(filePath, 'utf8');
-        // Simple regex to catch href="/staff..." avoiding imports and paths starting with /api/staff which are allowed/proxies for now, 
-        // wait, the user said "/staff root HR sayfası asla admin'e redirect olmamalı. /admin içinden /staff'e yönlendiren 'Panel' gibi generik link olmamalı"
-        // Let's look for href="/staff" or href='/staff'
-        const regex = /href=(["'`])\/staff(\/|["'`])/g;
+
+        // Sadece URL/segment olarak /staff'a giden href="..." veya router.push('...')
+        // href="/staff" veya href='/staff' veya push('/staff' veya push("/staff"
+        const regexStaff = /(?:href=|push\()(["'`])\/staff\b(.*?)(["'`])/g;
 
         let match;
-        while ((match = regex.exec(content)) !== null) {
+        while ((match = regexStaff.exec(content)) !== null) {
             console.error(`❌ ERROR: Forbidden /staff link found in /admin!`);
             console.error(`   File: ${filePath}`);
-            console.error(`   Line content matches: href="/staff..."`);
+            console.error(`   Match: ${match[0]}`);
+            hasError = true;
+        }
+    });
+
+    // Check /b2b
+    walkDir(b2bPath, (filePath) => {
+        if (!filePath.endsWith('.tsx') && !filePath.endsWith('.ts')) return;
+        const content = fs.readFileSync(filePath, 'utf8');
+
+        const regexAdmin = /(?:href=|push\()(["'`])\/admin\b(.*?)(["'`])/g;
+        const regexStaff = /(?:href=|push\()(["'`])\/staff\b(.*?)(["'`])/g;
+
+        let matchA;
+        while ((matchA = regexAdmin.exec(content)) !== null) {
+            console.error(`❌ ERROR: Forbidden /admin link found in /b2b!`);
+            console.error(`   File: ${filePath}`);
+            console.error(`   Match: ${matchA[0]}`);
+            hasError = true;
+        }
+
+        let matchS;
+        while ((matchS = regexStaff.exec(content)) !== null) {
+            console.error(`❌ ERROR: Forbidden /staff link found in /b2b!`);
+            console.error(`   File: ${filePath}`);
+            console.error(`   Match: ${matchS[0]}`);
             hasError = true;
         }
     });
 
     if (hasError) {
-        console.error('\n🚨 TEST FAILED. Admin pages must not link to /staff HR pages.');
+        console.error('\n🚨 TEST FAILED. Link boundaries violated.');
         process.exit(1);
     } else {
-        console.log('✅ TEST PASSED. No /staff links found in /admin pages.');
+        console.log('✅ TEST PASSED. All route boundaries intact.');
         process.exit(0);
     }
 }
 
-checkAdminLinks();
+checkRoutes();

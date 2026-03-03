@@ -45,7 +45,7 @@ export function PendingDealerOrdersCard() {
 
             <div className="mt-4">
                 <Link
-                    href="/admin/dealer-orders"
+                    href="/admin/b2b/dealer-orders"
                     className="h-10 px-4 inline-flex items-center rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-95"
                 >
                     Kuyruğa Git

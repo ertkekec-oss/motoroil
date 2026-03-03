@@ -106,8 +106,9 @@ export default function Sidebar() {
         '/advisor': { perm: 'finance_view', feature: 'accountant' },
         '/admin/audit-logs': { perm: 'audit_view' },
         '/staff/pdks': { perm: 'staff_manage' },
-        '/admin/dealer-orders': { perm: 'admin_manage' },
-        '/admin/finance/refunds': { perm: 'admin_manage' },
+        '/admin/b2b/dealer-orders': { perm: 'admin_manage' },
+        '/admin/b2b/refunds': { perm: 'admin_manage' },
+        '/admin/b2b/settings': { perm: 'admin_manage' },
         '/security/suspicious': { perm: 'security_access' },
         '/billing': { perm: 'settings_manage' },
         '/field-mobile/routes': { perm: 'field_sales_access' },
@@ -138,7 +139,7 @@ export default function Sidebar() {
                     id: 'b2b-global-parent',
                     subItems: [
                         { name: 'Uyuşmazlık Çözüm Merkezi', href: '/support/tickets' },
-                        { name: 'B2B Dashboard', href: '/dashboard' },
+                        { name: 'B2B Dashboard', href: '/b2b/dashboard' },
 
                         { name: 'SİPARİŞLER', href: '' },
                         ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/network/seller/orders' }] : []),
@@ -196,9 +197,15 @@ export default function Sidebar() {
                     ]
                 },
                 { name: 'PDKS', href: '/staff/pdks', icon: Clock },
-                { name: 'B2B Sipariş Onayı', href: '/admin/dealer-orders', icon: Inbox },
                 { name: 'İnsan Kaynakları', href: '/staff', icon: Users },
-                { name: 'İade İşlemleri', href: '/admin/finance/refunds', icon: Receipt },
+            ]
+        },
+        {
+            group: "B2B Network",
+            items: [
+                { name: 'Sipariş Onayı', href: '/admin/b2b/dealer-orders', icon: Inbox },
+                { name: 'İadeler', href: '/admin/b2b/refunds', icon: Receipt },
+                { name: 'Ayarlar', href: '/admin/b2b/settings', icon: Settings },
             ]
         },
         {
