@@ -1,0 +1,6 @@
+﻿
+> periodya@0.1.0 test:links
+> npx ts-node scripts/check-links.ts
+
+­şöı Checking /admin, /dealer-network, and /staff directories for link boundaries...
+Ô£à TEST PASSED. All route boundaries intact.

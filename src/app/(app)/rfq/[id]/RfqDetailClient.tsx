@@ -29,7 +29,7 @@ export default function RfqDetailClient({ rfq, items, offers }: { rfq: any, item
             try {
                 await acceptOfferAction(offerId);
                 alert("Offer accepted! Order created. Proceed to Buyer Orders to checkout.");
-                router.push("/network/buyer/orders");
+                router.push("/hub/buyer/orders");
             } catch (err: any) {
                 alert(err.message || "Failed to accept offer.");
             }

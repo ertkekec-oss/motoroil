@@ -1,0 +1,869 @@
+﻿
+> periodya@0.1.0 build
+> prisma generate && prisma migrate deploy && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Ô£ö Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 3.14s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to react to database changes in your app as they happen? Discover how with Pulse: https://pris.ly/tip-1-pulse
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-billowing-glade-agt0zp7m-pooler.c-2.eu-central-1.aws.neon.tech"
+
+26 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+Ôû▓ Next.js 16.1.4 (Turbopack)
+- Environments: .env.production.local, .env.local, .env.production, .env
+
+node.exe : ÔÜá The "middlewar
+e" file convention is depreca
+ted. Please use "proxy" inste
+ad. Learn more: https://nextj
+s.org/docs/messages/middlewar
+e-to-proxy
+At line:1 char:1
++ & "C:\Program Files\nodejs/
+node.exe" "C:\Program Files\n
+odejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (ÔÜá The  
+   "middle...leware-to-pro   
+ xy:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed
+ with 8 errors:
+./src/app/api/network/payment
+s/intents/route.ts:4:1
+Module not found: Can't resol
+ve '@/lib/hub/payments/config
+'
+[0m [90m 2 |[39m [36mimpo
+rt[39m prisma [36mfrom[39m
+ [32m"@/lib/prisma"[39m
+ [90m 3 |[39m [36mimport[
+39m { requireDealerContext } 
+[36mfrom[39m [32m"@/lib/ne
+twork/context"[39m
+[31m[1m>[22m[39m[90m 4 |
+[39m [36mimport[39m { getS
+upplierPaymentConfigOrThrow }
+ [36mfrom[39m [32m"@/lib/h
+ub/payments/config"[39m
+ [90m   |[39m [31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mexport[
+39m [36masync[39m [36mfunc
+tion[39m [33mPOST[39m(req
+[33m:[39m [33mRequest[39m)
+ {
+ [90m 7 |[39m     [36mtry
+[39m {[0m
+
+Import map: aliased to relati
+ve './src/lib/hub/payments/co
+nfig' inside of [project]/
+
+
+https://nextjs.org/docs/messa
+ges/module-not-found
+
+
+./src/app/api/dealer-network/
+orders/[id]/refund/route.ts:4
+:1
+Module not found: Can't resol
+ve '@/lib/hub/payments/getPro
+vider'
+[0m [90m 2 |[39m [36mimpo
+rt[39m prisma [36mfrom[39m
+ [32m"@/lib/prisma"[39m[33
+m;[39m
+ [90m 3 |[39m [36mimport[
+39m { authorize[33m,[39m ha
+sPermission } [36mfrom[39m 
+[32m"@/lib/auth"[39m[33m;
+[39m
+[31m[1m>[22m[39m[90m 4 |
+[39m [36mimport[39m { getP
+aymentProviderAdapter } [36m
+from[39m [32m"@/lib/hub/pay
+ments/getProvider"[39m[33m;
+[39m
+ [90m   |[39m [31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m
+ [90m 5 |[39m [36mimport[
+39m { auditLog } [36mfrom[3
+9m [32m"@/lib/audit/log"[39
+m[33m;[39m
+ [90m 6 |[39m [36mimport[
+39m { enqueueAccountingEvent 
+} [36mfrom[39m [32m"@/lib/
+network/accounting/outbox"[3
+9m[33m;[39m
+ [90m 7 |[39m[0m
+
+Import map: aliased to relati
+ve './src/lib/hub/payments/ge
+tProvider' inside of [project
+]/
+
+
+https://nextjs.org/docs/messa
+ges/module-not-found
+
+
+./src/app/api/network/payment
+s/callback/iyzico/route.ts:3:
+1
+Module not found: Can't resol
+ve '@/lib/hub/payments/getPro
+vider'
+[0m [90m 1 |[39m [36mimpo
+rt[39m { [33mNextResponse[
+39m } [36mfrom[39m [32m"ne
+xt/server"[39m[33m;[39m
+ [90m 2 |[39m [36mimport[
+39m prisma [36mfrom[39m [3
+2m"@/lib/prisma"[39m[33m;[
+39m
+[31m[1m>[22m[39m[90m 3 |
+[39m [36mimport[39m { getP
+aymentProviderAdapter } [36m
+from[39m [32m"@/lib/hub/pay
+ments/getProvider"[39m[33m;
+[39m
+ [90m   |[39m [31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m
+ [90m 4 |[39m [36mimport[
+39m { markOrderPaidIfEligible
+ } [36mfrom[39m [32m"@/lib
+/hub/payments/orderStatus"[3
+9m[33m;[39m
+ [90m 5 |[39m [36mimport[
+39m { releaseReservationForOr
+der } [36mfrom[39m [32m"@/
+lib/network/inventory/reserva
+tion"[39m[33m;[39m
+ [90m 6 |[39m [36mimport[
+39m { enqueueAccountingEvent 
+} [36mfrom[39m [32m"@/lib/
+network/accounting/outbox"[3
+9m[33m;[39m[0m
+
+Import map: aliased to relati
+ve './src/lib/hub/payments/ge
+tProvider' inside of [project
+]/
+
+
+https://nextjs.org/docs/messa
+ges/module-not-found
+
+
+./src/app/api/network/payment
+s/callback/odeal/route.ts:3:1
+Module not found: Can't resol
+ve '@/lib/hub/payments/getPro
+vider'
+[0m [90m 1 |[39m [36mimpo
+rt[39m { [33mNextResponse[
+39m } [36mfrom[39m [32m"ne
+xt/server"[39m[33m;[39m
+ [90m 2 |[39m [36mimport[
+39m prisma [36mfrom[39m [3
+2m"@/lib/prisma"[39m[33m;[
+39m
+[31m[1m>[22m[39m[90m 3 |
+[39m [36mimport[39m { getP
+aymentProviderAdapter } [36m
+from[39m [32m"@/lib/hub/pay
+ments/getProvider"[39m[33m;
+[39m
+ [90m   |[39m [31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m
+ [90m 4 |[39m [36mimport[
+39m { markOrderPaidIfEligible
+ } [36mfrom[39m [32m"@/lib
+/hub/payments/orderStatus"[3
+9m[33m;[39m
+ [90m 5 |[39m [36mimport[
+39m { releaseReservationForOr
+der } [36mfrom[39m [32m"@/
+lib/network/inventory/reserva
+tion"[39m[33m;[39m
+ [90m 6 |[39m [36mimport[
+39m { enqueueAccountingEvent 
+} [36mfrom[39m [32m"@/lib/
+network/accounting/outbox"[3
+9m[33m;[39m[0m
+
+Import map: aliased to relati
+ve './src/lib/hub/payments/ge
+tProvider' inside of [project
+]/
+
+
+https://nextjs.org/docs/messa
+ges/module-not-found
+
+
+./src/app/api/network/payment
+s/intent/route.ts:4:1
+Module not found: Can't resol
+ve '@/lib/hub/payments/getPro
+vider'
+[0m [90m 2 |[39m [36mimpo
+rt[39m prisma [36mfrom[39m
+ [32m"@/lib/prisma"[39m[33
+m;[39m
+ [90m 3 |[39m [36mimport[
+39m { requireDealerContext } 
+[36mfrom[39m [32m"@/lib/ne
+twork/context"[39m[33m;[39
+m
+[31m[1m>[22m[39m[90m 4 |
+[39m [36mimport[39m { getP
+aymentProviderAdapter } [36m
+from[39m [32m"@/lib/hub/pay
+ments/getProvider"[39m[33m;
+[39m
+ [90m   |[39m [31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m
+ [90m 5 |[39m [36mimport[
+39m { [33mPaymentScope[39m 
+} [36mfrom[39m [32m"@/lib/
+hub/payments/types"[39m[33m
+;[39m
+ [90m 6 |[39m
+ [90m 7 |[39m [36mfunction
+[39m assertString(x[33m:[3
+9m any[33m,[39m name[33m:
+[39m string) {[0m
+
+Import map: aliased to relati
+ve './src/lib/hub/payments/ge
+tProvider' inside of [project
+]/
+
+
+https://nextjs.org/docs/messa
+ges/module-not-found
+
+
+./src/app/api/network/payment
+s/callback/iyzico/route.ts:4:
+1
+Module not found: Can't resol
+ve '@/lib/hub/payments/orderS
+tatus'
+[0m [90m 2 |[39m [36mimpo
+rt[39m prisma [36mfrom[39m
+ [32m"@/lib/prisma"[39m[33
+m;[39m
+ [90m 3 |[39m [36mimport[
+39m { getPaymentProviderAdapt
+er } [36mfrom[39m [32m"@/l
+ib/hub/payments/getProvider"
+[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |
+[39m [36mimport[39m { mark
+OrderPaidIfEligible } [36mfr
+om[39m [32m"@/lib/hub/payme
+nts/orderStatus"[39m[33m;[
+39m
+ [90m   |[39m [31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m [36mimport[
+39m { releaseReservationForOr
+der } [36mfrom[39m [32m"@/
+lib/network/inventory/reserva
+tion"[39m[33m;[39m
+ [90m 6 |[39m [36mimport[
+39m { enqueueAccountingEvent 
+} [36mfrom[39m [32m"@/lib/
+network/accounting/outbox"[3
+9m[33m;[39m
+ [90m 7 |[39m[0m
+
+Import map: aliased to relati
+ve './src/lib/hub/payments/or
+derStatus' inside of [project
+]/
+
+
+https://nextjs.org/docs/messa
+ges/module-not-found
+
+
+./src/app/api/network/payment
+s/callback/odeal/route.ts:4:1
+Module not found: Can't resol
+ve '@/lib/hub/payments/orderS
+tatus'
+[0m [90m 2 |[39m [36mimpo
+rt[39m prisma [36mfrom[39m
+ [32m"@/lib/prisma"[39m[33
+m;[39m
+ [90m 3 |[39m [36mimport[
+39m { getPaymentProviderAdapt
+er } [36mfrom[39m [32m"@/l
+ib/hub/payments/getProvider"
+[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |
+[39m [36mimport[39m { mark
+OrderPaidIfEligible } [36mfr
+om[39m [32m"@/lib/hub/payme
+nts/orderStatus"[39m[33m;[
+39m
+ [90m   |[39m [31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m [36mimport[
+39m { releaseReservationForOr
+der } [36mfrom[39m [32m"@/
+lib/network/inventory/reserva
+tion"[39m[33m;[39m
+ [90m 6 |[39m [36mimport[
+39m { enqueueAccountingEvent 
+} [36mfrom[39m [32m"@/lib/
+network/accounting/outbox"[3
+9m[33m;[39m
+ [90m 7 |[39m[0m
+
+Import map: aliased to relati
+ve './src/lib/hub/payments/or
+derStatus' inside of [project
+]/
+
+
+https://nextjs.org/docs/messa
+ges/module-not-found
+
+
+./src/app/network/payment/res
+ult/page.tsx:6:1
+Module not found: Can't resol
+ve '@/lib/hub/payments/usePay
+mentIntentPoll'
+[0m [90m 4 |[39m [36mimpo
+rt[39m { [33mSuspense[39m 
+} [36mfrom[39m [32m"react"
+[39m[33m;[39m
+ [90m 5 |[39m [36mimport[
+39m [33mLink[39m [36mfrom
+[39m [32m"next/link"[39m[3
+3m;[39m
+[31m[1m>[22m[39m[90m 6 |
+[39m [36mimport[39m { useP
+aymentIntentPoll } [36mfrom
+[39m [32m"@/lib/hub/payments
+/usePaymentIntentPoll"[39m[
+33m;[39m
+ [90m   |[39m [31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39
+m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mfunction
+[39m [33mResultContent[39m
+() {
+ [90m 9 |[39m     [36mcons
+t[39m sp [33m=[39m useSear
+chParams()[33m;[39m[0m
+
+Import map: aliased to relati
+ve './src/lib/hub/payments/us
+ePaymentIntentPoll' inside of
+ [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./src/app/network/payment
+/result/page.tsx [Client Comp
+onent Browser]
+    ./src/app/network/payment
+/result/page.tsx [Server Comp
+onent]
+
+  Client Component SSR:
+    ./src/app/network/payment
+/result/page.tsx [Client Comp
+onent SSR]
+    ./src/app/network/payment
+/result/page.tsx [Server Comp
+onent]
+
+https://nextjs.org/docs/messa
+ges/module-not-found
+
+
+    at <unknown> (./src/app/a
+pi/network/payments/intents/r
+oute.ts:4:1)
+    at <unknown> (https://nex
+tjs.org/docs/messages/module-
+not-found)
+    at <unknown> (./src/app/a
+pi/dealer-network/orders/[id]
+/refund/route.ts:4:1)
+    at <unknown> (https://nex
+tjs.org/docs/messages/module-
+not-found)
+    at <unknown> (./src/app/a
+pi/network/payments/callback/
+iyzico/route.ts:3:1)
+    at <unknown> (https://nex
+tjs.org/docs/messages/module-
+not-found)
+    at <unknown> (./src/app/a
+pi/network/payments/callback/
+odeal/route.ts:3:1)
+    at <unknown> (https://nex
+tjs.org/docs/messages/module-
+not-found)
+    at <unknown> (./src/app/a
+pi/network/payments/intent/ro
+ute.ts:4:1)
+    at <unknown> (https://nex
+tjs.org/docs/messages/module-
+not-found)
+    at <unknown> (./src/app/a
+pi/network/payments/callback/
+iyzico/route.ts:4:1)
+    at <unknown> (https://nex
+tjs.org/docs/messages/module-
+not-found)
+    at <unknown> (./src/app/a
+pi/network/payments/callback/
+odeal/route.ts:4:1)
+    at <unknown> (https://nex
+tjs.org/docs/messages/module-
+not-found)
+    at <unknown> (./src/app/n
+etwork/payment/result/page.ts
+x:6:1)
+    at <unknown> (https://nex
+tjs.org/docs/messages/module-
+not-found)

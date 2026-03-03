@@ -155,7 +155,7 @@ export async function createOrdersFromCartAction(checkoutAttemptKey: string) {
     await clearCartAction();
 
     revalidatePath("/catalog");
-    revalidatePath("/network/buyer/orders");
+    revalidatePath("/hub/buyer/orders");
 
     return { success: true };
 }

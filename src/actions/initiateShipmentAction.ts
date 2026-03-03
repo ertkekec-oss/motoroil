@@ -21,8 +21,8 @@ export async function initiateShipmentAction(orderId: string, payload: any) {
             items: payload.items || undefined, // Array of { productId, qty } from client 
         });
 
-        revalidatePath(`/network/seller/orders/${orderId}`);
-        revalidatePath(`/network/seller/orders`);
+        revalidatePath(`/hub/seller/orders/${orderId}`);
+        revalidatePath(`/hub/seller/orders`);
 
         return result;
     } catch (e: any) {

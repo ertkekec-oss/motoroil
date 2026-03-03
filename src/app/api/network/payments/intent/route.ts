@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireDealerContext } from "@/lib/network/context";
-import { getPaymentProviderAdapter } from "@/lib/network/payments/getProvider";
-import { PaymentScope } from "@/lib/network/payments/types";
+import { getPaymentProviderAdapter } from "@/lib/hub/payments/getProvider";
+import { PaymentScope } from "@/lib/hub/payments/types";
 
 function assertString(x: any, name: string) {
     if (typeof x !== "string" || !x) throw new Error(`INVALID_${name}`);

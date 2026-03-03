@@ -62,7 +62,7 @@ export default async function SellerOrderDetailPage({
         },
     });
 
-    if (!order) redirect("/network/seller/orders");
+    if (!order) redirect("/hub/seller/orders");
 
     // Prevent seeing orders that do not belong to seller
     if (order.sellerCompanyId !== session.settings.companyId) {
@@ -80,7 +80,7 @@ export default async function SellerOrderDetailPage({
             <div className="flex items-center justify-between">
                 <div>
                     <div className="flex items-center gap-3">
-                        <Link href="/network/seller/orders" className="text-sm text-gray-500 hover:text-gray-900 border border-gray-200 bg-white rounded-md px-2 py-1">&larr; Satışlara Dön</Link>
+                        <Link href="/hub/seller/orders" className="text-sm text-gray-500 hover:text-gray-900 border border-gray-200 bg-white rounded-md px-2 py-1">&larr; Satışlara Dön</Link>
                     </div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 mt-2">Sipariş Yönetimi</h1>
                     <p className="text-sm font-mono text-gray-500 mt-1">#{order.id}</p>

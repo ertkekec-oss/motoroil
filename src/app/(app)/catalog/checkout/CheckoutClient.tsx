@@ -23,7 +23,7 @@ export default function CheckoutClient({ previewData }: { previewData: any }) {
             try {
                 await createOrdersFromCartAction(attemptKey);
                 alert("Order placed successfully via ESCROW mock payment!");
-                router.push("/network/buyer/orders");
+                router.push("/hub/buyer/orders");
             } catch (err: any) {
                 alert(err.message || "Checkout failed");
             }

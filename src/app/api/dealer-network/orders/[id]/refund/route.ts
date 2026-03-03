@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { authorize, hasPermission } from "@/lib/auth";
-import { getPaymentProviderAdapter } from "@/lib/network/payments/getProvider";
+import { getPaymentProviderAdapter } from "@/lib/hub/payments/getProvider";
 import { auditLog } from "@/lib/audit/log";
 import { enqueueAccountingEvent } from "@/lib/network/accounting/outbox";
 

@@ -167,7 +167,7 @@ export async function acceptOfferAction(offerId: string) {
     // If we wanted we could mark RFQ ACCEPTED if all sellers accepted.
 
     revalidatePath(`/rfq/${offer.rfqId}`);
-    revalidatePath("/network/buyer/orders");
+    revalidatePath("/hub/buyer/orders");
 
     return { success: true };
 }

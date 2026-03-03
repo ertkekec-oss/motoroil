@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { usePaymentIntentPoll } from "@/lib/network/payments/usePaymentIntentPoll";
+import { usePaymentIntentPoll } from "@/lib/hub/payments/usePaymentIntentPoll";
 
 function ResultContent() {
     const sp = useSearchParams();

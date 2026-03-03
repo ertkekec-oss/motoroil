@@ -78,10 +78,10 @@ interface DashboardSummary {
 const ALL_MODULES = [
     { id: "terminal", title: "POS Terminal", desc: "Hızlı Perakende Satış", href: "/terminal", icon: <ShoppingCart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "FINANCE"], color: "bg-orange-50 text-orange-600 border-orange-100" },
     { id: "b2b_network", title: "B2B Network", desc: "Global Ağa Bağlanın", href: "/dashboard", icon: <Building2 className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "BUYER", "SELLER"], color: "bg-blue-50 text-blue-600 border-blue-100" },
-    { id: "orders", title: "Siparişler", desc: "Sipariş Merkezi", href: "/network/seller/orders", icon: <Send className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-indigo-50 text-indigo-600 border-indigo-100" },
+    { id: "orders", title: "Siparişler", desc: "Sipariş Merkezi", href: "/hub/seller/orders", icon: <Send className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-indigo-50 text-indigo-600 border-indigo-100" },
     { id: "catalog", title: "Katalog", desc: "Ürün Yönetimi", href: "/seller/products", icon: <Box className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
-    { id: "finance_b2b", title: "Finans (B2B)", desc: "Ağ İçi Finans", href: "/network/finance", icon: <Banknote className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "SELLER"], color: "bg-rose-50 text-rose-600 border-rose-100" },
-    { id: "growth", title: "Büyüme & Güven", desc: "Performans İzleme", href: "/network/trust-score", icon: <TrendingUp className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "SELLER"], color: "bg-amber-50 text-amber-600 border-amber-100" },
+    { id: "finance_b2b", title: "Finans (B2B)", desc: "Ağ İçi Finans", href: "/hub/finance", icon: <Banknote className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "SELLER"], color: "bg-rose-50 text-rose-600 border-rose-100" },
+    { id: "growth", title: "Büyüme & Güven", desc: "Performans İzleme", href: "/hub/trust-score", icon: <TrendingUp className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "SELLER"], color: "bg-amber-50 text-amber-600 border-amber-100" },
     { id: "purchasing", title: "Satınalma", desc: "Tedarik ve Sözleşme", href: "/rfq", icon: <Briefcase className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "BUYER"], color: "bg-cyan-50 text-cyan-600 border-cyan-100" },
     { id: "staff", title: "Personel Paneli", desc: "Kişisel Portalınız", href: "/staff/me", icon: <Users className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER", "BUYER", "FINANCE", "GROWTH", "RISK"], color: "bg-slate-100 text-slate-800 border-slate-200" },
     { id: "accounting", title: "Mali İşler", desc: "Kasa & Banka Bütçe", href: "/accounting", icon: <Landmark className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"], color: "bg-rose-50 text-rose-600 border-rose-100" },
@@ -365,7 +365,7 @@ export default function ClientDashboard() {
                         const steps = [
                             { id: 1, title: "Şirket Profili", desc: "Temel işletme bilgileri", status: isS1Complete ? 'completed' : 'active', href: "/settings/company" },
                             { id: 2, title: "Katalog Aktarımı", desc: "Ürün ve fiyat listeleri", status: isS2Complete ? 'completed' : (isS1Complete ? 'active' : 'locked'), href: "/seller/products" },
-                            { id: 3, title: "İlk Sipariş", desc: "Test veya gerçek sipariş", status: isS3Complete ? 'completed' : (isS2Complete ? 'active' : 'locked'), href: "/network/seller/orders" },
+                            { id: 3, title: "İlk Sipariş", desc: "Test veya gerçek sipariş", status: isS3Complete ? 'completed' : (isS2Complete ? 'active' : 'locked'), href: "/hub/seller/orders" },
                             { id: 4, title: "Otonom İşlemler", desc: "Akıllı süreç eşleşmesi", status: isS4Complete ? 'completed' : (isS3Complete ? 'active' : 'locked'), href: "/fintech/control-tower" },
                         ];
                         const completedNodesCount = steps.filter(s => s.status === 'completed').length;

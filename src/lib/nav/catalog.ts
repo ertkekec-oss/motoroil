@@ -11,15 +11,15 @@ export interface NavRoute {
 export const tenantRoutes: NavRoute[] = [
     { label: 'POS Terminal', href: '/terminal', keywords: ['pos', 'terminal', 'satış', 'sepet', 'kasa'], icon: 'Monitor' },
     { label: 'Dashboard', href: '/dashboard', keywords: ['home', 'dashboard', 'panel', 'ana sayfa'], icon: 'Home' },
-    { label: 'Orders (Alınan)', href: '/network/seller/orders', keywords: ['orders', 'siparişler', 'satış', 'alınan'], roles: ['SELLER'], icon: 'ShoppingCart' },
-    { label: 'Orders (Verilen)', href: '/network/buyer/orders', keywords: ['orders', 'siparişler', 'alış', 'verilen'], roles: ['BUYER'], icon: 'ShoppingBag' },
+    { label: 'Orders (Alınan)', href: '/hub/seller/orders', keywords: ['orders', 'siparişler', 'satış', 'alınan'], roles: ['SELLER'], icon: 'ShoppingCart' },
+    { label: 'Orders (Verilen)', href: '/hub/buyer/orders', keywords: ['orders', 'siparişler', 'alış', 'verilen'], roles: ['BUYER'], icon: 'ShoppingBag' },
     { label: 'Ürünlerim (Seller)', href: '/seller/products', keywords: ['products', 'ürünler', 'katalog', 'satıcı'], roles: ['SELLER'], icon: 'Package' },
     { label: 'B2B Keşfet (Buyer)', href: '/catalog', keywords: ['catalog', 'keşfet', 'b2b', 'ürün bul'], roles: ['BUYER'], icon: 'Search' },
-    { label: 'Finans: Kazançlar', href: '/network/finance?tab=earnings', keywords: ['finance', 'earnings', 'kazanç', 'para'], icon: 'DollarSign' },
-    { label: 'Finans: Payouts', href: '/network/finance?tab=payouts', keywords: ['finance', 'payouts', 'çekim', 'withdraw'], icon: 'CreditCard' },
-    { label: 'Finans: Faturalar', href: '/network/finance?tab=invoices', keywords: ['finance', 'invoices', 'fatura', 'boost'], icon: 'FileText' },
-    { label: 'Finans: Ödemeler', href: '/network/finance?tab=payments', keywords: ['finance', 'payments', 'ödeme', 'hesap'], icon: 'Activity' },
-    { label: 'Güven Skorum', href: '/network/trust-score', keywords: ['trust', 'güven', 'skor', 'puan'], icon: 'ShieldCheck' },
+    { label: 'Finans: Kazançlar', href: '/hub/finance?tab=earnings', keywords: ['finance', 'earnings', 'kazanç', 'para'], icon: 'DollarSign' },
+    { label: 'Finans: Payouts', href: '/hub/finance?tab=payouts', keywords: ['finance', 'payouts', 'çekim', 'withdraw'], icon: 'CreditCard' },
+    { label: 'Finans: Faturalar', href: '/hub/finance?tab=invoices', keywords: ['finance', 'invoices', 'fatura', 'boost'], icon: 'FileText' },
+    { label: 'Finans: Ödemeler', href: '/hub/finance?tab=payments', keywords: ['finance', 'payments', 'ödeme', 'hesap'], icon: 'Activity' },
+    { label: 'Güven Skorum', href: '/hub/trust-score', keywords: ['trust', 'güven', 'skor', 'puan'], icon: 'ShieldCheck' },
     { label: 'Boost Yönetimi', href: '/seller/boost', keywords: ['boost', 'reklam', 'öne çık', 'promosyon'], roles: ['SELLER'], icon: 'Zap' },
     { label: 'Sözleşmelerim', href: '/contracts', keywords: ['contracts', 'sözleşmeler', 'anlaşma'], icon: 'FileSignature' },
     { label: 'Taleplerim (Destek)', href: '/support/tickets', keywords: ['support', 'destek', 'yardım', 'ticket', 'dispute'], icon: 'LifeBuoy' },
@@ -27,7 +27,7 @@ export const tenantRoutes: NavRoute[] = [
 
 export const tenantActions: NavRoute[] = [
     { label: 'Create Support Ticket', action: '/support/tickets/new', keywords: ['create', 'ticket', 'yardım', 'destek aç'], isAction: true, icon: 'PlusCircle' },
-    { label: 'Go to Finance (Earnings)', action: '/network/finance?tab=earnings', keywords: ['go', 'finance', 'kazanç'], isAction: true, icon: 'ArrowRight' },
+    { label: 'Go to Finance (Earnings)', action: '/hub/finance?tab=earnings', keywords: ['go', 'finance', 'kazanç'], isAction: true, icon: 'ArrowRight' },
     { label: 'View Boost', action: '/seller/boost', keywords: ['view', 'boost', 'reklam gör'], roles: ['SELLER'], isAction: true, icon: 'Eye' },
     { label: 'Open Cart / Catalog', action: '/catalog', keywords: ['open', 'cart', 'sepet', 'katalog aç'], roles: ['BUYER'], isAction: true, icon: 'ShoppingCart' },
 ];

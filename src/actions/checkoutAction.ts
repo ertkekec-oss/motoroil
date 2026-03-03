@@ -102,7 +102,7 @@ export async function processCheckoutAction() {
     await clearCartAction();
 
     revalidatePath("/catalog");
-    revalidatePath("/network/buyer/orders");
+    revalidatePath("/hub/buyer/orders");
 
     return { success: true };
 }

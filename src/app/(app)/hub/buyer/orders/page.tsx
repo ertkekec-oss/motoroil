@@ -124,25 +124,25 @@ export default async function BuyerOrdersPage({
                     {/* Filtre Strip */}
                     <div className="flex bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden p-1 shrink-0">
                         <Link
-                            href="/network/buyer/orders"
+                            href="/hub/buyer/orders"
                             className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${!status ? "bg-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 hover:text-slate-900 hover:bg-slate-50"}`}
                         >
                             Tümü
                         </Link>
                         <Link
-                            href="/network/buyer/orders?status=PENDING_PAYMENT"
+                            href="/hub/buyer/orders?status=PENDING_PAYMENT"
                             className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "PENDING_PAYMENT" ? "bg-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 hover:text-slate-900 hover:bg-slate-50"}`}
                         >
                             Ödeme Bekleyen
                         </Link>
                         <Link
-                            href="/network/buyer/orders?status=PAID"
+                            href="/hub/buyer/orders?status=PAID"
                             className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "PAID" ? "bg-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 hover:text-slate-900 hover:bg-slate-50"}`}
                         >
                             Ödendi (İşleniyor)
                         </Link>
                         <Link
-                            href="/network/buyer/orders?status=DELIVERED"
+                            href="/hub/buyer/orders?status=DELIVERED"
                             className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "DELIVERED" ? "bg-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 hover:text-slate-900 hover:bg-slate-50"}`}
                         >
                             Teslim Alındı
@@ -182,7 +182,7 @@ export default async function BuyerOrdersPage({
                                         <tr key={o.id} className="hover:bg-slate-50 transition-colors group">
                                             <td className="px-6 py-4">
                                                 <Link
-                                                    href={`/network/buyer/orders/${o.id}`}
+                                                    href={`/hub/buyer/orders/${o.id}`}
                                                     className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors"
                                                 >
                                                     #{o.id.slice(0, 8).toUpperCase()}
@@ -226,7 +226,7 @@ export default async function BuyerOrdersPage({
                         <div className="flex items-center gap-2 shrink-0">
                             {cursor ? (
                                 <Link
-                                    href={status ? `/network/buyer/orders?status=${status}` : "/network/buyer/orders"}
+                                    href={status ? `/hub/buyer/orders?status=${status}` : "/hub/buyer/orders"}
                                     className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
                                 >
                                     Baştan
@@ -241,8 +241,8 @@ export default async function BuyerOrdersPage({
                                 <Link
                                     href={
                                         status
-                                            ? `/network/buyer/orders?status=${status}&cursor=${nextCursor}`
-                                            : `/network/buyer/orders?cursor=${nextCursor}`
+                                            ? `/hub/buyer/orders?status=${status}&cursor=${nextCursor}`
+                                            : `/hub/buyer/orders?cursor=${nextCursor}`
                                     }
                                     className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
                                 >

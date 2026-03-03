@@ -48,10 +48,10 @@ export default function Sidebar() {
         const expandMap: Record<string, string[]> = {
             'b2b-global-parent': [
                 '/dashboard', '/support/tickets',
-                '/network/seller/orders', '/network/buyer/orders',
+                '/hub/seller/orders', '/hub/buyer/orders',
                 '/seller/products', '/catalog',
-                '/network/finance', '/network/trust-score', '/network/stock-risks', '/seller/boost', '/seller/boost/analytics',
-                '/rfq', '/contracts', '/network/buyer'
+                '/hub/finance', '/hub/trust-score', '/hub/stock-risks', '/seller/boost', '/seller/boost/analytics',
+                '/rfq', '/contracts', '/hub/buyer'
             ],
             'field-sales-parent': ['/field-sales'],
             'reports-parent': ['/reports'],
@@ -118,8 +118,8 @@ export default function Sidebar() {
         '/fintech/open-banking': { perm: 'finance_view' },
         '/fintech/smart-pricing': { perm: 'finance_view', feature: 'smart_pricing' },
         '/notifications': { perm: 'pos_access' },
-        '/network/buyer/orders': { perm: 'supplier_view' },
-        '/network/seller/orders': { perm: 'sales_archive' },
+        '/hub/buyer/orders': { perm: 'supplier_view' },
+        '/hub/seller/orders': { perm: 'sales_archive' },
     };
 
     // @ts-ignore
@@ -142,19 +142,19 @@ export default function Sidebar() {
                         { name: 'B2B Dashboard', href: '/b2b/dashboard' },
 
                         { name: 'SİPARİŞLER', href: '' },
-                        ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/network/seller/orders' }] : []),
-                        ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/network/buyer/orders' }] : []),
+                        ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/hub/seller/orders' }] : []),
+                        ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/hub/buyer/orders' }] : []),
 
                         { name: 'KATALOG', href: '' },
                         ...(isSeller ? [{ name: 'Katalog (Ürünlerim)', href: '/seller/products' }] : []),
                         ...(isBuyer ? [{ name: 'Katalog (B2B Keşfet)', href: '/catalog' }] : []),
 
                         { name: 'FİNANS', href: '' },
-                        { name: 'Finance (B2B)', href: '/network/finance' },
+                        { name: 'Finance (B2B)', href: '/hub/finance' },
                         ...(isSeller ? [
                             { name: 'Growth: Boost Yönetimi', href: '/seller/boost' },
                             { name: 'Growth: Boost Analiz', href: '/seller/boost/analytics' },
-                            { name: 'Growth: Güven Skoru', href: '/network/trust-score' }
+                            { name: 'Growth: Güven Skoru', href: '/hub/trust-score' }
                         ] : []),
 
                         ...(isBuyer ? [

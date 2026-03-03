@@ -1,0 +1,1370 @@
+﻿node.exe : Vercel CLI 50.22.0
+At C:\Users\ertke\AppData\Roa
+ming\npm\vercel.ps1:24 char:5
++     & "node$exe"  "$basedir
+/node_modules/vercel/dist/vc.
+js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Vercel   
+  CLI 50.22.0:String) [],    
+ RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Retrieving projectÔÇĞ
+Deploying motoroils-projects/
+motoroil
+Uploading [------------------
+--] (0.0B/1.1MB)
+Uploading [=====-------------
+--] (286.9KB/1.1MB)
+Uploading [==========--------
+--] (556.2KB/1.1MB)
+Uploading [===============---
+--] (839.9KB/1.1MB)
+Uploading [==================
+==] (1.1MB/1.1MB)
+Inspect: https://vercel.com/m
+otoroils-projects/motoroil/GQ
+MYzPcd1HnVbgrreStowJzb3qeC [6
+s]
+Production: https://motoroil-
+bdx8l0fwh-motoroils-projects.
+vercel.app [6s]
+Building...
+Building...
+Building: Running build in Wa
+shington, D.C., USA (East) ÔÇ
+ô iad1
+Building: Build machine confi
+guration: 4 cores, 8 GB
+Building: Retrieving list of 
+deployment files...
+Building: Downloading 1750 de
+ployment files...
+Building: Restored build cach
+e from previous deployment (H
+unW4WNTfzvN7mPDPhGm7cpma2h4)
+Building: Running "vercel bui
+ld"
+Building: Installing dependen
+cies...
+Building: > periodya@0.1.0 po
+stinstall
+Building: > prisma generate
+Building: Environment variabl
+es loaded from .env
+Building: Prisma schema loade
+d from prisma/schema.prisma
+Building: Ô£ö Generated Prism
+a Client (v5.22.0) to ./node_
+modules/@prisma/client in 2.3
+6s
+Building: Start by importing 
+your Prisma Client (See: http
+s://pris.ly/d/importing-clien
+t)
+Building: Tip: Easily identif
+y and fix slow SQL queries in
+ your app. Optimize helps you
+ enhance your visibility: htt
+ps://pris.ly/--optimize
+Building: up to date in 6s
+Building: 183 packages are lo
+oking for funding
+Building: run `npm fund` for 
+details
+Building: Detected Next.js ve
+rsion: 16.1.4
+Building: Running "npm run ve
+rcel-build"
+Building: > periodya@0.1.0 ve
+rcel-build
+Building: > prisma generate &
+& next build
+Building: Environment variabl
+es loaded from .env
+Building: Prisma schema loade
+d from prisma/schema.prisma
+Building: Ô£ö Generated Prism
+a Client (v5.22.0) to ./node_
+modules/@prisma/client in 1.8
+4s
+Building: Start by importing 
+your Prisma Client (See: http
+s://pris.ly/d/importing-clien
+t)
+Building: Tip: Want real-time
+ updates to your database wit
+hout manual polling? Discover
+ how with Pulse: https://pris
+.ly/tip-0-pulse
+Building: ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÉ
+Building: Ôöé  Update availab
+le 5.22.0 -> 7.4.2           
+            Ôöé
+Building: Ôöé                
+                             
+            Ôöé
+Building: Ôöé  This is a majo
+r update - please follow the 
+guide at    Ôöé
+Building: Ôöé  https://pris.l
+y/d/major-version-upgrade    
+            Ôöé
+Building: Ôöé                
+                             
+            Ôöé
+Building: Ôöé  Run the follow
+ing to update                
+            Ôöé
+Building: Ôöé    npm i --save
+-dev prisma@latest           
+            Ôöé
+Building: Ôöé    npm i @prism
+a/client@latest              
+            Ôöé
+Building: ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔ
+öÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöİ
+Building: Ôû▓ Next.js 16.1.4 
+(Turbopack)
+Building: - Environments: .en
+v.production, .env
+Building: ÔÜá The "middleware
+" file convention is deprecat
+ed. Please use "proxy" instea
+d. Learn more: https://nextjs
+.org/docs/messages/middleware
+-to-proxy
+Building: Creating an optimiz
+ed production build ...
+Building: Ô£ô Compiled succes
+sfully in 36.5s
+Building: Skipping validation
+ of types
+Building: Collecting page dat
+a using 3 workers ...
+Building: [Prisma] Initializi
+ng PrismaClientSingleton v2 (
+Robust Isolation)
+Building: [Prisma] Initializi
+ng PrismaClientSingleton v2 (
+Robust Isolation)
+Building: [Prisma] Initializi
+ng PrismaClientSingleton v2 (
+Robust Isolation)
+Building: {"event":"redis_con
+nected","timestamp":"2026-03-
+03T23:07:44.641Z","host":"ups
+tash","status":"connected"}
+Building: {"event":"redis_con
+nected","timestamp":"2026-03-
+03T23:07:45.551Z","host":"ups
+tash","status":"connected"}
+Building: {"event":"redis_con
+nected","timestamp":"2026-03-
+03T23:07:45.557Z","host":"ups
+tash","status":"connected"}
+Building: [Prisma] Initializi
+ng PrismaClientSingleton v2 (
+Robust Isolation)
+Building: [Prisma] Initializi
+ng PrismaClientSingleton v2 (
+Robust Isolation)
+Building: [Prisma] Initializi
+ng PrismaClientSingleton v2 (
+Robust Isolation)
+Building: {"event":"redis_con
+nected","timestamp":"2026-03-
+03T23:07:46.165Z","host":"ups
+tash","status":"connected"}
+Building: Generating static p
+ages using 3 workers (0/291) 
+...
+Building: Generating static p
+ages using 3 workers (72/291)
+Building: Generating static p
+ages using 3 workers (145/291
+)
+Building: Generating static p
+ages using 3 workers (218/291
+)
+Building: Ô£ô Generating stat
+ic pages using 3 workers (291
+/291) in 2.0s
+Building: Finalizing page opt
+imization ...
+Building: Route (app)
+Building: Ôöî Ôùï /
+Building: Ôö£ Ôùï /_not-found
+Building: Ôö£ Ôùï /accounting
+Building: Ôö£ ãÆ /admin
+Building: Ôö£ ãÆ /admin/audit
+-logs
+Building: Ôö£ Ôùï /admin/b2b/
+dealer-orders
+Building: Ôö£ Ôùï /admin/b2b/
+refunds
+Building: Ôö£ Ôùï /admin/b2b/
+settings
+Building: Ôö£ ãÆ /admin/catal
+og/categories
+Building: Ôö£ ãÆ /admin/compa
+nies
+Building: Ôö£ ãÆ /admin/dashb
+oard
+Building: Ôö£ Ôùï /admin/deal
+er-network/settings
+Building: Ôö£ Ôùï /admin/deal
+er-orders
+Building: Ôö£ ãÆ /admin/dispu
+tes
+Building: Ôö£ ãÆ /admin/dispu
+tes/[ticketId]
+Building: Ôö£ Ôùï /admin/fina
+nce/refunds
+Building: Ôö£ ãÆ /admin/growt
+h/audit
+Building: Ôö£ ãÆ /admin/growt
+h/billing-health
+Building: Ôö£ ãÆ /admin/growt
+h/boost-rules
+Building: Ôö£ ãÆ /admin/growt
+h/revenue
+Building: Ôö£ ãÆ /admin/growt
+h/subscriptions
+Building: Ôö£ ãÆ /admin/healt
+h
+Building: Ôö£ ãÆ /admin/logs
+Building: Ôö£ ãÆ /admin/marke
+tplace/ops
+Building: Ôö£ ãÆ /admin/ops/l
+edgers
+Building: Ôö£ ãÆ /admin/ops/o
+rders
+Building: Ôö£ ãÆ /admin/ops/p
+ayments
+Building: Ôö£ ãÆ /admin/ops/p
+roviders
+Building: Ôö£ ãÆ /admin/ops/s
+hipments
+Building: Ôö£ ãÆ /admin/payme
+nts-escrow/audit
+Building: Ôö£ ãÆ /admin/payme
+nts-escrow/commissions
+Building: Ôö£ ãÆ /admin/payme
+nts-escrow/policies
+Building: Ôö£ ãÆ /admin/payme
+nts-escrow/providers
+Building: Ôö£ ãÆ /admin/payou
+ts
+Building: Ôö£ ãÆ /admin/plans
+Building: Ôö£ ãÆ /admin/platf
+orm-finance
+Building: Ôö£ ãÆ /admin/produ
+cts
+Building: Ôö£ ãÆ /admin/sales
+-radar
+Building: Ôö£ ãÆ /admin/secur
+ity
+Building: Ôö£ Ôùï /admin/sett
+ings/dealer-portal
+Building: Ôö£ ãÆ /admin/suppo
+rt/tickets
+Building: Ôö£ ãÆ /admin/suppo
+rt/tickets/[id]
+Building: Ôö£ ãÆ /admin/tenan
+ts
+Building: Ôö£ ãÆ /admin/tenan
+ts/[id]
+Building: Ôö£ ãÆ /admin/tenan
+ts/[id]/help
+Building: Ôö£ ãÆ /admin/trans
+actions
+Building: Ôö£ ãÆ /admin/trust
+-monitor
+Building: Ôö£ ãÆ /admin/websi
+te
+Building: Ôö£ Ôùï /advisor
+Building: Ôö£ ãÆ /api/admin/a
+udit-logs
+Building: Ôö£ ãÆ /api/admin/a
+utomation/run
+Building: Ôö£ ãÆ /api/admin/b
+illing/boost/charge/run
+Building: Ôö£ ãÆ /api/admin/b
+illing/boost/collection/run
+Building: Ôö£ ãÆ /api/admin/b
+illing/boost/health
+Building: Ôö£ ãÆ /api/admin/b
+illing/boost/health/snapshot
+Building: Ôö£ ãÆ /api/admin/b
+illing/boost/invoices
+Building: Ôö£ ãÆ /api/admin/b
+illing/boost/meter/run
+Building: Ôö£ ãÆ /api/admin/b
+illing/boost/rollover/run
+Building: Ôö£ ãÆ /api/admin/b
+illing/boost/subscriptions/ac
+tivate
+Building: Ôö£ ãÆ /api/admin/b
+illing/boost/subscriptions/ca
+ncel
+Building: Ôö£ ãÆ /api/admin/b
+illing/boost/subscriptions/pa
+use
+Building: Ôö£ ãÆ /api/admin/c
+ontrol-hub
+Building: Ôö£ ãÆ /api/admin/d
+ashboard/actions
+Building: Ôö£ ãÆ /api/admin/d
+ashboard/overview
+Building: Ôö£ ãÆ /api/admin/d
+ashboard/timeseries
+Building: Ôö£ ãÆ /api/admin/d
+ealer-orders
+Building: Ôö£ ãÆ /api/admin/d
+ealer-orders/[id]
+Building: Ôö£ ãÆ /api/admin/d
+ealer-orders/[id]/approve
+Building: Ôö£ ãÆ /api/admin/d
+ealer-orders/[id]/refund
+Building: Ôö£ ãÆ /api/admin/d
+ealer-orders/[id]/reject
+Building: Ôö£ ãÆ /api/admin/d
+ealer-orders/count
+Building: Ôö£ ãÆ /api/admin/d
+iscovery/boost-rules
+Building: Ôö£ ãÆ /api/admin/d
+iscovery/boost-rules/[id]/dea
+ctivate
+Building: Ôö£ ãÆ /api/admin/d
+isputes
+Building: Ôö£ ãÆ /api/admin/d
+isputes/[ticketId]
+Building: Ôö£ ãÆ /api/admin/d
+isputes/[ticketId]/actions
+Building: Ôö£ ãÆ /api/admin/d
+isputes/[ticketId]/request-in
+fo
+Building: Ôö£ ãÆ /api/admin/f
+eatures
+Building: Ôö£ ãÆ /api/admin/f
+inance/commission/plans
+Building: Ôö£ ãÆ /api/admin/f
+inance/commission/plans/[id]/
+activate
+Building: Ôö£ ãÆ /api/admin/f
+inance/earnings/[earningId]/r
+elease
+Building: Ôö£ ãÆ /api/admin/f
+inance/ledger
+Building: Ôö£ ãÆ /api/admin/f
+inance/overview
+Building: Ôö£ ãÆ /api/admin/f
+inance/payout/outbox/run
+Building: Ôö£ ãÆ /api/admin/f
+inance/payout/requests
+Building: Ôö£ ãÆ /api/admin/f
+inance/payout/requests/[id]/a
+pprove
+Building: Ôö£ ãÆ /api/admin/f
+inance/payout/requests/[id]/p
+rocess-internal
+Building: Ôö£ ãÆ /api/admin/f
+inance/payout/requests/[id]/r
+eject
+Building: Ôö£ ãÆ /api/admin/f
+inance/payout/trigger-release
+/[shipmentId]
+Building: Ôö£ ãÆ /api/admin/f
+inance/payout/webhooks/proces
+s
+Building: Ôö£ ãÆ /api/admin/f
+inance/shipping/invoices
+Building: Ôö£ ãÆ /api/admin/f
+inance/shipping/invoices/[id]
+Building: Ôö£ ãÆ /api/admin/f
+inance/shipping/lines/[lineId
+]/dispute
+Building: Ôö£ ãÆ /api/admin/f
+inance/shipping/lines/[lineId
+]/match
+Building: Ôö£ ãÆ /api/admin/f
+inance/shipping/lines/queue
+Building: Ôö£ ãÆ /api/admin/f
+inance/trust-scores/[sellerTe
+nantId]/recalc
+Building: Ôö£ ãÆ /api/admin/g
+rowth/audit
+Building: Ôö£ ãÆ /api/admin/g
+rowth/billing-health
+Building: Ôö£ ãÆ /api/admin/g
+rowth/billing-health/run-coll
+ection-guard
+Building: Ôö£ ãÆ /api/admin/g
+rowth/billing-health/snapshot
+Building: Ôö£ ãÆ /api/admin/g
+rowth/boost-rules
+Building: Ôö£ ãÆ /api/admin/g
+rowth/boost-rules/[id]/disabl
+e
+Building: Ôö£ ãÆ /api/admin/g
+rowth/boost-rules/[id]/expire
+-now
+Building: Ôö£ ãÆ /api/admin/g
+rowth/enforcement
+Building: Ôö£ ãÆ /api/admin/g
+rowth/enforcement/[tenantId]
+Building: Ôö£ ãÆ /api/admin/g
+rowth/policy
+Building: Ôö£ ãÆ /api/admin/g
+rowth/revenue
+Building: Ôö£ ãÆ /api/admin/g
+rowth/subscriptions
+Building: Ôö£ ãÆ /api/admin/g
+rowth/subscriptions/[id]/unbl
+ock
+Building: Ôö£ ãÆ /api/admin/h
+ealth
+Building: Ôö£ ãÆ /api/admin/h
+elp/categories
+Building: Ôö£ ãÆ /api/admin/h
+elp/topics
+Building: Ôö£ ãÆ /api/admin/h
+elp/topics/[id]
+Building: Ôö£ ãÆ /api/admin/m
+arketplace/ops
+Building: Ôö£ ãÆ /api/admin/m
+arketplace/queue/health
+Building: Ôö£ ãÆ /api/admin/m
+arketplace/queue/replay
+Building: Ôö£ ãÆ /api/admin/m
+arketplace/queue/status
+Building: Ôö£ ãÆ /api/admin/m
+etrics/cohorts/daily
+Building: Ôö£ ãÆ /api/admin/m
+etrics/platform/daily
+Building: Ôö£ ãÆ /api/admin/m
+etrics/run
+Building: Ôö£ ãÆ /api/admin/m
+etrics/tenants/daily
+Building: Ôö£ ãÆ /api/admin/n
+ormalize-marketplaces
+Building: Ôö£ ãÆ /api/admin/o
+ps/alerts/[id]/ack
+Building: Ôö£ ãÆ /api/admin/o
+ps/alerts/[id]/resolve
+Building: Ôö£ ãÆ /api/admin/o
+ps/health
+Building: Ôö£ ãÆ /api/admin/o
+ps/health/snapshot
+Building: Ôö£ ãÆ /api/admin/o
+ps/payouts/[id]/force-finaliz
+e
+Building: Ôö£ ãÆ /api/admin/o
+ps/payouts/[id]/force-reconci
+le
+Building: Ôö£ ãÆ /api/admin/o
+ps/payouts/[id]/quarantine
+Building: Ôö£ ãÆ /api/admin/o
+ps/payouts/[id]/rerun-outbox
+Building: Ôö£ ãÆ /api/admin/o
+ps/run/outbox
+Building: Ôö£ ãÆ /api/admin/o
+ps/run/reconcile-pull
+Building: Ôö£ ãÆ /api/admin/o
+ps/run/repair
+Building: Ôö£ ãÆ /api/admin/o
+ps/run/sentinel
+Building: Ôö£ ãÆ /api/admin/p
+ayments-escrow/audit
+Building: Ôö£ ãÆ /api/admin/p
+ayments-escrow/commissions/pl
+ans
+Building: Ôö£ ãÆ /api/admin/p
+ayments-escrow/commissions/pl
+ans/[id]
+Building: Ôö£ ãÆ /api/admin/p
+ayments-escrow/commissions/pl
+ans/[id]/archive
+Building: Ôö£ ãÆ /api/admin/p
+ayments-escrow/commissions/pr
+eview
+Building: Ôö£ ãÆ /api/admin/p
+ayments-escrow/policies
+Building: Ôö£ ãÆ /api/admin/p
+ayments-escrow/providers/reco
+ncile-pull
+Building: Ôö£ ãÆ /api/admin/p
+ayments-escrow/providers/stat
+us
+Building: Ôö£ ãÆ /api/admin/p
+ayouts/queue
+Building: Ôö£ ãÆ /api/admin/p
+ayouts/queue/[id]/approve
+Building: Ôö£ ãÆ /api/admin/p
+ayouts/queue/[id]/reject
+Building: Ôö£ ãÆ /api/admin/p
+dks/displays
+Building: Ôö£ ãÆ /api/admin/p
+dks/events
+Building: Ôö£ ãÆ /api/admin/p
+dks/events/approve
+Building: Ôö£ ãÆ /api/admin/r
+efunds
+Building: Ôö£ ãÆ /api/admin/r
+efunds/[id]
+Building: Ôö£ ãÆ /api/admin/r
+eset-data
+Building: Ôö£ ãÆ /api/admin/r
+ollout/tenant/[tenantId]
+Building: Ôö£ ãÆ /api/admin/r
+ollout/tenant/[tenantId]/acti
+vate-pilot
+Building: Ôö£ ãÆ /api/admin/r
+ollout/tenant/[tenantId]/paus
+e-boost
+Building: Ôö£ ãÆ /api/admin/r
+ollout/tenant/[tenantId]/paus
+e-escrow
+Building: Ôö£ ãÆ /api/admin/r
+ollout/tenant/[tenantId]/paus
+e-payout
+Building: Ôö£ ãÆ /api/admin/r
+ollout/tenant/[tenantId]/resu
+me-all
+Building: Ôö£ ãÆ /api/admin/r
+ollout/tenant/[tenantId]/set-
+feature
+Building: Ôö£ ãÆ /api/admin/r
+ollout/tenant/[tenantId]/set-
+risk-caps
+Building: Ôö£ ãÆ /api/admin/s
+ales-radar
+Building: Ôö£ ãÆ /api/admin/s
+earch
+Building: Ôö£ ãÆ /api/admin/s
+ettings/dealer-portal
+Building: Ôö£ ãÆ /api/admin/t
+enants
+Building: Ôö£ ãÆ /api/admin/t
+enants/[id]
+Building: Ôö£ ãÆ /api/admin/t
+enants/[id]/actions
+Building: Ôö£ ãÆ /api/admin/t
+ickets/[id]/reply
+Building: Ôö£ ãÆ /api/admin/t
+ickets/[id]/update
+Building: Ôö£ ãÆ /api/admin/t
+ickets/queue
+Building: Ôö£ ãÆ /api/admin/w
+ebsite
+Building: Ôö£ ãÆ /api/admin/w
+ebsite/menus
+Building: Ôö£ ãÆ /api/admin/w
+ebsite/pages
+Building: Ôö£ ãÆ /api/admin/w
+ebsite/pages/[id]
+Building: Ôö£ ãÆ /api/admin/w
+ebsite/upload
+Building: Ôö£ ãÆ /api/analyti
+cs/summary
+Building: Ôö£ ãÆ /api/analyti
+cs/upsell
+Building: Ôö£ ãÆ /api/auth/ch
+ange-password
+Building: Ôö£ ãÆ /api/auth/de
+mo
+Building: Ôö£ ãÆ /api/auth/fo
+rgot-password
+Building: Ôö£ ãÆ /api/auth/lo
+gin
+Building: Ôö£ ãÆ /api/auth/lo
+gout
+Building: Ôö£ ãÆ /api/auth/re
+gister
+Building: Ôö£ ãÆ /api/auth/re
+set-password-confirm
+Building: Ôö£ ãÆ /api/automat
+ion/run
+Building: Ôö£ ãÆ /api/backup
+Building: Ôö£ ãÆ /api/billing
+/boost-invoices
+Building: Ôö£ ãÆ /api/billing
+/boost/invoices
+Building: Ôö£ ãÆ /api/billing
+/boost/subscription
+Building: Ôö£ ãÆ /api/billing
+/checkout
+Building: Ôö£ ãÆ /api/billing
+/overview
+Building: Ôö£ ãÆ /api/billing
+/plans
+Building: Ôö£ ãÆ /api/billing
+/plans/[id]
+Building: Ôö£ ãÆ /api/billing
+/subscription
+Building: Ôö£ ãÆ /api/branche
+s
+Building: Ôö£ ãÆ /api/branche
+s/[id]
+Building: Ôö£ ãÆ /api/branche
+s/documents
+Building: Ôö£ ãÆ /api/buyer/r
+ecommendations/action
+Building: Ôö£ ãÆ /api/campaig
+ns
+Building: Ôö£ ãÆ /api/checks
+Building: Ôö£ ãÆ /api/checks/
+[id]
+Building: Ôö£ ãÆ /api/checks/
+collect
+Building: Ôö£ ãÆ /api/contrac
+ts/create
+Building: Ôö£ ãÆ /api/coupons
+Building: Ôö£ ãÆ /api/cron/pa
+yout-reconciliation
+Building: Ôö£ ãÆ /api/cron/re
+concile-transactions
+Building: Ôö£ ãÆ /api/cron/re
+curring-orders
+Building: Ôö£ ãÆ /api/cron/sh
+ipment-sync
+Building: Ôö£ ãÆ /api/cron/sy
+nc-all
+Building: Ôö£ ãÆ /api/custome
+rs
+Building: Ôö£ ãÆ /api/custome
+rs/[id]
+Building: Ôö£ ãÆ /api/custome
+rs/[id]/documents
+Building: Ôö£ ãÆ /api/custome
+rs/[id]/pricing
+Building: Ôö£ ãÆ /api/custome
+rs/[id]/statement
+Building: Ôö£ ãÆ /api/custome
+rs/[id]/warranties
+Building: Ôö£ ãÆ /api/custome
+rs/categories
+Building: Ôö£ ãÆ /api/custome
+rs/import
+Building: Ôö£ ãÆ /api/dashboa
+rd/stats
+Building: Ôö£ ãÆ /api/dashboa
+rd/summary
+Building: Ôö£ ãÆ /api/db-ping
+Building: Ôö£ ãÆ /api/dealer-
+network/orders/[id]
+Building: Ôö£ ãÆ /api/dealer-
+network/orders/[id]/approve
+Building: Ôö£ ãÆ /api/dealer-
+network/orders/[id]/refund
+Building: Ôö£ ãÆ /api/dealer-
+network/orders/[id]/reject
+Building: Ôö£ ãÆ /api/dealer-
+network/orders/approvals
+Building: Ôö£ ãÆ /api/dealer-
+network/orders/approvals/coun
+t
+Building: Ôö£ ãÆ /api/dealer-
+network/refunds
+Building: Ôö£ ãÆ /api/dealer-
+network/refunds/[id]
+Building: Ôö£ ãÆ /api/dealer-
+network/settings
+Building: Ôö£ ãÆ /api/debug/n
+ilvera-series
+Building: Ôö£ ãÆ /api/documen
+ts/[id]
+Building: Ôö£ ãÆ /api/field-s
+ales/admin/live-status
+Building: Ôö£ ãÆ /api/field-s
+ales/admin/location-requests
+Building: Ôö£ ãÆ /api/field-s
+ales/admin/location-requests/
+process
+Building: Ôö£ ãÆ /api/field-s
+ales/admin/settings
+Building: Ôö£ ãÆ /api/field-s
+ales/collections
+Building: Ôö£ ãÆ /api/field-s
+ales/location-request
+Building: Ôö£ ãÆ /api/field-s
+ales/orders/[id]
+Building: Ôö£ ãÆ /api/field-s
+ales/orders/create
+Building: Ôö£ ãÆ /api/field-s
+ales/routes
+Building: Ôö£ ãÆ /api/field-s
+ales/routes/[id]
+Building: Ôö£ ãÆ /api/field-s
+ales/routes/[id]/stops
+Building: Ôö£ ãÆ /api/field-s
+ales/routes/[id]/stops/batch
+Building: Ôö£ ãÆ /api/field-s
+ales/stops/[id]
+Building: Ôö£ ãÆ /api/field-s
+ales/templates
+Building: Ôö£ ãÆ /api/field-s
+ales/templates/[id]
+Building: Ôö£ ãÆ /api/field-s
+ales/visits
+Building: Ôö£ ãÆ /api/field-s
+ales/visits/active
+Building: Ôö£ ãÆ /api/field-s
+ales/visits/end
+Building: Ôö£ ãÆ /api/field-s
+ales/visits/start
+Building: Ôö£ ãÆ /api/finance
+/payout/destinations
+Building: Ôö£ ãÆ /api/finance
+/payout/requests
+Building: Ôö£ ãÆ /api/finance
+/payout/status
+Building: Ôö£ ãÆ /api/finance
+/payout/submerchant/onboard
+Building: Ôö£ ãÆ /api/finance
+/trust-score
+Building: Ôö£ ãÆ /api/financi
+als/accounts
+Building: Ôö£ ãÆ /api/financi
+als/accounts/[id]/ledger
+Building: Ôö£ ãÆ /api/financi
+als/accounts/sync
+Building: Ôö£ ãÆ /api/financi
+als/audit
+Building: Ôö£ ãÆ /api/financi
+als/checks
+Building: Ôö£ ãÆ /api/financi
+als/checks/[id]
+Building: Ôö£ ãÆ /api/financi
+als/checks/[id]/status
+Building: Ôö£ ãÆ /api/financi
+als/forecast
+Building: Ôö£ ãÆ /api/financi
+als/payment-plans
+Building: Ôö£ ãÆ /api/financi
+als/payment-plans/pay
+Building: Ôö£ ãÆ /api/financi
+als/reports/ba-bs
+Building: Ôö£ ãÆ /api/financi
+als/reports/health
+Building: Ôö£ ãÆ /api/financi
+als/reports/income-statement
+Building: Ôö£ ãÆ /api/financi
+als/reports/trial-balance
+Building: Ôö£ ãÆ /api/financi
+als/statements/parse
+Building: Ôö£ ãÆ /api/financi
+als/transactions
+Building: Ôö£ ãÆ /api/financi
+als/transactions/[id]
+Building: Ôö£ ãÆ /api/fintech
+/banking/connect
+Building: Ôö£ ãÆ /api/fintech
+/banking/credentials
+Building: Ôö£ ãÆ /api/fintech
+/banking/duplicates
+Building: Ôö£ ãÆ /api/fintech
+/banking/import-xml
+Building: Ôö£ ãÆ /api/fintech
+/banking/match
+Building: Ôö£ ãÆ /api/fintech
+/banking/merge
+Building: Ôö£ ãÆ /api/fintech
+/banking/replay
+Building: Ôö£ ãÆ /api/fintech
+/banking/run-tests
+Building: Ôö£ ãÆ /api/fintech
+/banking/sync
+Building: Ôö£ ãÆ /api/fintech
+/banking/test-connection
+Building: Ôö£ ãÆ /api/fintech
+/banking/test-pipeline
+Building: Ôö£ ãÆ /api/fintech
+/banking/transactions
+Building: Ôö£ ãÆ /api/fintech
+/dashboard/heatmap
+Building: Ôö£ ãÆ /api/fintech
+/dashboard/metrics
+Building: Ôö£ ãÆ /api/health-
+check
+Building: Ôö£ ãÆ /api/health/
+prisma
+Building: Ôö£ ãÆ /api/integra
+tions/ecommerce/sync
+Building: Ôö£ ãÆ /api/integra
+tions/marketplace/check-mappi
+ng
+Building: Ôö£ ãÆ /api/integra
+tions/marketplace/hydrate
+Building: Ôö£ ãÆ /api/integra
+tions/marketplace/save-mappin
+g
+Building: Ôö£ ãÆ /api/integra
+tions/marketplace/stats
+Building: Ôö£ ãÆ /api/integra
+tions/marketplace/sync
+Building: Ôö£ ãÆ /api/integra
+tions/marketplace/test
+Building: Ôö£ ãÆ /api/integra
+tions/nilvera/test
+Building: Ôö£ ãÆ /api/integra
+tions/send
+Building: Ôö£ ãÆ /api/integra
+tions/settings/save
+Building: Ôö£ ãÆ /api/interna
+l/accounting/process
+Building: Ôö£ ãÆ /api/invento
+ry/audit
+Building: Ôö£ ãÆ /api/invento
+ry/pending
+Building: Ôö£ ãÆ /api/invento
+ry/transfer
+Building: Ôö£ ãÆ /api/kasalar
+Building: Ôö£ ãÆ /api/kasalar
+/[id]
+Building: Ôö£ ãÆ /api/logs
+Building: Ôö£ ãÆ /api/marketp
+laces/[marketplace]/orders/[o
+rderId]/actions
+Building: Ôö£ ãÆ /api/marketp
+laces/[marketplace]/orders/[o
+rderId]/label
+Building: Ôö£ ãÆ /api/marketp
+laces/actions/[auditId]
+Building: Ôö£ ãÆ /api/message
+s
+Building: Ôö£ ãÆ /api/metrics
+/daily
+Building: Ôö£ ãÆ /api/metrics
+/track
+Building: Ôö£ ãÆ /api/network
+/auth/logout
+Building: Ôö£ ãÆ /api/network
+/auth/mode
+Building: Ôö£ ãÆ /api/network
+/auth/otp/request
+Building: Ôö£ ãÆ /api/network
+/auth/otp/verify
+Building: Ôö£ ãÆ /api/network
+/auth/password/login
+Building: Ôö£ ãÆ /api/network
+/cart
+Building: Ôö£ ãÆ /api/network
+/cart/items
+Building: Ôö£ ãÆ /api/network
+/cart/items/[id]
+Building: Ôö£ ãÆ /api/network
+/catalog/products
+Building: Ôö£ ãÆ /api/network
+/checkout
+Building: Ôö£ ãÆ /api/network
+/context/switch
+Building: Ôö£ ãÆ /api/network
+/credit
+Building: Ôö£ ãÆ /api/network
+/demands
+Building: Ôö£ ãÆ /api/network
+/demands/[id]/offers
+Building: Ôö£ ãÆ /api/network
+/discovery
+Building: Ôö£ ãÆ /api/network
+/earnings
+Building: Ôö£ ãÆ /api/network
+/invites/redeem
+Building: Ôö£ ãÆ /api/network
+/listings
+Building: Ôö£ ãÆ /api/network
+/listings/[id]
+Building: Ôö£ ãÆ /api/network
+/me
+Building: Ôö£ ãÆ /api/network
+/memberships
+Building: Ôö£ ãÆ /api/network
+/offers/[id]/accept
+Building: Ôö£ ãÆ /api/network
+/orders
+Building: Ôö£ ãÆ /api/network
+/orders/[id]
+Building: Ôö£ ãÆ /api/network
+/orders/[id]/confirm-delivery
+Building: Ôö£ ãÆ /api/network
+/orders/[id]/payments/init
+Building: Ôö£ ãÆ /api/network
+/orders/[id]/shipments/init
+Building: Ôö£ ãÆ /api/network
+/payments/callback/iyzico
+Building: Ôö£ ãÆ /api/network
+/payments/callback/odeal
+Building: Ôö£ ãÆ /api/network
+/payments/intent
+Building: Ôö£ ãÆ /api/network
+/payments/intents
+Building: Ôö£ ãÆ /api/network
+/payments/intents/[id]
+Building: Ôö£ ãÆ /api/network
+/payments/intents/by-order/[o
+rderId]
+Building: Ôö£ ãÆ /api/network
+/payouts/destinations
+Building: Ôö£ ãÆ /api/network
+/payouts/requests
+Building: Ôö£ ãÆ /api/network
+/payouts/summary
+Building: Ôö£ ãÆ /api/network
+/trust-score
+Building: Ôö£ ãÆ /api/notific
+ations
+Building: Ôö£ ãÆ /api/notific
+ations/summary
+Building: Ôö£ ãÆ /api/onboard
+ing/init
+Building: Ôö£ ãÆ /api/ops-int
+ernal/queue-health
+Building: Ôö£ ãÆ /api/orders/
+[id]
+Building: Ôö£ ãÆ /api/orders/
+collect
+Building: Ôö£ ãÆ /api/orders/
+get-label
+Building: Ôö£ ãÆ /api/orders/
+pending
+Building: Ôö£ ãÆ /api/orders/
+update-cargo
+Building: Ôö£ ãÆ /api/portal/
+auth/login
+Building: Ôö£ ãÆ /api/portal/
+auth/logout
+Building: Ôö£ ãÆ /api/pos/ode
+al/pay
+Building: Ôö£ ãÆ /api/pricing
+/bulk-update
+Building: Ôö£ ãÆ /api/pricing
+/initialize
+Building: Ôö£ ãÆ /api/pricing
+/lists
+Building: Ôö£ ãÆ /api/pricing
+/lists/[id]
+Building: Ôö£ ãÆ /api/pricing
+/lists/[id]/prices
+Building: Ôö£ ãÆ /api/pricing
+/products/[productId]/prices
+Building: Ôö£ ãÆ /api/pricing
+/resolve-customer
+Building: Ôö£ ãÆ /api/product
+s
+Building: Ôö£ ãÆ /api/product
+s/[id]
+Building: Ôö£ ãÆ /api/product
+s/attributes
+Building: Ôö£ ãÆ /api/product
+s/bulk
+Building: Ôö£ ãÆ /api/product
+s/import
+Building: Ôö£ ãÆ /api/public/
+cms/page/[slug]
+Building: Ôö£ ãÆ /api/public/
+landing
+Building: Ôö£ ãÆ /api/public/
+recovery
+Building: Ôö£ ãÆ /api/purchas
+ing/[id]/approve
+Building: Ôö£ ãÆ /api/purchas
+ing/[id]/reject
+Building: Ôö£ ãÆ /api/purchas
+ing/create
+Building: Ôö£ ãÆ /api/purchas
+ing/import
+Building: Ôö£ ãÆ /api/purchas
+ing/list
+Building: Ôö£ ãÆ /api/quotes
+Building: Ôö£ ãÆ /api/quotes/
+[id]
+Building: Ôö£ ãÆ /api/quotes/
+[id]/convert
+Building: Ôö£ ãÆ /api/reports
+/ceo-metrics
+Building: Ôö£ ãÆ /api/rollout
+/features
+Building: Ôö£ ãÆ /api/sales/c
+reate
+Building: Ôö£ ãÆ /api/sales/f
+ormal-invoice-send
+Building: Ôö£ ãÆ /api/sales/f
+ormal-invoice-test
+Building: Ôö£ ãÆ /api/sales/f
+ormal-send
+Building: Ôö£ ãÆ /api/sales/f
+ormal-test
+Building: Ôö£ ãÆ /api/sales/h
+istory
+Building: Ôö£ ãÆ /api/sales/i
+nvoices
+Building: Ôö£ ãÆ /api/sales/i
+nvoices/[id]
+Building: Ôö£ ãÆ /api/sales/i
+nvoices/[id]/approve
+Building: Ôö£ ãÆ /api/sales/i
+nvoices/convert
+Building: Ôö£ ãÆ /api/sales/w
+ayslips
+Building: Ôö£ ãÆ /api/search
+Building: Ôö£ ãÆ /api/securit
+y/anomalies
+Building: Ôö£ ãÆ /api/securit
+y/events
+Building: Ôö£ ãÆ /api/seller/
+boost
+Building: Ôö£ ãÆ /api/seller/
+boost/analytics
+Building: Ôö£ ãÆ /api/service
+s
+Building: Ôö£ ãÆ /api/service
+s/[id]
+Building: Ôö£ ãÆ /api/service
+s/upcoming
+Building: Ôö£ ãÆ /api/setting
+s
+Building: Ôö£ ãÆ /api/setting
+s/mail
+Building: Ôö£ ãÆ /api/setup
+Building: Ôö£ ãÆ /api/staff
+Building: Ôö£ ãÆ /api/staff/a
+ttendance
+Building: Ôö£ ãÆ /api/staff/d
+ealer-orders
+Building: Ôö£ ãÆ /api/staff/d
+ealer-orders/[id]
+Building: Ôö£ ãÆ /api/staff/d
+ealer-orders/[id]/approve
+Building: Ôö£ ãÆ /api/staff/d
+ealer-orders/[id]/refund
+Building: Ôö£ ãÆ /api/staff/d
+ealer-orders/[id]/reject
+Building: Ôö£ ãÆ /api/staff/d
+ealer-orders/count
+Building: Ôö£ ãÆ /api/staff/d
+ealers/invites
+Building: Ôö£ ãÆ /api/staff/d
+ocuments
+Building: Ôö£ ãÆ /api/staff/e
+xpenses
+Building: Ôö£ ãÆ /api/staff/l
+eaves
+Building: Ôö£ ãÆ /api/staff/m
+y-customers
+Building: Ôö£ ãÆ /api/staff/p
+ayroll
+Building: Ôö£ ãÆ /api/staff/p
+uantaj
+Building: Ôö£ ãÆ /api/staff/r
+efunds
+Building: Ôö£ ãÆ /api/staff/r
+efunds/[id]
+Building: Ôö£ ãÆ /api/staff/r
+eports
+Building: Ôö£ ãÆ /api/staff/s
+hifts
+Building: Ôö£ ãÆ /api/staff/t
+argets
+Building: Ôö£ ãÆ /api/supplie
+rs
+Building: Ôö£ ãÆ /api/supplie
+rs/[id]
+Building: Ôö£ ãÆ /api/supplie
+rs/import
+Building: Ôö£ ãÆ /api/supplie
+rs/transaction
+Building: Ôö£ ãÆ /api/support
+/attachments/[id]
+Building: Ôö£ ãÆ /api/support
+/attachments/upload-url
+Building: Ôö£ ãÆ /api/support
+/tickets
+Building: Ôö£ ãÆ /api/support
+/tickets/[id]
+Building: Ôö£ ãÆ /api/support
+/tickets/[id]/reply
+Building: Ôö£ ãÆ /api/suspend
+ed-sales
+Building: Ôö£ ãÆ /api/tickets
+Building: Ôö£ ãÆ /api/tickets
+/[id]
+Building: Ôö£ ãÆ /api/tickets
+/[id]/messages
+Building: Ôö£ ãÆ /api/user/in
+sights
+Building: Ôö£ ãÆ /api/v1/pdks
+/check-in
+Building: Ôö£ ãÆ /api/v1/pdks
+/check-out
+Building: Ôö£ ãÆ /api/v1/pdks
+/display/pair
+Building: Ôö£ ãÆ /api/v1/pdks
+/display/token
+Building: Ôö£ ãÆ /api/warrant
+ies
+Building: Ôö£ ãÆ /api/warrant
+ies/[id]
+Building: Ôö£ ãÆ /api/webhook
+s/iyzico
+Building: Ôö£ ãÆ /api/webhook
+s/iyzico/callback
+Building: Ôö£ ãÆ /api/webhook
+s/shipments/[carrier]
+Building: Ôö£ Ôùï /b2b/dashbo
+ard
+Building: Ôö£ Ôùï /b2b/orders
+/approvals
+Building: Ôö£ Ôùï /b2b/refund
+s
+Building: Ôö£ Ôùï /b2b/settin
+gs
+Building: Ôö£ Ôùï /billing
+Building: Ôö£ ãÆ /billing/boo
+st-invoices
+Building: Ôö£ ãÆ /buyer/recom
+mendations
+Building: Ôö£ ãÆ /catalog
+Building: Ôö£ ãÆ /catalog/[pr
+oductId]
+Building: Ôö£ ãÆ /catalog/car
+t
+Building: Ôö£ ãÆ /catalog/che
+ckout
+Building: Ôö£ ãÆ /contracts
+Building: Ôö£ ãÆ /contracts/[
+id]
+Building: Ôö£ Ôùï /customers
+Building: Ôö£ ãÆ /customers/[
+id]
+Building: Ôö£ Ôùï /dashboard
+Building: Ôö£ Ôùï /dealer-net
+work/dashboard
+Building: Ôö£ Ôùï /dealer-net
+work/orders/approvals
+Building: Ôö£ Ôùï /dealer-net
+work/refunds
+Building: Ôö£ Ôùï /dealer-net
+work/settings
+Building: Ôö£ Ôùï /field-mobi
+le/collection/create
+Building: Ôö£ Ôùï /field-mobi
+le/customers
+Building: Ôö£ ãÆ /field-mobil
+e/customers/[id]
+Building: Ôö£ Ôùï /field-mobi
+le/expenses
+Building: Ôö£ Ôùï /field-mobi
+le/order/create
+Building: Ôö£ Ôùï /field-mobi
+le/profile
+Building: Ôö£ Ôùï /field-mobi
+le/reports
+Building: Ôö£ Ôùï /field-mobi
+le/routes
+Building: Ôö£ ãÆ /field-mobil
+e/routes/[id]
+Building: Ôö£ Ôùï /field-mobi
+le/targets
+Building: Ôö£ Ôùï /field-mobi
+le/visits
+Building: Ôö£ Ôùï /field-sale
+s
+Building: Ôö£ Ôùï /field-sale
+s/admin/config
+Building: Ôö£ Ôùï /field-sale
+s/admin/live
+Building: Ôö£ Ôùï /field-sale
+s/admin/routes
+Building: Ôö£ ãÆ /field-sales
+/admin/routes/[id]
+Building: Ôö£ Ôùï /fintech/co
+ntrol-tower
+Building: Ôö£ Ôùï /fintech/op
+en-banking
+Building: Ôö£ Ôùï /fintech/pr
+ofitability-heatmap
+Building: Ôö£ Ôùï /fintech/sm
+art-pricing
+Building: Ôö£ ãÆ /formal-invo
+ice/send
+Building: Ôö£ ãÆ /formal-invo
+ice/test
+Building: Ôö£ ãÆ /help
+Building: Ôö£ ãÆ /help/[slug]
+Building: Ôö£ Ôùï /integratio
+ns
+Building: Ôö£ Ôùï /inventory
+Building: Ôö£ Ôùï /inventory/
+variants
+Building: Ôö£ Ôùï /invoices
+Building: Ôö£ Ôùï /login
+Building: Ôö£ Ôùï /network
+Building: Ôö£ ãÆ /network/buy
+er/orders
+Building: Ôö£ ãÆ /network/buy
+er/orders/[id]
+Building: Ôö£ Ôùï /network/ca
+rt
+Building: Ôö£ Ôùï /network/ca
+talog
+Building: Ôö£ Ôùï /network/ea
+rnings
+Building: Ôö£ Ôùï /network/fi
+nance
+Building: Ôö£ ãÆ /network/inv
+ite/[token]
+Building: Ôö£ Ôùï /network/or
+ders
+Building: Ôö£ ãÆ /network/ord
+ers/[id]
+Building: Ôö£ Ôùï /network/pa
+yment/result
+Building: Ôö£ Ôùï /network/pa
+yments
+Building: Ôö£ Ôùï /network/pa
+youts
+Building: Ôö£ Ôùï /network/se
+lect-supplier
+Building: Ôö£ ãÆ /network/sel
+ler/balances
+Building: Ôö£ ãÆ /network/sel
+ler/orders
+Building: Ôö£ ãÆ /network/sel
+ler/orders/[id]
+Building: Ôö£ Ôùï /network/st
+ock-risks
+Building: Ôö£ Ôùï /network/tr
+ust-score
+Building: Ôö£ Ôùï /notificati
+ons
+Building: Ôö£ Ôùï /onboarding
+Building: Ôö£ Ôùï /payment
+Building: Ôö£ Ôùï /pdks/displ
+ay
+Building: Ôö£ ãÆ /portal/dash
+board
+Building: Ôö£ ãÆ /portal/logi
+n
+Building: Ôö£ Ôùï /purchasing
+Building: Ôö£ Ôùï /quotes
+Building: Ôö£ Ôùï /register
+Building: Ôö£ Ôùï /reports
+Building: Ôö£ Ôùï /reports/ce
+o
+Building: Ôö£ Ôùï /reports/da
+ily
+Building: Ôö£ Ôùï /reports/su
+ppliers
+Building: Ôö£ Ôùï /reset-pass
+word
+Building: Ôö£ ãÆ /rfq
+Building: Ôö£ ãÆ /rfq/[id]
+Building: Ôö£ Ôùï /robots.txt
+Building: Ôö£ Ôùï /sales
+Building: Ôö£ Ôùï /sales/invo
+ice
+Building: Ôö£ Ôùï /security/s
+uspicious
+Building: Ôö£ ãÆ /seller/auto
+mation
+Building: Ôö£ ãÆ /seller/auto
+mation/decisions
+Building: Ôö£ Ôùï /seller/boo
+st
+Building: Ôö£ Ôùï /seller/boo
+st/analytics
+Building: Ôö£ ãÆ /seller/cont
+racts
+Building: Ôö£ ãÆ /seller/prod
+ucts
+Building: Ôö£ ãÆ /seller/prod
+ucts/[id]
+Building: Ôö£ ãÆ /seller/rfqs
+Building: Ôö£ ãÆ /seller/rfqs
+/[id]
+Building: Ôö£ ãÆ /seller/sugg
+estions
+Building: Ôö£ Ôùï /service
+Building: Ôö£ ãÆ /service/[id
+]
+Building: Ôö£ Ôùï /service/ne
+w
+Building: Ôö£ Ôùï /settings
+Building: Ôö£ Ôùï /settings/b
+ranch
+Building: Ôö£ Ôùï /settings/p
+ricing
+Building: Ôö£ Ôùï /setup
+Building: Ôö£ Ôùï /sitemap.xm
+l
+Building: Ôö£ Ôùï /staff
+Building: Ôö£ Ôùï /staff/deal
+er-orders
+Building: Ôö£ Ôùï /staff/fina
+nce/refunds
+Building: Ôö£ Ôùï /staff/me
+Building: Ôö£ Ôùï /staff/pdks
+Building: Ôö£ Ôùï /suppliers
+Building: Ôö£ ãÆ /suppliers/[
+id]
+Building: Ôö£ ãÆ /support
+Building: Ôö£ ãÆ /support/[id
+]
+Building: Ôö£ Ôùï /support/ne
+w
+Building: Ôö£ Ôùï /support/ti
+ckets
+Building: Ôö£ Ôùï /terminal
+Building: Ôö£ ãÆ /test-deskto
+p
+Building: Ôö£ Ôùï /theme-test
+Building: Ôö£ Ôùï /treasury
+Building: Ôöö ãÆ /vehicle/[pl
+ate]
+Building: ãÆ Proxy (Middlewar
+e)
+Building: Ôùï  (Static)   pre
+rendered as static content
+Building: ãÆ  (Dynamic)  serv
+er-rendered on demand
+Building: Traced Next.js serv
+er files in: 35.127ms
+Building: Created all serverl
+ess functions in: 1.690s
+Building: Collected static fi
+les (public/, static/, .next/
+static): 9.245ms
+Building: Build Completed in 
+/vercel/output [59s]
+Building: Deploying outputs..
+.
+Building: Deployment complete
+d
+Building: Creating build cach
+e...
+[2K[1A[2K[GProduction: ht
+tps://motoroil-bdx8l0fwh-moto
+roils-projects.vercel.app [2m
+]
+Completing...
+Aliased: https://www.periodya
+.com [2m]
+https://motoroil-bdx8l0fwh-motoroils-projects.vercel.app

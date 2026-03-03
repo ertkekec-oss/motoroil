@@ -21,8 +21,8 @@ export async function confirmDeliveryAction(orderId: string) {
         const result = await confirmDelivery(orderId, session.settings.companyId);
 
         // Revalidate the specific order detail page and list
-        revalidatePath(`/network/buyer/orders/${orderId}`);
-        revalidatePath(`/network/buyer/orders`);
+        revalidatePath(`/hub/buyer/orders/${orderId}`);
+        revalidatePath(`/hub/buyer/orders`);
 
         return result;
     } catch (e: any) {

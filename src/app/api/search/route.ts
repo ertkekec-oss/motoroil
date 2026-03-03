@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
                 id: o.id,
                 title: `Order: ${o.refNumber || o.id.split('-')[0]}`,
                 subtitle: `Amount: ₺${o.totalAmount} (${role})`,
-                href: role === 'SELLER' ? '/network/seller/orders' : '/network/buyer/orders'
+                href: role === 'SELLER' ? '/hub/seller/orders' : '/hub/buyer/orders'
             });
         });
     } catch { }
@@ -126,7 +126,7 @@ export async function GET(req: NextRequest) {
                 id: i.id,
                 title: `Invoice: ${i.period}`,
                 subtitle: `Status: ${i.status}`,
-                href: `/network/finance?tab=invoices`
+                href: `/hub/finance?tab=invoices`
             });
         });
     } catch { }

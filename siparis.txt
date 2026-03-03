@@ -1,0 +1,84 @@
+﻿commit cbf11a757342718232211cee00799f730f01bbb9
+Author: Ertke Kec <ertkekec@gmail.com>
+Date:   Wed Feb 25 23:39:09 2026 +0300
+
+    feat: Add D1 & D2 features for suggestion engine (circuit breaker, global kill switch, dry run, suggested price)
+
+diff --git a/src/components/Sidebar.tsx b/src/components/Sidebar.tsx
+index 31ec6e2..8215bcf 100644
+--- a/src/components/Sidebar.tsx
++++ b/src/components/Sidebar.tsx
+@@ -20,6 +20,7 @@ export default function Sidebar() {
+ 
+     const [fieldSalesOpen, setFieldSalesOpen] = useState(false);
+     const [reportsOpen, setReportsOpen] = useState(false);
++    const [networkOpen, setNetworkOpen] = useState(false);
+ 
+     // Auto-expand if active
+     useEffect(() => {
+@@ -29,6 +30,9 @@ export default function Sidebar() {
+         if (pathname.includes('/reports')) {
+             setReportsOpen(true);
+         }
++        if (pathname.includes('/network') || pathname.includes('/admin/ops')) {
++            setNetworkOpen(true);
++        }
+     }, [pathname]);
+ 
+     const isSystemAdmin = currentUser === null || currentUser?.role === 'SUPER_ADMIN' || (currentUser?.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('m├╝d├╝r')));
+@@ -69,6 +73,8 @@ export default function Sidebar() {
+         '/fintech/open-banking': { perm: 'finance_view' },
+         '/fintech/smart-pricing': { perm: 'finance_view', feature: 'smart_pricing' },
+         '/notifications': { perm: 'pos_access' },
++        '/network/buyer/orders': { perm: 'supplier_view' },
++        '/network/seller/orders': { perm: 'sales_archive' },
+     };
+ 
+     const menuItems = [
+@@ -81,6 +87,29 @@ export default function Sidebar() {
+         { name: 'Cari Hesaplar', href: '/customers', icon: '­şñØ' },
+         { name: 'Tedarik├ği A─ş─▒', href: '/suppliers', icon: '­şÜÜ' },
+ 
++        // B2B A─ŞI & PAZARYER─░
++        {
++            name: 'B2B & Pazaryeri A─ş─▒',
++            icon: '­şîı',
++            isParent: true,
++            id: 'network-parent',
++            subItems: [
++                { name: 'B2B ├£r├╝n Katalo─şu', href: '/catalog', icon: '­şøı´©Å' },
++                { name: '­şøÆ Sepetim (Cart)', href: '/catalog/cart', icon: '­şøÆ' },
++                { name: 'Pazarl─▒kl─▒ Al─▒mlar (Buyer)', href: '/rfq', icon: '­şñØ' },
++                { name: 'S├Âzle┼şmelerim (Buyer)', href: '/contracts', icon: '­şô£' },
++                { name: '├£r├╝n Yay─▒nlama (Seller)', href: '/seller/products', icon: '­şôó' },
++                { name: 'Gelen Talepler (Seller)', href: '/seller/rfqs', icon: '­şôê' },
++                { name: 'Tedarik S├Âzle┼şmeleri (Seller)', href: '/seller/contracts', icon: '­şñØ' },
++                { name: 'Al─▒nan Sipari┼şler (Seller)', href: '/network/seller/orders', icon: '­şÅ¬' },
++                { name: 'Verilen Sipari┼şler (Buyer)', href: '/network/buyer/orders', icon: '­şøÆ' },
++                { name: 'ADMIN: Kategoriler', href: '/admin/catalog/categories', icon: '­şôé' },
++                { name: 'ADMIN: Onay Masas─▒', href: '/admin/products', icon: 'ÔÜû´©Å' },
++                { name: 'ADMIN: Firmalar', href: '/admin/companies', icon: '­şÅó' },
++                { name: 'ADMIN: Altyap─▒', href: '/admin/ops/providers', icon: 'ÔÜÖ´©Å' }
++            ]
++        },
++
+         // AKILLI S─░STEMLER GRUBU
+         { name: 'Finansal Kontrol Kulesi', href: '/fintech/control-tower', icon: '­şù╝' },
+ 
+@@ -283,7 +312,7 @@ export default function Sidebar() {
+             }}>
+                 {menuItems.map((item: any) => {
+                     if (item.isParent) {
+-                        const isExpanded = item.id === 'field-sales-parent' ? fieldSalesOpen : (item.id === 'reports-parent' ? reportsOpen : false);
++                        const isExpanded = item.id === 'field-sales-parent' ? fieldSalesOpen : (item.id === 'reports-parent' ? reportsOpen : (item.id === 'network-parent' ? networkOpen : false));
+                         const anyChildActive = item.subItems?.some((sub: any) => pathname === sub.href);
+ 
+                         return (
+@@ -292,6 +321,7 @@ export default function Sidebar() {
+                                     onClick={() => {
+                                         if (item.id === 'field-sales-parent') setFieldSalesOpen(!fieldSalesOpen);
+                                         if (item.id === 'reports-parent') setReportsOpen(!reportsOpen);
++                                        if (item.id === 'network-parent') setNetworkOpen(!networkOpen);
+                                     }}
+                                     style={{
+                                         display: 'flex', alignItems: 'center', gap: '14px',

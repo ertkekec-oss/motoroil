@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { requireDealerContext } from "@/lib/network/context"
-import { getSupplierPaymentConfigOrThrow } from "@/lib/network/payments/config"
+import { getSupplierPaymentConfigOrThrow } from "@/lib/hub/payments/config"
 
 export async function POST(req: Request) {
     try {

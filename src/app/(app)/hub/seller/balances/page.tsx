@@ -120,7 +120,7 @@ export default async function SellerBalancesPage() {
                                         {new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "medium" }).format(tx.createdAt)}
                                     </td>
                                     <td className="px-5 py-4">
-                                        <Link href={`/network/seller/orders/${tx.networkOrderId}`} className="font-semibold text-gray-900 hover:underline">
+                                        <Link href={`/hub/seller/orders/${tx.networkOrderId}`} className="font-semibold text-gray-900 hover:underline">
                                             Sipariş #{tx.networkOrderId.slice(-8).toUpperCase()}
                                         </Link>
                                         <div className="text-xs text-gray-500 font-mono mt-1">Ref: {tx.idempotencyKey}</div>

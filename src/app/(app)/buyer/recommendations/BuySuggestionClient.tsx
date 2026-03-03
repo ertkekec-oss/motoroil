@@ -25,7 +25,7 @@ export function BuySuggestionClient({ suggestionId, globalProductId, hasSeller }
                 if (action === 'BUY') {
                     router.push(`/catalog?search=${globalProductId}`);
                 } else if (action === 'RFQ') {
-                    router.push(`/network/buyer/rfq/new?product=${globalProductId}`);
+                    router.push(`/hub/buyer/rfq/new?product=${globalProductId}`);
                 } else {
                     router.refresh();
                 }
