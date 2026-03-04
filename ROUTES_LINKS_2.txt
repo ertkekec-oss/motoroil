@@ -1,0 +1,23 @@
+﻿C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:71 <NavItem href="/admin/dashboard" icon={LayoutDashboard} label="Executive Dashboard" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:77 <NavItem href="/admin/payments-escrow/policies" icon={FileText} label="Escrow Policies" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:78 <NavItem href="/admin/payments-escrow/commissions" icon={Percent} label="Commission Plans" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:79 <NavItem href="/admin/payouts" icon={ArrowRightLeft} label="Payout Control" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:80 <NavItem href="/admin/payments-escrow/providers" icon={CreditCard} label="Providers" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:81 <NavItem href="/admin/payments-escrow/audit" icon={ShieldCheck} label="Finance Audit Log" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:88 <NavItem href="/admin/growth/boost-rules" icon={TrendingUp} label="Boost Rules" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:89 <NavItem href="/admin/growth/billing-health" icon={Activity} label="Billing Health" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:90 <NavItem href="/admin/growth/revenue" icon={LayoutDashboard} label="Revenue Analytics" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:91 <NavItem href="/admin/growth/audit" icon={FileText} label="Growth Audit" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:92 <NavItem href="/admin/growth/subscriptions" icon={Users} label="Hub Subscriptions" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:99 <NavItem href="/admin/disputes" icon={AlertTriangle} label="Dispute Queue" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:100 <NavItem href="/admin/trust-monitor" icon={Activity} label="Trust Monitor" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:102 <NavItem href="/admin/disputes/policies" icon={FileText} label="Resolution Policies" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:109 <NavItem href="/admin/companies" icon={Store} label="Companies" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:110 <NavItem href="/admin/catalog/categories" icon={DatabaseZap} label="Categories" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:111 <NavItem href="/admin/products" icon={CheckCircle} label="Product Approvals" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:112 <NavItem href="/admin/tenants" icon={Users} label="All Tenants" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:113 <NavItem href="/admin/plans" icon={FileText} label="SaaS Plans" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:120 <NavItem href="/admin/ops/providers" icon={Server} label="Platform Infra" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:121 <NavItem href="/admin/ops/ledgers" icon={DatabaseZap} label="System Ledger" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:122 <NavItem href="/admin/security" icon={ShieldAlert} label="Security Kit" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:123 <NavItem href="/admin/logs" icon={Activity} label="System Logs" />

@@ -1,5 +1,5 @@
-import { permanentRedirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
-export default function RedirectPage() {
-    permanentRedirect('/dealer-network/settings');
+export default function DeprecatedB2BSettings() {
+    redirect("/dealer-network/settings");
 }

@@ -106,9 +106,10 @@ export default function Sidebar() {
         '/advisor': { perm: 'finance_view', feature: 'accountant' },
         '/admin/audit-logs': { perm: 'audit_view' },
         '/staff/pdks': { perm: 'staff_manage' },
-        '/b2b/orders/approvals': { perm: 'b2b_manage' },
-        '/b2b/refunds': { perm: 'b2b_manage' },
-        '/b2b/settings': { perm: 'b2b_manage' },
+        '/dealer-network/dashboard': { perm: 'b2b_manage' },
+        '/dealer-network/orders/approvals': { perm: 'b2b_manage' },
+        '/dealer-network/refunds': { perm: 'b2b_manage' },
+        '/dealer-network/settings': { perm: 'b2b_manage' },
         '/security/suspicious': { perm: 'security_access' },
         '/billing': { perm: 'settings_manage' },
         '/field-mobile/routes': { perm: 'field_sales_access' },
@@ -139,8 +140,6 @@ export default function Sidebar() {
                     id: 'b2b-global-parent',
                     subItems: [
                         { name: 'Uyuşmazlık Çözüm Merkezi', href: '/support/tickets' },
-                        { name: 'B2B Dashboard', href: '/b2b/dashboard' },
-
                         { name: 'SİPARİŞLER', href: '' },
                         ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/hub/seller/orders' }] : []),
                         ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/hub/buyer/orders' }] : []),

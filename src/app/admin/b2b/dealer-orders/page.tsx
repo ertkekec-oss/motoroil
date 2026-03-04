@@ -1,5 +1,5 @@
-import { permanentRedirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 export default function RedirectPage() {
-    permanentRedirect('/dealer-network/orders/approvals');
+    redirect('/admin/b2b/dealer-orders');
 }

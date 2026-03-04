@@ -111,6 +111,9 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
                     <NavItem href="/admin/products" icon={CheckCircle} label="Product Approvals" />
                     <NavItem href="/admin/tenants" icon={Users} label="All Tenants" />
                     <NavItem href="/admin/plans" icon={FileText} label="SaaS Plans" />
+                    <NavItem href="/admin/b2b/dealer-orders" icon={Activity} label="Dealer Orders Queue" />
+                    <NavItem href="/admin/b2b/refunds" icon={ArrowRightLeft} label="B2B Refunds (Platform)" />
+                    <NavItem href="/admin/b2b/settings" icon={Settings} label="Dealer Portal Policies" />
                 </NavGroup>
             )}
 

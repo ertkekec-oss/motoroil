@@ -1,0 +1,78 @@
+﻿C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:40 '/staff': { perm: 'staff_manage', feature: 'team_management' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:42 '/admin/dashboard': { perm: 'admin_view' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:43 '/admin/tenants': { perm: 'admin_view' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:44 '/admin/website': { perm: 'admin_view' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:45 '/admin/sales-radar': { perm: 'admin_view' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:46 '/admin/plans': { perm: 'admin_view' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:47 '/admin/transactions': { perm: 'admin_view' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:48 '/admin/logs': { perm: 'admin_view' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:49 '/admin/audit-logs': { perm: 'audit_view' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\ClientShell.tsx:117 const isAdminPage = pathname?.startsWith('/admin');
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:25 const isActive = pathname.startsWith(href) && href !== '/admin' || (href === '/admin/dashboard' && pathname === '/admin/dashboard');
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:71 <NavItem href="/admin/dashboard" icon={LayoutDashboard} label="Executive Dashboard" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:77 <NavItem href="/admin/payments-escrow/policies" icon={FileText} label="Escrow Policies" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:78 <NavItem href="/admin/payments-escrow/commissions" icon={Percent} label="Commission Plans" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:79 <NavItem href="/admin/payouts" icon={ArrowRightLeft} label="Payout Control" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:80 <NavItem href="/admin/payments-escrow/providers" icon={CreditCard} label="Providers" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:81 <NavItem href="/admin/payments-escrow/audit" icon={ShieldCheck} label="Finance Audit Log" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:88 <NavItem href="/admin/growth/boost-rules" icon={TrendingUp} label="Boost Rules" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:89 <NavItem href="/admin/growth/billing-health" icon={Activity} label="Billing Health" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:90 <NavItem href="/admin/growth/revenue" icon={LayoutDashboard} label="Revenue Analytics" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:91 <NavItem href="/admin/growth/audit" icon={FileText} label="Growth Audit" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:92 <NavItem href="/admin/growth/subscriptions" icon={Users} label="Hub Subscriptions" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:99 <NavItem href="/admin/disputes" icon={AlertTriangle} label="Dispute Queue" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:100 <NavItem href="/admin/trust-monitor" icon={Activity} label="Trust Monitor" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:102 <NavItem href="/admin/disputes/policies" icon={FileText} label="Resolution Policies" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:109 <NavItem href="/admin/companies" icon={Store} label="Companies" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:110 <NavItem href="/admin/catalog/categories" icon={DatabaseZap} label="Categories" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:111 <NavItem href="/admin/products" icon={CheckCircle} label="Product Approvals" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:112 <NavItem href="/admin/tenants" icon={Users} label="All Tenants" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:113 <NavItem href="/admin/plans" icon={FileText} label="SaaS Plans" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:120 <NavItem href="/admin/ops/providers" icon={Server} label="Platform Infra" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:121 <NavItem href="/admin/ops/ledgers" icon={DatabaseZap} label="System Ledger" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:122 <NavItem href="/admin/security" icon={ShieldAlert} label="Security Kit" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\AdminSidebar.tsx:123 <NavItem href="/admin/logs" icon={Activity} label="System Logs" />
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:51 '/hub/seller/orders', '/hub/buyer/orders',
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:53 '/hub/finance', '/hub/trust-score', '/hub/stock-risks', '/seller/boost', '/seller/boost/analytics',
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:54 '/rfq', '/contracts', '/hub/buyer'
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:105 '/staff': { perm: 'staff_manage', feature: 'team_management' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:107 '/admin/audit-logs': { perm: 'audit_view' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:108 '/staff/pdks': { perm: 'staff_manage' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:109 '/b2b/orders/approvals': { perm: 'b2b_manage' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:110 '/b2b/refunds': { perm: 'b2b_manage' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:111 '/b2b/settings': { perm: 'b2b_manage' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:115 '/staff/me': { perm: 'pos_access' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:121 '/hub/buyer/orders': { perm: 'supplier_view' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:122 '/hub/seller/orders': { perm: 'sales_archive' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:142 { name: 'B2B Dashboard', href: '/b2b/dashboard' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:145 ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/hub/seller/orders' }] : []),
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:146 ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/hub/buyer/orders' }] : []),
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:153 { name: 'Finance (B2B)', href: '/hub/finance' },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:157 { name: 'Growth: Güven Skoru', href: '/hub/trust-score' }
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:172 { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:199 { name: 'PDKS', href: '/staff/pdks', icon: Clock },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:200 { name: 'İnsan Kaynakları', href: '/staff', icon: Users },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:206 { name: 'Dashboard', href: '/dealer-network/dashboard', icon: LayoutDashboard },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:207 { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals', icon: Inbox },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:208 { name: 'İadeler', href: '/dealer-network/refunds', icon: Receipt },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:209 { name: 'Ayarlar', href: '/dealer-network/settings', icon: Settings },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:229 { name: 'Bilgi Bankası', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: Library }
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:237 { name: 'Denetim', href: '/admin/audit-logs', icon: Search },
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:243 { name: 'Support Inbox', href: '/admin/support/tickets', icon: Inbox }
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\components\Sidebar.tsx:255 return ['/admin/audit-logs', '/reports', '/advisor'].includes(item.href || '');
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\contexts\AppContext.tsx:114 const isAdminPath = pathname?.startsWith('/admin');
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\contexts\AppContext.tsx:150 '/staff': 'team_management'
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\adminGovernanceActions.ts:27 revalidatePath("/admin/catalog/categories");
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\adminGovernanceActions.ts:37 revalidatePath("/admin/catalog/categories");
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\adminGovernanceActions.ts:53 revalidatePath("/admin/catalog/categories");
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\adminGovernanceActions.ts:65 revalidatePath("/admin/products");
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\adminGovernanceActions.ts:75 revalidatePath("/admin/products");
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\adminGovernanceActions.ts:87 revalidatePath("/admin/companies");
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\adminGovernanceActions.ts:97 revalidatePath("/admin/companies");
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\checkoutAction.ts:105 revalidatePath("/hub/buyer/orders");
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\createOrdersFromCartAction.ts:158 revalidatePath("/hub/buyer/orders");
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\forceReleaseAction.ts:77 revalidatePath('/admin/ops/payments');
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\forceReleaseLedgerAction.ts:85 revalidatePath('/admin/ops/ledgers');
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\rfqResponseActions.ts:170 revalidatePath("/hub/buyer/orders");
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\actions\syncShipmentAction.ts:32 revalidatePath('/admin/ops/shipments');
+C:\Users\ertke\OneDrive\Masaüstü\periodya\muhasebeapp\motoroil\src\app\robots.ts:8 disallow: ['/admin/', '/api/', '/_next/'],

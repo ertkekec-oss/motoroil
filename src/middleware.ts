@@ -43,29 +43,18 @@ export async function middleware(request: NextRequest) {
     // 2. NETWORK B2B PORTAL GUARD (Dealer Auth)
     const base = portalBasePath();
     if (pathname.startsWith(base)) {
-        const isApi = pathname.startsWith(`${base}/api/`);
         const isLogin = pathname.startsWith(`${base}/login`);
 
         const hasSession = Boolean(request.cookies.get("pdya_ds")?.value);
         const hasMembership = Boolean(request.cookies.get("pdya_nm")?.value);
 
         if (!hasSession) {
-            if (isApi) {
-                // allow OTP endpoints
-                if (pathname.includes('/api/network/auth/otp')) return NextResponse.next();
-                return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
-            }
             if (!isLogin) return NextResponse.redirect(new URL(`${base}/login`, request.url));
             return NextResponse.next();
         }
 
         // session var, membership yoksa select sayfasına yönlendir (login sayfası hariç)
         if (!hasMembership) {
-            if (isApi) {
-                // allow context switch and logout endpoint
-                if (pathname.includes('/api/network/context/switch') || pathname.includes('/api/network/auth/logout')) return NextResponse.next();
-                return NextResponse.json({ error: "NO_ACTIVE_MEMBERSHIP" }, { status: 403 });
-            }
             const isSelect = pathname.startsWith(`${base}/select-supplier`);
             if (!isLogin && !isSelect) return NextResponse.redirect(new URL(`${base}/select-supplier`, request.url));
         }
@@ -76,7 +65,7 @@ export async function middleware(request: NextRequest) {
     // 3. Auth Related Paths - Allowed
     const publicPaths = [
         '/', '/login', '/register', '/reset-password',
-        '/api/auth', '/api/public',
+        '/api/auth', '/api/public', '/api/network',
         '/api/admin/marketplace/queue/health',
         '/pdks', '/api/v1/pdks/display'
     ];
