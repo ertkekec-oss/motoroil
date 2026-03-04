@@ -321,7 +321,7 @@ export default function ReportsPage() {
     }, [filteredTransactions]);
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg-main)', padding: '20px' }}>
+        <div className="min-h-screen p-5 bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] pb-24">
             <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
 
 
@@ -329,7 +329,7 @@ export default function ReportsPage() {
                 <header style={{ marginBottom: '30px' }}>
                     {/* Scope Selector (if admin) */}
                     {canViewAll && (
-                        <div style={{ background: 'var(--bg-card)', padding: '16px 24px', borderRadius: '12px', marginBottom: '20px', border: '1px solid var(--border-light)' }}>
+                        <div style={{ background: 'var(--bg-card)', padding: '16px 24px', borderRadius: '12px', marginBottom: '20px', border: "1px solid rgba(255,255,255,0.05)" }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
                                 <div style={{ display: 'flex', gap: '10px' }}>
                                     <button
@@ -356,9 +356,9 @@ export default function ReportsPage() {
                                             value={selectedBranch}
                                             onChange={(e) => setSelectedBranch(e.target.value)}
                                             style={{
-                                                background: 'var(--bg-deep)',
+                                                background: "#1e293b",
                                                 color: 'white',
-                                                border: '1px solid var(--border-light)',
+                                                border: "1px solid rgba(255,255,255,0.05)",
                                                 borderRadius: '8px',
                                                 padding: '8px 16px',
                                                 fontSize: '14px',
@@ -394,7 +394,7 @@ export default function ReportsPage() {
                         </div>
 
                         {/* Date Range Picker */}
-                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: 'var(--bg-card)', padding: '12px 20px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: 'var(--bg-card)', padding: '12px 20px', borderRadius: '12px', border: "1px solid rgba(255,255,255,0.05)" }}>
                             <input
                                 type="date"
                                 value={localDateRange.start}
@@ -451,7 +451,7 @@ export default function ReportsPage() {
 
                             {/* KPI Cards */}
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.primary}` }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.primary}` }}>
                                     <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '8px' }}>TOPLAM CİRO</div>
                                     <div style={{ fontSize: '32px', fontWeight: '900', color: 'white', marginBottom: '4px' }}>
                                         ₺{financialSummary.revenue.toLocaleString()}
@@ -461,7 +461,7 @@ export default function ReportsPage() {
                                     </div>
                                 </div>
 
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.success}` }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.success}` }}>
                                     <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '8px' }}>NET KAR</div>
                                     <div style={{ fontSize: '32px', fontWeight: '900', color: COLORS.success, marginBottom: '4px' }}>
                                         ₺{financialSummary.netProfit.toLocaleString()}
@@ -471,7 +471,7 @@ export default function ReportsPage() {
                                     </div>
                                 </div>
 
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.warning}` }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.warning}` }}>
                                     <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '8px' }}>ORTALAMA SEPET</div>
                                     <div style={{ fontSize: '32px', fontWeight: '900', color: 'white', marginBottom: '4px' }}>
                                         ₺{salesAnalytics.avgTicket.toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -481,7 +481,7 @@ export default function ReportsPage() {
                                     </div>
                                 </div>
 
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.danger}` }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.danger}` }}>
                                     <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '8px' }}>TOPLAM GİDER</div>
                                     <div style={{ fontSize: '32px', fontWeight: '900', color: 'white', marginBottom: '4px' }}>
                                         ₺{financialSummary.expenses.toLocaleString()}
@@ -495,7 +495,7 @@ export default function ReportsPage() {
                             {/* Charts Row */}
                             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
                                 {/* Sales Trend */}
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
                                     <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '20px' }}>📊 Satış Trendi</h3>
                                     <ResponsiveContainer width="100%" height={300}>
                                         <AreaChart data={salesAnalytics.dailyData}>
@@ -518,7 +518,7 @@ export default function ReportsPage() {
                                 </div>
 
                                 {/* Expense Breakdown */}
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
                                     <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '20px' }}>🍰 Gider Dağılımı</h3>
                                     <ResponsiveContainer width="100%" height={300}>
                                         <PieChart>
@@ -545,11 +545,11 @@ export default function ReportsPage() {
                             </div>
 
                             {/* Recent Transactions */}
-                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
                                 <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '20px' }}>🕐 Son İşlemler</h3>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
                                     {recentTransactions.map((tx, i) => (
-                                        <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '16px', borderRadius: '12px', borderLeft: `3px solid ${tx.type === 'Sales' ? COLORS.success : COLORS.danger}` }}>
+                                        <div key={i} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm" style={{ padding: '16px', borderRadius: '12px', borderLeft: `3px solid ${tx.type === 'Sales' ? COLORS.success : COLORS.danger}` }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                                                 <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                                                     {new Date(tx.date).toLocaleDateString('tr-TR')}
@@ -574,7 +574,7 @@ export default function ReportsPage() {
                     {/* Sales Tab */}
                     {activeTab === 'sales' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
                                 <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '20px' }}>📊 Günlük Satış Detayı</h3>
                                 <ResponsiveContainer width="100%" height={400}>
                                     <BarChart data={salesAnalytics.dailyData}>
@@ -598,11 +598,11 @@ export default function ReportsPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
                             {/* Financial Detailed Table */}
-                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '32px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '32px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)' }}>
                                 <h3 style={{ fontSize: '20px', fontWeight: '900', marginBottom: '24px' }}>🏛️ Detaylı Finansal Tablo</h3>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
 
-                                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '24px', borderRadius: '16px' }}>
+                                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm" style={{ padding: '24px', borderRadius: '16px' }}>
                                         <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>CİRO VE KARLILIK</div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                             <div className="flex-between"><span>Toplam Ciro</span> <span style={{ fontWeight: '700' }}>₺{financialSummary.revenue.toLocaleString()}</span></div>
@@ -614,7 +614,7 @@ export default function ReportsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '24px', borderRadius: '16px' }}>
+                                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm" style={{ padding: '24px', borderRadius: '16px' }}>
                                         <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>ALACAK VE BORÇ DURUMU</div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                             <div className="flex-between"><span>Müşteri Alacakları (Güncel)</span> <span style={{ fontWeight: '700' }}>₺{financialSummary.receivable.toLocaleString()}</span></div>
@@ -625,7 +625,7 @@ export default function ReportsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '24px', borderRadius: '16px' }}>
+                                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm" style={{ padding: '24px', borderRadius: '16px' }}>
                                         <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>PLANLI (GELECEK) ÖDEMELER</div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                             <div className="flex-between"><span>Planlı Alacaklar (Taksitler)</span> <span style={{ fontWeight: '700', color: COLORS.success }}>₺{financialSummary.plannedReceivable.toLocaleString()}</span></div>
@@ -639,12 +639,12 @@ export default function ReportsPage() {
                                 </div>
 
                                 <div style={{ marginTop: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', background: 'rgba(16, 185, 129, 0.05)', border: `1px solid ${COLORS.success}55` }}>
+                                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', background: 'rgba(16, 185, 129, 0.05)', border: `1px solid ${COLORS.success}55` }}>
                                         <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px' }}>TOPLAM ŞİRKET ALACAĞI</div>
                                         <div style={{ fontSize: '36px', fontWeight: '900', color: COLORS.success }}>₺{financialSummary.totalReceivable.toLocaleString()}</div>
                                         <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Cari + Gelecek Taksitler</div>
                                     </div>
-                                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', background: 'rgba(239, 68, 68, 0.05)', border: `1px solid ${COLORS.danger}55` }}>
+                                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', background: 'rgba(239, 68, 68, 0.05)', border: `1px solid ${COLORS.danger}55` }}>
                                         <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px' }}>TOPLAM ŞİRKET BORCU</div>
                                         <div style={{ fontSize: '36px', fontWeight: '900', color: COLORS.danger }}>₺{financialSummary.totalPayable.toLocaleString()}</div>
                                         <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Cari + Gelecek Taksitler</div>
@@ -654,21 +654,21 @@ export default function ReportsPage() {
 
                             {/* Hidden Costs Breakdown */}
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.indigo}` }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.indigo}` }}>
                                     <div style={{ fontSize: '24px', marginBottom: '12px' }}>💳</div>
                                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>POS KOMİSYON (Tahmini)</div>
                                     <div style={{ fontSize: '28px', fontWeight: '900' }}>₺{financialSummary.hiddenCosts.pos.toLocaleString()}</div>
                                     <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>%2.5 ortalama komisyon</p>
                                 </div>
 
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.warning}` }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.warning}` }}>
                                     <div style={{ fontSize: '24px', marginBottom: '12px' }}>🧾</div>
                                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>E-BELGE MALİYETİ</div>
                                     <div style={{ fontSize: '28px', fontWeight: '900' }}>₺{financialSummary.hiddenCosts.eDoc.toLocaleString()}</div>
                                     <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>{salesAnalytics.count} işlem × ₺1.25</p>
                                 </div>
 
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.pink}` }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.pink}` }}>
                                     <div style={{ fontSize: '24px', marginBottom: '12px' }}>🖨️</div>
                                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>KAĞIT/TONER</div>
                                     <div style={{ fontSize: '28px', fontWeight: '900' }}>₺{financialSummary.hiddenCosts.paper.toLocaleString()}</div>
@@ -683,23 +683,23 @@ export default function ReportsPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.primary}` }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.primary}` }}>
                                     <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '8px' }}>TOPLAM ENVANTER DEĞERİ (ALIŞ)</div>
                                     <div style={{ fontSize: '36px', fontWeight: '900', color: 'white' }}>₺{inventoryStats.totalValue.toLocaleString()}</div>
                                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Tüm stokların maliyet bedeli toplamı</div>
                                 </div>
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.warning}` }}>
+                                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.warning}` }}>
                                     <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '8px' }}>TOPLAM STOK ADEDİ</div>
                                     <div style={{ fontSize: '36px', fontWeight: '900', color: 'white' }}>{inventoryStats.totalQty.toLocaleString()}</div>
                                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Şu an depoda bulunan toplam ürün sayısı</div>
                                 </div>
                             </div>
 
-                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
                                 <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '20px' }}>📦 En Yüksek Stok Değerine Sahip Ürünler</h3>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
                                     {inventoryStats.topProducts.map((product, i) => (
-                                        <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm" style={{ padding: '20px', borderRadius: '12px', borderLeft: `4px solid ${COLORS.primary}` }}>
+                                        <div key={i} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm" style={{ padding: '20px', borderRadius: '12px', borderLeft: `4px solid ${COLORS.primary}` }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
                                                 <span style={{ fontSize: '24px' }}>📦</span>
                                                 <span style={{ fontSize: '11px', fontWeight: '700', color: Number(product.stock) < Number(product.minStock) ? COLORS.danger : COLORS.success }}>
@@ -724,11 +724,11 @@ export default function ReportsPage() {
                     {/* Customers Tab */}
                     {activeTab === 'customers' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
                                 <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '20px' }}>👥 Cari Bakiye Durumu</h3>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '16px' }}>
                                     {topCustomers.map((customer, i) => (
-                                        <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px' }}>
+                                        <div key={i} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-plus" style={{ padding: '24px', borderRadius: '16px' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
                                                 <div>
                                                     <div style={{ fontSize: '18px', fontWeight: '800', marginBottom: '4px' }}>{customer.name}</div>
@@ -755,7 +755,7 @@ export default function ReportsPage() {
                     {/* Cash Flow Tab */}
                     {activeTab === 'cashflow' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px' }}>
                                 <h3 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '20px' }}>🏦 Nakit Akış Analizi</h3>
                                 <ResponsiveContainer width="100%" height={400}>
                                     <LineChart data={cashFlowData}>
@@ -777,7 +777,7 @@ export default function ReportsPage() {
                             {/* Cash Summary */}
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
                                 {filteredKasalar.map((kasa, i) => (
-                                    <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.cyan}` }}>
+                                    <div key={i} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm card" style={{ padding: '24px', borderRadius: '16px', borderLeft: `4px solid ${COLORS.cyan}` }}>
                                         <div style={{ fontSize: '24px', marginBottom: '12px' }}>🏦</div>
                                         <div style={{ fontSize: '14px', fontWeight: '700', marginBottom: '8px' }}>{kasa.name}</div>
                                         <div style={{ fontSize: '28px', fontWeight: '900', color: COLORS.cyan }}>

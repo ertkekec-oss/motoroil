@@ -56,14 +56,14 @@ export default function DailyReportContent() {
     return (
         <div className="animate-fade-in">
             <style jsx>{`
-                .bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card {
+                .bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card {
                     background: var(--bg-card);
                     
                     border: 1px solid var(--border-light);
                     border-radius: 24px;
                     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 }
-                .bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card:hover {
+                .bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card:hover {
                     border-color: var(--primary);
                     transform: translateY(-5px);
                     background: var(--bg-hover);
@@ -125,7 +125,7 @@ export default function DailyReportContent() {
                             onChange={(e) => setSelectedBranch(e.target.value)}
                         >
                             {branches?.map((b: any) => (
-                                <option key={b.id} value={b.name} style={{ background: 'var(--bg-deep)' }}>{b.name}</option>
+                                <option key={b.id} value={b.name} style={{ background: "#1e293b" }}>{b.name}</option>
                             ))}
                         </select>
                     )}
@@ -149,7 +149,7 @@ export default function DailyReportContent() {
             </header>
 
             <div className="stat-grid mb-10">
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-8 group">
                     <div className="text-[10px] font-black tracking-widest text-primary mb-6 flex justify-between">
                         <span>TOPLAM CİRO</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
@@ -163,7 +163,7 @@ export default function DailyReportContent() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-8 group">
                     <div className="text-[10px] font-black tracking-widest text-emerald-400 mb-6 flex justify-between">
                         <span>TOPLAM TAHSİLAT</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
@@ -177,7 +177,7 @@ export default function DailyReportContent() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-8 group">
                     <div className="text-[10px] font-black tracking-widest text-red-500 mb-6 flex justify-between">
                         <span>TOPLAM GİDER</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↘</span>
@@ -191,7 +191,7 @@ export default function DailyReportContent() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group relative overflow-hidden">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-8 group relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5  -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
                     <div className="text-[10px] font-black tracking-widest text-cyan-400 mb-6 flex justify-between">
                         <span>BAKİYE DEĞİŞİMİ</span>
@@ -208,7 +208,7 @@ export default function DailyReportContent() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-10">
+                <div className="lg:col-span-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-10">
                     <div className="flex justify-between items-center mb-10">
                         <div>
                             <h3 className="text-xl font-black text-white mb-1">Anlık İşlem Takibi</h3>
@@ -259,7 +259,7 @@ export default function DailyReportContent() {
                 </div>
 
                 <div className="space-y-8">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-10">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-10">
                         <h3 className="text-lg font-black text-white mb-6">Kasa Dağılımı</h3>
                         <div className="space-y-7">
                             {kasalar.filter(k => (canViewAll && adminActiveTab === 'overall') ? true : k.branch === selectedBranch).slice(0, 6).map((kasa, i) => {
@@ -288,7 +288,7 @@ export default function DailyReportContent() {
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-10 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent relative overflow-hidden group">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card p-10 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:rotate-12 transition-transform">💡</div>
                         <h3 className="text-lg font-black text-white mb-4">Analitik Özet</h3>
                         <div className="space-y-4">

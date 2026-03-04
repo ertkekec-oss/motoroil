@@ -4,14 +4,14 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* Dark Mode Colors - Default */
-  --bg-deep: #020205;
-  --bg-dark: #080911;
-  --bg-card: rgba(15, 17, 30, 0.7);
-  --bg-hover: rgba(30, 35, 60, 0.8);
+  /* Dark Mode Colors - Default (Enterprise Navy) */
+  --bg-deep: #020617;
+  --bg-dark: #020617;
+  --bg-card: #0f172a;
+  --bg-hover: #1e293b;
   --bg-main: var(--bg-deep);
   --bg-app: var(--bg-deep);
-  --bg-panel: rgba(15, 23, 42, 0.6);
+  --bg-panel: #0f172a;
   --glass-bg: rgba(15, 17, 30, 0.4);
   --modal-overlay: rgba(0, 0, 0, 0.7);
 
