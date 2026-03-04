@@ -218,7 +218,7 @@ export default function Sidebar() {
             {
                 group: "Dealer Network",
                 items: [
-                    { name: 'Dashboard', href: '/dealer-network/dashboard', icon: LayoutDashboard },
+                    { name: 'Kontrol Paneli', href: '/dealer-network/dashboard', icon: LayoutDashboard },
                     { name: 'Bayiler', href: '/dealer-network/dealers', icon: Users },
                     { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals', icon: Inbox },
                     { name: 'İadeler', href: '/dealer-network/refunds', icon: Receipt },
@@ -241,18 +241,75 @@ export default function Sidebar() {
                     { name: 'Fintech Tower', href: '/fintech/control-tower', icon: Activity },
                     { name: 'Mali Müşavir', href: '/advisor', icon: Briefcase },
                     { name: 'Anomaliler', href: '/security/suspicious', icon: ShieldAlert, alertCount: suspiciousEventsCount },
-                    ...(isPlatformAdmin ? [
-                        { name: 'Bilgi Bankası', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: Library }
-                    ] : []),
                 ]
             },
             ...(isPlatformAdmin ? [
                 {
-                    group: "Network Governance",
+                    group: "PERİODYA HUB",
+                    items: [
+                        {
+                            name: 'Growth & Monetization',
+                            icon: TrendingUp,
+                            isParent: true,
+                            id: 'admin-hub-growth',
+                            subItems: [
+                                { name: 'Boost Yönetimi', href: '/admin/hub/growth/boost' },
+                                { name: 'Trust Score', href: '/admin/hub/growth/trust-score' },
+                                { name: 'Kampanyalar', href: '/admin/hub/growth/campaigns' },
+                            ]
+                        },
+                        {
+                            name: 'Risk & Resolution',
+                            icon: ShieldAlert,
+                            isParent: true,
+                            id: 'admin-hub-risk',
+                            subItems: [
+                                { name: 'Kredi Risk Merkezi', href: '/admin/hub/risk/credit' },
+                                { name: 'Escrow Uyuşmazlık', href: '/admin/hub/risk/escrow' },
+                                { name: 'Kötüye Kullanım', href: '/admin/hub/risk/abuse' },
+                            ]
+                        },
+                        {
+                            name: 'Network Governance',
+                            icon: Globe,
+                            isParent: true,
+                            id: 'admin-hub-network',
+                            subItems: [
+                                { name: 'Kategoriler', href: '/admin/hub/network/categories' },
+                                { name: 'Komisyon Havuzu', href: '/admin/hub/network/commissions' },
+                                { name: 'Markalar', href: '/admin/hub/network/brands' },
+                            ]
+                        },
+                        {
+                            name: 'System & Infra',
+                            icon: Terminal,
+                            isParent: true,
+                            id: 'admin-hub-infra',
+                            subItems: [
+                                { name: 'Aracı Kurumlar (Gateway)', href: '/admin/hub/infra/gateways' },
+                                { name: 'Fintech Routing', href: '/admin/hub/infra/fintech' },
+                                { name: 'API Limitleri', href: '/admin/hub/infra/limits' },
+                            ]
+                        }
+                    ]
+                },
+                {
+                    group: "B2B NETWORK",
                     items: [
                         { name: 'B2B Sipariş Kuyruğu', href: '/admin/b2b/dealer-orders', icon: Inbox },
                         { name: 'İade ve Uyuşmazlıklar', href: '/admin/b2b/refunds', icon: Receipt },
                         { name: 'Login & Risk Politikaları', href: '/admin/b2b/policies', icon: ShieldAlert },
+                    ]
+                },
+                {
+                    group: "PERİODYA AYARLARI",
+                    items: [
+                        { name: 'Sistem Kayıtları', href: '/admin/audit-logs', icon: Search },
+                        { name: 'Güvenlik Kalkanı', href: '/admin/security-kit', icon: ShieldAlert },
+                        { name: 'Tüm Müşteriler', href: '/admin/tenants', icon: Users },
+                        { name: 'SaaS Planları', href: '/admin/saas-plans', icon: CreditCard },
+                        { name: 'Destek Biletleri', href: '/admin/support/tickets', icon: Inbox },
+                        { name: 'Bilgi Bankası', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: Library }
                     ]
                 }
             ] : []),
@@ -260,14 +317,10 @@ export default function Sidebar() {
                 group: "Sistem",
                 items: [
                     { name: 'Yardım Merkezi', href: '/help', icon: LifeBuoy },
-                    { name: 'Denetim', href: '/admin/audit-logs', icon: Search },
                     { name: 'Destek', href: '/support', icon: HelpCircle },
                     { name: 'Sistem', href: '/settings/branch', icon: Terminal },
                     { name: 'Abonelik', href: '/billing', icon: CreditCard },
                     { name: 'Fiyatlandırma', href: '/settings/pricing', icon: ShoppingCart },
-                    ...(isPlatformAdmin ? [
-                        { name: 'Support Inbox', href: '/admin/support/tickets', icon: Inbox }
-                    ] : []),
                     { name: 'Ayarlar', href: '/settings', icon: Settings },
                 ]
             }
