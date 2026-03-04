@@ -165,33 +165,40 @@ export async function POST(req: Request) {
             }
 
             // --- CREDIT EXPOSURE CHECK ---
+            const settings = await tx.dealerNetworkSettings.findUnique({
+                where: { tenantId: ctx.supplierTenantId },
+                select: { creditPolicy: true, approvalRequiresPaymentIfFlagged: true }
+            })
+            const creditPolicy = settings?.creditPolicy || "HARD_LIMIT"
+
             const { creditLimit, exposureBase } = await computeExposureBase(ctx)
             const projectedExposure = exposureBase + grandTotal
             const limitExceeded = creditLimit > 0 && projectedExposure > creditLimit
-
-            if (limitExceeded && paymentMode === "ON_ACCOUNT") {
-                await auditLog({
-                    tenantId: ctx.supplierTenantId,
-                    actorDealerUserId: ctx.dealerUserId,
-                    type: "CREDIT_LIMIT_FORCE_PAYMENT",
-                    entityType: "DealerMembership",
-                    entityId: ctx.activeMembershipId,
-                    meta: { creditLimit, exposureBase, projectedExposure, paymentMode }
-                }).catch(e => console.error(e))
-
-                throw new HttpErr(409, "INSUFFICIENT_CREDIT_LIMIT", {
-                    creditLimit, exposureBase, projectedExposure, requiredPayment: "CARD"
-                })
-            }
 
             let isLimitExceeded = false
             let creditExceededAmount: number | undefined = undefined
             let paymentRequired = false
 
             if (limitExceeded) {
+                if (paymentMode === "ON_ACCOUNT" && (creditPolicy === "HARD_LIMIT" || creditPolicy === "FORCE_CARD_ON_LIMIT")) {
+                    await auditLog({
+                        tenantId: ctx.supplierTenantId,
+                        actorDealerUserId: ctx.dealerUserId,
+                        type: creditPolicy === "FORCE_CARD_ON_LIMIT" ? "CREDIT_LIMIT_FORCE_PAYMENT" : "CREDIT_LIMIT_EXCEEDED",
+                        entityType: "DealerMembership",
+                        entityId: ctx.activeMembershipId,
+                        meta: { creditLimit, exposureBase, projectedExposure, paymentMode, policy: creditPolicy }
+                    }).catch(e => console.error(e))
+
+                    throw new HttpErr(409, "INSUFFICIENT_CREDIT_LIMIT", {
+                        creditLimit, exposureBase, projectedExposure, requiredPayment: creditPolicy === "FORCE_CARD_ON_LIMIT" ? "CARD" : "NONE", policy: creditPolicy
+                    })
+                }
+
+                // Either CARD or SOFT_LIMIT + ON_ACCOUNT => order drops but gets flagged
                 isLimitExceeded = true
                 creditExceededAmount = projectedExposure - creditLimit
-                paymentRequired = true
+                paymentRequired = settings?.approvalRequiresPaymentIfFlagged ?? true
 
                 await auditLog({
                     tenantId: ctx.supplierTenantId,
@@ -199,7 +206,7 @@ export async function POST(req: Request) {
                     type: "CREDIT_LIMIT_EXCEEDED",
                     entityType: "Order",
                     entityId: idempotencyKey, // placeholder until order creation
-                    meta: { creditLimit, exposureBase, projectedExposure, grandTotal }
+                    meta: { creditLimit, exposureBase, projectedExposure, grandTotal, policy: creditPolicy }
                 }).catch(e => console.error(e))
             }
             // -----------------------------

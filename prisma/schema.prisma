@@ -9,19 +9,19 @@ datasource db {
 }
 
 model Tenant {
-  id           String        @id @default(cuid())
-  name         String
-  ownerEmail   String
-  phone        String?
-  status       String        @default("ACTIVE")
-  setupState   String        @default("PENDING")
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  companies    Company[]
-  growthEvents GrowthEvent[]
-  subscription Subscription?
-  upsellEvents UpsellEvent[]
-  users        User[]
+  id                String             @id @default(cuid())
+  name              String
+  ownerEmail        String
+  phone             String?
+  status            String             @default("ACTIVE")
+  setupState        String             @default("PENDING")
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  companies         Company[]
+  growthEvents      GrowthEvent[]
+  subscription      Subscription?
+  upsellEvents      UpsellEvent[]
+  users             User[]
   dealerMemberships DealerMembership[]
   dealerPriceRules  DealerPriceRule[]
   dealerInvites     DealerInvite[]
@@ -232,41 +232,41 @@ model UserCompanyAccess {
 }
 
 model Order {
-  id                String    @id @default(cuid())
-  marketplaceId     String
-  orderNumber       String
-  marketplace       String
-  customerName      String
-  customerEmail     String?
-  totalAmount       Decimal   @db.Decimal(10, 2)
-  currency          String    @default("TRY")
-  status            String
-  orderDate         DateTime
-  items             Json
-  shippingAddress   Json?
-  invoiceAddress    Json?
-  cargoTrackingNo   String?
-  cargoProvider     String?
-  rawData           Json?
-  deletedAt         DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  branch            String?   @default("Merkez")
-  companyId         String
-  shipmentPackageId String?
-  detailsFetchedAt  DateTime?
-  staffId           String?
-  company           Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  staff             Staff?    @relation("StaffStoreOrders", fields: [staffId], references: [id])
-  dealerMembershipId String?
-  salesChannel       SalesChannel @default(POS)
-  dealerPrice        Decimal?     @db.Decimal(12, 2)
-  dealerMembership   DealerMembership? @relation("OrderDealerMembership", fields: [dealerMembershipId], references: [id])
+  id                    String            @id @default(cuid())
+  marketplaceId         String
+  orderNumber           String
+  marketplace           String
+  customerName          String
+  customerEmail         String?
+  totalAmount           Decimal           @db.Decimal(10, 2)
+  currency              String            @default("TRY")
+  status                String
+  orderDate             DateTime
+  items                 Json
+  shippingAddress       Json?
+  invoiceAddress        Json?
+  cargoTrackingNo       String?
+  cargoProvider         String?
+  rawData               Json?
+  deletedAt             DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  branch                String?           @default("Merkez")
+  companyId             String
+  shipmentPackageId     String?
+  detailsFetchedAt      DateTime?
+  staffId               String?
+  company               Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  staff                 Staff?            @relation("StaffStoreOrders", fields: [staffId], references: [id])
+  dealerMembershipId    String?
+  salesChannel          SalesChannel      @default(POS)
+  dealerPrice           Decimal?          @db.Decimal(12, 2)
+  dealerMembership      DealerMembership? @relation("OrderDealerMembership", fields: [dealerMembershipId], references: [id])
   reservationReleasedAt DateTime?
-  accountingPostedAt DateTime?
-  isLimitExceeded    Boolean?     @default(false)
-  creditExceededAmount Decimal?   @db.Decimal(12, 2)
-  paymentRequired    Boolean?     @default(false)
+  accountingPostedAt    DateTime?
+  isLimitExceeded       Boolean?          @default(false)
+  creditExceededAmount  Decimal?          @db.Decimal(12, 2)
+  paymentRequired       Boolean?          @default(false)
 
   @@unique([companyId, orderNumber])
   @@index([marketplace, orderNumber])
@@ -3160,7 +3160,7 @@ model OpsHealthSnapshot {
 model BillingHealthSnapshot {
   id                       String   @id @default(cuid())
   day                      String   @unique
-  totalOutstandingAR       Decimal  @db.Decimal(18,2)
+  totalOutstandingAR       Decimal  @db.Decimal(18, 2)
   overdueInvoiceCount      Int
   blockedSubscriptionCount Int
   createdAt                DateTime @default(now())
@@ -3292,46 +3292,46 @@ model BoostPlan {
 }
 
 model BoostSubscription {
-  id                 String                  @id @default(cuid())
-  sellerTenantId     String
-  planId             String
-  status             BoostSubscriptionStatus
-  startAt            DateTime
-  currentPeriodStart DateTime
-  currentPeriodEnd   DateTime
-  nextRenewalAt      DateTime                @default(now())
+  id                   String                  @id @default(cuid())
+  sellerTenantId       String
+  planId               String
+  status               BoostSubscriptionStatus
+  startAt              DateTime
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  nextRenewalAt        DateTime                @default(now())
   lastChargedPeriodKey String?
-  autoRenew          Boolean                 @default(true)
-  billingBlocked     Boolean                 @default(false)
-  blockedAt          DateTime?
-  pausedAt           DateTime?
-  canceledAt         DateTime?
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
-  plan               BoostPlan               @relation(fields: [planId], references: [id])
-  invoices           BoostInvoice[]
+  autoRenew            Boolean                 @default(true)
+  billingBlocked       Boolean                 @default(false)
+  blockedAt            DateTime?
+  pausedAt             DateTime?
+  canceledAt           DateTime?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  plan                 BoostPlan               @relation(fields: [planId], references: [id])
+  invoices             BoostInvoice[]
 
   @@index([sellerTenantId, status])
 }
 
 model BoostInvoice {
-  id                String             @id @default(cuid())
-  sellerTenantId    String
-  subscriptionId    String
-  periodKey         String             // "2026-03"
-  amount            Decimal            @db.Decimal(18,2)
-  currency          String             @default("TRY")
-  status            BoostInvoiceStatus
-  issuedAt          DateTime
-  dueAt             DateTime
-  paidAt            DateTime?
-  ledgerGroupId     String?
-  graceEndsAt       DateTime?
-  overdueAt         DateTime?
-  collectionStatus  BoostInvoiceCollectionStatus @default(CURRENT)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  subscription      BoostSubscription  @relation(fields: [subscriptionId], references: [id])
+  id               String                       @id @default(cuid())
+  sellerTenantId   String
+  subscriptionId   String
+  periodKey        String // "2026-03"
+  amount           Decimal                      @db.Decimal(18, 2)
+  currency         String                       @default("TRY")
+  status           BoostInvoiceStatus
+  issuedAt         DateTime
+  dueAt            DateTime
+  paidAt           DateTime?
+  ledgerGroupId    String?
+  graceEndsAt      DateTime?
+  overdueAt        DateTime?
+  collectionStatus BoostInvoiceCollectionStatus @default(CURRENT)
+  createdAt        DateTime                     @default(now())
+  updatedAt        DateTime                     @updatedAt
+  subscription     BoostSubscription            @relation(fields: [subscriptionId], references: [id])
 
   @@unique([subscriptionId, periodKey])
   @@index([sellerTenantId, status])
@@ -3837,21 +3837,21 @@ enum DisputeActionType {
 }
 
 model DisputeCase {
-  id                    String                 @id @default(cuid())
-  ticketId              String                 @unique
-  status                DisputeStatus          @default(OPEN)
-  severity              DisputeSeverity        @default(LOW)
-  escrowActionState     EscrowActionState      @default(NONE)
-  referencedShipmentId  String?
-  referencedOrderId     String?
-  buyerTenantId         String
-  sellerTenantId        String
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
-  resolvedAt            DateTime?
-  resolutionSummary     String?                @db.Text
-  resolutionCode        DisputeResolutionCode?
-  actions               DisputeAction[]
+  id                   String                 @id @default(cuid())
+  ticketId             String                 @unique
+  status               DisputeStatus          @default(OPEN)
+  severity             DisputeSeverity        @default(LOW)
+  escrowActionState    EscrowActionState      @default(NONE)
+  referencedShipmentId String?
+  referencedOrderId    String?
+  buyerTenantId        String
+  sellerTenantId       String
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  resolvedAt           DateTime?
+  resolutionSummary    String?                @db.Text
+  resolutionCode       DisputeResolutionCode?
+  actions              DisputeAction[]
 
   @@index([status])
   @@index([severity])
@@ -3859,58 +3859,56 @@ model DisputeCase {
 }
 
 model DisputeAction {
-  id              String            @id @default(cuid())
-  disputeCaseId   String
-  actionType      DisputeActionType
-  actorUserId     String
-  actorRole       String
-  amount          Decimal?          @db.Decimal(12, 2)
-  reason          String
-  payloadJson     Json
-  idempotencyKey  String            @unique
-  createdAt       DateTime          @default(now())
-  disputeCase     DisputeCase       @relation(fields: [disputeCaseId], references: [id], onDelete: Restrict)
+  id             String            @id @default(cuid())
+  disputeCaseId  String
+  actionType     DisputeActionType
+  actorUserId    String
+  actorRole      String
+  amount         Decimal?          @db.Decimal(12, 2)
+  reason         String
+  payloadJson    Json
+  idempotencyKey String            @unique
+  createdAt      DateTime          @default(now())
+  disputeCase    DisputeCase       @relation(fields: [disputeCaseId], references: [id], onDelete: Restrict)
 
   @@index([disputeCaseId])
   @@index([actionType])
   @@index([createdAt])
 }
 
-
-
 model BoostPolicyConfig {
-  id                        String    @id @default("GLOBAL")
-  multiplierMin             Decimal   @default(1.0) @db.Decimal(5, 2)
-  multiplierMax             Decimal   @default(3.0) @db.Decimal(5, 2)
-  sponsoredInventoryCapPct  Int       @default(20)
-  interleavePatternJson     Json
-  graceDays                 Int       @default(5)
-  maxRuleDurationDays       Int       @default(90)
-  cTierBoostAllowed         Boolean   @default(true)
-  dTierBoostAllowed         Boolean   @default(false)
-  updatedAt                 DateTime  @updatedAt
+  id                       String   @id @default("GLOBAL")
+  multiplierMin            Decimal  @default(1.0) @db.Decimal(5, 2)
+  multiplierMax            Decimal  @default(3.0) @db.Decimal(5, 2)
+  sponsoredInventoryCapPct Int      @default(20)
+  interleavePatternJson    Json
+  graceDays                Int      @default(5)
+  maxRuleDurationDays      Int      @default(90)
+  cTierBoostAllowed        Boolean  @default(true)
+  dTierBoostAllowed        Boolean  @default(false)
+  updatedAt                DateTime @updatedAt
 }
 
 model BoostBillingHealthSnapshot {
-  id                            String    @id @default(cuid())
-  asOfDate                      String    @unique
-  outstandingArTotal            Decimal   @default(0) @db.Decimal(12, 2)
-  overdueCount                  Int       @default(0)
-  graceCount                    Int       @default(0)
-  blockedSubscriptionsCount     Int       @default(0)
-  topOverdueTenantsJson         Json
-  createdAt                     DateTime  @default(now())
+  id                        String   @id @default(cuid())
+  asOfDate                  String   @unique
+  outstandingArTotal        Decimal  @default(0) @db.Decimal(12, 2)
+  overdueCount              Int      @default(0)
+  graceCount                Int      @default(0)
+  blockedSubscriptionsCount Int      @default(0)
+  topOverdueTenantsJson     Json
+  createdAt                 DateTime @default(now())
 
   @@index([asOfDate])
 }
 
 model BoostTenantEnforcement {
-  tenantId          String    @id
-  boostPaused       Boolean   @default(false)
-  boostBanReason    String?   @db.Text
-  quotaCapOverride  Int?
-  effectiveFrom     DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  tenantId         String   @id
+  boostPaused      Boolean  @default(false)
+  boostBanReason   String?  @db.Text
+  quotaCapOverride Int?
+  effectiveFrom    DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 enum DealerMembershipStatus {
@@ -3945,53 +3943,53 @@ enum SalesChannel {
 }
 
 model DealerUser {
-  id                    String             @id @default(uuid())
-  email                 String             @unique
-  phone                 String?
-  passwordHash          String?
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime           @updatedAt
+  id                     String   @id @default(uuid())
+  email                  String   @unique
+  phone                  String?
+  passwordHash           String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
   defaultDealerCompanyId String?
-  
-  memberships           DealerMembership[]
-  sessions              DealerSession[]
+
+  memberships DealerMembership[]
+  sessions    DealerSession[]
 }
 
 model DealerOtpChallenge {
-  id         String   @id @default(uuid())
-  phoneE164  String   @unique
-  codeHash   String
-  expiresAt  DateTime
-  attempts   Int      @default(0)
-  createdAt  DateTime @default(now())
-  
+  id        String   @id @default(uuid())
+  phoneE164 String   @unique
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
   @@index([phoneE164])
 }
 
 model DealerSession {
-  id           String     @id @default(uuid())
-  tokenHash    String     @unique
+  id           String   @id @default(uuid())
+  tokenHash    String   @unique
   dealerUserId String
   expiresAt    DateTime
-  createdAt    DateTime   @default(now())
-  
-  dealerUser   DealerUser @relation(fields: [dealerUserId], references: [id], onDelete: Cascade)
-  
+  createdAt    DateTime @default(now())
+
+  dealerUser DealerUser @relation(fields: [dealerUserId], references: [id], onDelete: Cascade)
+
   @@index([dealerUserId])
 }
 
 model DealerCompany {
-  id              String             @id @default(uuid())
-  companyName     String
-  taxOffice       String?
-  taxNumber       String?
-  address         String?
-  city            String?
-  district        String?
-  createdAt       DateTime           @default(now())
-  
-  memberships     DealerMembership[]
-  invites         DealerInvite[]
+  id          String   @id @default(uuid())
+  companyName String
+  taxOffice   String?
+  taxNumber   String?
+  address     String?
+  city        String?
+  district    String?
+  createdAt   DateTime @default(now())
+
+  memberships DealerMembership[]
+  invites     DealerInvite[]
 }
 
 enum DealerFinancialMode {
@@ -4000,79 +3998,79 @@ enum DealerFinancialMode {
 }
 
 model DealerMembership {
-  id              String                 @id @default(uuid())
+  id              String  @id @default(uuid())
   dealerUserId    String
   dealerCompanyId String?
   tenantId        String
-  
-  status          DealerMembershipStatus @default(ACTIVE)
-  creditLimit     Decimal                @default(0.0) @db.Decimal(12, 2)
-  financialMode   DealerFinancialMode    @default(ISOLATED)
-  priceRuleId     String?
-  
-  dealerUser      DealerUser             @relation(fields: [dealerUserId], references: [id])
-  dealerCompany   DealerCompany?         @relation(fields: [dealerCompanyId], references: [id])
-  tenant          Tenant                 @relation(fields: [tenantId], references: [id])
-  priceRule       DealerPriceRule?       @relation(fields: [priceRuleId], references: [id])
-  orders          Order[]                @relation("OrderDealerMembership")
-  carts           DealerCart[]
+
+  status        DealerMembershipStatus @default(ACTIVE)
+  creditLimit   Decimal                @default(0.0) @db.Decimal(12, 2)
+  financialMode DealerFinancialMode    @default(ISOLATED)
+  priceRuleId   String?
+
+  dealerUser       DealerUser              @relation(fields: [dealerUserId], references: [id])
+  dealerCompany    DealerCompany?          @relation(fields: [dealerCompanyId], references: [id])
+  tenant           Tenant                  @relation(fields: [tenantId], references: [id])
+  priceRule        DealerPriceRule?        @relation(fields: [priceRuleId], references: [id])
+  orders           Order[]                 @relation("OrderDealerMembership")
+  carts            DealerCart[]
   checkoutAttempts DealerCheckoutAttempt[]
-  
-  createdAt       DateTime               @default(now())
-  updatedAt       DateTime               @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([dealerUserId, tenantId])
   @@index([tenantId])
 }
 
 model DealerPriceRule {
-  id              String             @id @default(uuid())
-  tenantId        String
-  ruleName        String
-  discount        Decimal            @default(0.0) @db.Decimal(5, 2)
-  isActive        Boolean            @default(true)
-  
-  tenant          Tenant             @relation(fields: [tenantId], references: [id])
-  memberships     DealerMembership[]
-  
+  id       String  @id @default(uuid())
+  tenantId String
+  ruleName String
+  discount Decimal @default(0.0) @db.Decimal(5, 2)
+  isActive Boolean @default(true)
+
+  tenant      Tenant             @relation(fields: [tenantId], references: [id])
+  memberships DealerMembership[]
+
   @@index([tenantId, isActive])
 }
 
 model DealerCheckoutAttempt {
-  id             String           @id @default(cuid())
+  id             String   @id @default(cuid())
   membershipId   String
   idempotencyKey String
   orderId        String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  membership     DealerMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  membership DealerMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
 
   @@unique([membershipId, idempotencyKey])
 }
 
 model DealerPaymentIntent {
-  id                 String                  @id @default(uuid())
+  id                 String                 @id @default(uuid())
   supplierTenantId   String
   dealerMembershipId String?
-  amount             Decimal                 @db.Decimal(12, 2)
-  currency           String                  @default("TRY")
+  amount             Decimal                @db.Decimal(12, 2)
+  currency           String                 @default("TRY")
   provider           DealerPaymentProvider?
-  status             String                  @default("CREATED")
+  status             String                 @default("CREATED")
   referenceCode      String?
   redirectUrl        String?
   providerData       Json?
   providerResult     Json?
   paidAmount         String?
   verifiedAt         DateTime?
-  idempotencyKey     String                  @unique
-  scope              String                  @default("DEALER_B2B")
+  idempotencyKey     String                 @unique
+  scope              String                 @default("DEALER_B2B")
   orderId            String?
   accountingPostedAt DateTime?
 
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([provider, referenceCode])
 }
 
@@ -4083,25 +4081,25 @@ enum DealerInviteStatus {
 }
 
 model DealerInvite {
-  id                 String             @id @default(uuid())
-  supplierTenantId   String
-  tokenHash          String             @unique
-  status             DealerInviteStatus @default(ISSUED)
-  expiresAt          DateTime
-  dealerCompanyId    String? 
-  issuedToPhoneE164  String? 
-  issuedToEmail      String?
-  maxRedemptions     Int                @default(1)
-  redemptionCount    Int                @default(0)
-  createdByUserId    String?
-  redeemedAt         DateTime?
-  
-  tenant             Tenant             @relation(fields: [supplierTenantId], references: [id])
-  dealerCompany      DealerCompany?     @relation(fields: [dealerCompanyId], references: [id])
+  id                String             @id @default(uuid())
+  supplierTenantId  String
+  tokenHash         String             @unique
+  status            DealerInviteStatus @default(ISSUED)
+  expiresAt         DateTime
+  dealerCompanyId   String?
+  issuedToPhoneE164 String?
+  issuedToEmail     String?
+  maxRedemptions    Int                @default(1)
+  redemptionCount   Int                @default(0)
+  createdByUserId   String?
+  redeemedAt        DateTime?
 
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  
+  tenant        Tenant         @relation(fields: [supplierTenantId], references: [id])
+  dealerCompany DealerCompany? @relation(fields: [dealerCompanyId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([supplierTenantId, status])
   @@index([expiresAt])
 }
@@ -4121,18 +4119,18 @@ enum CartStatus {
 }
 
 model DealerCart {
-  id               String   @id @default(uuid())
+  id               String @id @default(uuid())
   membershipId     String
   supplierTenantId String
 
-  membership       DealerMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  membership DealerMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
 
-  status           CartStatus @default(ACTIVE)
+  status CartStatus @default(ACTIVE)
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  items            DealerCartItem[]
+  items DealerCartItem[]
 
   // A membership can only have 1 active cart at a time.
   // Partial unique index trick for Postgres or general index for standard usage.
@@ -4141,40 +4139,40 @@ model DealerCart {
 }
 
 model DealerCartItem {
-  id         String   @id @default(uuid())
-  cartId     String
-  productId  String
-  quantity   Int
+  id        String @id @default(uuid())
+  cartId    String
+  productId String
+  quantity  Int
 
-  cart       DealerCart @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product    Product    @relation(fields: [productId], references: [id])
+  cart    DealerCart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product    @relation(fields: [productId], references: [id])
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([cartId, productId])
 }
 
 model TenantPaymentConfig {
-  id          String @id @default(uuid())
-  tenantId    String @unique
-  provider    DealerPaymentProvider
-  isEnabled   Boolean @default(false)
+  id        String                @id @default(uuid())
+  tenantId  String                @unique
+  provider  DealerPaymentProvider
+  isEnabled Boolean               @default(false)
 
   // secrets: encrypt-at-rest önerilir (uygulama seviyesinde)
-  configJson  Json
+  configJson Json
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([tenantId, provider])
 }
 
 model WebhookReplay {
-  id          String   @id @default(uuid())
-  provider    DealerPaymentProvider
-  nonce       String
-  seenAt      DateTime @default(now())
+  id       String                @id @default(uuid())
+  provider DealerPaymentProvider
+  nonce    String
+  seenAt   DateTime              @default(now())
 
   @@unique([provider, nonce])
   @@index([provider, seenAt])
@@ -4194,17 +4192,17 @@ model DealerRefund {
   amount           Decimal               @db.Decimal(12, 2)
   currency         String                @default("TRY")
 
-  reason           String?
-  idempotencyKey   String                @unique
+  reason         String?
+  idempotencyKey String  @unique
 
-  providerRefundId String?
-  providerResult   Json?
-  status           RefundStatus          @default(PENDING)
+  providerRefundId   String?
+  providerResult     Json?
+  status             RefundStatus @default(PENDING)
   accountingPostedAt DateTime?
 
-  createdByUserId  String?
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+  createdByUserId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([supplierTenantId, orderId])
   @@index([supplierTenantId, status])
@@ -4241,20 +4239,20 @@ enum AuditEventType {
 }
 
 model AuditEvent {
-  id              String         @id @default(uuid())
-  tenantId        String         // supplier tenant scope
-  actorUserId     String?        // staff user id (if any)
-  actorDealerUserId String?      // dealer user id (if any)
-  actorIp         String?
-  actorUa         String?
+  id                String  @id @default(uuid())
+  tenantId          String // supplier tenant scope
+  actorUserId       String? // staff user id (if any)
+  actorDealerUserId String? // dealer user id (if any)
+  actorIp           String?
+  actorUa           String?
 
-  type            AuditEventType
-  entityType      String?        // "Order" | "DealerRefund" | ...
-  entityId        String?
-  membershipId    String?        // dealerMembershipId (if relevant)
+  type         AuditEventType
+  entityType   String? // "Order" | "DealerRefund" | ...
+  entityId     String?
+  membershipId String? // dealerMembershipId (if relevant)
 
-  meta            Json?
-  createdAt       DateTime       @default(now())
+  meta      Json?
+  createdAt DateTime @default(now())
 
   @@index([tenantId, createdAt])
   @@index([tenantId, type, createdAt])
@@ -4270,17 +4268,17 @@ enum AccountingOutboxStatus {
 }
 
 model AccountingOutbox {
-  id           String   @id @default(cuid())
-  tenantId     String
-  event        String
-  entityId     String
-  dedupeKey    String   @unique
-  status       AccountingOutboxStatus @default(PENDING)
-  attempts     Int      @default(0)
-  nextRetryAt  DateTime?
-  lastError    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String                 @id @default(cuid())
+  tenantId    String
+  event       String
+  entityId    String
+  dedupeKey   String                 @unique
+  status      AccountingOutboxStatus @default(PENDING)
+  attempts    Int                    @default(0)
+  nextRetryAt DateTime?
+  lastError   String?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
 
   @@index([tenantId, status])
   @@index([nextRetryAt])
@@ -4292,8 +4290,26 @@ enum DealerAuthMode {
   OTP_OR_PASSWORD
 }
 
+enum DealerCreditPolicy {
+  HARD_LIMIT
+  SOFT_LIMIT
+  FORCE_CARD_ON_LIMIT
+}
+
 model TenantPortalConfig {
   tenantId       String         @id
   dealerAuthMode DealerAuthMode @default(PASSWORD_ONLY)
   updatedAt      DateTime       @updatedAt
+}
+
+model DealerNetworkSettings {
+  id                               String             @id @default(cuid())
+  tenantId                         String             @unique
+  creditPolicy                     DealerCreditPolicy @default(HARD_LIMIT)
+  hardLimitBlock                   Boolean            @default(true)
+  forceCardOnLimit                 Boolean            @default(false)
+  approvalRequiresPaymentIfFlagged Boolean            @default(true)
+  showLimitOnCartUI                Boolean            @default(true)
+  createdAt                        DateTime           @default(now())
+  updatedAt                        DateTime           @updatedAt
 }
