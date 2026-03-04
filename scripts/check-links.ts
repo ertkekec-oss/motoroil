@@ -107,6 +107,7 @@ function checkRoutes() {
         const networkRegex = /(?:href=|push\()(["'`])\/network\b(.*?)(["'`])/g;
         const hubRegex = /(?:href=|push\()(["'`])\/hub\b(.*?)(["'`])/g;
         const b2bRegex = /(?:href=|push\()(["'`])\/b2b\b(.*?)(["'`])/g;
+        const staffRegex = /(?:href=|push\()(["'`])\/staff\b(.*?)(["'`])/g;
         let match;
 
         while ((match = dealerRegex.exec(content)) !== null) {
@@ -117,6 +118,11 @@ function checkRoutes() {
         }
         while ((match = hubRegex.exec(content)) !== null) {
             logError('/hub link found in /admin', filePath, match[0]);
+        }
+        while ((match = staffRegex.exec(content)) !== null) {
+            if (filePath.includes(path.sep + 'b2b' + path.sep)) {
+                logError('/staff link found in /admin/b2b', filePath, match[0]);
+            }
         }
         while ((match = b2bRegex.exec(content)) !== null) {
             // Check if it's explicitly a redirect shim

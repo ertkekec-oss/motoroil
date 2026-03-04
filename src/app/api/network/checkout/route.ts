@@ -198,7 +198,7 @@ export async function POST(req: Request) {
                 // Either CARD or SOFT_LIMIT + ON_ACCOUNT => order drops but gets flagged
                 isLimitExceeded = true
                 creditExceededAmount = projectedExposure - creditLimit
-                paymentRequired = settings?.approvalRequiresPaymentIfFlagged ?? true
+                // paymentRequired depends on other factors, do not set forcefully by approvalRequiresPaymentIfFlagged
 
                 await auditLog({
                     tenantId: ctx.supplierTenantId,
