@@ -329,6 +329,7 @@ model Product {
   stocks              Stock[]
   movements           StockMovement[]
   dealerCartItems     DealerCartItem[]
+  DealerCatalogItem   DealerCatalogItem[]
 
   @@unique([code, branch, companyId])
   @@index([name])
@@ -4312,4 +4313,27 @@ model DealerNetworkSettings {
   showLimitOnCartUI                Boolean            @default(true)
   createdAt                        DateTime           @default(now())
   updatedAt                        DateTime           @updatedAt
+}
+
+enum DealerCatalogVisibility {
+  HIDDEN
+  VISIBLE
+}
+
+model DealerCatalogItem {
+  id               String                  @id @default(cuid())
+  supplierTenantId String
+  productId        String
+  product          Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
+  visibility       DealerCatalogVisibility @default(VISIBLE)
+  price            Decimal?                @db.Decimal(12, 2)
+  minOrderQty      Int                     @default(1)
+  maxOrderQty      Int?
+  dealerGroupId    String?
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+
+  @@unique([supplierTenantId, productId])
+  @@index([supplierTenantId])
+  @@index([productId])
 }

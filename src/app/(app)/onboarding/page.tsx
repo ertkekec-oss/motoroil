@@ -43,7 +43,8 @@ export default function OnboardingPage() {
     const [integrations, setIntegrations] = useState({
         eInvoice: false,
         bank: false,
-        ecommerce: false
+        ecommerce: false,
+        b2bNetwork: false
     });
 
     const handleNext = () => setStep(step + 1);
@@ -506,6 +507,20 @@ export default function OnboardingPage() {
                             <div className="checkbox-custom">{integrations.ecommerce && '✓'}</div>
                         </div>
 
+                        <div
+                            className={`integration-option ${integrations.b2bNetwork ? 'selected' : ''}`}
+                            onClick={() => setIntegrations({ ...integrations, b2bNetwork: !integrations.b2bNetwork })}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                <div className="icon-box" style={{ background: 'rgba(99, 102, 241, 0.1)', color: '#6366f1' }}>🤝</div>
+                                <div style={{ textAlign: 'left' }}>
+                                    <div style={{ fontWeight: 800, fontSize: '14px' }}>B2B Dealer Network</div>
+                                    <div style={{ fontSize: '12px', color: '#64748b' }}>Bayi sipariş portalı ve sanal POS.</div>
+                                </div>
+                            </div>
+                            <div className="checkbox-custom">{integrations.b2bNetwork && '✓'}</div>
+                        </div>
+
                         <button className="btn-next" onClick={handleNext}>
                             Son Adıma Geç
                         </button>
@@ -535,7 +550,8 @@ export default function OnboardingPage() {
                                     {[
                                         integrations.eInvoice ? 'E-Fatura' : '',
                                         integrations.bank ? 'Banka' : '',
-                                        integrations.ecommerce ? 'E-Ticaret' : ''
+                                        integrations.ecommerce ? 'E-Ticaret' : '',
+                                        integrations.b2bNetwork ? 'B2B Ağ' : ''
                                     ].filter(Boolean).join(', ') || 'Atlandı'}
                                 </span>
                             </div>

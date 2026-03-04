@@ -133,6 +133,29 @@ function checkRoutes() {
         }
     });
 
+    // Checking /hub boundaries
+    const hubPath = path.join(process.cwd(), 'src/app/(app)/hub');
+    walkDir(hubPath, (filePath) => {
+        if (!filePath.endsWith('.tsx') && !filePath.endsWith('.ts')) return;
+        const content = fs.readFileSync(filePath, 'utf8');
+
+        // Hub cannot link to /dealer-network, /network, or /admin
+        const dealerRegex = /(?:href=|push\()(["'`])\/dealer-network\b(.*?)(["'`])/g;
+        const networkRegex = /(?:href=|push\()(["'`])\/network\b(.*?)(["'`])/g;
+        const adminRegex = /(?:href=|push\()(["'`])\/admin\b(.*?)(["'`])/g;
+        let match;
+
+        while ((match = dealerRegex.exec(content)) !== null) {
+            logError('/dealer-network link found in /hub', filePath, match[0]);
+        }
+        while ((match = networkRegex.exec(content)) !== null) {
+            logError('/network link found in /hub', filePath, match[0]);
+        }
+        while ((match = adminRegex.exec(content)) !== null) {
+            logError('/admin link found in /hub', filePath, match[0]);
+        }
+    });
+
     // Sidebar Route Exist Check
     if (fs.existsSync(sidebarPath)) {
         console.log('🔍 Checking Sidebar hrefs against route manifest...');

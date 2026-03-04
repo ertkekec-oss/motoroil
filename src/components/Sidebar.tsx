@@ -220,6 +220,7 @@ export default function Sidebar() {
                 group: "Dealer Network",
                 items: [
                     { name: 'Bayiler', href: '/dealer-network/dealers', icon: Users },
+                    { name: 'B2B Katalog', href: '/dealer-network/catalog', icon: Box },
                     { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals', icon: Inbox },
                     { name: 'İadeler', href: '/dealer-network/refunds', icon: Receipt },
                     { name: 'Ayarlar', href: '/dealer-network/settings', icon: Settings },
