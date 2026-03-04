@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Sparkles, TrendingUp, AlertTriangle } from 'lucide-react';
 
 export default function AiCashierPanel({ cartItems, onAddSuggested }: { cartItems: any[], onAddSuggested: (prod: any) => void }) {
-    const isAiEnabled = process.env.NEXT_PUBLIC_POS_AI_CASHIER === 'true';
+    const isAiEnabled = process.env.NEXT_PUBLIC_POS_AI_CASHIER !== 'false';
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     if (!isAiEnabled) return null;

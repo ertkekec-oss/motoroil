@@ -3,7 +3,7 @@ import { Mic, MicOff } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
 
 export default function VoiceControl({ onCommand }: { onCommand: (cmd: string) => void }) {
-    const isVoiceEnabled = process.env.NEXT_PUBLIC_POS_VOICE === 'true';
+    const isVoiceEnabled = process.env.NEXT_PUBLIC_POS_VOICE !== 'false';
     const [isListening, setIsListening] = useState(false);
     const [supported, setSupported] = useState(true);
     const { showWarning } = useModal();

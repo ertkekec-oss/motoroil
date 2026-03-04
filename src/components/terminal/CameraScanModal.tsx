@@ -3,7 +3,7 @@ import { useModal } from '@/contexts/ModalContext';
 import { Camera, X, RefreshCw } from 'lucide-react';
 
 export default function CameraScanModal({ onScan, onClose }: { onScan: (barcode: string) => void, onClose: () => void }) {
-    const isCameraEnabled = process.env.NEXT_PUBLIC_POS_CAMERA_VISION === 'true';
+    const isCameraEnabled = process.env.NEXT_PUBLIC_POS_CAMERA_VISION !== 'false';
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isScanning, setIsScanning] = useState(false);

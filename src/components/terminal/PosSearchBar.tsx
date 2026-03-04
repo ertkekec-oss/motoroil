@@ -19,10 +19,10 @@ export const PosSearchBar = forwardRef<HTMLInputElement, any>((props: any, ref) 
             />
 
             <div className="flex items-center gap-2 pr-2">
-                {process.env.NEXT_PUBLIC_POS_VOICE === 'true' && (
+                {process.env.NEXT_PUBLIC_POS_VOICE !== 'false' && (
                     <VoiceControl onCommand={onVoiceCommand} />
                 )}
-                {process.env.NEXT_PUBLIC_POS_CAMERA_VISION === 'true' && (
+                {process.env.NEXT_PUBLIC_POS_CAMERA_VISION !== 'false' && (
                     <button type="button" onClick={onCameraClick} className="w-10 h-10 flex items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors">
                         <Camera size={20} />
                     </button>
