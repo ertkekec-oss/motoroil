@@ -105,6 +105,7 @@ function checkRoutes() {
         // Admin cannot link to /dealer-network, /network, or /b2b (except shim)
         const dealerRegex = /(?:href=|push\()(["'`])\/dealer-network\b(.*?)(["'`])/g;
         const networkRegex = /(?:href=|push\()(["'`])\/network\b(.*?)(["'`])/g;
+        const hubRegex = /(?:href=|push\()(["'`])\/hub\b(.*?)(["'`])/g;
         const b2bRegex = /(?:href=|push\()(["'`])\/b2b\b(.*?)(["'`])/g;
         let match;
 
@@ -113,6 +114,9 @@ function checkRoutes() {
         }
         while ((match = networkRegex.exec(content)) !== null) {
             logError('/network link found in /admin', filePath, match[0]);
+        }
+        while ((match = hubRegex.exec(content)) !== null) {
+            logError('/hub link found in /admin', filePath, match[0]);
         }
         while ((match = b2bRegex.exec(content)) !== null) {
             // Check if it's explicitly a redirect shim

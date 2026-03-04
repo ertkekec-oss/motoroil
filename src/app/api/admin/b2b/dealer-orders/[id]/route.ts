@@ -14,7 +14,7 @@ export async function GET(req: Request, { params }: { params: any }) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
-        const resolvedParams = await Promise.resolve(params);
+        const resolvedParams = (await Promise.resolve(params)) as any;
         const orderId = resolvedParams.id;
 
         const order = await prisma.order.findUnique({
