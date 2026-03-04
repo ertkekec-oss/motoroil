@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Dark Mode Colors - Default */
   --bg-deep: #020205;
@@ -348,7 +350,7 @@
 /* ── Modal overlay ── */
 [data-pos-theme="light"] .fixed.inset-0 {
   background: rgba(15, 23, 42, 0.55) !important;
-  
+
 }
 
 /* ── Dark hex helpers ── */
@@ -601,13 +603,13 @@ body::before {
 /* Glassmorphism & UI Components */
 .glass {
   background: var(--glass-bg);
-  
+
   border: var(--glass-border);
 }
 
 .glass-plus {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
-  
+
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: var(--shadow-premium);
 }
@@ -689,7 +691,7 @@ body::before {
   align-items: center;
   gap: 8px;
   background: var(--bg-card);
-  
+
   border: 1px solid var(--primary);
   padding: 10px 16px;
   border-radius: 99px;
@@ -885,7 +887,7 @@ body::before {
   width: 100%;
   height: 100%;
   background: var(--modal-overlay);
-  
+
   display: flex;
   justify-content: center;
   align-items: flex-start;

@@ -28,6 +28,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr" suppressHydrationWarning={true}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var localTheme = localStorage.getItem('periodya-theme') || localStorage.getItem('motoroil-theme');
+                var themeToSet = localTheme || 'dark';
+                document.documentElement.setAttribute('data-theme', themeToSet);
+                if (themeToSet === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body suppressHydrationWarning={true}>
         <Providers>{children}</Providers>
         <CookieConsent />
