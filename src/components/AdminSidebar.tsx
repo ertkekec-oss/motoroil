@@ -116,12 +116,16 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
                     <NavGroup title="Network Governance" icon={Network} groupKey="network">
                         <NavItem href="/admin/companies" icon={Store} label="Firmalar" />
                         <NavItem href="/admin/catalog/categories" icon={DatabaseZap} label="Kategoriler" />
+                        <NavItem href="/admin/catalog/brands" icon={CheckCircle} label="Markalar" />
                         <NavItem href="/admin/products" icon={CheckCircle} label="Ürün Onayları" />
                     </NavGroup>
                 )}
 
                 {isSuper && (
                     <NavGroup title="System & Infrastructure" icon={HardDrive} groupKey="system">
+                        <NavItem href="/admin/ops/gateways" icon={Server} label="Aracı Kurumlar (Gateway)" />
+                        <NavItem href="/admin/ops/fintech" icon={DatabaseZap} label="Fintech Routing" />
+                        <NavItem href="/admin/ops/limits" icon={Activity} label="API Limitleri" />
                         <NavItem href="/admin/ops/providers" icon={Server} label="Platform Altyapısı" />
                         <NavItem href="/admin/ops/ledgers" icon={DatabaseZap} label="Sistem Defteri" />
                     </NavGroup>
