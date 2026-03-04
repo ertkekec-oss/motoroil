@@ -123,7 +123,7 @@ export default function Sidebar() {
             '/advisor': { perm: 'finance_view', feature: 'accountant' },
             '/admin/audit-logs': { perm: 'audit_view', platformOnly: true },
             '/staff/pdks': { perm: 'staff_manage' },
-            '/dealer-network/dashboard': { perm: 'b2b_manage' },
+            '/hub-dashboard': { perm: 'b2b_manage' },
             '/dealer-network/dealers': { perm: 'b2b_manage' },
             '/dealer-network/orders/approvals': { perm: 'b2b_manage' },
             '/dealer-network/refunds': { perm: 'b2b_manage' },
@@ -155,6 +155,7 @@ export default function Sidebar() {
                         isParent: true,
                         id: 'b2b-global-parent',
                         subItems: [
+                            { name: 'Hub Paneli', href: '/hub-dashboard' },
                             { name: 'Uyuşmazlık Çözüm Merkezi', href: '/support/tickets' },
                             { name: 'SİPARİŞLER', href: '' },
                             ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/hub/seller/orders' }] : []),
@@ -218,7 +219,6 @@ export default function Sidebar() {
             {
                 group: "Dealer Network",
                 items: [
-                    { name: 'Kontrol Paneli', href: '/dealer-network/dashboard', icon: LayoutDashboard },
                     { name: 'Bayiler', href: '/dealer-network/dealers', icon: Users },
                     { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals', icon: Inbox },
                     { name: 'İadeler', href: '/dealer-network/refunds', icon: Receipt },

@@ -5,7 +5,8 @@ import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard, Wallet, TrendingUp, ShieldAlert,
     Network, HardDrive, FileText, Settings, Users, Percent,
-    CreditCard, Server, Activity, ArrowRightLeft, DatabaseZap, CheckCircle, Store, AlertTriangle, ShieldCheck
+    CreditCard, Server, Activity, ArrowRightLeft, DatabaseZap, CheckCircle, Store, AlertTriangle, ShieldCheck,
+    Search, Inbox, Library
 } from 'lucide-react';
 
 export function AdminSidebar({ userRole }: { userRole: string }) {

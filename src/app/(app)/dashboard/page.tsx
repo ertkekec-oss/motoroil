@@ -1,5 +1,5 @@
 import { permanentRedirect } from 'next/navigation';
 
 export default function RedirectPage() {
-    permanentRedirect('/dealer-network/dashboard');
+    permanentRedirect('/hub-dashboard');
 }
