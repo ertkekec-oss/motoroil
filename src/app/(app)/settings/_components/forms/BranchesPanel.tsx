@@ -34,7 +34,7 @@ function EmptyState({ icon, title, description, action }: { icon: string; title:
 function StatusBadge({ status }: { status: string }) {
     if (status === 'Aktif') {
         return (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-700 rounded text-[11px] font-medium text-slate-500 dark:text-slate-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 Aktif
             </span>
@@ -136,7 +136,7 @@ export default function BranchesPanel(props: any) {
             </div>
 
             {/* ── INLINE STAT STRIP ───────────────────────────────────── */}
-            <div className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+            <div className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-800 rounded-xl">
                 {[
                     { label: 'Toplam', value: totalBranches, icon: '🏪' },
                     { label: 'Aktif', value: activeBranches, icon: '✅' },
@@ -159,19 +159,19 @@ export default function BranchesPanel(props: any) {
             <div className={`grid gap-5 transition-all duration-300 ${isPanelOpen ? 'grid-cols-[1fr_360px]' : 'grid-cols-1'}`}>
 
                 {/* ═══ LEFT — BRANCH LIST ═══════════════════════════════ */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                <div className="bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
                     {/* Card header + inline filters */}
                     <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center gap-2">
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-white mr-1">
                             Kayıtlı Şubeler
-                            <span className="ml-1.5 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[11px] font-medium text-slate-500">
+                            <span className="ml-1.5 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[11px] font-medium text-slate-500 dark:text-slate-400">
                                 {filteredBranches.length}
                             </span>
                         </h3>
                         <div className="flex-1" />
                         {/* 🔍 Search */}
                         <div className="relative">
-                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs">🔍</span>
                             <input
                                 type="text"
                                 placeholder="Ara..."
@@ -246,18 +246,18 @@ export default function BranchesPanel(props: any) {
                                                     onClick={() => setSelectedBranchDocs(selectedBranchDocs === branch.id ? null : branch.id)}
                                                     className={`h-7 px-2 rounded border text-[11px] font-medium transition-colors ${selectedBranchDocs === branch.id
                                                         ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900'
-                                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50'
+                                                        : 'bg-white dark:bg-slate-900 dark:bg-white border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50'
                                                         }`}
                                                 >
                                                     📁{(branch.docs || 0) > 0 ? ` ${branch.docs}` : ''}
                                                 </button>
                                                 <button
                                                     onClick={() => openEditPanel(branch)}
-                                                    className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs"
+                                                    className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs"
                                                 >✏️</button>
                                                 <button
                                                     onClick={() => deleteBranch(branch.id)}
-                                                    className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50 transition-all text-sm"
+                                                    className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50 transition-all text-sm"
                                                 >×</button>
                                             </div>
                                         </div>
@@ -275,7 +275,7 @@ export default function BranchesPanel(props: any) {
                                                     <input type="file" id={`file-${branch.id}`} className="hidden" onChange={(e) => handleFileUpload(e, branch.id)} />
                                                     <label
                                                         htmlFor={`file-${branch.id}`}
-                                                        className="inline-flex items-center gap-1.5 h-8 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                                                        className="inline-flex items-center gap-1.5 h-8 px-3 bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
                                                     >
                                                         ⬆ Yükle
                                                     </label>
@@ -295,19 +295,19 @@ export default function BranchesPanel(props: any) {
                                             ) : (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                     {branchDocs.map((file: any) => (
-                                                        <div key={file.id} className="flex items-center justify-between p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg">
+                                                        <div key={file.id} className="flex items-center justify-between p-2.5 bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-700 rounded-lg">
                                                             <div className="flex items-center gap-2 min-w-0">
                                                                 <span className="text-base shrink-0">{file.fileType.includes('pdf') ? '📄' : '🖼️'}</span>
                                                                 <div className="min-w-0">
                                                                     <p className="text-xs font-medium text-slate-900 dark:text-white truncate">{file.fileName}</p>
-                                                                    <p className="text-[11px] text-slate-400">
+                                                                    <p className="text-[11px] text-slate-400 dark:text-slate-500">
                                                                         {new Date(file.uploadedAt).toLocaleDateString('tr-TR')} · {(file.fileSize / 1024).toFixed(1)} KB
                                                                     </p>
                                                                 </div>
                                                             </div>
                                                             <button
                                                                 onClick={() => deleteBranchDoc(file.id, branch.id)}
-                                                                className="ml-2 w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:border-rose-200 dark:hover:border-rose-500/30 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all text-sm shrink-0"
+                                                                className="ml-2 w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:border-rose-200 dark:hover:border-rose-500/30 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all text-sm shrink-0"
                                                             >
                                                                 ×
                                                             </button>
@@ -325,7 +325,7 @@ export default function BranchesPanel(props: any) {
 
                 {/* ═══ RIGHT — ADD / EDIT PANEL ══════════════════════════════ */}
                 {isPanelOpen && (
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm animate-in slide-in-from-right-4 duration-200">
+                    <div className="bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm animate-in slide-in-from-right-4 duration-200">
                         {/* Panel header */}
                         <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                             <div>
@@ -338,7 +338,7 @@ export default function BranchesPanel(props: any) {
                             </div>
                             <button
                                 onClick={closePanel}
-                                className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-base"
+                                className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-base"
                             >
                                 ×
                             </button>
@@ -444,7 +444,7 @@ export default function BranchesPanel(props: any) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 {/* SOL: ÖDEME YÖNTEMİ BUTONLARI */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                <div className="bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
                     <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                         <div>
                             <h3 className="text-base font-semibold text-slate-900 dark:text-white">Ödeme Yöntemi Butonları</h3>
@@ -515,11 +515,11 @@ export default function BranchesPanel(props: any) {
                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button
                                         onClick={() => startEditingPaymentMethod(pm)}
-                                        className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs"
+                                        className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs"
                                     >✏️</button>
                                     <button
                                         onClick={() => removePaymentMethodDefinition(pm.id)}
-                                        className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50 transition-all"
+                                        className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50 transition-all"
                                     >×</button>
                                 </div>
                             </div>
@@ -527,7 +527,7 @@ export default function BranchesPanel(props: any) {
 
                         {/* Sabit: Veresiye */}
                         <div className="flex items-center gap-3 px-5 py-3.5 bg-slate-50 dark:bg-slate-800/30">
-                            <div className="w-8 h-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-sm">📖</div>
+                            <div className="w-8 h-8 bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-sm">📖</div>
                             <div>
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Veresiye</p>
                                 <p className="text-xs text-slate-400 dark:text-slate-500">Sistem tarafından sabitlenmiştir</p>
@@ -537,7 +537,7 @@ export default function BranchesPanel(props: any) {
                 </div>
 
                 {/* SAĞ: KASA & BANKA HESAPLARI */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                <div className="bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
                     <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                         <div>
                             <h3 className="text-base font-semibold text-slate-900 dark:text-white">Kasa & Banka Hesapları</h3>
@@ -624,11 +624,11 @@ export default function BranchesPanel(props: any) {
                                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
                                             onClick={() => startEditingKasa(k)}
-                                            className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs"
+                                            className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs"
                                         >✏️</button>
                                         <button
                                             onClick={() => handleDeleteKasa(String(k.id))}
-                                            className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50 transition-all"
+                                            className="h-7 w-7 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50 transition-all"
                                         >×</button>
                                     </div>
                                 </div>

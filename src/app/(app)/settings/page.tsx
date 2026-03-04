@@ -1047,10 +1047,10 @@ export default function SettingsPage() {
 
     return (
         <div className="flex min-h-screen text-slate-900 dark:text-white">
-            <div className="fixed inset-0 -z-10 bg-slate-50 dark:bg-[#0B1220]" />
+            <div className="fixed inset-0 -z-10 bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617]" />
 
             {/* LEFT SIDEBAR MENU — sticky */}
-            <div className="w-[280px] shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] flex flex-col sticky top-0 h-screen overflow-y-auto">
+            <div className="w-[280px] shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] flex flex-col sticky top-0 h-screen overflow-y-auto">
                 <div className="p-5 border-b border-slate-200 dark:border-slate-800">
                     <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Ayarlar</h2>
                 </div>
@@ -1077,7 +1077,7 @@ export default function SettingsPage() {
                                 key={item.id}
                                 onClick={() => setActiveTab(item.id)}
                                 className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all text-left text-sm ${isActive
-                                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-medium'
+                                    ? 'bg-slate-900 dark:bg-white text-white dark:bg-white dark:text-slate-900 font-medium'
                                     : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                                     }`}
                             >
@@ -1152,15 +1152,15 @@ export default function SettingsPage() {
                 {/* 10.4 HEDİYE ÇEKİ YÖNETİM MODALI */}
                 {showCouponModal && (
                     <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/80 animate-in fade-in"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 dark:bg-white/50 dark:bg-slate-900 dark:bg-white/80 animate-in fade-in"
                         onClick={() => setShowCouponModal(false)}
                     >
                         <div
-                            className="bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm w-[800px] max-w-[95vw] h-[600px] max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+                            className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm w-[800px] max-w-[95vw] h-[600px] max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
                             onClick={e => e.stopPropagation()}
                         >
                             {/* Modal Header */}
-                            <div className="flex justify-between items-center p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                            <div className="flex justify-between items-center p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a]">
                                 <div>
                                     <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">🎫 Hediye Çeki Yönetimi</h2>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Toplam <strong className="text-slate-700 dark:text-slate-300">{filteredCouponsList.length}</strong> kod bulundu.</p>
@@ -1168,28 +1168,28 @@ export default function SettingsPage() {
                                 <div className="flex gap-2 items-center">
                                     <button onClick={exportCouponsExcel} className="h-9 px-4 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">📊 EXCEL</button>
                                     <button onClick={exportCouponsPDF} className="h-9 px-4 rounded-xl font-bold text-sm bg-rose-600 hover:bg-rose-700 text-white transition-colors">📄 PDF</button>
-                                    <button onClick={() => setShowCouponModal(false)} className="h-9 w-9 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 transition-colors ml-2">✕</button>
+                                    <button onClick={() => setShowCouponModal(false)} className="h-9 w-9 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors ml-2">✕</button>
                                 </div>
                             </div>
 
                             {/* Modal Search & Filters */}
-                            <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A]">
+                            <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a]">
                                 <div className="relative">
                                     <input
                                         type="text"
                                         placeholder="Kod veya kampanya adı ile ara..."
                                         value={couponSearch}
                                         onChange={e => { setCouponSearch(e.target.value); setCouponPage(1); }}
-                                        className="w-full h-11 pl-11 pr-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                                        className="w-full h-11 pl-11 pr-4 rounded-xl bg-slate-50 dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                                     />
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">🔍</span>
                                 </div>
                             </div>
 
                             {/* Modal Table */}
                             <div className="flex-1 overflow-auto bg-white dark:bg-[#0B1220]">
                                 <table className="w-full text-left border-collapse">
-                                    <thead className="h-12 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap bg-slate-50 dark:bg-slate-800/80 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
+                                    <thead className="h-12 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap bg-slate-50 dark:bg-[#0f172a] sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
                                         <tr>
                                             <th className="px-6 placeholder-slate-400 font-bold max-w-[200px]">KOD BİLGİSİ</th>
                                             <th className="px-6 font-bold">İNDİRİM</th>
@@ -1227,7 +1227,7 @@ export default function SettingsPage() {
                                                     <div className={`text-sm font-medium ${!c.expiryDate || new Date(c.expiryDate) > new Date() ? 'text-slate-700 dark:text-slate-300' : 'text-rose-500'}`}>
                                                         {c.expiryDate ? new Date(c.expiryDate).toLocaleDateString('tr-TR') : 'Süresiz'}
                                                     </div>
-                                                    {c.minPurchaseAmount > 0 && <div className="text-[10px] text-slate-500 mt-1">Min: ₺{c.minPurchaseAmount.toLocaleString()}</div>}
+                                                    {c.minPurchaseAmount > 0 && <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Min: ₺{c.minPurchaseAmount.toLocaleString()}</div>}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <button
@@ -1248,7 +1248,7 @@ export default function SettingsPage() {
                                 </table>
 
                                 {filteredCouponsList.length === 0 && (
-                                    <div className="flex flex-col items-center justify-center py-16 text-slate-400">
+                                    <div className="flex flex-col items-center justify-center py-16 text-slate-400 dark:text-slate-500">
                                         <div className="text-3xl mb-3">🔎</div>
                                         <p className="text-sm">Aranan kriterlere uygun kod bulunamadı.</p>
                                     </div>
@@ -1256,7 +1256,7 @@ export default function SettingsPage() {
                             </div>
 
                             {/* Modal Footer / Pagination */}
-                            <div className="flex justify-between items-center p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                            <div className="flex justify-between items-center p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a]">
                                 <button
                                     disabled={couponPage === 1}
                                     onClick={() => setCouponPage(p => p - 1)}
@@ -1265,7 +1265,7 @@ export default function SettingsPage() {
                                     ◀ Geri
                                 </button>
 
-                                <span className="text-xs font-bold text-slate-500 tracking-wider">
+                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider">
                                     SAYFA <span className="text-slate-900 dark:text-white px-1">{couponPage}</span> / {totalCouponPages || 1}
                                 </span>
 

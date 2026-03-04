@@ -9,7 +9,7 @@ function ERPInput(props: any) {
     return (
         <input
             {...props}
-            className={`w-full h-10 px-3 bg-white border border-slate-300 rounded-lg text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all shadow-sm ${props.className || ''}`}
+            className={`w-full h-10 px-3 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white/20 focus:border-slate-900 dark:focus:border-white/30 transition-all shadow-sm ${props.className || ''}`}
         />
     );
 }
@@ -18,7 +18,7 @@ function ERPSelect(props: any) {
     return (
         <select
             {...props}
-            className={`w-full h-10 px-3 bg-white border border-slate-300 rounded-lg text-[14px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all shadow-sm ${props.className || ''}`}
+            className={`w-full h-10 px-3 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-[14px] text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white/20 focus:border-slate-900 dark:focus:border-white/30 transition-all shadow-sm ${props.className || ''}`}
         />
     );
 }
@@ -26,7 +26,7 @@ function ERPSelect(props: any) {
 function ERPField({ label, children }: { label: string, children: React.ReactNode }) {
     return (
         <div className="flex flex-col gap-1.5 focus-within:text-slate-900">
-            <label className="text-[12px] font-medium text-slate-500 uppercase tracking-widest transition-colors">{label}</label>
+            <label className="text-[12px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest transition-colors">{label}</label>
             {children}
         </div>
     );
@@ -34,14 +34,14 @@ function ERPField({ label, children }: { label: string, children: React.ReactNod
 
 function ERPBlock({ title, description, badge, children, action }: { title?: string, description?: string, badge?: React.ReactNode, children: React.ReactNode, action?: React.ReactNode }) {
     return (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-[0px_1px_2px_rgba(0,0,0,0.02)] mb-6">
+        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-[0px_1px_2px_rgba(0,0,0,0.02)] mb-6">
             {(title || description || action || badge) && (
-                <div className="flex items-start justify-between mb-6 pb-5 border-b border-slate-100">
+                <div className="flex items-start justify-between mb-6 pb-5 border-b border-slate-100 dark:border-white/5">
                     <div className="flex items-center gap-3">
                         {badge}
                         <div>
-                            {title && <h3 className="text-[16px] font-semibold text-slate-900">{title}</h3>}
-                            {description && <p className="text-[14px] text-slate-500 mt-1">{description}</p>}
+                            {title && <h3 className="text-[16px] font-semibold text-slate-900 dark:text-white">{title}</h3>}
+                            {description && <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-1">{description}</p>}
                         </div>
                     </div>
                     {action && <div>{action}</div>}
@@ -54,11 +54,11 @@ function ERPBlock({ title, description, badge, children, action }: { title?: str
 
 function StatStrip({ items }: { items: { val: string | number, label: string }[] }) {
     return (
-        <div className="w-full bg-white border border-slate-200 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-hidden mb-6 flex divide-x divide-slate-100">
+        <div className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-hidden mb-6 flex divide-x divide-slate-100">
             {items.map((it, idx) => (
                 <div key={idx} className="flex-1 p-5">
-                    <p className="text-[24px] font-semibold text-slate-900 tracking-tight">{it.val}</p>
-                    <p className="text-[12px] font-medium text-slate-500 uppercase tracking-widest mt-1">{it.label}</p>
+                    <p className="text-[24px] font-semibold text-slate-900 dark:text-white tracking-tight">{it.val}</p>
+                    <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">{it.label}</p>
                 </div>
             ))}
         </div>
@@ -94,24 +94,24 @@ export default function CampaignPointsPanel(props: any) {
         <div className="max-w-6xl animate-in fade-in duration-300">
             {/* Header */}
             <div className="mb-8">
-                <h2 className="text-[24px] font-semibold text-slate-900 tracking-tight">Promosyon & Finansal Katkı Modülü</h2>
-                <p className="text-[14px] text-slate-500 mt-1">Koşullu indirim algoritmaları, çapraz satış kurguları ve hediye çeki yönetimleri.</p>
+                <h2 className="text-[24px] font-semibold text-slate-900 dark:text-white tracking-tight">Promosyon & Finansal Katkı Modülü</h2>
+                <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-1">Koşullu indirim algoritmaları, çapraz satış kurguları ve hediye çeki yönetimleri.</p>
             </div>
 
             {/* Navigasyon Strip */}
-            <div className="flex bg-white rounded-t-2xl border-b border-slate-200 mb-6 overflow-hidden shadow-[0px_1px_2px_rgba(0,0,0,0.02)]">
+            <div className="flex bg-white dark:bg-[#0f172a] rounded-t-2xl border-b border-slate-200 dark:border-white/5 mb-6 overflow-hidden shadow-[0px_1px_2px_rgba(0,0,0,0.02)]">
                 {subTabs.map(tab => {
                     const isActive = campaignSubTab === tab.id;
                     return (
                         <button
                             key={tab.id}
                             onClick={() => setCampaignSubTab(tab.id)}
-                            className={`flex-1 relative px-6 py-4 flex flex-col items-start gap-1 transition-colors focus:outline-none ${isActive ? 'bg-slate-50' : 'hover:bg-slate-50/50'}`}
+                            className={`flex-1 relative px-6 py-4 flex flex-col items-start gap-1 transition-colors focus:outline-none ${isActive ? 'bg-slate-50 dark:bg-[#1e293b]' : 'hover:bg-slate-50/50'}`}
                         >
-                            <span className={`text-[14px] font-semibold ${isActive ? 'text-slate-900' : 'text-slate-600'}`}>{tab.label}</span>
-                            <span className="text-[12px] text-slate-400">{tab.desc}</span>
+                            <span className={`text-[14px] font-semibold ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-300'}`}>{tab.label}</span>
+                            <span className="text-[12px] text-slate-400 dark:text-slate-500">{tab.desc}</span>
                             {isActive && (
-                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900" />
+                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 dark:bg-white" />
                             )}
                         </button>
                     );
@@ -129,28 +129,28 @@ export default function CampaignPointsPanel(props: any) {
                             { val: campaigns.filter((c: any) => c.type === 'loyalty_points').length, label: 'Sadakat Programı' },
                         ]} />
 
-                        <div className="bg-white border border-slate-200 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
                             {campaigns.length === 0 ? (
-                                <div className="p-12 text-center border-b border-slate-100">
-                                    <div className="w-12 h-12 mx-auto bg-slate-50 rounded-xl text-2xl flex items-center justify-center mb-3">📍</div>
-                                    <p className="text-[14px] font-medium text-slate-900">Pasif Durumda</p>
-                                    <p className="text-[13px] text-slate-500 mt-1">Aktif bir fiyatlandırma kurgusu listelenmedi.</p>
+                                <div className="p-12 text-center border-b border-slate-100 dark:border-white/5">
+                                    <div className="w-12 h-12 mx-auto bg-slate-50 dark:bg-[#1e293b] rounded-xl text-2xl flex items-center justify-center mb-3">📍</div>
+                                    <p className="text-[14px] font-medium text-slate-900 dark:text-white">Pasif Durumda</p>
+                                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">Aktif bir fiyatlandırma kurgusu listelenmedi.</p>
                                 </div>
                             ) : (
                                 <table className="w-full text-left">
                                     <thead>
-                                        <tr className="bg-slate-50/50 border-b border-slate-200">
-                                            <th className="px-5 py-3 text-[12px] font-semibold text-slate-500 uppercase tracking-widest">Kurgu Detayı</th>
-                                            <th className="px-5 py-3 text-[12px] font-semibold text-slate-500 uppercase tracking-widest">Tip</th>
-                                            <th className="px-5 py-3 text-[12px] font-semibold text-slate-500 uppercase tracking-widest">Aksiyon</th>
+                                        <tr className="bg-slate-50/50 border-b border-slate-200 dark:border-white/5">
+                                            <th className="px-5 py-3 text-[12px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Kurgu Detayı</th>
+                                            <th className="px-5 py-3 text-[12px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Tip</th>
+                                            <th className="px-5 py-3 text-[12px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Aksiyon</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {campaigns.map((camp: any) => (
                                             <tr key={camp.id} className="hover:bg-slate-50/50 group">
                                                 <td className="px-5 py-3.5">
-                                                    <div className="text-[14px] font-medium text-slate-900">{camp.name}</div>
-                                                    <div className="text-[12px] text-slate-500 mt-0.5">
+                                                    <div className="text-[14px] font-medium text-slate-900 dark:text-white">{camp.name}</div>
+                                                    <div className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">
                                                         {camp.type === 'loyalty_points' && 'Sadakat Puanı Kazandırır'}
                                                         {camp.type === 'payment_method_discount' && 'Ödeme Tipi İndirimi'}
                                                         {camp.type === 'buy_x_get_discount' && `${camp.conditions.buyQuantity} Alana %${camp.conditions.rewardValue} Koşullu İndirim`}
@@ -158,14 +158,14 @@ export default function CampaignPointsPanel(props: any) {
                                                     </div>
                                                 </td>
                                                 <td className="px-5 py-3.5">
-                                                    <span className="inline-flex px-2 py-1 rounded bg-slate-100 text-[11px] font-semibold text-slate-700 uppercase tracking-widest border border-slate-200">
+                                                    <span className="inline-flex px-2 py-1 rounded bg-slate-100 text-[11px] font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-widest border border-slate-200 dark:border-white/5">
                                                         {camp.type === 'buy_x_get_free' ? `+${camp.conditions.rewardQuantity} BEDELSİZ` : `%${((camp.discountRate || camp.pointsRate || 0) * 100).toFixed(0)} AVANTAJ`}
                                                     </span>
                                                 </td>
                                                 <td className="px-5 py-3.5 w-24">
                                                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <button onClick={() => startEditingCampaign(camp)} className="text-[13px] text-slate-600 hover:text-slate-900 font-medium px-2 py-1 bg-white border border-slate-200 rounded shadow-sm">Seç</button>
-                                                        <button onClick={() => deleteCampaign(camp.id)} className="text-[13px] text-red-600 hover:text-red-700 font-medium px-2 py-1 bg-white border border-red-200 rounded shadow-sm">Sil</button>
+                                                        <button onClick={() => startEditingCampaign(camp)} className="text-[13px] text-slate-600 dark:text-slate-300 hover:text-slate-900 font-medium px-2 py-1 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded shadow-sm">Seç</button>
+                                                        <button onClick={() => deleteCampaign(camp.id)} className="text-[13px] text-red-600 hover:text-red-700 font-medium px-2 py-1 bg-white dark:bg-[#0f172a] border border-red-200 rounded shadow-sm">Sil</button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -215,8 +215,8 @@ export default function CampaignPointsPanel(props: any) {
                                 </div>
 
                                 {(newCampaign.type === 'buy_x_get_discount' || newCampaign.type === 'buy_x_get_free') && (
-                                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-4 mt-2">
-                                        <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-200 pb-2">Algoritma Koşulları</p>
+                                    <div className="p-4 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-lg space-y-4 mt-2">
+                                        <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest border-b border-slate-200 dark:border-white/5 pb-2">Algoritma Koşulları</p>
                                         <div className="grid grid-cols-2 gap-4">
                                             <ERPField label="Tetikleyici Adet (Buy X)">
                                                 <ERPInput
@@ -262,7 +262,7 @@ export default function CampaignPointsPanel(props: any) {
 
                                 {(custClasses || []).length > 0 && (
                                     <ERPField label="Sınıflandırma İzolasyonu">
-                                        <div className="flex flex-wrap gap-2 pt-1 border border-slate-200 p-2 bg-slate-50 rounded-lg">
+                                        <div className="flex flex-wrap gap-2 pt-1 border border-slate-200 dark:border-white/5 p-2 bg-slate-50 dark:bg-[#1e293b] rounded-lg">
                                             {(custClasses || []).map((cc: string) => {
                                                 const isSelected = (newCampaign.targetCustomerCategoryIds || []).includes(cc);
                                                 return (
@@ -274,7 +274,7 @@ export default function CampaignPointsPanel(props: any) {
                                                             const next = current.includes(cc) ? current.filter((x: string) => x !== cc) : [...current, cc];
                                                             setNewCampaign({ ...newCampaign, targetCustomerCategoryIds: next });
                                                         }}
-                                                        className={`px-3 py-1 text-[12px] font-semibold transition-all border rounded ${isSelected ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-slate-300 text-slate-600 hover:border-slate-400'}`}
+                                                        className={`px-3 py-1 text-[12px] font-semibold transition-all border rounded ${isSelected ? 'bg-slate-900 dark:bg-white border-slate-900 text-white' : 'bg-white dark:bg-[#0f172a] border-slate-300 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-slate-400'}`}
                                                     >
                                                         {cc}
                                                     </button>
@@ -298,8 +298,8 @@ export default function CampaignPointsPanel(props: any) {
                                     </ERPField>
                                 )}
 
-                                <div className="flex gap-3 pt-5 border-t border-slate-100">
-                                    <button onClick={addCampaign} className="flex-1 h-10 bg-slate-900 text-white text-[14px] font-medium rounded-lg hover:bg-slate-800 transition-colors">
+                                <div className="flex gap-3 pt-5 border-t border-slate-100 dark:border-white/5">
+                                    <button onClick={addCampaign} className="flex-1 h-10 bg-slate-900 dark:bg-white text-white text-[14px] font-medium rounded-lg hover:bg-slate-800 transition-colors">
                                         {editingCampaignId ? 'Protokolü Güncelle' : 'Kayıtlara Ekle'}
                                     </button>
                                     {editingCampaignId && (
@@ -312,7 +312,7 @@ export default function CampaignPointsPanel(props: any) {
                                                     targetCustomerCategoryIds: []
                                                 });
                                             }}
-                                            className="px-4 h-10 bg-slate-100 text-slate-700 text-[14px] font-medium rounded-lg hover:bg-slate-200 border border-slate-200 transition-colors"
+                                            className="px-4 h-10 bg-slate-100 text-slate-700 dark:text-slate-200 text-[14px] font-medium rounded-lg hover:bg-slate-200 border border-slate-200 dark:border-white/5 transition-colors"
                                         >
                                             İptal
                                         </button>
@@ -333,8 +333,8 @@ export default function CampaignPointsPanel(props: any) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Prim Tarafı */}
                         <div className="space-y-4">
-                            <h4 className="text-[13px] font-semibold text-slate-900 px-2 border-l-2 border-slate-900">Aracı (Referans) Kazanımı</h4>
-                            <div className="p-5 border border-slate-200 bg-white shadow-sm rounded-xl space-y-4">
+                            <h4 className="text-[13px] font-semibold text-slate-900 dark:text-white px-2 border-l-2 border-slate-900">Aracı (Referans) Kazanımı</h4>
+                            <div className="p-5 border border-slate-200 dark:border-white/5 bg-white dark:bg-[#0f172a] shadow-sm rounded-xl space-y-4">
                                 <ERPField label="Hesaplama Modeli">
                                     <ERPSelect
                                         value={referralSettings.referrerRewardType || 'percent'}
@@ -351,14 +351,14 @@ export default function CampaignPointsPanel(props: any) {
                                         onChange={(e: any) => setReferralSettings({ ...referralSettings, referrerDiscount: parseFloat(e.target.value) || 0 })}
                                     />
                                 </ERPField>
-                                <p className="text-[12px] text-slate-500">Hesaba ciro veya komisyon üzerinden hak ediş yansıtır.</p>
+                                <p className="text-[12px] text-slate-500 dark:text-slate-400">Hesaba ciro veya komisyon üzerinden hak ediş yansıtır.</p>
                             </div>
                         </div>
 
                         {/* Yeni Gelen Tarafı */}
                         <div className="space-y-4">
-                            <h4 className="text-[13px] font-semibold text-slate-900 px-2 border-l-2 border-emerald-500">Alt Üye Teşviki</h4>
-                            <div className="p-5 border border-slate-200 bg-white shadow-sm rounded-xl space-y-4">
+                            <h4 className="text-[13px] font-semibold text-slate-900 dark:text-white px-2 border-l-2 border-emerald-500">Alt Üye Teşviki</h4>
+                            <div className="p-5 border border-slate-200 dark:border-white/5 bg-white dark:bg-[#0f172a] shadow-sm rounded-xl space-y-4">
                                 <ERPField label="İskonto Tipi">
                                     <ERPSelect
                                         value={referralSettings.refereeGiftType || 'amount'}
@@ -375,7 +375,7 @@ export default function CampaignPointsPanel(props: any) {
                                         onChange={(e: any) => setReferralSettings({ ...referralSettings, refereeGift: parseFloat(e.target.value) || 0 })}
                                     />
                                 </ERPField>
-                                <p className="text-[12px] text-slate-500">Sisteme yeni dahil edilen müşteri ID'sine atanacak indirim kotası.</p>
+                                <p className="text-[12px] text-slate-500 dark:text-slate-400">Sisteme yeni dahil edilen müşteri ID'sine atanacak indirim kotası.</p>
                             </div>
                         </div>
                     </div>
@@ -383,7 +383,7 @@ export default function CampaignPointsPanel(props: any) {
                     <div className="flex justify-end pt-8">
                         <button
                             onClick={saveReferralSettings}
-                            className="h-10 px-6 bg-slate-900 text-white rounded-lg text-[14px] font-medium hover:bg-slate-800 transition-colors shadow-sm"
+                            className="h-10 px-6 bg-slate-900 dark:bg-white text-white rounded-lg text-[14px] font-medium hover:bg-slate-800 transition-colors shadow-sm"
                         >
                             Konfigürasyonu Kaydet
                         </button>
@@ -421,7 +421,7 @@ export default function CampaignPointsPanel(props: any) {
                                     />
                                 </ERPField>
                             </div>
-                            <div className="grid grid-cols-2 gap-4 border-t border-slate-100 pt-5">
+                            <div className="grid grid-cols-2 gap-4 border-t border-slate-100 dark:border-white/5 pt-5">
                                 <ERPField label="Kavram">
                                     <ERPSelect
                                         value={newCoupon.type}
@@ -460,7 +460,7 @@ export default function CampaignPointsPanel(props: any) {
                             </div>
 
                             <div className="pt-2">
-                                <button onClick={addCoupon} className="w-full h-10 bg-slate-900 border border-slate-900 rounded-lg text-white text-[14px] font-medium hover:bg-slate-800 shadow-sm transition-colors">
+                                <button onClick={addCoupon} className="w-full h-10 bg-slate-900 dark:bg-white border border-slate-900 rounded-lg text-white text-[14px] font-medium hover:bg-slate-800 shadow-sm transition-colors">
                                     Havuzu Tetikle & Kodları Bas
                                 </button>
                             </div>
@@ -476,14 +476,14 @@ export default function CampaignPointsPanel(props: any) {
 
                         <ERPBlock title="Kayıt Dosyaları & Yönetim" description={`${coupons.length} basılmış kupon bloğunu yönetin veya dışa aktarın.`}>
                             <div className="flex flex-col gap-3">
-                                <button onClick={() => setShowCouponModal(true)} className="h-10 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 text-[14px] font-semibold hover:bg-white transition-colors">
+                                <button onClick={() => setShowCouponModal(true)} className="h-10 bg-slate-100 border border-slate-200 dark:border-white/5 rounded-lg text-slate-700 dark:text-slate-200 text-[14px] font-semibold hover:bg-white transition-colors">
                                     Seri Kontrol Listesi
                                 </button>
                                 <div className="grid grid-cols-2 gap-3 mt-2">
-                                    <button onClick={exportCouponsExcel} className="h-10 bg-white border border-slate-300 rounded-lg text-slate-700 text-[13px] font-medium hover:bg-slate-50 transition-colors">
+                                    <button onClick={exportCouponsExcel} className="h-10 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-slate-700 dark:text-slate-200 text-[13px] font-medium hover:bg-slate-50 transition-colors">
                                         Excel Export
                                     </button>
-                                    <button onClick={exportCouponsPDF} className="h-10 bg-white border border-slate-300 rounded-lg text-slate-700 text-[13px] font-medium hover:bg-slate-50 transition-colors">
+                                    <button onClick={exportCouponsPDF} className="h-10 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-slate-700 dark:text-slate-200 text-[13px] font-medium hover:bg-slate-50 transition-colors">
                                         PDF Matrix
                                     </button>
                                 </div>

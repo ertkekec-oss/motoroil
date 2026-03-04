@@ -9,13 +9,13 @@ export default function PricingPage() {
                         <div className="w-10 h-10 rounded-xl bg-blue-600 border border-blue-500 shadow-inner flex items-center justify-center text-white text-lg font-bold shrink-0">
                             💰
                         </div>
-                        <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-3">
+                        <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
                             Fiyatlandırma Yönetimi
                         </h1>
                     </div>
                     <div className="flex items-center gap-2 pl-[52px] mt-1">
                         <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse shadow-sm"></span>
-                        <p className="text-slate-500 font-bold text-[11px] uppercase tracking-widest">
+                        <p className="text-slate-500 dark:text-slate-400 font-bold text-[11px] uppercase tracking-widest">
                             ÇOKLU FİYAT LİSTELERİ, MÜŞTERİ GRUPLARI VE FORMÜL KURALLARI
                         </p>
                     </div>

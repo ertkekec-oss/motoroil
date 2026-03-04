@@ -9,7 +9,7 @@ function ERPInput(props: any) {
     return (
         <input
             {...props}
-            className={`w-full h-10 px-3 bg-white border border-slate-300 rounded-lg text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:border-slate-900 transition-all shadow-sm ${props.className || ''}`}
+            className={`w-full h-10 px-3 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:border-slate-900 dark:focus:border-white/30 transition-all shadow-sm ${props.className || ''}`}
         />
     );
 }
@@ -42,13 +42,13 @@ export default function SystemResetPanel(props: any) {
         <div className="max-w-4xl animate-in fade-in duration-300">
             {/* Header */}
             <div className="mb-8">
-                <h2 className="text-[24px] font-semibold text-slate-900 tracking-tight">Kritik Sistem & Veri Katmanı Sıfırlama</h2>
-                <p className="text-[14px] text-slate-500 mt-1">Geri dönüşü olmayan, kalıcı veri silme işlemleri protokolü.</p>
+                <h2 className="text-[24px] font-semibold text-slate-900 dark:text-white tracking-tight">Kritik Sistem & Veri Katmanı Sıfırlama</h2>
+                <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-1">Geri dönüşü olmayan, kalıcı veri silme işlemleri protokolü.</p>
             </div>
 
             {/* Warning Banner */}
             <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-4 mb-8">
-                <div className="w-10 h-10 bg-white border border-red-200 rounded-lg flex items-center justify-center text-red-600 text-xl shadow-sm shrink-0 mt-0.5">
+                <div className="w-10 h-10 bg-white dark:bg-[#0f172a] border border-red-200 rounded-lg flex items-center justify-center text-red-600 text-xl shadow-sm shrink-0 mt-0.5">
                     ⚠️
                 </div>
                 <div>
@@ -59,7 +59,7 @@ export default function SystemResetPanel(props: any) {
                 </div>
             </div>
 
-            <div className="bg-white border-2 border-red-100 rounded-2xl shadow-[0_4px_12px_rgba(239,68,68,0.05)] overflow-hidden">
+            <div className="bg-white dark:bg-[#0f172a] border-2 border-red-100 rounded-2xl shadow-[0_4px_12px_rgba(239,68,68,0.05)] overflow-hidden">
                 <div className="p-6 pb-5 border-b border-red-100 bg-red-50/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h3 className="text-[16px] font-semibold text-red-900">Module-Level Silme Matrisi</h3>
@@ -85,7 +85,7 @@ export default function SystemResetPanel(props: any) {
                     {/* Modül Modül Grid */}
                     <div className="mb-8">
                         <div className="flex items-center gap-3 mb-4">
-                            <h4 className="text-[12px] font-semibold text-slate-500 uppercase tracking-widest whitespace-nowrap">Kısmi Silme / Modül Seçimi</h4>
+                            <h4 className="text-[12px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap">Kısmi Silme / Modül Seçimi</h4>
                             <div className="h-px bg-slate-100 flex-1"></div>
                         </div>
 
@@ -97,7 +97,7 @@ export default function SystemResetPanel(props: any) {
                                         key={opt.id}
                                         className={`flex items-center gap-3 px-4 py-3 border rounded-xl cursor-pointer transition-colors text-[13px] font-medium ${isChecked
                                                 ? 'bg-red-50 border-red-200 text-red-700'
-                                                : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                                                : 'bg-white dark:bg-[#0f172a] border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-200 hover:border-slate-300'
                                             }`}
                                     >
                                         <input
@@ -115,10 +115,10 @@ export default function SystemResetPanel(props: any) {
                     </div>
 
                     {/* Onay Formu */}
-                    <div className="p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
+                    <div className="p-6 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl space-y-4">
                         <div>
-                            <label className="text-[12px] font-semibold text-slate-500 uppercase tracking-widest block mb-2">Güvenlik Onay İmzası</label>
-                            <p className="text-[13px] text-slate-600 mb-3 block">Bilinçli bir işlem olduğunu belgelemek için kutucuğa eksiksiz <strong>ONAYLIYORUM</strong> kelimesini yazınız.</p>
+                            <label className="text-[12px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">Güvenlik Onay İmzası</label>
+                            <p className="text-[13px] text-slate-600 dark:text-slate-300 mb-3 block">Bilinçli bir işlem olduğunu belgelemek için kutucuğa eksiksiz <strong>ONAYLIYORUM</strong> kelimesini yazınız.</p>
                             <ERPInput
                                 type="text"
                                 id="resetConfirmationInput"
