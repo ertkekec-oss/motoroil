@@ -10,7 +10,7 @@ import {
 
 export function AdminSidebar({ userRole }: { userRole: string }) {
     const pathname = usePathname();
-    const [openGroup, setOpenGroup] = useState<string | null>(null);
+    const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
     const isFinance = userRole === 'PLATFORM_FINANCE_ADMIN';
     const isGrowth = userRole === 'PLATFORM_GROWTH_ADMIN';
@@ -18,7 +18,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
     const isSuper = userRole === 'SUPER_ADMIN' || userRole === 'PLATFORM_ADMIN';
 
     const toggleGroup = (group: string) => {
-        setOpenGroup(openGroup === group ? null : group);
+        setOpenSections(prev => ({ ...prev, [group]: !prev[group] }));
     };
 
     const NavItem = ({ href, icon: Icon, label }: { href: string, icon: any, label: string }) => {
@@ -32,15 +32,18 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
     };
 
     const NavGroup = ({ title, icon: Icon, children, groupKey }: { title: string, icon: any, children: React.ReactNode, groupKey: string }) => {
-        const isOpen = openGroup === groupKey;
+        const isOpen = openSections[groupKey];
         // Auto open if active path is inside
-        const isChildActive = React.Children.toArray(children).some((child: any) => pathname.startsWith(child.props.href));
+        const isChildActive = React.Children.toArray(children).some((child: any) => {
+            if (child.props.href && pathname.startsWith(child.props.href)) return true;
+            return false;
+        });
 
         React.useEffect(() => {
-            if (isChildActive && openGroup !== groupKey) {
-                setOpenGroup(groupKey);
+            if (isChildActive && openSections[groupKey] === undefined) {
+                setOpenSections(prev => ({ ...prev, [groupKey]: true }));
             }
-        }, [pathname, isChildActive, groupKey]);
+        }, [pathname, isChildActive, groupKey, openSections]);
 
         return (
             <div className="mb-1">
@@ -66,65 +69,74 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
     };
 
     return (
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto hidden-scrollbar">
-            {(isSuper || isFinance || isGrowth || isRisk) && (
-                <NavItem href="/admin/dashboard" icon={LayoutDashboard} label="Executive Dashboard" />
-            )}
+        <nav className="flex-1 p-4 space-y-4 overflow-y-auto hidden-scrollbar">
+            {/* Executive Dashboard */}
+            <div className="space-y-1">
+                {(isSuper || isFinance || isGrowth || isRisk) && (
+                    <NavItem href="/admin/dashboard" icon={LayoutDashboard} label="Yönetim Paneli" />
+                )}
+            </div>
 
-            {/* FINANCE & ESCROW */}
-            {(isSuper || isFinance) && (
-                <NavGroup title="Finance & Escrow" icon={Wallet} groupKey="finance">
-                    <NavItem href="/admin/payments-escrow/policies" icon={FileText} label="Escrow Policies" />
-                    <NavItem href="/admin/payments-escrow/commissions" icon={Percent} label="Commission Plans" />
-                    <NavItem href="/admin/payouts" icon={ArrowRightLeft} label="Payout Control" />
-                    <NavItem href="/admin/payments-escrow/providers" icon={CreditCard} label="Providers" />
-                    <NavItem href="/admin/payments-escrow/audit" icon={ShieldCheck} label="Finance Audit Log" />
-                </NavGroup>
-            )}
+            {/* PERİODYA HUB (Sabit Menü) */}
+            <div className="space-y-1">
+                <div className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                    PERİODYA HUB
+                </div>
+                {(isSuper || isGrowth || isFinance) && (
+                    <NavGroup title="Growth & Monetization" icon={TrendingUp} groupKey="growth">
+                        <NavItem href="/admin/hub/growth/boost" icon={TrendingUp} label="Boost Yönetimi" />
+                        <NavItem href="/admin/hub/growth/trust-score" icon={Activity} label="Trust Score" />
+                        <NavItem href="/admin/hub/growth/campaigns" icon={FileText} label="Kampanyalar" />
+                    </NavGroup>
+                )}
+                {(isSuper || isRisk) && (
+                    <NavGroup title="Risk & Resolution" icon={ShieldAlert} groupKey="risk">
+                        <NavItem href="/admin/hub/risk/credit" icon={AlertTriangle} label="Kredi Risk Merkezi" />
+                        <NavItem href="/admin/hub/risk/escrow" icon={ArrowRightLeft} label="Escrow Uyuşmazlık" />
+                        <NavItem href="/admin/hub/risk/abuse" icon={ShieldCheck} label="Kötüye Kullanım" />
+                    </NavGroup>
+                )}
+                {isSuper && (
+                    <NavGroup title="Network Governance" icon={Network} groupKey="network">
+                        <NavItem href="/admin/hub/network/categories" icon={DatabaseZap} label="Kategoriler" />
+                        <NavItem href="/admin/hub/network/commissions" icon={Percent} label="Komisyon Havuzu" />
+                        <NavItem href="/admin/hub/network/brands" icon={CheckCircle} label="Markalar" />
+                    </NavGroup>
+                )}
+                {isSuper && (
+                    <NavGroup title="System & Infrastructure" icon={HardDrive} groupKey="infra">
+                        <NavItem href="/admin/hub/infra/gateways" icon={Server} label="Aracı Kurumlar (Gateway)" />
+                        <NavItem href="/admin/hub/infra/fintech" icon={DatabaseZap} label="Fintech Routing" />
+                        <NavItem href="/admin/hub/infra/limits" icon={Activity} label="API Limitleri" />
+                    </NavGroup>
+                )}
+            </div>
 
-            {/* GROWTH & MONETIZATION */}
-            {(isSuper || isGrowth || isFinance) && (
-                <NavGroup title="Growth & Monetization" icon={TrendingUp} groupKey="growth">
-                    <NavItem href="/admin/growth/boost-rules" icon={TrendingUp} label="Boost Rules" />
-                    <NavItem href="/admin/growth/billing-health" icon={Activity} label="Billing Health" />
-                    <NavItem href="/admin/growth/revenue" icon={LayoutDashboard} label="Revenue Analytics" />
-                    <NavItem href="/admin/growth/audit" icon={FileText} label="Growth Audit" />
-                    <NavItem href="/admin/growth/subscriptions" icon={Users} label="Hub Subscriptions" />
-                </NavGroup>
-            )}
-
-            {/* RISK & RESOLUTION */}
-            {(isSuper || isRisk) && (
-                <NavGroup title="Risk & Resolution" icon={ShieldAlert} groupKey="risk">
-                    <NavItem href="/admin/disputes" icon={AlertTriangle} label="Dispute Queue" />
-                    <NavItem href="/admin/trust-monitor" icon={Activity} label="Trust Monitor" />
-                    {/* SLA Alerts can be added here if exists, mapping to empty route for now */}
-                    <NavItem href="/admin/disputes/policies" icon={FileText} label="Resolution Policies" />
-                </NavGroup>
-            )}
-
-            {/* NETWORK GOVERNANCE */}
+            {/* B2B NETWORK */}
             {isSuper && (
-                <NavGroup title="Network Governance" icon={Network} groupKey="network">
-                    <NavItem href="/admin/companies" icon={Store} label="Companies" />
-                    <NavItem href="/admin/catalog/categories" icon={DatabaseZap} label="Categories" />
-                    <NavItem href="/admin/products" icon={CheckCircle} label="Product Approvals" />
-                    <NavItem href="/admin/tenants" icon={Users} label="All Tenants" />
-                    <NavItem href="/admin/plans" icon={FileText} label="SaaS Plans" />
-                    <NavItem href="/admin/b2b/dealer-orders" icon={Activity} label="Dealer Orders Queue" />
-                    <NavItem href="/admin/b2b/refunds" icon={ArrowRightLeft} label="B2B Refunds (Platform)" />
-                    <NavItem href="/admin/b2b/settings" icon={Settings} label="Dealer Portal Policies" />
-                </NavGroup>
+                <div className="space-y-1">
+                    <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">
+                        B2B NETWORK
+                    </div>
+                    <NavItem href="/admin/b2b/dealer-orders" icon={Activity} label="B2B Sipariş Kuyruğu" />
+                    <NavItem href="/admin/b2b/refunds" icon={ArrowRightLeft} label="İade ve Uyuşmazlıklar" />
+                    <NavItem href="/admin/b2b/policies" icon={ShieldAlert} label="Login & Risk Politikaları" />
+                </div>
             )}
 
-            {/* SYSTEM & INFRASTRUCTURE */}
+            {/* PERİODYA AYARLARI */}
             {isSuper && (
-                <NavGroup title="System & Infrastructure" icon={HardDrive} groupKey="system">
-                    <NavItem href="/admin/ops/providers" icon={Server} label="Platform Infra" />
-                    <NavItem href="/admin/ops/ledgers" icon={DatabaseZap} label="System Ledger" />
-                    <NavItem href="/admin/security" icon={ShieldAlert} label="Security Kit" />
-                    <NavItem href="/admin/logs" icon={Activity} label="System Logs" />
-                </NavGroup>
+                <div className="space-y-1">
+                    <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">
+                        PERİODYA AYARLARI
+                    </div>
+                    <NavItem href="/admin/audit-logs" icon={Search} label="Sistem Kayıtları" />
+                    <NavItem href="/admin/security-kit" icon={ShieldAlert} label="Güvenlik Kalkanı" />
+                    <NavItem href="/admin/tenants" icon={Users} label="Tüm Müşteriler" />
+                    <NavItem href="/admin/saas-plans" icon={CreditCard} label="SaaS Planları" />
+                    <NavItem href="/admin/support/tickets" icon={Inbox} label="Destek Biletleri" />
+                    <NavItem href="/admin/tenants/PLATFORM_ADMIN/help" icon={Library} label="Bilgi Bankası" />
+                </div>
             )}
         </nav>
     );
