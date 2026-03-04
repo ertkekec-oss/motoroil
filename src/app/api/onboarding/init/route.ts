@@ -1,7 +1,7 @@
-
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession, createSession } from '@/lib/auth';
+import crypto from 'crypto';
 
 export async function POST(request: Request) {
     try {
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
         }
 
         const data = await request.json();
-        const { company, branch, finance, integrations } = data;
+        const { company, branch, finance, staff } = data;
 
         const tenantId = session.tenantId;
 
@@ -164,23 +164,7 @@ export async function POST(request: Request) {
                 }
             }
 
-            // 6. Save Integration Flags to AppSettings for later setup
-            await tx.appSettings.upsert({
-                where: {
-                    companyId_key: {
-                        companyId: companyRecord!.id,
-                        key: 'onboarding_integrations'
-                    }
-                },
-                update: { value: integrations },
-                create: {
-                    companyId: companyRecord!.id,
-                    key: 'onboarding_integrations',
-                    value: integrations
-                }
-            });
-
-            // 6.b Save Company Profile to AppSettings (for the Settings -> Company Profile page)
+            // 6. Save Company Profile to AppSettings
             const companyProfileSettings = [
                 { key: 'company_name', value: company.name },
                 { key: 'company_slogan', value: company.slogan || '' },
@@ -209,13 +193,32 @@ export async function POST(request: Request) {
                 });
             }
 
-            // 7. Update Tenant Setup State
+            // 7. Create Staff (if provided and different from current user)
+            if (staff && staff.firstName) {
+                const pw = crypto.createHash('sha256').update('123456').digest('hex'); // simple default password or placeholder for staff
+                await tx.staff.create({
+                    data: {
+                        companyId: companyRecord!.id,
+                        firstName: staff.firstName,
+                        lastName: staff.lastName || '',
+                        email: staff.email || '',
+                        phone: staff.phone || '',
+                        role: staff.role || 'Kasiyer',
+                        branch: mainBranch.name,
+                        status: 'Aktif',
+                        pinCode: Math.floor(1000 + Math.random() * 9000).toString(),
+                        password: pw
+                    }
+                });
+            }
+
+            // 8. Update Tenant Setup State
             await tx.tenant.update({
                 where: { id: tenantId },
                 data: { setupState: 'COMPLETED' }
             });
 
-            // 8. Update User's company access if missing
+            // 9. Update User's company access if missing
             await tx.userCompanyAccess.upsert({
                 where: {
                     userId_companyId: {
@@ -231,7 +234,7 @@ export async function POST(request: Request) {
                 update: {}
             });
 
-            // 9. Re-create session with updated setupState
+            // 10. Re-create session with updated setupState
             await createSession({
                 ...session,
                 setupState: 'COMPLETED'
@@ -240,7 +243,7 @@ export async function POST(request: Request) {
             return createdItems;
         });
 
-        return NextResponse.json({ success: true });
+        return NextResponse.json({ success: true, redirect: '/data-import' }); // Returning redirect to let frontend know where to go next
 
     } catch (error: any) {
         console.error('Onboarding Init Error:', error);

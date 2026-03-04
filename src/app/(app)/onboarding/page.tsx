@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -6,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useModal } from '@/contexts/ModalContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { TURKISH_CITIES, TURKISH_DISTRICTS } from '@/lib/constants';
+import { EnterpriseCard, EnterpriseInput, EnterpriseSelect, EnterpriseButton } from '@/components/ui/enterprise';
+import { Building2, Store, Wallet, Users, LayoutDashboard, BrainCircuit, Rocket } from 'lucide-react';
 
 export default function OnboardingPage() {
     const [step, setStep] = useState(1);
@@ -40,12 +41,22 @@ export default function OnboardingPage() {
         bankName: 'Ana Banka Hesabı (TL)'
     });
 
-    const [integrations, setIntegrations] = useState({
-        eInvoice: false,
-        bank: false,
-        ecommerce: false,
-        b2bNetwork: false
+    const [staffData, setStaffData] = useState({
+        createStaff: false,
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        role: 'Kasiyer'
     });
+
+    const STEPS = [
+        { id: 1, label: 'Firma Profili', icon: Building2 },
+        { id: 2, label: 'Şube & Depo', icon: Store },
+        { id: 3, label: 'Kasalar', icon: Wallet },
+        { id: 4, label: 'Personel', icon: Users },
+        { id: 5, label: 'Veri Aktarımı', icon: BrainCircuit },
+    ];
 
     const handleNext = () => setStep(step + 1);
     const handlePrev = () => setStep(step - 1);
@@ -60,17 +71,18 @@ export default function OnboardingPage() {
                     company: companyData,
                     branch: branchData,
                     finance: financeData,
-                    integrations: integrations
+                    staff: staffData.createStaff ? staffData : null
                 })
             });
 
             const result = await res.json();
             if (result.success) {
                 updateUser({ setupState: 'COMPLETED' });
-                showSuccess('Başarılı', 'Kurulum tamamlandı! Sisteme yönlendiriliyorsunuz...');
+                showSuccess('Başarılı', 'Altyapı hazırlandı! Akıllı veri aktarıcısına yönlendiriliyorsunuz...');
                 setTimeout(() => {
-                    router.push('/dashboard');
-                }, 2000);
+                    // Redirect to the new dat aimport page for the 5th step
+                    router.push(result.redirect || '/data-import');
+                }, 1500);
             } else {
                 showError('Hata', result.error || 'Bir hata oluştu');
             }
@@ -82,488 +94,273 @@ export default function OnboardingPage() {
     };
 
     return (
-        <div className="onboarding-container">
-            <style jsx>{`
-                .onboarding-container {
-                    min-height: 100vh;
-                    background: radial-gradient(circle at top right, #0f172a, #020617);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-family: 'Outfit', sans-serif;
-                    color: white;
-                    padding: 20px;
-                }
-                .bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card {
-                    background: rgba(30, 41, 59, 0.5);
-                    
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 32px;
-                    padding: 48px;
-                    width: 100%;
-                    max-width: 600px;
-                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.05);
-                }
-                .step-indicator {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-bottom: 40px;
-                    position: relative;
-                }
-                .step-indicator::before {
-                    content: '';
-                    position: absolute;
-                    top: 15px;
-                    left: 0;
-                    right: 0;
-                    height: 2px;
-                    background: rgba(255, 255, 255, 0.05);
-                    z-index: 1;
-                }
-                .step-dot {
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 50%;
-                    background: #1e293b;
-                    border: 2px solid #334155;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 12px;
-                    font-weight: 800;
-                    position: relative;
-                    z-index: 2;
-                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                .step-dot.active {
-                    background: #3b82f6;
-                    border-color: #60a5fa;
-                    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-                    color: white;
-                }
-                .step-dot.completed {
-                    background: #10b981;
-                    border-color: #34d399;
-                    color: white;
-                }
-                h1 { 
-                    font-size: 32px; 
-                    margin-bottom: 12px; 
-                    font-weight: 900; 
-                    letter-spacing: -0.025em;
-                    background: linear-gradient(to bottom right, #fff, #94a3b8); 
-                    -webkit-background-clip: text; 
-                    -webkit-text-fill-color: transparent; 
-                }
-                p { color: #94a3b8; margin-bottom: 32px; line-height: 1.6; font-size: 15px; }
-                .input-grid {
-                    display: grid;
-                    grid-template-cols: 1fr 1fr;
-                    gap: 16px;
-                    margin-bottom: 24px;
-                }
-                .input-group { margin-bottom: 20px; text-align: left; }
-                label { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-                input, select, textarea {
-                    width: 100%;
-                    background: rgba(15, 23, 42, 0.6);
-                    border: 1px solid rgba(255, 255, 255, 0.05);
-                    border-radius: 14px;
-                    padding: 14px 18px;
-                    color: white;
-                    outline: none;
-                    font-size: 14px;
-                    transition: all 0.2s;
-                    font-weight: 500;
-                }
-                input:focus, select:focus { 
-                    border-color: #3b82f6; 
-                    background: rgba(15, 23, 42, 0.8);
-                    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-                }
-                .toggle-card {
-                    display: flex;
-                    align-items: center;
-                    gap: 20px;
-                    background: rgba(15, 23, 42, 0.4);
-                    padding: 24px;
-                    border-radius: 20px;
-                    border: 1px solid rgba(255, 255, 255, 0.05);
-                    transition: all 0.2s;
-                    cursor: pointer;
-                    margin-bottom: 16px;
-                }
-                .toggle-card:hover {
-                    background: rgba(15, 23, 42, 0.6);
-                    border-color: rgba(255,255,255,0.1);
-                }
-                .toggle-card.active {
-                    background: rgba(59, 130, 246, 0.1);
-                    border-color: rgba(59, 130, 246, 0.3);
-                }
-                .icon-box {
-                    width: 52px;
-                    height: 52px;
-                    background: rgba(255, 255, 255, 0.05);
-                    border-radius: 16px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 24px;
-                }
-                button {
-                    padding: 16px;
-                    border-radius: 16px;
-                    font-weight: 700;
-                    cursor: pointer;
-                    transition: all 0.3s;
-                    border: none;
-                    font-size: 14px;
-                    letter-spacing: 0.02em;
-                }
-                .btn-next { background: #3b82f6; color: white; margin-top: 10px; width: 100%; }
-                .btn-next:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 24px -10px rgba(59, 130, 246, 0.5); background: #2563eb; }
-                .btn-next:disabled { opacity: 0.5; cursor: not-allowed; }
-                .btn-back { background: transparent; color: #64748b; margin-top: 12px; width: 100%; }
-                .btn-back:hover { color: white; background: rgba(255,255,255,0.05); }
-                
-                .integration-option {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 20px;
-                    background: rgba(15, 23, 42, 0.4);
-                    border: 1px solid rgba(255, 255, 255, 0.05);
-                    border-radius: 20px;
-                    margin-bottom: 12px;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                .integration-option:hover { background: rgba(15, 23, 42, 0.7); border-color: rgba(255,255,255,0.1); }
-                .integration-option.selected { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
-                .checkbox-custom {
-                    width: 24px;
-                    height: 24px;
-                    border: 2px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 8px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.2s;
-                }
-                .selected .checkbox-custom { background: #3b82f6; border-color: #3b82f6; }
-            `}</style>
+        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center p-4 py-12 relative overflow-hidden font-outfit">
+            {/* Background elements */}
+            <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
 
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card">
-                <div className="step-indicator">
-                    {[1, 2, 3, 4, 5].map(s => (
-                        <div
-                            key={s}
-                            className={`step-dot ${step === s ? 'active' : step > s ? 'completed' : ''}`}
-                        >
-                            {step > s ? '✓' : s}
-                        </div>
-                    ))}
+            <div className="w-full max-w-4xl animate-in fade-in zoom-in-95 duration-500 relative z-10">
+
+                <div className="text-center mb-10">
+                    <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-500/20 transform rotate-3">
+                        <Rocket className="w-8 h-8 text-white -rotate-3" />
+                    </div>
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                        Periodya&apos;ya Hoş Geldiniz
+                    </h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-3 text-lg">
+                        İşletmenizin omurgasını kurmak için 5 hızlı adım.
+                    </p>
                 </div>
 
-                {/* STEP 1: FİRMA PROFİLİ */}
-                {step === 1 && (
-                    <div className="step-content">
-                        <h1>Firma Profili 🏢</h1>
-                        <p>İşletmenizin yasal bilgilerini kaydederek başlayalım. Bu bilgiler e-fatura ve resmi belgelerde kullanılacaktır.</p>
+                <div className="flex items-center justify-between mb-8 relative">
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-200 dark:bg-slate-800 -z-10 rounded-full" />
+                    <div
+                        className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-blue-600 -z-10 rounded-full transition-all duration-500"
+                        style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
+                    />
 
-                        <div className="input-group">
-                            <label>Firma Ünvanı</label>
-                            <input
-                                type="text"
-                                placeholder="Örn: Periodya Teknoloji Ltd. Şti."
-                                value={companyData.name}
-                                onChange={(e) => setCompanyData({ ...companyData, name: e.target.value })}
-                            />
-                        </div>
+                    {STEPS.map((s, i) => {
+                        const isActive = step === s.id;
+                        const isPassed = step > s.id;
+                        const Icon = s.icon;
 
-                        <div className="input-group">
-                            <label>Slogan / Alt Başlık</label>
-                            <input
-                                type="text"
-                                placeholder="Örn: Profesyonel Oto Servis ve Bakım"
-                                value={companyData.slogan}
-                                onChange={(e) => setCompanyData({ ...companyData, slogan: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="input-grid">
-                            <div className="input-group">
-                                <label>VKN / TCKN</label>
-                                <input
-                                    type="text"
-                                    maxLength={11}
-                                    placeholder="10 veya 11 hane"
-                                    value={companyData.vkn}
-                                    onChange={(e) => setCompanyData({ ...companyData, vkn: e.target.value })}
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label>Vergi Dairesi</label>
-                                <input
-                                    type="text"
-                                    placeholder="Örn: Mecidiyeköy"
-                                    value={companyData.taxOffice}
-                                    onChange={(e) => setCompanyData({ ...companyData, taxOffice: e.target.value })}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="input-grid">
-                            <div className="input-group">
-                                <label>Şehir</label>
-                                <select
-                                    value={companyData.city}
-                                    onChange={(e) => setCompanyData({ ...companyData, city: e.target.value, district: '' })}
+                        return (
+                            <div key={s.id} className="flex flex-col items-center gap-2 bg-slate-50 dark:bg-[#020617] px-2">
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold transition-all duration-300 relative border-2
+                                    ${isActive ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/30 scale-110' :
+                                        isPassed ? 'bg-white dark:bg-slate-900 border-blue-600 text-blue-600' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400'}`}
                                 >
-                                    {TURKISH_CITIES.map(city => (
-                                        <option key={city} value={city}>{city}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="input-group">
-                                <label>İlçe</label>
-                                <select
-                                    value={companyData.district}
-                                    onChange={(e) => setCompanyData({ ...companyData, district: e.target.value })}
-                                    disabled={!companyData.city}
-                                >
-                                    <option value="">İlçe Seçin...</option>
-                                    {(TURKISH_DISTRICTS[companyData.city] || []).map(district => (
-                                        <option key={district} value={district}>{district}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="input-grid">
-                            <div className="input-group">
-                                <label>Genel E-posta</label>
-                                <input
-                                    type="email"
-                                    placeholder="info@firma.com"
-                                    value={companyData.email}
-                                    onChange={(e) => setCompanyData({ ...companyData, email: e.target.value })}
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label>Web Sitesi</label>
-                                <input
-                                    type="text"
-                                    placeholder="www.firma.com.tr"
-                                    value={companyData.website}
-                                    onChange={(e) => setCompanyData({ ...companyData, website: e.target.value })}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="input-group">
-                            <label>Varsayılan Adres (Şube Bilgisi Yoksa)</label>
-                            <textarea
-                                rows={2}
-                                placeholder="Firma açık adresi..."
-                                value={companyData.address}
-                                onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })}
-                                style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '14px', width: '100%', color: 'white', padding: '14px' }}
-                            />
-                        </div>
-
-                        <div className="input-group">
-                            <label>Varsayılan Telefon</label>
-                            <input
-                                type="text"
-                                placeholder="+90 (---) --- -- --"
-                                value={companyData.phone}
-                                onChange={(e) => setCompanyData({ ...companyData, phone: e.target.value })}
-                            />
-                        </div>
-
-                        <button className="btn-next" onClick={handleNext} disabled={!companyData.name || !companyData.vkn}>
-                            Devam Et
-                        </button>
-                    </div>
-                )}
-
-                {/* STEP 2: ŞUBE & DEPO */}
-                {step === 2 && (
-                    <div className="step-content">
-                        <h1>Şube ve Depo 📍</h1>
-                        <p>Satış yapacağınız ana şubeyi ve stokları tutacağınız varsayılan depoyu tanımlayın.</p>
-
-                        <div className="input-group">
-                            <label>Ana Şube Adı</label>
-                            <input
-                                type="text"
-                                placeholder="Örn: Merkez Şube"
-                                value={branchData.branchName}
-                                onChange={(e) => setBranchData({ ...branchData, branchName: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="input-group">
-                            <label>Varsayılan Depo Adı</label>
-                            <input
-                                type="text"
-                                placeholder="Örn: Ana Depo"
-                                value={branchData.warehouseName}
-                                onChange={(e) => setBranchData({ ...branchData, warehouseName: e.target.value })}
-                            />
-                        </div>
-
-                        <button className="btn-next" onClick={handleNext} disabled={!branchData.branchName || !branchData.warehouseName}>
-                            Devam Et
-                        </button>
-                        <button className="btn-back" onClick={handlePrev}>Geri Dön</button>
-                    </div>
-                )}
-
-                {/* STEP 3: KASALAR */}
-                {step === 3 && (
-                    <div className="step-content">
-                        <h1>Kasa ve Banka 🏦</h1>
-                        <p>Nakit ve banka ödemelerinizi takip etmek için ilk hesaplarınızı oluşturalım.</p>
-
-                        <div
-                            className={`toggle-card ${financeData.createDefaultKasa ? 'active' : ''}`}
-                            onClick={() => setFinanceData({ ...financeData, createDefaultKasa: !financeData.createDefaultKasa })}
-                        >
-                            <div className="icon-box">💵</div>
-                            <div style={{ flex: 1, textAlign: 'left' }}>
-                                <div style={{ fontWeight: 800, fontSize: '14px' }}>Nakit Kasa Oluşturulsun</div>
-                                <div style={{ fontSize: '12px', color: '#64748b' }}>"{financeData.kasaName}" isminde bir kasa açılır.</div>
-                            </div>
-                            <div className="checkbox-custom" style={{ background: financeData.createDefaultKasa ? '#3b82f6' : 'transparent', borderColor: financeData.createDefaultKasa ? '#3b82f6' : 'rgba(255,255,255,0.1)' }}>{financeData.createDefaultKasa && '✓'}</div>
-                        </div>
-
-                        <div
-                            className={`toggle-card ${financeData.createDefaultBank ? 'active' : ''}`}
-                            onClick={() => setFinanceData({ ...financeData, createDefaultBank: !financeData.createDefaultBank })}
-                        >
-                            <div className="icon-box">🏦</div>
-                            <div style={{ flex: 1, textAlign: 'left' }}>
-                                <div style={{ fontWeight: 800, fontSize: '14px' }}>Banka Hesabı Oluşturulsun</div>
-                                <div style={{ fontSize: '12px', color: '#64748b' }}>"{financeData.bankName}" isminde bir hesap açılır.</div>
-                            </div>
-                            <div className="checkbox-custom" style={{ background: financeData.createDefaultBank ? '#3b82f6' : 'transparent', borderColor: financeData.createDefaultBank ? '#3b82f6' : 'rgba(255,255,255,0.1)' }}>{financeData.createDefaultBank && '✓'}</div>
-                        </div>
-
-                        <button className="btn-next" onClick={handleNext}>
-                            Devam Et
-                        </button>
-                        <button className="btn-back" onClick={handlePrev}>Geri Dön</button>
-                    </div>
-                )}
-
-                {/* STEP 4: ENTEGRASYON GÜCÜ */}
-                {step === 4 && (
-                    <div className="step-content">
-                        <h1>Entegrasyon Gücü ⚡</h1>
-                        <p>İşletmenizi dijital dünyaya bağlayın. Seçtiğiniz modüller kurulum sonrası aktif edilecektir.</p>
-
-                        <div
-                            className={`integration-option ${integrations.eInvoice ? 'selected' : ''}`}
-                            onClick={() => setIntegrations({ ...integrations, eInvoice: !integrations.eInvoice })}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                <div className="icon-box" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>📄</div>
-                                <div style={{ textAlign: 'left' }}>
-                                    <div style={{ fontWeight: 800, fontSize: '14px' }}>E-Fatura Entegrasyonu</div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>Nilvera ile e-fatura/e-arşiv süreçleri.</div>
+                                    <Icon className="w-5 h-5" />
                                 </div>
-                            </div>
-                            <div className="checkbox-custom">{integrations.eInvoice && '✓'}</div>
-                        </div>
-
-                        <div
-                            className={`integration-option ${integrations.bank ? 'selected' : ''}`}
-                            onClick={() => setIntegrations({ ...integrations, bank: !integrations.bank })}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                <div className="icon-box" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>💳</div>
-                                <div style={{ textAlign: 'left' }}>
-                                    <div style={{ fontWeight: 800, fontSize: '14px' }}>Banka Entegrasyonu</div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>Banka hareketlerini anlık takip edin.</div>
-                                </div>
-                            </div>
-                            <div className="checkbox-custom">{integrations.bank && '✓'}</div>
-                        </div>
-
-                        <div
-                            className={`integration-option ${integrations.ecommerce ? 'selected' : ''}`}
-                            onClick={() => setIntegrations({ ...integrations, ecommerce: !integrations.ecommerce })}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                <div className="icon-box" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>📦</div>
-                                <div style={{ textAlign: 'left' }}>
-                                    <div style={{ fontWeight: 800, fontSize: '14px' }}>E-Ticaret Entegrasyonu</div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>Pazaryeri ve web sitenizi bağlayın.</div>
-                                </div>
-                            </div>
-                            <div className="checkbox-custom">{integrations.ecommerce && '✓'}</div>
-                        </div>
-
-                        <div
-                            className={`integration-option ${integrations.b2bNetwork ? 'selected' : ''}`}
-                            onClick={() => setIntegrations({ ...integrations, b2bNetwork: !integrations.b2bNetwork })}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                <div className="icon-box" style={{ background: 'rgba(99, 102, 241, 0.1)', color: '#6366f1' }}>🤝</div>
-                                <div style={{ textAlign: 'left' }}>
-                                    <div style={{ fontWeight: 800, fontSize: '14px' }}>B2B Dealer Network</div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>Bayi sipariş portalı ve sanal POS.</div>
-                                </div>
-                            </div>
-                            <div className="checkbox-custom">{integrations.b2bNetwork && '✓'}</div>
-                        </div>
-
-                        <button className="btn-next" onClick={handleNext}>
-                            Son Adıma Geç
-                        </button>
-                        <button className="btn-back" onClick={handlePrev}>Geri Dön</button>
-                    </div>
-                )}
-
-                {/* STEP 5: ÖZET & TAMAMLAMA */}
-                {step === 5 && (
-                    <div className="step-content" style={{ textAlign: 'center' }}>
-                        <div className="icon-box" style={{ width: '80px', height: '80px', margin: '0 auto 24px', fontSize: '40px', background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6' }}>🚀</div>
-                        <h1>Hazırız!</h1>
-                        <p>Tüm ayarlarınız yapılandırıldı. Periodya paneline giriş yapmak için hazırsınız.</p>
-
-                        <div style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '24px', borderRadius: '24px', textAlign: 'left', marginBottom: '32px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase' }}>Firma:</span>
-                                <span style={{ fontWeight: 700, fontSize: '14px' }}>{companyData.name}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase' }}>Şube:</span>
-                                <span style={{ fontWeight: 700, fontSize: '14px' }}>{branchData.branchName}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase' }}>Entegrasyonlar:</span>
-                                <span style={{ fontWeight: 700, fontSize: '14px', color: '#3b82f6' }}>
-                                    {[
-                                        integrations.eInvoice ? 'E-Fatura' : '',
-                                        integrations.bank ? 'Banka' : '',
-                                        integrations.ecommerce ? 'E-Ticaret' : '',
-                                        integrations.b2bNetwork ? 'B2B Ağ' : ''
-                                    ].filter(Boolean).join(', ') || 'Atlandı'}
+                                <span className={`text-[10px] font-black uppercase tracking-wider hidden md:block ${isActive ? 'text-blue-600' : isPassed ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400'}`}>
+                                    {s.label}
                                 </span>
                             </div>
-                        </div>
+                        )
+                    })}
+                </div>
 
-                        <button className="btn-next" onClick={handleComplete} disabled={loading}>
-                            {loading ? 'Kurulum Başlatılıyor...' : 'Kurulumu Tamamla'}
-                        </button>
-                        {!loading && <button className="btn-back" onClick={handlePrev}>Geri Dön</button>}
-                    </div>
-                )}
+                <EnterpriseCard className="p-8 md:p-12 shadow-2xl border-0 ring-1 ring-slate-200 dark:ring-slate-800/50 bg-white/80 dark:bg-[#0b1120]/80 backdrop-blur-xl">
+
+                    {/* STEP 1: FİRMA PROFİLİ */}
+                    {step === 1 && (
+                        <div className="space-y-6 animate-in slide-in-from-right-8 duration-300">
+                            <div className="mb-8">
+                                <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
+                                    <Building2 className="text-blue-500" /> Firma Profili
+                                </h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm">Resmi belgelerde ve e-Fatura süreçlerinde kullanılacak temel bilgileriniz.</p>
+                                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-lg text-sm border border-blue-100 dark:border-blue-900/50 flex gap-3">
+                                    <span className="text-xl">💡</span> <strong>İpucu:</strong> Vergi numaranızı doğru girdiğinizden emin olun, e-Fatura paneli buna göre aktive edilecektir.
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <EnterpriseInput label="Firma Ünvanı / Adı *" value={companyData.name} onChange={e => setCompanyData({ ...companyData, name: e.target.value })} placeholder="Örn: Periodya Teknoloji A.Ş." />
+                                <EnterpriseInput label="Slogan (Fatura/Fiş Altı)" value={companyData.slogan} onChange={e => setCompanyData({ ...companyData, slogan: e.target.value })} placeholder="Müşterilerinize iletmek istediğiniz not..." />
+
+                                <EnterpriseInput label="VKN / TCKN *" value={companyData.vkn} onChange={e => setCompanyData({ ...companyData, vkn: e.target.value.replace(/[^0-9]/g, '').slice(0, 11) })} placeholder="10 veya 11 Haneli Vergi No" />
+                                <EnterpriseInput label="Vergi Dairesi" value={companyData.taxOffice} onChange={e => setCompanyData({ ...companyData, taxOffice: e.target.value })} placeholder="Örn: Zincirlikuyu VD" />
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">İl</label>
+                                    <EnterpriseSelect value={companyData.city} onChange={e => setCompanyData({ ...companyData, city: e.target.value, district: '' })}>
+                                        {TURKISH_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                    </EnterpriseSelect>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">İlçe</label>
+                                    <EnterpriseSelect value={companyData.district} onChange={e => setCompanyData({ ...companyData, district: e.target.value })} disabled={!companyData.city}>
+                                        <option value="">İlçe Seçin</option>
+                                        {(TURKISH_DISTRICTS[companyData.city] || []).map((d: string) => <option key={d} value={d}>{d}</option>)}
+                                    </EnterpriseSelect>
+                                </div>
+                            </div>
+
+                            <EnterpriseInput label="Açık Adres" value={companyData.address} onChange={e => setCompanyData({ ...companyData, address: e.target.value })} placeholder="Mahalle, sokak, kapı no..." />
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <EnterpriseInput label="Şirket E-Posta" type="email" value={companyData.email} onChange={e => setCompanyData({ ...companyData, email: e.target.value })} placeholder="info@..." />
+                                <EnterpriseInput label="Telefon" value={companyData.phone} onChange={e => setCompanyData({ ...companyData, phone: e.target.value })} placeholder="+90..." />
+                                <EnterpriseInput label="Web Sitesi" value={companyData.website} onChange={e => setCompanyData({ ...companyData, website: e.target.value })} placeholder="www..." />
+                            </div>
+
+                            <div className="flex justify-end pt-6">
+                                <EnterpriseButton onClick={handleNext} disabled={!companyData.name || !companyData.vkn || companyData.vkn.length < 10}>
+                                    Devam Et
+                                </EnterpriseButton>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* STEP 2: ŞUBE & DEPO */}
+                    {step === 2 && (
+                        <div className="space-y-6 animate-in slide-in-from-right-8 duration-300">
+                            <div className="mb-8">
+                                <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
+                                    <Store className="text-blue-500" /> Şube ve Depo Tanımları
+                                </h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm">İlk kayıtlarınızın otomatik olarak yapılacağı ana nokta.</p>
+                                <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 rounded-lg text-sm border border-amber-100 dark:border-amber-900/50 flex gap-3">
+                                    <span className="text-xl">⚠️</span> <strong>Dikkate Alın:</strong> İşiniz tek bir konumda olsa bile "Merkez Şube" ve "Ana Depo" olarak varsayılan bir yapıyı sistem otomatik olarak kullanır. Sonradan istediğiniz kadar şube ekleyebilirsiniz.
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+                                    <Store className="w-8 h-8 text-slate-400 mb-4" />
+                                    <EnterpriseInput label="Ana Şube Adı" value={branchData.branchName} onChange={e => setBranchData({ ...branchData, branchName: e.target.value })} />
+                                    <p className="text-xs text-slate-500 mt-2">Satışlarınız, faturalarınız ve personelleriniz başlangıçta bu şubeye kaydedilecektir.</p>
+                                </div>
+
+                                <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+                                    <Package className="w-8 h-8 text-slate-400 mb-4" />
+                                    <EnterpriseInput label="Ana Depo Adı" value={branchData.warehouseName} onChange={e => setBranchData({ ...branchData, warehouseName: e.target.value })} />
+                                    <p className="text-xs text-slate-500 mt-2">İçeri aktarılacak tüm stoklar ilk olarak bu ana depo üzerinden işlem görecektir.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between pt-6 border-t border-slate-100 dark:border-slate-800 mt-8">
+                                <EnterpriseButton variant="secondary" onClick={handlePrev}>Geri</EnterpriseButton>
+                                <EnterpriseButton onClick={handleNext} disabled={!branchData.branchName || !branchData.warehouseName}>Devam Et</EnterpriseButton>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* STEP 3: KASALAR */}
+                    {step === 3 && (
+                        <div className="space-y-6 animate-in slide-in-from-right-8 duration-300">
+                            <div className="mb-8">
+                                <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
+                                    <Wallet className="text-blue-500" /> İlk Kasa ve Bankalar
+                                </h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm">Satış tahsilatlarının akacağı hesapları şimdi hızlıca oluşturalım.</p>
+                                <div className="mt-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-sm border border-emerald-100 dark:border-emerald-900/50 flex gap-3">
+                                    <span className="text-xl">💳</span> <strong>Küçük İpucu:</strong> Eğer online banka/pos entegrasyonu yapacaksanız, sanal pos paralarınızın birikeceği ayrı bir kasa da açabileceksiniz (Şu an sadece temel olanları seçin).
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className={`p-6 rounded-2xl border-2 transition-all cursor-pointer flex gap-4 items-center ${financeData.createDefaultKasa ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-800'}`} onClick={() => setFinanceData({ ...financeData, createDefaultKasa: !financeData.createDefaultKasa })}>
+                                    <input type="checkbox" checked={financeData.createDefaultKasa} readOnly className="w-5 h-5 text-blue-600 rounded" />
+                                    <div className="flex-1">
+                                        <h3 className="font-bold text-lg">Nakit Kasası Kur</h3>
+                                        <p className="text-slate-500 text-sm mt-1">Nakit ve POS harici günlük satışlar buraya akar.</p>
+                                    </div>
+                                    <div className="w-1/3" onClick={e => e.stopPropagation()}>
+                                        <EnterpriseInput label="" placeholder="Merkez Nakit Kasası" value={financeData.kasaName} onChange={e => setFinanceData({ ...financeData, kasaName: e.target.value })} disabled={!financeData.createDefaultKasa} />
+                                    </div>
+                                </div>
+
+                                <div className={`p-6 rounded-2xl border-2 transition-all cursor-pointer flex gap-4 items-center ${financeData.createDefaultBank ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-800'}`} onClick={() => setFinanceData({ ...financeData, createDefaultBank: !financeData.createDefaultBank })}>
+                                    <input type="checkbox" checked={financeData.createDefaultBank} readOnly className="w-5 h-5 text-blue-600 rounded" />
+                                    <div className="flex-1">
+                                        <h3 className="font-bold text-lg">Banka Hesabı Kur</h3>
+                                        <p className="text-slate-500 text-sm mt-1">Havale/EFT ve kredi kartı alacakları bu hesaptan izlenir.</p>
+                                    </div>
+                                    <div className="w-1/3" onClick={e => e.stopPropagation()}>
+                                        <EnterpriseInput label="" placeholder="Ana Banka Hesabı" value={financeData.bankName} onChange={e => setFinanceData({ ...financeData, bankName: e.target.value })} disabled={!financeData.createDefaultBank} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between pt-6 border-t border-slate-100 dark:border-slate-800 mt-8">
+                                <EnterpriseButton variant="secondary" onClick={handlePrev}>Geri</EnterpriseButton>
+                                <EnterpriseButton onClick={handleNext}>Devam Et</EnterpriseButton>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* STEP 4: PERSONEL */}
+                    {step === 4 && (
+                        <div className="space-y-6 animate-in slide-in-from-right-8 duration-300">
+                            <div className="mb-8">
+                                <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
+                                    <Users className="text-blue-500" /> Personel / Kasiyer
+                                </h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm">Sisteme ve POS ekranına ilk girişi yapacak olan personelinizi belirleyin (Opsiyonel).</p>
+                                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-lg text-sm border border-blue-100 dark:border-blue-900/50 flex gap-3">
+                                    <span className="text-xl">👩‍💼</span> <strong>Yönetici Hesabı:</strong> Kendi ana hesabınız her zaman "Yönetici" yetkisine sahiptir. Burada sadece Terminal'de çalışacak birini ekleyebilirsiniz. İstemezseniz direkt geçin.
+                                </div>
+                            </div>
+
+                            <label className="flex items-center gap-3 cursor-pointer p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800">
+                                <input type="checkbox" className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 border-slate-300" checked={staffData.createStaff} onChange={(e) => setStaffData({ ...staffData, createStaff: e.target.checked })} />
+                                <span className="font-bold">Yeni bir personel hesabı oluşturmak istiyorum</span>
+                            </label>
+
+                            {staffData.createStaff && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border-2 border-blue-100 dark:border-blue-900/40 rounded-2xl bg-blue-50/30 dark:bg-blue-900/10 animate-in slide-in-from-top-4">
+                                    <EnterpriseInput label="Ad *" value={staffData.firstName} onChange={e => setStaffData({ ...staffData, firstName: e.target.value })} placeholder="Ali" />
+                                    <EnterpriseInput label="Soyad" value={staffData.lastName} onChange={e => setStaffData({ ...staffData, lastName: e.target.value })} placeholder="Yılmaz" />
+                                    <EnterpriseInput label="E-Posta (Şifre Yenileme İçin)" type="email" value={staffData.email} onChange={e => setStaffData({ ...staffData, email: e.target.value })} placeholder="ali@firma.com" />
+                                    <EnterpriseInput label="Telefon" value={staffData.phone} onChange={e => setStaffData({ ...staffData, phone: e.target.value })} placeholder="05..." />
+                                    <div className="md:col-span-2">
+                                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 block">Rol / Yetki</label>
+                                        <EnterpriseSelect value={staffData.role} onChange={e => setStaffData({ ...staffData, role: e.target.value })}>
+                                            <option value="Kasiyer">Sadece Kasa / Terminal Yetkisi (Kasiyer)</option>
+                                            <option value="Mağaza Müdürü">Şube Yönetimi (Mağaza Müdürü)</option>
+                                            <option value="Depo Uzmanı">Sadece Stok Yönetimi (Depo Sorumlusu)</option>
+                                        </EnterpriseSelect>
+                                        <p className="text-xs text-slate-400 mt-2">Not: İlk parola &quot;123456&quot; ve 4 haneli PIN rastgele olarak atanır, Settings &gt; Personel alanından izleyebilirsiniz.</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex justify-between pt-6 border-t border-slate-100 dark:border-slate-800 mt-8">
+                                <EnterpriseButton variant="secondary" onClick={handlePrev}>Geri</EnterpriseButton>
+                                <EnterpriseButton onClick={handleNext} disabled={staffData.createStaff && !staffData.firstName}>Devam Et</EnterpriseButton>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* STEP 5: İÇE AKTARMA */}
+                    {step === 5 && (
+                        <div className="space-y-6 animate-in slide-in-from-right-8 duration-300 text-center py-6">
+
+                            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/40">
+                                <BrainCircuit className="w-12 h-12 text-white animate-pulse" />
+                            </div>
+
+                            <h2 className="text-3xl font-black mb-4">Her Şey Hazır. Şimdi Verilerinizi Alalım!</h2>
+                            <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto mb-8">
+                                Sisteminizin altyapısı kuruldu. Excel tablolarınızdaki müşteri, tedarikçi ve ürün verilerinizi <strong className="text-indigo-500">Yapay Zeka Destekli</strong> içe aktarma motorumuzla tek tıklamayla sisteme dahil edeceğiz.
+                            </p>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto mb-8 text-left">
+                                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                                    <div className="text-2xl mb-2">🤖</div>
+                                    <h4 className="font-bold text-sm">Akıllı Eşleştirme</h4>
+                                    <p className="text-xs text-slate-500">Sütun başlıklarını otomatik tespit eder.</p>
+                                </div>
+                                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                                    <div className="text-2xl mb-2">⚖️</div>
+                                    <h4 className="font-bold text-sm">Bakiye Koruma</h4>
+                                    <p className="text-xs text-slate-500">Mevcut cari bakiyelerinizi açılış fişiyle kayıt altına alır.</p>
+                                </div>
+                                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                                    <div className="text-2xl mb-2">🛡️</div>
+                                    <h4 className="font-bold text-sm">Güvenli Geçiş</h4>
+                                    <p className="text-xs text-slate-500">Hata durumunda tüm işlemi anında iptal eder, veri kirliliğini önler.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                <EnterpriseButton variant="secondary" onClick={handlePrev} disabled={loading}>Geri Dön</EnterpriseButton>
+                                <EnterpriseButton onClick={handleComplete} disabled={loading} className="px-8 flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                                    {loading ? 'Altyapı Kaydediliyor...' : 'Kaydet ve Verileri Aktarmaya Başla'} <Rocket className="w-5 h-5" />
+                                </EnterpriseButton>
+                            </div>
+                        </div>
+                    )}
+                </EnterpriseCard>
             </div>
         </div>
     );
+}
+
+// Ignore unused icon warning
+function Package(props: any) {
+    return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>;
 }
