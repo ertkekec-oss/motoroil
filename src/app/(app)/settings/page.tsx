@@ -14,8 +14,10 @@ import ServiceFeesPanel from './_components/forms/ServiceFeesPanel';
 import InvoiceSettingsPanel from './_components/forms/InvoiceSettingsPanel';
 import AccountPanel from './_components/forms/AccountPanel';
 import BranchesPanel from './_components/forms/BranchesPanel';
-import IntegrationsPanel from './_components/forms/IntegrationsPanel';
 import CompanyProfileForm from './_components/forms/CompanyProfileForm';
+import IntegrationsPanel from './_components/forms/IntegrationsPanel';
+import PricingPage from './pricing/page';
+import BranchSettingsPage from './branch/page';
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -1058,8 +1060,10 @@ export default function SettingsPage() {
                     {[
                         { id: 'company', label: 'Firma Profili', icon: '🏢' },
                         { id: 'integrations', label: 'Entegrasyonlar', icon: '🔌' },
-                        { id: 'branches', label: 'Şubeler & Depo', icon: '�️' },
+                        { id: 'branches', label: 'Şubeler & Depo', icon: '🏫' },
+                        { id: 'branch_auth', label: 'Şube-Kasa Yetkileri', icon: '🔐' },
                         { id: 'profile', label: 'Hesabım', icon: '👤' },
+                        { id: 'pricing', label: 'Fiyatlandırma', icon: '💲' },
                         { id: 'invoice', label: 'Fatura Ayarları', icon: '🧾' },
                         { id: 'services', label: 'Servis Ücretleri', icon: '🔧' },
                         { id: 'taxes', label: 'KDV & Vergiler', icon: '💰' },
@@ -1114,6 +1118,9 @@ export default function SettingsPage() {
                 {/* 1. ŞUBELER & DEPO */}
                 {activeTab === 'branches' && <BranchesPanel {...sharedProps} />}
 
+                {/* ŞUBE-KASA YETKILERI */}
+                {activeTab === 'branch_auth' && <BranchSettingsPage />}
+
                 {/* 3. MASRAF & KOMİSYON AYARLARI */}
                 {activeTab === 'expenses' && <SalesExpensesPanel {...sharedProps} />}
 
@@ -1122,6 +1129,7 @@ export default function SettingsPage() {
                 {activeTab === 'profile' && <AccountPanel {...sharedProps} />}
 
                 {activeTab === 'invoice' && <InvoiceSettingsPanel {...sharedProps} />}
+                {activeTab === 'pricing' && <PricingPage />}
 
                 {/* 3.1. SERVİS AYARLARI */}
                 {activeTab === 'services' && <ServiceFeesPanel {...sharedProps} />}

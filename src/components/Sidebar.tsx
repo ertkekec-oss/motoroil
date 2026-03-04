@@ -249,10 +249,7 @@ export default function Sidebar() {
                 group: "Sistem",
                 items: [
                     { name: 'Yardım Merkezi', href: '/help', icon: LifeBuoy },
-                    { name: 'Destek', href: '/support', icon: HelpCircle },
-                    { name: 'Sistem', href: '/settings/branch', icon: Terminal },
                     { name: 'Abonelik', href: '/billing', icon: CreditCard },
-                    { name: 'Fiyatlandırma', href: '/settings/pricing', icon: ShoppingCart },
                     { name: 'Ayarlar', href: '/settings', icon: Settings },
                 ]
             }
