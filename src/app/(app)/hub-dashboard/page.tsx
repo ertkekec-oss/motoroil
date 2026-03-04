@@ -76,7 +76,7 @@ export default function TenantNetworkDashboard() {
     }
 
     return (
-        <div className="flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative font-sans" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative font-sans min-h-screen dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617]" style={{ scrollbarWidth: 'none' }}>
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
             <div className="max-w-[1400px] mx-auto space-y-8 pb-24">
 
