@@ -1247,10 +1247,10 @@ function InventoryContent() {
         <div className="flex-1 text-left">
           {!isCounting ? (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h1 className="text-[26px] font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <h1 className="text-[26px] font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                 Envanter Yönetimi
               </h1>
-              <p className="text-[13px] text-slate-500 font-bold tracking-wide mt-1">
+              <p className="text-[13px] text-slate-500 dark:text-slate-400 font-bold tracking-wide mt-1">
                 Ürün, stok ve fiyat yönetim merkezi
               </p>
             </div>
@@ -1274,24 +1274,24 @@ function InventoryContent() {
         {!isCounting && (
           <div className="flex items-center justify-start xl:justify-end gap-3 flex-wrap xl:flex-nowrap w-full xl:w-auto">
             <input type="file" ref={fileInputRef} onChange={handleExcelUpload} accept=".xlsx, .xls" className="hidden" />
-            <button onClick={() => fileInputRef.current?.click()} className="h-[42px] px-5 border border-slate-200 text-slate-700 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+            <button onClick={() => fileInputRef.current?.click()} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
               Yükle
             </button>
-            <button onClick={exportToExcel} className="h-[42px] px-5 border border-slate-200 text-slate-700 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+            <button onClick={exportToExcel} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
               İndir
             </button>
-            <button onClick={startCount} className="h-[42px] px-5 border border-slate-200 text-slate-700 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+            <button onClick={startCount} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
               Stok Sayımı
             </button>
-            <button onClick={() => setShowScanner(true)} className="h-[42px] px-5 border border-slate-200 text-slate-700 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+            <button onClick={() => setShowScanner(true)} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
               Barkod Tara
             </button>
             <button onClick={() => setShowAddModal(true)} className="h-[42px] px-6 bg-blue-600 hover:bg-blue-700 !text-white font-black rounded-[10px] text-[13px] uppercase tracking-widest transition-colors shadow-sm flex items-center justify-center gap-2 whitespace-nowrap border border-blue-600">
               Yeni Ürün
             </button>
-            <button onClick={() => setShowHealthReport(true)} className="h-[42px] px-5 border border-slate-200 text-slate-700 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap group relative">
+            <button onClick={() => setShowHealthReport(true)} className="h-[42px] px-5 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-[10px] text-[13px] hover:bg-slate-50 transition-colors bg-white dark:bg-[#0f172a] shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap group relative">
               Health Raporu
-              <div className="absolute opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-3 bg-white border border-slate-200 rounded-[12px] shadow-lg text-slate-600 text-[11px] leading-relaxed z-[100] pointer-events-none font-normal text-center whitespace-normal">
+              <div className="absolute opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[12px] shadow-lg text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed z-[100] pointer-events-none font-normal text-center whitespace-normal">
                 Stok sağlığı ve devir analiz raporunu görüntüler.
               </div>
             </button>
@@ -1301,7 +1301,7 @@ function InventoryContent() {
 
       {/* --- SEKMELER + STRATEJİK MOD SEÇİMİ --- */}
       {!isCounting ? (
-        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-6 z-20 relative border-b border-slate-200 pb-0 w-full">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-6 z-20 relative border-b border-slate-200 dark:border-white/5 pb-0 w-full">
           <div className="w-full flex-1 overflow-x-auto scrollbar-hide">
             <div className="flex w-full xl:w-max gap-8 px-1 h-12 items-end">
               {[
@@ -1348,13 +1348,13 @@ function InventoryContent() {
       {isCounting && (
         <div className="flex items-center justify-between mb-6 p-4 bg-amber-50 border border-amber-200 rounded-[12px] shadow-sm w-full">
           <div className="flex items-center gap-4">
-            <div className="flex bg-white border border-amber-300 shadow-sm p-1 rounded-[10px]">
+            <div className="flex bg-white dark:bg-[#0f172a] border border-amber-300 shadow-sm p-1 rounded-[10px]">
               <input
                 type="text"
                 placeholder="Sayılacak ürünü ara..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-transparent border-none outline-none px-4 py-2 text-[14px] font-bold text-slate-900 w-64 placeholder:text-slate-400 placeholder:font-medium"
+                className="bg-transparent border-none outline-none px-4 py-2 text-[14px] font-bold text-slate-900 dark:text-white w-64 placeholder:text-slate-400 placeholder:font-medium"
               />
             </div>
             <div className="text-[12px] text-amber-700 font-bold uppercase tracking-widest">
@@ -1388,7 +1388,7 @@ function InventoryContent() {
           <div className="bg-amber-500 text-white font-bold p-3 text-center rounded-xl mb-4 shadow-sm flex items-center justify-center gap-2 animate-in slide-in-from-top-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4" /><path d="M3.34 19a10 10 0 1 1 17.32 0" /></svg>
             SİMÜLASYON AKTİF — Gerçek veriler değiştirilmiyor (What-If engine running)
-            <button onClick={() => setIsSimulationMode(false)} className="ml-4 px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-xs">Kapat</button>
+            <button onClick={() => setIsSimulationMode(false)} className="ml-4 px-3 py-1 bg-white/20 hover:bg-white dark:bg-[#0f172a]/30 rounded-lg text-xs">Kapat</button>
           </div>
         )}
 
@@ -1503,7 +1503,7 @@ function InventoryContent() {
             ].map((action) => (
               <button
                 key={action.id}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-800 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-800 dark:hover:bg-white dark:bg-[#0f172a]/5 transition-colors text-slate-400 hover:text-white"
                 onClick={() => handleBulkAction(action.id as any)}
               >
                 <span className="text-[14px] grayscale opacity-70 group-hover:opacity-100">{action.icon}</span>
@@ -1528,7 +1528,7 @@ function InventoryContent() {
 
           <button
             onClick={() => setSelectedIds([])}
-            className="text-slate-500 hover:text-white ml-2 transition-colors p-1"
+            className="text-slate-500 dark:text-slate-400 hover:text-white ml-2 transition-colors p-1"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1686,12 +1686,12 @@ function InventoryContent() {
                   <h2 className="text-[20px] font-semibold text-slate-900 dark:text-white">
                     Sayım Sonuç Raporu
                   </h2>
-                  <p className="text-[13px] text-slate-500 font-medium mt-1">
+                  <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium mt-1">
                     {auditReport.items.length} kalemde fark tespit edildi.
                   </p>
                 </div>
                 <div className="text-right bg-white dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
-                  <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-widest mb-1">
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-widest mb-1">
                     TOPLAM MALİYET ETKİSİ
                   </div>
                   <div
@@ -1724,13 +1724,13 @@ function InventoryContent() {
                   {auditReport.items.map((item: any) => (
                     <tr
                       key={item.id}
-                      className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group"
+                      className="hover:bg-slate-50 dark:hover:bg-white dark:bg-[#0f172a]/5 transition-colors group"
                     >
                       <td className="px-6 py-4">
                         <div className="font-semibold text-[13px] text-slate-900 dark:text-slate-100 mb-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           {item.name}
                         </div>
-                        <div className="text-[11px] text-slate-500 font-mono font-medium">
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono font-medium">
                           {item.id}
                         </div>
                       </td>

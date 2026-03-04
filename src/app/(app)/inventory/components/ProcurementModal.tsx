@@ -101,9 +101,9 @@ export default function ProcurementModal({ isOpen, onClose, products }: Procurem
                         <h2 className="text-[20px] font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                             <span className="text-[24px]">📋</span> Tedarik Planlayıcı
                         </h2>
-                        <p className="text-[13px] text-slate-500 font-medium mt-1">Kritik seviyeleri normalize etmek için ürün seçin</p>
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium mt-1">Kritik seviyeleri normalize etmek için ürün seçin</p>
                     </div>
-                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 flex items-center justify-center text-slate-500 transition-colors">✕</button>
+                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors">✕</button>
                 </div>
 
                 {/* Content */}
@@ -140,14 +140,14 @@ export default function ProcurementModal({ isOpen, onClose, products }: Procurem
                                             <td className="px-5 py-3">
                                                 <div className="flex flex-col">
                                                     <span className="text-[13px] font-semibold text-slate-900 dark:text-slate-100">{p.name}</span>
-                                                    <span className="text-[11px] text-slate-500 font-medium mt-0.5">{p.code} • {p.brand}</span>
+                                                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">{p.code} • {p.brand}</span>
                                                 </div>
                                             </td>
                                             <td className="px-5 py-3 text-center">
                                                 <span className={`text-[13px] font-bold ${p.stock <= 0 ? 'text-red-500' : 'text-amber-500'}`}>{p.stock}</span>
                                             </td>
                                             <td className="px-5 py-3 text-center">
-                                                <span className="text-[13px] font-medium text-slate-500">{p.minStock || 5}</span>
+                                                <span className="text-[13px] font-medium text-slate-500 dark:text-slate-400">{p.minStock || 5}</span>
                                             </td>
                                             <td className="px-5 py-3 text-center">
                                                 <span className="text-[13px] font-bold text-emerald-500">+{Math.max(0, (p.minStock || 5) * 2 - (p.stock || 0))}</span>
@@ -175,7 +175,7 @@ export default function ProcurementModal({ isOpen, onClose, products }: Procurem
                 {/* Footer */}
                 <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1e293b] flex justify-between items-center shrink-0">
                     <div className="flex flex-col">
-                        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest">Planlanan Kalem Sayısı</span>
+                        <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Planlanan Kalem Sayısı</span>
                         <span className="text-[16px] font-bold text-slate-900 dark:text-white">{selectedIds.length} Ürün</span>
                     </div>
 

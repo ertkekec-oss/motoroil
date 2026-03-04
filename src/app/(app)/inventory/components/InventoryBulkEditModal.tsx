@@ -85,10 +85,10 @@ export default function InventoryBulkEditModal({
                         </h3>
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                            <p className="text-slate-500 text-[11px] font-medium tracking-wider uppercase">Seçili {selectedIds.length} ürün işleme hazır</p>
+                            <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium tracking-wider uppercase">Seçili {selectedIds.length} ürün işleme hazır</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 flex items-center justify-center dark:hover:bg-white/10 transition-colors text-slate-500 font-medium">✕</button>
+                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 flex items-center justify-center dark:hover:bg-white/10 transition-colors text-slate-500 dark:text-slate-400 font-medium">✕</button>
                 </div>
 
                 <div className="p-8 overflow-y-auto flex-1 custom-scroll">
@@ -136,7 +136,7 @@ export default function InventoryBulkEditModal({
                                 <div key={product.id} className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[16px] p-5 flex flex-col gap-3 hover:border-blue-500 transition-colors group shadow-sm">
                                     <div className="flex flex-col">
                                         <div className="text-[13px] font-semibold text-slate-900 dark:text-white truncate mb-0.5">{product.name}</div>
-                                        <div className="text-[11px] text-slate-500 font-medium tracking-wider">{product.code}</div>
+                                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wider">{product.code}</div>
                                     </div>
                                     <input
                                         type="text"
@@ -201,7 +201,7 @@ export default function InventoryBulkEditModal({
                                         <div key={product.id} className="bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-[16px] p-5 hover:border-blue-500 transition-colors group shadow-sm">
                                             <div className="flex flex-col mb-4">
                                                 <div className="text-[13px] font-semibold text-slate-900 dark:text-white truncate mb-0.5 leading-tight" title={product.name}>{product.name}</div>
-                                                <div className="text-[11px] text-slate-500 font-medium tracking-wider">{product.code}</div>
+                                                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wider">{product.code}</div>
                                             </div>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div className="flex flex-col gap-1.5">

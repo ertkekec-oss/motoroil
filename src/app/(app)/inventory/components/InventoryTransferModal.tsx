@@ -66,10 +66,10 @@ export default function InventoryTransferModal({
                         </h2>
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>
-                            <p className="text-slate-500 text-[11px] font-medium uppercase tracking-wider">Şubeler Arası Güvenli Taşıma</p>
+                            <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium uppercase tracking-wider">Şubeler Arası Güvenli Taşıma</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-slate-500 font-medium">✕</button>
+                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-slate-500 dark:text-slate-400 font-medium">✕</button>
                 </div>
 
                 <div className="p-8 flex flex-col gap-6">

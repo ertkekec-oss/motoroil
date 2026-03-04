@@ -100,17 +100,17 @@ const DashboardView = ({
                     <ProgressBar label="Tahsilat Hedefi" value={420000} max={600000} color="bg-amber-500" theme={theme} />
                 </div>
 
-                <div className="mt-8 p-4 bg-white/5 rounded-2xl border border-white/10">
+                <div className="mt-8 p-4 bg-white dark:bg-[#0f172a]/5 rounded-2xl border border-white/10">
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Aktif Görevler</h4>
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group hover:border-emerald-500/30 transition-all cursor-pointer">
+                        <div className="flex items-center justify-between p-3 bg-white dark:bg-[#0f172a]/5 rounded-xl border border-white/5 group hover:border-emerald-500/30 transition-all cursor-pointer">
                             <div className="flex items-center gap-3">
                                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
                                 <span className="text-xs font-bold text-white text-sm">Aylık stok sayımı onayı</span>
                             </div>
                             <span className="text-[10px] font-bold text-gray-500 uppercase">Bugün</span>
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group hover:border-amber-500/30 transition-all cursor-pointer">
+                        <div className="flex items-center justify-between p-3 bg-white dark:bg-[#0f172a]/5 rounded-xl border border-white/5 group hover:border-amber-500/30 transition-all cursor-pointer">
                             <div className="flex items-center gap-3">
                                 <div className="w-2 h-2 rounded-full bg-amber-500" />
                                 <span className="text-xs font-bold text-white text-sm">Pazaryeri hakediş kontrolü</span>
@@ -156,15 +156,15 @@ const DashboardView = ({
             <Card title="Son Bordro Özetleri" icon={IconShield} theme={theme}>
                 <div className="space-y-4 text-center">
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                        <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <div className="p-4 bg-white dark:bg-[#0f172a]/5 rounded-2xl border border-white/5">
                             <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Ocak 2026</p>
                             <p className={theme === 'light' ? "text-sm font-black text-pos" : "text-sm font-black text-white"}>₺32,450</p>
                         </div>
-                        <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <div className="p-4 bg-white dark:bg-[#0f172a]/5 rounded-2xl border border-white/5">
                             <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Aralık 2025</p>
                             <p className={theme === 'light' ? "text-sm font-black text-pos" : "text-sm font-black text-white"}>₺31,200</p>
                         </div>
-                        <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <div className="p-4 bg-white dark:bg-[#0f172a]/5 rounded-2xl border border-white/5">
                             <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Kasım 2025</p>
                             <p className={theme === 'light' ? "text-sm font-black text-pos" : "text-sm font-black text-white"}>₺31,200</p>
                         </div>
@@ -199,7 +199,7 @@ const DashboardView = ({
                         </button>
                     </div>
 
-                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between">
+                    <div className="p-4 bg-white dark:bg-[#0f172a]/5 rounded-2xl border border-white/5 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                             <div>
@@ -239,7 +239,7 @@ const LeaveRequestView = ({ theme }: any) => {
                             <select
                                 value={type}
                                 onChange={(e) => setType(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-emerald-500/50"
+                                className="w-full bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-emerald-500/50"
                             >
                                 <option value="YILLIK">Yıllık Ücretli İzin</option>
                                 <option value="MAZARET">Mazeret İzni</option>
@@ -251,21 +251,21 @@ const LeaveRequestView = ({ theme }: any) => {
                                 <label className="text-[10px] font-bold text-gray-400 uppercase">Başlangıç</label>
                                 <input
                                     type="date"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-emerald-500/50"
+                                    className="w-full bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-emerald-500/50"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-bold text-gray-400 uppercase">Bitiş</label>
                                 <input
                                     type="date"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-emerald-500/50"
+                                    className="w-full bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-emerald-500/50"
                                 />
                             </div>
                         </div>
                         <div className="space-y-2">
                             <label className="text-[10px] font-bold text-gray-400 uppercase">Not / Açıklama</label>
                             <textarea
-                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-emerald-500/50 resize-none"
+                                className="w-full h-24 bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-emerald-500/50 resize-none"
                                 placeholder="İzin nedeninizi kısaca belirtin..."
                             />
                         </div>
@@ -294,7 +294,7 @@ const LeaveRequestView = ({ theme }: any) => {
                                     { type: 'MAZARET', range: '12 Nis - 13 Nis', status: 'REDDEDİLDİ', color: 'text-rose-400', approver: 'Mehmet Demir' },
                                     { type: 'HASTALIK', range: '02 Şub - 04 Şub', status: 'ONAYLANDI', color: 'text-emerald-400', approver: 'Sistem (Oto)' },
                                 ].map((row, i) => (
-                                    <tr key={i} className="bg-white/5 rounded-xl border border-white/5 group hover:bg-white/10 transition-all">
+                                    <tr key={i} className="bg-white/5 rounded-xl border border-white/5 group hover:bg-white dark:bg-[#0f172a]/10 transition-all">
                                         <td className="px-4 py-4 rounded-l-xl">
                                             <span className="text-xs font-black text-white">{row.type}</span>
                                         </td>
@@ -339,7 +339,7 @@ const ProfileSettingsView = ({ user, theme }: any) => {
                         <input
                             type="text"
                             defaultValue={user?.name}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
+                            className="w-full bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
                         />
                     </div>
                     <div className="space-y-2">
@@ -347,7 +347,7 @@ const ProfileSettingsView = ({ user, theme }: any) => {
                         <input
                             type="email"
                             defaultValue={user?.email}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
+                            className="w-full bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
                         />
                     </div>
                     <div className="space-y-2">
@@ -355,14 +355,14 @@ const ProfileSettingsView = ({ user, theme }: any) => {
                         <input
                             type="tel"
                             placeholder="+90 5xx xxx xx xx"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
+                            className="w-full bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
                         />
                     </div>
                     <div className="space-y-2">
                         <label className="text-[10px] font-bold text-gray-400 uppercase">Adres</label>
                         <input
                             type="text"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
+                            className="w-full bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
                         />
                     </div>
                 </div>
@@ -374,14 +374,14 @@ const ProfileSettingsView = ({ user, theme }: any) => {
                             <label className="text-[10px] font-bold text-gray-400 uppercase">Yeni Şifre</label>
                             <input
                                 type="password"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
+                                className="w-full bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
                             />
                         </div>
                         <div className="space-y-2">
                             <label className="text-[10px] font-bold text-gray-400 uppercase">Şifre Tekrar</label>
                             <input
                                 type="password"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
+                                className="w-full bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-emerald-500/50"
                             />
                         </div>
                     </div>
@@ -498,14 +498,14 @@ export default function PersonelPanel() {
 
     if (loading) return (
         <div className="p-12 space-y-8 animate-pulse text-indigo-400/50">
-            <div className="h-20 bg-white/5 rounded-2xl w-full" />
+            <div className="h-20 bg-white dark:bg-[#0f172a]/5 rounded-2xl w-full" />
             <div className="grid grid-cols-4 gap-6">
-                <div className="h-32 bg-white/5 rounded-2xl" />
-                <div className="h-32 bg-white/5 rounded-2xl" />
-                <div className="h-32 bg-white/5 rounded-2xl" />
-                <div className="h-32 bg-white/5 rounded-2xl" />
+                <div className="h-32 bg-white dark:bg-[#0f172a]/5 rounded-2xl" />
+                <div className="h-32 bg-white dark:bg-[#0f172a]/5 rounded-2xl" />
+                <div className="h-32 bg-white dark:bg-[#0f172a]/5 rounded-2xl" />
+                <div className="h-32 bg-white dark:bg-[#0f172a]/5 rounded-2xl" />
             </div>
-            <div className="h-64 bg-white/5 rounded-2xl w-full" />
+            <div className="h-64 bg-white dark:bg-[#0f172a]/5 rounded-2xl w-full" />
         </div>
     );
 
@@ -531,7 +531,7 @@ export default function PersonelPanel() {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex items-center gap-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl w-fit">
+            <div className="flex items-center gap-2 p-1.5 bg-white dark:bg-[#0f172a]/5 border border-white/10 rounded-2xl w-fit">
                 <button
                     onClick={() => setActiveTab('dashboard')}
                     className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 flex items-center gap-2 ${activeTab === 'dashboard' ? (theme === 'light' ? 'bg-primary text-white shadow-sm' : 'bg-indigo-500 text-white shadow-sm shadow-indigo-500/20') : 'text-gray-500 hover:text-white'}`}

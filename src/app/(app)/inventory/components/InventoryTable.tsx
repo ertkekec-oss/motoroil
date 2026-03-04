@@ -47,7 +47,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
     };
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm relative z-0 flex flex-col" style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}>
+        <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm relative z-0 flex flex-col" style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}>
             {selectedIds.length > 0 && !isCounting && (
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-slate-900 px-4 py-2 rounded-xl shadow-xl flex items-center gap-4 z-50 animate-in slide-in-from-top-2 text-white">
                     <span className="text-xs font-bold">{selectedIds.length} ürün seçildi</span>
@@ -60,9 +60,9 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                 </div>
             )}
 
-            <div className="shrink-0 bg-slate-50 border-b border-slate-200 px-4 h-12 flex items-center text-[11px] font-bold text-slate-500 uppercase tracking-widest sticky top-0 rounded-t-2xl z-20">
+            <div className="shrink-0 bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/5 px-4 h-12 flex items-center text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest sticky top-0 rounded-t-2xl z-20">
                 <div className="w-10">
-                    <input type="checkbox" className="w-4 h-4 accent-blue-600 rounded border-slate-300 cursor-pointer"
+                    <input type="checkbox" className="w-4 h-4 accent-blue-600 rounded border-slate-300 dark:border-white/10 cursor-pointer"
                         onChange={handleHeaderCheckboxChange}
                         checked={selectedIds.length === products.length && products.length > 0}
                     />
@@ -91,8 +91,8 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                     <div className="h-full flex flex-col items-center justify-center opacity-40 py-24 space-y-4">
                         <div className="text-4xl text-slate-400">📦</div>
                         <div className="text-center">
-                            <h3 className="text-[14px] font-semibold text-slate-700">Kayıt Bulunamadı</h3>
-                            <p className="text-[13px] text-slate-500 mt-1">Arama kriterlerinize uygun ürün yok.</p>
+                            <h3 className="text-[14px] font-semibold text-slate-700 dark:text-slate-300">Kayıt Bulunamadı</h3>
+                            <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">Arama kriterlerinize uygun ürün yok.</p>
                         </div>
                     </div>
                 ) : (
@@ -114,25 +114,25 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                     `}
                                 >
                                     <div className="w-10 shrink-0 flex items-center" onClick={e => e.stopPropagation()}>
-                                        <input type="checkbox" className="w-4 h-4 accent-blue-600 rounded border-slate-300 cursor-pointer"
+                                        <input type="checkbox" className="w-4 h-4 accent-blue-600 rounded border-slate-300 dark:border-white/10 cursor-pointer"
                                             checked={isSelected}
                                             onChange={() => isSelected ? onSelectionChange(selectedIds.filter(id => id !== item.id)) : onSelectionChange([...selectedIds, item.id])}
                                         />
                                     </div>
 
                                     <div className="flex-[2] px-3 overflow-hidden">
-                                        <div className="font-bold text-[13px] text-slate-900 truncate">{item.name}</div>
-                                        <div className="text-[11px] font-medium text-slate-500 truncate">{item.code} {item.brand && `• ${item.brand}`}</div>
+                                        <div className="font-bold text-[13px] text-slate-900 dark:text-white truncate">{item.name}</div>
+                                        <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">{item.code} {item.brand && `• ${item.brand}`}</div>
                                     </div>
 
                                     <div className="flex-1 px-3 overflow-hidden">
-                                        <div className="text-[12px] font-semibold text-slate-700 truncate">{item.category || '-'}</div>
+                                        <div className="text-[12px] font-semibold text-slate-700 dark:text-slate-300 truncate">{item.category || '-'}</div>
                                     </div>
 
                                     {isCounting ? (
                                         <>
                                             <div className="w-32 px-3 flex flex-col justify-center">
-                                                <div className="text-[13px] font-bold text-slate-700 tabular-nums">{item.stock} <span className="text-[10px] text-slate-500">{item.unit || 'Adet'}</span></div>
+                                                <div className="text-[13px] font-bold text-slate-700 dark:text-slate-300 tabular-nums">{item.stock} <span className="text-[10px] text-slate-500 dark:text-slate-400">{item.unit || 'Adet'}</span></div>
                                             </div>
                                             <div className="w-48 px-3" onClick={e => e.stopPropagation()}>
                                                 <input
@@ -147,7 +147,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                     ) : (
                                         <>
                                             <div className="flex-1 px-3 text-right">
-                                                <span className="text-[12px] font-semibold text-slate-600">{item.branch || 'Mrkz:'} <span className="text-slate-900">{Math.floor((item.stock || 0) * 0.4)}</span></span>
+                                                <span className="text-[12px] font-semibold text-slate-600 dark:text-slate-400">{item.branch || 'Mrkz:'} <span className="text-slate-900 dark:text-white">{Math.floor((item.stock || 0) * 0.4)}</span></span>
                                             </div>
                                             <div className="flex-1 px-3 text-right flex flex-col">
                                                 <span className="text-[13px] font-bold text-blue-600 tabular-nums">{item.stock} <span className="text-blue-400 text-[10px]">{item.unit || 'Adet'}</span></span>

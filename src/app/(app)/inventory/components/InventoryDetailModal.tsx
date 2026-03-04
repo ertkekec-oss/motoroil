@@ -40,7 +40,7 @@ export default function InventoryDetailModal({
                 <div className="flex justify-between items-center p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e293b]/50">
                     <div>
                         <h2 className="text-[20px] font-semibold text-slate-900 dark:text-white flex flex-col gap-1">
-                            <span className="flex items-center gap-2">✏️ Ürün Düzenle <span className="text-slate-500 font-medium text-[13px]">(#{selectedProduct.code})</span></span>
+                            <span className="flex items-center gap-2">✏️ Ürün Düzenle <span className="text-slate-500 dark:text-slate-400 font-medium text-[13px]">(#{selectedProduct.code})</span></span>
                             {selectedProduct.parentId && allProducts && (
                                 <button
                                     onClick={() => {
@@ -54,7 +54,7 @@ export default function InventoryDetailModal({
                             )}
                         </h2>
                     </div>
-                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 flex items-center justify-center text-slate-500 transition-colors">
+                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors">
                         ✕
                     </button>
                 </div>
@@ -100,7 +100,7 @@ export default function InventoryDetailModal({
                                 <div className="bg-slate-50 dark:bg-[#1e293b] rounded-[20px] p-6 border border-slate-200 dark:border-white/10 shadow-sm custom-scroll">
                                     <h3 className="text-[14px] font-semibold text-slate-800 dark:text-white mb-4 border-b border-slate-200 dark:border-white/10 pb-3 flex justify-between items-center">
                                         <span>Ürün Varyantları</span>
-                                        <span className="text-[11px] font-medium text-slate-500 bg-white dark:bg-[#0f172a] px-3 py-1 rounded-[8px] border border-slate-200 dark:border-white/10 shadow-sm">Ana Ürün: {selectedProduct.code}</span>
+                                        <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-white dark:bg-[#0f172a] px-3 py-1 rounded-[8px] border border-slate-200 dark:border-white/10 shadow-sm">Ana Ürün: {selectedProduct.code}</span>
                                     </h3>
 
                                     <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scroll pr-2">
@@ -122,7 +122,7 @@ export default function InventoryDetailModal({
                                                                 {variant.name.replace(selectedProduct.name, '').trim() || variant.name}
                                                                 <span className="text-[10px] px-2 py-0.5 rounded-[6px] bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 font-medium">{variant.code}</span>
                                                             </div>
-                                                            <div className="text-[11px] text-slate-500 flex items-center gap-2 font-medium">
+                                                            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2 font-medium">
                                                                 <span>Stok: <b className={variant.stock <= 0 ? 'text-red-500' : 'text-emerald-500'}>{variant.stock}</b></span>
                                                                 <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20"></span>
                                                                 <span>Fiyat: <b className="text-slate-700 dark:text-slate-300">{Number(variant.price).toLocaleString('tr-TR')} ₺</b></span>
@@ -135,7 +135,7 @@ export default function InventoryDetailModal({
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="text-center py-12 flex flex-col items-center justify-center text-slate-500">
+                                            <div className="text-center py-12 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400">
                                                 <span className="text-3xl opacity-50 mb-3">📦</span>
                                                 <span className="text-[14px] font-semibold text-slate-700 dark:text-slate-300">Varyant Bulunamadı</span>
                                                 <p className="text-[12px] opacity-70 mt-1.5 max-w-[200px] leading-relaxed">Bu ana ürüne bağlı alt varyantlar henüz oluşturulmamış.</p>
@@ -144,7 +144,7 @@ export default function InventoryDetailModal({
                                     </div>
 
                                     <div className="mt-5 pt-4 border-t border-slate-200 dark:border-white/10 text-center">
-                                        <p className="text-[11px] font-medium text-slate-500 leading-relaxed">Yeni varyant eklemek için "Envanter → Yeni Ürün" menüsünü kullanın ve "Varyant Kullan" seçeneğini işaretleyin.</p>
+                                        <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">Yeni varyant eklemek için "Envanter → Yeni Ürün" menüsünü kullanın ve "Varyant Kullan" seçeneğini işaretleyin.</p>
                                     </div>
                                 </div>
                             </div>

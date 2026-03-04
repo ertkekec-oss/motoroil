@@ -44,15 +44,15 @@ export default async function BuyerRfqListPage() {
     const activeRfqsCount = rfqs.filter(r => r.status === 'PUBLISHED' || r.status === 'NEGOTIATING').length;
 
     return (
-        <div className="bg-slate-50 min-h-screen pb-16 w-full font-sans">
+        <div className="bg-slate-50 min-h-screen dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
                     <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">
+                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-1">
                             Özel Fiyat Teklifleri (RFQ)
                         </h1>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
                             B2B ağındaki tedarikçilerden toplu alım ve ihale usulü fiyat teklifi (Request For Quotation) süreçlerini yönetin.
                         </p>
                     </div>
@@ -60,12 +60,12 @@ export default async function BuyerRfqListPage() {
                     <div className="flex items-center gap-3 shrink-0">
                         <Link
                             href="/catalog"
-                            className="h-10 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+                            className="h-10 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:text-white transition-colors shadow-sm"
                         >
                             Kataloğa Dön
                         </Link>
                         <button
-                            className="h-10 px-5 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm gap-2"
+                            className="h-10 px-5 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold bg-slate-900 dark:bg-blue-600 text-white hover:bg-slate-800 transition-colors shadow-sm gap-2"
                         >
                             <span>+</span> Yeni İhale / RFQ Oluştur
                         </button>
@@ -74,22 +74,22 @@ export default async function BuyerRfqListPage() {
 
                 {/* Stat Strip */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-1">Toplam İhale (RFQ)</p>
-                        <p className="text-3xl font-bold text-slate-900">{rfqs.length}</p>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Toplam İhale (RFQ)</p>
+                        <p className="text-3xl font-bold text-slate-900 dark:text-white">{rfqs.length}</p>
                     </div>
-                    <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-1">Aktif Müzakere</p>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Aktif Müzakere</p>
                         <p className="text-3xl font-bold text-blue-600">{activeRfqsCount}</p>
                     </div>
-                    <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-1">Gelen Teklif</p>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Gelen Teklif</p>
                         <p className="text-3xl font-bold text-amber-600">
                             {rfqs.reduce((acc, r) => acc + r.offers.filter(o => o.status !== "REJECTED").length, 0)}
                         </p>
                     </div>
-                    <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                        <p className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-1">Onaylanan Alımlar</p>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                        <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Onaylanan Alımlar</p>
                         <p className="text-3xl font-bold text-emerald-600">
                             {rfqs.filter(r => r.status === 'ACCEPTED').length}
                         </p>
@@ -97,17 +97,17 @@ export default async function BuyerRfqListPage() {
                 </div>
 
                 {/* Ana Tablo Konteyner */}
-                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                    <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b]/50 flex items-center justify-between">
                         <div>
-                            <h2 className="text-base font-semibold text-slate-900">RFQ Operasyon Tablosu</h2>
-                            <p className="text-[13px] text-slate-500 mt-1">İhale ve teklif alma süreçlerinin detaylı listesi.</p>
+                            <h2 className="text-base font-semibold text-slate-900 dark:text-white">RFQ Operasyon Tablosu</h2>
+                            <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">İhale ve teklif alma süreçlerinin detaylı listesi.</p>
                         </div>
                     </div>
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-left table-auto">
-                            <thead className="bg-white border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold tracking-wide">
+                            <thead className="bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-white/5 text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold tracking-wide">
                                 <tr>
                                     <th className="px-6 py-4 font-bold">RFQ Referans / Tarih</th>
                                     <th className="px-6 py-4 font-bold text-center">Talep Edilen Kalem</th>
@@ -120,29 +120,29 @@ export default async function BuyerRfqListPage() {
                                 {rfqs.length === 0 ? (
                                     <tr>
                                         <td colSpan={5} className="px-6 py-16 text-center">
-                                            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-200 shadow-sm">
+                                            <div className="w-16 h-16 bg-slate-50 dark:bg-[#1e293b] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-200 dark:border-white/5 shadow-sm">
                                                 📝
                                             </div>
-                                            <p className="text-[15px] font-semibold text-slate-900">Aktif RFQ Bulunmuyor</p>
-                                            <p className="text-[13px] text-slate-500 max-w-sm mx-auto mt-1">
+                                            <p className="text-[15px] font-semibold text-slate-900 dark:text-white">Aktif RFQ Bulunmuyor</p>
+                                            <p className="text-[13px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
                                                 Henüz herhangi bir ürüne ilişkin çoklu teklif talebi başlatmadınız. Özel fiyat almak için "Yeni RFQ" oluşturun.
                                             </p>
                                         </td>
                                     </tr>
                                 ) : (
                                     rfqs.map((r: any) => (
-                                        <tr key={r.id} className="hover:bg-slate-50 transition-colors group">
+                                        <tr key={r.id} className="hover:bg-slate-50 dark:bg-[#1e293b] transition-colors group">
                                             <td className="px-6 py-4">
-                                                <div className="font-bold text-slate-900 font-mono text-[14px]">
+                                                <div className="font-bold text-slate-900 dark:text-white font-mono text-[14px]">
                                                     RFQ-{r.id.slice(-6).toUpperCase()}
                                                 </div>
-                                                <div className="text-[12px] text-slate-500 mt-0.5 font-medium">
+                                                <div className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
                                                     {new Date(r.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })}
                                                 </div>
                                             </td>
 
                                             <td className="px-6 py-4 text-center">
-                                                <span className="inline-flex items-center justify-center h-7 px-3 bg-slate-50 border border-slate-200 rounded-md font-mono text-[13px] font-bold text-slate-700">
+                                                <span className="inline-flex items-center justify-center h-7 px-3 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-md font-mono text-[13px] font-bold text-slate-700 dark:text-slate-300">
                                                     {r.items.length} Kalem
                                                 </span>
                                             </td>
@@ -160,7 +160,7 @@ export default async function BuyerRfqListPage() {
                                             <td className="px-6 py-4 text-right align-middle">
                                                 <Link
                                                     href={`/rfq/${r.id}`}
-                                                    className="inline-flex items-center justify-center h-8 px-4 bg-white border border-slate-300 text-slate-700 text-[13px] font-semibold rounded-lg hover:bg-slate-900 hover:border-slate-900 hover:text-white transition-colors shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                                    className="inline-flex items-center justify-center h-8 px-4 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 text-[13px] font-semibold rounded-lg hover:bg-slate-900 hover:border-slate-900 hover:text-white transition-colors shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
                                                 >
                                                     Müzakereyi Yönet
                                                 </Link>
