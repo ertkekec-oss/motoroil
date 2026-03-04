@@ -94,12 +94,12 @@ export default function OnboardingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center p-4 py-12 relative overflow-hidden font-outfit">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pb-32 relative overflow-x-hidden overflow-y-auto font-outfit">
             {/* Background elements */}
             <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
 
-            <div className="w-full max-w-4xl animate-in fade-in zoom-in-95 duration-500 relative z-10">
+            <div className="w-full max-w-4xl mx-auto mt-6 md:mt-12 animate-in fade-in zoom-in-95 duration-500 relative z-10">
 
                 <div className="text-center mb-10">
                     <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-500/20 transform rotate-3">
