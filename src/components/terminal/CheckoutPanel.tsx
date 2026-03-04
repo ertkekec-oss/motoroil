@@ -8,7 +8,7 @@ export default function CheckoutPanel({
 }: any) {
 
     return (
-        <div className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex flex-col shadow-sm h-full max-h-[calc(100vh-2rem)] overflow-hidden">
+        <div className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex flex-col shadow-sm flex-1 min-h-0 overflow-hidden">
             <h2 className="text-[10px] font-black opacity-40 mb-6 tracking-widest text-center shrink-0 uppercase">SATIŞ ÖZETİ</h2>
 
             <div className="flex-1 overflow-y-auto pr-0 space-y-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">

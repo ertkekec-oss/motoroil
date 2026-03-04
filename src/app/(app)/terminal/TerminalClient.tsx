@@ -243,7 +243,7 @@ export default function TerminalClient() {
     }, []);
 
     return (
-        <div className="pos-terminal-scope flex flex-col w-full h-full min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white transition-colors duration-300">
+        <div className="pos-terminal-scope flex flex-col flex-1 h-[calc(100vh-64px)] md:h-screen w-full bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-white transition-colors duration-300 overflow-hidden">
             {/* SCOPE CSS (isolated) */}
             <style dangerouslySetInnerHTML={{
                 __html: `
@@ -279,22 +279,23 @@ export default function TerminalClient() {
             </div>
 
             {/* MAIN GRID */}
-            <div className="flex-1 flex flex-col lg:flex-row gap-6 p-6 h-[calc(100vh-110px)] overflow-hidden">
+            <div className="flex-1 flex flex-col md:flex-row gap-4 lg:gap-6 p-4 lg:p-6 min-h-0 overflow-hidden">
 
                 {/* TERMINAL WORKSPACE (Left) */}
                 <div className="flex-1 min-w-0 flex flex-col gap-4">
-
-                    <PosSearchBar
-                        ref={searchInputRef}
-                        searchInput={searchInput}
-                        setSearchInput={setSearchInput}
-                        handleSearchSubmit={handleSearchSubmit}
-                        filteredProducts={filteredProducts}
-                        addToCart={addToCart}
-                        getPrice={getPrice}
-                        onVoiceCommand={handleVoiceCommand}
-                        onCameraClick={() => setShowCameraModal(true)}
-                    />
+                    <div className="max-w-3xl">
+                        <PosSearchBar
+                            ref={searchInputRef}
+                            searchInput={searchInput}
+                            setSearchInput={setSearchInput}
+                            handleSearchSubmit={handleSearchSubmit}
+                            filteredProducts={filteredProducts}
+                            addToCart={addToCart}
+                            getPrice={getPrice}
+                            onVoiceCommand={handleVoiceCommand}
+                            onCameraClick={() => setShowCameraModal(true)}
+                        />
+                    </div>
 
                     <AiCashierPanel cartItems={cart} onAddSuggested={addToCart} />
 
@@ -304,7 +305,7 @@ export default function TerminalClient() {
                 </div>
 
                 {/* CHECKOUT PANEL (Right) */}
-                <div className="w-full lg:w-[380px] shrink-0 h-full hidden lg:flex flex-col">
+                <div className="w-full md:w-[320px] lg:w-[380px] xl:w-[420px] shrink-0 h-full flex flex-col">
                     <CheckoutPanel
                         ref={checkoutPanelRef}
                         cart={cart}
