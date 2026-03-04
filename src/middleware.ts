@@ -40,7 +40,42 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // 2. NETWORK B2B PORTAL GUARD (Dealer Auth)
+    // 2. ADMIN GUARD (CRITICAL: MUST BE BEFORE NETWORK GUARD)
+    if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+        const sessionToken = request.cookies.get('session')?.value;
+
+        if (!sessionToken) {
+            if (pathname.startsWith('/api')) {
+                return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+            }
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+
+        try {
+            const { payload } = await jwtVerify(sessionToken, JWT_SECRET);
+            const allowedAdminRoles = ['SUPER_ADMIN', 'PLATFORM_ADMIN', 'SUPPORT_AGENT'];
+            // @ts-ignore Let's safely check payload role
+            const userRole = payload?.role as string;
+
+            if (!allowedAdminRoles.includes(userRole)) {
+                if (pathname.startsWith('/api')) {
+                    return NextResponse.json({ error: 'Bu alana erişim yetkiniz yok.' }, { status: 403 });
+                }
+                return NextResponse.redirect(new URL('/login', request.url));
+            }
+
+            return NextResponse.next();
+        } catch (err) {
+            console.error('Middleware admin session error:', err);
+            const response = pathname.startsWith('/api')
+                ? NextResponse.json({ error: 'Oturum geçersiz' }, { status: 401 })
+                : NextResponse.redirect(new URL('/login', request.url));
+            response.cookies.delete('session');
+            return response;
+        }
+    }
+
+    // 3. NETWORK B2B PORTAL GUARD (Dealer Auth)
     const base = portalBasePath();
     if (pathname.startsWith(base)) {
         const isLogin = pathname.startsWith(`${base}/login`);
@@ -73,7 +108,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // 3. Auth Related Paths - Allowed
+    // 4. Auth Related Paths & Public API - Allowed
     const publicPaths = [
         '/', '/login', '/register', '/reset-password',
         '/api/auth', '/api/public', '/api/network',
@@ -89,45 +124,25 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // 4. Protected Paths - Verify Session
+    // 5. GLOBAL SESSION GUARD (Protected Paths)
     const sessionToken = request.cookies.get('session')?.value;
 
     if (!sessionToken) {
-        // For API calls, return 401
         if (pathname.startsWith('/api')) {
             return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
         }
-        // For Page calls, redirect to login
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
     try {
-        // Verify JWT
-        const { payload } = await jwtVerify(sessionToken, JWT_SECRET);
-
-        // Admin Governance Protection
-        if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
-            const allowedAdminRoles = ['SUPER_ADMIN', 'PLATFORM_ADMIN', 'SUPPORT_AGENT'];
-            // @ts-ignore Let's safely check payload role
-            const userRole = payload?.role as string;
-
-            if (!allowedAdminRoles.includes(userRole)) {
-                if (pathname.startsWith('/api')) {
-                    return NextResponse.json({ error: 'Bu alana erişim yetkiniz yok.' }, { status: 403 });
-                }
-                return NextResponse.redirect(new URL('/login', request.url));
-            }
-        }
-
+        await jwtVerify(sessionToken, JWT_SECRET);
         return NextResponse.next();
     } catch (err) {
-        console.error('Middleware session error:', err);
-        // Invalid session
+        console.error('Middleware global session error:', err);
         const response = pathname.startsWith('/api')
             ? NextResponse.json({ error: 'Oturum geçersiz' }, { status: 401 })
             : NextResponse.redirect(new URL('/login', request.url));
 
-        // Clear invalid cookie
         response.cookies.delete('session');
         return response;
     }

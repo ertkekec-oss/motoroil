@@ -81,9 +81,13 @@ function checkRoutes() {
         const content = fs.readFileSync(filePath, 'utf8');
 
         const networkRegex = /(?:href=|push\()(["'`])\/network\b(.*?)(["'`])/g;
+        const adminRegex = /(?:href=|push\()(["'`])\/admin\b(.*?)(["'`])/g;
         let match;
         while ((match = networkRegex.exec(content)) !== null) {
             logError('/network link found in /dealer-network', filePath, match[0]);
+        }
+        while ((match = adminRegex.exec(content)) !== null) {
+            logError('/admin link found in /dealer-network', filePath, match[0]);
         }
     });
 
@@ -93,9 +97,13 @@ function checkRoutes() {
         const content = fs.readFileSync(filePath, 'utf8');
 
         const dealerRegex = /(?:href=|push\()(["'`])\/dealer-network\b(.*?)(["'`])/g;
+        const networkRegex = /(?:href=|push\()(["'`])\/network\b(.*?)(["'`])/g;
         let match;
         while ((match = dealerRegex.exec(content)) !== null) {
             logError('/dealer-network link found in /admin', filePath, match[0]);
+        }
+        while ((match = networkRegex.exec(content)) !== null) {
+            logError('/network link found in /admin', filePath, match[0]);
         }
     });
 
