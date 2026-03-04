@@ -146,7 +146,8 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
                     <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">
                         PERİODYA AYARLARI
                     </div>
-                    <NavItem href="/admin/logs" icon={Search} label="Sistem Kayıtları" />
+                    <NavItem href="/admin/audit-logs" icon={Search} label="Denetim Kayıtları" />
+                    <NavItem href="/admin/logs" icon={Activity} label="Sistem Kayıtları" />
                     <NavItem href="/admin/security" icon={ShieldAlert} label="Güvenlik Kalkanı" />
                     <NavItem href="/admin/tenants" icon={Users} label="Tüm Müşteriler" />
                     <NavItem href="/admin/plans" icon={CreditCard} label="SaaS Planları" />
