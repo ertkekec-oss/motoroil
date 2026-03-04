@@ -1152,7 +1152,7 @@ export default function SettingsPage() {
                 {/* 10.4 HEDİYE ÇEKİ YÖNETİM MODALI */}
                 {showCouponModal && (
                     <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 dark:bg-white/50 dark:bg-slate-900 dark:bg-white/80 animate-in fade-in"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 dark:bg-white/50 dark:bg-[#0f172a]/80 animate-in fade-in"
                         onClick={() => setShowCouponModal(false)}
                     >
                         <div
@@ -1180,7 +1180,7 @@ export default function SettingsPage() {
                                         placeholder="Kod veya kampanya adı ile ara..."
                                         value={couponSearch}
                                         onChange={e => { setCouponSearch(e.target.value); setCouponPage(1); }}
-                                        className="w-full h-11 pl-11 pr-4 rounded-xl bg-slate-50 dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                                        className="w-full h-11 pl-11 pr-4 rounded-xl bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                                     />
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">🔍</span>
                                 </div>

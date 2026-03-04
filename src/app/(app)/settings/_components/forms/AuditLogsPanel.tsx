@@ -39,7 +39,7 @@ export default function AuditLogsPanel(props: any) {
     const hasLogs = logs && logs.length > 0;
 
     return (
-        <div className="max-w-6xl animate-in fade-in duration-300">
+        <div className="max-w-5xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300">
             {/* Header Alanı */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
@@ -49,7 +49,7 @@ export default function AuditLogsPanel(props: any) {
 
                 <div className="flex items-center gap-3">
                     <button
-                        className="h-10 px-4 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-slate-700 dark:text-slate-200 text-[14px] font-medium hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+                        className="h-10 px-4 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/20 rounded-lg text-slate-700 dark:text-slate-200 text-[14px] font-medium hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
                         disabled={true}
                     >
                         <span>📥</span> Dışa Aktar (CSV)
@@ -96,7 +96,7 @@ export default function AuditLogsPanel(props: any) {
                     </p>
                     <button
                         onClick={fetchLogs}
-                        className="h-10 px-5 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-slate-700 dark:text-slate-200 text-[14px] font-medium hover:bg-slate-50 transition-colors shadow-sm"
+                        className="h-10 px-5 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/20 rounded-lg text-slate-700 dark:text-slate-200 text-[14px] font-medium hover:bg-slate-50 transition-colors shadow-sm"
                     >
                         Tekrar Sorgula
                     </button>

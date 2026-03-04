@@ -60,7 +60,7 @@ export default function NotificationSettingsPanel(props: any) {
     ];
 
     return (
-        <div className="max-w-4xl animate-in fade-in duration-300">
+        <div className="max-w-5xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>

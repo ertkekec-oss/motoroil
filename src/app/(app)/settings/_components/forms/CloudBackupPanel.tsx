@@ -40,7 +40,7 @@ function StatStrip({ items }: { items: { val: string | number | React.ReactNode,
 
 export default function CloudBackupPanel(props: any) {
     return (
-        <div className="max-w-5xl animate-in fade-in duration-300">
+        <div className="max-w-5xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300">
             {/* Header */}
             <div className="mb-8">
                 <h2 className="text-[24px] font-semibold text-slate-900 dark:text-white tracking-tight">Sistem Yedekleme & İş Sürekliliği</h2>

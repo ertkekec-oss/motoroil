@@ -9,7 +9,7 @@ function ERPInput(props: any) {
     return (
         <input
             {...props}
-            className={`w-full h-10 px-3 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white/20 focus:border-slate-900 dark:focus:border-white/30 transition-all shadow-sm ${props.className || ''}`}
+            className={`w-full h-10 px-3 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/20 rounded-lg text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white/20 focus:border-slate-900 dark:focus:border-white/30 transition-all shadow-sm ${props.className || ''}`}
         />
     );
 }
@@ -18,7 +18,7 @@ function ERPSelect(props: any) {
     return (
         <select
             {...props}
-            className={`w-full h-10 px-3 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-[14px] text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white/20 focus:border-slate-900 dark:focus:border-white/30 transition-all shadow-sm ${props.className || ''}`}
+            className={`w-full h-10 px-3 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/20 rounded-lg text-[14px] text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white/20 focus:border-slate-900 dark:focus:border-white/30 transition-all shadow-sm ${props.className || ''}`}
         />
     );
 }
@@ -91,7 +91,7 @@ export default function CampaignPointsPanel(props: any) {
     ];
 
     return (
-        <div className="max-w-6xl animate-in fade-in duration-300">
+        <div className="max-w-5xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300">
             {/* Header */}
             <div className="mb-8">
                 <h2 className="text-[24px] font-semibold text-slate-900 dark:text-white tracking-tight">Promosyon & Finansal Katkı Modülü</h2>
@@ -480,10 +480,10 @@ export default function CampaignPointsPanel(props: any) {
                                     Seri Kontrol Listesi
                                 </button>
                                 <div className="grid grid-cols-2 gap-3 mt-2">
-                                    <button onClick={exportCouponsExcel} className="h-10 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-slate-700 dark:text-slate-200 text-[13px] font-medium hover:bg-slate-50 transition-colors">
+                                    <button onClick={exportCouponsExcel} className="h-10 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/20 rounded-lg text-slate-700 dark:text-slate-200 text-[13px] font-medium hover:bg-slate-50 transition-colors">
                                         Excel Export
                                     </button>
-                                    <button onClick={exportCouponsPDF} className="h-10 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-slate-700 dark:text-slate-200 text-[13px] font-medium hover:bg-slate-50 transition-colors">
+                                    <button onClick={exportCouponsPDF} className="h-10 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/20 rounded-lg text-slate-700 dark:text-slate-200 text-[13px] font-medium hover:bg-slate-50 transition-colors">
                                         PDF Matrix
                                     </button>
                                 </div>

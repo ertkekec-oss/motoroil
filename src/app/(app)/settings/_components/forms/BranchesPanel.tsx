@@ -34,7 +34,7 @@ function EmptyState({ icon, title, description, action }: { icon: string; title:
 function StatusBadge({ status }: { status: string }) {
     if (status === 'Aktif') {
         return (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-700 rounded text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-700 rounded text-[11px] font-medium text-slate-500 dark:text-slate-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 Aktif
             </span>
@@ -122,7 +122,7 @@ export default function BranchesPanel(props: any) {
     };
 
     return (
-        <div className="space-y-5 max-w-3xl animate-in fade-in duration-300">
+        <div className="space-y-5 max-w-5xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300">
 
             {/* ── PAGE HEADER ─────────────────────────────────────────── */}
             <div className="flex items-center justify-between gap-4">
@@ -136,7 +136,7 @@ export default function BranchesPanel(props: any) {
             </div>
 
             {/* ── INLINE STAT STRIP ───────────────────────────────────── */}
-            <div className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-800 rounded-xl">
+            <div className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-xl">
                 {[
                     { label: 'Toplam', value: totalBranches, icon: '🏪' },
                     { label: 'Aktif', value: activeBranches, icon: '✅' },
@@ -159,7 +159,7 @@ export default function BranchesPanel(props: any) {
             <div className={`grid gap-5 transition-all duration-300 ${isPanelOpen ? 'grid-cols-[1fr_360px]' : 'grid-cols-1'}`}>
 
                 {/* ═══ LEFT — BRANCH LIST ═══════════════════════════════ */}
-                <div className="bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
                     {/* Card header + inline filters */}
                     <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center gap-2">
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-white mr-1">
@@ -246,7 +246,7 @@ export default function BranchesPanel(props: any) {
                                                     onClick={() => setSelectedBranchDocs(selectedBranchDocs === branch.id ? null : branch.id)}
                                                     className={`h-7 px-2 rounded border text-[11px] font-medium transition-colors ${selectedBranchDocs === branch.id
                                                         ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900'
-                                                        : 'bg-white dark:bg-slate-900 dark:bg-white border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50'
+                                                        : 'bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50'
                                                         }`}
                                                 >
                                                     📁{(branch.docs || 0) > 0 ? ` ${branch.docs}` : ''}
@@ -275,7 +275,7 @@ export default function BranchesPanel(props: any) {
                                                     <input type="file" id={`file-${branch.id}`} className="hidden" onChange={(e) => handleFileUpload(e, branch.id)} />
                                                     <label
                                                         htmlFor={`file-${branch.id}`}
-                                                        className="inline-flex items-center gap-1.5 h-8 px-3 bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                                                        className="inline-flex items-center gap-1.5 h-8 px-3 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
                                                     >
                                                         ⬆ Yükle
                                                     </label>
@@ -295,7 +295,7 @@ export default function BranchesPanel(props: any) {
                                             ) : (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                     {branchDocs.map((file: any) => (
-                                                        <div key={file.id} className="flex items-center justify-between p-2.5 bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-700 rounded-lg">
+                                                        <div key={file.id} className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-700 rounded-lg">
                                                             <div className="flex items-center gap-2 min-w-0">
                                                                 <span className="text-base shrink-0">{file.fileType.includes('pdf') ? '📄' : '🖼️'}</span>
                                                                 <div className="min-w-0">
@@ -325,7 +325,7 @@ export default function BranchesPanel(props: any) {
 
                 {/* ═══ RIGHT — ADD / EDIT PANEL ══════════════════════════════ */}
                 {isPanelOpen && (
-                    <div className="bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm animate-in slide-in-from-right-4 duration-200">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm animate-in slide-in-from-right-4 duration-200">
                         {/* Panel header */}
                         <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                             <div>
@@ -444,7 +444,7 @@ export default function BranchesPanel(props: any) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 {/* SOL: ÖDEME YÖNTEMİ BUTONLARI */}
-                <div className="bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
                     <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                         <div>
                             <h3 className="text-base font-semibold text-slate-900 dark:text-white">Ödeme Yöntemi Butonları</h3>
@@ -527,7 +527,7 @@ export default function BranchesPanel(props: any) {
 
                         {/* Sabit: Veresiye */}
                         <div className="flex items-center gap-3 px-5 py-3.5 bg-slate-50 dark:bg-slate-800/30">
-                            <div className="w-8 h-8 bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-sm">📖</div>
+                            <div className="w-8 h-8 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-sm">📖</div>
                             <div>
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Veresiye</p>
                                 <p className="text-xs text-slate-400 dark:text-slate-500">Sistem tarafından sabitlenmiştir</p>
@@ -537,7 +537,7 @@ export default function BranchesPanel(props: any) {
                 </div>
 
                 {/* SAĞ: KASA & BANKA HESAPLARI */}
-                <div className="bg-white dark:bg-slate-900 dark:bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
                     <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                         <div>
                             <h3 className="text-base font-semibold text-slate-900 dark:text-white">Kasa & Banka Hesapları</h3>

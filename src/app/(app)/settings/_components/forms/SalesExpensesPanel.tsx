@@ -9,7 +9,7 @@ function ERPInput(props: any) {
     return (
         <input
             {...props}
-            className={`w-full h-10 px-3 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white/20 focus:border-slate-900 dark:focus:border-white/30 transition-all shadow-sm disabled:bg-slate-50 dark:disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-200 ${props.className || ''}`}
+            className={`w-full h-10 px-3 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/20 rounded-lg text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white/20 focus:border-slate-900 dark:focus:border-white/30 transition-all shadow-sm disabled:bg-slate-50 dark:disabled:bg-slate-800 disabled:text-slate-500 dark:disabled:text-slate-400 disabled:border-slate-200 dark:disabled:border-white/10 ${props.className || ''}`}
         />
     );
 }
@@ -32,7 +32,7 @@ export default function SalesExpensesPanel(props: any) {
     const posCommissions: any[] = salesExpenses?.posCommissions || [];
 
     return (
-        <div className="max-w-5xl animate-in fade-in duration-300">
+        <div className="max-w-5xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
@@ -56,7 +56,7 @@ export default function SalesExpensesPanel(props: any) {
                                 posCommissions: [...currentComms, { installment: 'Taksit X', rate: 0 }],
                             });
                         }}
-                        className="h-10 px-5 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg text-slate-700 dark:text-slate-200 text-[13px] font-medium hover:bg-slate-50 transition-colors shadow-sm whitespace-nowrap"
+                        className="h-10 px-5 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/20 rounded-lg text-slate-700 dark:text-slate-200 text-[13px] font-medium hover:bg-slate-50 transition-colors shadow-sm whitespace-nowrap"
                     >
                         + Yeni Dilim Ekle
                     </button>

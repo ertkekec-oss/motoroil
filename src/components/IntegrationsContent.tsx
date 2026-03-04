@@ -16,7 +16,7 @@ function ERPInput(props: any) {
     return (
         <input
             {...props}
-            className="w-full h-10 px-3 bg-white border border-slate-300 rounded-lg text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all shadow-sm"
+            className="w-full h-10 px-3 bg-white dark:bg-[#020617] border border-slate-300 dark:border-white/10 rounded-lg text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all shadow-sm"
         />
     );
 }
@@ -25,7 +25,7 @@ function ERPSelect(props: any) {
     return (
         <select
             {...props}
-            className="w-full h-10 px-3 bg-white border border-slate-300 rounded-lg text-[14px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all shadow-sm"
+            className="w-full h-10 px-3 bg-white dark:bg-[#020617] border border-slate-300 dark:border-white/10 rounded-lg text-[14px] text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all shadow-sm"
         />
     );
 }
@@ -33,7 +33,7 @@ function ERPSelect(props: any) {
 function ERPField({ label, children }: { label: string, children: React.ReactNode }) {
     return (
         <div className="flex flex-col gap-1.5 focus-within:text-slate-900">
-            <label className="text-[12px] font-medium text-slate-500 transition-colors">{label}</label>
+            <label className="text-[12px] font-medium text-slate-500 dark:text-slate-400 transition-colors">{label}</label>
             {children}
         </div>
     );
@@ -41,10 +41,10 @@ function ERPField({ label, children }: { label: string, children: React.ReactNod
 
 function ERPBlock({ title, children, aside }: { title?: string, children: React.ReactNode, aside?: React.ReactNode }) {
     return (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-[0px_1px_2px_rgba(0,0,0,0.02)]">
+        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-[0px_1px_2px_rgba(0,0,0,0.02)]">
             {(title || aside) && (
                 <div className="flex items-center justify-between mb-6">
-                    {title && <h3 className="text-[16px] font-semibold text-slate-900">{title}</h3>}
+                    {title && <h3 className="text-[16px] font-semibold text-slate-900 dark:text-white">{title}</h3>}
                     {aside && <div>{aside}</div>}
                 </div>
             )}
@@ -58,13 +58,13 @@ function ERPSwitch({ checked, onChange, label, description }: any) {
         <label className="flex items-start gap-3 cursor-pointer group">
             <div className="relative inline-flex items-center mt-0.5">
                 <input type="checkbox" className="sr-only peer" checked={checked} onChange={onChange} />
-                <div className="w-9 h-5 bg-slate-200 peer-checked:bg-slate-900 rounded-full transition-colors duration-200">
-                    <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${checked ? 'translate-x-4' : 'translate-x-0'}`} />
+                <div className="w-9 h-5 bg-slate-200 peer-checked:bg-slate-900 dark:bg-white rounded-full transition-colors duration-200">
+                    <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white dark:bg-[#0B1220] shadow-sm transition-transform duration-200 ${checked ? 'translate-x-4' : 'translate-x-0'}`} />
                 </div>
             </div>
             <div>
-                <p className="text-[14px] font-medium text-slate-900 group-hover:text-black transition-colors">{label}</p>
-                {description && <p className="text-[13px] text-slate-500 mt-0.5">{description}</p>}
+                <p className="text-[14px] font-medium text-slate-900 dark:text-white group-hover:text-black transition-colors">{label}</p>
+                {description && <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>}
             </div>
         </label>
     );
@@ -76,7 +76,7 @@ function TestResultBanner({ result }: { result?: string }) {
     return (
         <div className={`flex items-start gap-3 p-4 rounded-xl border text-[13px] font-medium animate-in fade-in slide-in-from-bottom-2 duration-200 ${ok
             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-            : 'bg-slate-50 text-slate-700 border-slate-300'
+            : 'bg-slate-50 dark:bg-[#1e293b] text-slate-700 dark:text-slate-200 border-slate-300 dark:border-white/10'
             }`}>
             <span className="text-base shrink-0">{ok ? '✅' : 'ℹ️'}</span>
             <span>{result.replace('✅', '').replace('❌', '').trim()}</span>
@@ -97,7 +97,7 @@ const TABS: { id: TabId; label: string; desc: string }[] = [
 
 function NavStrip({ activeTab, onTabChange }: { activeTab: TabId; onTabChange: (id: TabId) => void }) {
     return (
-        <div className="flex bg-white px-8 pt-2">
+        <div className="flex bg-white dark:bg-[#0B1220] px-8 pt-2">
             {TABS.map(tab => {
                 const isActive = activeTab === tab.id;
                 return (
@@ -107,10 +107,10 @@ function NavStrip({ activeTab, onTabChange }: { activeTab: TabId; onTabChange: (
                         className={`relative px-6 py-4 flex flex-col items-start gap-0.5 transition-colors focus:outline-none ${isActive ? '' : 'hover:bg-slate-50'
                             }`}
                     >
-                        <span className={`text-[14px] font-semibold ${isActive ? 'text-slate-900' : 'text-slate-600'}`}>{tab.label}</span>
-                        <span className="text-[12px] text-slate-400">{tab.desc}</span>
+                        <span className={`text-[14px] font-semibold ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-300'}`}>{tab.label}</span>
+                        <span className="text-[12px] text-slate-400 dark:text-slate-500">{tab.desc}</span>
                         {isActive && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-sm" />
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 dark:bg-white rounded-t-sm" />
                         )}
                     </button>
                 );
@@ -123,26 +123,26 @@ function NavStrip({ activeTab, onTabChange }: { activeTab: TabId; onTabChange: (
 
 function EFaturaTab({ settings, onChange, onTest, isTesting, testResult }: any) {
     return (
-        <div className="max-w-4xl mx-auto px-8 py-8 space-y-6 animate-in fade-in duration-300">
+        <div className="max-w-5xl mx-auto w-full px-8 py-8 space-y-6 animate-in fade-in duration-300">
             {/* Ozet Strip */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-[0px_1px_2px_rgba(0,0,0,0.02)] flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-[0px_1px_2px_rgba(0,0,0,0.02)] flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-8">
                     <div>
-                        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Entegrasyon</p>
-                        <p className="text-[14px] font-semibold text-slate-900 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-slate-900" /> Nilvera E-Fatura
+                        <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Entegrasyon</p>
+                        <p className="text-[14px] font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white" /> Nilvera E-Fatura
                         </p>
                     </div>
                     <div className="w-px h-8 bg-slate-200" />
                     <div>
-                        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Ortam</p>
-                        <p className="text-[14px] font-medium text-slate-700">{settings.environment === 'production' ? 'Canlı Ortam' : 'Test Ortamı'}</p>
+                        <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Ortam</p>
+                        <p className="text-[14px] font-medium text-slate-700 dark:text-slate-200">{settings.environment === 'production' ? 'Canlı Ortam' : 'Test Ortamı'}</p>
                     </div>
                 </div>
                 <button
                     onClick={onTest}
                     disabled={isTesting}
-                    className="h-9 px-4 bg-white border border-slate-300 rounded-lg text-[13px] font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors disabled:opacity-50"
+                    className="h-9 px-4 bg-white dark:bg-[#0B1220] border border-slate-300 dark:border-white/10 rounded-lg text-[13px] font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors disabled:opacity-50"
                 >
                     {isTesting ? 'Test Ediliyor...' : 'Bağlantı Testi'}
                 </button>
@@ -152,7 +152,7 @@ function EFaturaTab({ settings, onChange, onTest, isTesting, testResult }: any) 
 
             {/* Çalışma Ortamı */}
             <ERPBlock title="Çalışma Ortamı">
-                <div className="flex p-1 bg-slate-50 border border-slate-200 rounded-xl w-fit">
+                <div className="flex p-1 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl w-fit">
                     {[
                         { value: 'test', label: 'Test Ortamı' },
                         { value: 'production', label: 'Canlı Ortam' },
@@ -161,8 +161,8 @@ function EFaturaTab({ settings, onChange, onTest, isTesting, testResult }: any) 
                             key={env.value}
                             onClick={() => onChange({ ...settings, environment: env.value })}
                             className={`px-5 py-2 rounded-lg text-[13px] font-semibold transition-all ${settings.environment === env.value
-                                ? 'bg-white text-slate-900 shadow-sm border border-slate-200/60'
-                                : 'text-slate-500 hover:text-slate-700'
+                                ? 'bg-white dark:bg-[#0B1220] text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-white/5/60'
+                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
                                 }`}
                         >
                             {env.label}
@@ -189,9 +189,9 @@ function EFaturaTab({ settings, onChange, onTest, isTesting, testResult }: any) 
                                 onChange={(e: any) => onChange({ ...settings, companyTitle: e.target.value })}
                             />
                         </ERPField>
-                        <div className="mt-2 p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
-                            <p className="text-[13px] text-slate-600 leading-relaxed">
-                                <span className="font-semibold text-slate-900">Bilgi:</span> VKN/TCKN bilgisi GİB portalındaki ile birebir aynı olmalıdır. Değişiklikler fatura senkronizasyonunu etkileyebilir.
+                        <div className="mt-2 p-3.5 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl">
+                            <p className="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                <span className="font-semibold text-slate-900 dark:text-white">Bilgi:</span> VKN/TCKN bilgisi GİB portalındaki ile birebir aynı olmalıdır. Değişiklikler fatura senkronizasyonunu etkileyebilir.
                             </p>
                         </div>
                     </div>
@@ -220,8 +220,8 @@ function EFaturaTab({ settings, onChange, onTest, isTesting, testResult }: any) 
                     </ERPBlock>
 
                     {/* API Bağlantısı (Gizlenebilir, Compact) */}
-                    <div className="bg-white border text-sm border-slate-200 rounded-2xl p-5 shadow-[0px_1px_2px_rgba(0,0,0,0.02)]">
-                        <h4 className="text-[14px] font-semibold text-slate-900 mb-4">Gelişmiş API Ayarları</h4>
+                    <div className="bg-white dark:bg-[#0B1220] border text-sm border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-[0px_1px_2px_rgba(0,0,0,0.02)]">
+                        <h4 className="text-[14px] font-semibold text-slate-900 dark:text-white mb-4">Gelişmiş API Ayarları</h4>
                         <div className="space-y-4">
                             <ERPField label="API Uç Noktası (Endpoint)">
                                 <ERPInput
@@ -278,15 +278,15 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
     const activeCount = MARKETPLACE_CONFIGS.filter(m => (settings as any)[m.key]?.enabled).length;
 
     return (
-        <div className="max-w-5xl mx-auto px-8 py-8 space-y-6 animate-in fade-in duration-300">
+        <div className="max-w-5xl mx-auto w-full px-8 py-8 space-y-6 animate-in fade-in duration-300">
             {/* Ozet / Dashboard Strip */}
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <div className="bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/5 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50">
                     <div>
-                        <p className="text-[14px] font-semibold text-slate-900">Çoklu Kanal (Omnichannel) İzleme</p>
-                        <p className="text-[12px] text-slate-500 mt-0.5">Sipariş verileri asenkron senkronize edilir.</p>
+                        <p className="text-[14px] font-semibold text-slate-900 dark:text-white">Çoklu Kanal (Omnichannel) İzleme</p>
+                        <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">Sipariş verileri asenkron senkronize edilir.</p>
                     </div>
-                    <button onClick={onRefreshStats} className="text-[13px] font-medium text-slate-600 hover:text-slate-900 border border-slate-300 bg-white px-3 py-1.5 rounded-lg shadow-sm">
+                    <button onClick={onRefreshStats} className="text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0B1220] px-3 py-1.5 rounded-lg shadow-sm">
                         Verileri Tazele
                     </button>
                 </div>
@@ -298,8 +298,8 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
                         { val: `${activeCount} / ${MARKETPLACE_CONFIGS.length}`, label: 'Bağlı Kanal' },
                     ].map((s, i) => (
                         <div key={i} className="p-5">
-                            <p className="text-[24px] font-semibold text-slate-900 tracking-tight">{s.val}</p>
-                            <p className="text-[12px] font-medium text-slate-500 uppercase tracking-widest mt-1">{s.label}</p>
+                            <p className="text-[24px] font-semibold text-slate-900 dark:text-white tracking-tight">{s.val}</p>
+                            <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">{s.label}</p>
                         </div>
                     ))}
                 </div>
@@ -312,14 +312,14 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
                     const enabled = mktSettings.enabled ?? false;
 
                     return (
-                        <div key={ch.key} className="bg-white border border-slate-200 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] transition-all">
+                        <div key={ch.key} className="bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/5 rounded-2xl shadow-[0px_1px_2px_rgba(0,0,0,0.02)] transition-all">
                             {/* Satır Header */}
                             <div className="px-6 py-5 flex items-center justify-between cursor-pointer" onClick={() => onChange({ ...settings, [ch.key]: { ...mktSettings, enabled: !enabled } })}>
                                 <div className="flex items-center gap-4">
                                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: enabled ? '#0f172a' : '#cbd5e1' }} />
                                     <div>
-                                        <h4 className="text-[15px] font-semibold text-slate-900">{ch.title}</h4>
-                                        <span className="text-[12px] font-medium text-slate-400 mt-0.5">{ch.method}</span>
+                                        <h4 className="text-[15px] font-semibold text-slate-900 dark:text-white">{ch.title}</h4>
+                                        <span className="text-[12px] font-medium text-slate-400 dark:text-slate-500 mt-0.5">{ch.method}</span>
                                     </div>
                                 </div>
                                 <ERPSwitch
@@ -330,7 +330,7 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
 
                             {/* Genişletilmiş Form */}
                             {enabled && (
-                                <div className="px-6 pb-6 border-t border-slate-100 pt-5">
+                                <div className="px-6 pb-6 border-t border-slate-100 dark:border-white/5 pt-5">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
                                         {ch.fields.includes('url') && (
                                             <div className="col-span-1 md:col-span-2"><ERPField label="XML URL">
@@ -397,7 +397,7 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
                                         )}
                                     </div>
 
-                                    <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-xl">
                                         <ERPSwitch
                                             checked={mktSettings.autoSync ?? false}
                                             onChange={(e: any) => onChange({ ...settings, [ch.key]: { ...mktSettings, autoSync: e.target.checked } })}
@@ -406,7 +406,7 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
                                         <button
                                             onClick={() => onTest(ch.key)}
                                             disabled={isTesting}
-                                            className="h-9 px-4 bg-white border border-slate-300 rounded-lg text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                            className="h-9 px-4 bg-white dark:bg-[#0B1220] border border-slate-300 dark:border-white/10 rounded-lg text-[13px] font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition-colors"
                                         >
                                             Bağlantıyı Doğrula
                                         </button>
@@ -430,19 +430,19 @@ function MarketplaceTab({ settings, onChange, onTest, isTesting, testResults, st
 
 function POSTab({ settings, onChange }: any) {
     return (
-        <div className="max-w-4xl mx-auto px-8 py-8 space-y-6 animate-in fade-in duration-300">
+        <div className="max-w-5xl mx-auto w-full px-8 py-8 space-y-6 animate-in fade-in duration-300">
             {/* Ozet Strip */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-[0px_1px_2px_rgba(0,0,0,0.02)] flex items-center gap-8">
+            <div className="bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/5 rounded-2xl p-5 shadow-[0px_1px_2px_rgba(0,0,0,0.02)] flex items-center gap-8">
                 <div>
-                    <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Terminal</p>
-                    <p className="text-[14px] font-semibold text-slate-900 flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-900" /> Ödeal POS
+                    <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Terminal</p>
+                    <p className="text-[14px] font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white" /> Ödeal POS
                     </p>
                 </div>
                 <div className="w-px h-8 bg-slate-200" />
                 <div>
-                    <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Durum</p>
-                    <p className="text-[14px] font-medium text-slate-700">Aktif İşlemde</p>
+                    <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Durum</p>
+                    <p className="text-[14px] font-medium text-slate-700 dark:text-slate-200">Aktif İşlemde</p>
                 </div>
             </div>
 
@@ -487,12 +487,12 @@ function POSTab({ settings, onChange }: any) {
             </div>
 
             {/* Bilgi Kutusu */}
-            <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50/50 space-y-3">
-                <h4 className="text-[13px] font-semibold text-slate-700 uppercase tracking-widest mb-2">POS İşlem Akış Dizini</h4>
+            <div className="border border-slate-200 dark:border-white/5 rounded-2xl p-6 bg-slate-50/50 space-y-3">
+                <h4 className="text-[13px] font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-widest mb-2">POS İşlem Akış Dizini</h4>
                 <div className="grid gap-2">
-                    <p className="text-[14px] text-slate-600"><strong className="text-slate-900">1.</strong> Satış ekranında tutar cihaza yansıtılır.</p>
-                    <p className="text-[14px] text-slate-600"><strong className="text-slate-900">2.</strong> Banka onay kodu sisteme döner, açık fatura/tahsilat kapanır.</p>
-                    <p className="text-[14px] text-slate-600"><strong className="text-slate-900">3.</strong> Cihaz Z raporu mutabakatını sağlayınız.</p>
+                    <p className="text-[14px] text-slate-600 dark:text-slate-300"><strong className="text-slate-900 dark:text-white">1.</strong> Satış ekranında tutar cihaza yansıtılır.</p>
+                    <p className="text-[14px] text-slate-600 dark:text-slate-300"><strong className="text-slate-900 dark:text-white">2.</strong> Banka onay kodu sisteme döner, açık fatura/tahsilat kapanır.</p>
+                    <p className="text-[14px] text-slate-600 dark:text-slate-300"><strong className="text-slate-900 dark:text-white">3.</strong> Cihaz Z raporu mutabakatını sağlayınız.</p>
                 </div>
             </div>
         </div>
@@ -658,17 +658,17 @@ export default function IntegrationsContent() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC]">
+        <div className="min-h-screen bg-slate-50 dark:bg-transparent">
             {/* Header */}
-            <header className="bg-white border-b border-slate-200 px-8 py-5 flex items-center justify-between sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+            <header className="bg-white dark:bg-[#0B1220] border-b border-slate-200 dark:border-white/5 px-8 py-5 flex items-center justify-between sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                 <div>
-                    <h1 className="text-[22px] font-semibold text-slate-900 tracking-tight">Sistem Entegrasyonları</h1>
-                    <p className="text-[14px] text-slate-500 mt-0.5">Ticari servis yönetim ve bağlantı merkezi.</p>
+                    <h1 className="text-[22px] font-semibold text-slate-900 dark:text-white tracking-tight">Sistem Entegrasyonları</h1>
+                    <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-0.5">Ticari servis yönetim ve bağlantı merkezi.</p>
                 </div>
                 <button
                     onClick={saveSettings}
                     disabled={isSaving}
-                    className="h-10 px-5 bg-slate-900 rounded-lg text-white text-[14px] font-medium hover:bg-slate-800 transition-colors disabled:opacity-50"
+                    className="h-10 px-5 bg-slate-900 dark:bg-white rounded-lg text-white text-[14px] font-medium hover:bg-slate-800 transition-colors disabled:opacity-50"
                 >
                     {isSaving ? 'İşleniyor...' : 'Ayarları Kaydet'}
                 </button>
@@ -706,7 +706,7 @@ export default function IntegrationsContent() {
                         <POSTab settings={posSettings} onChange={setPosSettings} />
                     )}
                     {activeTab === 'banking' && (
-                        <div className="max-w-5xl mx-auto px-8 py-8 animate-in fade-in duration-300">
+                        <div className="max-w-5xl mx-auto w-full px-8 py-8 animate-in fade-in duration-300">
                             <BankIntegrationOnboarding />
                         </div>
                     )}
