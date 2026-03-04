@@ -28,7 +28,7 @@ export default function TenantNetworkDashboard() {
             try {
                 // Sadece mevcut API'lerden derliyoruz:
                 const [earnRes, billRes] = await Promise.all([
-                    fetch('/api/network/earnings').catch(() => null),
+                    fetch('/api/dealer-network/earnings').catch(() => null),
                     fetch('/api/billing/boost-invoices').catch(() => null)
                 ]);
 
@@ -44,7 +44,7 @@ export default function TenantNetworkDashboard() {
 
                 // Simulate/approximate order metrics from existing earnings API items if actual order API is missing
                 // Or try checking API orders if exists
-                const ordRes = await fetch('/api/network/orders').catch(() => null);
+                const ordRes = await fetch('/api/dealer-network/orders').catch(() => null);
                 if (ordRes?.ok) {
                     const oData = await ordRes.json();
                     // Just count them
@@ -91,13 +91,13 @@ export default function TenantNetworkDashboard() {
                 </div>
 
                 {hasBoostIssue && (
-                    <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/40 p-5 rounded-[24px] flex items-center justify-between shadow-sm cursor-pointer hover:bg-orange-100/50 dark:hover:bg-orange-950/40 transition-colors" onClick={() => router.push('/hub/finance?tab=invoices')}>
+                    <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/40 p-5 rounded-[24px] flex items-center justify-between shadow-sm transition-colors">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-2xl">
                                 <AlertTriangle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                             </div>
                             <div>
-                                <div className="font-bold text-orange-800 dark:text-orange-400 text-[15px]">Gecikmiş Fatura (Boost/Hub)</div>
+                                <div className="font-bold text-orange-800 dark:text-orange-400 text-[15px]">Gecikmiş Fatura</div>
                                 <div className="text-[13px] text-orange-700 dark:text-orange-500/80 mt-0.5">Ödenmemiş faturalarınız bulunuyor. Görünürlüğünüz kısıtlanmış olabilir.</div>
                             </div>
                         </div>
@@ -113,7 +113,7 @@ export default function TenantNetworkDashboard() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                             {/* Box 1 */}
-                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-sm hover:border-blue-400 dark:hover:border-blue-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/hub/seller/orders')}>
+                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-sm hover:border-blue-400 dark:hover:border-blue-500/50 transition-all cursor-pointer flex items-center gap-4 group">
                                 <div className="w-14 h-14 rounded-[16px] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-transform group-hover:scale-105">
                                     <ShoppingCart className="w-6 h-6" />
                                 </div>
@@ -124,7 +124,7 @@ export default function TenantNetworkDashboard() {
                             </div>
 
                             {/* Box 2 */}
-                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-sm hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/hub/finance')}>
+                            <div className="bg-white dark:bg-[#080911] p-[24px] rounded-[24px] border border-[#0F172A]/[0.06] dark:border-white/5 shadow-[0_6px_18px_rgba(15,23,42,0.04)] dark:shadow-none hover:shadow-[0_10px_25px_rgba(15,23,42,0.06)] dark:hover:shadow-sm hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all cursor-pointer flex items-center gap-4 group">
                                 <div className="w-14 h-14 rounded-[16px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-transform group-hover:scale-105">
                                     <Landmark className="w-6 h-6" />
                                 </div>
@@ -194,7 +194,7 @@ export default function TenantNetworkDashboard() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                             {/* Box 1 */}
-                            <div className="bg-slate-50 dark:bg-[#080911] p-[24px] rounded-[24px] border border-slate-200/60 dark:border-[#1E293B] shadow-sm dark:shadow-[0_6px_18px_rgba(0,0,0,0.2)] hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-500/50 transition-all cursor-pointer flex items-center gap-4 group" onClick={() => router.push('/hub/buyer/orders')}>
+                            <div className="bg-slate-50 dark:bg-[#080911] p-[24px] rounded-[24px] border border-slate-200/60 dark:border-[#1E293B] shadow-sm dark:shadow-[0_6px_18px_rgba(0,0,0,0.2)] hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-500/50 transition-all cursor-pointer flex items-center gap-4 group">
                                 <div className="w-14 h-14 rounded-[16px] bg-blue-100 dark:bg-slate-800/60 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-transform group-hover:scale-105">
                                     <ShoppingCart className="w-6 h-6" />
                                 </div>

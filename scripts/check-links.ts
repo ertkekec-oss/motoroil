@@ -80,14 +80,20 @@ function checkRoutes() {
         if (!filePath.endsWith('.tsx') && !filePath.endsWith('.ts')) return;
         const content = fs.readFileSync(filePath, 'utf8');
 
+        // B2B cannot link to /network, /admin, or /hub
         const networkRegex = /(?:href=|push\()(["'`])\/network\b(.*?)(["'`])/g;
         const adminRegex = /(?:href=|push\()(["'`])\/admin\b(.*?)(["'`])/g;
+        const hubRegex = /(?:href=|push\()(["'`])\/hub\b(.*?)(["'`])/g;
         let match;
+
         while ((match = networkRegex.exec(content)) !== null) {
             logError('/network link found in /dealer-network', filePath, match[0]);
         }
         while ((match = adminRegex.exec(content)) !== null) {
             logError('/admin link found in /dealer-network', filePath, match[0]);
+        }
+        while ((match = hubRegex.exec(content)) !== null) {
+            logError('/hub link found in /dealer-network', filePath, match[0]);
         }
     });
 
@@ -96,14 +102,24 @@ function checkRoutes() {
         if (!filePath.endsWith('.tsx') && !filePath.endsWith('.ts')) return;
         const content = fs.readFileSync(filePath, 'utf8');
 
+        // Admin cannot link to /dealer-network, /network, or /b2b (except shim)
         const dealerRegex = /(?:href=|push\()(["'`])\/dealer-network\b(.*?)(["'`])/g;
         const networkRegex = /(?:href=|push\()(["'`])\/network\b(.*?)(["'`])/g;
+        const b2bRegex = /(?:href=|push\()(["'`])\/b2b\b(.*?)(["'`])/g;
         let match;
+
         while ((match = dealerRegex.exec(content)) !== null) {
             logError('/dealer-network link found in /admin', filePath, match[0]);
         }
         while ((match = networkRegex.exec(content)) !== null) {
             logError('/network link found in /admin', filePath, match[0]);
+        }
+        while ((match = b2bRegex.exec(content)) !== null) {
+            // Check if it's explicitly a redirect shim
+            if (content.includes('redirect(')) {
+                continue;
+            }
+            logError('Forbidden /b2b link found in /admin', filePath, match[0]);
         }
     });
 
