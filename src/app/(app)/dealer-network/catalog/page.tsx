@@ -85,7 +85,7 @@ export default function DealerCatalogPage() {
             title="B2B Katalog Yönetimi"
             description="Ürünlerinizi bayi portalına (B2B) açın, toplu fiyat ve miktar kurallarını belirleyin."
         >
-            <div className="bg-white rounded-xl border-slate-200 border p-6 space-y-4">
+            <div className="bg-white dark:bg-[#0f172a] rounded-xl border-slate-200 dark:border-white/5 border p-6 space-y-4">
                 <div className="flex gap-4 items-center justify-between">
                     <div className="flex-1 max-w-sm">
                         <input
@@ -97,8 +97,8 @@ export default function DealerCatalogPage() {
                         />
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={() => setAllVisible(true)} className="px-4 py-2 border rounded-md text-sm font-semibold hover:bg-slate-50 text-slate-700">Tümünü Aç</button>
-                        <button onClick={() => setAllVisible(false)} className="px-4 py-2 border rounded-md text-sm font-semibold hover:bg-slate-50 text-slate-700">Tümünü Kapat</button>
+                        <button onClick={() => setAllVisible(true)} className="px-4 py-2 border rounded-md text-sm font-semibold hover:bg-slate-50 dark:bg-[#1e293b] text-slate-700 dark:text-slate-300">Tümünü Aç</button>
+                        <button onClick={() => setAllVisible(false)} className="px-4 py-2 border rounded-md text-sm font-semibold hover:bg-slate-50 dark:bg-[#1e293b] text-slate-700 dark:text-slate-300">Tümünü Kapat</button>
                         <button
                             disabled={saving}
                             onClick={saveChanges}
@@ -110,14 +110,14 @@ export default function DealerCatalogPage() {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto relative mt-4 border border-slate-200 rounded-lg">
+                <div className="overflow-x-auto relative mt-4 border border-slate-200 dark:border-white/5 rounded-lg">
                     {loading ? (
-                        <div className="p-8 text-center text-slate-500">Yükleniyor...</div>
+                        <div className="p-8 text-center text-slate-500 dark:text-slate-400">Yükleniyor...</div>
                     ) : products.length === 0 ? (
-                        <div className="p-8 text-center text-slate-500">Ürün bulunamadı</div>
+                        <div className="p-8 text-center text-slate-500 dark:text-slate-400">Ürün bulunamadı</div>
                     ) : (
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-medium text-xs">
+                            <thead className="bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 uppercase font-medium text-xs">
                                 <tr>
                                     <th className="p-4">Kod</th>
                                     <th className="p-4">Ürün Adı</th>
@@ -130,9 +130,9 @@ export default function DealerCatalogPage() {
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {products.map((p) => (
-                                    <tr key={p.id} className="hover:bg-slate-50/50">
-                                        <td className="p-4 font-mono text-slate-500">{p.sku}</td>
-                                        <td className="p-4 font-semibold text-slate-900">{p.name}</td>
+                                    <tr key={p.id} className="hover:bg-slate-50/50 dark:bg-[#1e293b]/50">
+                                        <td className="p-4 font-mono text-slate-500 dark:text-slate-400">{p.sku}</td>
+                                        <td className="p-4 font-semibold text-slate-900 dark:text-white">{p.name}</td>
                                         <td className="p-4">
                                             <button
                                                 onClick={() => handleUpdateField(p.id, "isVisible", !p.isVisible)}
@@ -167,7 +167,7 @@ export default function DealerCatalogPage() {
                                                 onChange={(e) => handleUpdateField(p.id, "maxOrderQty", parseInt(e.target.value) || null)}
                                             />
                                         </td>
-                                        <td className="p-4 text-slate-500">
+                                        <td className="p-4 text-slate-500 dark:text-slate-400">
                                             {p.stock}
                                         </td>
                                     </tr>

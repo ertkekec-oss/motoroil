@@ -76,7 +76,7 @@ export default function DealerNetworkSettingsPage() {
     if (loading) {
         return (
             <EnterprisePageShell title="Dealer Network Ayarları" description="">
-                <div className="p-8 text-center text-slate-500">Yükleniyor...</div>
+                <div className="p-8 text-center text-slate-500 dark:text-slate-400">Yükleniyor...</div>
             </EnterprisePageShell>
         );
     }
@@ -120,7 +120,7 @@ export default function DealerNetworkSettingsPage() {
                                 <div className="flex items-center h-5 mr-3 mt-0.5">
                                     <input
                                         type="radio"
-                                        className="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                                        className="w-4 h-4 text-indigo-600 border-slate-300 dark:border-white/10 focus:ring-indigo-500"
                                         checked={settings?.creditPolicy === 'HARD_LIMIT'}
                                         readOnly
                                     />
@@ -138,7 +138,7 @@ export default function DealerNetworkSettingsPage() {
                                 <div className="flex items-center h-5 mr-3 mt-0.5">
                                     <input
                                         type="radio"
-                                        className="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                                        className="w-4 h-4 text-indigo-600 border-slate-300 dark:border-white/10 focus:ring-indigo-500"
                                         checked={settings?.creditPolicy === 'SOFT_LIMIT'}
                                         readOnly
                                     />
@@ -156,7 +156,7 @@ export default function DealerNetworkSettingsPage() {
                                 <div className="flex items-center h-5 mr-3 mt-0.5">
                                     <input
                                         type="radio"
-                                        className="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                                        className="w-4 h-4 text-indigo-600 border-slate-300 dark:border-white/10 focus:ring-indigo-500"
                                         checked={settings?.creditPolicy === 'FORCE_CARD_ON_LIMIT'}
                                         readOnly
                                     />
@@ -216,7 +216,7 @@ export default function DealerNetworkSettingsPage() {
 
                     <EnterpriseCard className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                         <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
-                            <Box className="w-4 h-4 text-slate-500" />
+                            <Box className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                             <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">Etki Alanı (Scope) Bilgisi</h3>
                         </div>
                         <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
