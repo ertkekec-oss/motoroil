@@ -83,6 +83,11 @@ export default function Sidebar() {
     const checkPerm = (permCode: string) => isSystemAdmin || hasPermission(permCode);
     const checkFeature = (featCode: string) => hasFeature(featCode);
 
+    // @ts-ignore
+    const isBuyer = isSystemAdmin || hasPermission('supplier_view') || currentUser?.type === 'buying';
+    // @ts-ignore
+    const isSeller = isSystemAdmin || hasPermission('sales_archive') || currentUser?.type === 'selling';
+
     const buildMenu = ({
         isSystemAdmin,
         isPlatformAdmin,

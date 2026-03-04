@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import EnterpriseCard from "@/components/enterprise/EnterpriseCard";
-import EnterpriseTable from "@/components/enterprise/EnterpriseTable";
+import { EnterpriseCard, EnterpriseTable } from "@/components/ui/enterprise";
 
 export default function DealersPage() {
     const [dealers, setDealers] = useState([]);
@@ -19,12 +18,7 @@ export default function DealersPage() {
             .catch(err => console.error(err));
     }, []);
 
-    const columns = [
-        { key: "dealerName", label: "Bayi Adı" },
-        { key: "taxNumber", label: "Vergi No" },
-        { key: "status", label: "Durum" },
-        { key: "creditLimit", label: "Kredi Limiti" },
-    ];
+    const headers = ["Bayi Adı", "Vergi No", "Durum", "Kredi Limiti"];
 
     return (
         <div className="p-8 space-y-6">
@@ -35,11 +29,27 @@ export default function DealersPage() {
                 </button>
             </div>
             <EnterpriseCard>
-                <EnterpriseTable
-                    columns={columns}
-                    data={dealers}
-                    emptyMessage="Henüz bayi bulunmuyor."
-                />
+                <div className="p-5 border-b border-slate-100">
+                    <h3 className="text-lg font-semibold text-slate-900">Kayıtlı Bayiler</h3>
+                </div>
+                <EnterpriseTable headers={headers}>
+                    {dealers.length === 0 ? (
+                        <tr>
+                            <td colSpan={4} className="p-4 text-center text-sm text-slate-500">
+                                Henüz bayi bulunmuyor.
+                            </td>
+                        </tr>
+                    ) : (
+                        dealers.map((dealer: any, idx) => (
+                            <tr key={idx} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                                <td className="p-4 text-sm font-medium text-slate-900">{dealer.dealerName}</td>
+                                <td className="p-4 text-sm text-slate-600">{dealer.taxNumber}</td>
+                                <td className="p-4 text-sm text-slate-600">{dealer.status}</td>
+                                <td className="p-4 text-sm font-medium text-slate-900">{dealer.creditLimit}</td>
+                            </tr>
+                        ))
+                    )}
+                </EnterpriseTable>
             </EnterpriseCard>
         </div>
     );

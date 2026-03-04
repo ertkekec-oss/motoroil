@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import EnterpriseCard from "@/components/enterprise/EnterpriseCard";
-import EnterpriseTable from "@/components/enterprise/EnterpriseTable";
+import { EnterpriseCard, EnterpriseTable } from "@/components/ui/enterprise";
 import { Shield } from "lucide-react";
 
 export default function AdminB2BPoliciesPage() {
@@ -21,49 +20,64 @@ export default function AdminB2BPoliciesPage() {
                 <span>Bu ayarlar tüm tenantlar için bağlayıcıdır ve tenant yöneticileri tarafından değiştirilemez.</span>
             </div>
 
-            <EnterpriseCard title="Giriş ve Oturum Politikaları">
-                <div className="space-y-4 max-w-lg mt-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Dealer Portal Login Mode</label>
-                        <select
-                            value={policy.loginMode}
-                            onChange={(e) => setPolicy({ ...policy, loginMode: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        >
-                            <option value="OTP_REQUIRED">Sadece OTP (Şifresiz)</option>
-                            <option value="PASSWORD_AND_OTP">Şifre + OTP (MFA)</option>
-                            <option value="PASSWORD_ONLY">Sadece Şifre</option>
-                        </select>
+            <EnterpriseCard>
+                <div className="p-5 border-b border-slate-100 bg-white rounded-t-xl">
+                    <h3 className="text-lg font-semibold text-slate-900">Giriş ve Oturum Politikaları</h3>
+                </div>
+                <div className="p-6">
+                    <div className="space-y-4 max-w-lg">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700">Dealer Portal Login Mode</label>
+                            <select
+                                value={policy.loginMode}
+                                onChange={(e) => setPolicy({ ...policy, loginMode: e.target.value })}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            >
+                                <option value="OTP_REQUIRED">Sadece OTP (Şifresiz)</option>
+                                <option value="PASSWORD_AND_OTP">Şifre + OTP (MFA)</option>
+                                <option value="PASSWORD_ONLY">Sadece Şifre</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </EnterpriseCard>
 
-            <EnterpriseCard title="Davet (Invite) Politikası">
-                <div className="space-y-4 max-w-lg mt-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Davet Linki Geçerlilik Süresi (Gün)</label>
-                        <input
-                            type="number"
-                            value={policy.inviteExpiry}
-                            onChange={(e) => setPolicy({ ...policy, inviteExpiry: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        />
+            <EnterpriseCard>
+                <div className="p-5 border-b border-slate-100 bg-white rounded-t-xl">
+                    <h3 className="text-lg font-semibold text-slate-900">Davet (Invite) Politikası</h3>
+                </div>
+                <div className="p-6">
+                    <div className="space-y-4 max-w-lg">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700">Davet Linki Geçerlilik Süresi (Gün)</label>
+                            <input
+                                type="number"
+                                value={policy.inviteExpiry}
+                                onChange={(e) => setPolicy({ ...policy, inviteExpiry: e.target.value })}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            />
+                        </div>
                     </div>
                 </div>
             </EnterpriseCard>
 
-            <EnterpriseCard title="Risk ve Kredi Politikası Varsayılanları">
-                <div className="space-y-4 max-w-lg mt-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700">Varsayılan Limit Aşım Aksiyonu</label>
-                        <select
-                            value={policy.riskDefault}
-                            onChange={(e) => setPolicy({ ...policy, riskDefault: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        >
-                            <option value="STRICT">Kapat / Siparişi Engelle</option>
-                            <option value="WARNING">Uyarı Ver / Onaya Düşür</option>
-                        </select>
+            <EnterpriseCard>
+                <div className="p-5 border-b border-slate-100 bg-white rounded-t-xl">
+                    <h3 className="text-lg font-semibold text-slate-900">Risk ve Kredi Politikası Varsayılanları</h3>
+                </div>
+                <div className="p-6">
+                    <div className="space-y-4 max-w-lg">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700">Varsayılan Limit Aşım Aksiyonu</label>
+                            <select
+                                value={policy.riskDefault}
+                                onChange={(e) => setPolicy({ ...policy, riskDefault: e.target.value })}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            >
+                                <option value="STRICT">Kapat / Siparişi Engelle</option>
+                                <option value="WARNING">Uyarı Ver / Onaya Düşür</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </EnterpriseCard>
