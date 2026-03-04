@@ -80,208 +80,243 @@ export default function Sidebar() {
     const isAuditor = currentUser?.role === 'AUDITOR';
     const displayUser = currentUser || authUser;
 
-    // UI mapping for permissions
-    const permMap: Record<string, { perm?: string, feature?: string }> = {
-        '/': { perm: 'pos_access', feature: 'pos' },
-        '/terminal': { perm: 'pos_access', feature: 'pos' },
-        '/accounting': { perm: 'finance_view', feature: 'financials' },
-        '/customers': { perm: 'customer_view', feature: 'current_accounts' },
-        '/suppliers': { perm: 'supplier_view', feature: 'suppliers' },
-        '/inventory': { perm: 'inventory_view', feature: 'inventory' },
-        '/service': { perm: 'service_view', feature: 'service_desk' },
-        '/sales': { perm: 'sales_archive', feature: 'sales' },
-        '/field-sales': { perm: 'field_sales_access', feature: 'field_sales' },
-        '/field-sales/admin/live': { perm: 'field_sales_admin', feature: 'field_sales' },
-        '/field-sales/admin/routes': { perm: 'field_sales_admin', feature: 'field_sales' },
-        '/quotes': { perm: 'offer_create', feature: 'quotes' },
-        '/reports': { perm: 'reports_view', feature: 'analytics' },
-        '/reports/ceo': { perm: 'reports_view', feature: 'ceo_intel' },
-        '/reports/daily': { perm: 'reports_view', feature: 'analytics' },
-        '/reports/suppliers': { perm: 'reports_view', feature: 'analytics' },
-        '/integrations': { perm: 'settings_manage', feature: 'e_invoice' },
-        '/settings/branch': { perm: 'settings_manage' },
-        '/settings': { perm: 'settings_manage' },
-        '/settings/pricing': { perm: 'settings_manage' },
-        '/staff': { perm: 'staff_manage', feature: 'team_management' },
-        '/advisor': { perm: 'finance_view', feature: 'accountant' },
-        '/admin/audit-logs': { perm: 'audit_view' },
-        '/staff/pdks': { perm: 'staff_manage' },
-        '/dealer-network/dashboard': { perm: 'b2b_manage' },
-        '/dealer-network/orders/approvals': { perm: 'b2b_manage' },
-        '/dealer-network/refunds': { perm: 'b2b_manage' },
-        '/dealer-network/settings': { perm: 'b2b_manage' },
-        '/security/suspicious': { perm: 'security_access' },
-        '/billing': { perm: 'settings_manage' },
-        '/field-mobile/routes': { perm: 'field_sales_access' },
-        '/staff/me': { perm: 'pos_access' },
-        '/fintech/control-tower': { perm: 'finance_view', feature: 'fintech_tower' },
-        '/fintech/profitability-heatmap': { perm: 'finance_view', feature: 'pnl_heatmap' },
-        '/fintech/open-banking': { perm: 'finance_view' },
-        '/fintech/smart-pricing': { perm: 'finance_view', feature: 'smart_pricing' },
-        '/notifications': { perm: 'pos_access' },
-        '/hub/buyer/orders': { perm: 'supplier_view' },
-        '/hub/seller/orders': { perm: 'sales_archive' },
+    const checkPerm = (permCode: string) => isSystemAdmin || hasPermission(permCode);
+    const checkFeature = (featCode: string) => hasFeature(featCode);
+
+    const buildMenu = ({
+        isSystemAdmin,
+        isPlatformAdmin,
+        isAuditor,
+        checkPerm,
+        checkFeature,
+        isBuyer,
+        isSeller,
+        suspiciousEventsCount
+    }: any) => {
+        const permMap: Record<string, { perm?: string, feature?: string, platformOnly?: boolean }> = {
+            '/': { perm: 'pos_access', feature: 'pos' },
+            '/terminal': { perm: 'pos_access', feature: 'pos' },
+            '/accounting': { perm: 'finance_view', feature: 'financials' },
+            '/customers': { perm: 'customer_view', feature: 'current_accounts' },
+            '/suppliers': { perm: 'supplier_view', feature: 'suppliers' },
+            '/inventory': { perm: 'inventory_view', feature: 'inventory' },
+            '/service': { perm: 'service_view', feature: 'service_desk' },
+            '/sales': { perm: 'sales_archive', feature: 'sales' },
+            '/field-sales': { perm: 'field_sales_access', feature: 'field_sales' },
+            '/field-sales/admin/live': { perm: 'field_sales_admin', feature: 'field_sales' },
+            '/field-sales/admin/routes': { perm: 'field_sales_admin', feature: 'field_sales' },
+            '/quotes': { perm: 'offer_create', feature: 'quotes' },
+            '/reports': { perm: 'reports_view', feature: 'analytics' },
+            '/reports/ceo': { perm: 'reports_view', feature: 'ceo_intel' },
+            '/reports/daily': { perm: 'reports_view', feature: 'analytics' },
+            '/reports/suppliers': { perm: 'reports_view', feature: 'analytics' },
+            '/integrations': { perm: 'settings_manage', feature: 'e_invoice' },
+            '/settings/branch': { perm: 'settings_manage' },
+            '/settings': { perm: 'settings_manage' },
+            '/settings/pricing': { perm: 'settings_manage' },
+            '/staff': { perm: 'staff_manage', feature: 'team_management' },
+            '/advisor': { perm: 'finance_view', feature: 'accountant' },
+            '/admin/audit-logs': { perm: 'audit_view', platformOnly: true },
+            '/staff/pdks': { perm: 'staff_manage' },
+            '/dealer-network/dashboard': { perm: 'b2b_manage' },
+            '/dealer-network/dealers': { perm: 'b2b_manage' },
+            '/dealer-network/orders/approvals': { perm: 'b2b_manage' },
+            '/dealer-network/refunds': { perm: 'b2b_manage' },
+            '/dealer-network/settings': { perm: 'b2b_manage' },
+            '/admin/b2b/dealer-orders': { platformOnly: true },
+            '/admin/b2b/refunds': { platformOnly: true },
+            '/admin/b2b/policies': { platformOnly: true },
+            '/security/suspicious': { perm: 'security_access' },
+            '/billing': { perm: 'settings_manage' },
+            '/field-mobile/routes': { perm: 'field_sales_access' },
+            '/staff/me': { perm: 'pos_access' },
+            '/fintech/control-tower': { perm: 'finance_view', feature: 'fintech_tower' },
+            '/fintech/profitability-heatmap': { perm: 'finance_view', feature: 'pnl_heatmap' },
+            '/fintech/open-banking': { perm: 'finance_view' },
+            '/fintech/smart-pricing': { perm: 'finance_view', feature: 'smart_pricing' },
+            '/notifications': { perm: 'pos_access' },
+            '/hub/buyer/orders': { perm: 'supplier_view' },
+            '/hub/seller/orders': { perm: 'sales_archive' },
+        };
+
+        const rawGroups = [
+            {
+                group: "Workspace",
+                items: [
+                    { name: 'POS Terminal', href: '/terminal', icon: Terminal },
+                    {
+                        name: 'Periodya Hub',
+                        icon: Globe,
+                        isParent: true,
+                        id: 'b2b-global-parent',
+                        subItems: [
+                            { name: 'Uyuşmazlık Çözüm Merkezi', href: '/support/tickets' },
+                            { name: 'SİPARİŞLER', href: '' },
+                            ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/hub/seller/orders' }] : []),
+                            ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/hub/buyer/orders' }] : []),
+
+                            { name: 'KATALOG', href: '' },
+                            ...(isSeller ? [{ name: 'Katalog (Ürünlerim)', href: '/seller/products' }] : []),
+                            ...(isBuyer ? [{ name: 'Katalog (B2B Keşfet)', href: '/catalog' }] : []),
+
+                            { name: 'FİNANS', href: '' },
+                            { name: 'Finance (B2B)', href: '/hub/finance' },
+                            ...(isSeller ? [
+                                { name: 'Growth: Boost Yönetimi', href: '/seller/boost' },
+                                { name: 'Growth: Boost Analiz', href: '/seller/boost/analytics' },
+                                { name: 'Growth: Güven Skoru', href: '/hub/trust-score' }
+                            ] : []),
+
+                            ...(isBuyer ? [
+                                { name: 'SATIN ALMA', href: '' },
+                                { name: 'Satınalma: RFQ', href: '/rfq' },
+                                { name: 'Satınalma: Sözleşmeler', href: '/contracts' }
+                            ] : [])
+                        ]
+                    },
+                ]
+            },
+            {
+                group: "Operasyonlar",
+                items: [
+                    { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
+                    { name: 'Finansal Yönetim', href: '/accounting', icon: Landmark },
+                    { name: 'Satış Yönetimi', href: '/sales', icon: Receipt },
+                    {
+                        name: 'Cariler',
+                        icon: Users,
+                        isParent: true,
+                        id: 'customers-parent',
+                        subItems: [
+                            { name: 'Müşteriler', href: '/customers' },
+                            { name: 'Tedarikçiler', href: '/suppliers' },
+                        ]
+                    },
+                    { name: 'Envanter', href: '/inventory', icon: Box },
+                    { name: 'Teklifler', href: '/quotes', icon: FileText },
+                    { name: 'TechoPs', href: '/service', icon: Wrench },
+                    {
+                        name: 'SalesX',
+                        icon: Map,
+                        isParent: true,
+                        id: 'field-sales-parent',
+                        subItems: [
+                            { name: 'Saha Yönetimi', href: '/field-sales/admin/routes' },
+                            { name: 'Rota & Müşteri', href: '/field-sales' },
+                            { name: 'Canlı Takip', href: '/field-sales/admin/live' },
+                        ]
+                    },
+                    { name: 'PDKS', href: '/staff/pdks', icon: Clock },
+                    { name: 'İnsan Kaynakları', href: '/staff', icon: Users },
+                ]
+            },
+            {
+                group: "Dealer Network",
+                items: [
+                    { name: 'Dashboard', href: '/dealer-network/dashboard', icon: LayoutDashboard },
+                    { name: 'Bayiler', href: '/dealer-network/dealers', icon: Users },
+                    { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals', icon: Inbox },
+                    { name: 'İadeler', href: '/dealer-network/refunds', icon: Receipt },
+                    { name: 'Ayarlar', href: '/dealer-network/settings', icon: Settings },
+                ]
+            },
+            {
+                group: "Analitik & Yönetim",
+                items: [
+                    {
+                        name: 'İş Zekası',
+                        icon: BarChart2,
+                        isParent: true,
+                        id: 'reports-parent',
+                        subItems: [
+                            { name: 'CEO Tablosu', href: '/reports/ceo' },
+                            { name: 'Detaylı Analiz', href: '/reports' },
+                        ]
+                    },
+                    { name: 'Fintech Tower', href: '/fintech/control-tower', icon: Activity },
+                    { name: 'Mali Müşavir', href: '/advisor', icon: Briefcase },
+                    { name: 'Anomaliler', href: '/security/suspicious', icon: ShieldAlert, alertCount: suspiciousEventsCount },
+                    ...(isPlatformAdmin ? [
+                        { name: 'Bilgi Bankası', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: Library }
+                    ] : []),
+                ]
+            },
+            ...(isPlatformAdmin ? [
+                {
+                    group: "Network Governance",
+                    items: [
+                        { name: 'B2B Sipariş Kuyruğu', href: '/admin/b2b/dealer-orders', icon: Inbox },
+                        { name: 'İade ve Uyuşmazlıklar', href: '/admin/b2b/refunds', icon: Receipt },
+                        { name: 'Login & Risk Politikaları', href: '/admin/b2b/policies', icon: ShieldAlert },
+                    ]
+                }
+            ] : []),
+            {
+                group: "Sistem",
+                items: [
+                    { name: 'Yardım Merkezi', href: '/help', icon: LifeBuoy },
+                    { name: 'Denetim', href: '/admin/audit-logs', icon: Search },
+                    { name: 'Destek', href: '/support', icon: HelpCircle },
+                    { name: 'Sistem', href: '/settings/branch', icon: Terminal },
+                    { name: 'Abonelik', href: '/billing', icon: CreditCard },
+                    { name: 'Fiyatlandırma', href: '/settings/pricing', icon: ShoppingCart },
+                    ...(isPlatformAdmin ? [
+                        { name: 'Support Inbox', href: '/admin/support/tickets', icon: Inbox }
+                    ] : []),
+                    { name: 'Ayarlar', href: '/settings', icon: Settings },
+                ]
+            }
+        ];
+
+        return rawGroups.map(group => {
+            const items = group.items.filter(item => {
+                const config = permMap[item.href || ''];
+                if (!config && !item.isParent) return true;
+                if (isAuditor) {
+                    return ['/admin/audit-logs', '/reports', '/advisor'].includes(item.href || '');
+                }
+                if (config?.platformOnly && !isPlatformAdmin) return false;
+                if (config?.feature && !checkFeature(config.feature)) return false;
+                if (isSystemAdmin && !config?.platformOnly) return true;
+                if (config?.perm) return checkPerm(config.perm);
+                return true;
+            }).map((item: any) => {
+                if (item.subItems) {
+                    return {
+                        ...item,
+                        subItems: item.subItems.filter((sub: any) => {
+                            const subConfig = permMap[sub.href];
+                            if (!subConfig) return true;
+                            if (subConfig.platformOnly && !isPlatformAdmin) return false;
+                            if (subConfig.feature && !checkFeature(subConfig.feature)) return false;
+                            if (isSystemAdmin && !subConfig.platformOnly) return true;
+                            if (subConfig.perm) return checkPerm(subConfig.perm);
+                            return true;
+                        })
+                    };
+                }
+                return item;
+            });
+
+            const validItems = items.filter((item: any) => {
+                if (item.isParent && (!item.subItems || item.subItems.length === 0)) return false;
+                return true;
+            });
+
+            return { ...group, items: validItems };
+        }).filter(g => g.items.length > 0);
     };
 
-    // @ts-ignore
-    const isBuyer = isSystemAdmin || hasPermission('supplier_view') || currentUser?.type === 'buying';
-    // @ts-ignore
-    const isSeller = isSystemAdmin || hasPermission('sales_archive') || currentUser?.type === 'selling';
-
-    const menuGroups = [
-        {
-            group: "Workspace",
-            items: [
-                { name: 'POS Terminal', href: '/terminal', icon: Terminal },
-                {
-                    name: 'Periodya Hub',
-                    icon: Globe,
-                    isParent: true,
-                    id: 'b2b-global-parent',
-                    subItems: [
-                        { name: 'Uyuşmazlık Çözüm Merkezi', href: '/support/tickets' },
-                        { name: 'SİPARİŞLER', href: '' },
-                        ...(isSeller ? [{ name: 'Alınan Siparişler', href: '/hub/seller/orders' }] : []),
-                        ...(isBuyer ? [{ name: 'Açık Siparişler', href: '/hub/buyer/orders' }] : []),
-
-                        { name: 'KATALOG', href: '' },
-                        ...(isSeller ? [{ name: 'Katalog (Ürünlerim)', href: '/seller/products' }] : []),
-                        ...(isBuyer ? [{ name: 'Katalog (B2B Keşfet)', href: '/catalog' }] : []),
-
-                        { name: 'FİNANS', href: '' },
-                        { name: 'Finance (B2B)', href: '/hub/finance' },
-                        ...(isSeller ? [
-                            { name: 'Growth: Boost Yönetimi', href: '/seller/boost' },
-                            { name: 'Growth: Boost Analiz', href: '/seller/boost/analytics' },
-                            { name: 'Growth: Güven Skoru', href: '/hub/trust-score' }
-                        ] : []),
-
-                        ...(isBuyer ? [
-                            { name: 'SATIN ALMA', href: '' },
-                            { name: 'Satınalma: RFQ', href: '/rfq' },
-                            { name: 'Satınalma: Sözleşmeler', href: '/contracts' }
-                        ] : [])
-                    ]
-                },
-            ]
-        },
-        {
-            group: "Operasyonlar",
-            items: [
-                { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
-                { name: 'Finansal Yönetim', href: '/accounting', icon: Landmark },
-                { name: 'Satış Yönetimi', href: '/sales', icon: Receipt },
-                {
-                    name: 'Cariler',
-                    icon: Users,
-                    isParent: true,
-                    id: 'customers-parent',
-                    subItems: [
-                        { name: 'Müşteriler', href: '/customers' },
-                        { name: 'Tedarikçiler', href: '/suppliers' },
-                    ]
-                },
-                { name: 'Envanter', href: '/inventory', icon: Box },
-                { name: 'Teklifler', href: '/quotes', icon: FileText },
-                { name: 'TechoPs', href: '/service', icon: Wrench },
-                {
-                    name: 'SalesX',
-                    icon: Map,
-                    isParent: true,
-                    id: 'field-sales-parent',
-                    subItems: [
-                        { name: 'Saha Yönetimi', href: '/field-sales/admin/routes' },
-                        { name: 'Rota & Müşteri', href: '/field-sales' },
-                        { name: 'Canlı Takip', href: '/field-sales/admin/live' },
-                    ]
-                },
-                { name: 'PDKS', href: '/staff/pdks', icon: Clock },
-                { name: 'İnsan Kaynakları', href: '/staff', icon: Users },
-            ]
-        },
-        {
-            group: "Dealer Network",
-            items: [
-                { name: 'Dashboard', href: '/dealer-network/dashboard', icon: LayoutDashboard },
-                { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals', icon: Inbox },
-                { name: 'İadeler', href: '/dealer-network/refunds', icon: Receipt },
-                { name: 'Ayarlar', href: '/dealer-network/settings', icon: Settings },
-            ]
-        },
-        {
-            group: "Analitik & Yönetim",
-            items: [
-                {
-                    name: 'İş Zekası',
-                    icon: BarChart2,
-                    isParent: true,
-                    id: 'reports-parent',
-                    subItems: [
-                        { name: 'CEO Tablosu', href: '/reports/ceo' },
-                        { name: 'Detaylı Analiz', href: '/reports' },
-                    ]
-                },
-                { name: 'Fintech Tower', href: '/fintech/control-tower', icon: Activity },
-                { name: 'Mali Müşavir', href: '/advisor', icon: Briefcase },
-                { name: 'Anomaliler', href: '/security/suspicious', icon: ShieldAlert, alertCount: suspiciousEvents.length },
-                ...(isPlatformAdmin ? [
-                    { name: 'Bilgi Bankası', href: '/admin/tenants/PLATFORM_ADMIN/help', icon: Library }
-                ] : []),
-            ]
-        },
-        {
-            group: "Sistem",
-            items: [
-                { name: 'Yardım Merkezi', href: '/help', icon: LifeBuoy },
-                { name: 'Denetim', href: '/admin/audit-logs', icon: Search },
-                { name: 'Destek', href: '/support', icon: HelpCircle },
-                { name: 'Sistem', href: '/settings/branch', icon: Terminal },
-                { name: 'Abonelik', href: '/billing', icon: CreditCard },
-                { name: 'Fiyatlandırma', href: '/settings/pricing', icon: ShoppingCart },
-                ...(isPlatformAdmin ? [
-                    { name: 'Support Inbox', href: '/admin/support/tickets', icon: Inbox }
-                ] : []),
-                { name: 'Ayarlar', href: '/settings', icon: Settings },
-            ]
-        }
-    ];
-
-    const filteredGroups = menuGroups.map(group => {
-        const items = group.items.filter(item => {
-            const config = permMap[item.href || ''];
-            if (!config && !item.isParent) return true;
-            if (isAuditor) {
-                return ['/admin/audit-logs', '/reports', '/advisor'].includes(item.href || '');
-            }
-            if (config?.feature && !hasFeature(config.feature)) return false;
-            if (isSystemAdmin) return true;
-            if (config?.perm) return hasPermission(config.perm);
-            return true;
-        }).map(item => {
-            if (item.subItems) {
-                return {
-                    ...item,
-                    subItems: item.subItems.filter(sub => {
-                        const subConfig = permMap[sub.href];
-                        if (!subConfig) return true;
-                        if (subConfig.feature && !hasFeature(subConfig.feature)) return false;
-                        if (isSystemAdmin) return true;
-                        if (subConfig.perm) return hasPermission(subConfig.perm);
-                        return true;
-                    })
-                };
-            }
-            return item;
-        });
-
-        // Filter out parent items that have no authorized subItems
-        const validItems = items.filter(item => {
-            if (item.isParent && (!item.subItems || item.subItems.length === 0)) return false;
-            return true;
-        });
-
-        return { ...group, items: validItems };
-    }).filter(g => g.items.length > 0);
+    const filteredGroups = buildMenu({
+        isSystemAdmin,
+        isPlatformAdmin,
+        isAuditor,
+        checkPerm,
+        checkFeature,
+        isBuyer,
+        isSeller,
+        suspiciousEventsCount: suspiciousEvents?.length || 0
+    });
 
 
     const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

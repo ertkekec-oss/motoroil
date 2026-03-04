@@ -44,19 +44,30 @@ export async function middleware(request: NextRequest) {
     const base = portalBasePath();
     if (pathname.startsWith(base)) {
         const isLogin = pathname.startsWith(`${base}/login`);
+        const isInvite = pathname.startsWith(`${base}/invite`);
+        const isApi = pathname.startsWith(`${base}/api`);
+
+        if (isLogin || isInvite) {
+            return NextResponse.next();
+        }
 
         const hasSession = Boolean(request.cookies.get("pdya_ds")?.value);
         const hasMembership = Boolean(request.cookies.get("pdya_nm")?.value);
 
         if (!hasSession) {
-            if (!isLogin) return NextResponse.redirect(new URL(`${base}/login`, request.url));
-            return NextResponse.next();
+            if (isApi) {
+                return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+            }
+            return NextResponse.redirect(new URL(`${base}/login`, request.url));
         }
 
-        // session var, membership yoksa select sayfasına yönlendir (login sayfası hariç)
-        if (!hasMembership) {
-            const isSelect = pathname.startsWith(`${base}/select-supplier`);
-            if (!isLogin && !isSelect) return NextResponse.redirect(new URL(`${base}/select-supplier`, request.url));
+        // session var, membership yoksa select sayfasına yönlendir
+        const isSelect = pathname.startsWith(`${base}/select-supplier`);
+        if (!hasMembership && !isSelect) {
+            if (isApi) {
+                return NextResponse.json({ error: 'Membership required' }, { status: 403 });
+            }
+            return NextResponse.redirect(new URL(`${base}/select-supplier`, request.url));
         }
 
         return NextResponse.next();

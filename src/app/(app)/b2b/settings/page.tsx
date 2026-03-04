@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function DeprecatedB2BSettings() {
+export default function B2bSettingsRedirect() {
     redirect("/dealer-network/settings");
 }

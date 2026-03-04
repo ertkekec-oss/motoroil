@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function DeprecatedB2BRefunds() {
+export default function B2bRefundsRedirect() {
     redirect("/dealer-network/refunds");
 }

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function DeprecatedB2BDashboard() {
-    // Deprecated. Forwarding to Hub Seller Dashboard / Orders.
+export default function B2bDashboardRedirect() {
     redirect("/hub/seller/orders");
 }
