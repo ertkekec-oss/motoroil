@@ -240,7 +240,7 @@ export default function DailyReportPage() {
                                                     t.type === 'Collection' ? 'bg-emerald-500/20 text-emerald-400' :
                                                         'bg-red-500/20 text-red-400'
                                                     }`}>{t.type}</span>
-                                                <span className="w-1 h-1 rounded-full bg-white/10"></span>
+                                                <span className="w-1 h-1 rounded-full bg-white dark:bg-[#0f172a]/10"></span>
                                                 <span className="text-[10px] text-white/40 font-bold">{new Date(t.date).toLocaleTimeString('tr-TR')}</span>
                                             </div>
                                         </div>
@@ -274,7 +274,7 @@ export default function DailyReportPage() {
                                             <span className="text-[11px] font-black text-white/50 uppercase tracking-widest group-hover:text-white/80 transition-colors">{kasa.name}</span>
                                             <span className="text-xs font-black text-white">₺ {Number(kasa.balance).toLocaleString()}</span>
                                         </div>
-                                        <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                        <div className="w-full h-1.5 bg-white dark:bg-[#0f172a]/5 rounded-full overflow-hidden">
                                             <div
                                                 className={`h-full bg-gradient-to-r ${i % 2 === 0 ? 'from-primary to-orange-400' : 'from-emerald-400 to-green-600'} shadow-[0_0_10px_var(--primary-glow)] transition-all duration-1000`}
                                                 style={{ width: `${percentage}%` }}

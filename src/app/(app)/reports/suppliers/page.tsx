@@ -168,7 +168,7 @@ export default function SupplierReportsPage() {
                         </thead>
                         <tbody>
                             {supplierStats.map(s => (
-                                <tr key={s.id} style={{ borderBottom: '1px solid var(--border-light)' }} className="hover:bg-white/5">
+                                <tr key={s.id} style={{ borderBottom: '1px solid var(--border-light)' }} className="hover:bg-white dark:bg-[#0f172a]/5">
                                     <td style={{ padding: '15px 20px', fontWeight: 'bold' }}>{s.name}</td>
                                     <td>{s.count}</td>
                                     <td>₺{s.totalPurchase.toLocaleString()}</td>
