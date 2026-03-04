@@ -16,7 +16,7 @@ import CheckoutPanel from '@/components/terminal/CheckoutPanel';
 import AiCashierPanel from '@/components/terminal/AiCashierPanel';
 import CameraScanModal from '@/components/terminal/CameraScanModal';
 import OfflineBadge from '@/components/terminal/OfflineBadge';
-import { Clock } from 'lucide-react';
+import { Clock, Tag, FileText, Gift, CreditCard } from 'lucide-react';
 
 export default function TerminalClient() {
     const { products } = useInventory();
@@ -41,6 +41,15 @@ export default function TerminalClient() {
     const [showResumptionModal, setShowResumptionModal] = useState(false);
     const [showSuspendModal, setShowSuspendModal] = useState(false);
     const [suspenseLabel, setSuspenseLabel] = useState('');
+
+    const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+    const [showExtrasModal, setShowExtrasModal] = useState(false);
+
+    // Order Extras
+    const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
+    const [discountCode, setDiscountCode] = useState('');
+    const [pointsToUse, setPointsToUse] = useState<number>(0);
+    const [referenceNote, setReferenceNote] = useState('');
 
     const [activePriceListId, setActivePriceListId] = useState<string | null>(null);
     const [activePriceListName, setActivePriceListName] = useState<string | null>(null);
@@ -146,34 +155,43 @@ export default function TerminalClient() {
 
     // Calculations
     const subtotal = cart.reduce((sum, item) => sum + (Number(item.price || 0) * item.qty), 0);
-    const totalDiscount = 0; // Simplified for this view, extendable
+    const totalDiscount = appliedDiscount || 0;
     const vatExcludedTotal = subtotal / 1.2;
-    const finalTotal = Math.max(0, subtotal - totalDiscount);
+    const finalTotal = Math.max(0, subtotal - totalDiscount - (pointsToUse || 0));
     const customer = customers.find(c => c.name === selectedCustomer);
 
     // Finalize (Offline aware)
     const handleFinalize = async () => {
         if (cart.length === 0 || isProcessing) return;
         if (!paymentMode) return showWarning("Hata", "Lütfen bir ödeme yöntemi seçiniz.");
-        if (paymentMode !== 'account' && !selectedKasa && kasalar?.length > 0) {
-            // Fallback or auto select
-            const defaultCash = kasalar.find(k => k.type === 'Nakit');
-            const defaultCard = kasalar.find(k => k.type === 'Kredi Kartı' || k.type?.includes('POS'));
+
+        // Auto-select first matching kasa if none selected to save clicks
+        if (!selectedKasa && kasalar?.length > 0 && paymentMode !== 'account') {
+            const defaultCash = kasalar.find((k: any) => k.type === 'Nakit');
+            const defaultCard = kasalar.find((k: any) => k.type === 'Kredi Kartı' || k.type?.includes('POS'));
             const auto = paymentMode === 'cash' ? defaultCash : defaultCard;
             if (auto) setSelectedKasa(auto.id);
-            else return showWarning("Hata", "Lütfen kasa/banka seçiniz.");
+        }
+
+        setShowCheckoutModal(true);
+    };
+
+    const executeSale = async () => {
+        if (paymentMode !== 'account' && !selectedKasa && kasalar?.length > 0) {
+            return showWarning("Hata", "Lütfen kasa/banka seçiniz.");
         }
 
         const payload = {
             items: cart.map(i => ({ productId: i.id, qty: i.qty })),
             total: finalTotal,
             customerName: selectedCustomer,
-            description: `POS: ${selectedCustomer}`,
+            description: referenceNote ? `REF: ${referenceNote}` : `POS: ${selectedCustomer}`,
             paymentMode,
             kasaId: selectedKasa || 'CashKasa',
             customerId: customer?.id,
             discountAmount: totalDiscount,
-            pointsUsed: 0,
+            couponCode: discountCode,
+            pointsUsed: pointsToUse || 0,
             installments: undefined
         };
 
@@ -182,19 +200,30 @@ export default function TerminalClient() {
             if (!isOnline) {
                 addToQueue('sale', payload);
                 showSuccess("Offline: İşlem kuyruğa alındı. Online olunca otomatik gönderilecek.", "");
-                setCart([]); setPaymentMode(null); setSelectedCustomer('Perakende Müşteri');
+                resetTerminalState();
                 return;
             }
 
             const success = await processSale(payload);
             if (success) {
                 showSuccess("Satış Başarıyla Tamamlandı", "");
-                setCart([]); setPaymentMode(null); setSelectedCustomer('Perakende Müşteri');
+                resetTerminalState();
             } else {
                 showError("İşlem Reddedildi", "Satış kaydedilemedi.");
             }
         } catch (e: any) { showError("Hata", e.message); }
         finally { setIsProcessing(false); searchInputRef.current?.focus(); }
+    };
+
+    const resetTerminalState = () => {
+        setCart([]);
+        setPaymentMode(null);
+        setSelectedCustomer('Perakende Müşteri');
+        setAppliedDiscount(0);
+        setDiscountCode('');
+        setPointsToUse(0);
+        setReferenceNote('');
+        setShowCheckoutModal(false);
     };
 
     // Keyboard Shortcuts
@@ -234,6 +263,8 @@ export default function TerminalClient() {
                     setShowCameraModal(false);
                     setShowResumptionModal(false);
                     setShowSuspendModal(false);
+                    setShowCheckoutModal(false);
+                    setShowExtrasModal(false);
                     break;
             }
         };
@@ -271,6 +302,18 @@ export default function TerminalClient() {
                 </div>
 
                 <div className="ml-auto flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-2 border-r border-slate-200 dark:border-white/10 pr-4 mr-2">
+                        <button onClick={() => setShowExtrasModal(true)} className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/5 text-[11px] font-bold transition-colors">
+                            <Tag size={12} /> Kupon {discountCode && <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>}
+                        </button>
+                        <button onClick={() => setShowExtrasModal(true)} className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/5 text-[11px] font-bold transition-colors">
+                            <Gift size={12} /> Puan {pointsToUse > 0 && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>}
+                        </button>
+                        <button onClick={() => setShowExtrasModal(true)} className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/5 text-[11px] font-bold transition-colors">
+                            <FileText size={12} /> Ref {referenceNote && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>}
+                        </button>
+                    </div>
+
                     <button onClick={() => setShowResumptionModal(true)} className="flex items-center gap-2 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-500 hover:bg-amber-100 px-3 py-1.5 rounded-full text-xs font-bold border border-amber-200 dark:border-amber-500/20 transition-colors">
                         <Clock size={14} /> Bekleyenler ({suspendedSales?.length || 0}) <kbd className="hidden sm:inline-block font-sans opacity-70 border border-current px-1 rounded ml-1">F9</kbd>
                     </button>
@@ -279,11 +322,11 @@ export default function TerminalClient() {
             </div>
 
             {/* MAIN GRID */}
-            <div className="flex-1 flex flex-col md:flex-row gap-4 lg:gap-6 p-4 lg:p-6 min-h-0 overflow-hidden">
+            <div className="flex-1 flex flex-row gap-4 lg:gap-6 p-4 lg:p-6 min-h-0 overflow-hidden">
 
                 {/* TERMINAL WORKSPACE (Left) */}
                 <div className="flex-1 min-w-0 flex flex-col gap-4">
-                    <div className="max-w-3xl">
+                    <div className="w-full">
                         <PosSearchBar
                             ref={searchInputRef}
                             searchInput={searchInput}
@@ -305,14 +348,14 @@ export default function TerminalClient() {
                 </div>
 
                 {/* CHECKOUT PANEL (Right) */}
-                <div className="w-full md:w-[320px] lg:w-[380px] xl:w-[420px] shrink-0 h-full flex flex-col">
+                <div className="w-[300px] lg:w-[380px] shrink-0 h-full flex flex-col">
                     <CheckoutPanel
                         ref={checkoutPanelRef}
                         cart={cart}
                         subtotal={subtotal}
                         finalTotal={finalTotal}
                         vatExcludedTotal={vatExcludedTotal}
-                        totalDiscount={totalDiscount}
+                        totalDiscount={totalDiscount + (pointsToUse || 0)}
                         selectedCustomer={selectedCustomer}
                         customers={customers}
                         activePriceListName={activePriceListName}
@@ -407,11 +450,95 @@ export default function TerminalClient() {
                                 onClick={() => {
                                     if (!suspenseLabel) return showWarning("Hata", "Lütfen bir etiket giriniz.");
                                     suspendSale(suspenseLabel, cart.map(i => ({ product: i, qty: i.qty })), customer, finalTotal);
-                                    setCart([]); setSuspenseLabel(''); setShowSuspendModal(false);
+                                    resetTerminalState(); setSuspenseLabel(''); setShowSuspendModal(false);
                                     showSuccess("Satış beklemeye alındı", "");
                                 }}
                                 className="flex-1 bg-amber-500 text-amber-950 py-3 rounded-xl font-bold hover:bg-amber-600">
                                 Beklemeye Al
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* EXTRAS MODAL (Discount, Coupon, Ref) */}
+            {showExtrasModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
+                    <div className="w-full max-w-md bg-white dark:bg-[#0f172a] rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95">
+                        <h3 className="text-lg font-black tracking-tight mb-5">Sipariş Ekstraları</h3>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Sepet İndirimi (₺)</label>
+                                <div className="relative">
+                                    <Tag className="absolute left-3 top-1/2 -mt-2.5 text-slate-400" size={20} />
+                                    <input type="number" min="0" value={appliedDiscount || ''} onChange={e => setAppliedDiscount(Number(e.target.value))} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="0.00" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Kupon Kodu</label>
+                                <input type="text" value={discountCode} onChange={e => setDiscountCode(e.target.value)} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500 uppercase" placeholder="KOD GİRİN" />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Puan Kullan ({customer?.points || 0} Kullanılabilir)</label>
+                                <div className="relative">
+                                    <Gift className="absolute left-3 top-1/2 -mt-2.5 text-slate-400" size={20} />
+                                    <input type="number" max={customer?.points || 0} min="0" value={pointsToUse || ''} onChange={e => setPointsToUse(Number(e.target.value))} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="0" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Sipariş Notu / Referans</label>
+                                <div className="relative">
+                                    <FileText className="absolute left-3 top-1/2 -mt-2.5 text-slate-400" size={20} />
+                                    <input type="text" value={referenceNote} onChange={e => setReferenceNote(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="Örn: Evrak No, Sipariş No, Masa No vb." />
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onClick={() => setShowExtrasModal(false)} className="mt-6 w-full h-12 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">EKLE VE KAPAT</button>
+                    </div>
+                </div>
+            )}
+
+            {showCheckoutModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
+                    <div className="w-full max-w-lg bg-white dark:bg-[#0f172a] rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-2xl animate-in fade-in slide-in-from-bottom-4">
+                        <h3 className="text-xl font-black mb-4 flex items-center gap-2 tracking-tight"><CreditCard className="text-indigo-500" /> Ödemeyi Tamamla</h3>
+
+                        <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-5 rounded-2xl mb-6 shadow-sm">
+                            <div className="flex justify-between text-sm font-bold text-slate-500 mb-2"><span>Sepet Ara Toplam</span><span>₺{subtotal.toLocaleString()}</span></div>
+                            {(appliedDiscount > 0 || pointsToUse > 0) && (
+                                <div className="flex justify-between text-sm font-bold text-emerald-500 mb-2"><span>İndirim / Puan</span><span>-₺{(appliedDiscount + (pointsToUse || 0)).toLocaleString()}</span></div>
+                            )}
+                            <div className="h-px w-full bg-slate-200 dark:bg-white/10 my-3"></div>
+                            <div className="flex justify-between text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight"><span>Genel Toplam</span><span>₺{finalTotal.toLocaleString()}</span></div>
+                        </div>
+
+                        {paymentMode !== 'account' && (
+                            <div className="mb-6">
+                                <label className="text-[10px] font-bold opacity-50 uppercase tracking-widest block mb-3">Hedef Kasa / Banka Seçimi</label>
+                                <div className="grid grid-cols-2 gap-3 max-h-[160px] overflow-y-auto pr-1">
+                                    {(kasalar || []).filter((k: any) => paymentMode === 'cash' ? k.type === 'Nakit' : k.type !== 'Nakit').map((k: any) => (
+                                        <button
+                                            key={k.id}
+                                            onClick={() => setSelectedKasa(k.id)}
+                                            className={`p-4 rounded-xl border flex flex-col justify-center transition-all shadow-sm ${selectedKasa === k.id ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 ring-2 ring-indigo-500/50' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'}`}
+                                        >
+                                            <span className={`text-sm font-bold truncate block w-full text-left ${selectedKasa === k.id ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300'}`}>{k.name}</span>
+                                            <span className={`text-[10px] mt-1 text-left uppercase font-bold tracking-widest ${selectedKasa === k.id ? 'text-indigo-500 dark:text-indigo-500/70' : 'text-slate-400 dark:text-slate-500'}`}>{k.currency || 'TRY'} • Bakiye: {k.balance || 0}</span>
+                                        </button>
+                                    ))}
+                                    {(!(kasalar || []).filter((k: any) => paymentMode === 'cash' ? k.type === 'Nakit' : k.type !== 'Nakit').length) && (
+                                        <div className="col-span-2 text-sm text-center py-4 bg-slate-50 dark:bg-[#020617] rounded-xl text-slate-500 border border-slate-200 dark:border-white/5 font-medium">Bu ödeme tipi için tanımlı kasa bulunamadı.</div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex gap-3 mt-8">
+                            <button onClick={() => setShowCheckoutModal(false)} className="flex-1 py-4 font-bold rounded-xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">İptal / Vazgeç</button>
+                            <button onClick={executeSale} disabled={isProcessing} className="flex-1 py-4 font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-md shadow-indigo-600/20 text-[15px]">
+                                {isProcessing ? 'İŞLENİYOR...' : 'ONAYLA VE BİTİR'}
                             </button>
                         </div>
                     </div>
