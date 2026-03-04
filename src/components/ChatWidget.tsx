@@ -87,25 +87,23 @@ export default function ChatWidget() {
     // ─────────────────────────────────────────────────────────────────────────
 
     return (
-        <>
-            {/* Toggle Button — Enterprise: slate, no glow, rounded-lg */}
+        <div className="relative inline-block">
+            {/* Toggle Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`fixed z-[9000] flex items-center justify-center transition-all duration-200 shadow-sm border
+                className={`flex items-center justify-center transition-all duration-200 shadow-sm border
                     ${isOpen
                         ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
                         : 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900'}
-                    bottom-20 right-6 w-10 h-10 rounded-lg
-                    md:bottom-6 md:right-6
-                    max-md:top-[14px] max-md:right-[80px] max-md:bottom-auto max-md:w-8 max-md:h-8
+                    w-10 h-10 rounded-lg shrink-0
                 `}
             >
                 <span className="text-base">{isOpen ? '✕' : '💬'}</span>
             </button>
 
-            {/* Chat Window — flat slate, shadow-sm, rounded-xl */}
+            {/* Chat Window */}
             {isOpen && (
-                <div className="fixed z-[9000] w-[350px] max-md:w-[90vw] max-md:left-[5vw] h-[500px] max-md:h-[60vh] bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm flex flex-col overflow-hidden animate-in fade-in duration-200 bottom-36 right-6 md:bottom-20 md:right-6 max-md:top-20 max-md:bottom-auto">
+                <div className="absolute z-[9000] w-[350px] max-md:w-[90vw] max-md:-right-[10vw] h-[500px] max-md:h-[60vh] bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg flex flex-col overflow-hidden animate-in fade-in duration-200 top-full mt-2 right-0 origin-top-right">
 
                     {/* Header */}
                     <div className="h-12 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 justify-between shrink-0">
@@ -233,6 +231,6 @@ export default function ChatWidget() {
                     )}
                 </div>
             )}
-        </>
+        </div>
     );
 }

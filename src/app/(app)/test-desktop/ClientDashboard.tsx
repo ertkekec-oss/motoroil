@@ -16,6 +16,10 @@ import { useApp } from '@/contexts/AppContext';
 import "./density-80.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
+import NotificationCenter from "@/components/NotificationCenter";
+import ChatWidget from "@/components/ChatWidget";
+import SalesMonitor from "@/components/SalesMonitor";
 
 const formatter = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 0 });
 const pFormatter = new Intl.NumberFormat('tr-TR', { style: 'percent', minimumFractionDigits: 1 });
@@ -289,12 +293,27 @@ export default function ClientDashboard() {
                             <h2 className="text-[25px] sm:text-[36px] font-[700] tracking-tight text-[#0F172A] dark:text-white leading-tight mb-1">PERİODYA DASHBOARD</h2>
                             <p className="text-[12.5px] font-semibold text-slate-500 tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full opacity-80">Tüm Kurumsal Ağın Gerçek Zamanlı Özeti</p>
                         </div>
-                        {!isBroadcastDismissed && (
-                            <div className="hidden lg:flex items-center gap-2 mt-2 px-3 py-1.5 rounded-full bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-800/20">
-                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80"></div>
-                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Board Notice Active</span>
+                        <div className="flex flex-col items-end gap-3">
+                            <div className="flex flex-row items-center gap-2.5">
+                                <ThemeToggle />
+                                <NotificationCenter />
+                                <ChatWidget />
+                                {user && (
+                                    <SalesMonitor
+                                        userRole={user.role || 'GUEST'}
+                                        currentBranch={user.branch || 'Merkez'}
+                                        currentStaff={user.name || 'Staff'}
+                                    />
+                                )}
                             </div>
-                        )}
+
+                            {!isBroadcastDismissed && (
+                                <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-800/20 shadow-sm relative z-0">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80"></div>
+                                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Board Notice Active</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* EXECUTIVE PRESENCE LAYER */}

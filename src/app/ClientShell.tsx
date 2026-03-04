@@ -9,13 +9,10 @@ import { useInventory } from "../contexts/InventoryContext";
 import { useFinancials } from "../contexts/FinancialContext";
 import Sidebar from "../components/Sidebar";
 
-import SalesMonitor from "../components/SalesMonitor";
-import ChatWidget from "../components/ChatWidget";
 import { MobileNav } from "../components/MobileNav";
 import { GrowthBanner } from "../components/GrowthBanner";
 import GlobalErrorScreen from "../components/GlobalErrorScreen";
 import AppSkeleton from "../components/AppSkeleton";
-import NotificationCenter from "../components/NotificationCenter";
 import CommandPalette from "../components/CommandPalette";
 
 const permMap: Record<string, { perm?: string, feature?: string }> = {
@@ -100,7 +97,6 @@ function MobileHeader() {
             </button>
             <div style={{ fontWeight: '800', fontSize: '18px', flex: 1 }}>{getTitle(pathname || '')}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <NotificationCenter />
                 <div style={{ fontSize: '20px' }}>⚡</div>
             </div>
         </header>
@@ -235,20 +231,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                     {showSidebar && <GrowthBanner />}
                     {children}
 
-                    {auth.user && !isAdminPage && (
-                        <>
-                            {widgetsReady && (
-                                <>
-                                    <SalesMonitor
-                                        userRole={auth.user.role}
-                                        currentBranch={auth.user.branch}
-                                        currentStaff={auth.user.name}
-                                    />
-                                    <ChatWidget />
-                                </>
-                            )}
-                        </>
-                    )}
                 </main>
                 {showSidebar && <MobileNav />}
             </div>

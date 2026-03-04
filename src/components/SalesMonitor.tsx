@@ -245,11 +245,11 @@ export default function SalesMonitor({
     if (!isAdmin) return null;
 
     return (
-        <>
-            {/* Floating Button */}
+        <div className="relative inline-block">
+            {/* Inline Button */}
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="sales-monitor-btn"
+                className="sales-monitor-inline-btn"
                 title="Kaçak Satış Monitörü"
                 style={{
                     background: isListening ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
@@ -261,7 +261,7 @@ export default function SalesMonitor({
 
             {/* Badge - Şüpheli olay sayısı */}
             {suspiciousEvents.length > 0 && (
-                <div className="sales-monitor-badge">
+                <div className="sales-monitor-inline-badge">
                     {suspiciousEvents.length}
                 </div>
             )}
@@ -364,67 +364,68 @@ export default function SalesMonitor({
             )}
 
             <style jsx>{`
-                .sales-monitor-btn {
-                    position: fixed;
-                    bottom: 24px;
-                    right: 100px;
-                    width: 64px;
-                    height: 64px;
-                    border-radius: 20px;
-                    border: 4px solid var(--bg-deep);
+                .sales-monitor-inline-btn {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 8px;
+                    border: none;
                     color: white;
-                    font-size: 28px;
+                    font-size: 18px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     cursor: pointer;
-                    z-index: 9999;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    flex-shrink: 0;
                 }
-                .sales-monitor-badge {
-                    position: fixed;
-                    bottom: 72px;
-                    right: 96px;
+                .sales-monitor-inline-btn:hover {
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+                }
+                .sales-monitor-inline-badge {
+                    position: absolute;
+                    top: -6px;
+                    right: -6px;
                     background: #ff3b3b;
                     color: white;
-                    font-size: 11px;
+                    font-size: 10px;
                     font-weight: 900;
-                    min-width: 20px;
-                    height: 20px;
+                    min-width: 18px;
+                    height: 18px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    border-radius: 10px;
-                    z-index: 10000;
-                    border: 2px solid var(--bg-deep);
+                    border-radius: 9px;
+                    z-index: 10;
+                    border: 2px solid var(--bg-card);
                     padding: 0 4px;
                 }
                 .sales-monitor-panel {
-                    position: fixed;
-                    bottom: 100px;
-                    right: 24px;
+                    position: absolute;
+                    top: calc(100% + 10px);
+                    right: 0;
                     width: 320px;
                     background: var(--bg-card);
                     
                     border: 1px solid var(--border-rich);
-                    border-radius: 24px;
-                    padding: 24px;
+                    border-radius: 12px;
+                    padding: 16px;
                     z-index: 9998;
                     display: flex;
                     flex-direction: column;
                     gap: 16px;
-                    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-                    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                    animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                    transform-origin: top right;
                 }
                 @keyframes pulse {
-                    0%, 100% { box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3), 0 0 0 0px rgba(239, 68, 68, 0.4); }
-                    50% { box-shadow: 0 4px 30px rgba(239, 68, 68, 0.6), 0 0 0 10px rgba(239, 68, 68, 0); }
+                    0%, 100% { box-shadow: 0 0 0 0px rgba(239, 68, 68, 0.2); }
+                    50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
                 }
                 @keyframes slideUp {
                     from {
                         opacity: 0;
-                        transform: translateY(20px) scale(0.95);
+                        transform: translateY(10px) scale(0.95);
                     }
                     to {
                         opacity: 1;
@@ -432,6 +433,6 @@ export default function SalesMonitor({
                     }
                 }
             `}</style>
-        </>
+        </div>
     );
 }
