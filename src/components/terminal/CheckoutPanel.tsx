@@ -8,16 +8,16 @@ export default function CheckoutPanel({
 }: any) {
 
     return (
-        <div className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex flex-col shadow-sm flex-1 min-h-0 overflow-hidden">
-            <h2 className="text-[10px] font-black opacity-40 mb-6 tracking-widest text-center shrink-0 uppercase">SATIŞ ÖZETİ</h2>
+        <div className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-2xl p-4 lg:p-6 flex flex-col shadow-sm flex-1 min-h-0 overflow-hidden">
+            <h2 className="text-[10px] font-black opacity-40 mb-4 tracking-widest text-center shrink-0 uppercase">SATIŞ ÖZETİ</h2>
 
-            <div className="flex-1 overflow-y-auto pr-0 space-y-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex-1 overflow-y-auto pr-0 space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {/* Customer Select */}
                 <div>
                     <label className="text-[10px] font-bold opacity-50 block mb-2 uppercase tracking-widest">Müşteri / Cari</label>
                     <div
                         onClick={() => setIsCustomerModalOpen(true)}
-                        className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-white/5 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-500/30 transition-all shadow-sm group"
+                        className="flex justify-between items-center bg-white dark:bg-slate-900 p-3 lg:p-4 rounded-xl border border-slate-200 dark:border-white/5 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-500/30 transition-all shadow-sm group"
                     >
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
@@ -63,38 +63,38 @@ export default function CheckoutPanel({
                 {/* Payment Methods */}
                 <div>
                     <label className="text-[10px] font-bold opacity-50 block mb-2 uppercase tracking-widest">ÖDEME YÖNTEMİ</label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2">
                         <button
                             onClick={() => setPaymentMode('cash')}
-                            className={`p-4 rounded-xl border flex items-center justify-center gap-2.5 transition-all text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'cash'
+                            className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all text-xs lg:text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'cash'
                                 ? 'bg-indigo-600 border-indigo-600 text-white dark:bg-indigo-500 dark:border-indigo-500'
                                 : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-white/20'
                                 }`}
                         >
-                            <Banknote size={18} /> Nakit <span className="text-[9px] opacity-60 ml-auto hidden sm:inline-block">F11</span>
+                            <Banknote size={16} /> Nakit <span className="text-[9px] opacity-60 ml-auto hidden xl:inline-block">F11</span>
                         </button>
                         <button
                             onClick={() => setPaymentMode('card')}
-                            className={`p-4 rounded-xl border flex items-center justify-center gap-2.5 transition-all text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'card'
+                            className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all text-xs lg:text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'card'
                                 ? 'bg-indigo-600 border-indigo-600 text-white dark:bg-indigo-500 dark:border-indigo-500'
                                 : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-white/20'
                                 }`}
                         >
-                            <CreditCard size={18} /> Kredi Kartı <span className="text-[9px] opacity-60 ml-auto hidden sm:inline-block">F12</span>
+                            <CreditCard size={16} /> Kredi Kartı <span className="text-[9px] opacity-60 ml-auto hidden xl:inline-block">F12</span>
                         </button>
                         <button
                             onClick={() => setPaymentMode('transfer')}
-                            className={`p-4 rounded-xl border flex items-center justify-center gap-2.5 transition-all text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'transfer'
+                            className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all text-xs lg:text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'transfer'
                                 ? 'bg-indigo-600 border-indigo-600 text-white dark:bg-indigo-500 dark:border-indigo-500'
                                 : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-white/20'
                                 }`}
                         >
-                            <Landmark size={18} /> Havale/EFT
+                            <Landmark size={16} /> Havale/EFT
                         </button>
                         <button
                             disabled={selectedCustomer === 'Perakende Müşteri'}
                             onClick={() => setPaymentMode('account')}
-                            className={`p-4 rounded-xl border flex items-center justify-center gap-2.5 transition-all text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-[#0f172a] ${selectedCustomer === 'Perakende Müşteri'
+                            className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all text-xs lg:text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-[#0f172a] ${selectedCustomer === 'Perakende Müşteri'
                                 ? 'bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-white/5 text-slate-300 dark:text-slate-600 cursor-not-allowed'
                                 : paymentMode === 'account'
                                     ? 'bg-indigo-600 border-indigo-600 text-white dark:bg-indigo-500 dark:border-indigo-500'
