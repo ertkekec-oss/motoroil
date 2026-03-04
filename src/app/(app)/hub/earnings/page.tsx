@@ -67,36 +67,36 @@ export default function NetworkEarningsPage() {
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">💵 Ağ Kazançları</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">💵 Ağ Kazançları</h1>
             <FinanceStatusBanner />
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <p className="text-sm font-semibold text-slate-500 mb-1">Toplam Bekleyen Kazanç</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatMoney(kpis?.pendingNetTotal || 0)}</p>
+                <div className="bg-white dark:bg-[#0f172a] p-5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
+                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Toplam Bekleyen Kazanç</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatMoney(kpis?.pendingNetTotal || 0)}</p>
                     <div className="text-xs text-orange-600 mt-2 font-medium bg-orange-50 inline-block px-2 py-1 rounded">PENDING & CLEARED</div>
                 </div>
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <p className="text-sm font-semibold text-slate-500 mb-1">Serbest Bırakılacak (7 Gün)</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatMoney(kpis?.releasingNext7dNetTotal || 0)}</p>
+                <div className="bg-white dark:bg-[#0f172a] p-5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
+                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Serbest Bırakılacak (7 Gün)</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatMoney(kpis?.releasingNext7dNetTotal || 0)}</p>
                     <div className="text-xs text-blue-600 mt-2 font-medium bg-blue-50 inline-block px-2 py-1 rounded">KESİNLEŞTİ</div>
                 </div>
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <p className="text-sm font-semibold text-slate-500 mb-1">Serbest Bırakılan (30 Gün)</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatMoney(kpis?.releasedLast30dNetTotal || 0)}</p>
+                <div className="bg-white dark:bg-[#0f172a] p-5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
+                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Serbest Bırakılan (30 Gün)</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{formatMoney(kpis?.releasedLast30dNetTotal || 0)}</p>
                     <div className="text-xs text-green-600 mt-2 font-medium bg-green-50 inline-block px-2 py-1 rounded">ÖDENDİ</div>
                 </div>
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <p className="text-sm font-semibold text-slate-500 mb-1">Ortalama Release Süresi</p>
-                    <p className="text-2xl font-bold text-slate-900">{kpis?.avgReleaseTimeHours ? (kpis.avgReleaseTimeHours / 24).toFixed(1) : "0"} Gün</p>
-                    <div className="text-xs text-slate-600 mt-2 font-medium bg-slate-100 inline-block px-2 py-1 rounded">Sektör Ort.: 15.0 Gün</div>
+                <div className="bg-white dark:bg-[#0f172a] p-5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
+                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Ortalama Release Süresi</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{kpis?.avgReleaseTimeHours ? (kpis.avgReleaseTimeHours / 24).toFixed(1) : "0"} Gün</p>
+                    <div className="text-xs text-slate-600 dark:text-slate-400 mt-2 font-medium bg-slate-100 inline-block px-2 py-1 rounded">Sektör Ort.: 15.0 Gün</div>
                 </div>
             </div>
 
             {/* List */}
-            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
-                <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl shadow-sm overflow-hidden flex flex-col">
+                <div className="border-b border-slate-200 dark:border-white/5 px-6 py-4 flex items-center justify-between">
                     <div className="flex space-x-6">
                         <button onClick={() => setActiveTab("pending")} className={`text-sm font-semibold pb-4 -mb-4 border-b-2 transition-colors ${activeTab === "pending" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}>Bekleyen ({earnings.filter(e => ["PENDING", "CLEARED"].includes(e.status)).length})</button>
                         <button onClick={() => setActiveTab("released")} className={`text-sm font-semibold pb-4 -mb-4 border-b-2 transition-colors ${activeTab === "released" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}>Serbest Bırakılan</button>
@@ -105,8 +105,8 @@ export default function NetworkEarningsPage() {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-slate-600">
-                        <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                    <table className="w-full text-left text-sm text-slate-600 dark:text-slate-400">
+                        <thead className="bg-slate-50 dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-white/5">
                             <tr>
                                 <th className="px-6 py-3 font-semibold">Tarih</th>
                                 <th className="px-6 py-3 font-semibold">Shipment Ref</th>
@@ -118,7 +118,7 @@ export default function NetworkEarningsPage() {
                                 <th className="px-6 py-3 font-semibold"></th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 bg-white">
+                        <tbody className="divide-y divide-slate-100 bg-white dark:bg-[#0f172a]">
                             {loading ? (
                                 <tr>
                                     <td colSpan={8} className="px-6 py-12 text-center text-slate-400">Veriler yükleniyor...</td>
@@ -129,9 +129,9 @@ export default function NetworkEarningsPage() {
                                 </tr>
                             ) : (
                                 filteredEarnings.map(item => (
-                                    <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                                    <tr key={item.id} className="hover:bg-slate-50 dark:bg-[#1e293b] transition-colors group">
                                         <td className="px-6 py-4 whitespace-nowrap">{formatDate(item.createdAt)}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-900">{item.refId}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-900 dark:text-white">{item.refId}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">{formatMoney(item.gross)}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-red-600">-{formatMoney(item.commission)}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right font-bold text-green-700">{formatMoney(item.net)}</td>
@@ -140,7 +140,7 @@ export default function NetworkEarningsPage() {
                                                 {item.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-slate-500">{formatDate(item.expectedClearDate)}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-slate-500 dark:text-slate-400">{formatDate(item.expectedClearDate)}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <button className="text-blue-600 hover:text-blue-800 font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity">Detay</button>
                                         </td>

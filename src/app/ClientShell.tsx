@@ -225,7 +225,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 )}
 
                 <main
-                    className="main-content flex-1 min-w-0"
+                    className="main-content flex-1 min-w-0 bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617]"
                     onClick={() => {
                         if (app.isSidebarOpen && typeof window !== 'undefined' && window.innerWidth < 768) {
                             app.setIsSidebarOpen(false);

@@ -30,20 +30,20 @@ function FinanceTabs() {
     };
 
     return (
-        <div className="bg-slate-50 min-h-screen w-full font-sans">
+        <div className="bg-slate-50 min-h-screen dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] w-full font-sans">
             <div className="max-w-[1600px] mx-auto pt-8">
                 {/* Header & Tabs */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8 px-4 sm:px-6 lg:px-8">
                     <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">
+                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-1">
                             B2B Finansal Operasyon Merkezi (Finance Gateway)
                         </h1>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
                             Pazaryeri tahsilatları, escrow hakediş blokajları, komisyon faturaları ve nakit (payout) çıkış talepleri paneli.
                         </p>
                     </div>
 
-                    <div className="flex bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden p-1 shrink-0">
+                    <div className="flex bg-white dark:bg-[#0f172a] rounded-lg border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden p-1 shrink-0">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
@@ -68,10 +68,10 @@ function FinanceTabs() {
 export default function UnifiedFinancePage() {
     return (
         <Suspense fallback={
-            <div className="bg-slate-50 min-h-screen flex items-center justify-center p-12">
-                <div className="bg-white p-12 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center items-center">
-                    <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-4"></div>
-                    <span className="text-sm font-medium text-slate-500 uppercase tracking-widest">Finans Modülleri Başlatılıyor...</span>
+            <div className="bg-slate-50 min-h-screen dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] flex items-center justify-center p-12">
+                <div className="bg-white dark:bg-[#0f172a] p-12 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm flex flex-col justify-center items-center">
+                    <div className="w-8 h-8 border-4 border-slate-200 dark:border-white/5 border-t-slate-900 rounded-full animate-spin mb-4"></div>
+                    <span className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">Finans Modülleri Başlatılıyor...</span>
                 </div>
             </div>
         }>
