@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: any }) {
     try {
         const session = await getSession();
         if (!session) {
@@ -17,10 +17,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
         const body = await req.json();
 
-        // Tenant checks on whether the dealer with {params.id} belongs to {tenantId} would happen here
-        console.log(`[Credit] Modifying limit for ${params.id} at tenant ${tenantId} by ${user.id}`);
+        const resolvedParams = await Promise.resolve(params);
+        const orderId = resolvedParams.id;
 
-        return NextResponse.json({ success: true, message: `Kredi limiti güncellendi: ${params.id}`, limit: body.creditLimit });
+        // Tenant checks on whether the dealer with {params.id} belongs to {tenantId} would happen here
+        console.log(`[Credit] Modifying limit for ${orderId} at tenant ${tenantId} by ${user.id}`);
+
+        return NextResponse.json({ success: true, message: `Kredi limiti güncellendi: ${orderId}`, limit: body.creditLimit });
     } catch (error: any) {
         if (error.message === 'UNAUTHORIZED') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
