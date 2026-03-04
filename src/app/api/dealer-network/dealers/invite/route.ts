@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
-// @ts-ignore
-import { requireUserContext } from '@/lib/auth';
+import { getSession } from '@/lib/auth';
 
 export async function POST(req: Request) {
     try {
-        const { user, tenantId } = await requireUserContext();
+        const session = await getSession();
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const user = session.user || session;
+        const tenantId = session.tenantId || user.tenantId;
 
         if (!user.permissions?.includes('b2b_manage') && user.role !== 'TENANT_OWNER') {
             return NextResponse.json({ error: 'Bu islem icin b2b_manage yetkisi gereklidir' }, { status: 403 });
