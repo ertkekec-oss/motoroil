@@ -68,7 +68,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
     const items = Array.from(catalogMap.values());
 
     return (
-        <div className="bg-slate-50 dark:bg-transparent min-h-screen pb-16 w-full font-sans">
+        <div className="bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] min-h-screen pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
@@ -81,7 +81,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                         </p>
                     </div>
 
-                    <div className="flex bg-white dark:bg-[#080911] rounded-lg border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden p-1 shrink-0">
+                    <div className="flex bg-white dark:bg-[#0f172a] rounded-lg border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden p-1 shrink-0">
                         <Link
                             href="/catalog"
                             className="px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm"
@@ -92,12 +92,12 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                 </div>
 
                 {/* Filtre Strip */}
-                <div className="bg-white dark:bg-[#080911] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
                     <div className="relative w-full sm:w-80">
                         <input
                             type="text"
                             placeholder="Marka, kod, isim veya SKU ile arayın..."
-                            className="w-full text-sm border border-slate-300 dark:border-white/20 rounded-lg px-4 py-2 bg-slate-50 dark:bg-[#080911] focus:bg-white dark:bg-[#080911] focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-white/10/20 focus:border-slate-900 dark:focus:border-white/40 transition-all font-medium placeholder:text-slate-400 dark:text-slate-500"
+                            className="w-full text-sm border border-slate-300 dark:border-white/20 rounded-lg px-4 py-2 bg-slate-50 dark:bg-[#0f172a] focus:bg-white dark:bg-[#0f172a] focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-white/10/20 focus:border-slate-900 dark:focus:border-white/40 transition-all font-medium placeholder:text-slate-400 dark:text-slate-500"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">🔍</span>
                     </div>
@@ -105,15 +105,15 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                         <button className="px-5 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-[13px] font-semibold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shadow-sm">
                             Filtreyi Uygula
                         </button>
-                        <button className="px-5 py-2 border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 text-[13px] font-semibold rounded-lg hover:bg-slate-50 dark:bg-[#080911] transition-colors shadow-sm bg-white dark:bg-[#080911]">
+                        <button className="px-5 py-2 border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 text-[13px] font-semibold rounded-lg hover:bg-slate-50 dark:bg-[#0f172a] transition-colors shadow-sm bg-white dark:bg-[#0f172a]">
                             Kategori Seç
                         </button>
                     </div>
                 </div>
 
                 {/* Ana Veri Tablosu */}
-                <div className="bg-white dark:bg-[#080911] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden">
-                    <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#080911]/50 flex items-center justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#0f172a]/50 flex items-center justify-between">
                         <h2 className="text-base font-semibold text-slate-900 dark:text-white">Endüstriyel Parça İndeksi</h2>
                         <span className="inline-flex items-center justify-center min-w-8 h-8 px-2 bg-slate-200/50 text-[12px] font-bold text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm">
                             {items.length} Kayıt
@@ -122,7 +122,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-left table-auto">
-                            <thead className="bg-white dark:bg-[#080911] border-b border-slate-200 dark:border-white/10 text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold tracking-wide">
+                            <thead className="bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-white/10 text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold tracking-wide">
                                 <tr>
                                     <th className="px-6 py-4 font-bold">Referans / Barkod</th>
                                     <th className="px-6 py-4 font-bold">Ürün Tanımı</th>
@@ -143,9 +143,9 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                                     </tr>
                                 ) : (
                                     items.map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-slate-50 dark:bg-[#080911] transition-colors group">
-                                            <td className="px-6 py-4 font-mono text-[13px] text-slate-500 dark:text-slate-400 bg-white dark:bg-[#080911] group-hover:bg-slate-50 dark:bg-[#080911]">
-                                                <span className="px-2 py-0.5 border border-slate-200 dark:border-white/10 rounded text-slate-600 dark:text-slate-300 font-semibold bg-slate-50 dark:bg-[#080911]">
+                                        <tr key={idx} className="hover:bg-slate-50 dark:bg-[#0f172a] transition-colors group">
+                                            <td className="px-6 py-4 font-mono text-[13px] text-slate-500 dark:text-slate-400 bg-white dark:bg-[#0f172a] group-hover:bg-slate-50 dark:bg-[#0f172a]">
+                                                <span className="px-2 py-0.5 border border-slate-200 dark:border-white/10 rounded text-slate-600 dark:text-slate-300 font-semibold bg-slate-50 dark:bg-[#0f172a]">
                                                     {item.product.barcode || item.product.id.slice(0, 8)}
                                                 </span>
                                             </td>
@@ -184,7 +184,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                                             <td className="px-6 py-4 text-center">
                                                 <Link
                                                     href={`/catalog/${item.product.id}`}
-                                                    className="inline-flex items-center justify-center h-8 px-4 bg-white dark:bg-[#080911] border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 text-[13px] font-semibold rounded-lg hover:bg-slate-900 hover:border-slate-900 hover:text-white transition-colors shadow-sm"
+                                                    className="inline-flex items-center justify-center h-8 px-4 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 text-[13px] font-semibold rounded-lg hover:bg-slate-900 hover:border-slate-900 hover:text-white transition-colors shadow-sm"
                                                 >
                                                     İncele
                                                 </Link>
@@ -196,7 +196,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                         </table>
                     </div>
 
-                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#080911]/50 flex items-center justify-between">
+                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#0f172a]/50 flex items-center justify-between">
                         <div className="text-[13px] font-medium text-slate-500 dark:text-slate-400">
                             Sayfa 1 / 1
                         </div>

@@ -113,7 +113,7 @@ export default async function SellerOrdersPage({
     const nextCursor = hasNext ? data[data.length - 1]?.id : null;
 
     return (
-        <div className="bg-slate-50 dark:bg-transparent min-h-screen pb-16 w-full font-sans">
+        <div className="bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] min-h-screen pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
@@ -127,28 +127,28 @@ export default async function SellerOrdersPage({
                     </div>
 
                     {/* Filtre Strip */}
-                    <div className="flex bg-white dark:bg-[#080911] rounded-lg border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden p-1 shrink-0">
+                    <div className="flex bg-white dark:bg-[#0f172a] rounded-lg border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden p-1 shrink-0">
                         <Link
                             href="/hub/seller/orders"
-                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${!status ? "bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-[#080911]"}`}
+                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${!status ? "bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-[#0f172a]"}`}
                         >
                             Tümü
                         </Link>
                         <Link
                             href="/hub/seller/orders?status=PENDING_PAYMENT"
-                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "PENDING_PAYMENT" ? "bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-[#080911]"}`}
+                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "PENDING_PAYMENT" ? "bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-[#0f172a]"}`}
                         >
                             Açık (Awaiting)
                         </Link>
                         <Link
                             href="/hub/seller/orders?status=PAID"
-                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "PAID" ? "bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-[#080911]"}`}
+                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "PAID" ? "bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-[#0f172a]"}`}
                         >
                             Ödendi (Hazırlanıyor)
                         </Link>
                         <Link
                             href="/hub/seller/orders?status=DELIVERED"
-                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "DELIVERED" ? "bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-[#080911]"}`}
+                            className={`px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors ${status === "DELIVERED" ? "bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm" : "bg-transparent text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-[#0f172a]"}`}
                         >
                             Teslim Edildi
                         </Link>
@@ -156,10 +156,10 @@ export default async function SellerOrdersPage({
                 </div>
 
                 {/* Ana Veri Alanı (Container) */}
-                <div className="bg-white dark:bg-[#080911] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left table-auto">
-                            <thead className="bg-slate-50 dark:bg-[#080911]/50 border-b border-slate-100 dark:border-white/5 text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold tracking-wide">
+                            <thead className="bg-slate-50 dark:bg-[#0f172a]/50 border-b border-slate-100 dark:border-white/5 text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold tracking-wide">
                                 <tr>
                                     <th className="px-6 py-4 font-bold">Referans No</th>
                                     <th className="px-6 py-4 font-bold">Müşteri (Alıcı)</th>
@@ -173,7 +173,7 @@ export default async function SellerOrdersPage({
                                 {data.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-16 text-center">
-                                            <div className="w-16 h-16 bg-slate-50 dark:bg-[#080911] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-200 dark:border-white/10 shadow-sm">
+                                            <div className="w-16 h-16 bg-slate-50 dark:bg-[#0f172a] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-200 dark:border-white/10 shadow-sm">
                                                 📦
                                             </div>
                                             <p className="text-[15px] font-semibold text-slate-900 dark:text-white">Sipariş Bulunamadı</p>
@@ -184,7 +184,7 @@ export default async function SellerOrdersPage({
                                     </tr>
                                 ) : (
                                     data.map((o) => (
-                                        <tr key={o.id} className="hover:bg-slate-50 dark:bg-[#080911] transition-colors group">
+                                        <tr key={o.id} className="hover:bg-slate-50 dark:bg-[#0f172a] transition-colors group">
                                             <td className="px-6 py-4">
                                                 <Link
                                                     href={`/hub/seller/orders/${o.id}`}
@@ -223,7 +223,7 @@ export default async function SellerOrdersPage({
                         </table>
                     </div>
 
-                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#080911]/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#0f172a]/50 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="text-[13px] font-medium text-slate-500 dark:text-slate-400">
                             {data.length} kayıt listeleniyor.
                         </div>
@@ -232,12 +232,12 @@ export default async function SellerOrdersPage({
                             {cursor ? (
                                 <Link
                                     href={status ? `/hub/seller/orders?status=${status}` : "/hub/seller/orders"}
-                                    className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 dark:border-white/20 bg-white dark:bg-[#080911] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#080911] transition-colors shadow-sm"
+                                    className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#0f172a] transition-colors shadow-sm"
                                 >
                                     Baştan
                                 </Link>
                             ) : (
-                                <span className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#080911] text-slate-400 dark:text-slate-500 cursor-not-allowed">
+                                <span className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a] text-slate-400 dark:text-slate-500 cursor-not-allowed">
                                     Baştan
                                 </span>
                             )}
@@ -249,12 +249,12 @@ export default async function SellerOrdersPage({
                                             ? `/hub/seller/orders?status=${status}&cursor=${nextCursor}`
                                             : `/hub/seller/orders?cursor=${nextCursor}`
                                     }
-                                    className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 dark:border-white/20 bg-white dark:bg-[#080911] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#080911] transition-colors shadow-sm"
+                                    className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0f172a] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#0f172a] transition-colors shadow-sm"
                                 >
                                     Daha Fazla
                                 </Link>
                             ) : (
-                                <span className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#080911] text-slate-400 dark:text-slate-500 cursor-not-allowed">
+                                <span className="h-9 px-4 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a] text-slate-400 dark:text-slate-500 cursor-not-allowed">
                                     Daha Fazla
                                 </span>
                             )}

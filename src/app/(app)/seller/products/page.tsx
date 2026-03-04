@@ -33,7 +33,7 @@ export default async function SellerProductsPage() {
     const unlistedCount = products.length - listedCount - pausedCount;
 
     return (
-        <div className="bg-slate-50 dark:bg-[#080911] dark:bg-transparent min-h-screen pb-16 w-full font-sans">
+        <div className="bg-slate-50 dark:bg-[#0f172a] dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] min-h-screen pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
@@ -48,7 +48,7 @@ export default async function SellerProductsPage() {
 
                     <div className="flex items-center gap-3 shrink-0">
                         <button
-                            className="h-10 px-5 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold bg-slate-900 dark:bg-white dark:text-slate-900 dark:bg-white dark:bg-[#080911] dark:text-slate-900 dark:text-white dark:bg-white dark:bg-[#080911] dark:text-slate-900 dark:text-white dark:text-white text-white hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shadow-sm gap-2"
+                            className="h-10 px-5 inline-flex items-center justify-center rounded-lg text-[13px] font-semibold bg-slate-900 dark:bg-white dark:text-slate-900 dark:bg-white dark:bg-[#0f172a] dark:text-slate-900 dark:text-white dark:bg-white dark:bg-[#0f172a] dark:text-slate-900 dark:text-white dark:text-white text-white hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shadow-sm gap-2"
                         >
                             <span>+</span> Lokal Ürün Ekle
                         </button>
@@ -57,27 +57,27 @@ export default async function SellerProductsPage() {
 
                 {/* Dashboard Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-white dark:bg-[#080911] border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
                         <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-1">Lokal ERP Toplam Ürün</p>
                         <p className="text-3xl font-bold text-slate-900 dark:text-white dark:text-white dark:text-white">{products.length}</p>
                     </div>
-                    <div className="bg-white dark:bg-[#080911] border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
                         <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-1">Ağda Satışta (Aktif)</p>
                         <p className="text-3xl font-bold text-emerald-600">{listedCount}</p>
                     </div>
-                    <div className="bg-white dark:bg-[#080911] border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
                         <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-1">Durdurulan İlanlar</p>
                         <p className="text-3xl font-bold text-amber-600">{pausedCount}</p>
                     </div>
-                    <div className="bg-white dark:bg-[#080911] border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded-2xl p-5 shadow-sm relative overflow-hidden">
                         <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-1">B2B Ağına Kapalı</p>
                         <p className="text-3xl font-bold text-slate-400 dark:text-slate-500 dark:text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400">{unlistedCount}</p>
                     </div>
                 </div>
 
                 {/* Ana Veri Tablosu */}
-                <div className="bg-white dark:bg-[#080911] border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden">
-                    <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 dark:border-white/5 dark:border-white/5 bg-slate-50 dark:bg-[#080911]/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 dark:border-white/5 dark:border-white/5 bg-slate-50 dark:bg-[#0f172a]/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
                             <h2 className="text-base font-semibold text-slate-900 dark:text-white dark:text-white dark:text-white">Envanter Eşleştirme & Listeleme Tablosu</h2>
                             <p className="text-[13px] text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 mt-1">Lokal ürün kartları ve B2B listeleme fiyatlarını buradan yönetin.</p>
@@ -86,14 +86,14 @@ export default async function SellerProductsPage() {
                             <input
                                 type="text"
                                 placeholder="Barkod veya isim ara..."
-                                className="w-full text-sm border border-slate-300 dark:border-white/20 dark:border-white/20 dark:border-white/20 rounded-lg px-4 py-2 bg-white dark:bg-[#080911] focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-white/10 dark:focus:ring-white/10 dark:focus:ring-white/10/20 focus:border-slate-900 dark:focus:border-white/40 dark:focus:border-white/40 dark:focus:border-white/40 transition-all font-medium placeholder:text-slate-400 dark:text-slate-500 dark:text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 shadow-sm"
+                                className="w-full text-sm border border-slate-300 dark:border-white/20 dark:border-white/20 dark:border-white/20 rounded-lg px-4 py-2 bg-white dark:bg-[#0f172a] focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-white/10 dark:focus:ring-white/10 dark:focus:ring-white/10/20 focus:border-slate-900 dark:focus:border-white/40 dark:focus:border-white/40 dark:focus:border-white/40 transition-all font-medium placeholder:text-slate-400 dark:text-slate-500 dark:text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 shadow-sm"
                             />
                         </div>
                     </div>
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-left table-auto">
-                            <thead className="bg-white dark:bg-[#080911] border-b border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 text-xs uppercase text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 font-semibold tracking-wide">
+                            <thead className="bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 text-xs uppercase text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 font-semibold tracking-wide">
                                 <tr>
                                     <th className="px-6 py-4 font-bold">Lokal Ürün Kodu</th>
                                     <th className="px-6 py-4 font-bold">Ürün Nitelik / Adı</th>
@@ -119,9 +119,9 @@ export default async function SellerProductsPage() {
                                         const isListed = !!listing;
 
                                         return (
-                                            <tr key={p.id} className="hover:bg-slate-50 dark:bg-[#080911] transition-colors group">
-                                                <td className="px-6 py-4 font-mono text-[13px] text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 bg-white dark:bg-[#080911] group-hover:bg-slate-50 dark:bg-[#080911]">
-                                                    <span className="px-2 py-0.5 border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded text-slate-600 dark:text-slate-300 dark:text-slate-300 dark:text-slate-300 font-semibold bg-slate-50 dark:bg-[#080911]">
+                                            <tr key={p.id} className="hover:bg-slate-50 dark:bg-[#0f172a] transition-colors group">
+                                                <td className="px-6 py-4 font-mono text-[13px] text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 bg-white dark:bg-[#0f172a] group-hover:bg-slate-50 dark:bg-[#0f172a]">
+                                                    <span className="px-2 py-0.5 border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 rounded text-slate-600 dark:text-slate-300 dark:text-slate-300 dark:text-slate-300 font-semibold bg-slate-50 dark:bg-[#0f172a]">
                                                         {p.code || p.id.slice(0, 8)}
                                                     </span>
                                                 </td>
@@ -159,7 +159,7 @@ export default async function SellerProductsPage() {
                                                             </span>
                                                         )
                                                     ) : (
-                                                        <span className="inline-flex px-2.5 py-1 rounded bg-slate-100 dark:bg-white/5 dark:bg-white dark:bg-[#080911]/5 dark:bg-white dark:bg-[#080911]/5 text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10">
+                                                        <span className="inline-flex px-2.5 py-1 rounded bg-slate-100 dark:bg-white/5 dark:bg-white dark:bg-[#0f172a]/5 dark:bg-white dark:bg-[#0f172a]/5 text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10">
                                                             Yayında Değil
                                                         </span>
                                                     )}
@@ -171,7 +171,7 @@ export default async function SellerProductsPage() {
                                                             <span className="animate-pulse w-1.5 h-1.5 bg-blue-600 rounded-full"></span> B2B SYNC
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex px-2 py-0.5 rounded border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 bg-slate-50 dark:bg-[#080911] text-[11px] font-bold text-slate-400 dark:text-slate-500 dark:text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 tracking-wide">
+                                                        <span className="inline-flex px-2 py-0.5 rounded border border-slate-200 dark:border-white/10 dark:border-white/10 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a] text-[11px] font-bold text-slate-400 dark:text-slate-500 dark:text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 dark:text-slate-400 tracking-wide">
                                                             LOCAL ONLY
                                                         </span>
                                                     )}
@@ -181,8 +181,8 @@ export default async function SellerProductsPage() {
                                                     <Link
                                                         href={`/seller/products/${p.id}`}
                                                         className={`inline-flex items-center justify-center h-8 px-4 border text-[13px] font-semibold rounded-lg transition-colors shadow-sm focus:outline-none ${isListed
-                                                            ? 'bg-white dark:bg-[#080911] border-slate-300 dark:border-white/20 dark:border-white/20 dark:border-white/20 text-slate-700 dark:text-slate-200 dark:text-slate-200 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#080911] hover:text-slate-900 dark:text-white dark:text-white dark:text-white'
-                                                            : 'bg-slate-900 dark:bg-white dark:text-slate-900 dark:bg-white dark:bg-[#080911] dark:text-slate-900 dark:text-white border-transparent text-white hover:bg-slate-800'
+                                                            ? 'bg-white dark:bg-[#0f172a] border-slate-300 dark:border-white/20 dark:border-white/20 dark:border-white/20 text-slate-700 dark:text-slate-200 dark:text-slate-200 dark:text-slate-200 hover:bg-slate-50 dark:bg-[#0f172a] hover:text-slate-900 dark:text-white dark:text-white dark:text-white'
+                                                            : 'bg-slate-900 dark:bg-white dark:text-slate-900 dark:bg-white dark:bg-[#0f172a] dark:text-slate-900 dark:text-white border-transparent text-white hover:bg-slate-800'
                                                             }`}
                                                     >
                                                         {isListed ? "Yönet / İncele" : "B2B'de Yayınla"}
