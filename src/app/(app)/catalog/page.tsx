@@ -68,23 +68,23 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
     const items = Array.from(catalogMap.values());
 
     return (
-        <div className="bg-slate-50 min-h-screen pb-16 w-full font-sans">
+        <div className="bg-slate-50 dark:bg-transparent min-h-screen pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8">
                     <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">
+                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight mb-1">
                             B2B Tedarik Kataloğu <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 tracking-widest uppercase">Global Ağ</span>
                         </h1>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-slate-600 dark:text-slate-300">
                             Pazaryerindeki onaylı tedarikçilerin stoklarında bulunan ve anında sipariş edilebilir hazır ürünler tablosu.
                         </p>
                     </div>
 
-                    <div className="flex bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden p-1 shrink-0">
+                    <div className="flex bg-white dark:bg-[#080911] rounded-lg border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden p-1 shrink-0">
                         <Link
                             href="/catalog"
-                            className="px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors bg-slate-900 text-white shadow-sm"
+                            className="px-4 py-1.5 text-[13px] font-semibold rounded-md transition-colors bg-slate-900 dark:bg-white dark:text-slate-900 text-white shadow-sm"
                         >
                             Tüm Lüks Konsorsiyum Ağı
                         </Link>
@@ -92,37 +92,37 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                 </div>
 
                 {/* Filtre Strip */}
-                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div className="bg-white dark:bg-[#080911] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
                     <div className="relative w-full sm:w-80">
                         <input
                             type="text"
                             placeholder="Marka, kod, isim veya SKU ile arayın..."
-                            className="w-full text-sm border border-slate-300 rounded-lg px-4 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-all font-medium placeholder:text-slate-400"
+                            className="w-full text-sm border border-slate-300 dark:border-white/20 rounded-lg px-4 py-2 bg-slate-50 dark:bg-[#080911] focus:bg-white dark:bg-[#080911] focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-white/10/20 focus:border-slate-900 dark:focus:border-white/40 transition-all font-medium placeholder:text-slate-400 dark:text-slate-500"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">🔍</span>
                     </div>
                     <div className="flex gap-2">
-                        <button className="px-5 py-2 bg-slate-900 text-white text-[13px] font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm">
+                        <button className="px-5 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-[13px] font-semibold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shadow-sm">
                             Filtreyi Uygula
                         </button>
-                        <button className="px-5 py-2 border border-slate-300 text-slate-700 text-[13px] font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-sm bg-white">
+                        <button className="px-5 py-2 border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 text-[13px] font-semibold rounded-lg hover:bg-slate-50 dark:bg-[#080911] transition-colors shadow-sm bg-white dark:bg-[#080911]">
                             Kategori Seç
                         </button>
                     </div>
                 </div>
 
                 {/* Ana Veri Tablosu */}
-                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                    <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                        <h2 className="text-base font-semibold text-slate-900">Endüstriyel Parça İndeksi</h2>
-                        <span className="inline-flex items-center justify-center min-w-8 h-8 px-2 bg-slate-200/50 text-[12px] font-bold text-slate-700 rounded-lg border border-slate-200 shadow-sm">
+                <div className="bg-white dark:bg-[#080911] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#080911]/50 flex items-center justify-between">
+                        <h2 className="text-base font-semibold text-slate-900 dark:text-white">Endüstriyel Parça İndeksi</h2>
+                        <span className="inline-flex items-center justify-center min-w-8 h-8 px-2 bg-slate-200/50 text-[12px] font-bold text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm">
                             {items.length} Kayıt
                         </span>
                     </div>
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-left table-auto">
-                            <thead className="bg-white border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold tracking-wide">
+                            <thead className="bg-white dark:bg-[#080911] border-b border-slate-200 dark:border-white/10 text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold tracking-wide">
                                 <tr>
                                     <th className="px-6 py-4 font-bold">Referans / Barkod</th>
                                     <th className="px-6 py-4 font-bold">Ürün Tanımı</th>
@@ -132,40 +132,40 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                                     <th className="px-6 py-4 font-bold text-center">Operasyon</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 text-[14px]">
+                            <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-[14px]">
                                 {items.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-16 text-center text-slate-500">
+                                        <td colSpan={6} className="px-6 py-16 text-center text-slate-500 dark:text-slate-400">
                                             <div className="text-3xl mb-4">🏪</div>
-                                            <p className="text-[15px] font-semibold text-slate-900">Katalog Boş</p>
-                                            <p className="text-[13px] text-slate-500 max-w-sm mx-auto mt-1">Platform üzerinde aktif satışta olan ürün kaydı bulunumadı.</p>
+                                            <p className="text-[15px] font-semibold text-slate-900 dark:text-white">Katalog Boş</p>
+                                            <p className="text-[13px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">Platform üzerinde aktif satışta olan ürün kaydı bulunumadı.</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     items.map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-slate-50 transition-colors group">
-                                            <td className="px-6 py-4 font-mono text-[13px] text-slate-500 bg-white group-hover:bg-slate-50">
-                                                <span className="px-2 py-0.5 border border-slate-200 rounded text-slate-600 font-semibold bg-slate-50">
+                                        <tr key={idx} className="hover:bg-slate-50 dark:bg-[#080911] transition-colors group">
+                                            <td className="px-6 py-4 font-mono text-[13px] text-slate-500 dark:text-slate-400 bg-white dark:bg-[#080911] group-hover:bg-slate-50 dark:bg-[#080911]">
+                                                <span className="px-2 py-0.5 border border-slate-200 dark:border-white/10 rounded text-slate-600 dark:text-slate-300 font-semibold bg-slate-50 dark:bg-[#080911]">
                                                     {item.product.barcode || item.product.id.slice(0, 8)}
                                                 </span>
                                             </td>
 
                                             <td className="px-6 py-4">
-                                                <div className="font-semibold text-slate-900">{item.product.name}</div>
-                                                <div className="text-[12px] text-slate-500 mt-0.5">{item.product.category || 'Genel Kategori'}</div>
+                                                <div className="font-semibold text-slate-900 dark:text-white">{item.product.name}</div>
+                                                <div className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">{item.product.category || 'Genel Kategori'}</div>
                                             </td>
 
-                                            <td className="px-6 py-4 font-mono font-semibold text-right text-[15px] text-slate-900">
+                                            <td className="px-6 py-4 font-mono font-semibold text-right text-[15px] text-slate-900 dark:text-white">
                                                 {item.minPrice === item.maxPrice
                                                     ? item.minPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                                     : `${item.minPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} - ${item.maxPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}`
                                                 }
-                                                <span className="text-slate-400 text-[12px] ml-1">₺</span>
+                                                <span className="text-slate-400 dark:text-slate-500 text-[12px] ml-1">₺</span>
                                             </td>
 
                                             <td className="px-6 py-4 text-center">
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 border border-slate-200 text-[12px] font-bold text-slate-700">
-                                                    <span className="text-slate-400">🏢</span> {item.sellersCount} Satıcı
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[12px] font-bold text-slate-700 dark:text-slate-200">
+                                                    <span className="text-slate-400 dark:text-slate-500">🏢</span> {item.sellersCount} Satıcı
                                                 </span>
                                             </td>
 
@@ -184,7 +184,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                                             <td className="px-6 py-4 text-center">
                                                 <Link
                                                     href={`/catalog/${item.product.id}`}
-                                                    className="inline-flex items-center justify-center h-8 px-4 bg-white border border-slate-300 text-slate-700 text-[13px] font-semibold rounded-lg hover:bg-slate-900 hover:border-slate-900 hover:text-white transition-colors shadow-sm"
+                                                    className="inline-flex items-center justify-center h-8 px-4 bg-white dark:bg-[#080911] border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 text-[13px] font-semibold rounded-lg hover:bg-slate-900 hover:border-slate-900 hover:text-white transition-colors shadow-sm"
                                                 >
                                                     İncele
                                                 </Link>
@@ -196,8 +196,8 @@ export default async function CatalogPage({ searchParams }: { searchParams: { q?
                         </table>
                     </div>
 
-                    <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                        <div className="text-[13px] font-medium text-slate-500">
+                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#080911]/50 flex items-center justify-between">
+                        <div className="text-[13px] font-medium text-slate-500 dark:text-slate-400">
                             Sayfa 1 / 1
                         </div>
                     </div>
