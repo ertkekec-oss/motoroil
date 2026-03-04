@@ -103,7 +103,22 @@ export async function middleware(request: NextRequest) {
 
     try {
         // Verify JWT
-        await jwtVerify(sessionToken, JWT_SECRET);
+        const { payload } = await jwtVerify(sessionToken, JWT_SECRET);
+
+        // Admin Governance Protection
+        if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+            const allowedAdminRoles = ['SUPER_ADMIN', 'PLATFORM_ADMIN', 'SUPPORT_AGENT'];
+            // @ts-ignore Let's safely check payload role
+            const userRole = payload?.role as string;
+
+            if (!allowedAdminRoles.includes(userRole)) {
+                if (pathname.startsWith('/api')) {
+                    return NextResponse.json({ error: 'Bu alana erişim yetkiniz yok.' }, { status: 403 });
+                }
+                return NextResponse.redirect(new URL('/login', request.url));
+            }
+        }
+
         return NextResponse.next();
     } catch (err) {
         console.error('Middleware session error:', err);

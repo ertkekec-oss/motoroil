@@ -99,6 +99,70 @@ function checkRoutes() {
         }
     });
 
+    // Sidebar Route Exist Check
+    if (fs.existsSync(sidebarPath)) {
+        console.log('🔍 Checking Sidebar hrefs against route manifest...');
+        const content = fs.readFileSync(sidebarPath, 'utf8');
+
+        // Extract all valid Next.js paths by walking src/app
+        const appPath = path.join(process.cwd(), 'src/app');
+        const validRoutes = new Set<string>();
+        validRoutes.add('/'); // root route assumption
+        validRoutes.add('#'); // sometimes empty/anchor
+
+        walkDir(appPath, (filePath) => {
+            if (filePath.endsWith('page.tsx') || filePath.endsWith('route.ts')) {
+                let routePath = filePath.replace(appPath, '').replace(/\\/g, '/');
+                // Remove route groups like /(app)
+                routePath = routePath.replace(/\/\([^)]+\)/g, '');
+                // Remove page.tsx or route.ts suffix
+                routePath = routePath.replace(/\/page\.tsx$/, '').replace(/\/route\.ts$/, '');
+                if (routePath === '') routePath = '/';
+                validRoutes.add(routePath);
+
+                // Add dynamic route capability (very basic matching pattern for test purposes)
+                // If it's a dynamic path like /dealers/[id], let's try to normalize it
+                if (routePath.includes('[') && routePath.includes(']')) {
+                    const normalizedDynamic = routePath.replace(/\[.*?\]/g, 'DYNAMIC');
+                    validRoutes.add(normalizedDynamic);
+                }
+            }
+        });
+
+        // Add some known external/special routes that may not be directly in app dir
+        const knownSafeRoutes = [
+            '', '/', '#', '/help', '/support', '/support/tickets', '/settings',
+            '/settings/branch', '/settings/pricing', '/billing', '/api/auth/logout'
+        ];
+        knownSafeRoutes.forEach(r => validRoutes.add(r));
+
+        const hrefRegex = /href:\s*(['"`])(.*?)\1/g;
+        let match;
+        while ((match = hrefRegex.exec(content)) !== null) {
+            let href = match[2].trim();
+            if (href === '') continue; // allowed empty hrefs mapped in permMap or parent nodes
+
+            // basic dynamic check substitution if any dynamic param is used
+            const toCheck = href.replace(/\/[a-f0-9]{24}/g, '/DYNAMIC').replace(/\/[0-9]+/g, '/DYNAMIC');
+
+            // Quick bypass for external or non-app routes if we know them
+            if (toCheck.startsWith('http')) continue;
+
+            const exists = validRoutes.has(toCheck) || Array.from(validRoutes).some(r => {
+                if (r.includes('DYNAMIC')) {
+                    const regexSafe = r.replace(/DYNAMIC/g, '[^/]+');
+                    const rTest = new RegExp('^' + regexSafe + '$');
+                    return rTest.test(toCheck);
+                }
+                return false;
+            });
+
+            if (!exists) {
+                logError('Sidebar link points to non-existent route (404 risk)', sidebarPath, href);
+            }
+        }
+    }
+
     if (hasError) {
         console.error('\n🚨 TEST FAILED. Namespace boundaries violated.');
         process.exit(1);
