@@ -699,18 +699,16 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Firmadan nakit / kk ile ödeme çıkışı yap</div>
                         </div>
                     </Link>
-
-                    <button
-                        onClick={() => router.push(`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`)}
-                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-main, white)', padding: '24px', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', cursor: 'pointer', transition: 'all 0.2s' }}
+                    <Link href={`/?selectedCustomer=${encodeURIComponent(val(customer.name, ''))}`}
+                        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '12px', background: 'var(--bg-card, rgba(255,255,255,0.02))', color: 'var(--text-main, white)', padding: '24px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.2s', border: '1px solid rgba(255,255,255,0.1)' }}
                         className="hover:-translate-y-1 hover:bg-white/5 hover:border-white/20"
                     >
                         <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'var(--bg-panel, rgba(255,255,255,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🛒</div>
                         <div style={{ textAlign: 'center' }}>
                             <div style={{ fontWeight: '800', fontSize: '15px', letterSpacing: '0.5px', marginBottom: '4px', color: 'var(--text-main, #e2e8f0)' }}>SATIŞ YAP (POS)</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Bu müşteriye yeni işlem başlat</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted, #64748b)', fontWeight: '600' }}>Bu müşteriye terminalde yeni satış başlat</div>
                         </div>
-                    </button>
+                    </Link>
                 </div>
 
                 {/* ENTERPRISE TABS */}
@@ -1318,7 +1316,7 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                     </div>
                 </div>
 
-            </div>
+            </div >
 
             {/* MODALS START HERE */}
 
@@ -1664,54 +1662,56 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
 
 
             {/* INVOICE SUCCESS & SHARE MODAL */}
-            {shareModalOpen && lastInvoice && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.9)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '480px', padding: '48px 40px', borderRadius: '32px', textAlign: 'center', border: '1px solid rgba(16, 185, 129, 0.4)', background: 'var(--bg-panel, #0f172a)', boxShadow: '0 24px 60px rgba(0,0,0,0.5), 0 0 60px rgba(16, 185, 129, 0.15)' }}>
-                        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%)', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '64px', margin: '0 auto 32px', boxShadow: '0 12px 30px rgba(16, 185, 129, 0.2)' }}>
-                            🎉
-                        </div>
-                        <h2 style={{ fontSize: '28px', fontWeight: '900', color: 'var(--text-main, #fff)', marginBottom: '12px', letterSpacing: '-0.5px' }}>Fatura Hazır!</h2>
-                        <p style={{ color: 'var(--text-muted, #94a3b8)', fontSize: '15px', marginBottom: '40px', lineHeight: '1.6', fontWeight: '500' }}>Resmi faturanız başarıyla oluşturuldu ve GİB sistemine entegre edildi.</p>
+            {
+                shareModalOpen && lastInvoice && (
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.9)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '480px', padding: '48px 40px', borderRadius: '32px', textAlign: 'center', border: '1px solid rgba(16, 185, 129, 0.4)', background: 'var(--bg-panel, #0f172a)', boxShadow: '0 24px 60px rgba(0,0,0,0.5), 0 0 60px rgba(16, 185, 129, 0.15)' }}>
+                            <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%)', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '64px', margin: '0 auto 32px', boxShadow: '0 12px 30px rgba(16, 185, 129, 0.2)' }}>
+                                🎉
+                            </div>
+                            <h2 style={{ fontSize: '28px', fontWeight: '900', color: 'var(--text-main, #fff)', marginBottom: '12px', letterSpacing: '-0.5px' }}>Fatura Hazır!</h2>
+                            <p style={{ color: 'var(--text-muted, #94a3b8)', fontSize: '15px', marginBottom: '40px', lineHeight: '1.6', fontWeight: '500' }}>Resmi faturanız başarıyla oluşturuldu ve GİB sistemine entegre edildi.</p>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                <button
+                                    onClick={() => {
+                                        const msg = `Sayın ${customer.name}, ${lastInvoice.invoiceNo} numaralı faturanızı bu bağlantıdan görüntüleyebilirsiniz: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
+                                        window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
+                                    }}
+                                    className="btn btn-primary hover:-translate-y-1"
+                                    style={{ background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)', boxShadow: '0 8px 24px rgba(37, 211, 102, 0.3)', border: 'none', height: '64px', borderRadius: '20px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
+                                >
+                                    <span style={{ fontSize: '24px' }}>💬</span> Müşteriye WhatsApp'tan İlet
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        window.location.href = `mailto:${customer.email || ''}?subject=Faturanız Hazır - ${lastInvoice.invoiceNo}&body=Sayın ${customer.name}, %0D%0A%0D%0A${lastInvoice.invoiceNo} numaralı faturanız ekte yer almaktadır. %0D%0A%0D%0AFaturayı görüntülemek için tıkla: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
+                                    }}
+                                    className="btn btn-outline hover:bg-white/10"
+                                    style={{ height: '64px', borderRadius: '20px', fontWeight: '800', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
+                                >
+                                    <span style={{ fontSize: '24px' }}>📧</span> E-Posta ile Gönder
+                                </button>
+                                <button
+                                    onClick={() => window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`, '_blank')}
+                                    style={{ marginTop: '16px', background: 'none', border: 'none', color: '#3b82f6', fontSize: '15px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+                                    className="hover:text-blue-400"
+                                >
+                                    <span>📄</span> PDF İndir / Görüntüle
+                                </button>
+                            </div>
+
                             <button
-                                onClick={() => {
-                                    const msg = `Sayın ${customer.name}, ${lastInvoice.invoiceNo} numaralı faturanızı bu bağlantıdan görüntüleyebilirsiniz: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
-                                    window.open(`https://wa.me/${customer.phone?.replace(/\s/g, '').replace(/^0/, '90')}?text=${encodeURIComponent(msg)}`, '_blank');
-                                }}
-                                className="btn btn-primary hover:-translate-y-1"
-                                style={{ background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)', boxShadow: '0 8px 24px rgba(37, 211, 102, 0.3)', border: 'none', height: '64px', borderRadius: '20px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
+                                onClick={() => setShareModalOpen(false)}
+                                style={{ marginTop: '48px', width: '100%', padding: '20px', background: 'var(--bg-card, rgba(255,255,255,0.02))', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', borderRadius: '20px', color: 'var(--text-muted, #888)', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', letterSpacing: '1px' }}
+                                className="hover:bg-white/5 hover:text-white"
                             >
-                                <span style={{ fontSize: '24px' }}>💬</span> Müşteriye WhatsApp'tan İlet
-                            </button>
-                            <button
-                                onClick={() => {
-                                    window.location.href = `mailto:${customer.email || ''}?subject=Faturanız Hazır - ${lastInvoice.invoiceNo}&body=Sayın ${customer.name}, %0D%0A%0D%0A${lastInvoice.invoiceNo} numaralı faturanız ekte yer almaktadır. %0D%0A%0D%0AFaturayı görüntülemek için tıkla: https://www.periodya.com/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`;
-                                }}
-                                className="btn btn-outline hover:bg-white/10"
-                                style={{ height: '64px', borderRadius: '20px', fontWeight: '800', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, #fff)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', transition: 'all 0.2s', width: '100%' }}
-                            >
-                                <span style={{ fontSize: '24px' }}>📧</span> E-Posta ile Gönder
-                            </button>
-                            <button
-                                onClick={() => window.open(`/api/sales/invoices?action=get-pdf&invoiceId=${lastInvoice.id}`, '_blank')}
-                                style={{ marginTop: '16px', background: 'none', border: 'none', color: '#3b82f6', fontSize: '15px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
-                                className="hover:text-blue-400"
-                            >
-                                <span>📄</span> PDF İndir / Görüntüle
+                                PENCEREYİ KAPAT
                             </button>
                         </div>
-
-                        <button
-                            onClick={() => setShareModalOpen(false)}
-                            style={{ marginTop: '48px', width: '100%', padding: '20px', background: 'var(--bg-card, rgba(255,255,255,0.02))', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', borderRadius: '20px', color: 'var(--text-muted, #888)', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', letterSpacing: '1px' }}
-                            className="hover:bg-white/5 hover:text-white"
-                        >
-                            PENCEREYİ KAPAT
-                        </button>
                     </div>
-                </div>
-            )}
+                )
+            }
 
 
             {/* ADDITIONAL TAX MODAL */}
@@ -1793,115 +1793,117 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             }
 
             {/* WARRANTY START MODAL */}
-            {warrantyModalOpen && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '520px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 24px 60px rgba(0,0,0,0.4)', }}>
-                        <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <span style={{ fontSize: '24px' }}>🛡️</span> Garanti Başlat
-                            </h3>
-                            <button onClick={() => setWarrantyModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
-                        </div>
-
-                        <div className="flex-col gap-5">
-                            <div className="flex-col gap-2">
-                                <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>FATURA SEÇİMİ (Satın Alma Kaydı)</label>
-                                <select
-                                    value={newWarranty.invoiceId}
-                                    onChange={(e) => {
-                                        setNewWarranty({ ...newWarranty, invoiceId: e.target.value, productId: '', productName: '' });
-                                    }}
-                                    style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
-                                >
-                                    <option value="">İlgili faturayı seçiniz...</option>
-                                    {customerInvoices.map(inv => (
-                                        <option key={inv.id} value={inv.id}>{inv.number} - {inv.date} ({inv.total} ₺)</option>
-                                    ))}
-                                </select>
+            {
+                warrantyModalOpen && (
+                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '520px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 24px 60px rgba(0,0,0,0.4)', }}>
+                            <div className="flex-between mb-8 pb-4" style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.1))' }}>
+                                <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main, white)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <span style={{ fontSize: '24px' }}>🛡️</span> Garanti Başlat
+                                </h3>
+                                <button onClick={() => setWarrantyModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
                             </div>
 
-                            {newWarranty.invoiceId && (
-                                <div className="flex-col gap-2 animate-scale-in">
-                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>ÜRÜN SEÇİMİ</label>
-                                    <select
-                                        value={newWarranty.productId}
-                                        onChange={(e) => {
-                                            const inv = customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId);
-                                            const prodItem = inv?.items.find((p: any) => (p.productId || p.id || '').toString() === e.target.value);
-                                            let pName = prodItem?.name || '';
-                                            if (!pName && prodItem?.productId) {
-                                                const realProd = products.find(p => p.id === prodItem.productId);
-                                                if (realProd) pName = realProd.name;
-                                            }
-                                            setNewWarranty({ ...newWarranty, productId: e.target.value, productName: pName });
-                                        }}
-                                        style={{ padding: '16px 20px', borderRadius: '16px', background: 'rgba(59, 130, 246, 0.05)', color: 'var(--text-main, white)', border: '1px solid rgba(59, 130, 246, 0.2)', fontWeight: '700', fontSize: '14px' }}
-                                    >
-                                        <option value="">Garanti tanımlanacak ürünü seçin...</option>
-                                        {customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId)?.items.map((p: any) => {
-                                            let displayName = p.name;
-                                            if (!displayName && p.productId) {
-                                                const realProd = products.find((prod: any) => prod.id === p.productId);
-                                                if (realProd) displayName = realProd.name;
-                                            }
-                                            return (
-                                                <option key={p.productId || p.id || Math.random()} value={p.productId || p.id}>
-                                                    {displayName || 'İsimsiz Ürün'}
-                                                </option>
-                                            );
-                                        })}
-                                    </select>
-                                </div>
-                            )}
-
-                            <div className="flex-col gap-2">
-                                <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>SERİ NO (KADRO / ŞASİ NO)</label>
-                                <input
-                                    type="text"
-                                    placeholder="Örn: CR12345678"
-                                    value={newWarranty.serialNo}
-                                    onChange={(e) => setNewWarranty({ ...newWarranty, serialNo: e.target.value })}
-                                    style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
-                                    className="focus:border-blue-500 transition-colors"
-                                />
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                            <div className="flex-col gap-5">
                                 <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>GARANTİ SÜRESİ</label>
+                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>FATURA SEÇİMİ (Satın Alma Kaydı)</label>
                                     <select
-                                        value={newWarranty.period}
-                                        onChange={(e) => setNewWarranty({ ...newWarranty, period: e.target.value })}
+                                        value={newWarranty.invoiceId}
+                                        onChange={(e) => {
+                                            setNewWarranty({ ...newWarranty, invoiceId: e.target.value, productId: '', productName: '' });
+                                        }}
                                         style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
                                     >
-                                        {(warrantyPeriods && warrantyPeriods.length > 0 ? warrantyPeriods : ['6 Ay', '1 Yıl', '2 Yıl', '3 Yıl', '5 Yıl']).map(p => (
-                                            <option key={p} value={p}>{p}</option>
+                                        <option value="">İlgili faturayı seçiniz...</option>
+                                        {customerInvoices.map(inv => (
+                                            <option key={inv.id} value={inv.id}>{inv.number} - {inv.date} ({inv.total} ₺)</option>
                                         ))}
                                     </select>
                                 </div>
+
+                                {newWarranty.invoiceId && (
+                                    <div className="flex-col gap-2 animate-scale-in">
+                                        <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>ÜRÜN SEÇİMİ</label>
+                                        <select
+                                            value={newWarranty.productId}
+                                            onChange={(e) => {
+                                                const inv = customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId);
+                                                const prodItem = inv?.items.find((p: any) => (p.productId || p.id || '').toString() === e.target.value);
+                                                let pName = prodItem?.name || '';
+                                                if (!pName && prodItem?.productId) {
+                                                    const realProd = products.find(p => p.id === prodItem.productId);
+                                                    if (realProd) pName = realProd.name;
+                                                }
+                                                setNewWarranty({ ...newWarranty, productId: e.target.value, productName: pName });
+                                            }}
+                                            style={{ padding: '16px 20px', borderRadius: '16px', background: 'rgba(59, 130, 246, 0.05)', color: 'var(--text-main, white)', border: '1px solid rgba(59, 130, 246, 0.2)', fontWeight: '700', fontSize: '14px' }}
+                                        >
+                                            <option value="">Garanti tanımlanacak ürünü seçin...</option>
+                                            {customerInvoices.find(i => i.id.toString() === newWarranty.invoiceId)?.items.map((p: any) => {
+                                                let displayName = p.name;
+                                                if (!displayName && p.productId) {
+                                                    const realProd = products.find((prod: any) => prod.id === p.productId);
+                                                    if (realProd) displayName = realProd.name;
+                                                }
+                                                return (
+                                                    <option key={p.productId || p.id || Math.random()} value={p.productId || p.id}>
+                                                        {displayName || 'İsimsiz Ürün'}
+                                                    </option>
+                                                );
+                                            })}
+                                        </select>
+                                    </div>
+                                )}
+
                                 <div className="flex-col gap-2">
-                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>BAŞLANGIÇ TARİHİ</label>
+                                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>SERİ NO (KADRO / ŞASİ NO)</label>
                                     <input
-                                        type="date"
-                                        value={newWarranty.startDate}
-                                        onChange={(e) => setNewWarranty({ ...newWarranty, startDate: e.target.value })}
+                                        type="text"
+                                        placeholder="Örn: CR12345678"
+                                        value={newWarranty.serialNo}
+                                        onChange={(e) => setNewWarranty({ ...newWarranty, serialNo: e.target.value })}
                                         style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
-                                        className="input-date-dark"
+                                        className="focus:border-blue-500 transition-colors"
                                     />
                                 </div>
-                            </div>
 
-                            <button
-                                onClick={handleStartWarranty}
-                                className="btn btn-primary hover:-translate-y-1 hover:shadow-sm"
-                                style={{ marginTop: '24px', padding: '18px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', transition: 'all 0.2s', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                            >
-                                <span>✅</span> GARANTİYİ BAŞLAT VE ONAYLA
-                            </button>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                    <div className="flex-col gap-2">
+                                        <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>GARANTİ SÜRESİ</label>
+                                        <select
+                                            value={newWarranty.period}
+                                            onChange={(e) => setNewWarranty({ ...newWarranty, period: e.target.value })}
+                                            style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
+                                        >
+                                            {(warrantyPeriods && warrantyPeriods.length > 0 ? warrantyPeriods : ['6 Ay', '1 Yıl', '2 Yıl', '3 Yıl', '5 Yıl']).map(p => (
+                                                <option key={p} value={p}>{p}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex-col gap-2">
+                                        <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted, #888)', letterSpacing: '0.5px' }}>BAŞLANGIÇ TARİHİ</label>
+                                        <input
+                                            type="date"
+                                            value={newWarranty.startDate}
+                                            onChange={(e) => setNewWarranty({ ...newWarranty, startDate: e.target.value })}
+                                            style={{ padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', color: 'var(--text-main, white)', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', fontWeight: '700', fontSize: '14px' }}
+                                            className="input-date-dark"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={handleStartWarranty}
+                                    className="btn btn-primary hover:-translate-y-1 hover:shadow-sm"
+                                    style={{ marginTop: '24px', padding: '18px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', transition: 'all 0.2s', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                >
+                                    <span>✅</span> GARANTİYİ BAŞLAT VE ONAYLA
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* PRODUCT PICKER MODAL */}
             {
@@ -2014,146 +2016,150 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
             }
 
             {/* CHECK COLLECT MODAL */}
-            {showCheckCollectModal && activeCheck && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(15, 23, 42, 0.85)', zIndex: 10000,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
-                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', width: '100%', maxWidth: '440px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                            <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-main, #fff)', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <span>{activeCheck.type.includes('Alınan') ? '📥' : '📤'}</span>
-                                {activeCheck.type.includes('Alınan') ? 'Tahsilat Onayı' : 'Ödeme Çıkış Onayı'}
-                            </h3>
-                            <button onClick={() => setShowCheckCollectModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            <div style={{ padding: '24px', background: 'var(--bg-card, rgba(255,255,255,0.03))', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', textAlign: 'center' }}>
-                                <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: '800', letterSpacing: '1px' }}>{activeCheck.type}</div>
-                                <div style={{ fontSize: '36px', fontWeight: '900', color: 'var(--text-main, #fff)', fontFamily: 'monospace' }}>{Number(activeCheck.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span style={{ fontSize: '24px', opacity: 0.8 }}>₺</span></div>
-                                <div style={{ fontSize: '13px', color: 'var(--text-muted, #aaa)', marginTop: '8px', fontWeight: '600' }}>{activeCheck.bank} - <span style={{ fontFamily: 'monospace' }}>{activeCheck.number}</span></div>
+            {
+                showCheckCollectModal && activeCheck && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'rgba(15, 23, 42, 0.85)', zIndex: 10000,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ background: 'var(--bg-panel, #0f172a)', padding: '40px', borderRadius: '32px', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', width: '100%', maxWidth: '440px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                                <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-main, #fff)', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <span>{activeCheck.type.includes('Alınan') ? '📥' : '📤'}</span>
+                                    {activeCheck.type.includes('Alınan') ? 'Tahsilat Onayı' : 'Ödeme Çıkış Onayı'}
+                                </h3>
+                                <button onClick={() => setShowCheckCollectModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted, #888)', fontSize: '28px', cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-white">&times;</button>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                <label style={{ fontSize: '12px', color: 'var(--text-muted, #bbb)', fontWeight: '800', letterSpacing: '0.5px' }}>{activeCheck.type.includes('Alınan') ? 'TAHSİLATIN GEÇECEĞİ (GİRECEĞİ) HESAP' : 'ÖDEMENİN ÇIKACAĞI HESAP'}</label>
-                                <select
-                                    value={targetKasaId}
-                                    onChange={(e) => setTargetKasaId(e.target.value)}
-                                    style={{ width: '100%', padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontSize: '15px', fontWeight: '700', outline: 'none' }}
-                                    className="focus:border-blue-500"
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                <div style={{ padding: '24px', background: 'var(--bg-card, rgba(255,255,255,0.03))', borderRadius: '20px', border: '1px solid var(--border-color, rgba(255,255,255,0.05))', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: '800', letterSpacing: '1px' }}>{activeCheck.type}</div>
+                                    <div style={{ fontSize: '36px', fontWeight: '900', color: 'var(--text-main, #fff)', fontFamily: 'monospace' }}>{Number(activeCheck.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} <span style={{ fontSize: '24px', opacity: 0.8 }}>₺</span></div>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-muted, #aaa)', marginTop: '8px', fontWeight: '600' }}>{activeCheck.bank} - <span style={{ fontFamily: 'monospace' }}>{activeCheck.number}</span></div>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    <label style={{ fontSize: '12px', color: 'var(--text-muted, #bbb)', fontWeight: '800', letterSpacing: '0.5px' }}>{activeCheck.type.includes('Alınan') ? 'TAHSİLATIN GEÇECEĞİ (GİRECEĞİ) HESAP' : 'ÖDEMENİN ÇIKACAĞI HESAP'}</label>
+                                    <select
+                                        value={targetKasaId}
+                                        onChange={(e) => setTargetKasaId(e.target.value)}
+                                        style={{ width: '100%', padding: '16px 20px', borderRadius: '16px', background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontSize: '15px', fontWeight: '700', outline: 'none' }}
+                                        className="focus:border-blue-500"
+                                    >
+                                        <option value="">İşlem yapılacak kasayı seçin...</option>
+                                        {kasalar.filter((k: any) => k.name !== 'ÇEK / SENET PORTFÖYÜ').map((k: any) => (
+                                            <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺)</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <button
+                                    onClick={handleExecuteCheckCollect}
+                                    disabled={isProcessingCollection || !targetKasaId}
+                                    style={{
+                                        width: '100%', padding: '20px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: '#fff',
+                                        border: 'none', fontWeight: '900', fontSize: '15px', cursor: 'pointer',
+                                        opacity: (isProcessingCollection || !targetKasaId) ? 0.6 : 1, transition: 'all 0.2s',
+                                        boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', letterSpacing: '1px',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                                    }}
+                                    className={(!isProcessingCollection && targetKasaId) ? "hover:-translate-y-1 hover:shadow-sm" : ""}
                                 >
-                                    <option value="">İşlem yapılacak kasayı seçin...</option>
-                                    {kasalar.filter((k: any) => k.name !== 'ÇEK / SENET PORTFÖYÜ').map((k: any) => (
-                                        <option key={k.id} value={k.id}>{k.name} ({Number(k.balance).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺)</option>
-                                    ))}
-                                </select>
+                                    {isProcessingCollection ? (
+                                        <><div className="loader border-t-white w-4 h-4 rounded-full border-2 border-white/20 animate-spin"></div> İŞLENİYOR...</>
+                                    ) : (
+                                        <><span>✅</span> İŞLEMİ TAMAMLA</>
+                                    )}
+                                </button>
                             </div>
-
-                            <button
-                                onClick={handleExecuteCheckCollect}
-                                disabled={isProcessingCollection || !targetKasaId}
-                                style={{
-                                    width: '100%', padding: '20px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: '#fff',
-                                    border: 'none', fontWeight: '900', fontSize: '15px', cursor: 'pointer',
-                                    opacity: (isProcessingCollection || !targetKasaId) ? 0.6 : 1, transition: 'all 0.2s',
-                                    boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)', letterSpacing: '1px',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-                                }}
-                                className={(!isProcessingCollection && targetKasaId) ? "hover:-translate-y-1 hover:shadow-sm" : ""}
-                            >
-                                {isProcessingCollection ? (
-                                    <><div className="loader border-t-white w-4 h-4 rounded-full border-2 border-white/20 animate-spin"></div> İŞLENİYOR...</>
-                                ) : (
-                                    <><span>✅</span> İŞLEMİ TAMAMLA</>
-                                )}
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* PLAN MODAL */}
-            {showPlanModal && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '520px', maxWidth: '90vw', border: '1px solid rgba(245, 158, 11, 0.3)', background: 'var(--bg-panel, #0f172a)', padding: '0', borderRadius: '32px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
-                        <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%)' }}>
-                            <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <span style={{ padding: '8px', background: '#f59e0b', borderRadius: '12px', fontSize: '18px', boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)' }}>📅</span>
-                                Vadeli Satış Planı Oluştur
-                            </h3>
-                            <button onClick={() => setShowPlanModal(false)} style={{ background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontSize: '20px', cursor: 'pointer', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} className="hover:bg-white/10">&times;</button>
-                        </div>
-                        <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <div>
-                                <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>ÖDEME PLANI BAŞLIĞI</label>
-                                <input
-                                    value={planData.title}
-                                    onChange={e => setPlanData({ ...planData, title: e.target.value })}
-                                    style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px' }}
-                                    className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
-                                />
+            {
+                showPlanModal && (
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-scale-in" style={{ width: '520px', maxWidth: '90vw', border: '1px solid rgba(245, 158, 11, 0.3)', background: 'var(--bg-panel, #0f172a)', padding: '0', borderRadius: '32px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+                            <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.05))', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%)' }}>
+                                <h3 style={{ margin: 0, color: 'var(--text-main, #fff)', fontSize: '20px', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <span style={{ padding: '8px', background: '#f59e0b', borderRadius: '12px', fontSize: '18px', boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)' }}>📅</span>
+                                    Vadeli Satış Planı Oluştur
+                                </h3>
+                                <button onClick={() => setShowPlanModal(false)} style={{ background: 'var(--bg-card, rgba(255,255,255,0.05))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, #fff)', fontSize: '20px', cursor: 'pointer', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} className="hover:bg-white/10">&times;</button>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                            <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                 <div>
-                                    <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>TOPLAM TUTAR (₺)</label>
+                                    <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>ÖDEME PLANI BAŞLIĞI</label>
                                     <input
-                                        type="number"
-                                        value={planData.totalAmount}
-                                        onChange={e => setPlanData({ ...planData, totalAmount: e.target.value })}
-                                        style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '900', fontSize: '16px', fontFamily: 'monospace' }}
+                                        value={planData.title}
+                                        onChange={e => setPlanData({ ...planData, title: e.target.value })}
+                                        style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px' }}
                                         className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
                                     />
                                 </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                    <div>
+                                        <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>TOPLAM TUTAR (₺)</label>
+                                        <input
+                                            type="number"
+                                            value={planData.totalAmount}
+                                            onChange={e => setPlanData({ ...planData, totalAmount: e.target.value })}
+                                            style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '900', fontSize: '16px', fontFamily: 'monospace' }}
+                                            className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>TAKSİT / VADE SAYISI</label>
+                                        <input
+                                            type="number"
+                                            value={planData.installmentCount}
+                                            onChange={e => setPlanData({ ...planData, installmentCount: e.target.value })}
+                                            style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px', textAlign: 'center' }}
+                                            className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
+                                        />
+                                    </div>
+                                </div>
                                 <div>
-                                    <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>TAKSİT / VADE SAYISI</label>
+                                    <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>PLANI BAŞLATMA TARİHİ</label>
                                     <input
-                                        type="number"
-                                        value={planData.installmentCount}
-                                        onChange={e => setPlanData({ ...planData, installmentCount: e.target.value })}
-                                        style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px', textAlign: 'center' }}
-                                        className="focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
+                                        type="date"
+                                        value={planData.startDate}
+                                        onChange={e => setPlanData({ ...planData, startDate: e.target.value })}
+                                        style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px' }}
+                                        className="input-date-dark focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
                                     />
                                 </div>
-                            </div>
-                            <div>
-                                <label style={{ display: 'block', color: 'var(--text-muted, #888)', fontSize: '11px', marginBottom: '8px', fontWeight: '800', letterSpacing: '0.5px' }}>PLANI BAŞLATMA TARİHİ</label>
-                                <input
-                                    type="date"
-                                    value={planData.startDate}
-                                    onChange={e => setPlanData({ ...planData, startDate: e.target.value })}
-                                    style={{ width: '100%', padding: '16px 20px', background: 'var(--bg-card, rgba(255,255,255,0.03))', border: '1px solid var(--border-color, rgba(255,255,255,0.1))', color: 'var(--text-main, white)', borderRadius: '16px', fontWeight: '700', fontSize: '14px' }}
-                                    className="input-date-dark focus:border-amber-500 focus:bg-amber-500/5 transition-colors"
-                                />
-                            </div>
 
-                            <div style={{ padding: '20px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '16px', marginTop: '12px' }}>
-                                <label style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#f59e0b', cursor: 'pointer', fontWeight: '800' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={planData.isExisting}
-                                        onChange={e => setPlanData({ ...planData, isExisting: e.target.checked })}
-                                        style={{ accentColor: '#f59e0b', width: '20px', height: '20px' }}
-                                    />
-                                    <span>Mevcut Bakiyeden Dönüştür (Re-Scheduling)</span>
-                                </label>
-                                <div style={{ fontSize: '12px', color: 'var(--text-muted, #aaa)', marginTop: '8px', marginLeft: '32px', fontWeight: '500', lineHeight: '1.5' }}>
-                                    Bu seçenek aktifken cari hesap bakiyesine ekstra borç eklenmez, işlemi mevcut açık risk üzerinden planlar.
+                                <div style={{ padding: '20px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '16px', marginTop: '12px' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#f59e0b', cursor: 'pointer', fontWeight: '800' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={planData.isExisting}
+                                            onChange={e => setPlanData({ ...planData, isExisting: e.target.checked })}
+                                            style={{ accentColor: '#f59e0b', width: '20px', height: '20px' }}
+                                        />
+                                        <span>Mevcut Bakiyeden Dönüştür (Re-Scheduling)</span>
+                                    </label>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted, #aaa)', marginTop: '8px', marginLeft: '32px', fontWeight: '500', lineHeight: '1.5' }}>
+                                        Bu seçenek aktifken cari hesap bakiyesine ekstra borç eklenmez, işlemi mevcut açık risk üzerinden planlar.
+                                    </div>
                                 </div>
-                            </div>
 
-                            <button
-                                onClick={handleSavePlan}
-                                className="btn btn-primary hover:-translate-y-1 hover:shadow-sm"
-                                style={{ marginTop: '20px', padding: '18px', width: '100%', justifyContent: 'center', borderRadius: '16px', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(245, 158, 11, 0.3)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}
-                            >
-                                <span>✅</span> ÖDEME PLANINI OLUŞTUR
-                            </button>
+                                <button
+                                    onClick={handleSavePlan}
+                                    className="btn btn-primary hover:-translate-y-1 hover:shadow-sm"
+                                    style={{ marginTop: '20px', padding: '18px', width: '100%', justifyContent: 'center', borderRadius: '16px', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', border: 'none', color: 'white', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', boxShadow: '0 8px 24px rgba(245, 158, 11, 0.3)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                >
+                                    <span>✅</span> ÖDEME PLANINI OLUŞTUR
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* STATEMENT MODAL */}
             <StatementModal
@@ -2173,6 +2179,6 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 type={statementType}
                 entityType="CUSTOMER"
             />
-        </div>
+        </div >
     );
 }

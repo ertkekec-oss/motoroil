@@ -16,6 +16,7 @@ export default function CameraScanModal({ onScan, onClose }: { onScan: (barcode:
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
+                    await videoRef.current.play().catch(e => console.warn("Auto-play prevented", e));
                     setIsScanning(true);
                 }
             } catch (err) {

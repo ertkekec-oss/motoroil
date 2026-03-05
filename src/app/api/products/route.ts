@@ -38,19 +38,7 @@ export async function GET(request: Request) {
             take: limit + 1, // Fetch one extra to know if there's a next page
             cursor: cursor ? { id: cursor } : undefined,
             orderBy: { createdAt: 'desc' },
-            select: {
-                id: true,
-                name: true,
-                code: true,
-                barcode: true,
-                price: true,
-                category: true,
-                stock: true,
-                brand: true,
-                type: true,
-                unit: true,
-                imageUrl: true,
-                isParent: true,
+            include: {
                 stocks: {
                     select: {
                         branch: true,

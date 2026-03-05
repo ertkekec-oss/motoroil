@@ -136,7 +136,7 @@ export async function POST(req: Request) {
                         { accountCode: ACCOUNTS.ALINAN_CEKLER + '.01', accountName: 'ALINAN ÇEKLER PORTFÖYÜ', type: 'Borç', amount: amt, documentType: 'ÇEK', documentNo: number },
                         { accountCode: ACCOUNTS.ALICILAR + '.01', accountName: 'ALICILAR', type: 'Alacak', amount: amt, documentType: 'ÇEK', documentNo: number }
                     ]
-                });
+                }, tx);
             }
 
             if (type === 'Out' && supplierId) {
@@ -170,7 +170,7 @@ export async function POST(req: Request) {
                         { accountCode: ACCOUNTS.SATICILAR + '.01', accountName: 'SATICILAR', type: 'Borç', amount: amt, documentType: 'ÇEK', documentNo: number },
                         { accountCode: ACCOUNTS.VERILEN_CEKLER + '.01', accountName: 'VERİLEN ÇEKLER VE ÖDEME EMİRLERİ', type: 'Alacak', amount: amt, documentType: 'ÇEK', documentNo: number }
                     ]
-                });
+                }, tx);
             }
 
             return newCheck;
