@@ -4927,6 +4927,9 @@ enum PaymentIntentStatus {
   FAILED
   CANCELED
   REFUNDED
+  CHARGEBACK_OPENED
+  CHARGEBACK_WON
+  CHARGEBACK_LOST
 }
 
 enum SettlementInstructionStatus {
@@ -5005,6 +5008,7 @@ enum B2BJournalSourceType {
   ORDER
   ESCROW
   REFUND
+  CORRECTION
 }
 
 model PaymentIntent {
@@ -5077,12 +5081,14 @@ model B2BLedgerAccount {
 }
 
 model B2BJournalEntry {
-  id         String                @id @default(cuid())
-  tenantId   String
-  sourceType B2BJournalSourceType
-  sourceId   String
-  status     B2BJournalEntryStatus @default(POSTED)
-  createdAt  DateTime              @default(now())
+  id              String                @id @default(cuid())
+  tenantId        String
+  sourceType      B2BJournalSourceType
+  sourceId        String
+  originalEntryId String?
+  reason          String?
+  status          B2BJournalEntryStatus @default(POSTED)
+  createdAt       DateTime              @default(now())
 
   lines B2BJournalLine[]
 
@@ -5135,4 +5141,20 @@ model B2BSystemConfig {
   valueJson Json
   updatedAt DateTime @updatedAt
   updatedBy String?
+}
+
+enum OpsDrillStatus {
+  PASSED
+  FAILED
+  NEEDS_IMPROVEMENT
+}
+
+model OpsDrillRun {
+  id          String         @id @default(cuid())
+  date        DateTime       @default(now())
+  rtoMinutes  Int?
+  rpoMinutes  Int?
+  status      OpsDrillStatus @default(PASSED)
+  detailsJson Json?
+  createdBy   String?
 }
