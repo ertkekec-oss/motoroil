@@ -16,6 +16,28 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: 'No products provided' }, { status: 400 });
         }
 
+        const tenantId = (session as any).tenantId;
+        const companyId = session.companyId;
+
+        if (!tenantId) {
+            return NextResponse.json({ success: false, error: 'Tenant bilgisi bulunamadı' }, { status: 400 });
+        }
+
+        let company;
+        if (companyId) {
+            company = await prisma.company.findUnique({
+                where: { id: companyId }
+            });
+        } else {
+            company = await prisma.company.findFirst({
+                where: { tenantId }
+            });
+        }
+
+        if (!company) {
+            return NextResponse.json({ success: false, error: 'Şirket bilgisi bulunamadı' }, { status: 400 });
+        }
+
         const results = {
             created: 0,
             updated: 0,
@@ -31,7 +53,7 @@ export async function POST(req: Request) {
             try {
                 // Check if exists by Code
                 const existing = await prisma.product.findFirst({
-                    where: { code: p.code }
+                    where: { code: p.code, companyId: company.id }
                 });
 
                 if (existing) {
@@ -79,6 +101,7 @@ export async function POST(req: Request) {
                     const branchName = p.branch || 'Merkez';
                     const newProduct = await prisma.product.create({
                         data: {
+                            companyId: company.id,
                             name: p.name,
                             code: p.code,
                             barcode: p.barcode,

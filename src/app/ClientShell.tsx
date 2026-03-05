@@ -56,6 +56,7 @@ function MobileHeader() {
     const getTitle = (path: string) => {
         if (path === '/') return 'Kontrol Paneli';
         if (path === '/terminal') return 'POS Terminal';
+        if (path === '/desktop') return 'Masaüstü';
         if (path === '/dashboard') return 'B2B Network';
         if (path === '/accounting') return 'Finans';
         if (path === '/inventory') return 'Envanter';
@@ -157,7 +158,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
                 // 3. Permission Check (only for non-admin users)
                 if (config.perm && !app.hasPermission(config.perm)) {
-                    const targetFallback = app.hasPermission('pos_access') ? '/dashboard' : '/field-mobile/routes';
+                    const targetFallback = app.hasPermission('pos_access') ? '/desktop' : '/field-mobile/routes';
                     router.push(targetFallback);
                 }
             }

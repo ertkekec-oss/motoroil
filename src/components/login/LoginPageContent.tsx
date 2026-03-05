@@ -186,7 +186,7 @@ export default function LoginPageContent() {
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
-            router.push('/dashboard');
+            router.push('/desktop');
         }
     }, [isLoading, isAuthenticated, router]);
 

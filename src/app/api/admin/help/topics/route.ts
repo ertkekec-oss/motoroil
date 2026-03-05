@@ -24,7 +24,7 @@ export async function POST(req: Request) {
                 categoryId,
                 status: status || 'DRAFT',
                 order: parseInt(order) || 0,
-                tenantId: tenantId === 'global' ? null : tenantId // tenantId null for global topics
+                tenantId: (tenantId === 'global' || tenantId === 'PLATFORM_ADMIN') ? null : tenantId // tenantId null for global topics
             }
         });
 

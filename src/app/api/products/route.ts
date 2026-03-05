@@ -91,13 +91,22 @@ export async function POST(request: Request) {
 
         // Get tenant's company
         const tenantId = (session as any).tenantId;
+        const companyId = session.companyId;
+
         if (!tenantId) {
             return NextResponse.json({ error: 'Tenant bilgisi bulunamadı' }, { status: 400 });
         }
 
-        const company = await prisma.company.findFirst({
-            where: { tenantId }
-        });
+        let company;
+        if (companyId) {
+            company = await prisma.company.findUnique({
+                where: { id: companyId }
+            });
+        } else {
+            company = await prisma.company.findFirst({
+                where: { tenantId }
+            });
+        }
 
         if (!company) {
             return NextResponse.json({ error: 'Şirket bilgisi bulunamadı' }, { status: 400 });

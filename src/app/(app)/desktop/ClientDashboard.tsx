@@ -80,33 +80,38 @@ interface DashboardSummary {
 }
 
 const ALL_MODULES = [
-    { id: "terminal", title: "POS Terminal", desc: "Hızlı Perakende Satış", href: "/terminal", icon: <ShoppingCart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "FINANCE"], color: "bg-orange-50 text-orange-600 border-orange-100" },
-    { id: "b2b_network", title: "B2B Network", desc: "Global Ağa Bağlanın", href: "/dashboard", icon: <Building2 className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "BUYER", "SELLER"], color: "bg-blue-50 text-blue-600 border-blue-100" },
-    { id: "orders", title: "Siparişler", desc: "Sipariş Merkezi", href: "/hub/seller/orders", icon: <Send className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-indigo-50 text-indigo-600 border-indigo-100" },
-    { id: "catalog", title: "Katalog", desc: "Ürün Yönetimi", href: "/seller/products", icon: <Box className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
-    { id: "finance_b2b", title: "Finans (B2B)", desc: "Ağ İçi Finans", href: "/hub/finance", icon: <Banknote className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "SELLER"], color: "bg-rose-50 text-rose-600 border-rose-100" },
-    { id: "growth", title: "Büyüme & Güven", desc: "Performans İzleme", href: "/hub/trust-score", icon: <TrendingUp className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "SELLER"], color: "bg-amber-50 text-amber-600 border-amber-100" },
-    { id: "purchasing", title: "Satınalma", desc: "Tedarik ve Sözleşme", href: "/rfq", icon: <Briefcase className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "BUYER"], color: "bg-cyan-50 text-cyan-600 border-cyan-100" },
-    { id: "staff", title: "Personel Paneli", desc: "Kişisel Portalınız", href: "/staff/me", icon: <Users className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER", "BUYER", "FINANCE", "GROWTH", "RISK"], color: "bg-slate-100 text-slate-800 border-slate-200" },
-    { id: "accounting", title: "Mali İşler", desc: "Kasa & Banka Bütçe", href: "/accounting", icon: <Landmark className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"], color: "bg-rose-50 text-rose-600 border-rose-100" },
-    { id: "sales", title: "Satış İşlemleri", desc: "Fatura ve Ciro", href: "/sales", icon: <Receipt className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "SELLER"], color: "bg-rose-50 text-rose-600 border-rose-100" },
-    { id: "customers", title: "Cari Hesaplar", desc: "Bakiye Yönetimi", href: "/customers", icon: <CheckSquare className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"], color: "bg-rose-50 text-rose-600 border-rose-100" },
-    { id: "suppliers", title: "Tedarikçiler", desc: "Kurumsal İlişkiler", href: "/suppliers", icon: <Building2 className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "BUYER"], color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
-    { id: "control_tower", title: "Kontrol Kulesi", desc: "Otonom Finans", href: "/fintech/control-tower", icon: <Activity className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"], color: "bg-purple-50 text-purple-600 border-purple-100" },
-    { id: "inventory", title: "Depo & Envanter", desc: "Stok Kontrolü", href: "/inventory", icon: <PackageSearch className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-sky-50 text-sky-600 border-sky-100" },
-    { id: "field_sales", title: "Saha Satış", desc: "Rota & Takip", href: "/field-sales", icon: <MapPin className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-fuchsia-50 text-fuchsia-600 border-fuchsia-100" },
-    { id: "quotes", title: "Teklifler", desc: "Fiyatlamalar", href: "/quotes", icon: <FileText className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-fuchsia-50 text-fuchsia-600 border-fuchsia-100" },
-    { id: "service", title: "Servis Masası", desc: "Müşteri Hizmetleri", href: "/service", icon: <HeadphonesIcon className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF"], color: "bg-teal-50 text-teal-600 border-teal-100" },
-    { id: "analytics", title: "İş Zekası", desc: "Analiz & Raporlar", href: "/reports/ceo", icon: <LineChart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "FINANCE"], color: "bg-slate-800 text-white border-slate-700" },
-    { id: "pdks", title: "PDKS Yönetimi", desc: "Vardiya & Giriş", href: "/staff/pdks", icon: <Fingerprint className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200" },
-    { id: "audit_logs", title: "Denetim Logları", desc: "Sistem İzleme", href: "/admin/audit-logs", icon: <SearchCheck className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "RISK"], color: "bg-red-50 text-red-600 border-red-100" },
-    { id: "suspicious", title: "Kaçak Tespiti", desc: "Güvenlik Uyarıları", href: "/security/suspicious", icon: <ShieldAlert className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "RISK"], color: "bg-red-100 text-red-700 border-red-200" },
-    { id: "help_center", title: "Yardım Merkezi", desc: "Destek ve Döküman", href: "/help", icon: <HelpCircle className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER", "BUYER"], color: "bg-teal-50 text-teal-600 border-teal-100" },
-    { id: "disputes", title: "İhtilaf Çözümü", desc: "Uyuşmazlık Merkezi", href: "/support/tickets", icon: <ShieldAlert className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER", "BUYER"], color: "bg-red-50 text-red-600 border-red-100" },
-    { id: "advisor", title: "Mali Müşavir", desc: "E-Beyanname", href: "/advisor", icon: <Briefcase className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200" },
-    { id: "settings", title: "Ayarlar", desc: "Sistem Yapılandırma", href: "/settings", icon: <Settings className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200" },
-    { id: "team", title: "Ekip Yönetimi", desc: "Kullanıcı Profilleri", href: "/staff", icon: <Users className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200" },
-    { id: "billing", title: "Abonelik", desc: "Lisans Planları", href: "/billing", icon: <PieChart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-amber-50 text-amber-600 border-amber-100" },
+    { id: "terminal", title: "POS Terminal", desc: "Hızlı Perakende Satış", href: "/terminal", icon: <ShoppingCart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "FINANCE"], color: "bg-orange-50 text-orange-600 border-orange-100", group: "POS Terminal" },
+
+    { id: "hub", title: "Periodya Hub", desc: "Genel Bakış", href: "/dashboard", icon: <LayoutList className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER", "FINANCE", "GROWTH", "RISK", "STAFF"], color: "bg-blue-50 text-blue-600 border-blue-100", group: "Periodya Hub" },
+    { id: "operations", title: "Operasyonlar", desc: "Sipariş ve Tedarik Yönetimi", href: "/hub/seller/orders", icon: <Send className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-indigo-50 text-indigo-600 border-indigo-100", group: "Periodya Hub" },
+    { id: "staff", title: "Personel Portalı", desc: "Çalışan Ekranı", href: "/staff/me", icon: <Users className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER", "BUYER", "FINANCE", "GROWTH", "RISK"], color: "bg-slate-100 text-slate-800 border-slate-200", group: "Periodya Hub" },
+    { id: "accounting", title: "Finansal Yönetim", desc: "Kasa & Banka", href: "/accounting", icon: <Landmark className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"], color: "bg-rose-50 text-rose-600 border-rose-100", group: "Periodya Hub" },
+    { id: "sales", title: "Satış Yönetimi", desc: "Ciro ve Faturalar", href: "/sales", icon: <Receipt className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "SELLER"], color: "bg-rose-50 text-rose-600 border-rose-100", group: "Periodya Hub" },
+
+    { id: "customers", title: "Cariler", desc: "Müşteri ve Bakiye Yönetimi", href: "/customers", icon: <CheckSquare className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"], color: "bg-emerald-50 text-emerald-600 border-emerald-100", group: "Cariler" },
+    { id: "inventory", title: "Envanter", desc: "Stok Kontrolü ve Depo", href: "/inventory", icon: <PackageSearch className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-sky-50 text-sky-600 border-sky-100", group: "Cariler" },
+    { id: "quotes", title: "Teklifler", desc: "Fiyatlamalar", href: "/quotes", icon: <FileText className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-fuchsia-50 text-fuchsia-600 border-fuchsia-100", group: "Cariler" },
+    { id: "service", title: "TechoPs", desc: "Servis Masası ve Destek", href: "/service", icon: <HeadphonesIcon className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF"], color: "bg-teal-50 text-teal-600 border-teal-100", group: "Cariler" },
+
+    { id: "field_sales", title: "SalesX", desc: "Saha Satış Performansı", href: "/field-sales", icon: <MapPin className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER"], color: "bg-fuchsia-50 text-fuchsia-600 border-fuchsia-100", group: "SalesX" },
+    { id: "pdks", title: "PDKS", desc: "Vardiya & Giriş Kontrol", href: "/staff/pdks", icon: <Fingerprint className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200", group: "SalesX" },
+    { id: "team", title: "İnsan Kaynakları", desc: "Ekip Profilleri ve Takip", href: "/staff", icon: <Users className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200", group: "SalesX" },
+
+    { id: "b2b_network", title: "Bayiler", desc: "Ağ Yönetimi", href: "/dealer-network/dealers", icon: <Building2 className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "BUYER", "SELLER"], color: "bg-blue-50 text-blue-600 border-blue-100", group: "Dealer Network" },
+    { id: "catalog", title: "B2B Katalog", desc: "Ürün Yönetimi", href: "/dealer-network/catalog", icon: <Box className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-emerald-50 text-emerald-600 border-emerald-100", group: "Dealer Network" },
+    { id: "hub_orders", title: "Sipariş Onayı", desc: "Bayi Siparişleri Merkezi", href: "/dealer-network/orders", icon: <CheckSquare className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-indigo-50 text-indigo-600 border-indigo-100", group: "Dealer Network" },
+    { id: "hub_returns", title: "İadeler", desc: "İade Süreçleri", href: "/dealer-network/returns", icon: <AlertTriangle className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "SELLER", "BUYER"], color: "bg-orange-50 text-orange-600 border-orange-100", group: "Dealer Network" },
+    { id: "hub_settings", title: "Ayarlar", desc: "Network Yapılandırması", href: "/settings/b2b", icon: <Settings className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200", group: "Dealer Network" },
+
+    { id: "analytics", title: "İş Zekası", desc: "Analiz & Raporlar", href: "/reports/ceo", icon: <LineChart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "GROWTH", "FINANCE"], color: "bg-slate-800 text-white border-slate-700", group: "Analitik & Yönetim" },
+    { id: "control_tower", title: "Fintech Tower", desc: "Otonom Finans", href: "/fintech/control-tower", icon: <Activity className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "RISK"], color: "bg-purple-50 text-purple-600 border-purple-100", group: "Analitik & Yönetim" },
+    { id: "advisor", title: "Mali Müşavir", desc: "E-Beyanname Müşaviri", href: "/advisor", icon: <Briefcase className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200", group: "Analitik & Yönetim" },
+    { id: "suspicious", title: "Anomaliler", desc: "Kaçak Tespiti", href: "/security/suspicious", icon: <ShieldAlert className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "RISK"], color: "bg-red-100 text-red-700 border-red-200", group: "Analitik & Yönetim" },
+
+    { id: "import", title: "Gelişmiş İçe Aktar", desc: "Akıllı Veri Yükleme", href: "/settings/import", icon: <FileUp className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-cyan-50 text-cyan-600 border-cyan-100", group: "Sistem" },
+    { id: "help_center", title: "Yardım Merkezi", desc: "Destek ve Dokümantasyon", href: "/help", icon: <HelpCircle className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN", "STAFF", "SELLER", "BUYER"], color: "bg-teal-50 text-teal-600 border-teal-100", group: "Sistem" },
+    { id: "billing", title: "Abonelik", desc: "Lisans Planları", href: "/billing", icon: <PieChart className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-amber-50 text-amber-600 border-amber-100", group: "Sistem" },
+    { id: "settings", title: "Ayarlar", desc: "Şirket Yapılandırmaları", href: "/settings", icon: <Settings className="w-6 h-6" />, roles: ["SUPER_ADMIN", "ADMIN"], color: "bg-slate-100 text-slate-800 border-slate-200", group: "Sistem" },
 ];
 
 const MOCK_ANNOUNCEMENTS = [
@@ -236,33 +241,42 @@ export default function ClientDashboard() {
                     {/* Hide Scrollbar, Touch-first padding, Two-column Grid Layout */}
                     <div className="flex-1 overflow-y-auto px-7 pb-8" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                         <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
-                        <div className="grid grid-cols-2 gap-4 pdy-grid-tight">
+                        <div className="space-y-6">
                             {!mounted ? (
-                                Array.from({ length: 12 }).map((_, i) => (
-                                    <div key={i} className="h-[105px] bg-slate-50 dark:bg-slate-800/50 rounded-2xl animate-pulse" />
-                                ))
+                                <div className="grid grid-cols-2 gap-4 pdy-grid-tight">
+                                    {Array.from({ length: 12 }).map((_, i) => (
+                                        <div key={i} className="h-[105px] bg-slate-50 dark:bg-slate-800/50 rounded-2xl animate-pulse" />
+                                    ))}
+                                </div>
                             ) : (
-                                filteredFeatures.map(feat => (
-                                    <button
-                                        key={feat.id}
-                                        onClick={() => {
-                                            trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
-                                            router.push(feat.href);
-                                        }}
-                                        className="text-left flex flex-col items-start p-5 rounded-[18px] transition-transform active:scale-95 border border-slate-200/60 hover:border-slate-300 dark:border-slate-700/50 dark:hover:border-slate-600 focus:outline-none shadow-sm hover:shadow-sm cursor-pointer bg-white dark:bg-slate-800 group"
-                                    >
-                                        <div className={`p-3 rounded-xl mb-3.5 shadow-sm ${feat.color.replace('border-', 'border border-')}`}>
-                                            <div className="scale-90 origin-top-left -mx-0.5 -my-0.5">
-                                                {feat.icon}
-                                            </div>
+                                Array.from(new Set(filteredFeatures.map(f => f.group))).map(group => (
+                                    <div key={group || "Diğer"} className="mb-2">
+                                        <h3 className="text-[12px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 pl-1">{group || "Diğer"}</h3>
+                                        <div className="grid grid-cols-2 gap-4 pdy-grid-tight">
+                                            {filteredFeatures.filter(f => f.group === group).map(feat => (
+                                                <button
+                                                    key={feat.id}
+                                                    onClick={() => {
+                                                        trackEvent("FEATURE_TILE_CLICKED", { tileKey: feat.id });
+                                                        router.push(feat.href);
+                                                    }}
+                                                    className="text-left flex flex-col items-start p-5 rounded-[18px] transition-transform active:scale-95 border border-slate-200/60 hover:border-slate-300 dark:border-slate-700/50 dark:hover:border-slate-600 focus:outline-none shadow-sm hover:shadow-sm cursor-pointer bg-white dark:bg-slate-800 group"
+                                                >
+                                                    <div className={`p-3 rounded-xl mb-3.5 shadow-sm ${feat.color.replace('border-', 'border border-')}`}>
+                                                        <div className="scale-90 origin-top-left -mx-0.5 -my-0.5">
+                                                            {feat.icon}
+                                                        </div>
+                                                    </div>
+                                                    <h4 className="text-[14.5px] font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight">{feat.title}</h4>
+                                                    <p className="text-[11px] font-semibold text-slate-500 mt-1 line-clamp-2 leading-snug">{feat.desc}</p>
+                                                </button>
+                                            ))}
                                         </div>
-                                        <h4 className="text-[14.5px] font-extrabold text-[#0F172A] dark:text-white tracking-tight leading-tight">{feat.title}</h4>
-                                        <p className="text-[11px] font-semibold text-slate-500 mt-1 line-clamp-2 leading-snug">{feat.desc}</p>
-                                    </button>
+                                    </div>
                                 ))
                             )}
                             {mounted && filteredFeatures.length === 0 && (
-                                <div className="col-span-2 text-center py-10">
+                                <div className="text-center py-10 w-full">
                                     <BoxSelect className="w-9 h-9 text-slate-300 mx-auto mb-3" />
                                     <p className="text-[15px] text-slate-500 font-bold">Modül bulunamadı.</p>
                                 </div>
