@@ -1,11 +1,11 @@
 import { Queue } from 'bullmq';
-import { redisConnection } from './redis';
+import { redisConnection, disableRedis } from './redis';
 
 // ============================================================================
 // MARKETPLACE ACTIONS QUEUE & DLQ
 // ============================================================================
 
-export const marketplaceQueue = new Queue('marketplace-actions', {
+export const marketplaceQueue = disableRedis ? new Proxy({}, { get: () => () => Promise.resolve() }) as any : new Queue('marketplace-actions', {
     connection: redisConnection as any,
     defaultJobOptions: {
         attempts: 3,
@@ -23,7 +23,7 @@ export const marketplaceQueue = new Queue('marketplace-actions', {
     },
 });
 
-export const marketplaceDlq = new Queue('marketplace-actions-dlq', {
+export const marketplaceDlq = disableRedis ? new Proxy({}, { get: () => () => Promise.resolve() }) as any : new Queue('marketplace-actions-dlq', {
     connection: redisConnection as any,
     defaultJobOptions: {
         removeOnComplete: { count: 1000 },

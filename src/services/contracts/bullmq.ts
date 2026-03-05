@@ -3,13 +3,26 @@ import IORedis from 'ioredis';
 
 // Shared rediscover configuration
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-export const redisConnection = new IORedis(redisUrl, { maxRetriesPerRequest: null });
+
+// During next.js static generation/builds, we shouldn't attempt to connect to Redis
+// Vercel build typically runs without REDIS_URL, so we can use that as an easy fallback.
+const disableRedis = !process.env.REDIS_URL;
+
+export const redisConnection = disableRedis ? null as any : new IORedis(redisUrl, { maxRetriesPerRequest: null, lazyConnect: true });
+
+function createQueue(name: string) {
+    if (disableRedis) {
+        // Return dummy proxy for Next.js build step
+        return new Proxy({}, { get: () => () => Promise.resolve() }) as any;
+    }
+    return new Queue(name, { connection: redisConnection });
+}
 
 // Define Queues
-export const renderPdfQueue = new Queue('contracts:render_pdf', { connection: redisConnection as any });
-export const webhookIngestQueue = new Queue('contracts:webhook_ingest', { connection: redisConnection as any });
-export const sendSmsOtpQueue = new Queue('contracts:send_sms_otp', { connection: redisConnection as any });
-export const exportAuditQueue = new Queue('contracts:export_audit', { connection: redisConnection as any });
-export const sendEnvelopeQueue = new Queue('contracts:send_envelope', { connection: redisConnection as any });
-export const finalizeSignatureQueue = new Queue('contracts:finalize_signature', { connection: redisConnection as any });
-export const verifySignatureQueue = new Queue('contracts:verify_signature', { connection: redisConnection as any });
+export const renderPdfQueue = createQueue('contracts_render_pdf');
+export const webhookIngestQueue = createQueue('contracts_webhook_ingest');
+export const sendSmsOtpQueue = createQueue('contracts_send_sms_otp');
+export const exportAuditQueue = createQueue('contracts_export_audit');
+export const sendEnvelopeQueue = createQueue('contracts_send_envelope');
+export const finalizeSignatureQueue = createQueue('contracts_finalize_signature');
+export const verifySignatureQueue = createQueue('contracts_verify_signature');

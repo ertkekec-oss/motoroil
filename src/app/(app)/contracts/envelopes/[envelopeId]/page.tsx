@@ -1,8 +1,11 @@
 import { EnterprisePageShell, EnterpriseCard, EnterpriseTable, EnterpriseButton } from '@/components/ui/enterprise';
 import { prisma } from '@/lib/prisma';
 import { getStrictTenantId } from '@/services/contracts/tenantContext';
+import { notFound } from 'next/navigation';
 import { sendEnvelope } from '@/actions/contracts/envelopes';
 import RenderPdfButton from '../../documents/RenderPdfButton';
+
+export const dynamic = "force-dynamic";
 
 export default async function EnvelopeDetailPage({ params }: { params: { envelopeId: string } }) {
     const tenantId = await getStrictTenantId();

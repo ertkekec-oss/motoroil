@@ -2,6 +2,8 @@ import { EnterprisePageShell, EnterpriseCard, EnterpriseTable, EnterpriseButton 
 import { fetchEnvelopes } from '@/actions/contracts/envelopes';
 import Link from 'next/link';
 
+export const dynamic = "force-dynamic";
+
 export default async function EnvelopesPage() {
     const envelopes = await fetchEnvelopes();
 

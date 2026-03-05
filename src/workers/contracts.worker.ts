@@ -11,7 +11,7 @@ import { getProvider } from '../services/contracts/providers';
 import { enqueueFinalizeSignature } from '../services/contracts/jobs';
 
 // Set up processors for all queues
-const renderWorker = new Worker('contracts:render_pdf', async (job: Job) => {
+const renderWorker = new Worker('contracts_render_pdf', async (job: Job) => {
     const { documentVersionId } = job.data;
     console.log(`[Worker] Started render_pdf for version: ${documentVersionId}`);
 
@@ -102,7 +102,7 @@ const renderWorker = new Worker('contracts:render_pdf', async (job: Job) => {
     }
 }, { connection: redisConnection as any });
 
-const webhookWorker = new Worker('contracts:webhook_ingest', async (job: Job) => {
+const webhookWorker = new Worker('contracts_webhook_ingest', async (job: Job) => {
     const { webhookInboxId } = job.data;
     console.log(`[Worker] Started webhook_ingest for inbox: ${webhookInboxId}`);
 
@@ -144,7 +144,7 @@ const webhookWorker = new Worker('contracts:webhook_ingest', async (job: Job) =>
     return { success: true };
 }, { connection: redisConnection as any });
 
-const smsOtpWorker = new Worker('contracts:send_sms_otp', async (job: Job) => {
+const smsOtpWorker = new Worker('contracts_send_sms_otp', async (job: Job) => {
     const { signingSessionId } = job.data;
     console.log(`[Worker] Started sms_otp for session: ${signingSessionId}`);
 
@@ -182,7 +182,7 @@ const smsOtpWorker = new Worker('contracts:send_sms_otp', async (job: Job) => {
     return { success: true };
 }, { connection: redisConnection as any });
 
-const auditExportWorker = new Worker('contracts:export_audit', async (job: Job) => {
+const auditExportWorker = new Worker('contracts_export_audit', async (job: Job) => {
     const { envelopeId, format } = job.data;
     console.log(`[Worker] Started export_audit for envelope: ${envelopeId}`);
 
@@ -235,7 +235,7 @@ const auditExportWorker = new Worker('contracts:export_audit', async (job: Job) 
     return { success: true };
 }, { connection: redisConnection as any });
 
-const finalizeSignatureWorker = new Worker('contracts:finalize_signature', async (job: Job) => {
+const finalizeSignatureWorker = new Worker('contracts_finalize_signature', async (job: Job) => {
     const { providerKey, providerRef, envelopeId, recipientId } = job.data;
     console.log(`[Worker] Started finalize_signature for recipient: ${recipientId}`);
 
@@ -366,7 +366,7 @@ const finalizeSignatureWorker = new Worker('contracts:finalize_signature', async
     return { success: true };
 }, { connection: redisConnection as any });
 
-const verifySignatureWorker = new Worker('contracts:verify_signature', async (job: Job) => {
+const verifySignatureWorker = new Worker('contracts_verify_signature', async (job: Job) => {
     // Real LTV/PAdES validation using node-forge / @peculiar/x509 logic happens here.
     return { success: true };
 }, { connection: redisConnection as any });

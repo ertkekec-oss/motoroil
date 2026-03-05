@@ -1,8 +1,8 @@
 import { Queue } from 'bullmq';
-import { redisConnection } from '@/lib/queue/redis';
+import { redisConnection, disableRedis } from '@/lib/queue/redis';
 
 // Export the Queue
-export const shipmentSyncQueue = new Queue('shipment-sync', {
+export const shipmentSyncQueue = disableRedis ? new Proxy({}, { get: () => () => Promise.resolve() }) as any : new Queue('shipment-sync', {
     connection: redisConnection as any,
     defaultJobOptions: {
         attempts: 5,

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getStrictTenantId } from "@/services/contracts/tenantContext";
 import { ShieldAlert, Unlock, ArrowRight } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function GateSummaryRiskPage() {
     const tenantId = await getStrictTenantId();
 

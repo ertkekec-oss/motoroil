@@ -1,0 +1,28 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mThe model "LedgerAccount" cannot be defined because a model with that name already exists.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:5022[0m
+[1;94m   | [0m
+[1;94m5021 | [0m
+[1;94m5022 | [0mmodel [1;91mLedgerAccount[0m {
+[1;94m   | [0m
+[1;91merror[0m: [1mThe model "JournalEntry" cannot be defined because a model with that name already exists.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:5036[0m
+[1;94m   | [0m
+[1;94m5035 | [0m
+[1;94m5036 | [0mmodel [1;91mJournalEntry[0m {
+[1;94m   | [0m
+[1;91merror[0m: [1mThe model "JournalLine" cannot be defined because a model with that name already exists.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:5050[0m
+[1;94m   | [0m
+[1;94m5049 | [0m
+[1;94m5050 | [0mmodel [1;91mJournalLine[0m {
+[1;94m   | [0m
+
+Validation Error Count: 3
+[Context: validate]
+
+Prisma CLI Version : 5.22.0

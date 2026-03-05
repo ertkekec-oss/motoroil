@@ -4749,6 +4749,7 @@ enum EscrowStatus {
   REQUIRED
   FUNDS_HELD
   RELEASE_REQUESTED
+  SETTLEMENT_EXECUTING
   RELEASED
   REFUNDED
   DISPUTED
@@ -4915,4 +4916,223 @@ model NetworkDisputeEvent {
 
   @@index([supplierTenantId])
   @@index([disputeCaseId])
+}
+
+// --- PAYMENT & SETTLEMENT MODELS ---
+
+enum PaymentIntentStatus {
+  CREATED
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  CANCELED
+  REFUNDED
+}
+
+enum SettlementInstructionStatus {
+  PENDING
+  EXECUTING
+  SETTLED
+  FAILED
+  CANCELED
+  NEEDS_REVIEW
+}
+
+enum SettlementPayeeType {
+  SUPPLIER_BANK
+  DEALER_REFUND
+  PLATFORM_FEE
+}
+
+enum B2BPayeeStatus {
+  ACTIVE
+  INACTIVE
+  NEEDS_VERIFICATION
+}
+
+model B2BPayeeProfile {
+  id             String              @id @default(cuid())
+  tenantId       String
+  payeeType      SettlementPayeeType
+  counterpartyId String
+  ibanMasked     String?
+  ibanEncrypted  String?
+  bankName       String?
+  taxId          String?
+  status         B2BPayeeStatus      @default(NEEDS_VERIFICATION)
+  createdAt      DateTime            @default(now())
+
+  @@index([tenantId])
+  @@index([counterpartyId])
+}
+
+model B2BBankTransactionInbox {
+  id               String   @id @default(cuid())
+  tenantId         String
+  bankTxId         String   @unique
+  amount           Decimal
+  currency         String   @default("TRY")
+  iban             String?
+  description      String?
+  occurredAt       DateTime
+  matched          Boolean  @default(false)
+  settlementInstId String?
+  createdAt        DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([matched])
+}
+
+enum IntegrationInboxStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+enum B2BLedgerAccountType {
+  ASSET
+  LIABILITY
+  INCOME
+  EXPENSE
+}
+
+enum B2BJournalEntryStatus {
+  POSTED
+  VOID
+}
+
+enum B2BJournalSourceType {
+  ORDER
+  ESCROW
+  REFUND
+}
+
+model PaymentIntent {
+  id             String              @id @default(cuid())
+  tenantId       String
+  orderId        String
+  membershipId   String
+  amount         Decimal
+  currency       String              @default("TRY")
+  status         PaymentIntentStatus @default(CREATED)
+  providerKey    String // e.g. "IYZICO", "ODEAL"
+  idempotencyKey String              @unique
+  providerRef    String?
+  metaJson       Json?
+  createdAt      DateTime            @default(now())
+
+  @@index([tenantId])
+  @@index([orderId])
+  @@index([membershipId])
+}
+
+model SettlementInstruction {
+  id             String                      @id @default(cuid())
+  idempotencyKey String                      @unique
+  tenantId       String
+  escrowCaseId   String
+  payeeType      SettlementPayeeType
+  amount         Decimal
+  currency       String                      @default("TRY")
+  status         SettlementInstructionStatus @default(PENDING)
+  providerKey    String
+  providerRef    String?
+  scheduledAt    DateTime?
+  settledAt      DateTime?
+  createdAt      DateTime                    @default(now())
+
+  @@index([tenantId])
+  @@index([escrowCaseId])
+}
+
+model IntegrationInbox {
+  id              String                 @id @default(cuid())
+  tenantId        String
+  providerKey     String
+  eventType       String
+  providerEventId String                 @unique
+  payloadBlobId   String?
+  receivedAt      DateTime               @default(now())
+  processedAt     DateTime?
+  status          IntegrationInboxStatus @default(PENDING)
+  error           String?
+
+  @@index([tenantId])
+  @@index([providerKey])
+  @@index([status])
+}
+
+model B2BLedgerAccount {
+  id        String               @id @default(cuid())
+  tenantId  String
+  code      String
+  name      String
+  type      B2BLedgerAccountType
+  isSystem  Boolean              @default(false)
+  createdAt DateTime             @default(now())
+
+  lines B2BJournalLine[]
+
+  @@unique([tenantId, code])
+}
+
+model B2BJournalEntry {
+  id         String                @id @default(cuid())
+  tenantId   String
+  sourceType B2BJournalSourceType
+  sourceId   String
+  status     B2BJournalEntryStatus @default(POSTED)
+  createdAt  DateTime              @default(now())
+
+  lines B2BJournalLine[]
+
+  @@index([tenantId])
+  @@index([sourceType, sourceId])
+}
+
+model B2BJournalLine {
+  id          String   @id @default(cuid())
+  tenantId    String
+  entryId     String
+  accountId   String
+  debit       Decimal  @default(0)
+  credit      Decimal  @default(0)
+  currency    String   @default("TRY")
+  description String?
+  createdAt   DateTime @default(now())
+
+  entry   B2BJournalEntry  @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  account B2BLedgerAccount @relation(fields: [accountId], references: [id])
+
+  @@index([tenantId])
+  @@index([entryId])
+  @@index([accountId])
+}
+
+enum B2BOutboxEventStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model B2BOutboxEvent {
+  id          String               @id @default(cuid())
+  tenantId    String
+  topic       String // e.g. ESCROW_RELEASE, PAYOUT_EXECUTE
+  payloadJson Json
+  status      B2BOutboxEventStatus @default(PENDING)
+  retryCount  Int                  @default(0)
+  lastError   String?
+  createdAt   DateTime             @default(now())
+  sentAt      DateTime?
+
+  @@index([status])
+  @@index([topic])
+}
+
+model B2BSystemConfig {
+  key       String   @id
+  valueJson Json
+  updatedAt DateTime @updatedAt
+  updatedBy String?
 }

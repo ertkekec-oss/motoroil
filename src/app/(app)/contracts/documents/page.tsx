@@ -3,6 +3,8 @@ import { fetchDocuments } from '@/actions/contracts/documents';
 import Link from 'next/link';
 import RenderPdfButton from './RenderPdfButton';
 
+export const dynamic = "force-dynamic";
+
 export default async function DocumentsPage() {
     const docs = await fetchDocuments();
 
