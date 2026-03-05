@@ -4,6 +4,7 @@ import { prisma } from '../lib/prisma';
 import { getPaymentProvider } from '../services/payments/providers';
 import { createSettlementJournalEntry } from '../services/payments/accounting';
 import { B2BJournalSourceType, EscrowAction } from '@prisma/client';
+import { getAccountReconStatus } from '../services/finance/reconciliation/health';
 
 const releaseEscrowWorker = new Worker('escrow_release', async (job: Job) => {
     const { escrowCaseId } = job.data;
@@ -15,6 +16,36 @@ const releaseEscrowWorker = new Worker('escrow_release', async (job: Job) => {
 
     if (escrowCase.status !== 'FUNDS_HELD' && escrowCase.status !== 'RELEASE_REQUESTED') {
         return;
+    }
+
+    const { overrideReconLock } = job.data;
+
+    // Reconciliation Dispute/Overdue Lock Guard
+    // We assume membership directly implies the dealer's accountId.
+    // For MVP we lookup the mapped account manually or skip if not found.
+    const agreement = await prisma.networkAgreement.findFirst({
+        where: { membershipId: escrowCase.membershipId, supplierTenantId: escrowCase.supplierTenantId }
+    });
+
+    if (agreement && agreement.dealerTenantId && !overrideReconLock) {
+        const dealerCustomer = await prisma.customer.findFirst({
+            where: { companyId: escrowCase.supplierTenantId, tenantId: agreement.dealerTenantId }
+        });
+
+        if (dealerCustomer) {
+            const reconStatus = await getAccountReconStatus(dealerCustomer.id);
+            if (['DISPUTED', 'OVERDUE'].includes(reconStatus.health)) {
+                await prisma.escrowEvent.create({
+                    data: {
+                        tenantId: escrowCase.supplierTenantId,
+                        escrowCaseId: escrowCase.id,
+                        action: 'RELEASE_REQUESTED' as EscrowAction,
+                        systemNotes: `Escrow release blocked due to account Recon Health: ${reconStatus.health}. Admin override required to release.`
+                    }
+                });
+                return; // HARD BLOCK
+            }
+        }
     }
 
     // CREATE SETTLEMENT INSTRUCTION

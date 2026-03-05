@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { GateResult } from '@prisma/client';
+import { getAccountReconStatus } from '@/services/finance/reconciliation/health';
 
 export interface GateEvaluationParams {
     supplierTenantId: string;
@@ -50,14 +51,38 @@ export async function evaluateEligibility({
     }
 
     // 4. Mutabakat Gate (Reconciliation status)
-    // Normally query external reconciliation module to check isOverdue.
-    const isReconOverdue = false; // Mock
-    if (isReconOverdue) {
-        reasons.push('RECON_OVERDUE');
-        if (escrowRules.includes('RECON_OVERDUE_30D') && result !== 'BLOCKED') {
-            result = 'ESCROW_REQUIRED';
-        } else {
-            result = 'BLOCKED';
+    let hasMembershipAccount = true;
+    let accountId = "";
+
+    // Ideally, the membership holds the mapped account id or we infer it
+    // For MVP we assume dealerTenantId maps to an account with matching taxNo/id. 
+    // Usually, we lookup the Customer record that corresponds to the dealer. 
+    // Since we don't have direct accountId in NetworkMembership right now, let's look it up via companyId fallback.
+    const mappedCustomer = await prisma.customer.findFirst({
+        where: { companyId: supplierTenantId, tenantId: agreement.dealerTenantId || undefined }
+    });
+
+    if (mappedCustomer) {
+        accountId = mappedCustomer.id;
+        const reconStatus = await getAccountReconStatus(accountId);
+        const reconRules: any = terms.reconciliation || { mode: 'REQUIRE_SIGNED', overdueAction: 'BLOCK', missingAction: 'BLOCK', disputedAction: 'ESCROW' };
+
+        if (reconStatus.health === 'MISSING') {
+            reasons.push('RECON_MISSING');
+            if (reconRules.missingAction === 'BLOCK') result = 'BLOCKED';
+            else if (reconRules.missingAction === 'ESCROW' && result !== 'BLOCKED') result = 'ESCROW_REQUIRED';
+        }
+
+        if (reconStatus.health === 'OVERDUE') {
+            reasons.push('RECON_OVERDUE');
+            if (reconRules.overdueAction === 'BLOCK') result = 'BLOCKED';
+            else if (reconRules.overdueAction === 'ESCROW' && result !== 'BLOCKED') result = 'ESCROW_REQUIRED';
+        }
+
+        if (reconStatus.health === 'DISPUTED') {
+            reasons.push('RECON_DISPUTED');
+            if (reconRules.disputedAction === 'BLOCK') result = 'BLOCKED';
+            else if (reconRules.disputedAction === 'ESCROW' && result !== 'BLOCKED') result = 'ESCROW_REQUIRED';
         }
     }
 
