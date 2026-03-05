@@ -62,7 +62,7 @@ export default function SuspiciousActivityPage() {
     }, [events, pendingProducts]);
 
     return (
-        <div className="p-6 pb-32 animate-fade-in min-h-screen bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617]">
+        <div className="p-6 pb-32 animate-fade-in min-h-screen bg-slate-50 dark:bg-[#0f172a]">
             <style jsx>{`
                 .bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm-card {
                     background: rgba(15, 17, 30, 0.4);

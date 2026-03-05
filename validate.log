@@ -1,0 +1,17 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mError validating field `product` in model `DealerCatalogItem`: The relation field `product` on model `DealerCatalogItem` is missing an opposite relation field on the model `Product`. Either run `prisma format` or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:4327[0m
+[1;94m   | [0m
+[1;94m4326 | [0m  productId        String
+[1;94m4327 | [0m  [1;91mproduct          Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)[0m
+[1;94m4328 | [0m  visibility       DealerCatalogVisibility @default(VISIBLE)
+[1;94m   | [0m
+
+Validation Error Count: 1
+[Context: validate]
+
+Prisma CLI Version : 5.22.0

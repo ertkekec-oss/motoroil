@@ -1,0 +1,28 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mThe enum "DisputeStatus" cannot be defined because a enum with that name already exists.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:4774[0m
+[1;94m   | [0m
+[1;94m4773 | [0m
+[1;94m4774 | [0menum [1;91mDisputeStatus[0m {
+[1;94m   | [0m
+[1;91merror[0m: [1mThe enum "DisputeAction" cannot be defined because a model with that name already exists.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:4790[0m
+[1;94m   | [0m
+[1;94m4789 | [0m
+[1;94m4790 | [0menum [1;91mDisputeAction[0m {
+[1;94m   | [0m
+[1;91merror[0m: [1mThe model "DisputeCase" cannot be defined because a model with that name already exists.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:4885[0m
+[1;94m   | [0m
+[1;94m4884 | [0m
+[1;94m4885 | [0mmodel [1;91mDisputeCase[0m {
+[1;94m   | [0m
+
+Validation Error Count: 3
+[Context: validate]
+
+Prisma CLI Version : 5.22.0

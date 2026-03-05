@@ -123,7 +123,11 @@ export default function MailSettingsPanel(props: any) {
                         </p>
                     </div>
 
-                    <button className="h-10 px-4 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-200 rounded-lg text-[13px] font-medium hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50" disabled={!isConfigured}>
+                    <button
+                        onClick={props.testSmtpConnection}
+                        className="h-10 px-4 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-200 rounded-lg text-[13px] font-medium hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50"
+                        disabled={!isConfigured}
+                    >
                         📬 Bağlantıyı Sınama Testi
                     </button>
                 </div>

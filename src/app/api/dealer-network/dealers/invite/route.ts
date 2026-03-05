@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
+import prisma from '@/lib/prisma';
 
 export async function POST(req: Request) {
     try {
@@ -17,8 +18,26 @@ export async function POST(req: Request) {
 
         const body = await req.json();
 
+        let targetEmail = body.email;
+        let customerId = body.customerId;
+
+        if (customerId && !targetEmail) {
+            const customer = await prisma.customer.findUnique({
+                where: { id: customerId }
+            });
+
+            if (!customer || !customer.email) {
+                return NextResponse.json({ error: 'Seçilen carinin geçerli bir e-posta adresi bulunmuyor.' }, { status: 400 });
+            }
+            targetEmail = customer.email;
+        }
+
+        if (!targetEmail) {
+            return NextResponse.json({ error: 'Davetiyeyi göndermek için geçerli bir e-posta adresi gereklidir.' }, { status: 400 });
+        }
+
         // Tenant context operations would happen here...
-        console.log(`[Invite] Inviting ${body.email} for tenant ${tenantId} by ${user.id}`);
+        console.log(`[Invite] Inviting ${targetEmail} for tenant ${tenantId} by ${user.id}${customerId ? ` (Customer ID: ${customerId})` : ''}`);
 
         return NextResponse.json({ success: true, message: "Davetiye gönderildi." });
     } catch (error: any) {

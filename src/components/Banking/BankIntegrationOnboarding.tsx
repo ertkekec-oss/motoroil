@@ -76,34 +76,127 @@ export default function BankOnboardingHub() {
 
     const handleDownloadForm = () => {
         if (!selectedBank) return;
+
+        const unTurk = (str: string) => {
+            return str
+                .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
+                .replace(/ü/g, 'u').replace(/Ü/g, 'U')
+                .replace(/ş/g, 's').replace(/Ş/g, 'S')
+                .replace(/ı/g, 'i').replace(/İ/g, 'I')
+                .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+                .replace(/ç/g, 'c').replace(/Ç/g, 'C');
+        };
+
         const doc = new jsPDF();
-        doc.setFontSize(22);
-        doc.text("BANKA ENTEGRASYON BAŞVURU FORMU", 105, 20, { align: "center" });
-        doc.setFontSize(14);
-        doc.text(`Banka: ${selectedBank.displayName}`, 20, 40);
-        doc.text(`Tarih: ${new Date().toLocaleDateString('tr-TR')}`, 20, 50);
-        doc.setFontSize(12);
-        doc.text("Aşağıdaki alanların banka tarafından tanımlanması ve taraflara iletilmesi rica olunur.", 20, 70);
-        let y = 85;
+
+        // Setup default font
+        doc.setFont("helvetica");
+
+        // 1. Navy Blue Header
+        doc.setFillColor(15, 23, 42); // slate-900 / enterprise navy
+        doc.rect(0, 0, 210, 32, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "bold");
+        doc.text("BANKA ENTEGRASYON BASVURU FORMU", 105, 18, { align: "center" });
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text("PERIODYA ENTERPRISE B2B FINANS PLATFORMU", 105, 25, { align: "center" });
+
+        // 2. Info Box
+        doc.setTextColor(15, 23, 42);
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text("Basvuru / Firma Detayi", 20, 50);
+
+        doc.setLineWidth(0.5);
+        doc.setDrawColor(200, 205, 215);
+        doc.line(20, 53, 190, 53);
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Tarih: ${new Date().toLocaleDateString('tr-TR')}`, 20, 62);
+        doc.text(`Entegrasyon Hedefi: ${unTurk(selectedBank.displayName)}`, 20, 70);
+        doc.text(`Baglanti Protokolu: ${unTurk(selectedBank.integrationMethod)}`, 20, 78);
+
+        // 3. Info Text
+        doc.setTextColor(100, 116, 139); // slate-500
+        const descText = unTurk("Sistem entegrasyonunun aktif edilebilmesi adina, asagida istenilen servis baglanti bilgilerinin bankaniz tarafindan uretilmesi ve size iletilmesi gerekmektedir. Ilgili veriler sadece B2B panelinizden girilebilir, e-posta ile paylasmayiniz.");
+        const splitDesc = doc.splitTextToSize(descText, 170);
+        doc.text(splitDesc, 20, 90);
+
+        // 4. Form Fields
+        doc.setTextColor(15, 23, 42);
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text("Banka Tarafindan Iletilecek Degerler", 20, 115);
+        doc.line(20, 118, 190, 118);
+
+        let y = 128;
+        doc.setFontSize(10);
         selectedBank.onboardingFields.forEach((field) => {
             const isRequired = selectedBank.requiredCredentials.includes(field.key);
-            let statusText = isRequired ? "[ZORUNLU]" : "[OPSİYONEL - VARSA]";
-            if (selectedBank.id === 'KUVEYT_TURK' && (field.key === 'serviceUsername' || field.key === 'servicePassword')) {
-                statusText = "[OPSİYONEL - VARSA DOLDURUNUZ]";
-            }
-            doc.text(`${field.label}: ____________________ ${statusText}`, 20, y);
-            y += 10;
+            let statusText = isRequired ? "(ZORUNLU)" : "(OPSIYONEL)";
+
+            // Field Label
+            doc.setFont("helvetica", "bold");
+            const cleanLabel = unTurk(field.label);
+            doc.text(cleanLabel + ":", 20, y);
+
+            // Input Line
+            doc.setDrawColor(180, 185, 195);
+            doc.setLineDashPattern([1, 1], 0); // dotted line
+            doc.line(75, y, 165, y);
+            doc.setLineDashPattern([], 0); // solid reset
+
+            // Requirement Status
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(statusText, 168, y);
+
+            // Reset for next
+            doc.setTextColor(15, 23, 42);
+            doc.setFontSize(10);
+
+            y += 12;
         });
-        y += 10;
-        doc.setFontSize(10);
-        doc.text("Teknik Notlar:", 20, y);
+
+        // 5. Technical Requirements
         y += 5;
-        selectedBank.technicalAppendix.protocolNotes.forEach(note => {
-            doc.text(`- ${note}`, 25, y);
-            y += 5;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text("Teknik Parametreler ve Uyari Notlari", 20, y);
+        doc.setDrawColor(200, 205, 215);
+        doc.line(20, y + 3, 190, y + 3);
+
+        y += 12;
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        selectedBank.technicalAppendix.protocolNotes.forEach((note) => {
+            const cleanNote = "- " + unTurk(note);
+            const splitNote = doc.splitTextToSize(cleanNote, 170);
+            doc.text(splitNote, 20, y);
+            y += splitNote.length * 6;
         });
-        doc.save(`${selectedBank.id}_Basvuru_Formu.pdf`);
-        showSuccess('Başarılı', `${selectedBank.displayName} için başvuru dokümanları (PDF) indirildi.`);
+
+        if (selectedBank.technicalAppendix.ipWhitelist.length > 0) {
+            y += 4;
+            doc.setFont("helvetica", "bold");
+            doc.text("Whitelist Icin Erisim IP Listesi:", 20, y);
+            doc.setFont("helvetica", "normal");
+            doc.text(selectedBank.technicalAppendix.ipWhitelist.join(', '), 70, y);
+        }
+
+        // 6. Print Footer
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(150, 160, 175);
+        doc.text("Dokuman Otomasyonu: Periodya Enterprise ERP / BankConfig", 105, 285, { align: "center" });
+
+        // Save
+        doc.save(`${selectedBank.id.replace(/_/g, '')}_Entegrasyon_Formu.pdf`);
+        showSuccess('Başarılı', `${selectedBank.displayName} detaylı başvuru paketi PDF olarak oluşturuldu.`);
         setCurrentStepStatus('PENDING_ACTIVATION');
     };
 

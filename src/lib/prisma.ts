@@ -16,7 +16,10 @@ const operationalModels = [
     'bankconnection', 'banktransaction', 'bankstatement', 'cashflowforecast',
     'inventorylayer', 'matchingrule', 'externalrequest', 'fintechaudit', 'stock',
     'networkorder', 'networkdemand', 'networkoffer', 'networklisting',
-    'shipment', 'shipmentevent'
+    'shipment', 'shipmentevent',
+    'fileblob', 'documenttemplate', 'templateversion', 'document', 'documentversion',
+    'envelope', 'recipient', 'signingsession', 'signatureproviderconfig', 'webhookinbox',
+    'auditevent', 'hashledger'
 ];
 
 const prismaClientSingleton = () => {
@@ -147,7 +150,7 @@ const prismaClientSingleton = () => {
                             const applyFilter = (target: any) => {
                                 if (modelName === 'company') {
                                     target.tenantId = effectiveTenantId;
-                                } else if (modelName === 'user' || modelName === 'staff' || modelName === 'subscription') {
+                                } else if (modelName === 'user' || modelName === 'staff' || modelName === 'subscription' || ['fileblob', 'documenttemplate', 'templateversion', 'document', 'documentversion', 'envelope', 'recipient', 'signingsession', 'signatureproviderconfig', 'webhookinbox', 'auditevent', 'hashledger'].includes(modelName)) {
                                     target.tenantId = effectiveTenantId;
                                 } else if (modelName === 'tenant') {
                                     target.id = effectiveTenantId;
@@ -258,7 +261,7 @@ const prismaClientSingleton = () => {
 
                         // Mutation Protection for creation
                         if (['create', 'createMany', 'upsert'].includes(operation)) {
-                            const bypass = ['company', 'user', 'tenant', 'subscription', 'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic', 'loginattempt'];
+                            const bypass = ['company', 'user', 'tenant', 'subscription', 'ticket', 'ticketmessage', 'ticketattachment', 'helpcategory', 'helptopic', 'loginattempt', 'fileblob', 'documenttemplate', 'templateversion', 'document', 'documentversion', 'envelope', 'recipient', 'signingsession', 'signatureproviderconfig', 'webhookinbox', 'auditevent', 'hashledger'];
                             if (!bypass.includes(modelName)) {
                                 const data = operation === 'upsert' ? (newArgs as any).create : (newArgs as any).data;
                                 if (data && !isPlatformAdmin) {
@@ -277,7 +280,7 @@ const prismaClientSingleton = () => {
                     }
 
                     // PUBLIC ACCESS (No session)
-                    const publicSafe = ['user', 'staff', 'tenant', 'plan', 'company', 'subscription', 'loginattempt', 'salesinvoice', 'appsettings', 'helpcategory', 'helptopic'];
+                    const publicSafe = ['user', 'staff', 'tenant', 'plan', 'company', 'subscription', 'loginattempt', 'salesinvoice', 'appsettings', 'helpcategory', 'helptopic', 'signingsession', 'recipient', 'envelope', 'documentversion', 'auditevent', 'document', 'templateversion', 'signatureproviderconfig'];
                     if (publicSafe.includes(modelName)) {
                         return query(args);
                     }

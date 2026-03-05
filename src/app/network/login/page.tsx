@@ -68,7 +68,7 @@ export default function DealerNetworkLoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4 selection:bg-blue-500/30 font-sans relative overflow-hidden">
+        <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 selection:bg-blue-500/30 font-sans relative overflow-hidden">
 
             {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">

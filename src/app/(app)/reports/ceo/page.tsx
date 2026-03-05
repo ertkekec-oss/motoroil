@@ -64,7 +64,7 @@ export default function CEODashboardPage() {
 
     if (isLoading || loading) {
         return (
-            <div className="min-h-screen bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] flex items-center justify-center text-slate-800 dark:text-slate-200 font-sans">
+            <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] flex items-center justify-center text-slate-800 dark:text-slate-200 font-sans">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     <div className="font-bold text-sm tracking-widest text-slate-500 dark:text-slate-400 uppercase animate-pulse">İş Zekası Yükleniyor...</div>
@@ -80,7 +80,7 @@ export default function CEODashboardPage() {
     const hasIssues = issues.length > 0 || warnings.length > 0;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] text-slate-800 dark:text-slate-200 font-sans p-6 md:p-10 pb-24 animate-in fade-in duration-500">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-200 font-sans p-6 md:p-10 pb-24 animate-in fade-in duration-500">
 
             {/* 2. Dark Hero Alanı */}
             <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-8 mb-6 shadow-md relative z-10">

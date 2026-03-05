@@ -20,23 +20,23 @@ export function DailyBriefPanel({ onClose }: { onClose: () => void }) {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 shadow-sm flex flex-col justify-between">
                     <span className="text-rose-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5"><AlertTriangle className="w-3 h-3" /> Kritik Stokta</span>
-                    <div className="text-xl font-black text-slate-900 dark:text-white mt-2">5 Ürün</div>
+                    <div className="text-xl font-black text-slate-900 dark:text-white mt-2">0 Ürün</div>
                 </div>
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 shadow-sm flex flex-col justify-between">
                     <span className="text-orange-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5"><TrendingUp className="w-3 h-3" /> Hızlı Tükenen</span>
-                    <div className="text-xl font-black text-slate-900 dark:text-white mt-2">3 Ürün</div>
+                    <div className="text-xl font-black text-slate-900 dark:text-white mt-2">0 Ürün</div>
                 </div>
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 shadow-sm flex flex-col justify-between">
                     <span className="text-amber-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5"><TrendingDown className="w-3 h-3" /> Marj Düşen</span>
-                    <div className="text-xl font-black text-slate-900 dark:text-white mt-2">2 Ürün</div>
+                    <div className="text-xl font-black text-slate-900 dark:text-white mt-2">0 Ürün</div>
                 </div>
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 shadow-sm flex flex-col justify-between">
                     <span className="text-emerald-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5"><LineChart className="w-3 h-3" /> Fazla Stok Değeri</span>
-                    <div className="text-xl font-black text-slate-900 dark:text-white mt-2">₺48.500</div>
+                    <div className="text-xl font-black text-slate-900 dark:text-white mt-2">₺0</div>
                 </div>
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 shadow-sm flex flex-col justify-between">
                     <span className="text-indigo-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5"><PackageOpen className="w-3 h-3" /> Transfer Önerisi</span>
-                    <div className="text-xl font-black text-slate-900 dark:text-white mt-2">4 Ürün</div>
+                    <div className="text-xl font-black text-slate-900 dark:text-white mt-2">0 Ürün</div>
                 </div>
             </div>
 
@@ -122,13 +122,8 @@ export function WeeklyHealthReport({ onClose }: { onClose: () => void }) {
 }
 
 export function FocusQueueTab({ products }: { products: any[] }) {
-    // Simulated dummy data
-    const anomalies = [
-        { id: 1, type: 'Kritik Stok Acil!', product: 'Premium Motor Yağı 5W-40', impact: '-₺1.200/gün', action: 'Tedarikçi siparişi geç' },
-        { id: 2, type: 'Marj Düşüşü Riskli', product: 'Ağır Vasıta Filtre Seti', impact: '-₺850/gün', action: 'Fiyat %5 güncelle' },
-        { id: 3, type: '0 Stok ama Aktif', product: 'Endüstriyel Gres Pompası', impact: 'Satış Kaçırma Risk', action: 'Stoğa Kapat / Pasife Al' },
-        { id: 4, type: 'Atıl Stok (B2B Önerisi)', product: 'Eski Sezon Yazlık Bakım Seti', impact: '₺14.000 (Depo)', action: 'B2B Ağına Taslak Olarak Gönder' },
-    ];
+    // Empty dummy data array to hide demo info
+    const anomalies: any[] = [];
 
     return (
         <div className="space-y-4 animate-in fade-in">
@@ -164,7 +159,14 @@ export function FocusQueueTab({ products }: { products: any[] }) {
                                 <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Operasyon</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                            {anomalies.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-400">
+                                        Müdahale edilecek bir anomali bulunamadı.
+                                    </td>
+                                </tr>
+                            )}
                             {anomalies.map((a, i) => (
                                 <tr key={i} className="hover:bg-slate-50 dark:bg-[#1e293b] transition-colors group">
                                     <td className="px-4 py-3">
@@ -199,14 +201,7 @@ export function FocusQueueTab({ products }: { products: any[] }) {
                     <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Senaryo tabanlı stratejik karar motoru.</p>
 
                     <div className="space-y-3">
-                        <div className="flex justify-between items-center text-sm border-b border-slate-100 dark:border-white/5 pb-2">
-                            <span className="text-slate-600 dark:text-slate-400 font-medium">Fiyat %10 artarsa (30 Gün Etki)</span>
-                            <span className="font-bold text-emerald-600">+₺24.500 Ciro</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm border-b border-slate-100 dark:border-white/5 pb-2">
-                            <span className="text-slate-600 dark:text-slate-400 font-medium">Atıl Stok B2B'de (Suni Gelir)</span>
-                            <span className="font-bold text-blue-600">+₺41.000 Tahsilat</span>
-                        </div>
+                        <div className="text-center text-xs text-slate-400 py-4">Tahmin modelleri için yeterli veri toplanması bekleniyor.</div>
                     </div>
                 </div>
 
@@ -215,20 +210,7 @@ export function FocusQueueTab({ products }: { products: any[] }) {
                     <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Gerçek zamanlı sistem denetimi anomali kayıtları.</p>
 
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                                <span className="text-slate-600 dark:text-slate-400 font-medium">Ani Satış Sıçraması (ID: 8042)</span>
-                            </div>
-                            <span className="text-slate-400 font-medium">2 sa önce</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                                <span className="text-slate-600 dark:text-slate-400 font-medium">Fiyat Sapması Uyarısı (ID: 1024)</span>
-                            </div>
-                            <span className="text-slate-400 font-medium">14 sa önce</span>
-                        </div>
+                        <div className="text-center text-xs text-slate-400 py-4">Sistem denetimleri şu anda beklemede. Herhangi bir risk tespit edilmedi.</div>
                     </div>
                 </div>
             </div>
@@ -247,10 +229,10 @@ export function ExecutiveSummaryMode({ products }: { products: any[] }) {
                         </span>
                         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Stok Sağlık Skoru</span>
                     </div>
-                    <div className="text-3xl font-black text-slate-900 dark:text-white mt-2">78<span className="text-lg text-slate-400 font-bold">/100</span></div>
+                    <div className="text-3xl font-black text-slate-900 dark:text-white mt-2">0<span className="text-lg text-slate-400 font-bold">/100</span></div>
                     <div className="mt-4">
                         <div className="w-full bg-slate-100 dark:bg-[#334155]/50 rounded-full h-1.5">
-                            <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: '78%' }}></div>
+                            <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: '0%' }}></div>
                         </div>
                     </div>
                 </div>
@@ -262,9 +244,9 @@ export function ExecutiveSummaryMode({ products }: { products: any[] }) {
                         </span>
                         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Ortalama Devir Süresi</span>
                     </div>
-                    <div className="text-3xl font-black text-slate-900 dark:text-white mt-2">42 <span className="text-lg text-slate-400 font-bold">Gün</span></div>
-                    <div className="mt-4 flex items-center text-[11px] font-bold text-emerald-600 gap-1 bg-emerald-50 w-max px-2 py-1 rounded-md">
-                        <TrendingDown className="w-3 h-3" /> -3 gün düzelme
+                    <div className="text-3xl font-black text-slate-900 dark:text-white mt-2">0 <span className="text-lg text-slate-400 font-bold">Gün</span></div>
+                    <div className="mt-4 flex items-center text-[11px] font-bold text-emerald-600 gap-1 bg-transaparent w-max rounded-md">
+                        Veri Bekleniyor
                     </div>
                 </div>
 
@@ -275,9 +257,9 @@ export function ExecutiveSummaryMode({ products }: { products: any[] }) {
                         </span>
                         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Atıl Stok Tutarı</span>
                     </div>
-                    <div className="text-3xl font-black text-slate-900 dark:text-white mt-2">₺184K</div>
-                    <div className="mt-4 flex items-center text-[11px] font-bold text-amber-600 gap-1 bg-amber-50 w-max px-2 py-1 rounded-md">
-                        <TrendingUp className="w-3 h-3" /> %14 Toplam Depo Oranı
+                    <div className="text-3xl font-black text-slate-900 dark:text-white mt-2">₺0</div>
+                    <div className="mt-4 flex items-center text-[11px] font-bold text-amber-600 gap-1 bg-transparent w-max rounded-md">
+                        Veri Bekleniyor
                     </div>
                 </div>
 
@@ -288,9 +270,9 @@ export function ExecutiveSummaryMode({ products }: { products: any[] }) {
                         </span>
                         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Kritik SKU Sayısı</span>
                     </div>
-                    <div className="text-3xl font-black text-slate-900 dark:text-white mt-2">12</div>
-                    <div className="mt-4 flex items-center text-[11px] font-bold text-rose-600 gap-1 bg-rose-50 w-max px-2 py-1 rounded-md">
-                        <AlertTriangle className="w-3 h-3" /> Stok tükenme riski
+                    <div className="text-3xl font-black text-slate-900 dark:text-white mt-2">0</div>
+                    <div className="mt-4 flex items-center text-[11px] font-bold text-rose-600 gap-1 bg-transparent w-max rounded-md">
+                        Mevcut Risk Yok
                     </div>
                 </div>
             </div>

@@ -248,6 +248,17 @@ export default function StaffManagementContent() {
         { id: 'approve_products', label: '🔴 Ürün Kartı Onayı', category: 'Kritik' },
         { id: 'approve_transfers', label: '🔴 Transfer Onaylama', category: 'Kritik' },
 
+        // --- İNSAN KAYNAKLARI & BORDRO ---
+        { id: 'hr_view', label: 'Personel Listesi Görme', category: 'İnsan Kayn.' },
+        { id: 'hr_manage', label: 'Personel Ekle/Çıkar', category: 'İnsan Kayn.' },
+        { id: 'payroll_manage', label: 'Maaş ve Bordro Onayı', category: 'İnsan Kayn.' },
+        { id: 'shift_manage', label: 'Vardiya ve İzinleri Yönet', category: 'İnsan Kayn.' },
+
+        // --- RESMİ MUHASEBE & MALİ MÜŞAVİR ---
+        { id: 'tax_manage', label: 'KDV, Vergi ve Beyannameler', category: 'Resmi Muh.' },
+        { id: 'mizan_export', label: 'Mizan ve Dışa Aktarımlar', category: 'Resmi Muh.' },
+        { id: 'e_invoice', label: 'Resmi e-Fatura ve e-Arşiv Kesimi', category: 'Resmi Muh.' },
+
         // --- ÖZEL KISITLAMALAR ---
         { id: 'branch_isolation', label: '🚫 Şube İzolasyonu (Sadece Kendi Şubesi)', category: 'Kısıtlama' }
     ];
@@ -258,6 +269,8 @@ export default function StaffManagementContent() {
         'Saha Satış': ['field_sales_access', 'field_sales_admin', 'customer_view', 'customer_edit', 'inventory_view', 'pos_access', 'sales_archive'],
         'E-Ticaret Uzmanı': ['ecommerce_view', 'ecommerce_manage', 'inventory_view', 'inventory_edit', 'sales_archive'],
         'Servis Personeli': ['service_view', 'service_create', 'service_complete', 'inventory_view'],
+        'İnsan Kaynakları': ['hr_view', 'hr_manage', 'payroll_manage', 'shift_manage', 'staff_manage'],
+        'Mali Müşavir': ['tax_manage', 'mizan_export', 'e_invoice', 'finance_view', 'finance_transactions', 'finance_reports'],
         'Personel': ['pos_access', 'branch_isolation']
     };
 
@@ -1997,9 +2010,12 @@ export default function StaffManagementContent() {
                                                 <option value="Yönetici">👑 Yönetici</option>
                                                 <option value="Şube Müdürü">🏢 Şube Müdürü</option>
                                                 <option value="Muhasebe">💰 Muhasebe</option>
+                                                <option value="Mali Müşavir">💼 Mali Müşavir</option>
+                                                <option value="İnsan Kaynakları">👥 İnsan Kaynakları</option>
                                                 <option value="Servis Personeli">🔧 Servis Personeli</option>
                                                 <option value="Satış Temsilcisi">🤝 Satış Temsilcisi</option>
                                                 <option value="Saha Satış">🚚 Saha Satış</option>
+                                                <option value="Personel">👤 Personel</option>
                                             </select>
                                         </div>
                                         <div className="space-y-1.5">

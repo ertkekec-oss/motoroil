@@ -261,7 +261,7 @@ export default function DataImportClient() {
                     const isPassed = i < currentStep;
                     const Icon = s.icon;
                     return (
-                        <div key={s.id} className="flex flex-col items-center gap-3 min-w-[120px] bg-white dark:bg-[#020617]">
+                        <div key={s.id} className="flex flex-col items-center gap-3 min-w-[120px] bg-white dark:bg-[#0f172a]">
                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm transition-all duration-300 relative border-2
                                 ${isActive ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/30' :
                                     isPassed ? 'bg-white dark:bg-slate-800 text-blue-600 border-blue-600' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-400 border-transparent'}

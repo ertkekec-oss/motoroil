@@ -63,7 +63,7 @@ export default function TrustScorePage() {
     };
 
     return (
-        <div className="bg-slate-50 min-h-screen dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] pb-16 w-full font-sans">
+        <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] pb-16 w-full font-sans">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
                 {/* Header */}
                 <div className="mb-8">

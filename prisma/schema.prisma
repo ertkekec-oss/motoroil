@@ -329,7 +329,7 @@ model Product {
   stocks              Stock[]
   movements           StockMovement[]
   dealerCartItems     DealerCartItem[]
-  DealerCatalogItem   DealerCatalogItem[]
+  dealerCatalogItems  DealerCatalogItem[]
 
   @@unique([code, branch, companyId])
   @@index([name])
@@ -4336,4 +4336,583 @@ model DealerCatalogItem {
   @@unique([supplierTenantId, productId])
   @@index([supplierTenantId])
   @@index([productId])
+}
+
+// CONTRACTS MVP ENUMS
+enum TemplateStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum TemplateEngine {
+  HTML
+  PDF_FORM
+}
+
+enum DocumentStatus {
+  DRAFT
+  GENERATED
+  PENDING_SIGN
+  SENT
+  SIGNED
+  ACTIVE
+  COMPLETED
+  TERMINATED
+  EXPIRED
+  VOID
+}
+
+enum DocumentSource {
+  TEMPLATE
+  UPLOAD
+  API
+}
+
+enum EnvelopeStatus {
+  DRAFT
+  SENT
+  DELIVERED
+  VIEWED
+  SIGNING
+  COMPLETED
+  DECLINED
+  VOIDED
+}
+
+enum RecipientStatus {
+  CREATED
+  SENT
+  DELIVERED
+  VIEWED
+  OTP_VERIFIED
+  SIGNING
+  SIGNED
+  DECLINED
+}
+
+enum RecipientRole {
+  SIGNER
+  CC
+  APPROVER
+}
+
+enum AuthMethod {
+  NONE
+  EMAIL_OTP
+  SMS_OTP
+}
+
+enum ContractAuditAction {
+  CREATED
+  UPDATED
+  SENT
+  DELIVERED
+  VIEWED
+  OTP_REQUESTED
+  OTP_VERIFIED
+  SIGN_STARTED
+  SIGN_COMPLETED
+  SIGNED
+  DECLINED
+  COMPLETED
+  VOIDED
+  DOWNLOADED
+  PDF_RENDER_QUEUED
+  PDF_RENDERED
+  OTP_SENT
+  WEBHOOK_VERIFIED
+  AUDIT_EXPORTED
+  CONTRACT_GENERATED
+  CLAUSE_INSERTED
+  CONTRACT_RENDERED
+  CONTRACT_SIGNED
+  NETWORK_AGREEMENT_ACTIVATED
+}
+
+enum TemplateSourceType {
+  ACCOUNT
+  ORDER
+  USER
+  TENANT
+}
+
+enum ClauseCategory {
+  PAYMENT_TERMS
+  CONFIDENTIALITY
+  TERMINATION
+  JURISDICTION
+  FORCE_MAJEURE
+  WARRANTY
+  OTHER
+}
+
+enum ContractActorType {
+  SYSTEM
+  USER
+  RECIPIENT
+}
+
+enum RenderStatus {
+  PENDING
+  RENDERING
+  COMPLETED
+  FAILED
+}
+
+enum WebhookStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+// CONTRACTS MVP MODELS
+model FileBlob {
+  id             String   @id @default(cuid())
+  tenantId       String
+  s3Key          String
+  fileHash       String
+  checksumSha256 String?
+  fileSize       Int
+  fileType       String
+  createdAt      DateTime @default(now())
+
+  documents DocumentVersion[]
+
+  @@index([tenantId])
+}
+
+model DocumentTemplate {
+  id          String         @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  schemaJson  Json?
+  engine      TemplateEngine @default(HTML)
+  status      TemplateStatus @default(DRAFT)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  versions TemplateVersion[]
+  mappings ContractTemplateMapping[]
+
+  @@index([tenantId])
+}
+
+model TemplateVersion {
+  id          String   @id @default(cuid())
+  templateId  String
+  version     Int
+  tenantId    String
+  bodyContent String
+  schemaJson  Json?
+  checksum    String?
+  createdAt   DateTime @default(now())
+
+  template  DocumentTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  documents Document[]
+
+  @@unique([templateId, version])
+  @@index([tenantId])
+}
+
+model ContractTemplateMapping {
+  id           String             @id @default(cuid())
+  templateId   String
+  sourceType   TemplateSourceType
+  fieldPath    String
+  variableName String
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  template DocumentTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
+}
+
+model Clause {
+  id        String         @id @default(cuid())
+  tenantId  String
+  title     String
+  category  ClauseCategory
+  bodyHtml  String
+  version   Int            @default(1)
+  isActive  Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([tenantId])
+}
+
+model Document {
+  id                     String         @id @default(cuid())
+  tenantId               String
+  subject                String
+  source                 DocumentSource @default(TEMPLATE)
+  status                 DocumentStatus @default(DRAFT)
+  templateVersionId      String?
+  linkedAccountId        String?
+  linkedOrderId          String?
+  linkedEmployeeId       String?
+  linkedReconciliationId String?
+  tags                   Json?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  templateVersion TemplateVersion?  @relation(fields: [templateVersionId], references: [id])
+  versions        DocumentVersion[]
+  envelopes       Envelope[]
+
+  @@index([tenantId])
+  @@index([linkedAccountId])
+  @@index([linkedOrderId])
+}
+
+model DocumentVersion {
+  id           String       @id @default(cuid())
+  documentId   String
+  version      Int
+  tenantId     String
+  fileBlobId   String?
+  bodySnapshot String?
+  renderStatus RenderStatus @default(PENDING)
+  createdAt    DateTime     @default(now())
+
+  document  Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  fileBlob  FileBlob?  @relation(fields: [fileBlobId], references: [id])
+  envelopes Envelope[]
+
+  @@unique([documentId, version])
+  @@index([tenantId])
+}
+
+model Envelope {
+  id                   String         @id @default(cuid())
+  tenantId             String
+  documentId           String
+  documentVersionId    String
+  status               EnvelopeStatus @default(DRAFT)
+  signedPdfBlobId      String?
+  certChainBlobId      String?
+  ocspCrlBlobId        String?
+  timestampTokenBlobId String?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  document           Document             @relation(fields: [documentId], references: [id])
+  documentVersion    DocumentVersion      @relation(fields: [documentVersionId], references: [id])
+  recipients         Recipient[]
+  auditEvents        ContractAuditEvent[]
+  signatureArtifacts SignatureArtifact[]
+
+  @@index([tenantId])
+}
+
+model Recipient {
+  id         String          @id @default(cuid())
+  tenantId   String
+  envelopeId String
+  email      String
+  name       String
+  role       RecipientRole   @default(SIGNER)
+  status     RecipientStatus @default(CREATED)
+  orderIndex Int             @default(1)
+  authMethod AuthMethod      @default(NONE)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  envelope           Envelope             @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  signingSession     SigningSession?
+  auditEvents        ContractAuditEvent[]
+  signatureArtifacts SignatureArtifact[]
+
+  @@index([envelopeId, orderIndex])
+  @@index([tenantId])
+}
+
+model SigningSession {
+  id                String    @id @default(cuid())
+  tenantId          String
+  recipientId       String    @unique
+  publicTokenHash   String    @unique
+  expiresAt         DateTime
+  tokenUsedAt       DateTime?
+  lastIp            String?
+  userAgent         String?
+  deviceFingerprint String?
+  otpState          Json?
+  attemptCount      Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+}
+
+model SignatureProviderConfig {
+  id                   String   @id @default(cuid())
+  tenantId             String
+  providerKey          String
+  credentialsEncrypted String
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@unique([tenantId, providerKey])
+  @@index([tenantId])
+}
+
+model WebhookInbox {
+  id            String        @id @default(cuid())
+  tenantId      String
+  providerKey   String?
+  payloadBlobId String?
+  headers       Json?
+  payload       Json?
+  status        WebhookStatus @default(PENDING)
+  processedAt   DateTime?
+  createdAt     DateTime      @default(now())
+
+  @@index([tenantId])
+}
+
+model ContractAuditEvent {
+  id          String              @id @default(cuid())
+  tenantId    String
+  envelopeId  String?
+  recipientId String?
+  actorType   ContractActorType
+  actorId     String?
+  action      ContractAuditAction
+  ip          String?
+  userAgent   String?
+  meta        Json?
+  createdAt   DateTime            @default(now())
+
+  envelope  Envelope?  @relation(fields: [envelopeId], references: [id])
+  recipient Recipient? @relation(fields: [recipientId], references: [id])
+
+  @@index([envelopeId, createdAt])
+  @@index([tenantId])
+}
+
+model HashLedger {
+  id           String   @id @default(cuid())
+  tenantId     String
+  targetType   String
+  targetId     String
+  hashValue    String
+  previousHash String?
+  createdAt    DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([targetType, targetId])
+}
+
+model SignatureArtifact {
+  id                   String   @id @default(cuid())
+  tenantId             String
+  envelopeId           String
+  recipientId          String
+  signedPdfBlobId      String
+  certChainBlobId      String?
+  ocspCrlBlobId        String?
+  timestampTokenBlobId String?
+  createdAt            DateTime @default(now())
+
+  envelope  Envelope  @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
+  @@index([tenantId])
+}
+
+// --- B2B NETWORK & ESCROW MODELS ---
+
+enum AgreementStatus {
+  REQUIRED
+  SENT
+  SIGNED
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+enum GateResult {
+  ALLOWED
+  ESCROW_REQUIRED
+  BLOCKED
+}
+
+enum EscrowStatus {
+  REQUIRED
+  FUNDS_HELD
+  RELEASE_REQUESTED
+  RELEASED
+  REFUNDED
+  DISPUTED
+  CANCELED
+}
+
+enum HoldMode {
+  PROVIDER_NATIVE
+  OPERATIONAL
+}
+
+enum EscrowAction {
+  HOLD_REQUESTED
+  HOLD_CONFIRMED
+  RELEASE_REQUESTED
+  RELEASED
+  REFUND_REQUESTED
+  REFUNDED
+  DISPUTE_OPENED
+  DISPUTE_CLOSED
+}
+
+enum NetworkDisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+  CANCELED
+}
+
+enum NetworkDisputeReason {
+  DAMAGED
+  MISSING
+  NOT_DELIVERED
+  PRICE_MISMATCH
+  OTHER
+}
+
+enum NetworkDisputeAction {
+  OPENED
+  MESSAGE_ADDED
+  EVIDENCE_ATTACHED
+  ESCALATED
+  RESOLVED
+  REJECTED
+}
+
+model NetworkAgreement {
+  id               String          @id @default(cuid())
+  supplierTenantId String
+  dealerTenantId   String?
+  membershipId     String
+  contractId       String?
+  status           AgreementStatus @default(REQUIRED)
+  effectiveAt      DateTime?
+  expiresAt        DateTime?
+  policySnapshotId String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  policySnapshot NetworkPolicySnapshot?  @relation(fields: [policySnapshotId], references: [id])
+  snapshots      NetworkPolicySnapshot[] @relation("AgreementSnapshots")
+
+  @@index([supplierTenantId])
+  @@index([membershipId])
+}
+
+model NetworkPolicySnapshot {
+  id               String   @id @default(cuid())
+  supplierTenantId String
+  agreementId      String
+  version          Int
+  termsJson        Json
+  hashSha256       String
+  createdAt        DateTime @default(now())
+
+  agreement NetworkAgreement   @relation("AgreementSnapshots", fields: [agreementId], references: [id])
+  activeFor NetworkAgreement[]
+
+  @@index([supplierTenantId])
+  @@index([agreementId])
+}
+
+model NetworkGateResult {
+  id               String     @id @default(cuid())
+  supplierTenantId String
+  membershipId     String
+  orderDraftId     String?
+  orderId          String?
+  result           GateResult
+  reasonCodesJson  Json
+  createdAt        DateTime   @default(now())
+
+  @@index([supplierTenantId])
+  @@index([membershipId])
+}
+
+model EscrowCase {
+  id                 String       @id @default(cuid())
+  supplierTenantId   String
+  membershipId       String
+  orderId            String
+  amount             Decimal
+  currency           String       @default("TRY")
+  status             EscrowStatus @default(REQUIRED)
+  holdMode           HoldMode     @default(OPERATIONAL)
+  providerKey        String       @default("manual")
+  providerRef        String?
+  policySnapshotJson Json?
+  heldAt             DateTime?
+  releasedAt         DateTime?
+  createdAt          DateTime     @default(now())
+
+  events EscrowEvent[]
+
+  @@index([supplierTenantId])
+  @@index([orderId])
+}
+
+model EscrowEvent {
+  id               String       @id @default(cuid())
+  supplierTenantId String
+  escrowCaseId     String
+  action           EscrowAction
+  metaJson         Json?
+  createdAt        DateTime     @default(now())
+
+  case EscrowCase @relation(fields: [escrowCaseId], references: [id], onDelete: Cascade)
+
+  @@index([supplierTenantId])
+  @@index([escrowCaseId])
+}
+
+model NetworkDisputeCase {
+  id                   String               @id @default(cuid())
+  supplierTenantId     String
+  membershipId         String
+  orderId              String
+  escrowCaseId         String?
+  status               NetworkDisputeStatus @default(OPEN)
+  reason               NetworkDisputeReason
+  claimedAmount        Decimal?
+  notes                String?
+  evidenceBundleBlobId String?
+  createdBy            String?
+  resolvedAt           DateTime?
+  createdAt            DateTime             @default(now())
+
+  events NetworkDisputeEvent[]
+
+  @@index([supplierTenantId])
+  @@index([orderId])
+}
+
+model NetworkDisputeEvent {
+  id               String               @id @default(cuid())
+  supplierTenantId String
+  disputeCaseId    String
+  action           NetworkDisputeAction
+  metaJson         Json?
+  createdAt        DateTime             @default(now())
+
+  case NetworkDisputeCase @relation(fields: [disputeCaseId], references: [id], onDelete: Cascade)
+
+  @@index([supplierTenantId])
+  @@index([disputeCaseId])
 }

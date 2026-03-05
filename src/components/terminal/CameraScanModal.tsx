@@ -1,47 +1,77 @@
-import React, { useRef, useState, useEffect } from 'react';
+"use client";
+import React, { useEffect, useState, useRef } from 'react';
 import { useModal } from '@/contexts/ModalContext';
 import { Camera, X, RefreshCw } from 'lucide-react';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 
 export default function CameraScanModal({ onScan, onClose }: { onScan: (barcode: string) => void, onClose: () => void }) {
     const isCameraEnabled = process.env.NEXT_PUBLIC_POS_CAMERA_VISION !== 'false';
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isScanning, setIsScanning] = useState(false);
-    const { showError } = useModal();
+    const scannerRef = useRef<Html5Qrcode | null>(null);
 
     useEffect(() => {
-        let stream: MediaStream | null = null;
-        const startCamera = async () => {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                if (videoRef.current) {
-                    videoRef.current.srcObject = stream;
-                    await videoRef.current.play().catch(e => console.warn("Auto-play prevented", e));
-                    setIsScanning(true);
-                }
-            } catch (err) {
-                console.error(err);
-                setIsScanning(false);
-            }
+        if (!isCameraEnabled) return;
+
+        const scannerId = "reader";
+        scannerRef.current = new Html5Qrcode(scannerId);
+
+        const config = {
+            fps: 60, // Tarama hızını maksimum çerçeve sayısına çektik (Saniyede 60 tarama denemesi)
+            qrbox: function (viewfinderWidth: number, viewfinderHeight: number) {
+                // Ekran genişliğine göre daha yaygın bir tarama alanı oluştur (özellikle telefonda kenarlara kadar)
+                return {
+                    width: Math.min(viewfinderWidth * 0.9, 400),
+                    height: Math.min(viewfinderHeight * 0.4, 250)
+                };
+            },
+            aspectRatio: 1.0,
+            disableFlip: false,
+            // Sadece endüstride en çok kullanılan formatları tanımlıyoruz. Gereksiz formatları elemek CPU gücünü ana barkodlara odaklar.
+            formatsToSupport: [
+                Html5QrcodeSupportedFormats.EAN_13,
+                Html5QrcodeSupportedFormats.EAN_8,
+                Html5QrcodeSupportedFormats.CODE_128,
+                Html5QrcodeSupportedFormats.CODE_39,
+                Html5QrcodeSupportedFormats.UPC_A,
+                Html5QrcodeSupportedFormats.UPC_E,
+                Html5QrcodeSupportedFormats.QR_CODE
+            ]
         };
 
-        if (isCameraEnabled) {
-            startCamera();
-        }
+        scannerRef.current.start(
+            { facingMode: "environment" },
+            config,
+            (decodedText) => {
+                if (decodedText) {
+                    // Close and pass the text
+                    // Html5Qrcode stops automatically if we unmount, but best to stop explicitly
+                    if (scannerRef.current?.isScanning) {
+                        scannerRef.current.stop().then(() => {
+                            onScan(decodedText);
+                        }).catch((err) => {
+                            onScan(decodedText);
+                        });
+                    } else {
+                        onScan(decodedText);
+                    }
+                }
+            },
+            (errorMessage) => {
+                // Ignore parse errors, it reports every frame it fails to find a code
+            }
+        ).then(() => {
+            setIsScanning(true);
+        }).catch((err) => {
+            console.error("Camera start error", err);
+            setIsScanning(false);
+        });
 
         return () => {
-            if (stream) {
-                stream.getTracks().forEach(t => t.stop());
+            if (scannerRef.current && scannerRef.current.isScanning) {
+                scannerRef.current.stop().catch(console.error);
             }
         };
-    }, [isCameraEnabled]);
-
-    const handleMockScan = () => {
-        // Mock scan handler for demonstration. E.g. barcode reader API call.
-        const barcodes = ['111111', '869055', '334455', 'NO_BARCODE'];
-        const random = barcodes[Math.floor(Math.random() * barcodes.length)];
-        onScan(random);
-    };
+    }, [isCameraEnabled, onScan]);
 
     if (!isCameraEnabled) return null;
 
@@ -61,32 +91,36 @@ export default function CameraScanModal({ onScan, onClose }: { onScan: (barcode:
 
                 {/* Video Area */}
                 <div className="relative aspect-square bg-black overflow-hidden flex items-center justify-center">
+
+                    {/* The reader container for html5-qrcode */}
+                    <div id="reader" className="w-full h-full [&_video]:object-cover" />
+
                     {!isScanning ? (
-                        <div className="text-white flex flex-col items-center opacity-50">
+                        <div className="text-white flex flex-col items-center opacity-50 absolute inset-0 justify-center pointer-events-none bg-black">
                             <RefreshCw size={32} className="animate-spin mb-4" />
                             <p className="text-sm">Kamera başlatılıyor...</p>
                         </div>
                     ) : (
-                        <>
-                            <video ref={videoRef} autoPlay playsInline muted className="min-w-full min-h-full object-cover scale-[1.05]" />
-                            <div className="absolute inset-x-8 inset-y-8 border-2 border-primary/50 rounded-lg flex flex-col justify-between items-center py-4">
-                                <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary/90 opacity-80" />
-                                <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary/90 opacity-80" />
-                                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary/90 opacity-80" />
-                                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary/90 opacity-80" />
+                        <div className="absolute inset-x-8 inset-y-8 border-2 border-primary/50 rounded-lg flex flex-col justify-between items-center py-4 pointer-events-none">
+                            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary/90 opacity-80" />
+                            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary/90 opacity-80" />
+                            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary/90 opacity-80" />
+                            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary/90 opacity-80" />
 
-                                <div className="w-full h-0.5 bg-red-500/50 animate-[scan_2s_ease-in-out_infinite]" />
-                            </div>
-                        </>
+                            <div className="w-full h-0.5 bg-red-500/50 animate-[scan_2s_ease-in-out_infinite]" />
+                        </div>
                     )}
-                    <canvas ref={canvasRef} className="hidden" />
                 </div>
 
                 {/* Footer Controls */}
                 <div className="p-4 bg-slate-50 dark:bg-slate-900 flex justify-center border-t border-slate-100 dark:border-white/5">
-                    <button onClick={handleMockScan} className="h-12 px-6 flex items-center justify-center gap-2 text-white bg-primary hover:bg-primary/90 font-bold rounded-xl transition-all shadow-sm">
-                        <Camera size={20} /> Görsel Yakala
-                    </button>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 font-medium">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        SİSTEM BARKODU OTOMATİK TARAYACAKTIR
+                    </p>
                 </div>
             </div>
         </div>

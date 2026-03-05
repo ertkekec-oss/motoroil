@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             try {
                 const res = await fetch('/api/auth/me');
-                
+
                 if (res.ok) {
                     const data = await res.json();
                     if (data.authenticated && data.user) {
@@ -104,27 +104,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     // Redirect based on setupState and permissions
                     if (userData.setupState === 'PENDING') {
                         router.push('/onboarding');
-                    } else if (process.env.NEXT_PUBLIC_CONTROL_HUB_ENABLED === 'true') {
-                        // FEATURE FLAG ROUTING
-                        router.push('/test-desktop');
                     } else {
-                        // ADMIN role always goes to main dashboard
-                        if (userData.role === 'ADMIN' || userData.role === 'SUPER_ADMIN') {
-                            router.push('/dashboard');
-                        } else {
-                            // For non-admin users, check permissions
-                            const hasPOS = userData.permissions?.includes('pos_access');
-                            const hasFieldSales = userData.permissions?.includes('field_sales_access');
-
-                            if (hasPOS) {
-                                router.push('/dashboard');
-                            } else if (hasFieldSales) {
-                                router.push('/field-sales');
-                            } else {
-                                // Default fallback
-                                router.push('/dashboard');
-                            }
-                        }
+                        // All authorized users land on /desktop
+                        router.push('/desktop');
                     }
                 }, 100);
                 return true;

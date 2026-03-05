@@ -1,6 +1,25 @@
 
 "use client";
-import { Check } from 'lucide-react';
+import {
+    Check,
+    Building2,
+    Plug,
+    Building,
+    ShieldCheck,
+    User,
+    DollarSign,
+    FileText,
+    Wrench,
+    Coins,
+    CreditCard,
+    Gift,
+    BookOpen,
+    Bell,
+    Cloud,
+    ScrollText,
+    Mail,
+    ShieldAlert
+} from 'lucide-react';
 import MailSettingsPanel from './_components/forms/MailSettingsPanel';
 import SystemResetPanel from './_components/forms/SystemResetPanel';
 import CampaignPointsPanel from './_components/forms/CampaignPointsPanel';
@@ -957,6 +976,24 @@ export default function SettingsPage() {
         }
     };
 
+    const testSmtpConnection = async () => {
+        try {
+            const res = await fetch('/api/settings/mail/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(smtpSettings)
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                showSuccess('Başarılı', 'Bağlantı başarılı. Sistem mailleri gönderebiliyor.');
+            } else {
+                showError('Hata', data.error || 'Bağlantı sağlanamadı.');
+            }
+        } catch (e) {
+            showError('Hata', 'Sunucuya ulaşılamadı.');
+        }
+    };
+
     const quickAddPaymentMethod = async () => {
         if (!newItemInput) return;
         const id = Math.random().toString(36).substr(2, 9);
@@ -1030,7 +1067,7 @@ export default function SettingsPage() {
 
 
     const sharedProps: any = {
-        Check, TURKISH_CITIES, TURKISH_DISTRICTS, setSelectedBranchDocs, selectedBranchDocs, handleFileUpload, isDocsLoading, branchDocs, deleteBranchDoc, setShowKasaDefinitions, showKasaDefinitions, addPaymentMethodDefinition, editingPaymentMethodId, setEditingPaymentMethodId, startEditingPaymentMethod, removePaymentMethodDefinition, kasaTypes, contextBranches, products, allBrands, allCats, campaigns, addCoupon, setNewItemInput, newItemInput, addDefinition, brands, setBrands, prodCats, setProdCats, warranties, setWarranties, vehicleTypes, setVehicleTypes, quickRemovePaymentMethod, removeDefinition, IntegrationsContent, saveSmtpSettings, salesExpenses, updateSalesExpenses, addKdv,
+        Check, TURKISH_CITIES, TURKISH_DISTRICTS, setSelectedBranchDocs, selectedBranchDocs, handleFileUpload, isDocsLoading, branchDocs, deleteBranchDoc, setShowKasaDefinitions, showKasaDefinitions, addPaymentMethodDefinition, editingPaymentMethodId, setEditingPaymentMethodId, startEditingPaymentMethod, removePaymentMethodDefinition, kasaTypes, contextBranches, products, allBrands, allCats, campaigns, addCoupon, setNewItemInput, newItemInput, addDefinition, brands, setBrands, prodCats, setProdCats, warranties, setWarranties, vehicleTypes, setVehicleTypes, quickRemovePaymentMethod, removeDefinition, IntegrationsContent, saveSmtpSettings, testSmtpConnection, salesExpenses, updateSalesExpenses, addKdv,
         activeTab, setActiveTab, appSettings, tempCompanyInfo, setTempCompanyInfo, isSaving, handleSaveCompany,
         newCampaign, setNewCampaign, editingCampaignId, setEditingCampaignId, addCampaign, startEditingCampaign, deleteCampaign,
         newCoupon, setNewCoupon, showCouponModal, setShowCouponModal, couponSearch, setCouponSearch, couponPage, setCouponPage, exportCouponsExcel, exportCouponsPDF, totalCouponPages, paginatedCouponsList,
@@ -1049,7 +1086,7 @@ export default function SettingsPage() {
 
     return (
         <div className="flex min-h-screen text-slate-900 dark:text-white">
-            <div className="fixed inset-0 -z-10 bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617]" />
+            <div className="fixed inset-0 -z-10 bg-slate-50 dark:bg-[#0f172a]" />
 
             {/* LEFT SIDEBAR MENU — sticky */}
             <div className="w-[280px] shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] flex flex-col sticky top-0 h-screen overflow-y-auto">
@@ -1058,22 +1095,22 @@ export default function SettingsPage() {
                 </div>
                 <nav className="flex-1 p-3 flex flex-col gap-0.5">
                     {[
-                        { id: 'company', label: 'Firma Profili', icon: '🏢' },
-                        { id: 'integrations', label: 'Entegrasyonlar', icon: '🔌' },
-                        { id: 'branches', label: 'Şubeler & Depo', icon: '🏫' },
-                        { id: 'branch_auth', label: 'Şube-Kasa Yetkileri', icon: '🔐' },
-                        { id: 'profile', label: 'Hesabım', icon: '👤' },
-                        { id: 'pricing', label: 'Fiyatlandırma', icon: '💲' },
-                        { id: 'invoice', label: 'Fatura Ayarları', icon: '🧾' },
-                        { id: 'services', label: 'Servis Ücretleri', icon: '🔧' },
-                        { id: 'taxes', label: 'KDV & Vergiler', icon: '💰' },
-                        { id: 'expenses', label: 'Satış Giderleri', icon: '💳' },
-                        { id: 'campaigns', label: 'Kampanya & Puan', icon: '🎁' },
-                        { id: 'definitions', label: 'Tanımlar & Liste', icon: '📚' },
-                        { id: 'notifications', label: 'Bildirim Ayarları', icon: '🔔' },
-                        { id: 'backup', label: 'Bulut Yedekleme', icon: '☁️' },
-                        { id: 'logs', label: 'İşlem Günlükleri', icon: '📜' },
-                        { id: 'system', label: 'Mail Ayarları', icon: '📧' }
+                        { id: 'company', label: 'Firma Profili', icon: <Building2 className="w-5 h-5 text-indigo-500" /> },
+                        { id: 'integrations', label: 'Entegrasyonlar', icon: <Plug className="w-5 h-5 text-emerald-500" /> },
+                        { id: 'branches', label: 'Şubeler & Depo', icon: <Building className="w-5 h-5 text-sky-500" /> },
+                        { id: 'branch_auth', label: 'Şube-Kasa Yetkileri', icon: <ShieldCheck className="w-5 h-5 text-rose-500" /> },
+                        { id: 'profile', label: 'Hesabım', icon: <User className="w-5 h-5 text-amber-500" /> },
+                        { id: 'pricing', label: 'Fiyatlandırma', icon: <DollarSign className="w-5 h-5 text-green-500" /> },
+                        { id: 'invoice', label: 'Fatura Ayarları', icon: <FileText className="w-5 h-5 text-cyan-500" /> },
+                        { id: 'services', label: 'Servis Ücretleri', icon: <Wrench className="w-5 h-5 text-violet-500" /> },
+                        { id: 'taxes', label: 'KDV & Vergiler', icon: <Coins className="w-5 h-5 text-yellow-500" /> },
+                        { id: 'expenses', label: 'Satış Giderleri', icon: <CreditCard className="w-5 h-5 text-blue-500" /> },
+                        { id: 'campaigns', label: 'Kampanya & Puan', icon: <Gift className="w-5 h-5 text-pink-500" /> },
+                        { id: 'definitions', label: 'Tanımlar & Liste', icon: <BookOpen className="w-5 h-5 text-teal-500" /> },
+                        { id: 'notifications', label: 'Bildirim Ayarları', icon: <Bell className="w-5 h-5 text-orange-500" /> },
+                        { id: 'backup', label: 'Bulut Yedekleme', icon: <Cloud className="w-5 h-5 text-sky-400" /> },
+                        { id: 'logs', label: 'İşlem Günlükleri', icon: <ScrollText className="w-5 h-5 text-slate-500" /> },
+                        { id: 'system', label: 'Mail Ayarları', icon: <Mail className="w-5 h-5 text-indigo-400" /> }
                     ].map(item => {
                         const isActive = activeTab === item.id;
                         return (
@@ -1100,7 +1137,8 @@ export default function SettingsPage() {
                             : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20'
                             }`}
                     >
-                        <span>🚨</span> Sistem Sıfırlama
+                        <ShieldAlert className="w-5 h-5 flex-shrink-0" />
+                        <span>Sistem Sıfırlama</span>
                     </button>
                 </div>
             </div>

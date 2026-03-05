@@ -85,7 +85,7 @@ export default function ServiceDashboard() {
     const softBg = isLight ? 'bg-slate-50 border-slate-100' : 'bg-white/[0.02] border-white/5';
     const textMain = isLight ? 'text-slate-900' : 'text-white';
     const textMuted = isLight ? 'text-slate-500' : 'text-slate-400';
-    const pageBg = isLight ? 'min-h-screen bg-[#fafafa]' : 'min-h-screen bg-[#020617] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/40 via-[#020617] to-[#020617]';
+    const pageBg = isLight ? 'min-h-screen bg-[#fafafa]' : 'min-h-screen bg-[#0f172a]';
 
     return (
         <div data-pos-theme={theme} className={`${pageBg} p-8 font-sans transition-colors duration-300`}>

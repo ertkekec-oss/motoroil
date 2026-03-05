@@ -274,7 +274,7 @@ export default function TerminalClient() {
     }, []);
 
     return (
-        <div className="pos-terminal-scope flex flex-col flex-1 h-[calc(100vh-64px)] md:h-screen w-full bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-white transition-colors duration-300 overflow-hidden">
+        <div className="pos-terminal-scope flex flex-col flex-1 h-[calc(100vh-64px)] md:h-screen w-full bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white transition-colors duration-300 overflow-hidden">
             {/* SCOPE CSS (isolated) */}
             <style dangerouslySetInnerHTML={{
                 __html: `
@@ -472,25 +472,25 @@ export default function TerminalClient() {
                                 <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Sepet İndirimi (₺)</label>
                                 <div className="relative">
                                     <Tag className="absolute left-3 top-1/2 -mt-2.5 text-slate-400" size={20} />
-                                    <input type="number" min="0" value={appliedDiscount || ''} onChange={e => setAppliedDiscount(Number(e.target.value))} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="0.00" />
+                                    <input type="number" min="0" value={appliedDiscount || ''} onChange={e => setAppliedDiscount(Number(e.target.value))} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="0.00" />
                                 </div>
                             </div>
                             <div>
                                 <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Kupon Kodu</label>
-                                <input type="text" value={discountCode} onChange={e => setDiscountCode(e.target.value)} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500 uppercase" placeholder="KOD GİRİN" />
+                                <input type="text" value={discountCode} onChange={e => setDiscountCode(e.target.value)} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500 uppercase" placeholder="KOD GİRİN" />
                             </div>
                             <div>
                                 <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Puan Kullan ({customer?.points || 0} Kullanılabilir)</label>
                                 <div className="relative">
                                     <Gift className="absolute left-3 top-1/2 -mt-2.5 text-slate-400" size={20} />
-                                    <input type="number" max={customer?.points || 0} min="0" value={pointsToUse || ''} onChange={e => setPointsToUse(Number(e.target.value))} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="0" />
+                                    <input type="number" max={customer?.points || 0} min="0" value={pointsToUse || ''} onChange={e => setPointsToUse(Number(e.target.value))} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="0" />
                                 </div>
                             </div>
                             <div>
                                 <label className="text-[10px] font-bold opacity-50 block mb-1.5 uppercase tracking-widest">Sipariş Notu / Referans</label>
                                 <div className="relative">
                                     <FileText className="absolute left-3 top-1/2 -mt-2.5 text-slate-400" size={20} />
-                                    <input type="text" value={referenceNote} onChange={e => setReferenceNote(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="Örn: Evrak No, Sipariş No, Masa No vb." />
+                                    <input type="text" value={referenceNote} onChange={e => setReferenceNote(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500" placeholder="Örn: Evrak No, Sipariş No, Masa No vb." />
                                 </div>
                             </div>
                         </div>
@@ -529,7 +529,7 @@ export default function TerminalClient() {
                                         </button>
                                     ))}
                                     {(!(kasalar || []).filter((k: any) => paymentMode === 'cash' ? k.type === 'Nakit' : k.type !== 'Nakit').length) && (
-                                        <div className="col-span-2 text-sm text-center py-4 bg-slate-50 dark:bg-[#020617] rounded-xl text-slate-500 border border-slate-200 dark:border-white/5 font-medium">Bu ödeme tipi için tanımlı kasa bulunamadı.</div>
+                                        <div className="col-span-2 text-sm text-center py-4 bg-slate-50 dark:bg-[#0f172a] rounded-xl text-slate-500 border border-slate-200 dark:border-white/5 font-medium">Bu ödeme tipi için tanımlı kasa bulunamadı.</div>
                                     )}
                                 </div>
                             </div>

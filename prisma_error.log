@@ -1,0 +1,24 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mError validating field `envelope` in model `SignatureArtifact`: The relation field `envelope` on model `SignatureArtifact` is missing an opposite relation field on the model `Envelope`. Either run `prisma format` or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:4655[0m
+[1;94m   | [0m
+[1;94m4654 | [0m
+[1;94m4655 | [0m  [1;91menvelope  Envelope  @relation(fields: [envelopeId], references: [id], onDelete: Cascade)[0m
+[1;94m4656 | [0m  recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating field `recipient` in model `SignatureArtifact`: The relation field `recipient` on model `SignatureArtifact` is missing an opposite relation field on the model `Recipient`. Either run `prisma format` or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:4656[0m
+[1;94m   | [0m
+[1;94m4655 | [0m  envelope  Envelope  @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+[1;94m4656 | [0m  [1;91mrecipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)[0m
+[1;94m4657 | [0m
+[1;94m   | [0m
+
+Validation Error Count: 2
+[Context: validate]
+
+Prisma CLI Version : 5.22.0

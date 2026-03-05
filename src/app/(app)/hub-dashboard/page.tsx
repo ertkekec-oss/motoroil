@@ -54,8 +54,8 @@ export default function TenantNetworkDashboard() {
                     const be = (oData.items || []).filter((i: any) => i.role === 'BUYER' && i.status === 'ESCROW').length;
                     setOrdersData({ buyerPending: bp, buyerEscrow: be, sellerPending: sp, sellerEscrow: se });
                 } else {
-                    // Fallback to minimal numbers derived from earnings or defaults based on context
-                    setOrdersData({ buyerPending: 3, buyerEscrow: 1, sellerPending: 5, sellerEscrow: 2 });
+                    // Fallback to zeros as per user request to clean demo data
+                    setOrdersData({ buyerPending: 0, buyerEscrow: 0, sellerPending: 0, sellerEscrow: 0 });
                 }
 
             } catch (err) {
@@ -76,7 +76,7 @@ export default function TenantNetworkDashboard() {
     }
 
     return (
-        <div className="flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative font-sans min-h-screen dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617]" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex-1 overflow-y-auto w-full p-4 sm:p-8 xl:p-12 relative font-sans min-h-screen dark:bg-[#0f172a]" style={{ scrollbarWidth: 'none' }}>
             <style dangerouslySetInnerHTML={{ __html: `::-webkit-scrollbar { display: none; }` }} />
             <div className="max-w-[1400px] mx-auto space-y-8 pb-24">
 

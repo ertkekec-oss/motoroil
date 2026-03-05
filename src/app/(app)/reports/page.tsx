@@ -321,7 +321,7 @@ export default function ReportsPage() {
     }, [filteredTransactions]);
 
     return (
-        <div className="min-h-screen p-5 bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] pb-24">
+        <div className="min-h-screen p-5 bg-slate-50 dark:bg-[#0f172a] pb-24">
             <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
 
 

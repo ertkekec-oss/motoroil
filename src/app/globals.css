@@ -5,13 +5,13 @@
 
 :root {
   /* Dark Mode Colors - Default (Enterprise Navy) */
-  --bg-deep: #020617;
-  --bg-dark: #020617;
-  --bg-card: #0f172a;
-  --bg-hover: #1e293b;
+  --bg-deep: #0f172a;
+  --bg-dark: #0f172a;
+  --bg-card: #1e293b;
+  --bg-hover: #334155;
   --bg-main: var(--bg-deep);
   --bg-app: var(--bg-deep);
-  --bg-panel: #0f172a;
+  --bg-panel: #1e293b;
   --glass-bg: rgba(15, 17, 30, 0.4);
   --modal-overlay: rgba(0, 0, 0, 0.7);
 

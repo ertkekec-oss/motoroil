@@ -30,7 +30,7 @@ function FinanceTabs() {
     };
 
     return (
-        <div className="bg-slate-50 min-h-screen dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] w-full font-sans">
+        <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] w-full font-sans">
             <div className="max-w-[1600px] mx-auto pt-8">
                 {/* Header & Tabs */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-8 px-4 sm:px-6 lg:px-8">
@@ -68,7 +68,7 @@ function FinanceTabs() {
 export default function UnifiedFinancePage() {
     return (
         <Suspense fallback={
-            <div className="bg-slate-50 min-h-screen dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617] flex items-center justify-center p-12">
+            <div className="bg-slate-50 min-h-screen dark:bg-[#0f172a] flex items-center justify-center p-12">
                 <div className="bg-white dark:bg-[#0f172a] p-12 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm flex flex-col justify-center items-center">
                     <div className="w-8 h-8 border-4 border-slate-200 dark:border-white/5 border-t-slate-900 rounded-full animate-spin mb-4"></div>
                     <span className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">Finans Modülleri Başlatılıyor...</span>

@@ -269,7 +269,7 @@ function ServiceAcceptanceContent() {
     const textMuted = isLight ? 'text-slate-500' : 'text-slate-400';
     const cardBg = isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/5';
     const inputBg = isLight ? 'bg-slate-50 border-slate-200 focus:border-blue-500 hover:bg-white text-slate-900 placeholder:text-slate-400' : 'bg-white/[0.02] border-white/10 focus:border-blue-500/50 hover:bg-white/[0.04] text-white placeholder:text-white/20';
-    const pageBg = isLight ? 'min-h-screen bg-[#fafafa]' : 'min-h-screen bg-[#020617] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/40 via-[#020617] to-[#020617]';
+    const pageBg = isLight ? 'min-h-screen bg-[#fafafa]' : 'min-h-screen bg-[#0f172a]';
     const dropdownBg = isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#1e293b] border-white/10 shadow-2xl';
 
     return (

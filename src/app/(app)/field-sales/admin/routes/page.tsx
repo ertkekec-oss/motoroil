@@ -246,7 +246,7 @@ export default function AdminRoutesPage() {
     // Styling constants
     const textMain = isLight ? 'text-slate-900' : 'text-slate-100';
     const textMuted = isLight ? 'text-slate-500' : 'text-slate-400';
-    const bgPage = isLight ? 'min-h-screen bg-slate-50' : 'min-h-screen bg-[#020617] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/40 via-[#020617] to-[#020617]';
+    const bgPage = isLight ? 'min-h-screen bg-slate-50' : 'min-h-screen bg-[#0f172a]';
     const bgCard = isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/5';
     const bgSurface = isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5';
     const borderColor = isLight ? 'border-slate-200' : 'border-white/5';
@@ -648,7 +648,7 @@ export default function AdminRoutesPage() {
             {showCreateTemplateModal && (
                 <div className={`fixed inset-0 z-[110] flex items-center justify-center p-4  animate-in fade-in duration-200 ${isLight ? 'bg-slate-900/60' : 'bg-slate-900/80'}`}>
                     <div className={`w-full max-w-4xl overflow-hidden rounded-[24px] border shadow-2xl flex flex-col max-h-[90vh] ${isLight ? 'bg-white border-slate-200' : 'bg-[#0f172a] border-white/10'}`}>
-                        <div className={`p-6 md:p-8 flex-1 overflow-y-auto ${isLight ? 'bg-slate-50' : 'bg-[#020617]'}`}>
+                        <div className={`p-6 md:p-8 flex-1 overflow-y-auto ${isLight ? 'bg-slate-50' : 'bg-[#0f172a]'}`}>
                             <div className="flex justify-between items-start mb-8">
                                 <div>
                                     <h2 className={`text-[24px] font-bold tracking-tight mb-1 ${textMain}`}>Yeni Rota Şablonu</h2>

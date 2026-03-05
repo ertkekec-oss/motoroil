@@ -6,7 +6,7 @@ import {
     LayoutDashboard, Wallet, TrendingUp, ShieldAlert,
     Network, HardDrive, FileText, Settings, Users, Percent,
     CreditCard, Server, Activity, ArrowRightLeft, DatabaseZap, CheckCircle, Store, AlertTriangle, ShieldCheck,
-    Search, Inbox, Library
+    Search, Inbox, Library, Mail
 } from 'lucide-react';
 
 export function AdminSidebar({ userRole }: { userRole: string }) {
@@ -71,92 +71,112 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
 
     return (
         <nav className="flex-1 p-4 space-y-4 overflow-y-auto hidden-scrollbar">
-            {/* Executive Dashboard */}
-            <div className="space-y-1">
-                {(isSuper || isFinance || isGrowth || isRisk) && (
-                    <NavItem href="/admin/dashboard" icon={LayoutDashboard} label="Yönetim Paneli" />
-                )}
-            </div>
-
-            {/* PERİODYA HUB (Sabit Menü) */}
-            <div className="space-y-1">
+            {/* Yönetim - Sabit başlık */}
+            <div className="space-y-1 mb-6">
                 <div className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
-                    PERİODYA HUB
+                    Yönetim
                 </div>
 
-                {(isSuper || isFinance) && (
-                    <NavGroup title="Finans & Escrow" icon={Wallet} groupKey="finance">
-                        <NavItem href="/admin/payments-escrow/policies" icon={FileText} label="Escrow Politikaları" />
-                        <NavItem href="/admin/payments-escrow/commissions" icon={Percent} label="Komisyon Planları" />
-                        <NavItem href="/admin/payouts" icon={ArrowRightLeft} label="Ödeme Kontrolü" />
-                        <NavItem href="/admin/payments-escrow/providers" icon={CreditCard} label="Ödeme Sağlayıcıları" />
-                        <NavItem href="/admin/payments-escrow/audit" icon={ShieldCheck} label="Finans Denetimi" />
-                    </NavGroup>
-                )}
-
-                {(isSuper || isGrowth || isFinance) && (
-                    <NavGroup title="Growth & Monetization" icon={TrendingUp} groupKey="growth">
-                        <NavItem href="/admin/growth/boost-rules" icon={TrendingUp} label="Boost Kuralları" />
-                        <NavItem href="/admin/growth/billing-health" icon={Activity} label="Fatura Sağlığı" />
-                        <NavItem href="/admin/growth/revenue" icon={LayoutDashboard} label="Gelir İstatislikleri" />
-                        <NavItem href="/admin/growth/audit" icon={FileText} label="Büyüme Denetimi" />
-                        <NavItem href="/admin/growth/subscriptions" icon={Users} label="Hub Abonelikleri" />
-                    </NavGroup>
-                )}
-
-                {(isSuper || isRisk) && (
-                    <NavGroup title="Risk & Resolution" icon={ShieldAlert} groupKey="risk">
-                        <NavItem href="/admin/disputes" icon={AlertTriangle} label="Uyuşmazlık Kuyruğu" />
-                        <NavItem href="/admin/trust-monitor" icon={Activity} label="Güven Monitörü" />
-                        <NavItem href="/admin/disputes/policies" icon={FileText} label="Çözüm Politikaları" />
+                {(isSuper || isFinance || isGrowth || isRisk) && (
+                    <NavGroup title="YÖNETİM" icon={LayoutDashboard} groupKey="yonetim_main">
+                        <NavItem href="/admin/dashboard" icon={LayoutDashboard} label="Yönetim Dashboard" />
+                        {isSuper && (
+                            <>
+                                <NavItem href="/admin/tenants" icon={Users} label="Tüm Müşteriler" />
+                                <NavItem href="/admin/plans" icon={CreditCard} label="SaaS Planları" />
+                            </>
+                        )}
                     </NavGroup>
                 )}
 
                 {isSuper && (
-                    <NavGroup title="Network Governance" icon={Network} groupKey="network">
-                        <NavItem href="/admin/companies" icon={Store} label="Firmalar" />
-                        <NavItem href="/admin/catalog/categories" icon={DatabaseZap} label="Kategoriler" />
-                        <NavItem href="/admin/catalog/brands" icon={CheckCircle} label="Markalar" />
-                        <NavItem href="/admin/products" icon={CheckCircle} label="Ürün Onayları" />
-                    </NavGroup>
-                )}
-
-                {isSuper && (
-                    <NavGroup title="System & Infrastructure" icon={HardDrive} groupKey="system">
-                        <NavItem href="/admin/ops/gateways" icon={Server} label="Aracı Kurumlar (Gateway)" />
-                        <NavItem href="/admin/ops/fintech" icon={DatabaseZap} label="Fintech Routing" />
-                        <NavItem href="/admin/ops/limits" icon={Activity} label="API Limitleri" />
-                        <NavItem href="/admin/ops/providers" icon={Server} label="Platform Altyapısı" />
-                        <NavItem href="/admin/ops/ledgers" icon={DatabaseZap} label="Sistem Defteri" />
+                    <NavGroup title="TİCKET" icon={Inbox} groupKey="ticket_main">
+                        <NavItem href="/admin/support/tickets" icon={Inbox} label="Destek Biletleri" />
+                        <NavItem href="/admin/tenants/PLATFORM_ADMIN/help" icon={Library} label="Bilgi Bankası" />
                     </NavGroup>
                 )}
             </div>
 
-            {/* B2B NETWORK */}
-            {isSuper && (
-                <div className="space-y-1">
-                    <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-                        B2B NETWORK
-                    </div>
-                    <NavItem href="/admin/b2b/dealer-orders" icon={Activity} label="B2B Sipariş Kuyruğu" />
-                    <NavItem href="/admin/b2b/refunds" icon={ArrowRightLeft} label="B2B İade ve Uyuşmazlıklar" />
-                    <NavItem href="/admin/b2b/policies" icon={ShieldAlert} label="B2B Risk Politikaları" />
+            {/* B2B GLOBAL - Sabit başlık */}
+            <div className="space-y-1 mb-6">
+                <div className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                    B2B GLOBAL
                 </div>
-            )}
 
-            {/* PERİODYA AYARLARI */}
+                <NavGroup title="PERİODYA HUB" icon={Network} groupKey="hub_main">
+                    {(isSuper || isFinance) && (
+                        <NavGroup title="Finans & Escrow" icon={Wallet} groupKey="finance">
+                            <NavItem href="/admin/payments-escrow/policies" icon={FileText} label="Escrow Politikaları" />
+                            <NavItem href="/admin/payments-escrow/commissions" icon={Percent} label="Komisyon Planları" />
+                            <NavItem href="/admin/payouts" icon={ArrowRightLeft} label="Ödeme Kontrolü" />
+                            <NavItem href="/admin/payments-escrow/providers" icon={CreditCard} label="Ödeme Sağlayıcıları" />
+                            <NavItem href="/admin/payments-escrow/audit" icon={ShieldCheck} label="Finans Denetimi" />
+                        </NavGroup>
+                    )}
+
+                    {(isSuper || isGrowth || isFinance) && (
+                        <NavGroup title="Growth & Monetization" icon={TrendingUp} groupKey="growth">
+                            <NavItem href="/admin/growth/boost-rules" icon={TrendingUp} label="Boost Kuralları" />
+                            <NavItem href="/admin/growth/billing-health" icon={Activity} label="Fatura Sağlığı" />
+                            <NavItem href="/admin/growth/revenue" icon={LayoutDashboard} label="Gelir İstatislikleri" />
+                            <NavItem href="/admin/growth/audit" icon={FileText} label="Büyüme Denetimi" />
+                            <NavItem href="/admin/growth/subscriptions" icon={Users} label="Hub Abonelikleri" />
+                        </NavGroup>
+                    )}
+
+                    {(isSuper || isRisk) && (
+                        <NavGroup title="Risk & Resolution" icon={ShieldAlert} groupKey="risk">
+                            <NavItem href="/admin/disputes" icon={AlertTriangle} label="Uyuşmazlık Kuyruğu" />
+                            <NavItem href="/admin/trust-monitor" icon={Activity} label="Güven Monitörü" />
+                            <NavItem href="/admin/disputes/policies" icon={FileText} label="Çözüm Politikaları" />
+                        </NavGroup>
+                    )}
+
+                    {isSuper && (
+                        <NavGroup title="Network Governance" icon={Network} groupKey="network">
+                            <NavItem href="/admin/companies" icon={Store} label="Firmalar" />
+                            <NavItem href="/admin/catalog/categories" icon={DatabaseZap} label="Kategoriler" />
+                            <NavItem href="/admin/catalog/brands" icon={CheckCircle} label="Markalar" />
+                            <NavItem href="/admin/products" icon={CheckCircle} label="Ürün Onayları" />
+                        </NavGroup>
+                    )}
+
+                    {isSuper && (
+                        <NavGroup title="System & Infrastructure" icon={HardDrive} groupKey="system">
+                            <NavItem href="/admin/ops/gateways" icon={Server} label="Aracı Kurumlar (Gateway)" />
+                            <NavItem href="/admin/ops/fintech" icon={DatabaseZap} label="Fintech Routing" />
+                            <NavItem href="/admin/ops/limits" icon={Activity} label="API Limitleri" />
+                            <NavItem href="/admin/ops/providers" icon={Server} label="Platform Altyapısı" />
+                            <NavItem href="/admin/ops/ledgers" icon={DatabaseZap} label="Sistem Defteri" />
+                        </NavGroup>
+                    )}
+                </NavGroup>
+
+                {isSuper && (
+                    <NavGroup title="B2B NETWORK" icon={Store} groupKey="b2b_network_main">
+                        <NavItem href="/admin/b2b/dealer-orders" icon={Activity} label="B2B Sipariş Kuyruğu" />
+                        <NavItem href="/admin/b2b/refunds" icon={ArrowRightLeft} label="B2B İade ve Uyuşmazlıklar" />
+                        <NavItem href="/admin/b2b/policies" icon={ShieldAlert} label="B2B Risk Politikaları" />
+                    </NavGroup>
+                )}
+            </div>
+
+            {/* GÜVENLİK VE AYARLAR - SABİT BAŞLIK */}
             {isSuper && (
                 <div className="space-y-1">
                     <div className="px-3 mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-                        PERİODYA AYARLARI
+                        GÜVENLİK VE AYARLAR
                     </div>
-                    <NavItem href="/admin/audit-logs" icon={Search} label="Denetim Kayıtları" />
-                    <NavItem href="/admin/logs" icon={Activity} label="Sistem Kayıtları" />
-                    <NavItem href="/admin/security" icon={ShieldAlert} label="Güvenlik Kalkanı" />
-                    <NavItem href="/admin/tenants" icon={Users} label="Tüm Müşteriler" />
-                    <NavItem href="/admin/plans" icon={CreditCard} label="SaaS Planları" />
-                    <NavItem href="/admin/support/tickets" icon={Inbox} label="Destek Biletleri" />
-                    <NavItem href="/admin/tenants/PLATFORM_ADMIN/help" icon={Library} label="Bilgi Bankası" />
+
+                    <NavGroup title="LOGLAR VE GÜVENLİK" icon={ShieldAlert} groupKey="logs_security_main">
+                        <NavItem href="/admin/audit-logs" icon={Search} label="Denetim Kayıtları" />
+                        <NavItem href="/admin/logs" icon={Activity} label="Sistem Kayıtları" />
+                        <NavItem href="/admin/security" icon={ShieldCheck} label="Güvenlik Kalkanı" />
+                    </NavGroup>
+
+                    <NavGroup title="AYARLAR" icon={Settings} groupKey="settings_main">
+                        <NavItem href="/admin/settings/mail" icon={Mail} label="Mail Ayarları (Global)" />
+                    </NavGroup>
                 </div>
             )}
         </nav>

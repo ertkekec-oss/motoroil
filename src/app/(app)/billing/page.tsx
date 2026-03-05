@@ -116,7 +116,7 @@ function BillingContent() {
     }, [checkoutHtml]);
 
     if (loading) return (
-        <div className="p-12 space-y-8 animate-pulse min-h-screen bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617]">
+        <div className="p-12 space-y-8 animate-pulse min-h-screen bg-slate-50 dark:bg-[#0f172a]">
             <div className="h-20 bg-white dark:bg-[#0f172a] rounded-3xl w-full" />
             <div className="grid grid-cols-3 gap-8">
                 <div className="h-96 bg-white dark:bg-[#0f172a] rounded-3xl" />
@@ -131,7 +131,7 @@ function BillingContent() {
     const currentPlanId = plans.find(p => p.name === overview?.planName)?.id;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900/40 dark:via-[#020617] dark:to-[#020617]">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a]">
             <div className="p-8 max-w-7xl mx-auto font-sans animate-in fade-in duration-1000">
                 {/* Header section with refined light aesthetic */}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 bg-white dark:bg-[#0f172a] border border-slate-100 dark:border-white/5 p-8 rounded-[2.5rem] shadow-sm shadow-indigo-500/5">

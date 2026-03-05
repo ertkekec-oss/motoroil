@@ -7,7 +7,10 @@ import { X } from "lucide-react";
 export default function DealersPage() {
     const [dealers, setDealers] = useState<any[]>([]);
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+    const [inviteType, setInviteType] = useState<"email" | "customer">("customer");
     const [inviteEmail, setInviteEmail] = useState("");
+    const [selectedCustomerId, setSelectedCustomerId] = useState("");
+    const [customers, setCustomers] = useState<any[]>([]);
 
     // Credit Limit Drawer State
     const [selectedDealer, setSelectedDealer] = useState<any>(null);
@@ -21,17 +24,35 @@ export default function DealersPage() {
                 if (data.data) setDealers(data.data);
             })
             .catch(err => console.error(err));
+
+        fetch("/api/customers?limit=100") // Fetch enough customers for the dropdown
+            .then(res => res.json())
+            .then(data => {
+                if (data.data) setCustomers(data.data);
+                else if (Array.isArray(data)) setCustomers(data);
+            })
+            .catch(err => console.error(err));
     }, []);
 
     const handleInvite = async () => {
+        if (inviteType === 'email' && !inviteEmail) {
+            alert('Lütfen e-posta adresi girin.');
+            return;
+        }
+        if (inviteType === 'customer' && !selectedCustomerId) {
+            alert('Lütfen bir cari seçin.');
+            return;
+        }
+
         try {
             await fetch("/api/dealer-network/dealers/invite", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: inviteEmail })
+                body: JSON.stringify(inviteType === 'email' ? { email: inviteEmail } : { customerId: selectedCustomerId })
             });
             setIsInviteModalOpen(false);
             setInviteEmail("");
+            setSelectedCustomerId("");
             alert("Davetiye başarıyla gönderildi.");
         } catch (error) {
             alert("Davetiye gönderilemedi.");
@@ -119,17 +140,54 @@ export default function DealersPage() {
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <div className="p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Bayi Email Adresi</label>
-                                <input
-                                    type="email"
-                                    value={inviteEmail}
-                                    onChange={e => setInviteEmail(e.target.value)}
-                                    className="mt-1 block w-full rounded-md border border-slate-300 dark:border-white/10 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                                    placeholder="ornek@bayi.com"
-                                />
+                        <div className="p-6 space-y-6">
+                            {/* Invite Type Switcher */}
+                            <div className="flex p-1 bg-slate-100 dark:bg-white/5 rounded-lg">
+                                <button
+                                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${inviteType === 'customer' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                    onClick={() => setInviteType('customer')}
+                                >
+                                    Mevcut Cari Seç
+                                </button>
+                                <button
+                                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${inviteType === 'email' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                    onClick={() => setInviteType('email')}
+                                >
+                                    E-posta ile Davet
+                                </button>
                             </div>
+
+                            {/* Forms */}
+                            {inviteType === 'customer' ? (
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Bayi (Cari) Seçimi</label>
+                                    <select
+                                        value={selectedCustomerId}
+                                        onChange={e => setSelectedCustomerId(e.target.value)}
+                                        className="mt-1 block w-full rounded-md border border-slate-300 dark:border-white/10 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm bg-white dark:bg-[#0f172a] text-slate-900 dark:text-white"
+                                    >
+                                        <option value="">-- Cari Seçiniz --</option>
+                                        {customers.map(c => (
+                                            <option key={c.id} value={c.id}>
+                                                {c.name} {c.email ? `(${c.email})` : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <p className="mt-2 text-xs text-slate-500">Seçilen carinin e-posta adresi olması gereklidir. Yoksa davetiye iletilemez.</p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Bayi Email Adresi</label>
+                                    <input
+                                        type="email"
+                                        value={inviteEmail}
+                                        onChange={e => setInviteEmail(e.target.value)}
+                                        className="mt-1 block w-full rounded-md border border-slate-300 dark:border-white/10 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm bg-white dark:bg-[#0f172a]"
+                                        placeholder="ornek@bayi.com"
+                                    />
+                                    <p className="mt-2 text-xs text-slate-500">Bu e-posta adresine davetiyeyi içeren bir e-posta gönderilecektir.</p>
+                                </div>
+                            )}
                         </div>
                         <div className="bg-slate-50 dark:bg-[#1e293b] p-6 flex justify-end gap-3 rounded-b-xl border-t border-slate-100 dark:border-white/5">
                             <button onClick={() => setIsInviteModalOpen(false)} className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-lg hover:bg-slate-50">İptal</button>

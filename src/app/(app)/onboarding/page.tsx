@@ -94,7 +94,7 @@ export default function OnboardingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pb-32 relative overflow-x-hidden overflow-y-auto font-outfit">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] p-4 pb-32 relative overflow-x-hidden overflow-y-auto font-outfit">
             {/* Background elements */}
             <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
@@ -126,7 +126,7 @@ export default function OnboardingPage() {
                         const Icon = s.icon;
 
                         return (
-                            <div key={s.id} className="flex flex-col items-center gap-2 bg-slate-50 dark:bg-[#020617] px-2">
+                            <div key={s.id} className="flex flex-col items-center gap-2 bg-slate-50 dark:bg-[#0f172a] px-2">
                                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold transition-all duration-300 relative border-2
                                     ${isActive ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/30 scale-110' :
                                         isPassed ? 'bg-white dark:bg-slate-900 border-blue-600 text-blue-600' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400'}`}

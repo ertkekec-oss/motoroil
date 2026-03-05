@@ -67,25 +67,25 @@ const DashboardView = ({
             <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-emerald-500/20">
                 <IconActivity className={theme === 'light' ? "w-6 h-6 text-primary mb-4" : "w-6 h-6 text-emerald-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Performans Skoru</h4>
-                <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>92.4</p>
-                <p className={theme === 'light' ? "text-[10px] text-primary mt-2" : "text-[10px] text-emerald-500 mt-2"}>↑ %2.1 geçen aya göre</p>
+                <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>0.0</p>
+                <p className={theme === 'light' ? "text-[10px] text-primary mt-2" : "text-[10px] text-emerald-500 mt-2"}>Hesaplanıyor...</p>
             </div>
             <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-indigo-500/20">
                 <IconTrendingUp className={theme === 'light' ? "w-6 h-6 text-primary mb-4" : "w-6 h-6 text-indigo-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hedef Gerçekleşme</h4>
-                <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>%88</p>
+                <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>%0</p>
                 <p className="text-[10px] text-gray-500 mt-2">Bu ayki hedefler</p>
             </div>
             <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-amber-500/20">
                 <IconClock className={theme === 'light' ? "w-6 h-6 text-amber-600 mb-4" : "w-6 h-6 text-amber-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kalan İzin</h4>
-                <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>14</p>
+                <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>0</p>
                 <p className="text-[10px] text-gray-500 mt-2">Günlük bakiye</p>
             </div>
             <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 border-rose-500/20">
                 <IconZap className={theme === 'light' ? "w-6 h-6 text-rose-500 mb-4" : "w-6 h-6 text-rose-500 mb-4"} />
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Aylık Mesai</h4>
-                <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>12.5</p>
+                <p className={theme === 'light' ? "text-3xl font-black text-pos" : "text-3xl font-black text-white"}>0</p>
                 <p className="text-[10px] text-gray-500 mt-2">Ekstradan çalışılan saat</p>
             </div>
         </div>
@@ -94,29 +94,16 @@ const DashboardView = ({
             {/* Targets & Performance */}
             <Card title="Hedefler & Performans" icon={IconActivity} className="lg:col-span-2" theme={theme}>
                 <div className="space-y-6">
-                    <ProgressBar label="Satış Kotası Gerçekleşme" value={850000} max={1000000} theme={theme} />
-                    <ProgressBar label="Müşteri Memnuniyeti (NPS)" value={4.8} max={5} color="bg-indigo-500" theme={theme} />
-                    <ProgressBar label="Rota Uyumluluk Oranı" value={98} max={100} color="bg-blue-500" theme={theme} />
-                    <ProgressBar label="Tahsilat Hedefi" value={420000} max={600000} color="bg-amber-500" theme={theme} />
+                    <ProgressBar label="Satış Kotası Gerçekleşme" value={0} max={1000000} theme={theme} />
+                    <ProgressBar label="Müşteri Memnuniyeti (NPS)" value={0} max={5} color="bg-indigo-500" theme={theme} />
+                    <ProgressBar label="Rota Uyumluluk Oranı" value={0} max={100} color="bg-blue-500" theme={theme} />
+                    <ProgressBar label="Tahsilat Hedefi" value={0} max={600000} color="bg-amber-500" theme={theme} />
                 </div>
 
                 <div className="mt-8 p-4 bg-white dark:bg-[#0f172a]/5 rounded-2xl border border-white/10">
                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Aktif Görevler</h4>
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-white dark:bg-[#0f172a]/5 rounded-xl border border-white/5 group hover:border-emerald-500/30 transition-all cursor-pointer">
-                            <div className="flex items-center gap-3">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                                <span className="text-xs font-bold text-white text-sm">Aylık stok sayımı onayı</span>
-                            </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase">Bugün</span>
-                        </div>
-                        <div className="flex items-center justify-between p-3 bg-white dark:bg-[#0f172a]/5 rounded-xl border border-white/5 group hover:border-amber-500/30 transition-all cursor-pointer">
-                            <div className="flex items-center gap-3">
-                                <div className="w-2 h-2 rounded-full bg-amber-500" />
-                                <span className="text-xs font-bold text-white text-sm">Pazaryeri hakediş kontrolü</span>
-                            </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase">Yarın</span>
-                        </div>
+                        <div className="text-center text-xs text-gray-500 py-4">Bekleyen görev bulunmamaktadır.</div>
                     </div>
                 </div>
             </Card>
@@ -126,26 +113,14 @@ const DashboardView = ({
                 <div className="space-y-6">
                     <div className={theme === 'light' ? "p-4 bg-primary/10 border border-primary/20 rounded-2xl text-center" : "p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-center"}>
                         <p className={theme === 'light' ? "text-[10px] font-bold text-primary uppercase mb-1" : "text-[10px] font-bold text-emerald-500 uppercase mb-1"}>Şu Anki Vardiya</p>
-                        <p className={theme === 'light' ? "text-xl font-black text-pos" : "text-xl font-black text-white"}>09:00 - 18:00 (Merkez)</p>
+                        <p className={theme === 'light' ? "text-xl font-black text-pos" : "text-xl font-black text-white"}>Belirsiz</p>
                     </div>
 
                     <div className="space-y-4">
                         <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Haftalık Akış</h4>
-                        {[
-                            { day: 'Pazartesi', hour: '09:00 - 18:00', status: 'Tamamlandı' },
-                            { day: 'Salı', hour: '09:00 - 18:00', status: 'Tamamlandı' },
-                            { day: 'Çarşamba', hour: '09:00 - 18:00', status: 'Bugün' },
-                            { day: 'Perşembe', hour: '09:00 - 18:00', status: 'Bekliyor' },
-                            { day: 'Cuma', hour: '09:00 - 20:00', status: 'Mesaili', color: theme === 'light' ? 'text-amber-600' : 'text-amber-500' },
-                        ].map((s, i) => (
-                            <div key={i} className="flex justify-between items-center border-b border-white/5 pb-2">
-                                <span className="text-xs font-bold text-gray-400">{s.day}</span>
-                                <div className="text-right">
-                                    <p className={theme === 'light' ? "text-xs font-black text-pos leading-none mb-1" : "text-xs font-black text-white leading-none mb-1"}>{s.hour}</p>
-                                    <p className={`text-[9px] font-bold uppercase ${s.status === 'Tamamlandı' ? 'text-gray-600' : s.color || (theme === 'light' ? 'text-primary' : 'text-emerald-500')}`}>{s.status}</p>
-                                </div>
-                            </div>
-                        ))}
+                        <div className="text-center text-xs text-gray-500 py-6 border border-dashed border-gray-200 dark:border-white/10 rounded-xl">
+                            Vardiya planı tanımlanmamış.
+                        </div>
                     </div>
                 </div>
             </Card>
@@ -155,23 +130,9 @@ const DashboardView = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card title="Son Bordro Özetleri" icon={IconShield} theme={theme}>
                 <div className="space-y-4 text-center">
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                        <div className="p-4 bg-white dark:bg-[#0f172a]/5 rounded-2xl border border-white/5">
-                            <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Ocak 2026</p>
-                            <p className={theme === 'light' ? "text-sm font-black text-pos" : "text-sm font-black text-white"}>₺32,450</p>
-                        </div>
-                        <div className="p-4 bg-white dark:bg-[#0f172a]/5 rounded-2xl border border-white/5">
-                            <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Aralık 2025</p>
-                            <p className={theme === 'light' ? "text-sm font-black text-pos" : "text-sm font-black text-white"}>₺31,200</p>
-                        </div>
-                        <div className="p-4 bg-white dark:bg-[#0f172a]/5 rounded-2xl border border-white/5">
-                            <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Kasım 2025</p>
-                            <p className={theme === 'light' ? "text-sm font-black text-pos" : "text-sm font-black text-white"}>₺31,200</p>
-                        </div>
+                    <div className="p-8 text-xs text-gray-500 border border-dashed border-gray-300 dark:border-white/10 rounded-2xl">
+                        Geçmiş bordro kaydı bulunamadı.
                     </div>
-                    <button className={theme === 'light' ? "bg-primary text-white w-full py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm" : "btn-premium w-full py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2"}>
-                        <IconShield className="w-4 h-4" /> Kâğıtsız Bordro (PDF) İndir
-                    </button>
                 </div>
             </Card>
 
@@ -289,26 +250,11 @@ const LeaveRequestView = ({ theme }: any) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {[
-                                    { type: 'YILLIK', range: '15 Haz - 28 Haz', status: 'ONAYLANDI', color: 'text-emerald-400', approver: 'Ahmet Yılmaz' },
-                                    { type: 'MAZARET', range: '12 Nis - 13 Nis', status: 'REDDEDİLDİ', color: 'text-rose-400', approver: 'Mehmet Demir' },
-                                    { type: 'HASTALIK', range: '02 Şub - 04 Şub', status: 'ONAYLANDI', color: 'text-emerald-400', approver: 'Sistem (Oto)' },
-                                ].map((row, i) => (
-                                    <tr key={i} className="bg-white/5 rounded-xl border border-white/5 group hover:bg-white dark:bg-[#0f172a]/10 transition-all">
-                                        <td className="px-4 py-4 rounded-l-xl">
-                                            <span className="text-xs font-black text-white">{row.type}</span>
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <span className="text-xs font-bold text-gray-400">{row.range}</span>
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <span className={`text-[10px] font-black tracking-widest ${row.color}`}>{row.status}</span>
-                                        </td>
-                                        <td className="px-4 py-4 rounded-r-xl">
-                                            <span className="text-xs font-bold text-gray-400">{row.approver}</span>
-                                        </td>
-                                    </tr>
-                                ))}
+                                <tr>
+                                    <td colSpan={4} className="px-4 py-8 text-center text-xs text-gray-500 border border-dashed border-gray-300 dark:border-white/10 rounded-xl">
+                                        Geçmiş izin talebi kaydı bulunamadı.
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
