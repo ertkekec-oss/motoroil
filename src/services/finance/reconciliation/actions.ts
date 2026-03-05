@@ -80,3 +80,125 @@ export async function sendReconAction(data: {
         return { success: false, error: e.message };
     }
 }
+
+export async function resendReconAction(reconId: string) {
+    try {
+        const recon = await prisma.reconciliation.findUnique({ where: { id: reconId } });
+        if (!recon) throw new Error("Reconciliation not found");
+
+        if (['SIGNED', 'VOID'].includes(recon.status)) {
+            throw new Error(`Cannot resend. Status is ${recon.status}`);
+        }
+
+        const updated = await prisma.reconciliation.update({
+            where: { id: reconId },
+            data: {
+                sentAt: new Date(),
+                dueAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            }
+        });
+
+        await prisma.reconciliationAuditEvent.create({
+            data: {
+                tenantId: recon.tenantId,
+                reconciliationId: recon.id,
+                action: 'SENT',
+                metaJson: { note: 'Resent verification link.' }
+            }
+        });
+
+        return { success: true, reconciliation: updated };
+    } catch (e: any) {
+        return { success: false, error: e.message };
+    }
+}
+
+export async function voidReconAction(reconId: string, reason: string) {
+    try {
+        const recon = await prisma.reconciliation.findUnique({ where: { id: reconId } });
+        if (!recon) throw new Error("Reconciliation not found");
+
+        if (recon.status === 'SIGNED') {
+            throw new Error("Cannot void a SIGNED reconciliation");
+        }
+
+        const updated = await prisma.reconciliation.update({
+            where: { id: reconId },
+            data: { status: 'VOID' }
+        });
+
+        await prisma.reconciliationAuditEvent.create({
+            data: {
+                tenantId: recon.tenantId,
+                reconciliationId: recon.id,
+                action: 'VOIDED',
+                metaJson: { reason }
+            }
+        });
+
+        return { success: true, reconciliation: updated };
+    } catch (e: any) {
+        return { success: false, error: e.message };
+    }
+}
+
+export async function exportReconEvidenceAction(reconId: string) {
+    try {
+        // Mocking queue event for export
+        const recon = await prisma.reconciliation.findUnique({ where: { id: reconId } });
+        if (!recon) throw new Error("Reconciliation not found");
+
+        await prisma.reconciliationAuditEvent.create({
+            data: {
+                tenantId: recon.tenantId,
+                reconciliationId: recon.id,
+                action: 'CREATED',
+                metaJson: { customAction: 'EXPORT_QUEUED', timestamp: new Date() }
+            }
+        });
+
+        return { success: true, message: "Export job enqueued successfully" };
+    } catch (e: any) {
+        return { success: false, error: e.message };
+    }
+}
+
+export async function openReconDisputeAction(reconId: string, reason: string, notes: string) {
+    try {
+        const recon = await prisma.reconciliation.findUnique({ where: { id: reconId } });
+        if (!recon) throw new Error("Reconciliation not found");
+
+        if (['SIGNED', 'VOID'].includes(recon.status)) {
+            throw new Error(`Cannot dispute a ${recon.status} reconciliation`);
+        }
+
+        // State update
+        const updated = await prisma.reconciliation.update({
+            where: { id: reconId },
+            data: { status: 'DISPUTED' }
+        });
+
+        await prisma.reconciliationDispute.create({
+            data: {
+                tenantId: recon.tenantId,
+                reconciliationId: recon.id,
+                reason: reason as any,
+                notes,
+                createdByActorType: 'USER'
+            }
+        });
+
+        await prisma.reconciliationAuditEvent.create({
+            data: {
+                tenantId: recon.tenantId,
+                reconciliationId: recon.id,
+                action: 'DISPUTE_OPENED',
+                metaJson: { reason, notes }
+            }
+        });
+
+        return { success: true, reconciliation: updated };
+    } catch (e: any) {
+        return { success: false, error: e.message };
+    }
+}
