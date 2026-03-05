@@ -139,40 +139,40 @@ export async function POST(request: Request) {
                     console.log('✅ Müşteri e-ticaret kategorisine eklendi:', customer.name);
                 }
 
-                // Tahsilat işlemi
+                // Atomik Tahsilat işlemi (Transaction Kalkanı)
                 const amount = parseFloat(order.totalAmount.toString());
 
-                // Kasaya para ekle (Kasa already verified/created for company)
-                await prisma.kasa.update({
-                    where: { id: ecommerceKasa.id },
-                    data: { balance: { increment: amount } }
-                });
+                await prisma.$transaction(async (tx) => {
+                    // Kasaya para ekle
+                    await tx.kasa.update({
+                        where: { id: ecommerceKasa.id },
+                        data: { balance: { increment: amount } }
+                    });
 
-                // Müşteri bakiyesini güncelle (tahsil edildi olarak işaretle)
-                await prisma.customer.update({
-                    where: { id: customer.id },
-                    data: { balance: { decrement: amount } }
-                });
+                    // Müşteri bakiyesini güncelle (tahsil edildi olarak işaretle)
+                    await tx.customer.update({
+                        where: { id: customer.id },
+                        data: { balance: { decrement: amount } }
+                    });
 
-                // Transaction kaydı oluştur
-                await prisma.transaction.create({
-                    data: {
-                        companyId: companyId, // Set Company ID
-                        type: 'Tahsilat',
-                        amount: amount,
-                        description: `E-ticaret sipariş tahsilatı: ${order.orderNumber || order.id}`,
-                        kasaId: ecommerceKasa.id,
-                        customerId: customer.id,
-                        date: new Date()
-                    }
-                });
+                    // Transaction kaydı oluştur
+                    await tx.transaction.create({
+                        data: {
+                            companyId: companyId,
+                            type: 'Tahsilat',
+                            amount: amount,
+                            description: `E-ticaret sipariş tahsilatı: ${order.orderNumber || order.id}`,
+                            kasaId: ecommerceKasa.id,
+                            customerId: customer.id,
+                            date: new Date()
+                        }
+                    });
 
-                // Sipariş durumunu güncelle
-                await prisma.order.update({
-                    where: { id: orderId },
-                    data: {
-                        status: 'Tahsil Edildi'
-                    }
+                    // Sipariş durumunu güncelle
+                    await tx.order.update({
+                        where: { id: orderId },
+                        data: { status: 'Tahsil Edildi' }
+                    });
                 });
 
                 totalCollected += amount;

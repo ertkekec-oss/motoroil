@@ -35,7 +35,27 @@ export async function GET(req: Request) {
     try {
         const staff = await prisma.staff.findMany({
             where,
-            orderBy: { name: 'asc' }
+            orderBy: { name: 'asc' },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                name: true,
+                role: true,
+                branch: true,
+                type: true,
+                status: true,
+                permissions: true,
+                performance: true,
+                lastActive: true,
+                createdAt: true,
+                salary: true,
+                address: true,
+                companyId: true,
+                phone: true,
+                assignedCategoryIds: true
+                // Note: password is deliberately omitted
+            }
         });
 
         // Ensure salary is number

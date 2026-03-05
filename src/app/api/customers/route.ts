@@ -42,6 +42,7 @@ export async function GET(request: Request) {
         // Optimize: Use select to fetch only necessary fields instead of full include
         const customers = await prisma.customer.findMany({
             where: where,
+            take: 100, // Optimize memory consumption by preventing unbounded row retrieval
             select: {
                 id: true,
                 name: true,

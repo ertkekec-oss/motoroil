@@ -36,40 +36,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Sayfa yüklendiğinde localStorage'dan kullanıcıyı kontrol et
     useEffect(() => {
-        const checkAuth = () => {
-            // Şifre sıfırlama sayfasındaysak hiçbir auth kontrolü yapma
+        const checkAuth = async () => {
             if (pathname.startsWith('/reset-password')) {
                 setIsLoading(false);
                 return;
             }
 
             try {
-                // Migration: motoroil_ -> periodya_
-                const moUser = localStorage.getItem('motoroil_user') || localStorage.getItem('user');
-                const moIsLoggedIn = localStorage.getItem('motoroil_isLoggedIn') || localStorage.getItem('isLoggedIn');
+                const res = await fetch('/api/auth/me');
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.authenticated && data.user) {
+                        setUser(data.user);
 
-                if (moUser || moIsLoggedIn) {
-                    if (moUser) localStorage.setItem('periodya_user', moUser);
-                    if (moIsLoggedIn) localStorage.setItem('periodya_isLoggedIn', moIsLoggedIn);
-                    ['motoroil_user', 'user', 'motoroil_isLoggedIn', 'isLoggedIn'].forEach(k => localStorage.removeItem(k));
-                }
+                        // Temizlik: Eski localStorage verilerini sil
+                        ['periodya_user', 'periodya_isLoggedIn', 'motoroil_user', 'user', 'motoroil_isLoggedIn', 'isLoggedIn'].forEach(k => localStorage.removeItem(k));
 
-                const storedUser = localStorage.getItem('periodya_user');
-                const isLoggedIn = localStorage.getItem('periodya_isLoggedIn');
-
-                if (isLoggedIn === 'true' && storedUser) {
-                    const userData = JSON.parse(storedUser);
-                    setUser(userData);
-
-                    // ONBOARDING REDIRECTION
-                    if (userData.setupState === 'PENDING' && pathname !== '/onboarding' && !pathname.startsWith('/api')) {
-                        router.push('/onboarding');
+                        // ONBOARDING REDIRECTION
+                        if (data.user.setupState === 'PENDING' && pathname !== '/onboarding' && !pathname.startsWith('/api')) {
+                            router.push('/onboarding');
+                        }
+                    } else {
+                        const publicPaths = ['/login', '/register', '/', '/reset-password'];
+                        const isPublicPath = publicPaths.some(p => pathname === p || pathname.startsWith(p + '/'));
+                        if (!isPublicPath) {
+                            router.push('/login');
+                        }
                     }
                 } else {
-                    // Public paths allowed without login
                     const publicPaths = ['/login', '/register', '/', '/reset-password'];
                     const isPublicPath = publicPaths.some(p => pathname === p || pathname.startsWith(p + '/'));
-
                     if (!isPublicPath) {
                         router.push('/login');
                     }
@@ -99,8 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (res.ok) {
                 const userData = await res.json();
-                localStorage.setItem('periodya_user', JSON.stringify(userData));
-                localStorage.setItem('periodya_isLoggedIn', 'true');
+                // localStorage set removed for security (cookie based now)
 
                 // Give the browser a moment to process the cookie and state
                 setTimeout(() => {
@@ -147,8 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('Logout error:', e);
         }
         setUser(null);
-        localStorage.removeItem('periodya_user');
-        localStorage.removeItem('periodya_isLoggedIn');
+        // localStorage remove is not needed, handled by server cookie
         router.push('/login');
     };
 
@@ -162,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!user) return;
         const updatedUser = { ...user, ...data };
         setUser(updatedUser);
-        localStorage.setItem('periodya_user', JSON.stringify(updatedUser));
+        // localStorage set removed for security
     };
 
     return (

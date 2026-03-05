@@ -43,36 +43,36 @@ export default function Sidebar() {
         setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    // Auto-expand if active
+    // Kullanıcı sayfa değiştirdiğinde, sadece aktif olan menü açık kalır, diğerleri kapanır.
     useEffect(() => {
         const expandMap: Record<string, string[]> = {
             'b2b-global-parent': [
-                '/dashboard', '/support/tickets',
-                '/hub/seller/orders', '/hub/buyer/orders',
-                '/seller/products', '/catalog',
-                '/hub/finance', '/hub/trust-score', '/hub/stock-risks', '/seller/boost', '/seller/boost/analytics',
-                '/rfq', '/contracts', '/hub/buyer'
+                '/support/tickets', '/hub/seller/orders', '/hub/buyer/orders',
+                '/seller/products', '/catalog', '/hub/finance', '/hub/trust-score',
+                '/seller/boost', '/seller/boost/analytics', '/rfq', '/contracts', '/hub/buyer',
+                '/hub-dashboard'
             ],
-            'field-sales-parent': ['/field-sales'],
-            'reports-parent': ['/reports'],
+            'dealer-network-parent': [
+                '/dealer-network/dealers', '/dealer-network/catalog',
+                '/dealer-network/orders/approvals', '/dealer-network/refunds',
+                '/dealer-network/settings'
+            ],
             'customers-parent': ['/customers', '/suppliers'],
+            'field-sales-parent': ['/field-sales', '/field-sales/admin/routes', '/field-sales/admin/live'],
+            'reports-parent': ['/reports', '/reports/ceo', '/reports/daily', '/reports/suppliers']
         };
 
-        const newOpen = { ...openSections };
-        let changed = false;
+        setOpenSections(prev => {
+            const newOpenState = { ...prev };
 
-        Object.entries(expandMap).forEach(([id, paths]) => {
-            if (paths.some(p => pathname.includes(p))) {
-                if (!newOpen[id]) {
-                    newOpen[id] = true;
-                    changed = true;
-                }
-            }
+            Object.entries(expandMap).forEach(([id, paths]) => {
+                // Eğer pathname (aktif sayfa) bu grubun alt sayfalarından biriyse açık bırak, değilse tamemen kapat.
+                const isActive = paths.some(p => pathname === p || pathname.startsWith(p + '/'));
+                newOpenState[id] = isActive;
+            });
+
+            return newOpenState;
         });
-
-        if (changed) {
-            setOpenSections(newOpen);
-        }
     }, [pathname]);
 
     const isSystemAdmin = currentUser === null || currentUser?.role === 'SUPER_ADMIN' || (currentUser?.role && (currentUser.role.toLowerCase().includes('admin') || currentUser.role.toLowerCase().includes('müdür')));
@@ -180,6 +180,19 @@ export default function Sidebar() {
                             ] : [])
                         ]
                     },
+                    {
+                        name: 'Dealer Network',
+                        icon: Users,
+                        isParent: true,
+                        id: 'dealer-network-parent',
+                        subItems: [
+                            { name: 'Bayiler', href: '/dealer-network/dealers' },
+                            { name: 'B2B Katalog', href: '/dealer-network/catalog' },
+                            { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals' },
+                            { name: 'İadeler', href: '/dealer-network/refunds' },
+                            { name: 'Ayarlar', href: '/dealer-network/settings' },
+                        ]
+                    },
                 ]
             },
             {
@@ -216,16 +229,7 @@ export default function Sidebar() {
                     { name: 'İnsan Kaynakları', href: '/staff', icon: Users },
                 ]
             },
-            {
-                group: "Dealer Network",
-                items: [
-                    { name: 'Bayiler', href: '/dealer-network/dealers', icon: Users },
-                    { name: 'B2B Katalog', href: '/dealer-network/catalog', icon: Box },
-                    { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals', icon: Inbox },
-                    { name: 'İadeler', href: '/dealer-network/refunds', icon: Receipt },
-                    { name: 'Ayarlar', href: '/dealer-network/settings', icon: Settings },
-                ]
-            },
+
             {
                 group: "Analitik & Yönetim",
                 items: [
