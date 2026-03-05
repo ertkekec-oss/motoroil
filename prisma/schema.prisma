@@ -558,6 +558,7 @@ model Customer {
   services           ServiceRecord[]
   transactions       Transaction[]
   warranties         Warranty[]
+  reconciliations    Reconciliation[]
 
   @@unique([email, companyId])
   @@index([name])
@@ -565,6 +566,66 @@ model Customer {
   @@index([email])
   @@index([taxNumber])
   @@index([companyId])
+}
+
+enum ReconciliationStatus {
+  DRAFT
+  SENT
+  VIEWED
+  SIGNED
+  REJECTED
+  DISPUTED
+  EXPIRED
+}
+
+model Reconciliation {
+  id               String               @id @default(cuid())
+  tenantId         String
+  accountId        String // Matches Customer.id
+  periodStart      DateTime
+  periodEnd        DateTime
+  balance          Decimal              @db.Decimal(15, 2)
+  currency         String               @default("TRY")
+  status           ReconciliationStatus @default(DRAFT)
+  linkedContractId String? // Link to Contract engine
+  linkedEnvelopeId String? // Link to Signature engine
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  customer Customer                @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  snapshot ReconciliationSnapshot?
+  items    ReconciliationItem[]
+
+  @@index([tenantId])
+  @@index([accountId])
+  @@index([status])
+}
+
+model ReconciliationSnapshot {
+  id               String   @id @default(cuid())
+  reconciliationId String   @unique
+  totalDebit       Decimal  @db.Decimal(15, 2)
+  totalCredit      Decimal  @db.Decimal(15, 2)
+  balance          Decimal  @db.Decimal(15, 2)
+  transactionCount Int
+  hashSha256       String
+  createdAt        DateTime @default(now())
+
+  reconciliation Reconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+}
+
+model ReconciliationItem {
+  id               String   @id @default(cuid())
+  reconciliationId String
+  transactionId    String? // B2BJournalEntry id or Transaction id
+  date             DateTime
+  description      String
+  debit            Decimal  @default(0) @db.Decimal(15, 2)
+  credit           Decimal  @default(0) @db.Decimal(15, 2)
+
+  reconciliation Reconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+
+  @@index([reconciliationId])
 }
 
 model ServiceRecord {
