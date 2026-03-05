@@ -12,6 +12,7 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { useModal } from '@/contexts/ModalContext';
 import StatementModal from '@/components/modals/StatementModal';
 import Pagination from '@/components/Pagination';
+import ReconciliationWizard from '@/components/modals/ReconciliationWizard';
 
 export default function CustomerDetailClient({ customer, historyList }: { customer: any, historyList: any[] }) {
     const router = useRouter();
@@ -155,6 +156,9 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
     // Statement Modal State
     const [statementOpen, setStatementOpen] = useState(false);
     const [statementType, setStatementType] = useState<'summary' | 'detailed'>('summary');
+
+    // Reconciliation State
+    const [reconWizardOpen, setReconWizardOpen] = useState(false);
 
     // Invoice Conversion State
     const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
@@ -556,6 +560,13 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                             <span style={{ fontSize: '16px' }}>←</span> Müşteri Merkezi
                         </Link>
                         <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                                onClick={() => setReconWizardOpen(true)}
+                                className="btn"
+                                style={{ background: '#10b981', border: '1px solid rgba(16, 185, 129, 0.4)', color: 'white', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '800', display: 'flex', gap: '8px', alignItems: 'center', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)' }}
+                            >
+                                🤝 Mutabakat
+                            </button>
                             <button
                                 onClick={() => { setStatementType('summary'); setStatementOpen(true); }}
                                 className="btn"
@@ -2179,6 +2190,17 @@ export default function CustomerDetailClient({ customer, historyList }: { custom
                 type={statementType}
                 entityType="CUSTOMER"
             />
+
+            {reconWizardOpen && (
+                <ReconciliationWizard
+                    customer={customer}
+                    onClose={() => setReconWizardOpen(false)}
+                    onSuccess={() => {
+                        // Refresh data after successful reconciliation mapping
+                        router.refresh();
+                    }}
+                />
+            )}
         </div >
     );
 }

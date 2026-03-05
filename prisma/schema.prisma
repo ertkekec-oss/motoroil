@@ -570,12 +570,79 @@ model Customer {
 
 enum ReconciliationStatus {
   DRAFT
+  GENERATED
   SENT
   VIEWED
+  SIGNING
   SIGNED
   REJECTED
   DISPUTED
   EXPIRED
+  VOID
+}
+
+enum ReconDeliveryMethod {
+  EMAIL
+  SMS
+  WHATSAPP
+  INTERNAL
+}
+
+enum ReconAuthMethod {
+  OTP
+  QUALIFIED_ESIGN
+  BOTH
+}
+
+enum ReconCounterpartyRole {
+  COUNTERPARTY
+  CC
+}
+
+enum ReconCounterpartyStatus {
+  PENDING
+  NOTIFIED
+  VIEWED
+  SIGNED
+  REJECTED
+}
+
+enum ReconDisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+  CANCELED
+}
+
+enum ReconDisputeReason {
+  AMOUNT_MISMATCH
+  MISSING_TX
+  DUPLICATE_TX
+  OTHER
+}
+
+enum ReconActorType {
+  USER
+  COUNTERPARTY
+  SYSTEM
+  ADMIN
+}
+
+enum ReconAuditAction {
+  CREATED
+  SNAPSHOT_GENERATED
+  SENT
+  VIEWED
+  SIGNING_STARTED
+  SIGNED
+  REJECTED
+  DISPUTE_OPENED
+  DISPUTE_RESOLVED
+  VOIDED
+  EXPIRED
+  CONTRACT_LINKED
+  GATE_SIGNAL_EMITTED
 }
 
 model Reconciliation {
@@ -587,14 +654,25 @@ model Reconciliation {
   balance          Decimal              @db.Decimal(15, 2)
   currency         String               @default("TRY")
   status           ReconciliationStatus @default(DRAFT)
+  deliveryMethod   ReconDeliveryMethod  @default(INTERNAL)
+  authMethod       ReconAuthMethod      @default(OTP)
   linkedContractId String? // Link to Contract engine
   linkedEnvelopeId String? // Link to Signature engine
+  signedAt         DateTime?
+  sentAt           DateTime?
+  viewedAt         DateTime?
+  dueAt            DateTime?
+  createdByUserId  String?
+  metaJson         Json?
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
 
-  customer Customer                @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  snapshot ReconciliationSnapshot?
-  items    ReconciliationItem[]
+  customer       Customer                     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  snapshot       ReconciliationSnapshot?
+  items          ReconciliationItem[]
+  counterparties ReconciliationCounterparty[]
+  disputes       ReconciliationDispute[]
+  auditEvents    ReconciliationAuditEvent[]
 
   @@index([tenantId])
   @@index([accountId])
@@ -618,14 +696,101 @@ model ReconciliationItem {
   id               String   @id @default(cuid())
   reconciliationId String
   transactionId    String? // B2BJournalEntry id or Transaction id
+  sourceType       String?  @default("LEDGER_TX")
   date             DateTime
   description      String
   debit            Decimal  @default(0) @db.Decimal(15, 2)
   credit           Decimal  @default(0) @db.Decimal(15, 2)
+  refJson          Json?
+  hashSha256       String?
+
+  reconciliation Reconciliation              @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+  disputeItems   ReconciliationDisputeItem[]
+
+  @@index([reconciliationId])
+}
+
+model ReconciliationCounterparty {
+  id               String                  @id @default(cuid())
+  tenantId         String
+  reconciliationId String
+  name             String
+  email            String?
+  phone            String?
+  whatsappPhone    String?
+  role             ReconCounterpartyRole   @default(COUNTERPARTY)
+  status           ReconCounterpartyStatus @default(PENDING)
+  lastNotifiedAt   DateTime?
+  createdAt        DateTime                @default(now())
 
   reconciliation Reconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
 
   @@index([reconciliationId])
+  @@index([tenantId])
+}
+
+model ReconciliationDispute {
+  id                 String             @id @default(cuid())
+  tenantId           String
+  reconciliationId   String
+  status             ReconDisputeStatus @default(OPEN)
+  reason             ReconDisputeReason @default(OTHER)
+  notes              String?
+  createdByActorType ReconActorType     @default(USER)
+  createdByActorId   String?
+  createdAt          DateTime           @default(now())
+  resolvedAt         DateTime?
+
+  reconciliation Reconciliation              @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+  items          ReconciliationDisputeItem[]
+
+  @@index([reconciliationId])
+  @@index([tenantId])
+}
+
+model ReconciliationDisputeItem {
+  id                   String   @id @default(cuid())
+  tenantId             String
+  disputeId            String
+  reconciliationItemId String?
+  proposedDebit        Decimal  @default(0) @db.Decimal(15, 2)
+  proposedCredit       Decimal  @default(0) @db.Decimal(15, 2)
+  notes                String?
+  createdAt            DateTime @default(now())
+
+  dispute            ReconciliationDispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  reconciliationItem ReconciliationItem?   @relation(fields: [reconciliationItemId], references: [id])
+
+  @@index([disputeId])
+}
+
+model ReconciliationAuditEvent {
+  id               String           @id @default(cuid())
+  tenantId         String
+  reconciliationId String
+  actorType        ReconActorType   @default(SYSTEM)
+  actorId          String?
+  action           ReconAuditAction
+  ip               String?
+  userAgent        String?
+  metaJson         Json?
+  createdAt        DateTime         @default(now())
+
+  reconciliation Reconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+
+  @@index([reconciliationId])
+  @@index([tenantId])
+}
+
+model ReconciliationPolicySnapshot {
+  id           String   @id @default(cuid())
+  tenantId     String
+  version      Int
+  settingsJson Json
+  hashSha256   String
+  createdAt    DateTime @default(now())
+
+  @@index([tenantId])
 }
 
 model ServiceRecord {
