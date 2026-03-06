@@ -5600,6 +5600,10 @@ model SignatureEnvelope {
   createdByUserId  String?
   createdAt        DateTime                @default(now())
   updatedAt        DateTime                @updatedAt
+  completedAt      DateTime?
+  signedDocumentKey String?
+  otpRequired      Boolean                 @default(false)
+  sequentialSigning Boolean                @default(true)
 
   recipients       SignatureRecipient[]
   sessions         SignatureSession[]
@@ -5651,6 +5655,13 @@ enum SignatureAuditAction {
   RECIPIENT_SIGNED
   RECIPIENT_REJECTED
   ENVELOPE_COMPLETED
+  INVITATION_SENT_EMAIL
+  INVITATION_SENT_SMS
+  NEXT_SIGNER_INVITED
+  OTP_SENT
+  OTP_VERIFIED
+  OTP_VERIFICATION_FAILED
+  ENVELOPE_FINALIZED
 }
 
 model SignatureAuditEvent {
@@ -5670,4 +5681,45 @@ model SignatureAuditEvent {
   @@index([tenantId])
 }
 
+
+
+// ------------------------------------------------------------------------------------------------
+// OTP & PROVIDER CONF V1
+// ------------------------------------------------------------------------------------------------
+
+model OtpProviderConfig {
+  id                  String    @id @default(cuid())
+  tenantId            String
+  providerName        String
+  isEnabled           Boolean   @default(false)
+  apiUsername         String?
+  apiPasswordEncrypted String?
+  sender              String?
+  otpTemplate         String?
+  codeLength          Int       @default(6)
+  ttlSeconds          Int       @default(180)
+  cooldownSeconds     Int       @default(60)
+  maxDailyAttempts    Int       @default(5)
+  testPhone           String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@unique([tenantId, providerName])
+  @@index([tenantId])
+}
+
+model OtpVerification {
+  id           String    @id @default(cuid())
+  tenantId     String
+  phone        String
+  codeHash     String
+  expiresAt    DateTime
+  usedAt       DateTime?
+  attempts     Int       @default(0)
+  sessionId    String?   // Links verification to a specific signing session
+  createdAt    DateTime  @default(now())
+
+  @@index([tenantId])
+  @@index([phone])
+}
 

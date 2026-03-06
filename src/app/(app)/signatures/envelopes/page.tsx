@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
-export default async function EnvelopesPage() {
+export default async function SignatureEnvelopesPage() {
     const session = await getSession();
     if (!session) return notFound();
 
@@ -12,9 +12,7 @@ export default async function EnvelopesPage() {
     const envelopes = await prisma.signatureEnvelope.findMany({
         where: { tenantId },
         orderBy: { createdAt: 'desc' },
-        include: {
-            recipients: true
-        }
+        include: { recipients: true }
     });
 
     return (
@@ -26,58 +24,51 @@ export default async function EnvelopesPage() {
                             <span style={{ fontSize: '16px' }}>←</span> Panoya Dön
                         </Link>
                         <h1 style={{ fontSize: '28px', fontWeight: '800', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-                            Belge ve Zarflar
+                            İmza Zarfları
                         </h1>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: 0 }}>Tüm imza süreçlerinizin detaylı listesi.</p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: 0 }}>Tüm dijital sözleşme zarfları ve operasyon durumları.</p>
                     </div>
-
-                    <button style={{ padding: '10px 20px', background: '#3b82f6', color: 'white', borderRadius: '12px', fontSize: '14px', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
-                        + Yeni Zarf Oluştur
-                    </button>
                 </div>
 
                 <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '24px', overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                         <thead>
                             <tr style={{ background: 'rgba(0,0,0,0.2)', borderBottom: '1px solid var(--border-color)' }}>
-                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Oluşturulma</th>
-                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Başlık (Zarf ID)</th>
-                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Alıcı Sayısı</th>
+                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tarih</th>
+                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Zarf Başlığı</th>
                                 <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Durum</th>
+                                <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Alıcı Sayısı</th>
                                 <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'right' }}>Aksiyonlar</th>
                             </tr>
                         </thead>
                         <tbody>
                             {envelopes.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>Mevcut zarf bulunmuyor.</td>
+                                    <td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>Henüz zarf oluşturulmadı.</td>
                                 </tr>
                             ) : envelopes.map((env: any) => (
                                 <tr key={env.id} className="hover:bg-slate-800/20" style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                    <td style={{ padding: '16px 24px', fontSize: '13px' }}>
-                                        {new Date(env.createdAt).toLocaleString()}
-                                    </td>
-                                    <td style={{ padding: '16px 24px', fontSize: '13px' }}>
-                                        <div style={{ fontWeight: '700', color: 'white' }}>{env.title}</div>
-                                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: '4px' }}>
-                                            Zarf: {env.id.substring(env.id.length - 8).toUpperCase()}
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '16px 24px', fontSize: '13px' }}>
-                                        <span style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', fontSize: '11px', color: 'var(--text-muted)' }}>{env.recipients?.length || 0} Kişi</span>
+                                    <td style={{ padding: '16px 24px', fontSize: '13px' }}>{new Date(env.createdAt).toLocaleDateString()}</td>
+                                    <td style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 'bold' }}>
+                                        {env.title}
+                                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{env.documentFileName}</div>
                                     </td>
                                     <td style={{ padding: '16px 24px' }}>
                                         <span style={{
-                                            padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '800',
-                                            background: env.status === 'PENDING' ? 'rgba(245,158,11,0.1)' : env.status === 'COMPLETED' ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)',
-                                            color: env.status === 'PENDING' ? '#f59e0b' : env.status === 'COMPLETED' ? '#10b981' : 'var(--text-muted)'
+                                            padding: '4px 12px',
+                                            borderRadius: '6px',
+                                            fontSize: '11px',
+                                            fontWeight: '800',
+                                            background: env.status === 'COMPLETED' ? 'rgba(16,185,129,0.1)' : env.status === 'REJECTED' || env.status === 'FAILED' ? 'rgba(239,68,68,0.1)' : 'rgba(59,130,246,0.1)',
+                                            color: env.status === 'COMPLETED' ? '#10b981' : env.status === 'REJECTED' || env.status === 'FAILED' ? '#ef4444' : '#3b82f6'
                                         }}>
                                             {env.status}
                                         </span>
                                     </td>
+                                    <td style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 'bold' }}>{env.recipients.length} Kişi</td>
                                     <td style={{ padding: '16px 24px', textAlign: 'right' }}>
-                                        <Link href={`/signatures/envelopes/${env.id}`} style={{ display: 'inline-flex', padding: '6px 16px', background: 'rgba(255,255,255,0.05)', color: 'white', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', fontWeight: '600' }} className="hover:bg-white/10">
-                                            Detay
+                                        <Link href={`/signatures/envelopes/${env.id}`} style={{ padding: '6px 16px', background: 'rgba(255,255,255,0.05)', color: 'white', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: '600', textDecoration: 'none' }} className="hover:bg-white/10">
+                                            Detayları Görüntüle
                                         </Link>
                                     </td>
                                 </tr>
